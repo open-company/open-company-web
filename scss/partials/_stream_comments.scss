@@ -5,15 +5,12 @@ div.stream-comments {
   margin-top: 16px;
   padding-top: 16px;
 
-  &.editing {
-    div.stream-comments-list {
-      div.streacm-comment {
-        @include big_web(){
-          &:hover {
+  @include big_web(){
+    &.editing {
+      div.stream-comments-list {
+        div.stream-comment-thread div.stream-comment-outer {
+          &.open-thread:hover, &.showing-picker.open-thread {
             background-color: transparent;
-            div.stream-comment-floating-buttons {
-              display: none;
-            }
           }
         }
       }
@@ -22,29 +19,39 @@ div.stream-comments {
 
   div.stream-comments-list {
 
-    div.stream-comment-outer {
-      padding: 0;
+    div.stream-comment-thread {
+      margin-bottom: 16px;
       position: relative;
 
-      @include big_web() {
-        width: calc(100% + 16px);
-        padding-left: 8px;
-        padding-right: 8px;
-        margin-left: -8px;
+      button.expand-thead-bt {
+        width: 100%;
+        height: 28px;
+        padding: 0 0 4px 48px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+        text-align: left;
+        position: relative;
 
-        &.not-highlighted.open-thread:hover {
-          background-color: var(--opac-background-color-05);
-          border-radius: 4px;
-        }
+        &:before {
+          content: "";
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background-color: #000000;
+          background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+          background-size: 16px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: absolute;
+          left: 9px;
+          top: 4px;
 
-        &.not-highlighted:not(.open-thread):not(.showing-add-comment):hover div.stream-comment.indented-comment div.stream-comment-inner {
-          background-color: var(--opac-background-color-05);
-          border-radius: 4px;
-        }
-
-        &.not-highlighted:not(.open-thread).showing-add-comment div.stream-comment.indented-comment:hover div.stream-comment-inner {
-          background-color: var(--opac-background-color-05);
-          border-radius: 4px;
+          @include dark_mode(){
+            background-color: #FFFFFF;
+            background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+          }
         }
       }
 
@@ -52,12 +59,16 @@ div.stream-comments {
         &:before {
           content: "";
           width: 2px;
-          height: 100%;
+          height: calc(100% - 26px);
           position: absolute;
-          left: 23px;
-          top: 0;
+          left: 16px;
+          top: 24px;
           background-color: var(--opac-background-color-1);
         }
+
+        // &.has-new:before {
+        //   background-color: rgba($carrot_green, 0.4);
+        // }
 
         &.open-thread:before {
           height: calc(100% - 16px);
@@ -65,577 +76,544 @@ div.stream-comments {
         }
       }
 
-      &.open-thread {
-        &:not(:first-child) {
-          margin-top: 16px;
-        }
-      }
-
-      div.stream-comment.indented-comment div.stream-comment-inner {
-        margin-left: 40px;
-        width: calc(100% - 40px);
-        padding: 8px 0 8px 8px;
-
-        @include mobile() {
-          display: block;
-
-          div.more-menu {
-            button.more-menu-bt {
-              background-position: 0px left 4px top;
-              margin-top: -4px;
-              background-color: transparent;
-            }
-
-            ul.more-menu-list {
-              width: 94px;
-              top: 20px;
-              right: 13px;
-              left: unset;
-            }
-          }
-        }
-      }
-
-      &:not(.editing):hover {
-        div.stream-comment-floating-buttons {
-          display: block;
-        }
-      }
-
-      &.not-highlighted {
-        background-color: transparent;
-      }
-
-      &.highlighted {
-        background-color: #FFF7DD;
-        transition: background-color 3s ease-in;
-
-        @include dark_mode() {
-          background-color: rgba(0, 0, 0, 0.15);
-        }
-      }
-
-      div.stream-comment {
+      div.stream-comment-outer {
+        padding: 0;
         position: relative;
 
-        div.stream-comment-inner {
-          padding: 8px 0;
-        }
+        @include big_web() {
+          width: calc(100% + 16px);
+          padding-left: 8px;
+          padding-right: 8px;
+          margin-left: -8px;
 
-        &.add-comment-container {
-          padding-bottom: 8px;
-        }
-
-        div.stream-comment-mobile-menu {
-          display: none;
-          float: right;
-
-          div.emoji-picker-container {
-            button.close-bt {
-              display: none;
-            }
+          &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
+            background-color: var(--comments-floating-bt-background);
+            border-radius: 4px;
           }
+
+          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment:hover div.stream-comment div.stream-comment-inner,
+          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment.showing-picker div.stream-comment div.stream-comment-inner {
+            background-color: var(--comments-floating-bt-background);
+            border-radius: 4px;
+          }
+        }
+
+        &.open-thread {
+          &:not(:first-child) {
+            margin-top: 16px;
+          }
+        }
+
+        &.indented-comment div.stream-comment div.stream-comment-inner {
+          margin-left: 40px;
+          width: calc(100% - 32px);
+          padding: 8px 0 8px 8px;
 
           @include mobile() {
             display: block;
 
-            div.emoji-picker-container {
-              width: 100vw;
-              position: fixed;
-              top: 0;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              height: 100vh;
-              background-color: white;
-              z-index: 104;
-              padding-top: 29px;
-
-              button.close-bt {
-                color: var(--color);
-                padding: 0;
-                margin: 0;
-                @include OC_Body_Bold();
-                font-size: 16px;
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                display: block;
-              }
-
-              div.emoji-mart {
-                position: relative;
-                width: 100% !important;
-                height: calc(100vh - 29px);
-                bottom: unset;
-                box-shadow: none;
-                border-radius: none;
-                border: none;
-
-                div.emoji-mart-scroll {
-                  height: calc(100vh - 29px - 46px - 29px);
-                }
-
-                div.emoji-mart-bar:last-child {
-                  display: none;
-                }
-              }
-            }
-
             div.more-menu {
               button.more-menu-bt {
-                margin-top: -12px;
-                margin-left: 7px;
+                background-position: 0px left 4px top;
+                margin-top: -4px;
                 background-color: transparent;
               }
 
               ul.more-menu-list {
                 width: 94px;
                 top: 20px;
-                right: 0;
+                right: 13px;
                 left: unset;
               }
             }
           }
         }
 
-        &.showing-picker {
-          div.stream-comment-floating-buttons {
-            background-color: var(--comments-floating-bt-background);
+        &:hover, &.showing-picker {
+          div.stream-comment div.stream-comment-floating-buttons {
             display: block;
           }
         }
 
-        &.editing {
-          @include big_web() {
-            &:not(.highlighted):hover div.stream-comment-inner {
-              background-color: initial;
-            }
-          }
+        &.new-comment {
+          background-color: rgba(#3FBD7C, 0.16);
+          border-radius: 8px;
+          margin-bottom: 1px;
 
-          div.stream-comment-header {
-            display: none;
-          }
+          &.indented-comment {
+            background-color: transparent;
 
-          div.stream-comment-content {
-            div.stream-comment-body, div.stream-comment-body.medium-editor-element {
-              // editing comment
-              display: block;
-              margin-top: 0;
-              border-radius: 4px;
-              border: 1px solid var(--divider-line);
-              background-color: var(--overlay-background-color);
-              outline: none;
-              padding: 4px;
-              box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-              padding: 8px 16px;
-
-              @include dark_mode() {
-                box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.24);
-              }
-
-              &:focus, &:active {
-                outline: none;
-              }
+            div.stream-comment div.stream-comment-inner {
+              background-color: rgba(#3FBD7C, 0.16);
+              border-radius: 8px;
             }
           }
         }
 
-        div.stream-comment-floating-buttons {
-          position: absolute;
-          top: -8px;
-          right: -24px;
-          height: 32px;
-          z-index: 2;
-          display: none;
-          border-radius: 4px;
-          box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-          background-color: var(--color);
+        div.stream-comment {
+          position: relative;
 
-          @include dark_mode() {
-            box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+          div.stream-comment-inner {
+            padding: 8px 0;
           }
 
-          div.more-bt-container {
-            height: 32px;
-            float: left;
-            position: relative;
-
-            div.comment-more-menu-container {
-              position: absolute;
-              top: 34px;
-              left: 0;
-              padding: 8px 0;
-              border-radius: 4px;
-              width: 78px;
-              outline: none;
-              z-index: 110;
-              background-color: var(--overlay-background-color);
-              border: 1px solid var(--divider-line);
-
-              button {
-                padding: 0;
-                margin: 0;
-                @include OC_Body_Book();
-                font-size: 14px;
-                color: var(--color);
-                line-height: 18px;
-                cursor: pointer;
-                padding: 8px 16px;
-                background-color: var(--overlay-background-color);
-                position: relative;
-              }
-            }
+          &.add-comment-container {
+            padding-bottom: 8px;
           }
 
-          div.react-bt-container {
-            // width: 30px;
-            height: 32px;
-            float: left;
-
-            div.emoji-mart {
-              position: absolute;
-              top: 28px;
-              right: 0;
-              bottom: unset;
-              left: unset;
-            }
+          div.stream-comment-mobile-menu {
+            display: none;
+            float: right;
 
             div.emoji-picker-container {
               button.close-bt {
                 display: none;
               }
             }
+
+            @include mobile() {
+              display: block;
+
+              div.emoji-picker-container {
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 100vh;
+                background-color: white;
+                z-index: 104;
+                padding-top: 29px;
+
+                button.close-bt {
+                  color: var(--color);
+                  padding: 0;
+                  margin: 0;
+                  @include OC_Body_Bold();
+                  font-size: 16px;
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  display: block;
+                }
+
+                div.emoji-mart {
+                  position: relative;
+                  width: 100% !important;
+                  height: calc(100vh - 29px);
+                  bottom: unset;
+                  box-shadow: none;
+                  border-radius: none;
+                  border: none;
+
+                  div.emoji-mart-scroll {
+                    height: calc(100vh - 29px - 46px - 29px);
+                  }
+
+                  div.emoji-mart-bar:last-child {
+                    display: none;
+                  }
+                }
+              }
+
+              div.more-menu {
+                button.more-menu-bt {
+                  margin-top: -12px;
+                  margin-left: 7px;
+                  background-color: transparent;
+                }
+
+                ul.more-menu-list {
+                  width: 94px;
+                  top: 20px;
+                  right: 0;
+                  left: unset;
+                }
+              }
+            }
           }
 
-          div.react-bt-container .tooltip {
-            width: 86px;
-          }
-
-          .separator-bt {
-            border-left: 1px solid rgba(white, 0.1);
-          }
-
-          button.floating-bt {
-            padding: 0;
+          div.stream-comment-floating-buttons {
+            position: absolute;
+            top: -8px;
+            right: -24px;
             height: 32px;
-            min-width: 20px;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 0 8px;
-            float: left;
-            @include OC_Body_Bold();
-            font-size: 12px;
-            line-height: 32px;
-            color: var(--overlay-background-color);
-            text-transform: uppercase;
+            z-index: 2;
+            display: none;
+            border-radius: 4px;
+            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+            background-color: var(--color);
 
-            @include big_web() {
-              opacity: 0.5;
-              &:hover {
-                opacity: 1;
+            @include dark_mode() {
+              box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+            }
 
-                &:before {
-                  opacity: 0.5;
+            div.more-bt-container {
+              height: 32px;
+              float: left;
+              position: relative;
+
+              div.comment-more-menu-container {
+                position: absolute;
+                top: 34px;
+                left: 0;
+                padding: 8px 0;
+                border-radius: 4px;
+                width: 78px;
+                outline: none;
+                z-index: 110;
+                background-color: var(--overlay-background-color);
+                border: 1px solid var(--divider-line);
+
+                button {
+                  padding: 0;
+                  margin: 0;
+                  @include OC_Body_Book();
+                  font-size: 14px;
+                  color: var(--color);
+                  line-height: 18px;
+                  cursor: pointer;
+                  padding: 8px 16px;
+                  background-color: var(--overlay-background-color);
+                  position: relative;
                 }
               }
             }
 
-            &.more-bt {
-              padding-left: 30px;
-              background-image: cdnUrl("/img/ML/comment_more.svg");
-              background-size: 18px 4px;
-              background-position: left 8px top 14px;
-            }
-
-            &.share-bt {
-              padding-left: 24px;
-              background-image: cdnUrl("/img/ML/comment_share.svg");
-              background-size: 12px 12px;
-              background-position: left 8px top 10px;
-            }
-
-            &.reply-bt {
-              padding-left: 24px;
-              background-image: cdnUrl("/img/ML/comment_reply.svg");
-              background-size: 12px 12px;
-              background-position: left 8px top 10px;
-            }
-
-            &.react-bt {
-              padding-left: 26px;
-              background-image: cdnUrl("/img/ML/comment_react.svg");
-              background-size: 14px 14px;
-              background-position: left 8px top 9px;
-              border-right: none;
+            div.react-bt-container {
+              // width: 30px;
+              height: 32px;
+              float: left;
 
               div.emoji-mart {
-                right: 0;
-                left: unset;
                 position: absolute;
-                top: 34px;
+                top: 0;
+                right: 0;
+                bottom: unset;
+                left: unset;
+              }
+
+              div.emoji-picker-container {
+                button.close-bt {
+                  display: none;
+                }
               }
             }
 
-            @include dark_mode() {
+            div.react-bt-container .tooltip {
+              width: 86px;
+            }
+
+            .separator-bt {
+              border-left: 1px solid rgba(white, 0.1);
+            }
+
+            button.floating-bt {
+              padding: 0;
+              height: 32px;
+              min-width: 20px;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 0 8px;
+              float: left;
+              @include OC_Body_Bold();
+              font-size: 12px;
+              line-height: 32px;
+              color: var(--overlay-background-color);
+              text-transform: uppercase;
+
+              @include big_web() {
+                opacity: 0.5;
+                &:hover {
+                  opacity: 1;
+
+                  &:before {
+                    opacity: 0.5;
+                  }
+                }
+              }
+
               &.more-bt {
-                background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+                padding-left: 30px;
+                background-image: cdnUrl("/img/ML/comment_more.svg");
+                background-size: 18px 4px;
+                background-position: left 8px top 14px;
               }
 
               &.share-bt {
-                background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+                padding-left: 24px;
+                background-image: cdnUrl("/img/ML/comment_share.svg");
+                background-size: 12px 12px;
+                background-position: left 8px top 10px;
               }
 
               &.reply-bt {
-                background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                padding-left: 24px;
+                background-image: cdnUrl("/img/ML/comment_reply.svg");
+                background-size: 12px 12px;
+                background-position: left 8px top 10px;
               }
 
               &.react-bt {
-                background-image: cdnUrl("/img/ML/comment_react@dark.svg");
-              }
-            }
-          }
-        }
+                padding-left: 26px;
+                background-image: cdnUrl("/img/ML/comment_react.svg");
+                background-size: 14px 14px;
+                background-position: left 8px top 9px;
+                border-right: none;
 
-        div.stream-comment-author-avatar {
-          float: left;
-          width: 32px;
-          height: 32px;
-
-          @include user-profile(32);
-        }
-
-        div.stream-comment-right {
-          margin-left: 48px;
-
-          @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
-
-          @include dark_mode() {
-            @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
-          }
-        }
-
-        div.stream-comment-header {
-          height: 24px;
-
-          @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
-
-          @include dark_mode() {
-            @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
-          }
-
-          div.stream-comment-author-right {
-            float: left;
-            max-width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            flex-wrap: nowrap;
-            height: 18px;
-
-            @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
-
-            @include dark_mode() {
-              @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
-            }
-
-            div.stream-comment-author-name {
-              @include OC_Body_Bold();
-              font-size: 14px;
-              color: var(--color);
-              line-height: 16px;
-              float: left;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-
-              @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
-
-              @include dark_mode() {
-                @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
-              }
-            }
-
-            @include mobile() {
-              max-width: 80%;
-            }
-
-            div.stream-comment-author-right-group {
-              width: auto;
-              flex: 1 1 auto;
-              display: flex;
-              flex-direction: row;
-              flex-wrap: nowrap;
-              align-items: flex-start;
-              max-width: 100%;
-
-              &.new-comment {
-                max-width: calc(100% - 43px);
-              }
-
-              div.stream-comment-author-name {
-                flex: 1 0 auto;
-
-                @include mobile() {
-                  flex: 1 1 auto;
+                div.emoji-mart {
+                  right: 0;
+                  left: unset;
+                  position: absolute;
+                  top: 34px;
                 }
               }
 
-              div.stream-comment-author-timestamp {
-                flex: 0 0 auto;
+              @include dark_mode() {
+                &.more-bt {
+                  background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+                }
+
+                &.share-bt {
+                  background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+                }
+
+                &.reply-bt {
+                  background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                }
+
+                &.react-bt {
+                  background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                }
               }
             }
+          }
 
-            div.stream-comment-author-name {
-              @include OC_Body_Bold();
-              font-size: 14px;
-              color: var(--color);
-              line-height: 18px;
-              float: left;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              height: 18px;
+          div.stream-comment-author-avatar {
+            float: left;
+            width: 32px;
+            height: 32px;
+
+            @include user-profile(32);
+          }
+
+          div.stream-comment-right {
+            margin-left: 48px;
+
+            @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
+
+            @include dark_mode() {
+              @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
+            }
+          }
+
+          div.stream-comment-header {
+            height: 24px;
+
+            @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
+
+            @include dark_mode() {
+              @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
             }
 
-            div.stream-comment-author-timestamp {
+            div.stream-comment-author-right {
+              float: left;
+              max-width: 100%;
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              flex-wrap: nowrap;
+              height: 18px;
+
+              @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
+
+              @include dark_mode() {
+                @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
+              }
+
+              div.stream-comment-author-name {
+                @include OC_Body_Bold();
+                font-size: 14px;
+                color: var(--color);
+                line-height: 16px;
+                float: left;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
+
+                @include dark_mode() {
+                  @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
+                }
+              }
+
+              @include mobile() {
+                max-width: 80%;
+              }
+
+              div.stream-comment-author-right-group {
+                width: auto;
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: flex-start;
+                max-width: 100%;
+
+                &.new-comment {
+                  max-width: calc(100% - 43px);
+                }
+
+                div.stream-comment-author-name {
+                  flex: 1 0 auto;
+
+                  @include mobile() {
+                    flex: 1 1 auto;
+                  }
+                }
+
+                div.stream-comment-author-timestamp {
+                  flex: 0 0 auto;
+                }
+              }
+
+              div.stream-comment-author-name {
+                @include OC_Body_Bold();
+                font-size: 14px;
+                color: var(--color);
+                line-height: 18px;
+                float: left;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                height: 18px;
+              }
+
+              div.stream-comment-author-timestamp {
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: var(--light-color);
+                float: left;
+                margin-left: 6px;
+                line-height: 18px;
+                height: 18px;
+              }
+
+              div.new-comment-tag {
+                flex: 0 0 37px;
+                margin-left: 8px;
+                width: 37px;
+                height: 18px;
+                position: relative;
+
+                &:before {
+                  @include OC_Body_Bold();
+                  font-size: 12px;
+                  line-height: 18px;
+                  content: "(NEW)";
+                  color: $carrot_green;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                }
+              }
+            }
+          }
+
+          div.stream-comment-content {
+            text-align: left;
+            position: relative;
+
+            div.stream-comment-body {
+              display: inline;
+              @include activity-comment(15px, 18px, 12px);
+
+              @include mobile() {
+                @include activity-comment(18px, 24px, 16px);
+              }
+
+              .interactive-image {
+                cursor: zoom-in;
+
+                &:hover {
+                  opacity: 0.7;
+                }
+              }
+            }
+          }
+
+          div.stream-comment-reactions-footer {
+            height: 26px;
+            margin-top: 8px;
+
+            @include mobile() {
+              margin-bottom: 8px;
+            }
+          }
+
+          div.stream-comment-footer {
+            height: 24px;
+            margin-top: 2px;
+
+            @include mobile() {
+              margin-top: 8px;
+            }
+          }
+
+          div.save-cancel-edit-buttons {
+            float: right;
+            padding-top: 16px;
+
+            @include mobile() {
+              padding-top: 0;
+            }
+
+            button {
+              float: right;
               @include OC_Body_Book();
               font-size: 14px;
-              color: var(--light-color);
-              float: left;
-              margin-left: 6px;
+              padding: 0;
+              height: 18px;
               line-height: 18px;
-              height: 18px;
-            }
 
-            div.new-comment-tag {
-              flex: 0 0 34px;
-              margin-left: 8px;
-              width: 34px;
-              height: 18px;
-              background-image: cdnUrl("/img/ML/new_comment_tag.svg");
-              background-size: 34px 18px;
-              background-position: center;
-              background-repeat: no-repeat;
-            }
-          }
-        }
+              &.cancel-bt {
+                color: var(--light-color);
+                margin-right: 16px;
+              }
 
-        div.stream-comment-content {
-          text-align: left;
-          position: relative;
-
-          div.stream-comment-body {
-            display: inline;
-            @include activity-comment(15px, 18px, 12px);
-
-            @include mobile() {
-              @include activity-comment(18px, 24px, 16px);
-            }
-
-            .interactive-image {
-              cursor: zoom-in;
-
-              &:hover {
-                opacity: 0.7;
+              &.save-bt {
+                color: $carrot_green;
               }
             }
           }
         }
 
-        div.stream-comment-reactions-footer {
-          height: 26px;
-          margin-top: 8px;
-
-          @include mobile() {
-            margin-bottom: 8px;
-          }
+        div.stream-comment div.add-comment-box-container {
+          padding-top: 8px;
         }
 
-        div.stream-comment-footer {
-          height: 24px;
-          margin-top: 2px;
-
-          @include mobile() {
-            margin-top: 8px;
-          }
-        }
-
-        div.save-cancel-edit-buttons {
-          float: right;
-          padding-top: 16px;
-
-          @include mobile() {
-            padding-top: 0;
-          }
-
-          button {
-            float: right;
-            @include OC_Body_Book();
-            font-size: 14px;
-            padding: 0;
-            height: 18px;
-            line-height: 18px;
-
-            &.cancel-bt {
-              color: var(--light-color);
-              margin-right: 16px;
-            }
-
-            &.save-bt {
-              color: $carrot_green;
-            }
-          }
-        }
-      }
-
-      div.stream-comment div.add-comment-box-container {
-        padding-top: 8px;
-      }
-
-      div.stream-comment.indented-comment {
-        div.add-comment-box-container {
-          margin-left: 48px;
-
-          @include mobile() {
-            margin-left: 0;
-          }
-
-          div.add-comment-box {
-            width: calc(100% - 48px);
+        &.indented-comment div.stream-comment {
+          div.add-comment-box-container {
+            margin-left: 48px;
 
             @include mobile() {
-              width: 100%;
+              margin-left: 0;
             }
 
-            div.add-comment-footer.hide-footer {
-              display: none;
+            div.add-comment-box {
+              width: calc(100% - 48px);
+
+              @include mobile() {
+                width: 100%;
+              }
+
+              div.add-comment-footer.hide-footer {
+                display: none;
+              }
             }
           }
-        }
-      }
-    }
-
-    div.stream-comments-expand {
-      text-align: center;
-      cursor: pointer;
-      margin: 14px 0 8px;
-
-      span.collapse-expand-list {
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: var(--light-color);
-        padding-left: 22px;
-
-        background-image: cdnUrl("/img/ML/expand_comments.svg");
-        background-size: 14px 8px;
-        background-position: 0px 3px;
-        background-repeat: no-repeat;
-      }
-
-      &.expanded {
-        span.collapse-expand-list {
-          background-image: cdnUrl("/img/ML/collapse_comments.svg");
         }
       }
     }

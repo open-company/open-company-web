@@ -1,6 +1,7 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
             [cljsjs.emoji-mart]
+            [clojure.data :refer (diff)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -46,7 +47,7 @@
 (defn delete-clicked [e activity-data comment-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
-                    :message (if (pos? (:children-count comment-data))
+                    :message (if (seq (:thread-children comment-data))
                                "Delete this comment thread?"
                                "Delete this comment?")
                     :link-button-title "No"
@@ -79,23 +80,6 @@
     (utils/copy-to-clipboard input-field)
     (.removeChild (.-body js/document) input-field)))
 
-(defn- highlight-comment [s comment-id scroll?]
-  (when-let [comment-node (rum/ref-node s (str "stream-comment-" comment-id))]
-    (utils/after 10 (fn [_]
-     (swap! (::highlighting-comments s) #(conj % comment-id)
-     (when scroll?
-       (.scrollIntoView comment-node #js {:behavior "smooth" :block "center"}))
-     (utils/after 1000 (fn [_] (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
-
-(defn- maybe-highlight-comment [s]
-  (let [comments-data (-> s :rum/args first :comments-data)]
-    (when (and (seq comments-data)
-               (router/current-comment-id)
-               (not @(::initial-comment-scroll s))
-               (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
-      (reset! (::initial-comment-scroll s) true)
-      (highlight-comment s (router/current-comment-id) true))))
-
 (defn share-clicked [comment-data]
   (copy-comment-url (:url comment-data))
   (notification-actions/show-notification {:title "Share link copied to clipboard"
@@ -103,6 +87,29 @@
                                            :expire 3
                                            :id (keyword (str "comment-url-copied-"
                                             (:uuid comment-data)))}))
+
+(defn- thread-mark-read [s thread-uuid]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
+    (swap! (::threads s) (fn [threads]
+                           (-> threads
+                             (assoc-in [idx :new] false)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :new false) children))))))))
+
+(defn- comment-mark-read [s comment-data]
+  (let [threads @(::threads s)]
+    (if-not (seq (:parent-uuid comment-data))
+      (thread-mark-read s (:uuid comment-data))
+      (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
+        (swap! (::threads s) (fn [threads]
+                               (update-in threads [idx :thread-children]
+                                (fn [children]
+                                  (map #(if (= (:uuid %) (:uuid comment-data))
+                                          (assoc % :new false)
+                                          %)
+                                   children)))))))))
 
 (rum/defc emoji-picker < (when (responsive/is-mobile-size?)
                            ui-mixins/no-scroll-mixin)
@@ -125,9 +132,174 @@
       (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
        (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+         (comment-mark-read s comment-data)
          (comment-actions/react-from-picker activity-data comment-data
           (gobj/get emoji "native")))
        (reset! (::show-picker s) nil))}))))
+
+(rum/defc edit-comment < rum/static
+  [{:keys [activity-data comment-data closing-thread dismiss-reply-cb
+           edit-comment-key is-indented-comment?]}]
+  [:div.stream-comment-outer
+    {:key (str "stream-comment-" (:created-at comment-data))
+     :data-comment-uuid (:uuid comment-data)
+     :class (utils/class-set {:open-thread (not is-indented-comment?)
+                              :closing-thread closing-thread
+                              :indented-comment is-indented-comment?})}
+    [:div.stream-comment
+      (rum/with-key
+       (add-comment {:activity-data activity-data
+                     :parent-comment-uuid (:reply-parent comment-data)
+                     :dismiss-reply-cb dismiss-reply-cb
+                     :edit-comment-data comment-data})
+       (str "edit-comment-" edit-comment-key))]])
+
+
+(rum/defc read-comment < rum/static
+  [{:keys [activity-data comment-data closing-thread editing?
+           edit-comment-key is-indented-comment? mouse-leave-cb
+           edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
+           is-mobile? can-show-edit-bt? can-show-delete-bt?
+           show-more-menu showing-picker? did-react-cb new-thread?]}]
+  [:div.stream-comment-outer
+    {:key (str "stream-comment-" (:created-at comment-data))
+     :data-comment-uuid (:uuid comment-data)
+     :class (utils/class-set {:open-thread (not is-indented-comment?)
+                              :closing-thread closing-thread
+                              :new-comment (:new comment-data)
+                              :indented-comment is-indented-comment?
+                              :showing-picker showing-picker?})}
+    [:div.stream-comment
+      {:ref (str "stream-comment-" (:uuid comment-data))
+       :class (utils/class-set {:editing-other-comment editing?})
+       :on-mouse-leave mouse-leave-cb}
+      [:div.stream-comment-inner
+        (when is-mobile?
+          [:div.stream-comment-mobile-menu
+            (more-menu {:entity-data comment-data
+                        :external-share false
+                        :entity-type "comment"
+                        :show-edit? true
+                        :edit-cb edit-cb
+                        :show-delete? true
+                        :delete-cb delete-cb
+                        :can-comment-share? true
+                        :comment-share-cb share-cb
+                        :can-react? true
+                        :react-cb react-cb
+                        :can-reply? true
+                        :reply-cb reply-cb})
+            emoji-picker])
+        [:div.stream-comment-author-avatar
+          (user-avatar-image (:author comment-data))]
+
+        [:div.stream-comment-right
+          [:div.stream-comment-header.group
+            {:class utils/hide-class}
+            [:div.stream-comment-author-right
+              [:div.stream-comment-author-right-group
+                {:class (when (:new comment-data) "new-comment")}
+                [:div.stream-comment-author-name
+                  (:name (:author comment-data))]
+                [:div.stream-comment-author-timestamp
+                  [:time
+                    {:date-time (:created-at comment-data)
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip comment-data)}
+                    (utils/foc-date-time (:created-at comment-data))]]]
+              (when (and (:new comment-data)
+                         (or (and is-indented-comment?
+                                  (not new-thread?))
+                             (not is-indented-comment?)))
+                [:div.new-comment-tag])
+              (if (responsive/is-mobile-size?)
+                [:div.stream-comment-mobile-menu
+                  (more-menu comment-data nil {:external-share false
+                                               :entity-type "comment"
+                                               :show-edit? true
+                                               :edit-cb edit-cb
+                                               :show-delete? true
+                                               :delete-cb delete-cb
+                                               :can-comment-share? true
+                                               :comment-share-cb share-cb
+                                               :can-react? true
+                                               :react-cb react-cb
+                                               :can-reply? true
+                                               :reply-cb reply-cb})
+                  emoji-picker]
+                [:div.stream-comment-floating-buttons
+                  {:key (str "stream-comment-floating-buttons"
+                         (when can-show-edit-bt?
+                           "-edit")
+                         (when can-show-delete-bt?
+                           "-delete"))}
+                  (if (or can-show-delete-bt?
+                          can-show-edit-bt?)
+                    [:div.more-bt-container.separator-bt
+                      [:button.mlb-reset.floating-bt.more-bt.separator-bt
+                        {:on-click #(reset! show-more-menu (:uuid comment-data))}
+                        "More"]
+                      (when (= @show-more-menu (:uuid comment-data))
+                        [:div.comment-more-menu-container
+                          [:button.mlb-reset.share-bt
+                            {:on-click share-cb}
+                            "Share"]
+                          (when can-show-delete-bt?
+                            [:button.mlb-reset.delete-bt
+                              {:on-click #(delete-cb comment-data)}
+                              "Delete"])
+                          (when can-show-edit-bt?
+                            [:button.mlb-reset.edit-bt
+                              {:on-click #(edit-cb comment-data)}
+                              "Edit"])])]
+                    [:button.mlb-reset.floating-bt.share-bt.separator-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click share-cb
+                       :title "Copy link"}
+                      "Share"])
+                  ;; Reply to comment
+                  (when (:reply-parent comment-data)
+                    [:button.mlb-reset.floating-bt.reply-bt.separator-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click reply-cb
+                       :title "Reply"}
+                      "Reply"])
+                  ;; React container
+                  [:div.react-bt-container.separator-bt
+                    [:button.mlb-reset.floating-bt.react-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Add reaction"
+                       :on-click react-cb}
+                      "React"]
+                    emoji-picker]])]]
+          [:div.stream-comment-content
+            [:div.stream-comment-body.oc-mentions.oc-mentions-hover
+              {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+               :ref (str "comment-body-" (:uuid comment-data))
+               :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                        utils/hide-class true})}]]
+          (when (seq (:reactions comment-data))
+            [:div.stream-comment-reactions-footer.group
+              (reactions {:entity-data comment-data
+                          :hide-picker (zero? (count (:reactions comment-data)))
+                          :did-react-cb did-react-cb
+                          :optional-activity-data activity-data})])]]]])
+
+(defn- expand-thread [s comment-data]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) (:uuid comment-data)))]
+    (swap! (::threads s) (fn [thread]
+                           (-> thread
+                             (assoc-in [idx :collapsed-count] 0)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :expanded true) children))))))))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -139,9 +311,9 @@
                              (rum/local nil ::show-picker)
                              (rum/local #{} ::replying-to)
                              (rum/local {} ::comment-url-copy)
-                             (rum/local #{} ::highlighting-comments)
                              (rum/local false ::initial-comment-scroll)
                              (rum/local nil ::show-more-menu)
+                             (rum/local [] ::threads)
                              (drv/drv :add-comment-force-update)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
@@ -163,231 +335,149 @@
                                       (scroll-to-bottom s))))
                                s)
                              :will-mount (fn [s]
+                              (let [{:keys [current-user-id last-read-at comments-data]} (-> s :rum/args first)
+                                    threads (cu/collapsed-comments current-user-id last-read-at comments-data)]
+                                (reset! (::threads s) threads))
+                              ;; Restore cached comments
                               (let [add-comment-data @(drv/get-ref s :add-comment-data)
                                     {:keys [activity-data comments-data]} (-> s :rum/args first)]
                                 (mapv (fn [comment]
                                         (let [comment-key (dis/add-comment-string-key (:uuid activity-data) (:uuid comment))]
                                           (when (seq (get add-comment-data comment-key))
                                             (swap! (::replying-to s) #(conj % (:uuid comment))))))
-                                 (filter (comp nil? :parent-uuid) comments-data)))
+                                 comments-data))
                               s)
                              :did-mount (fn [s]
-                              (maybe-highlight-comment s)
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)
-                             :did-update (fn [s]
-                              (maybe-highlight-comment s)
-                              s)
                              :did-remount (fn [o s]
-                              (when (not= (-> o :rum/args first :comments-data count) (-> s :rum/args first :comments-data count))
-                                 (reset! (::replying-to s) #{}))
-                              (let [new-added-comment (-> s :rum/args first :new-added-comment)]
-                                (when new-added-comment
-                                  (utils/after 180 #(highlight-comment s new-added-comment false))
-                                  (comment-actions/add-comment-highlight-reset)))
+                              (let [{:keys [comments-data current-user-id last-read-at]} (-> s :rum/args first)
+                                    comments-diff (diff (-> o :rum/args first :comments-data) comments-data)]
+                                (when (or (seq (first comments-diff))
+                                          (seq (second comments-diff))
+                                          (not= last-read-at (-> o :rum/args first :last-read-at)))
+                                  (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
+                                        collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :new]) all-comments))]
+                                    (reset! (::threads s) (cu/collapsed-comments current-user-id last-read-at comments-data collapsed-map)))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        threads @(::threads s)
+        all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
-      (if (pos? (count comments-data))
+      (if (pos? (count threads))
         [:div.stream-comments-list
-          (for [idx (range (count comments-data))
-                :let [comment-data (nth comments-data idx)
-                      is-indented-comment? (seq (:parent-uuid comment-data))
-                      next-comment-data (when (< idx (dec (count comments-data)))
-                                          (nth comments-data (inc idx)))
-                      should-show-add-comment? (or (and (not (:parent-uuid comment-data))
-                                                        (not= (:parent-uuid next-comment-data) (:uuid comment-data))
-                                                        (utils/in? @(::replying-to s) (:uuid comment-data)))
-                                                   (and (not= (:parent-uuid next-comment-data) (:parent-uuid comment-data))
-                                                        (utils/in? @(::replying-to s) (:parent-uuid comment-data))))
-                      needs-left-border? (or is-indented-comment?
-                                             (= (:parent-uuid next-comment-data) (:uuid comment-data))
-                                             should-show-add-comment?)
+          (for [idx (range (count threads))
+                :let [root-comment-data (nth threads idx)
+                      expanded-thread? (zero? (:collapsed-count root-comment-data))
                       is-editing? (and (seq @(::editing? s))
-                                       (= @(::editing? s) (:uuid comment-data)))
-                      can-show-edit-bt? (and (:can-edit comment-data)
-                                                 (not (:is-emoji comment-data)))
-                      can-show-delete-bt? (:can-delete comment-data)
+                                       (= @(::editing? s) (:uuid root-comment-data)))
+                      add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent root-comment-data)
+                                              (:uuid root-comment-data))
+                      edit-comment-key (get-in add-comment-force-update* add-comment-string-key)
+                      show-add-comment? (utils/in? @(::replying-to s) (:uuid root-comment-data))
+                      closing-thread (and (-> root-comment-data :thread-children count zero?)
+                                          (not show-add-comment?))
                       showing-picker? (and (seq @(::show-picker s))
-                                           (= @(::show-picker s) (:uuid comment-data)))
-                      new-comment? (and (not= (-> comment-data :author :user-id) current-user-id)
-                                        (< (.getTime (utils/js-date last-read-at))
-                                           (.getTime (utils/js-date (:created-at comment-data)))))
-                      add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent comment-data)
-                                              (:uuid comment-data))
-                      edit-comment-key (get-in add-comment-force-update* add-comment-string-key)]]
-            (if is-editing?
-              [:div.stream-comment-outer
-                {:key (str "stream-comment-" (:created-at comment-data))
-                 :data-comment-uuid (:uuid comment-data)
-                 :data-children-count (:children-count comment-data)
-                 :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
-                                          :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
-                                          :left-border needs-left-border?
-                                          :open-thread (not is-indented-comment?)
-                                          :closing-thread (or (not next-comment-data)
-                                                              (empty? (:parent-uuid next-comment-data)))
-                                          :showing-add-comment should-show-add-comment?})}
-                [:div.stream-comment
-                  {:class (utils/class-set {:indented-comment is-indented-comment?})}
-                  (rum/with-key
-                   (add-comment {:activity-data activity-data
-                                 :parent-comment-uuid (:reply-parent comment-data)
-                                 :dismiss-reply-cb (partial finish-edit s comment-data)
-                                 :edit-comment-data comment-data})
-                   (str "edit-comment-" edit-comment-key))]]
-              [:div.stream-comment-outer
-                {:key (str "stream-comment-" (:created-at comment-data))
-                 :data-comment-uuid (:uuid comment-data)
-                 :data-children-count (:children-count comment-data)
-                 :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
-                                          :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
-                                          :left-border needs-left-border?
-                                          :open-thread (not is-indented-comment?)
-                                          :closing-thread (or (not next-comment-data)
-                                                              (empty? (:parent-uuid next-comment-data)))
-                                          :showing-add-comment should-show-add-comment?})}
-                [:div.stream-comment
-                  {:ref (str "stream-comment-" (:uuid comment-data))
-                   :class (utils/class-set {:editing is-editing?
-                                            :editing-other-comment (not (nil? @(::editing? s)))
-                                            :showing-picker showing-picker?
-                                            :indented-comment is-indented-comment?})
-                   :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
-                  [:div.stream-comment-inner
-                    (when (and (not is-editing?)
-                               is-mobile?)
-                      [:div.stream-comment-mobile-menu
-                        (more-menu {:entity-data comment-data
-                                    :external-share false
-                                    :entity-type "comment"
-                                    :show-edit? true
+                                           (= @(::show-picker s) (:uuid root-comment-data)))]]
+            [:div.stream-comment-thread
+              {:class (utils/class-set {:left-border (-> root-comment-data :thread-children count pos?)
+                                        :has-new (pos? (:new-count root-comment-data))})
+               :key (str "stream-comments-thread-" (:uuid root-comment-data))}
+              (if is-editing?
+                (edit-comment {:activity-data activity-data
+                               :comment-data root-comment-data
+                               :closing-thread closing-thread
+                               :dismiss-reply-cb (partial finish-edit s root-comment-data)
+                               :edit-comment-key edit-comment-key})
+                (read-comment {:activity-data activity-data
+                               :comment-data root-comment-data
+                               :closing-thread closing-thread
+                               :editing? (not (nil? @(::editing? s)))
+                               :mouse-leave-cb #(compare-and-set! (::show-more-menu s) (:uuid root-comment-data) nil)
+                               :is-mobile? is-mobile?
+                               :can-show-edit-bt? (and (:can-edit root-comment-data)
+                                                       (not (:is-emoji root-comment-data)))
+                               :can-show-delete-bt? (:can-delete root-comment-data)
+                               :edit-cb (partial start-editing s)
+                               :delete-cb (partial delete-clicked s activity-data)
+                               :share-cb #(share-clicked root-comment-data)
+                               :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
+                               :did-react-cb #(thread-mark-read s (:uuid root-comment-data))
+                               :reply-cb #(reply-to s (:reply-parent root-comment-data))
+                               :emoji-picker (when showing-picker?
+                                               (emoji-picker-container s root-comment-data))
+                               :showing-picker? showing-picker?
+                               :show-more-menu (::show-more-menu s)
+                               :dismiss-reply-cb (partial finish-edit s root-comment-data)
+                               :edit-comment-key edit-comment-key
+                               :new-thread? (:new root-comment-data)}))
+               (when (and (not expanded-thread?)
+                          (pos? (:collapsed-count root-comment-data)))
+                 [:button.mlb-reset.expand-thead-bt
+                   {:on-click #(expand-thread s root-comment-data)}
+                   (str "View " (:collapsed-count root-comment-data) " older repl" (if (not= (:collapsed-count root-comment-data) 1) "ies" "y"))])
+               (for [idx (range (count (:thread-children root-comment-data)))
+                     :let [comment-data (nth (:thread-children root-comment-data) idx)
+                           ind-is-editing? (and (seq @(::editing? s))
+                                            (= @(::editing? s) (:uuid comment-data)))
+                           ind-closing-thread (and (= idx (-> root-comment-data :thread-children count dec))
+                                                   (not show-add-comment?))
+                           ind-add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent comment-data)
+                                                   (:uuid comment-data))
+                           ind-edit-comment-key (get-in add-comment-force-update* add-comment-string-key)
+                           ind-showing-picker? (and (seq @(::show-picker s))
+                                                    (= @(::show-picker s) (:uuid comment-data)))]
+                    :when (or expanded-thread?
+                              (:expanded comment-data))]
+                 [:div.stream-comment-child
+                   {:key (str "stream-comments-thread-" (:uuid root-comment-data) "-child-" (:uuid comment-data))}
+                   (if ind-is-editing?
+                     (edit-comment {:activity-data activity-data
+                                    :comment-data comment-data
+                                    :is-indented-comment? true
+                                    :closing-thread ind-closing-thread
+                                    :dismiss-reply-cb (partial finish-edit s comment-data)
+                                    :edit-comment-key ind-edit-comment-key})
+                     (read-comment {:activity-data activity-data
+                                    :comment-data comment-data
+                                    :is-indented-comment? true
+                                    :closing-thread ind-closing-thread
+                                    :editing? (not (nil? @(::editing? s)))
+                                    :mouse-leave-cb #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)
+                                    :is-mobile? is-mobile?
+                                    :can-show-edit-bt? (and (:can-edit comment-data)
+                                                            (not (:is-emoji comment-data)))
+                                    :can-show-delete-bt? (:can-delete comment-data)
                                     :edit-cb (partial start-editing s)
-                                    :show-delete? true
                                     :delete-cb (partial delete-clicked s activity-data)
-                                    :can-comment-share? true
-                                    :comment-share-cb #(share-clicked comment-data)
-                                    :can-react? true
+                                    :share-cb #(share-clicked comment-data)
                                     :react-cb #(reset! (::show-picker s) (:uuid comment-data))
-                                    :can-reply? true
-                                    :reply-cb #(reply-to s (:reply-parent comment-data))})
-                        (when showing-picker?
-                          (emoji-picker-container s comment-data))])
-                    [:div.stream-comment-author-avatar
-                      (user-avatar-image (:author comment-data))]
-
-                    [:div.stream-comment-right
-                      [:div.stream-comment-header.group
-                        {:class utils/hide-class}
-                        [:div.stream-comment-author-right
-                          [:div.stream-comment-author-right-group
-                            {:class (when new-comment? "new-comment")}
-                            [:div.stream-comment-author-name
-                              (:name (:author comment-data))]
-                            [:div.stream-comment-author-timestamp
-                              [:time
-                                {:date-time (:created-at comment-data)
-                                 :data-toggle (when-not is-mobile? "tooltip")
-                                 :data-placement "top"
-                                 :data-container "body"
-                                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                                 :data-title (utils/activity-date-tooltip comment-data)}
-                                (utils/foc-date-time (:created-at comment-data))]]]
-                          (when new-comment?
-                            [:div.new-comment-tag])
-                          (when-not is-editing?
-                            (if (responsive/is-mobile-size?)
-                              [:div.stream-comment-mobile-menu
-                                (more-menu comment-data nil {:external-share false
-                                                             :entity-type "comment"
-                                                             :show-edit? true
-                                                             :edit-cb (partial start-editing s)
-                                                             :show-delete? true
-                                                             :delete-cb (partial delete-clicked s activity-data)
-                                                             :can-comment-share? true
-                                                             :comment-share-cb #(share-clicked comment-data)
-                                                             :can-react? true
-                                                             :react-cb #(reset! (::show-picker s) (:uuid comment-data))
-                                                             :can-reply? true
-                                                             :reply-cb #(reply-to s (:reply-parent comment-data))})
-                                (when showing-picker?
-                                  (emoji-picker-container s comment-data))]
-                              [:div.stream-comment-floating-buttons
-                                {:key (str "stream-comment-floating-buttons"
-                                       (when can-show-edit-bt?
-                                         "-edit")
-                                       (when can-show-delete-bt?
-                                         "-delete"))}
-                                (if (or can-show-delete-bt?
-                                        can-show-edit-bt?)
-                                  [:div.more-bt-container.separator-bt
-                                    [:button.mlb-reset.floating-bt.more-bt.separator-bt
-                                      {:on-click #(reset! (::show-more-menu s) (:uuid comment-data))}
-                                      "More"]
-                                    (when (= @(::show-more-menu s) (:uuid comment-data))
-                                      [:div.comment-more-menu-container
-                                        [:button.mlb-reset.share-bt
-                                          {:on-click #(share-clicked comment-data)}
-                                          "Share"]
-                                        (when can-show-delete-bt?
-                                          [:button.mlb-reset.delete-bt
-                                            {:on-click #(delete-clicked s activity-data comment-data)}
-                                            "Delete"])
-                                        (when can-show-edit-bt?
-                                          [:button.mlb-reset.edit-bt
-                                            {:on-click #(start-editing s comment-data)}
-                                            "Edit"])])]
-                                  [:button.mlb-reset.floating-bt.share-bt.separator-bt
-                                    {:data-toggle "tooltip"
-                                     :data-placement "top"
-                                     :on-click #(share-clicked comment-data)
-                                     :title "Copy link"}
-                                    "Share"])
-                                ;; Reply to comment
-                                (when (:reply-parent comment-data)
-                                  [:button.mlb-reset.floating-bt.reply-bt.separator-bt
-                                    {:data-toggle "tooltip"
-                                     :data-placement "top"
-                                     :on-click #(reply-to s (:reply-parent comment-data))
-                                     :title "Reply"}
-                                    "Reply"])
-                                ;; React container
-                                [:div.react-bt-container.separator-bt
-                                  [:button.mlb-reset.floating-bt.react-bt
-                                    {:data-toggle "tooltip"
-                                     :data-placement "top"
-                                     :title "Add reaction"
-                                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}
-                                    "React"]
-                                  (when showing-picker?
-                                    (emoji-picker-container s comment-data))]]))]]
-                      [:div.stream-comment-content
-                        [:div.stream-comment-body.oc-mentions.oc-mentions-hover
-                          {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-                           :ref (str "comment-body-" (:uuid comment-data))
-                           :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                                    :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
-                                                    :emoji-autocomplete is-editing?
-                                                    utils/hide-class true})}]]
-                      (when (and (not is-editing?)
-                                 (seq (:reactions comment-data)))
-                       [:div.stream-comment-reactions-footer.group
-                          (reactions {:entity-data comment-data
-                                      :hide-picker (zero? (count (:reactions comment-data)))
-                                      :optional-activity-data activity-data})])]]]
-              (when should-show-add-comment?
-                [:div.stream-comment
-                  {:class (utils/class-set {:indented-comment true
-                                            :add-comment-container true})}
-                  (rum/with-key (add-comment {:activity-data activity-data
-                                              :parent-comment-uuid (:reply-parent comment-data)
-                                              :dismiss-reply-cb (fn [_ _]
-                                                                 (swap! (::replying-to s) #(disj % (:reply-parent comment-data))))})
-                   (str "add-comment-" edit-comment-key))])]))]
-        [:div.stream-comments-empty])]))
+                                    :did-react-cb #(comment-mark-read s comment-data)
+                                    :reply-cb #(reply-to s (:reply-parent comment-data))
+                                    :emoji-picker (when ind-showing-picker?
+                                                    (emoji-picker-container s comment-data))
+                                    :showing-picker? ind-showing-picker?
+                                    :show-more-menu (::show-more-menu s)
+                                    :dismiss-reply-cb (partial finish-edit s comment-data)
+                                    :edit-comment-key ind-edit-comment-key
+                                    :new-thread? (:new root-comment-data)}))])
+          (when show-add-comment?
+            [:div.stream-comment-outer
+              {:key (str "stream-comment-add-" (:uuid root-comment-data))
+               :class (utils/class-set {:open-thread false
+                                        :closing-thread true
+                                        :indented-comment true})}
+              [:div.stream-comment
+                {:class (utils/class-set {:add-comment-container true})}
+                (rum/with-key (add-comment {:activity-data activity-data
+                                            :parent-comment-uuid (:reply-parent root-comment-data)
+                                            :add-comment-cb #(thread-mark-read s (:uuid root-comment-data))
+                                            :dismiss-reply-cb (fn [_ _]
+                                                               (swap! (::replying-to s) #(disj % (:reply-parent root-comment-data))))})
+                 (str "add-comment-" edit-comment-key))]])])])]))
