@@ -352,8 +352,10 @@ div.wrt-popup-container {
             }
           }
 
-          &.seen div.wrt-popup-list-row-name {
-            @include OC_Body_Bold();
+          &.seen {
+            div.wrt-popup-list-row-name, div.wrt-popup-list-row-seen {
+              @include OC_Body_Bold();
+            }
           }
 
           &.seen, &.sent {

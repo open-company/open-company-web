@@ -42,11 +42,11 @@
     :seen "Viewed"
     :unseen "Unopened"))
 
-(defn- send-all-unopened [s {:keys [current-user-data activity-data sorted-filtered-users slack-bot-data]}]
+(defn- remind-to [s {:keys [current-user-data activity-data users-list slack-bot-data]}]
   (let [wrt-share-base {:note "When you have a moment, please check out this post."
                         :subject (str "You may have missed: " (:headline activity-data))}
         wrt-share (apply merge
-                   (for [u sorted-filtered-users
+                   (for [u users-list
                         :when (and (not (:seen u))
                                    (not= (:user-id current-user-data) (:user-id u))
                                    (not (get @(::sending-notice s) (:user-id u))))
@@ -63,12 +63,14 @@
                         {:medium "email"
                          :to [(:email u)]}))}))]
     (swap! (::sending-notice s) merge (zipmap (keys wrt-share) (repeat (count wrt-share) :loading)))
+    (reset! (::show-remind-all-bt s) false)
     (activity-actions/activity-share activity-data (vals wrt-share)
      (fn [{:keys [success body]}]
+       (reset! (::show-remind-all-bt s) true)
        (if success
          (let [noticed-users (apply merge
                               (for [user-id (keys wrt-share)
-                                    :let [u (some #(when (= (:user-id %) user-id) %) sorted-filtered-users)
+                                    :let [u (some #(when (= (:user-id %) user-id) %) users-list)
                                           slack-user (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
                                {(:user-id u)
                                 (if (and slack-user
@@ -79,6 +81,7 @@
                                     (str "Sent to: @" (:display-name slack-user) " (Slack)")
                                     (str "Sent via Slack"))
                                   (str "Sent to: " (:email u)))}))]
+
            (swap! (::sending-notice s) merge noticed-users))
          (swap! (::sending-notice s) merge
           (apply merge
@@ -87,16 +90,16 @@
               (utils/after 5000 #(swap! (::sending-notice s) dissoc user-id))
               {user-id "An error occurred, please retry..."})))))))))
 
-(defn- send-all-unopened-clicked [s {:keys [unopened-count] :as props}]
+(defn- remind-to-all [s {:keys [unopened-count] :as props}]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "rerecord-video"
-                    :message (str "Do you want to send a reminder about this post to " unopened-count " users?")
+                    :message (str "Do you want to send a reminder to everyone that hasn’t yet opened it? (" unopened-count " users)")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
                     :solid-button-title "Yes, send"
                     :solid-button-cb (fn []
-                                      (send-all-unopened s props)
+                                      (remind-to s props)
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
@@ -112,6 +115,7 @@
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
                  (rum/local {} ::sending-notice)
+                 (rum/local true ::show-remind-all-bt)
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
@@ -147,7 +151,10 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         team-id (:team-id org-data)
-        slack-bot-data (first (jwt/team-has-bot? team-id))]
+        slack-bot-data (first (jwt/team-has-bot? team-id))
+        remind-all-users (filterv #(and (not (get @(::sending-notice s) (:user-id %)))
+                                        (not= (:user-id %) (:user-id current-user-data)))
+                          unseen-users)]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -168,16 +175,15 @@
             {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
             "Post analytics"]
-          (when (> (count unseen-users) 1)
+          (when (and (> (count remind-all-users) 1)
+                        @(::show-remind-all-bt s))
             [:button.mlb-reset.send-to-all-bt
-              {:on-click #(send-all-unopened-clicked s {:activity-data activity-data
-                                                        :current-user-data current-user-data
-                                                        :sorted-filtered-users sorted-filtered-users
-                                                        :slack-bot-data slack-bot-data
-                                                        :unopened-count (count unseen-users)})}
-              (if is-mobile?
-                "Send all"
-                "Send all unopened")])]
+              {:on-click #(remind-to-all s {:activity-data activity-data
+                                            :current-user-data current-user-data
+                                            :users-list remind-all-users
+                                            :slack-bot-data slack-bot-data
+                                            :unopened-count (count unseen-users)})}
+              "Remind all"])]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
           (small-loading)
@@ -278,7 +284,7 @@
                   [:div.wrt-popup-list-row-seen
                     (if (:seen u)
                       ;; Show time the read happened
-                      (str "Opened " (string/lower (utils/time-since (:read-at u))))
+                      (string/capital (string/lower (utils/time-since (:read-at u))))
                       (if user-sending-notice
                         (if (= user-sending-notice :loading)
                           "Sending..."
@@ -289,35 +295,10 @@
                              (not is-self-user?)
                              (not user-sending-notice))
                     [:button.mlb-reset.send-reminder-bt
-                      {:on-click (fn [_]
-                                   (let [user-payload (if (and slack-user
-                                                               (= (:notification-medium u) "slack"))
-                                                        {:medium "slack"
-                                                         :channel {:slack-org-id (:slack-org-id slack-user)
-                                                                   :channel-id (:id slack-user)
-                                                                   :channel-name "Carrot"
-                                                                   :type "user"}}
-                                                        {:medium "email"
-                                                         :to [(:email u)]})
-                                         wrt-share (merge user-payload
-                                                    {:note "When you have a moment, please check out this post."
-                                                     :subject (str "You may have missed: " (:headline activity-data))})]
-                                     (swap! (::sending-notice s) assoc (:user-id u) :loading)
-                                     ;; Show the share popup
-                                     (activity-actions/activity-share activity-data [wrt-share]
-                                      (fn [{:keys [success body]}]
-                                        (if success
-                                          (let [user-label (if (= (:medium wrt-share) "email")
-                                                             (str "Sent to: " (:email u))
-                                                             (if (and slack-user
-                                                                      (seq (:display-name slack-user))
-                                                                      (not= (:display-name slack-user) "-"))
-                                                               (str "Sent to: @" (:display-name slack-user) " (Slack)")
-                                                               (str "Sent via Slack")))]
-                                            (swap! (::sending-notice s) assoc (:user-id u) user-label))
-                                          (do
-                                            (swap! (::sending-notice s) assoc (:user-id u) "An error occurred, please retry...")
-                                            (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u)))))))))}
+                      {:on-click #(remind-to s {:activity-data activity-data
+                                                :current-user-data current-user-data
+                                                :users-list [u]
+                                                :slack-bot-data slack-bot-data})}
                       "Send"])])]])]]))
 
 (defn- under-middle-screen? [el]
