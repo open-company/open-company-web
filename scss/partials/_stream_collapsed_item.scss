@@ -136,10 +136,15 @@ div.stream-collapsed-item {
     }
 
     button.avatar-bt {
-      margin-right: 0;
+      margin: 0;
+      padding: 0;
       flex: 0 0 20px;
 
       @include activity-author(20);
+
+      div.user-avatar-img-container {
+        margin-right: 0;
+      }
     }
 
     &.bookmark-item div.stream-collapsed-item-fill {
