@@ -182,10 +182,10 @@
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
-                  (and (>= status 500) (<= status 599)))
+                  (<= 500 status 599))
           (network-error-handler))
         ; report all 5xx to sentry
-        (when (or (and (>= status 500) (<= status 599))
+        (when (or (<= 500 status 599)
                   (= status 400)
                   (= status 422))
           (let [report {:response response

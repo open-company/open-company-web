@@ -99,6 +99,7 @@ div.stream-item {
   padding: 24px 32px;
   background-color: var(--foc-background-color);
   overflow: visible;
+  border-radius: 4px;
 
   @include mobile() {
     width: 100%;

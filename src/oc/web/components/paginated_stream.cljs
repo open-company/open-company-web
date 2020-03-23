@@ -92,13 +92,17 @@
            comments-data
            editable-boards
            foc-layout
-           is-mobile] :as props}]
+           is-mobile
+           open-item
+           close-item] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
    [:div.virtualized-list-row
-     {:class (when collapsed-item? "collapsed-item")
+     {:class (utils/class-set {:collapsed-item collapsed-item?
+                               :open-item open-item
+                               :close-item close-item})
       :style style}
      (if collapsed-item?
        (stream-collapsed-item {:activity-data entry
@@ -130,6 +134,27 @@
      :class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
     label])
 
+(defn- get-item [items idx show-loading-more show-carrot-close]
+  (let [loading-more? (and show-loading-more
+                           (= idx (count items)))
+        carrot-close? (and (not loading-more?)
+                           show-carrot-close
+                           (= idx (count items)))
+        item (when (and (not loading-more?)
+                        (not carrot-close?)
+                        (<= 0 idx (dec (count items))))
+               (nth items idx))
+        separator-item? (and (not loading-more?)
+                             (not carrot-close?)
+                             (= (:content-type item) "separator"))]
+    (cond
+     loading-more?
+     {:content-type "loading-more"}
+     carrot-close?
+     {:content-type "carrot-close"}
+     :else
+     item)))
+
 (rum/defcs virtualized-stream < rum/static
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
@@ -157,27 +182,17 @@
         key-prefix (if is-mobile? "mobile" foc-layout)
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
-                          loading-more? (and show-loading-more
-                                             (= index (count items)))
-                          carrot-close? (and show-carrot-close
-                                              (not loading-more?)
-                                              (= index (count items)))
-                          item (when (and (not loading-more?)
-                                           (not carrot-close?))
-                                  (nth items index))
-                          separator-item? (and (not loading-more?)
-                                                (not carrot-close?)
-                                                (= (:content-type item) "separator"))]
-                      (cond
-                        separator-item?
+                          item (get-item items index show-loading-more show-carrot-close)]
+                      (case (:content-type item)
+                        "separator"
                         (if (= foc-layout dis/other-foc-layout)
                           foc-separators-height
                           (- foc-separators-height 8))
-                        loading-more?
+                        "loading-more"
                         (if is-mobile? 44 60)
-                        carrot-close?
+                        "carrot-close"
                         72
-                        :else
+                        ; else
                         (calc-card-height is-mobile? foc-layout))))
         row-renderer (fn [row-props]
                        (let [{:keys [key
@@ -185,34 +200,30 @@
                                      isScrolling
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             loading-more? (and show-loading-more
-                                                (= index (count items)))
-                             carrot-close? (and show-carrot-close
-                                                (not loading-more?)
-                                                (= index (count items)))
-                             item (when (and (not loading-more?)
-                                             (not carrot-close?))
-                                    (nth items index))
-                             separator-item? (and (not loading-more?)
-                                                  (not carrot-close?)
-                                                  (= (:content-type item) "separator"))
-                             reads-data (when (and (not separator-item?)
-                                                   (not loading-more?)
-                                                   (not carrot-close?))
-                                           (get activities-read (:uuid item)))
-                             row-key (str key-prefix "-" key)]
-                         (cond
-                           carrot-close?
+                             item (get-item items index show-loading-more show-carrot-close)
+                             reads-data (when (= (:content-type item) "entry")
+                                          (get activities-read (:uuid item)))
+                             row-key (str key-prefix "-" key)
+                             next-item (get-item items (inc index) show-loading-more show-carrot-close)
+                             prev-item (get-item items (dec index) show-loading-more show-carrot-close)]
+                         (case (:content-type item)
+                           "carrot-close"
                            (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
-                           loading-more?
+                           "loading-more"
                            (rum/with-key (load-more row-props) (str "loading-more-" row-key))
-                           separator-item?
+                           "separator"
                            (rum/with-key (separator-item (assoc row-props :foc-layout foc-layout) item) (str "separator-item-" row-key))
-                           :else
+                           ; else
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry item
                                                                   :reads-data reads-data
+                                                                  :open-item (or (= index 0)
+                                                                                 (and prev-item
+                                                                                      (#{"loading-more" "carrot-close" "separator"} (:content-type prev-item))))
+                                                                  :close-item (or (= index (count items))
+                                                                                  (not next-item)
+                                                                                  (not= (:content-type next-item) "entry"))
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
                             row-key))))]
