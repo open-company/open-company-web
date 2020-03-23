@@ -214,6 +214,20 @@ span.get-started-subtitle {
   color: rgba($deep_navy, 0.5);
   text-align: center;
   display: block;
+
+  a {
+    @include OC_Body_Book();
+    font-size: 16px;
+    line-height: 20px;
+    color: rgba($deep_navy, 0.5);
+    text-decoration: none;
+
+    @include big_web() {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 div.dashed-string {
