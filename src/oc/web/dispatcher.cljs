@@ -10,7 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]))
 
-(defonce app-state (atom {:loading false
+(defonce ^{:export true} app-state (atom {:loading false
                           :show-login-overlay false}))
 
 ; (def default-sort-type :recent-activity)
@@ -967,8 +967,7 @@
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
 (set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 ;; Utility externs
-(set! (.-OCWebUtils js/window) #js {:app_state app-state
-                                    :deref cljs.core.deref
+(set! (.-OCWebUtils js/window) #js {:deref cljs.core.deref
                                     :keyword cljs.core.keyword
                                     :count cljs.core.count
                                     :get cljs.core.get

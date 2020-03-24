@@ -9,7 +9,7 @@
             [oc.web.lib.jwt :as jwt]
             [clojure.string :as cstr]))
 
-(def path (atom {}))
+(def ^{:export true} path (atom {}))
 
 (defn set-route! [route parts]
   (timbre/info "set-route!" route parts)
