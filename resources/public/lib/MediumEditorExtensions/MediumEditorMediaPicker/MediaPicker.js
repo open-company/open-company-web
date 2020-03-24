@@ -403,10 +403,10 @@ function PlaceCaretAtEnd(el) {
       $(event.target).tooltip("hide");
     },
 
-    isTextElement: function(){
-      return (nextElSibling && nextElSibling.nodeType &&
-              nextElSibling.nodeType === Node.ELEMENT_NODE &&
-              ['p', 'h1', 'h2'].indexOf(nextElSibling.nodeName.toLowerCase()) >= 0);
+    isTextElement: function(el){
+      return (el && el.nodeType &&
+              el.nodeType === Node.ELEMENT_NODE &&
+              ['p', 'h1', 'h2'].indexOf(el.nodeName.toLowerCase()) >= 0);
     },
 
     addPoll: function(pollId) {
