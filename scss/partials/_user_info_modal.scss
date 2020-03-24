@@ -131,7 +131,7 @@ div.user-info-modal {
 
     div.user-info-body {
 
-      @include user-profile(160){
+      @include user-profile(80){
         margin: 24px auto 0;
         text-align: left;
       }
