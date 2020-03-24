@@ -131,9 +131,7 @@ div.user-info-modal {
 
     div.user-info-body {
 
-      @include user-profile(160px);
-
-      div.user-avatar-img-container {
+      @include user-profile(160){
         margin: 24px auto 0;
       }
 
@@ -154,7 +152,7 @@ div.user-info-modal {
         margin-top: 4px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: var(--color);
+        color: var(--light-color);
         line-height: 18px;
         text-align: center;
         width: 100%;
@@ -211,14 +209,6 @@ div.user-info-modal {
           text-align: left;
         }
 
-        div.user-info-about-timezone {
-          margin-top: 4px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          text-align: left;
-        }
-
         div.user-info-about-email {
           margin-top: 4px;
           @include OC_Body_Book();
@@ -229,6 +219,42 @@ div.user-info-modal {
           a {
             color: $carrot_green;
             text-decoration: none;
+
+            @include big_web() {
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+
+        div.user-info-about-slack {
+          margin-top: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          text-align: left;
+
+          a {
+            color: $carrot_green;
+            text-decoration: none;
+            display: block;
+            padding-left: 14px;
+            position: relative;
+            height: 20px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 14px;
+              background-image: cdnUrl("/img/ML/slack_green_icon.svg");
+              background-size: 14px 14px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              left: 0;
+              top: 3px;
+            }
 
             @include big_web() {
               &:hover {

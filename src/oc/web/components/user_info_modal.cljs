@@ -1,7 +1,7 @@
 (ns oc.web.components.user-info-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [cuerdas.core :as string]
+            [clojure.string :as string]
             [oc.web.lib.utils :as utils]
             [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
@@ -56,23 +56,38 @@
               (if my-profile?
                 "View my posts"
                 "View posts")])
-          (when (some seq (vals (-> user-data (select-keys [:location :timezone :email :profiles]))))
+          (when (some seq (vals (-> user-data (select-keys [:location :timezone :email :profiles :slack-users]))))
             [:div.user-info-about
               [:div.user-info-about-label
                 "About"]
-              (when (:location user-data)
+              (when (or (:location user-data)
+                        (:timezone user-data))
                 [:div.user-info-about-location
-                  (:location user-data)])
-              (when (:timezone user-data)
-                [:div.user-info-about-timezone
-                  (when-let [time-str (time-with-timezone (:timezone user-data))]
-                    (str time-str " local time"))])
+                  (when (:location user-data)
+                    (:location user-data))
+                  (when (:timezone user-data)
+                    (str
+                     (when (:location user-data)
+                       " (")
+                     (str (time-with-timezone (:timezone user-data)) " local time")
+                     (when (:location user-data)
+                       ")")))])
               (when (:email user-data)
                 [:div.user-info-about-email
                   [:a
                     {:href (str "mailto:" (:email user-data))
                      :target "_blank"}
                     (:email user-data)]])
+              (when (:slack-users user-data)
+                (for [slack-user (vals (:slack-users user-data))]
+                  [:div.user-info-about-slack
+                    {:key (str "slack-user-" (:slack-org-id slack-user) "-" (:id slack-user))}
+                    [:a
+                      {:href "."
+                       :on-click #(utils/event-stop %)}
+                      (if (string/starts-with? (:display-name slack-user) "@")
+                        (:display-name slack-user)
+                        (str "@" (:display-name slack-user)))]]))
               (when (seq (filter seq (vals (:profiles user-data))))
                 [:div.user-info-about-profiles
                   (for [[k v] (:profiles user-data)
@@ -81,8 +96,8 @@
                       {:class (name k)
                        :key (str "profile-" (name k))
                        :target "_blank"
-                       :href (if (or (clojure.string/starts-with? v "http")
-                                     (clojure.string/starts-with? v "//"))
+                       :href (if (or (string/starts-with? v "http")
+                                     (string/starts-with? v "//"))
                                v
                                (str "https://" v))}])])
               (when (:blurb user-data)
