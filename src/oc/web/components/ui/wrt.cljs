@@ -299,7 +299,7 @@
                                                 :current-user-data current-user-data
                                                 :users-list [u]
                                                 :slack-bot-data slack-bot-data})}
-                      "Send"])])]])]]))
+                      "Remind"])])]])]]))
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")
