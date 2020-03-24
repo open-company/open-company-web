@@ -82,12 +82,9 @@
                 (for [slack-user (vals (:slack-users user-data))]
                   [:div.user-info-about-slack
                     {:key (str "slack-user-" (:slack-org-id slack-user) "-" (:id slack-user))}
-                    [:a
-                      {:href "."
-                       :on-click #(utils/event-stop %)}
-                      (if (string/starts-with? (:display-name slack-user) "@")
-                        (:display-name slack-user)
-                        (str "@" (:display-name slack-user)))]]))
+                    (if (string/starts-with? (:display-name slack-user) "@")
+                      (:display-name slack-user)
+                      (str "@" (:display-name slack-user)))]))
               (when (seq (filter seq (vals (:profiles user-data))))
                 [:div.user-info-about-profiles
                   (for [[k v] (:profiles user-data)
