@@ -14,7 +14,7 @@
 
 (def ^:private popup-size
   {:width 296
-   :height 104})
+   :height 96})
 
 (def ^:private padding 24)
 

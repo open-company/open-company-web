@@ -133,6 +133,7 @@ div.user-info-modal {
 
       @include user-profile(160){
         margin: 24px auto 0;
+        text-align: left;
       }
 
       div.user-info-name {
@@ -239,7 +240,7 @@ div.user-info-modal {
             color: $carrot_green;
             text-decoration: none;
             display: block;
-            padding-left: 14px;
+            padding-left: 20px;
             position: relative;
             height: 20px;
 

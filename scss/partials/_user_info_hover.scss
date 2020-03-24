@@ -1,5 +1,5 @@
 $user_info_width: 296;
-$user_info_height: 104;
+$user_info_height: 96;
 $user_info_vertical_spacing: 8;
 
 div.user-info-hover {
@@ -42,17 +42,21 @@ div.user-info-hover {
     width: #{$user_info_width}px;
     height: #{$user_info_height}px;
 
-    @include user-profile(56) {
-      margin: 0 auto 16px;
-      float: none;
-    }
-
     div.user-info-header {
       height: 24px;
 
       @include user-profile(24) {
-        float: left;
-        margin: 0 8px 0 0;
+        float: left!important;
+        margin: 0 8px 0 0!important;
+        width: 24px!important;
+        height: 24px!important;
+        text-align: left!important;
+        white-space: nowrap!important;
+
+        img.user-avatar-img {
+          width: 24px!important;
+          height: 24px!important;
+        }
       }
 
       div.user-info-title {
@@ -68,7 +72,7 @@ div.user-info-hover {
 
     div.user-info-buttons {
       height: 32px;
-      margin-top: 16px;
+      margin-top: 8px;
 
       button.profile-bt {
         float: left;

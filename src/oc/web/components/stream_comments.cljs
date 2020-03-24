@@ -202,9 +202,10 @@
             [:div.stream-comment-author-right
               [:div.stream-comment-author-right-group
                 {:class (when (:new comment-data) "new-comment")}
-                [:div.stream-comment-author-name
+                [:div.stream-comment-author-name-container
                   (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id})
-                  (:name (:author comment-data))]
+                  [:div.stream-comment-author-name
+                    (:name (:author comment-data))]]
                 [:div.stream-comment-author-timestamp
                   [:time
                     {:date-time (:created-at comment-data)

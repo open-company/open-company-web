@@ -394,6 +394,7 @@ div.stream-comments {
             float: left;
             width: 32px;
             height: 32px;
+            position: relative;
 
             @include user-profile(32);
           }
@@ -466,8 +467,9 @@ div.stream-comments {
                   max-width: calc(100% - 43px);
                 }
 
-                div.stream-comment-author-name {
+                div.stream-comment-author-name-container {
                   flex: 1 0 auto;
+                  position: relative;
 
                   @include mobile() {
                     flex: 1 1 auto;
