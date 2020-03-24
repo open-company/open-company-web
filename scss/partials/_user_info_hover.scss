@@ -17,7 +17,7 @@ div.user-info-hover {
   }
 
   &.bottom {
-    bottom: -#{$user_info_height + $user_info_vertical_spacing + $user_info_vertical_spacing}px;
+    bottom: -#{$user_info_height + $user_info_vertical_spacing}px;
     padding-top: #{$user_info_vertical_spacing}px;
   }
 
