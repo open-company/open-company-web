@@ -179,7 +179,7 @@
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         timezones (.names (.-tz js/moment))
         show-password? (= (:auth-source current-user-data) "email")
-        links-tab-index (atom 4)]
+        links-tab-index (atom 5)]
     [:div.user-profile-modal-container
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-cb current-user-data nav-actions/close-all-panels)}]
@@ -192,8 +192,9 @@
                           (if (:has-changes current-user-data)
                             (save-clicked s)
                             (nav-actions/show-user-settings nil)))
-             :class (when @(::show-success s) "no-disable")
-             :disabled @(::loading s)}
+             :class (utils/class-set {:disabled (or (not (:has-changes current-user-data))
+                                                    @(::show-success s)
+                                                    @(::loading s))})}
             (if @(::show-success s)
               "Saved!"
               "Save")]
@@ -209,7 +210,7 @@
               (user-avatar-image user-for-avatar))
             [:div.user-profile-avatar-label "Edit profile photo"]]
           [:div.user-profile-modal-fields
-            [:div.field-label
+            [:div.field-label.big-web-tablet-only
               [:label.half-field-label
                 {:for "first-name"}
                 "First name"]
@@ -218,6 +219,15 @@
                 "Last name"]
               (when @(::name-error s)
                 [:span.error "Please provide your name."])]
+            [:div.field-label.big-web-tablet-only
+              [:label.half-field-label
+                {:for "last-name"}
+                "Last name"]
+              (when @(::name-error s)
+                [:span.error "Please provide your name."])]
+            [:label.field-label.mobile-only
+              {:for "first-name"}
+              "First name"]
             [:input.field-value.oc-input.half-field
               {:value (:first-name current-user-data)
                :type "text"
@@ -226,6 +236,9 @@
                :id "first-name"
                :max-length user-utils/user-name-max-lenth
                :on-change #(change! s [:first-name] (.. % -target -value))}]
+            [:label.field-label.mobile-only
+                {:for "last-name"}
+                "Last name"]
             [:input.field-value.oc-input.half-field
               {:value (:last-name current-user-data)
                :type "text"
