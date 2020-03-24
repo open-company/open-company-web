@@ -24,7 +24,8 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
@@ -161,7 +162,8 @@
            edit-comment-key is-indented-comment? mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt? member?
-           show-more-menu showing-picker? did-react-cb new-thread?]}]
+           show-more-menu showing-picker? did-react-cb new-thread?
+           current-user-id]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -192,18 +194,16 @@
                         :reply-cb reply-cb})
             emoji-picker])
         [:div.stream-comment-author-avatar
+          (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id})
           (user-avatar-image (:author comment-data))]
-
         [:div.stream-comment-right
           [:div.stream-comment-header.group
             {:class utils/hide-class}
             [:div.stream-comment-author-right
               [:div.stream-comment-author-right-group
                 {:class (when (:new comment-data) "new-comment")}
-                [:button.mlb-reset.stream-comment-author-name
-                  {:on-click #(when member?
-                                (utils/event-stop %)
-                                (nav-actions/show-user-info (:user-id (:author comment-data))))}
+                [:div.stream-comment-author-name
+                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id})
                   (:name (:author comment-data))]
                 [:div.stream-comment-author-timestamp
                   [:time
@@ -425,7 +425,8 @@
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key
                                :new-thread? (:new root-comment-data)
-                               :member? member?}))
+                               :member? member?
+                               :current-user-id current-user-id}))
                (when (and (not expanded-thread?)
                           (pos? (:collapsed-count root-comment-data)))
                  [:button.mlb-reset.expand-thead-bt
@@ -476,7 +477,8 @@
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
                                     :edit-comment-key ind-edit-comment-key
                                     :new-thread? (:new root-comment-data)
-                                    :member? member?}))])
+                                    :member? member?
+                                    :current-user-id current-user-id}))])
           (when show-add-comment?
             [:div.stream-comment-outer
               {:key (str "stream-comment-add-" (:uuid root-comment-data))
