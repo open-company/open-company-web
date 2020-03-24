@@ -36,6 +36,7 @@
         (assoc :can-delete (boolean delete-comment-link))
         (assoc :can-react can-react?)
         (assoc :reply-parent reply-parent)
+        (assoc :resource-uuid (:uuid activity-data))
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
@@ -69,7 +70,7 @@
 (defmethod dispatcher/action :comment-add
   [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
-        comments-data (vec (get-in db comments-key))
+        comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         new-comment-data (parse-comment (dispatcher/org-data db)
                                         activity-data
                                         comment-data)
@@ -89,7 +90,7 @@
 
 (defmethod dispatcher/action :comment-add/replace
   [db [_ activity-data comment-data comments-key new-comment-uuid]]
-  (let [comments-data (vec (get-in db comments-key))
+  (let [comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         old-comments-data (filterv #(not= (:uuid %) new-comment-uuid) comments-data)
         new-comment-data (parse-comment (dispatcher/org-data db)
                                         activity-data
@@ -100,27 +101,21 @@
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [activity-data body]}]]
-  (-> db
-    (assoc :comment-add-finish true)
-    (assoc :add-comment-highlight (:uuid body))))
+  (assoc db :comment-add-finish true))
 
 (defmethod dispatcher/action :comment-add/failed
   [db [_ activity-data comment-data comments-key]]
-  (let [all-comments (get-in db comments-key)
+  (let [all-comments (comment-utils/ungroup-comments (get-in db comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
         sorted-filtered-comments (comment-utils/sort-comments filtered-comments)]
     (assoc-in db comments-key sorted-filtered-comments)))
 
 (defmethod dispatcher/action :comment-save/failed
   [db [_ activity-data comment-data comments-key]]
-  (let [all-comments (get-in db comments-key)
+  (let [all-comments (comment-utils/ungroup-comments  (get-in db comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
         sorted-filtered-comments (comment-utils/sort-comments (conj filtered-comments comment-data))]
     (assoc-in db comments-key sorted-filtered-comments)))
-
-(defmethod dispatcher/action :add-comment-highlight-reset
-  [db [_]]
-  (dissoc db :add-comment-highlight))
 
 (defmethod dispatcher/action :comments-get
   [db [_ comments-key activity-data]]
@@ -145,16 +140,18 @@
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data comments-key]]
   (let [item-uuid (:uuid comment-data)
-        comments-data (get-in db comments-key)
-        new-comments-data (filterv #(and (not= item-uuid (:uuid %)) (not= item-uuid (:parent-uuid %)))
-                           comments-data)]
-    (assoc-in db comments-key new-comments-data)))
+        comments-data (comment-utils/ungroup-comments (get-in db comments-key))
+        new-comments-data (filterv #(and (not= item-uuid (:uuid %))
+                                         (not= item-uuid (:parent-uuid %)))
+                           comments-data)
+        sorted-comments (comment-utils/sort-comments new-comments-data)]
+    (assoc-in db comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-reaction-toggle
   [db [_ comments-key activity-data comment-data reaction-data reacting?]]
   (let [comment-uuid (:uuid comment-data)
         activity-uuid (:uuid activity-data)
-        comments-data (get-in db comments-key)
+        comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         comment-idx (utils/index-of comments-data #(= comment-uuid (:uuid %)))]
     ;; the comment has yet to be stored locally in app state so ignore and
     ;; wait for server side reaction
@@ -173,14 +170,17 @@
                         (dec (:count reaction-data)))
             new-reaction-data (assoc with-new-reacted :count new-count)
             new-reactions-data (assoc reactions-data reaction-idx new-reaction-data)
-            new-comment-data (assoc comment-data :reactions new-reactions-data)
-            new-comments-data (assoc comments-data comment-idx new-comment-data)]
-        (assoc-in db comments-key new-comments-data))
+            new-comment-data (-> comment-data
+                              (assoc :reactions new-reactions-data)
+                              (dissoc :thread-chilren))
+            new-comments-data (assoc comments-data comment-idx new-comment-data)
+            new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
+        (assoc-in db comments-key new-sorted-comments-data))
       db)))
 
 (defmethod dispatcher/action :comment-react-from-picker
   [db [_ comments-key activity-data comment-data reaction]]
-  (let [comments-data (get-in db comments-key)
+  (let [comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         comment-idx (utils/index-of comments-data #(= (:uuid comment-data) (:uuid %)))]
     ;; the comment has yet to be stored locally in app state so ignore and
     ;; wait for server side reaction
@@ -207,14 +207,18 @@
             new-reactions-data (if reaction-idx
                                  (assoc reactions-data reaction-idx new-reaction-data)
                                  (conj reactions-data new-reaction-data))
-            new-comment-data (assoc comment-data :reactions new-reactions-data)
-            new-comments-data (assoc comments-data comment-idx new-comment-data)]
-        (assoc-in db comments-key new-comments-data))
+            new-comment-data (-> comment-data
+                              (assoc :reactions new-reactions-data)
+                              (dissoc :thread-chilren))
+            new-comments-data (assoc comments-data comment-idx new-comment-data)
+            new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
+        (assoc-in db comments-key new-sorted-comments-data))
       db)))
 
 (defmethod dispatcher/action :comment-save
-  [db [_ org-slug comments-key updated-comment-map]]
-  (let [all-comments (get-in db comments-key)
+  [db [_ org-slug comments-key updated-comment-map*]]
+  (let [updated-comment-map (dissoc updated-comment-map* :thread-children)
+        all-comments (comment-utils/ungroup-comments (get-in db comments-key))
         filtered-comments (filterv #(not= (:uuid %) (:uuid updated-comment-map)) all-comments)
         sorted-new-comments (comment-utils/sort-comments (conj filtered-comments updated-comment-map))]
     (assoc-in db comments-key sorted-new-comments)))
@@ -226,7 +230,7 @@
         activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
         comment-data (:interaction interaction-data)
         item-uuid (:uuid comment-data)
-        comments-data (get-in db comments-key)
+        comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
     (if comment-idx
       (let [old-comment-data (get comments-data comment-idx)]
@@ -240,8 +244,9 @@
                 new-comment-data (if (contains? update-comment-data :reactions)
                                    update-comment-data
                                    (assoc update-comment-data :reactions (:reactions old-comment-data)))
-                new-comments-data (assoc comments-data comment-idx (parse-comment org-data activity-data new-comment-data))]
-            (assoc-in db comments-key new-comments-data))
+                new-comments-data (assoc comments-data comment-idx (parse-comment org-data activity-data new-comment-data))
+                new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
+            (assoc-in db comments-key new-sorted-comments-data))
           db))
       db)))
 
@@ -249,14 +254,20 @@
   [db [_ org-slug interaction-data]]
   (let [activity-uuid (:resource-uuid interaction-data)
         item-uuid (:uuid (:interaction interaction-data))
+        last-read-at (:last-read-at (dispatcher/activity-data org-slug activity-uuid db))
         comments-key (dispatcher/activity-comments-key org-slug activity-uuid)
-        comments-data (get-in db comments-key)
+        comments-data (comment-utils/ungroup-comments (get-in db comments-key))
+        deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
+        current-user-id (jwt/user-id)
+        deleting-new-comment? (when deleting-comment-data
+                                (comment-utils/new? current-user-id last-read-at deleting-comment-data))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
-        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))]
+        new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]
     (-> db
       (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
-      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-comments-count 0})
-      (assoc-in comments-key new-comments-data))))
+      (update-in (vec (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count)) (if deleting-new-comment? dec identity))
+      (assoc-in comments-key new-sorted-comments-data))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ org-slug entry-data interaction-data]]
@@ -284,7 +295,8 @@
           new-comments-count (if (and ;; comment is not from current user
                                       (not comment-from-current-user?)
                                       ;; and the activity we have is old (new-at is the created-at of the last comment)
-                                      (-> comment-data :created-at (compare (:new-at activity-data)) pos?))
+                                      (> (.getTime (utils/js-date (:new-at activity-data)))
+                                         (.getTime (utils/js-date (:created-at comment-data)))))
                                (inc old-comments-count)
                                old-comments-count)
           with-new-at (if comment-from-current-user?
@@ -292,18 +304,16 @@
                         (-> with-authors
                           (assoc :new-at created-at)
                           (assoc :new-comments-count new-comments-count)))
-          all-old-comments-data (dispatcher/activity-comments-data activity-uuid)]
+          all-old-comments-data (comment-utils/ungroup-comments (dispatcher/activity-comments-data org-slug activity-uuid db))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)
               ;; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-              sorted-comments-data (comment-utils/sort-comments new-comments-data)]
+              new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
           (-> db
-            (assoc-in (dispatcher/activity-comments-key org-slug activity-uuid) sorted-comments-data)
-            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)
-            ;; Highlight the comment being added
-            (update-in [:add-comment-highlight] #(if comment-from-current-user? % (:uuid comment-data)))))
+            (assoc-in (dispatcher/activity-comments-key org-slug activity-uuid) new-sorted-comments-data)
+            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
         ;; In case we don't have the comments already loaded just update the :new-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
         (assoc-in db (dispatcher/activity-key org-slug activity-uuid) with-new-at)))

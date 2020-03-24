@@ -9,7 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]))
 
-(defonce app-state (atom {:loading false
+(defonce ^{:export true} app-state (atom {:loading false
                           :show-login-overlay false}))
 
 ; (def default-sort-type :recent-activity)
@@ -71,6 +71,9 @@
 (defn activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
+
+(defn activity-last-read-at-key [org-slug activity-uuid]
+  (vec (conj (activity-key org-slug activity-uuid) :last-read-at)))
 
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
@@ -469,7 +472,6 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
    :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
    :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})
@@ -911,8 +913,7 @@
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
 (set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 ;; Utility externs
-(set! (.-OCWebUtils js/window) #js {:app_state app-state
-                                    :deref cljs.core.deref
+(set! (.-OCWebUtils js/window) #js {:deref cljs.core.deref
                                     :keyword cljs.core.keyword
                                     :count cljs.core.count
                                     :get cljs.core.get

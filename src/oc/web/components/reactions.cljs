@@ -22,7 +22,7 @@
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
-  [s {:keys [entity-data hide-picker optional-activity-data max-reactions]}]
+  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
@@ -82,6 +82,8 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
+                               (when (fn? did-react-cb)
+                                 (did-react-cb))
                                (if optional-activity-data
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
@@ -107,6 +109,8 @@
                 :autoFocus true
                 :onClick (fn [emoji event]
                            (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") reactions-data)
+                             (when (fn? did-react-cb)
+                               (did-react-cb))
                              (if optional-activity-data
                                (comment-actions/react-from-picker optional-activity-data entity-data (gobj/get emoji "native"))
                                (reaction-actions/react-from-picker entity-data (gobj/get emoji "native"))))
