@@ -291,12 +291,13 @@
 (defn autoresize-textarea [ref]
   (let [lst (atom nil)]
     (letfn [(autoresize [e]
-              (let [this (.-target e)]
+              (when-let [this (.-target e)]
                 (set! (.. this -style -cssText) "height:auto;")
                 (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))]
       {:did-mount (fn [s]
        (reset! lst
         (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
+       (autoresize #js {:target (rum/ref-node s ref)})
        s)
        :will-unmount (fn [s]
         (when @lst

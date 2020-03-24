@@ -5,12 +5,11 @@ $bottom_margin: 16;
 $h2_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
-  div.user-avatar-img-container {
+
+  @include user-profile($avatar_size) {
     float: left;
     margin-right: 13px;
   }
-
-  @include user-profile($avatar_size);
 
   div.name {
     overflow: hidden;

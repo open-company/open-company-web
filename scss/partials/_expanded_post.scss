@@ -229,7 +229,7 @@ div.expanded-post {
         }
       }
 
-      button.expanded-post-author-inner-label {
+      div.expanded-post-author-inner-label {
         @include OC_Body_Book();
         font-size: 12px;
         color: var(--light-color);
@@ -241,13 +241,16 @@ div.expanded-post {
         cursor: default;
         text-align: left;
         opacity: 1;
+        position: relative;
+
+        time {
+          min-height: 18px;
+          line-height: 18px;
+          display: inline-block;
+        }
 
         &:hover {
           opacity: 1;
-        }
-
-        &.clickable {
-          cursor: pointer;
         }
 
         @include mobile() {

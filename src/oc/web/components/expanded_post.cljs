@@ -25,7 +25,8 @@
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn close-expanded-post [e]
   (nav-actions/dismiss-post-modal e))
@@ -212,11 +213,8 @@
       [:div.expanded-post-author.group
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
-          [:button.mlb-reset.expanded-post-author-inner-label
-            {:class (when user-is-part-of-the-team "clickable")
-             :on-click #(when user-is-part-of-the-team
-                          (utils/event-stop %)
-                          (nav-actions/show-user-info (:user-id publisher)))}
+          [:div.expanded-post-author-inner-label
+            (user-info-hover {:user-data publisher :current-user-id current-user-id})
             (str (:name publisher) " in "
                  (:board-name activity-data)
                  (when (= (:board-access activity-data) "private")

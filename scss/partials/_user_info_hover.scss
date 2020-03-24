@@ -1,0 +1,110 @@
+$user_info_width: 296;
+$user_info_height: 104;
+$user_info_vertical_spacing: 8;
+
+div.user-info-hover {
+  display: none;
+  position: absolute;
+  width: #{$user_info_width}px;
+  height: #{$user_info_height + $user_info_vertical_spacing}px;
+  z-index: #{$navbar_zindex - 1};
+  text-align: center;
+  background-color: transparent;
+
+  &.top {
+    top: -#{$user_info_height + $user_info_vertical_spacing}px;
+    padding-bottom: #{$user_info_vertical_spacing}px;
+  }
+
+  &.bottom {
+    bottom: -#{$user_info_height + $user_info_vertical_spacing + $user_info_vertical_spacing}px;
+    padding-top: #{$user_info_vertical_spacing}px;
+  }
+
+  &.left {
+    left: 0;
+  }
+
+  &.right {
+    right: 0;
+  }
+
+  &.show {
+    display: block;
+  }
+
+  div.user-info-inner {
+    border: 1px solid var(--divider-line);
+    background-color: var(--tooltip-background-color);
+    padding: 16px;
+    box-shadow: none;
+    border-radius: 4px;
+    width: #{$user_info_width}px;
+    height: #{$user_info_height}px;
+
+    @include user-profile(56) {
+      margin: 0 auto 16px;
+      float: none;
+    }
+
+    div.user-info-header {
+      height: 24px;
+
+      @include user-profile(24) {
+        float: left;
+        margin: 0 8px 0 0;
+      }
+
+      div.user-info-title {
+        @include OC_Body_Bold();
+        float: left;
+        width: calc(100% - 24px - 8px);
+        text-align: left;
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--tooltip-color);
+      }
+    }
+
+    div.user-info-buttons {
+      height: 32px;
+      margin-top: 16px;
+
+      button.profile-bt {
+        float: left;
+        width: calc(50% - 8px);
+        padding: 7px 12px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+        border-radius: 4px;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      button.posts-bt {
+        float: right;
+        width: calc(50% - 8px);
+        padding: 7px 12px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+        border-radius: 4px;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}

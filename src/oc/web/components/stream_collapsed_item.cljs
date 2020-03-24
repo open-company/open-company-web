@@ -10,7 +10,8 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn- prefixed-html
   "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.
@@ -82,9 +83,8 @@
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
-        [:button.mlb-reset.avatar-bt
-          {:on-click #(when member?
-                        (nav-actions/show-user-info (:user-id publisher)))}
+        [:div.stream-collapsed-item-avatar-container
+          (user-info-hover {:user-data publisher :current-user-id current-user-id})
           (user-avatar-image publisher)]
         [:div.stream-collapsed-item-fill
           [:div.stream-item-headline.ap-seen-item-headline

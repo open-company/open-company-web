@@ -156,7 +156,7 @@
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
-  (clojure.string/join (map #(str " " (name %)) (keys (filter second classes)))))
+  (clojure.string/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
 
 (defun link-for
 

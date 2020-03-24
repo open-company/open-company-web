@@ -24,6 +24,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [cljsjs.hammer]))
 
@@ -258,19 +259,13 @@
                     (activity-actions/inbox-dismiss (:uuid activity-data)))}
         [:span "Dismiss"]]
       [:div.stream-item-header.group
-        [:button.mlb-reset.stream-header-head-author
-          {:on-click #(when member?
-                        (nav-actions/show-user-info (:user-id publisher)))}
+        [:div.stream-header-head-author
+          (user-info-hover {:user-data publisher :current-user-id current-user-id})
           (user-avatar-image publisher)
           [:div.name
             [:div.mobile-name
               [:div.name-inner
-                {:class utils/hide-class
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
+                {:class utils/hide-class}
                 (str
                  (:name publisher)
                  " in "
@@ -280,6 +275,11 @@
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
               [:div.time-since
+                {:data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
                 (let [t (or (:published-at activity-data) (:created-at activity-data))]
                   [:time
                     {:date-time t
