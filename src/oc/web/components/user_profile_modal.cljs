@@ -210,156 +210,160 @@
               (user-avatar-image user-for-avatar))
             [:div.user-profile-avatar-label "Edit profile photo"]]
           [:div.user-profile-modal-fields
-            [:div.field-label.big-web-tablet-only
-              [:label.half-field-label
-                {:for "first-name"}
-                "First name"]
-              [:label.half-field-label
-                {:for "last-name"}
-                "Last name"]
-              (when @(::name-error s)
-                [:span.error "Please provide your name."])]
-            [:div.field-label.big-web-tablet-only
-              [:label.half-field-label
-                {:for "last-name"}
-                "Last name"]
-              (when @(::name-error s)
-                [:span.error "Please provide your name."])]
-            [:label.field-label.mobile-only
-              {:for "first-name"}
-              "First name"]
-            [:input.field-value.oc-input.half-field
-              {:value (:first-name current-user-data)
-               :type "text"
-               :tab-index 1
-               :placeholder (placeholder :first-name)
-               :id "first-name"
-               :max-length user-utils/user-name-max-lenth
-               :on-change #(change! s [:first-name] (.. % -target -value))}]
-            [:label.field-label.mobile-only
-                {:for "last-name"}
-                "Last name"]
-            [:input.field-value.oc-input.half-field
-              {:value (:last-name current-user-data)
-               :type "text"
-               :tab-index 2
-               :id "last-name"
-               :placeholder (placeholder :last-name)
-               :max-length user-utils/user-name-max-lenth
-               :on-change #(change! s [:last-name] (.. % -target -value))}]
-            [:label.field-label
-              {:for "role"}
-              "Role"]
-            [:input.field-value.oc-input
-              {:value (:title current-user-data)
-               :type "text"
-               :id "role"
-               :placeholder (placeholder :title)
-               :tab-index 3
-               :max-length 56
-               :on-change #(change! s [:title] (.. % -target -value))}]
-            [:div.field-label
-              "Email"
-              (when @(::email-error s)
-                [:span.error "This email isn't valid."])]
-            [:input.field-value.not-allowed.oc-input
-              {:value (:email current-user-data)
-               :placeholder (placeholder :email)
-               :read-only true
-               :type "text"}]
-            [:label.field-label
-              {:for "blurb"}
-              "Blurb"]
-            [:textarea.field-value.oc-input
-              {:value (:blurb current-user-data)
-               :ref :blurb
-               :id "blurb"
-               :placeholder (placeholder :blurb)
-               :tab-index 3
-               :columns 2
-               :max-length 256
-               :on-change #(change! s [:blurb] (.. % -target -value))}]
-            [:label.field-label
-              {:for "location"}
-              "Location"]
-            [:input.field-value.oc-input
-              {:value (:location current-user-data)
-               :type "text"
-               :id "location"
-               :placeholder (placeholder :location)
-               :tab-index 4
-               :max-length 56
-               :on-change #(change! s [:location] (.. % -target -value))}]
-            [:label.field-label
-              {:for "timezone"}
-              "Timezone"]
-            [:select.field-value.oc-input
-              {:value (:timezone current-user-data)
-               :id "timezone"
-               :tab-index 5
-               :on-change #(change! s [:timezone] (.. % -target -value))}
-              ;; Promoted timezones
-              (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+            [:form
+              {:action "."
+               :on-submit #(utils/event-stop %)}
+              [:div.field-label.big-web-tablet-only
+                [:label.half-field-label
+                  {:for "profile-first-name"}
+                  "First name"]
+                [:label.half-field-label
+                  {:for "profile-last-name"}
+                  "Last name"]
+                (when @(::name-error s)
+                  [:span.error "Please provide your name."])]
+
+              [:label.field-label.mobile-only
+                {:for "profile-first-name"}
+                "First name"
+                (when @(::name-error s)
+                  [:span.error "Please provide your name."])]
+
+              [:input.field-value.oc-input.half-field
+                {:value (:first-name current-user-data)
+                 :type "text"
+                 :tab-index 1
+                 :placeholder (placeholder :first-name)
+                 :id "profile-first-name"
+                 :max-length user-utils/user-name-max-lenth
+                 :on-change #(change! s [:first-name] (.. % -target -value))}]
+
+              [:label.field-label.mobile-only
+                  {:for "profile-last-name"}
+                  "Last name"]
+
+              [:input.field-value.oc-input.half-field
+                {:value (:last-name current-user-data)
+                 :type "text"
+                 :tab-index 2
+                 :id "profile-last-name"
+                 :placeholder (placeholder :last-name)
+                 :max-length user-utils/user-name-max-lenth
+                 :on-change #(change! s [:last-name] (.. % -target -value))}]
+
+              [:label.field-label
+                {:for "profile-role"}
+                "Role"]
+              [:input.field-value.oc-input
+                {:value (:title current-user-data)
+                 :type "text"
+                 :id "profile-role"
+                 :placeholder (placeholder :title)
+                 :tab-index 3
+                 :max-length 56
+                 :on-change #(change! s [:title] (.. % -target -value))}]
+              [:div.field-label
+                "Email"
+                (when @(::email-error s)
+                  [:span.error "This email isn't valid."])]
+              [:input.field-value.not-allowed.oc-input
+                {:value (:email current-user-data)
+                 :placeholder (placeholder :email)
+                 :read-only true
+                 :type "text"}]
+              [:label.field-label
+                {:for "profile-blurb"}
+                "Blurb"]
+              [:textarea.field-value.oc-input
+                {:value (:blurb current-user-data)
+                 :ref :blurb
+                 :id "profile-blurb"
+                 :placeholder (placeholder :blurb)
+                 :tab-index 3
+                 :columns 2
+                 :max-length 256
+                 :on-change #(change! s [:blurb] (.. % -target -value))}]
+              [:label.field-label
+                {:for "profile-location"}
+                "Location"]
+              [:input.field-value.oc-input
+                {:value (:location current-user-data)
+                 :type "text"
+                 :id "profile-location"
+                 :placeholder (placeholder :location)
+                 :tab-index 4
+                 :max-length 56
+                 :on-change #(change! s [:location] (.. % -target -value))}]
+              [:label.field-label
+                {:for "profile-timezone"}
+                "Timezone"]
+              [:select.field-value.oc-input
+                {:value (:timezone current-user-data)
+                 :id "profile-timezone"
+                 :tab-index 5
+                 :on-change #(change! s [:timezone] (.. % -target -value))}
+                ;; Promoted timezones
+                (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+                  [:option
+                    {:key (str "timezone-" t "-promoted")
+                     :value t} t])
+                ;; Divider line option
                 [:option
-                  {:key (str "timezone-" t "-promoted")
-                   :value t} t])
-              ;; Divider line option
-              [:option
-                {:disabled true
-                 :value ""}
-                "------------"]
-              ;; All the timezones, repeating the promoted
-              (for [t timezones]
-                [:option
-                  {:key (str "timezone-" t)
-                   :value t}
-                  t])]
-            (for [[k v] (:profiles current-user-data)
-                  :let [field-name (str "profiles-" (name k))
-                        tab-index (swap! links-tab-index inc)]]
-              [:div.profile-group
-                {:key field-name}
+                  {:disabled true
+                   :value ""}
+                  "------------"]
+                ;; All the timezones, repeating the promoted
+                (for [t timezones]
+                  [:option
+                    {:key (str "timezone-" t)
+                     :value t}
+                    t])]
+              (for [[k v] (:profiles current-user-data)
+                    :let [field-name (str "profile-profiles-" (name k))
+                          tab-index (swap! links-tab-index inc)]]
+                [:div.profile-group
+                  {:key field-name}
+                  [:label.field-label
+                    {:for field-name}
+                    (str/capital (str/camel k))]
+                  [:input.field-value.oc-input
+                    {:value (get (:profiles current-user-data) k)
+                     :placeholder (placeholder k)
+                     :max-length 128
+                     :id field-name
+                     :tab-index tab-index
+                     :on-focus #(when-not (seq v)
+                                  (set! (.. % -target -value) (default-value k)))
+                     :on-change #(change! s [:profiles k] (.. % -target -value))
+                     :type "text"}]])
+              (when show-password?
+                [:div.fields-divider-line])
+              ;; Current password
+              (when show-password?
                 [:label.field-label
-                  {:for field-name}
-                  (str/capital (str/camel k))]
+                  {:for "profile-password"}
+                  "Currrent password"
+                  (when @(::current-password-error s)
+                      [:span.error "Current password required"])])
+              (when show-password?
                 [:input.field-value.oc-input
-                  {:value (get (:profiles current-user-data) k)
-                   :placeholder (placeholder k)
-                   :max-length 128
-                   :id field-name
-                   :tab-index tab-index
-                   :on-focus #(when-not (seq v)
-                                (set! (.. % -target -value) (default-value k)))
-                   :on-change #(change! s [:profiles k] (.. % -target -value))
-                   :type "text"}]])
-            (when show-password?
-              [:div.fields-divider-line])
-            ;; Current password
-            (when show-password?
-              [:label.field-label
-                {:for "password"}
-                "Currrent password"
-                (when @(::current-password-error s)
-                    [:span.error "Current password required"])])
-            (when show-password?
-              [:input.field-value.oc-input
-                {:type "password"
-                 :id "password"
-                 :tab-index (+ 4 (count (:profiles current-user-data)) 1)
-                 :placeholder (placeholder :password)
-                 :on-change #(change! s :current-password (.. % -target -value))
-                 :value (:current-password current-user-data)}])
-            (when show-password?
-              [:label.field-label
-                {:for "new-password"}
-                "New password"
-                (when @(::password-error s)
-                  [:span.error "Minimum 8 characters"])])
-            (when show-password?
-              [:input.field-value.oc-input
-                {:type "password"
-                 :id "new-password"
-                 :tab-index (+ 4 (count (:profiles current-user-data)) 1)
-                 :placeholder (placeholder :new-password)
-                 :on-change #(change! s :password (.. % -target -value))
-                 :value (:password current-user-data)}])]]]]))
+                  {:type "password"
+                   :id "profile-password"
+                   :tab-index (+ 4 (count (:profiles current-user-data)) 1)
+                   :placeholder (placeholder :password)
+                   :on-change #(change! s :current-password (.. % -target -value))
+                   :value (:current-password current-user-data)}])
+              (when show-password?
+                [:label.field-label
+                  {:for "profile-new-password"}
+                  "New password"
+                  (when @(::password-error s)
+                    [:span.error "Minimum 8 characters"])])
+              (when show-password?
+                [:input.field-value.oc-input
+                  {:type "password"
+                   :id "profile-new-password"
+                   :tab-index (+ 4 (count (:profiles current-user-data)) 1)
+                   :placeholder (placeholder :new-password)
+                   :on-change #(change! s :password (.. % -target -value))
+                   :value (:password current-user-data)}])]]]]]))
