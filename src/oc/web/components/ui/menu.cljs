@@ -159,12 +159,15 @@
         ;;
         (when (and (jwt/jwt)
                    current-user-data
-                   can-compose?)
+                   (pos? (:contributor-count org-data)))
           [:a
             {:href (oc-urls/contributor (:user-id current-user-data))
              :on-click (partial my-posts-click s (:user-id current-user-data))}
-            [:div.oc-menu-item.my-posts
-              "My posts"]])
+            [:div.oc-menu-item.my-posts.group
+              [:span.oc-menu-item-label
+                "My posts"]
+              [:span.count
+                (:contributor-count org-data)]]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))
