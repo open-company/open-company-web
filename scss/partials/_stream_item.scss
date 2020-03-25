@@ -587,8 +587,6 @@ div.stream-item {
         @include mobile() {
           @include activity-body-preview(16, 20, var(--color), 2);
         }
-
-        
       }
     }
 

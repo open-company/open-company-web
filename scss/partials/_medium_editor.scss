@@ -56,22 +56,34 @@ div.medium-editor-toolbar {
           background-image: cdnUrl("/img/ML/context_menu_list.svg");
         }
 
-        &.medium-editor-action-h2 {
-          background-image: cdnUrl("/img/ML/context_menu_h2.svg"); 
-          margin-left: 9px;
-          padding-left: 9px;
-          width: 32px;
-          border-left: 1px solid var(--cmail-me-separator);
-        }
-
         &.medium-editor-action-anchor {
-          background-image: cdnUrl("/img/ML/context_menu_anchor.svg"); 
+          background-image: cdnUrl("/img/ML/context_menu_anchor.svg");
         }
 
         &.medium-editor-action-quote {
           * {
             display: initial;
           }
+        }
+
+        &.medium-editor-action-highlighter {
+          background-image: cdnUrl("/img/ML/context_menu_highlighter.svg");
+          background-size: 14px 14px;
+        }
+
+        &.medium-editor-action-h1 {
+          background-image: cdnUrl("/img/ML/context_menu_h1.svg");
+          margin-left: 9px;
+          padding-left: 9px;
+          width: 32px;
+          border-left: 1px solid var(--cmail-me-separator);
+        }
+
+        &.medium-editor-action-h2 {
+          background-image: cdnUrl("/img/ML/context_menu_h2.svg");
+          background-size: 22px 22px;
+          width: 32px;
+          border-left: none;
         }
       }
     }
@@ -92,12 +104,16 @@ div.medium-editor-toolbar {
       background-image: cdnUrl("/img/ML/context_menu_list@dark.svg");
     }
 
+    &.medium-editor-action-h1 {
+      background-image: cdnUrl("/img/ML/context_menu_h1@dark.svg");
+    }
+
     &.medium-editor-action-h2 {
       background-image: cdnUrl("/img/ML/context_menu_h2@dark.svg");
     }
 
     &.medium-editor-action-anchor {
-      background-image: cdnUrl("/img/ML/context_menu_anchor@dark.svg"); 
+      background-image: cdnUrl("/img/ML/context_menu_anchor@dark.svg");
     }
   }
 }

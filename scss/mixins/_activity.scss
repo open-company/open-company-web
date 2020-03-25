@@ -2,7 +2,7 @@
 @import "../modules/_fonts";
 
 $bottom_margin: 16;
-$h2_top_margin: 24;
+$header_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
@@ -577,7 +577,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $paragraph_spacing: $line_height){
+@mixin activity-body($font_size: 16, $line_height: ($bottom_margin + 6), $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -633,10 +633,10 @@ $h2_top_margin: 24;
   }
 
   & > *:first-child {
-    margin: 0px;
+    margin-top: 0px;
   }
 
-  & > *:not(:last-child) {
+  & > *:not(:first-child):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
@@ -647,7 +647,7 @@ $h2_top_margin: 24;
     padding-bottom: 0px;
   }
 
-  & > blockquote:not(:last-child) {
+  & > blockquote:not(:first-child):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -656,6 +656,22 @@ $h2_top_margin: 24;
   & > blockquote:last-child:not(:first-child) {
     margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 10px;
+  }
+
+  & > h1:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h1:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  & > h2:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h2:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   & > img, img {
@@ -701,25 +717,30 @@ $h2_top_margin: 24;
     @include OC_Body_Bold_Italic();
   }
 
-  *:first-child {
-    margin-top: 0px;
-  }
+  h1 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
+    font-weight: normal;
+    padding-bottom: 0px;
 
-  & > *:not(:first-child) {
-    margin-top: #{$paragraph_spacing}px;
-  }
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
 
-  h2 + p {
-    margin-top: 0px !important;
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   h2 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 2}px;
-    line-height: #{$line_height}px;
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -783,6 +804,12 @@ $h2_top_margin: 24;
 
   span {
     background-color: transparent!important;
+  }
+
+  mark, mark.highlight {
+    background-color: var(--highlighter-bg-color);
+    color: $deep_navy;
+    border-radius: 3px;
   }
 
   @include poll($paragraph_spacing);
@@ -914,13 +941,13 @@ $h2_top_margin: 24;
 }
 
 
-@mixin activity-comment($font-size: 18px, $line-height: 24px, $paragraph-spacing: $line-height){
+@mixin activity-comment($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height){
   @include OC_Body_Book();
-  font-size: $font-size;
+  font-size: #{$font_size}px;
   color: var(--color);
   white-space: normal;
   overflow-wrap: break-word;
-  line-height: $line-height;
+  line-height: #{$line_height}px;
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -981,8 +1008,8 @@ $h2_top_margin: 24;
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     color: var(--light-color);
     font-style: normal;
-    font-size: $font-size;
-    line-height: $line-height;
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
     cursor: text;
   }
 
@@ -1066,36 +1093,32 @@ $h2_top_margin: 24;
   }
 
   p, ul > li, i {
-    min-height: $line-height
-  }
-
-  h2 + p {
-    margin-top: 0px !important;
+    min-height: #{$line_height}px
   }
 
   & > *:first-child {
-    margin: 0px;
+    margin-top: 0px;
   }
 
-  & > *:not(:last-child) {
-    margin: $paragraph-spacing 0px;
+  & > *:not(:first-child):not(:last-child) {
+    margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
   & > *:last-child:not(:first-child) {
-    margin: $paragraph-spacing 0px 0px;
+    margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 0px;
   }
 
-  & > blockquote:not(:last-child) {
-    margin: $paragraph-spacing 0px;
+  & > blockquote:not(:first-child):not(:last-child) {
+    margin: #{$paragraph_spacing}px 0px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
   & > blockquote:last-child:not(:first-child) {
-    margin: $paragraph-spacing 0px 0px;
+    margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 10px;
   }
 
@@ -1103,23 +1126,95 @@ $h2_top_margin: 24;
     padding-bottom: 8px;
   }
 
-  *:first-child {
-    margin-top: 0px;
-  }
-
-  & > *:not(:first-child) {
-    margin-top: $paragraph-spacing;
-  }
-
   span {
     background-color: transparent!important;
+  }
+
+  h1 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
+    font-weight: normal;
+    padding-bottom: 0px;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  h2 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
+    font-weight: normal;
+    padding-bottom: 0px;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  & > h1:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h1:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  & > h2:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h2:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  mark, mark.highlight {
+    background-color: var(--highlighter-bg-color);
+    color: $deep_navy;
+    border-radius: 3px;
   }
 }
 
 @mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
+
   @include activity-body($font_size, $line_height, $color, 0);
-  max-height: #{$line_height * $preview_lines}px;
   overflow: hidden;
+
+  color: var(--color);
+  @include OC_Body_Book();
+  line-height: 20px;
+  font-size: #{$font_size}px;
+
+  max-height: #{$line_height * $preview_lines}px;
+
+  h1, h2, mark, mark.highlight {
+    color: var(--color);
+    @include OC_Body_Book();
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    background-color: transparent;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  b, strong, &.editing b, &.editing strong {
+    @include OC_Body_Book();
+    font-weight: normal;
+  }
 
   .carrot-no-preview {
     display: none;
@@ -1154,17 +1249,5 @@ $h2_top_margin: 24;
         background-image: cdnUrl("/img/ML/media_poll@dark.svg");
       }
     }
-  }
-
-  h2 {
-    color: var(--color);
-    @include OC_Body_Book();
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-  }
-
-  b, strong, &.editing b, &.editing strong {
-    @include OC_Body_Book();
-    font-weight: normal;
   }
 }

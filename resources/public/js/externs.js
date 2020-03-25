@@ -84,6 +84,8 @@ MediaPicker.hide = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
+// MediumEditorHighlighterButton
+var HighlighterButton = function(){};
 // Debug app state
 var OCWebConfigLogLevel = function(){};
 var OCWebForceRefreshToken = function(){};
