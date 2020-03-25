@@ -166,6 +166,8 @@
 (defmethod dispatcher/action :entry-publish-with-board/finish
   [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
+        org-data-key (dispatcher/org-data-key org-slug)
+        contributor-count-key (vec (conj org-data-key :contributor-count))
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
         board-key (dispatcher/board-data-key org-slug board-slug)
@@ -173,6 +175,7 @@
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
     (-> db
+      (update-in contributor-count-key inc)
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
       (assoc-in posts-key merged-items)
       (dissoc :section-editing)
@@ -184,10 +187,13 @@
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
+        org-data-key (dispatcher/org-data-key org-slug)
+        contributor-count-key (vec (conj org-data-key :contributor-count))
         board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
         with-published-at (update fixed-activity-data :published-at #(if (seq %) % (utils/as-of-now)))]
     (-> db
+      (update-in contributor-count-key inc)
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
       (add-remove-item-from-all-posts org-slug with-published-at)
       (add-remove-item-from-bookmarks org-slug with-published-at)
@@ -204,7 +210,9 @@
 
 (defmethod dispatcher/action :activity-delete
   [db [_ org-slug activity-data]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        contributor-count-key (vec (conj org-data-key :contributor-count))
+        posts-key (dispatcher/posts-data-key org-slug)
         posts-data (dispatcher/posts-data)
         next-posts (dissoc posts-data (:uuid activity-data))
         ;; Remove the post from all the containers posts list
@@ -240,6 +248,7 @@
     ;; Now if the post is the one being edited in cmail let's remove it from there too
     (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
       (-> with-fixed-boards
+          (update-in contributor-count-key dec)
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
       (assoc-in with-fixed-boards posts-key next-posts))))
@@ -398,7 +407,7 @@
 
 (defmethod dispatcher/action :bookmarks-get/finish
   [db [_ org-slug fixed-posts]]
-  (let [org-key (dispatcher/org-data-key org-slug)
+  (let [org-data-key (dispatcher/org-data-key org-slug)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
@@ -406,7 +415,7 @@
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-key :bookmarks-count) (:total-count fixed-posts)))))
+      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-posts)))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug]]
@@ -418,8 +427,8 @@
 (defmethod dispatcher/action :bookmarks-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [org-key (dispatcher/org-data-key org)
-          org-data (get-in db org-key)
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
           container-key (dispatcher/container-key org :bookmarks)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
@@ -434,7 +443,7 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-key :bookmarks-count) (:total-count fixed-posts-data))))
+        (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-posts-data))))
     db))
 
 (defmethod dispatcher/action :remove-bookmark
@@ -442,16 +451,16 @@
   (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
         bookmarks-key (dispatcher/container-key org-slug :bookmarks)
         bookmarks-data (get-in db bookmarks-key)
-        org-key (dispatcher/org-data-key org-slug)]
+        org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
-      (update-in (conj org-key :bookmarks-count) dec)
+      (update-in (conj org-data-key :bookmarks-count) dec)
       (assoc-in activity-key entry-data)
       (add-remove-item-from-bookmarks org-slug entry-data))))
 
 (defmethod dispatcher/action :add-bookmark
   [db [_ org-slug activity-data]]
-  (let [org-key (dispatcher/org-data-key org-slug)]
-    (update-in db (conj org-key :bookmarks-count) inc)))
+  (let [org-data-key (dispatcher/org-data-key org-slug)]
+    (update-in db (conj org-data-key :bookmarks-count) inc)))
 
 (defmethod dispatcher/action :activities-count
   [db [_ org-slug items-count]]
