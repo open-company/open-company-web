@@ -600,11 +600,14 @@ div.stream-item {
           }
         }
 
-        h2 {
+        h1, h2, mark, mark.highlight {
           color: var(--color);
           @include OC_Body_Book();
           font-size: 16px;
           line-height: 20px;
+          background-color: transparent;
+          padding: 0 !important;
+          margin: 0 !important;
         }
 
         b, strong, &.editing b, &.editing strong {

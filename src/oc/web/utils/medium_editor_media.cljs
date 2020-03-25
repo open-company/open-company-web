@@ -351,7 +351,6 @@
     (when (and (seq users-list)
                (nil? @(:me/editor s)))
       (let [mobile-editor (responsive/is-tablet-or-mobile?)
-            show-subtitle (:show-h2 options)
             media-config (:media-config options)
             placeholder (or (:placeholder options) "What would you like to share?")
             body-el (rum/ref-node s "editor-node")
@@ -366,8 +365,7 @@
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "inlinecode"]
-                      show-subtitle (conj "h2"))
+            buttons ["bold" "italic" "unorderedlist" "anchor" "quote" "highlighter" "h1" "h2"]
             paste-ext-options #js {:forcePlainText false
                                    :cleanPastedHTML true
                                    :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
@@ -379,7 +377,7 @@
                                                  "center" "cite" "col" "colgroup" "command" "datagrid" "datalist"
                                                  "dd" "del" "details" "dfn" "dialog" "dir" "div" "dl" "dt" "em"
                                                  "embed" "eventsource" "fieldset" "figcaption" "font" "footer" "form"
-                                                 "frame" "frameset" "h1" (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                                 "frame" "frameset" "h3" "h4" "h5"
                                                  "h6" "head" "header" "hgroup" "hr" "html" "iframe" "ins" "isindex"
                                                  "kbd" "keygen" "label" "legend" "link"  "main" "map" "mark" "menu" "meter"
                                                  "nav" "noframes" "noscript" "object" "ol" "optgroup" "option"
@@ -395,6 +393,7 @@
                                                     "autocode" (js/AutoCode.)
                                                     "autoinlinecode" (js/AutoInlinecode.)
                                                     "inlinecode" (js/InlineCodeButton.)
+                                                    "highlighter" (js/HighlighterButton.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)

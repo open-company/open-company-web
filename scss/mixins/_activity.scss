@@ -2,7 +2,7 @@
 @import "../modules/_fonts";
 
 $bottom_margin: 16;
-$h2_top_margin: 24;
+$header_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
@@ -247,7 +247,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $paragraph_spacing: $line_height){
+@mixin activity-body($font_size: 16, $line_height: ($bottom_margin + 6), $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -303,10 +303,10 @@ $h2_top_margin: 24;
   }
 
   & > *:not(blockquote, pre):first-child {
-    margin: 0px;
+    margin-top: 0px;
   }
 
-  & > *:not(blockquote, pre):not(:last-child) {
+  & > *:not(blockquote, pre):not(:first-child):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
@@ -315,6 +315,33 @@ $h2_top_margin: 24;
   & > *:not(blockquote, pre):last-child:not(:first-child) {
     margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 0px;
+  }
+
+  & > blockquote:not(:first-child):not(:last-child) {
+    margin: #{$paragraph_spacing}px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: #{$paragraph_spacing}px 0px 0px;
+    padding-bottom: 10px;
+  }
+
+  & > h1:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h1:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  & > h2:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h2:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   & > img, img {
@@ -357,28 +384,33 @@ $h2_top_margin: 24;
   }
 
   i b, i strong, strong i, b i {
-    @include OC_Body_Bold_Italic(); 
+    @include OC_Body_Bold_Italic();
   }
 
-  *:not(blockquote, pre):first-child {
-    margin-top: 0px;
-  }
+  h1 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
+    font-weight: normal;
+    padding-bottom: 0px;
 
-  & > *:not(blockquote, pre):not(:first-child) {
-    margin-top: #{$paragraph_spacing}px;
-  }
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
 
-  h2 + p {
-    margin-top: 0px !important;
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   h2 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 2}px;
-    line-height: #{$line_height}px;
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
@@ -442,6 +474,12 @@ $h2_top_margin: 24;
 
   span {
     background-color: transparent!important;
+  }
+
+  mark, mark.highlight {
+    background-color: var(--highlighter-bg-color);
+    color: $deep_navy;
+    border-radius: 3px;
   }
 
   @include code-blocks(#{$font_size - 3}px, #{$line_height - 3}px, $paragraph_spacing);
@@ -572,13 +610,13 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-comment($font-size: 18px, $line-height: 24px, $paragraph-spacing: $line-height){
+@mixin activity-comment($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height){
   @include OC_Body_Book();
-  font-size: $font-size;
+  font-size: #{$font_size}px;
   color: var(--color);
   white-space: normal;
   overflow-wrap: break-word;
-  line-height: $line-height;
+  line-height: #{$line_height}px;
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -639,8 +677,8 @@ $h2_top_margin: 24;
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     color: var(--light-color);
     font-style: normal;
-    font-size: $font-size;
-    line-height: $line-height;
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
     cursor: text;
   }
 
@@ -720,11 +758,11 @@ $h2_top_margin: 24;
   }
 
   i b, i strong, strong i, b i {
-    @include OC_Body_Bold_Italic(); 
+    @include OC_Body_Bold_Italic();
   }
 
   p, ul > li, i {
-    min-height: $line-height;
+    min-height: #{$line_height}px
   }
 
   h2 + p {
@@ -732,34 +770,100 @@ $h2_top_margin: 24;
   }
 
   & > *:not(blockquote, pre):first-child {
-    margin: 0px;
-  }
-
-  & > *:not(blockquote, pre):not(:last-child) {
-    margin: $paragraph-spacing 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-  }
-
-  & > *:not(blockquote, pre):last-child:not(:first-child) {
-    margin: $paragraph-spacing 0px 0px;
-    padding-bottom: 0px;
-  }
-
-  & > img, img {
-    padding-bottom: 8px;
+    margin-top: 0px;
   }
 
   *:not(blockquote, pre):first-child {
     margin-top: 0px;
   }
 
-  & > *:not(blockquote, pre):first-child {
-    margin-top: $paragraph-spacing;
+  & > *:not(blockquote, pre):not(:last-child) {
+    margin: #{$paragraph_spacing}px 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  & > *:not(blockquote, pre):last-child:not(:first-child) {
+    margin: #{$paragraph_spacing}px 0px 0px;
+    padding-bottom: 0px;
+  }
+
+
+  & > blockquote:not(:first-child):not(:last-child) {
+    margin: #{$paragraph_spacing}px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: #{$paragraph_spacing}px 0px 0px;
+    padding-bottom: 10px;
+  }
+
+  & > img, img {
+    padding-bottom: 8px;
   }
 
   span {
     background-color: transparent!important;
+  }
+
+  h1 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
+    font-weight: normal;
+    padding-bottom: 0px;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  h2 {
+    @include OC_Body_Bold();
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
+    font-weight: normal;
+    padding-bottom: 0px;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  & > h1:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h1:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  & > h2:not(:first-child):not(:last-child) {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  }
+
+  & > h2:last-child:not(:first-child) {
+    margin: #{$header_top_margin}px 0px 0px;
+  }
+
+  mark, mark.highlight {
+    background-color: var(--highlighter-bg-color);
+    color: $deep_navy;
+    border-radius: 3px;
   }
 
   @include code-blocks(#{int($font-size) - 3}px, #{int($line-height) - 3}px, $paragraph-spacing);
