@@ -296,7 +296,7 @@
                 (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))]
       {:did-mount (fn [s]
        (reset! lst
-        (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
+        (events/listen (rum/ref-node s ref) EventType/KEYUP autoresize))
        (autoresize #js {:target (rum/ref-node s ref)})
        s)
        :will-unmount (fn [s]
