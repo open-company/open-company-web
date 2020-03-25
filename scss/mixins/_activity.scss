@@ -214,7 +214,7 @@ $header_top_margin: 24;
   }
 }
 
-@mixin poll($paragraph-spacing) {
+@mixin poll($paragraph_spacing) {
   div.oc-poll-portal {
     margin: 0 0 #{$paragraph_spacing}px;
 
