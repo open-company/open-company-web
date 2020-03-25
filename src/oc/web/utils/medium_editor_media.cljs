@@ -351,7 +351,6 @@
     (when (and (seq users-list)
                (nil? @(:me/editor s)))
       (let [mobile-editor (responsive/is-tablet-or-mobile?)
-            show-subtitle (:show-h2 options)
             media-config (:media-config options)
             placeholder (or (:placeholder options) "What would you like to share?")
             body-el (rum/ref-node s "editor-node")
@@ -366,13 +365,13 @@
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote"]
-                      show-subtitle (conj "h2"))
+            buttons ["bold" "italic" "unorderedlist" "anchor" "quote" "highlighter" "h1" "h2"]
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
                                 "fileDragging" false}
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
                                                     "autoquote" (js/AutoQuote.)
+                                                    "highlighter" (js/HighlighterButton.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
@@ -394,11 +393,9 @@
                                  :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
                                  :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
                                                  "textarea" "style" "javascript"]
-                                 :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
-                                                       (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                 :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                       "details" "summary" "nav" "abbr" "mark"
-                                                       "table" "thead" "tbody" "tr" "th" "td"]))}
+                                                       "details" "summary" "nav" "abbr" "table" "thead" "tbody" "tr" "th" "td"]))}
                      :placeholder #js {:text placeholder
                                        :hideOnClick false
                                        :hide-on-click false}

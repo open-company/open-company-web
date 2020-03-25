@@ -590,11 +590,14 @@ div.stream-item {
 
         max-height: #{20 * 2}px;
 
-        h2 {
+        h1, h2, mark, mark.highlight {
           color: var(--color);
           @include OC_Body_Book();
           font-size: 16px;
           line-height: 20px;
+          background-color: transparent;
+          padding: 0 !important;
+          margin: 0 !important;
         }
 
         b, strong, &.editing b, &.editing strong {
@@ -611,9 +614,14 @@ div.stream-item {
           line-height: 20px;
           max-height: #{20 * 2}px;
 
-          h2 {
+          h1, h2, mark, mark.highlight {
+            color: var(--color);
+            @include OC_Body_Book();
             font-size: 16px;
             line-height: 20px;
+            background-color: transparent;
+            padding: 0 !important;
+            margin: 0 !important;
           }
         }
       }
