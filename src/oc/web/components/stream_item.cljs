@@ -260,42 +260,36 @@
         [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
-          (user-info-hover {:user-data publisher :current-user-id current-user-id})
-          (user-avatar-image publisher)
-          [:div.name
-            [:div.mobile-name
-              [:div.name-inner
-                {:class utils/hide-class}
-                (str
-                 (:name publisher)
-                 " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))]
-              [:div.time-since
-                {:data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time t)])]]
-            [:div.muted-activity
+          [:div.hover-container.group
+            (user-info-hover {:user-data publisher :current-user-id current-user-id})
+            (user-avatar-image publisher)
+            [:span.name
+              {:class utils/hide-class}
+              (str
+               (:name publisher)
+               " in "
+               (:board-name activity-data)
+               (when (= (:board-access activity-data) "private")
+                 " (private)")
+               (when (= (:board-access activity-data) "public")
+                 " (public)"))]]
+          (let [t (or (:published-at activity-data) (:created-at activity-data))]
+            [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
-               :title "Muted"}]
-            [:div.must-see-tag]
-            [:div.bookmark-tag-small.mobile-only]
-            [:div.bookmark-tag.big-web-tablet-only]]]
+               :data-container "body"
+               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+               :data-title (utils/activity-date-tooltip activity-data)}
+              [:time
+                {:date-time t}
+                (utils/foc-date-time t)]])
+          [:div.muted-activity
+            {:data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :title "Muted"}]
+          [:div.must-see-tag]
+          [:div.bookmark-tag-small.mobile-only]
+          [:div.bookmark-tag.big-web-tablet-only]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?

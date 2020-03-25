@@ -28,16 +28,12 @@
         vertical-position (if (> (- (:y pos) (:y popup-offset)) (:height popup-size))
                             :top
                             :bottom)
-        ; vertical-offset (if (= vertical-position :top)
-        ;                   (* (:height popup-size) -1)
-        ;                   0)
         horizontal-offset (if (> (:x pos) (:x popup-offset))
                             0
                             (if (neg? (:x pos))
                               (+ (* (:x pos) -1) (:x popup-offset))
                               (- (:x popup-offset) (:x pos))))]
     {:vertical-position vertical-position
-     ; :vertical-offset vertical-offset
      :horizontal-offset horizontal-offset}))
 
 (defn- enter! [s parent-el]
@@ -52,14 +48,19 @@
 (defn- enter-ev [s parent-el]
   (when-not (-> s :rum/args first :disabled)
     (.clearTimeout js/window @(::enter-timeout s))
+    (.clearTimeout js/window @(::leave-timeout s))
     (reset! (::enter-timeout s) (.setTimeout js/window #(enter! s parent-el) 500))))
 
 (defn- leave-ev [s]
   (when-not (-> s :rum/args first :disabled)
     (.clearTimeout js/window @(::enter-timeout s))
-    (leave! s)))
+    (.clearTimeout js/window @(::leave-timeout s))
+    (if (-> s :rum/args first :leave-delay?)
+      (reset! (::leave-timeout s) (.setTimeout js/window #(leave! s) 500))
+      (leave! s))))
 
-(defn- click [s]
+(defn- click [s e]
+  (utils/event-stop e)
   (nav-actions/show-user-info (-> s :rum/args first :user-data :user-id)))
 
 (rum/defcs user-info-hover <
@@ -70,6 +71,7 @@
   (rum/local default-positioning ::positioning)
   (rum/local false ::hovering)
   (rum/local nil ::enter-timeout)
+  (rum/local nil ::leave-timeout)
   {:did-mount (fn [s]
    (let [el (rum/dom-node s)
          parent-el (.-parentElement el)]
@@ -94,16 +96,14 @@
       (events/unlistenByKey @(::click s))
       (reset! (::click s) nil))
     s)}
-  [s {:keys [disabled user-data current-user-id]}]
+  [s {:keys [disabled user-data current-user-id leave-delay?]}]
   (let [my-profile? (= (:user-id user-data) current-user-id)
         pos @(::positioning s)]
     [:div.user-info-hover
       {:class (utils/class-set {:show @(::hovering s)
                                 (:vertical-position pos) true
                                 :left true})
-       :style {:margin-left (str (:horizontal-offset pos) "px")
-               ; :margin-top (str (:vertical-offset pos) "px")
-               }}
+       :style {:margin-left (str (:horizontal-offset pos) "px")}}
       [:div.user-info-inner
         [:div.user-info-header
           (user-avatar-image user-data)

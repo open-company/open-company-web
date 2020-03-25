@@ -11,7 +11,7 @@ $header_top_margin: 24;
     margin-right: 13px;
   }
 
-  div.name {
+  div.name, span.name {
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
@@ -21,7 +21,7 @@ $header_top_margin: 24;
     white-space: nowrap;
   }
 
-  div.time-since {
+  div.time-since, span.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();

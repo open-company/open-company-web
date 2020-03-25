@@ -270,92 +270,82 @@ div.stream-item {
     }
 
     div.stream-header-head-author {
-      width: 100%;
-      padding: 0;
-      margin: 0;
-      cursor: pointer;
-      background-color: transparent;
-      border: none;
-      outline: none;
 
       @include mobile() {
         min-height: 24px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
       }
 
-      @include activity-author(24);
-
-      div.user-avatar-img-container {
-        margin-right: 8px;
-      }
-
-      div.name {
-        height: 24px;
+      div.hover-container {
         float: left;
+        margin-right: 8px;
         max-width: 70%;
-        color: var(--light-color);
+        @include activity-author(24);
 
         @include mobile() {
-          width: calc(100% - 32px);
-          max-width: unset;
+          float: unset;
+          max-width: calc(100% - 32px);
+          width: auto;
+          flex: 0 1 auto;
         }
 
-        div.mobile-name {
-          display: block;
+        div.user-avatar-img-container {
+          margin-right: 8px;
+        }
+
+        span.name {
+          height: 24px;
           float: left;
+          color: var(--light-color);
           white-space: nowrap;
-
-          div.name-inner {
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            line-height: 24px;
-            margin-right: 8px;
-            float: left;
-            white-space: nowrap;
-          }
-
-          div.time-since {
-            display: block;
-            float: left;
-            height: 24px;
-            line-height: 24px;
-            text-align: left;
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: var(--light-color);
-            position: relative;
-            margin-left: 6px;
-            overflow: visible;
-            white-sapce: nowrap;
-
-            &:before {
-              content: "";
-              width: 3px;
-              height: 3px;
-              background-color: var(--ultralight-color);
-              border-radius: 50%;
-              position: absolute;
-              top: 12px;
-              left: -8px;
-            }
-
-            @include mobile() {
-              display: block;
-              float: left;
-              line-height: 24px;
-            }
-          }
+          text-overflow: ellipsis;
+          overflow: hidden;
+          line-height: 24px;
+          float: left;
+          max-width: calc(100% - 32px);
         }
+      }
 
-        div.bookmark-tag-small {
-          float: right;
-          margin-right: 0;
-        }
+      span.time-since {
+        display: block;
+        float: left;
+        height: 24px;
+        line-height: 24px;
+        text-align: left;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--light-color);
+        position: relative;
+        margin-left: 6px;
+        white-sapce: nowrap;
 
         @include mobile() {
-          div.bookmark-tag-small {
-            margin-top: 3px;
-          }
+          float: unset;
+          flex: 0 0 auto;
+        }
+
+        &:before {
+          content: "";
+          width: 3px;
+          height: 3px;
+          background-color: var(--ultralight-color);
+          border-radius: 50%;
+          position: absolute;
+          top: 12px;
+          left: -8px;
+        }
+      }
+
+      div.bookmark-tag-small {
+        float: right;
+        margin-right: 0;
+      }
+
+      @include mobile() {
+        div.bookmark-tag-small {
+          margin-top: 3px;
         }
       }
 

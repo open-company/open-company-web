@@ -193,9 +193,6 @@
                         :can-reply? true
                         :reply-cb reply-cb})
             emoji-picker])
-        [:div.stream-comment-author-avatar
-          (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id})
-          (user-avatar-image (:author comment-data))]
         [:div.stream-comment-right
           [:div.stream-comment-header.group
             {:class utils/hide-class}
@@ -203,7 +200,9 @@
               [:div.stream-comment-author-right-group
                 {:class (when (:new comment-data) "new-comment")}
                 [:div.stream-comment-author-name-container
-                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id})
+                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
+                  [:div.stream-comment-author-avatar
+                    (user-avatar-image (:author comment-data))]
                   [:div.stream-comment-author-name
                     (:name (:author comment-data))]]
                 [:div.stream-comment-author-timestamp

@@ -390,15 +390,6 @@ div.stream-comments {
             }
           }
 
-          div.stream-comment-author-avatar {
-            float: left;
-            width: 32px;
-            height: 32px;
-            position: relative;
-
-            @include user-profile(32);
-          }
-
           div.stream-comment-right {
             margin-left: 48px;
 
@@ -470,6 +461,21 @@ div.stream-comments {
                 div.stream-comment-author-name-container {
                   flex: 1 0 auto;
                   position: relative;
+
+                  div.user-info-hover {
+                    transform: translateX(-48px);
+                  }
+
+                  div.stream-comment-author-avatar {
+                    position: absolute;
+                    left: -48px;
+                    top: 0;
+                    width: 48px;
+                    height: 32px;
+                    padding-right: 16px;
+
+                    @include user-profile(32);
+                  }
 
                   @include mobile() {
                     flex: 1 1 auto;

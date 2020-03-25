@@ -214,13 +214,14 @@
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
           [:div.expanded-post-author-inner-label
-            (user-info-hover {:user-data publisher :current-user-id current-user-id})
-            (str (:name publisher) " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))
+            [:span.hover-info-popup-container
+              (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
+              (str (:name publisher) " in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)"))]
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)
