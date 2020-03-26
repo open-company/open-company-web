@@ -53,7 +53,7 @@
     (section-actions/section-save
       {:name direct-name
        :access :private
-       :authors (vec @(::users s))
+       :authors (vec users)
        :direct true}
       ""
       (fn [board-data]
@@ -82,13 +82,14 @@
                            (rum/local nil ::existing-board)
   [s]
   (let [roster (drv/react s :team-roster)
-        editable-boards (drv/react s :editable-boards)
+        editable-boards (vec (vals (drv/react s :editable-boards)))
         current-user-data (drv/react s :current-user-data)
         active-users (filterv #(and (#{"active" "unverified"} (:status %))
                                     (not= (:user-id current-user-data) (:user-id %))) (:users roster))
         sorted-users (filter-sort-users s (:user-id current-user-data) active-users @(::query s))
         existing-board (some #(when (and (:direct %)
-                                         (= (set (:authors %)) @(::users s)))
+                                         (= (clojure.core/disj (set (:authors %)) (:user-id current-user-data))
+                                            (set @(::users s))))
                                 %)
                         editable-boards)]
     [:div.direct-picker
