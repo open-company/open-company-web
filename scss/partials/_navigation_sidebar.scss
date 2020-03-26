@@ -496,18 +496,21 @@ div.left-navigation-sidebar {
           transform: rotate(-180deg);
         }
 
-        &:before {
-          content: "";
-          position: absolute;
-          top: 12px;
-          left: 3px;
-          background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
-          background-size: 12px 6px;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 12px;
-          height: 6px;
-          transition: 180ms transform;
+        &.dropdown-arrow {
+
+          &:before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 3px;
+            background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
+            background-size: 12px 6px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 12px;
+            height: 6px;
+            transition: 180ms transform;
+          }
         }
 
         span.sections {

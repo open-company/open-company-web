@@ -237,7 +237,8 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::sections-list-collapsed s) "collapsed")
+                {:class (utils/class-set {:collapsed @(::sections-list-collapsed s)
+                                          :dropdown-arrow (seq sorted-boards)})
                  :on-click #(toggle-collapse-sections s)}
                 [:span.sections "Sections"]]
               (when create-link
@@ -283,7 +284,8 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::users-list-collapsed s) "collapsed")
+                {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
+                                          :dropdown-arrow (not (seq sorted-direct-boards))})
                  :on-click #(toggle-collapse-users s)}
                 [:span.sections "Direct"]]
               (when create-link
