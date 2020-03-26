@@ -34,6 +34,16 @@
 ;; :wrt-{uuid}
 ;; :theme
 
+;; Direct picker
+
+(defn hide-direct-picker []
+  (dis/dispatch! [:input (conj dis/direct-messages-key :visible) false]))
+
+(defn show-direct-picker []
+  (dis/dispatch! [:update dis/direct-messages-key #(-> %
+                                                    (assoc :users (or (:users %) #{}))
+                                                    (assoc :visible true))]))
+
 (defn- container-data [board-slug]
   (if (dis/is-container? board-slug)
     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
@@ -78,6 +88,7 @@
          org-slug (router/current-org-slug)
          is-container? (dis/is-container? board-slug)
          org-data (dis/org-data)]
+     (hide-direct-picker)
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -122,6 +133,7 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
+    (hide-direct-picker)
     (nav-to-url! e board to-url back-y should-refresh-data?)))
 
 (defn open-post-modal [activity-data dont-scroll]
@@ -136,6 +148,7 @@
         query-params (router/query-params)
         route [org board activity "activity"]
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
+    (hide-direct-picker)
     (router/set-route! route {:org org
                               :board board
                               :activity activity
@@ -148,13 +161,6 @@
         (utils/after 10 #(utils/scroll-to-y 0 0))
         (utils/scroll-to-y 0 0)))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
-
-;; Direct picker
-
-(defn show-direct-picker []
-  (dis/dispatch! [:update dis/direct-messages-key #(-> %
-                                                    (assoc :users (or (:users %) #{}))
-                                                    (assoc :visible true))]))
 
 ;; Push panel
 

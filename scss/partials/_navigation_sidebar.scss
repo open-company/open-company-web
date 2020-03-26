@@ -269,8 +269,6 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
-    overflow-x: hidden;
-    overflow-y: auto;
 
     @include mobile() {
       position: relative;
@@ -558,6 +556,16 @@ div.left-navigation-sidebar {
       z-index: 1;
     }
 
+    &:last-child {
+      a.left-navigaiton-sidebar-item:last-child {
+        margin-bottom: 10px;
+
+        @include mobile() {
+          margin-bottom: 0px;
+        }
+      }
+    }
+
     a.left-navigation-sidebar-item {
       display: block;
       cursor: pointer;
@@ -578,14 +586,6 @@ div.left-navigation-sidebar {
 
       &.drafts-board {
         margin-top: 24px;
-      }
-
-      &:last-child {
-        margin-bottom: 10px;
-
-        @include mobile() {
-          margin-bottom: 0px;
-        }
       }
 
       &.hover-item {

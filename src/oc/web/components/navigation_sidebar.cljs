@@ -159,8 +159,8 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        show-users-list member?
-        sorted-direct-boards (when show-users-list
+        show-direct member?
+        sorted-direct-boards (when show-direct
                                (sort-boards (filter-direct-boards all-boards)))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
@@ -278,13 +278,13 @@
                 (when (= (:access board) "private")
                   [:div.private])])])
         ;; Direct messages
-        (when show-users-list
+        (when show-direct
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::users-list-collapsed s) "collapsed")
-                 :on-click #(toggle-collapse-sections s)}
+                 :on-click #(toggle-collapse-users s)}
                 [:span.sections "Direct"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset

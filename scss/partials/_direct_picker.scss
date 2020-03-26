@@ -20,72 +20,94 @@ div.direct-picker {
     @include OC_Body_Book();
     font-size: 16px;
     color: var(--color);
-    margin-top: 16px;
+    margin-top: 4px;
   }
 
   div.direct-picker-selected-users {
-    margin-top: 24px;
+    margin-top: 8px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: stretch;
     
     div.direct-picker-selected-users-list {
-      background-color: var(--opac-background-color-2);
+      background-color: var(--opac-background-color-05);
       border-radius: 4px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      max-height: 500px;
-      width: calc(100% - 80px);
-      white-space: nowrap;
       padding: 0 8px 4px;
-      white-space: pre-wrap;
-      float: left;
-      display: block;
+      margin-right: 8px;
 
-      div.direct-picker-user {
+      flex: 1 1 auto;
+
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      align-content: flex-start;
+
+      button.direct-picker-selected-user {
         display: inline-block;
         height: 24px;
-        padding: 4px 8px;
+        padding: 4px 20px 4px 8px;
         margin-right: 4px;
         margin-top: 4px;
         background-color: var(--light-color);
         border-radius: 4px;
-        // flex: 0 0 auto;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+        align-content: flex-start;
+        position: relative;
 
-        @include user-profile(16) {
-          float: left;
-        }
-
-        span.direct-picker-user-name {
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--overlay-background-color);
-          float: left;
-          margin-left: 8px;
-        }
-
-        button.remove-user-bt {
-          float: left;
-          width: 16px;
-          height: 16px;
-          margin-left: 4px;
+        &:after {
+          content: "";
+          width: 20px;
+          height: 24px;
+          display: block;
           background-image: cdnUrl("/img/ML/mobile_close_x@dark.svg");
           background-position: center;
           background-repeat: no-repeat;
           background-size: 8px 8px;
+          position: absolute;
+          right: 0;
+          top: 0;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/mobile_close_x.svg");
           }
         }
+
+        @include user-profile(16) {
+          flex: 0 0 16px;
+        }
+
+        span.direct-picker-selected-user-name {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--overlay-background-color);
+          float: left;
+          margin-left: 4px;
+          flex: 1 0 auto;
+        }
       }
 
       input.direct-picker-search-field-input {
-        display: inline-block;
+        display: block;
         height: 24px;
         padding: 0;
         margin: 0;
         background-color: transparent;
         @include OC_Body_Book();
-        font-size: 14px;
+        font-size: 12px;
         line-height: 24px;
         color: var(--color);
         max-width: 100%;
@@ -94,12 +116,8 @@ div.direct-picker {
         outline: none;
         vertical-align: super;
         margin-top: 4px;
-        // flex: 1 1 auto;
-
-        // &.empty {
-        //   // display: block;
-        //   width: 100%;
-        // }
+        min-width: 160px;
+        flex: 1 1 auto;
 
         &:focus, &:active {
           border: none;
@@ -116,7 +134,7 @@ div.direct-picker {
     }
 
     button.direct-picker-create-bt {
-      width: 72px;
+      width: auto;
       height: 32px;
       @include OC_Body_Bold();
       font-size: 14px;
@@ -124,18 +142,19 @@ div.direct-picker {
       color: white;
       background-color: $carrot_green;
       border-radius: 4px;
-      padding: 7px 0;
-      float: right;
+      padding: 7px 14px;
+      flex: 0 0 auto;
 
-      &.disabled, &:disabed {
-        background-color: var(--opac-background-color-2);
+      &.disabled, &:disabled {
+        opacity: 1!important;
+        background-color: var(--opac-background-color-05);
         color: var(--light-color);
       }
     }
   }
 
   div.direct-picker-users-list {
-    margin-top: 24px;
+    margin-top: 16px;
     width: calc(100% + 48px);
     margin-left: -24px;
 
@@ -148,7 +167,7 @@ div.direct-picker {
       display: block;
 
       &.selected {
-        background-color: var(--opac-background-color-2);
+        background-color: var(--opac-background-color-05);
       }
 
       div.carrot-checkbox {

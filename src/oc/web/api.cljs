@@ -234,7 +234,7 @@
 
 (def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
 
-(def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
+(def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :direct])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
