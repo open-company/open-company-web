@@ -149,6 +149,13 @@
         (utils/scroll-to-y 0 0)))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
+;; Direct picker
+
+(defn show-direct-picker []
+  (dis/dispatch! [:update dis/direct-messages-key #(-> %
+                                                    (assoc :users (or (:users %) #{}))
+                                                    (assoc :visible true))]))
+
 ;; Push panel
 
 (defn- push-panel

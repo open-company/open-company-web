@@ -37,17 +37,34 @@
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
+(defn- toggle-collapse-users [s]
+  (let [next-value (not @(::users-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-users-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::users-list-collapsed s) next-value)
+    (reset! (::content-height s) nil)
+    (utils/after 100 #(save-content-height s))))
+
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
     (and (not= (:slug board-data) utils/default-drafts-board-slug)
+         (not (:direct board-data))
          (or (not (contains? self-link :count))
-             (and (contains? self-link :count)
-                  (pos? (:count self-link))))
-         (or (not (contains? board-data :draft))
-             (not (:draft board-data))))))
+             (pos? (:count self-link)))
+         (not (:draft board-data)))))
 
 (defn filter-boards [all-boards]
   (filterv filter-board all-boards))
+
+(defn filter-direct-board [board-data]
+  (let [self-link (utils/link-for (:links board-data) "self")]
+    (and (not= (:slug board-data) utils/default-drafts-board-slug)
+         (:direct board-data)
+         (or (not (contains? self-link :count))
+             (pos? (:count self-link)))
+         (not (:draft board-data)))))
+
+(defn filter-direct-boards [all-boards]
+  (filterv filter-direct-board all-boards))
 
 (defn save-window-size
   "Save the window height in the local state."
@@ -72,6 +89,7 @@
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local false ::sections-list-collapsed)
+                                (rum/local false ::users-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -80,6 +98,7 @@
                                   (save-window-size s)
                                   (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
+                                  (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -121,12 +140,12 @@
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
-        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
-        show-inbox (and user-is-part-of-the-team?
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-inbox (and member?
                         (utils/link-for (:links org-data) "inbox"))
-        show-all-posts (and user-is-part-of-the-team?
+        show-all-posts (and member?
                             (utils/link-for (:links org-data) "entries"))
-        show-bookmarks (and user-is-part-of-the-team?
+        show-bookmarks (and member?
                             (utils/link-for (:links org-data) "bookmarks"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -139,11 +158,15 @@
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)]
+                                 is-admin-or-author?)
+        show-users-list member?
+        sorted-direct-boards (when show-users-list
+                               (sort-boards (filter-direct-boards all-boards)))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
-                                :collapsed-sections @(::sections-list-collapsed s)})
+                                :collapsed-sections @(::sections-list-collapsed s)
+                                :collapsed-users @(::users-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -253,7 +276,45 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]
+                  [:div.private])])])
+        ;; Direct messages
+        (when show-users-list
+          [:div.left-navigation-sidebar-top.group
+            ;; Boards header
+            [:h3.left-navigation-sidebar-top-title.group
+              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                {:class (when @(::users-list-collapsed s) "collapsed")
+                 :on-click #(toggle-collapse-sections s)}
+                [:span.sections "Direct"]]
+              (when create-link
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
+                  {:on-click #(nav-actions/show-direct-picker)
+                   :title "Create a new direct"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-container "body"}])]])
+        (when (and show-boards
+                   (not @(::users-list-collapsed s)))
+          [:div.left-navigation-sidebar-items.group
+            (for [direct-board sorted-direct-boards
+                  :let [board-url (oc-urls/board org-slug (:slug direct-board))
+                        is-current-board (and (not is-inbox)
+                                              (not is-all-posts)
+                                              (not is-bookmarks)
+                                              (= selected-slug (:slug direct-board)))
+                        board-change-data (get change-data (:uuid direct-board))]]
+              [:a.left-navigation-sidebar-item.hover-item
+                {:class (utils/class-set {:item-selected is-current-board})
+                 :data-board (name (:slug direct-board))
+                 :key (str "board-list-" (name (:slug direct-board)) "-" (rand 100))
+                 :href board-url
+                 :on-click #(do
+                              (nav-actions/nav-to-url! % (:slug direct-board) board-url))}
+                [:div.direct-board-name.group
+                  [:div.internal
+                    {:class (utils/class-set {:new (seq (:unread board-change-data))})
+                     :key (str "board-list-" (name (:slug direct-board)) "-internal")
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name direct-board) (:slug direct-board)))}]]])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer
           [:button.mlb-reset.invite-people-bt
