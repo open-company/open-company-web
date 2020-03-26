@@ -178,6 +178,8 @@
 
 (def force-list-update-key [:force-list-update])
 
+(def direct-messages-key [:direct-messages])
+
 ;; Functions needed by derivatives
 
 (declare org-data)
@@ -474,7 +476,8 @@
                                     (get-in base (reminder-edit-key org-slug)))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
    :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
-   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})
+   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]
+   :direct-messages       [[:base] (fn [base] (get-in base direct-messages-key))]})
 
 ;; Action Loop =================================================================
 
