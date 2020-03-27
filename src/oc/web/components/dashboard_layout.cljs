@@ -234,6 +234,10 @@
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board))
                                                   :public (= (:access current-board-data) "public")})
+                         :data-toggle (when (and (not is-mobile?) (:direct current-board-data)) "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :title (:name current-board-data)
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"

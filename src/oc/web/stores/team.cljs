@@ -2,6 +2,7 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.utils :as utils]))
 
 (defmethod dispatcher/action :teams-get
@@ -13,9 +14,18 @@
   (assoc-in db [:teams-data :teams] teams))
 
 (defmethod dispatcher/action :team-roster-loaded
-  [db [_ roster-data]]
+  [db [_ org-slug roster-data]]
   (if roster-data
-    (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
+    (let [org-boards-key (concat (dispatcher/org-data-key org-slug) [:boards])
+          next-db* (update-in db org-boards-key #(mapv (fn [board] (au/direct-board-name board (:users roster-data) "team-roster-loaded/fix-org-boards")) %))
+          boards-key (dispatcher/boards-key org-slug)
+          next-db (reduce (fn [tdb board-key]
+                           (let [board-data-key (concat boards-key [board-key :board-data])
+                                 old-board-data (get-in tdb board-data-key)]
+                             (assoc-in tdb board-data-key (au/direct-board-name old-board-data (:users roster-data) "team-roster-loaded/fix-boards"))))
+                   next-db*
+                   (keys (get-in db boards-key)))]
+      (assoc-in next-db (dispatcher/team-roster-key (:team-id roster-data)) roster-data))
     db))
 
 (defn parse-team-data [team-data]

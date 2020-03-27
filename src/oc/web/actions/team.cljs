@@ -39,7 +39,7 @@
                                   :links (-> fixed-body :collection :links)
                                   :users users
                                   :mention-users (users-for-mentions users)}]
-           (dis/dispatch! [:team-roster-loaded fixed-roster-data])
+           (dis/dispatch! [:team-roster-loaded (router/current-org-slug) fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]
              (doseq [[activity-uuid read-data] activities-read]

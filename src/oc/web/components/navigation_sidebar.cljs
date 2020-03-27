@@ -316,6 +316,10 @@
                   [:div.internal
                     {:class (utils/class-set {:new (seq (:unread board-change-data))})
                      :key (str "board-list-" (name (:slug direct-board)) "-internal")
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :title (:name direct-board)
                      :dangerouslySetInnerHTML (utils/emojify (or (:name direct-board) (:slug direct-board)))}]]])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer

@@ -2,6 +2,7 @@
   (:require [cuerdas.core :as s]
             [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -278,11 +279,34 @@
       (assoc :fixed-video-id fixed-video-id)
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
+(defn direct-board-name [board-data roster-users callee]
+  (if (or (not (:direct board-data))
+          (not (seq roster-users)))
+    board-data
+    (let [calc-name (fn [users user]
+                      (let [user-id (if (map? user) (:user-id user) user)]
+                        (user-lib/name-for (some #(when (= (:user-id %) user-id) %) users))))
+          except-me (filterv #(when (and (not= % (jwt/user-id))
+                                         (not= (:user-id %) (jwt/user-id)))
+                                %)
+                     (:authors board-data))
+          board-name* (clojure.string/join ","
+                       (mapv (partial calc-name roster-users) (butlast except-me)))
+          board-name (str board-name*
+                          (when (> (count except-me) 1)
+                            " and ")
+                          (calc-name roster-users (last except-me)))]
+      (assoc board-data :name board-name))))
+
 (defn fix-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {}))
-  ([board-data change-data & [direction]]
+   (fix-board board-data {} (dis/team-roster)))
+
+  ([board-data change-data]
+   (fix-board board-data change-data (dis/team-roster)))
+
+  ([board-data change-data team-roster & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
@@ -321,8 +345,11 @@
                              with-posts-list)
           with-posts-separators (if (show-separators? (:slug board-data))
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
-      with-posts-separators)))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
+          with-fixed-direct-name (if (:direct with-posts-separators)
+                                   (direct-board-name with-posts-separators (:users team-roster) "fix-board")
+                                   with-posts-separators)]
+      with-fixed-direct-name)))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
