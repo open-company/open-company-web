@@ -372,6 +372,12 @@ $mobile-collapse-height: 160;
     height: 72px;
     opacity: 1;
 
+    @include big_web() {
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+
     div.expand-button-inner {
       margin: 16px auto 24px;
       width: 164px;
@@ -382,6 +388,7 @@ $mobile-collapse-height: 160;
       line-height: 18px;
       color: var(--color);
       position: relative;
+      border-radius: 4px;
       background-color: var(--opac-background-color-1);
 
       &:before {
