@@ -415,6 +415,30 @@ div.dashboard-layout {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+
+              span.internal-name {
+                @include OC_Body_Bold();
+                font-size: 15px;
+                color: var(--color);
+                line-height: 32px;  
+              }
+
+              span.count {
+                @include OC_Body_Book();
+                font-size: 12px;
+                line-height: 16px;
+                text-align: center;
+                color: var(--color);
+                min-width: 16px;
+                height: 16px;
+                display: inline-block;
+                background-color: var(--navigation-sidebar-count-bg);
+                border-radius: 4px;
+                vertical-align: top;
+                margin-top: 8px;
+                margin-left: 8px;
+                padding: 0 4px;
+              }
             }
 
             @include mobile() {

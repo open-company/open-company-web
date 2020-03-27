@@ -240,28 +240,40 @@
                   (when (or current-board-slug
                             current-contributor-id)
                     [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access current-board-data) "public")})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-inbox
-                                                   "Unread"
+                      (if is-contributor
+                        [:div.board-name-with-icon-internal
+                          (if (= (:user-id contributor-user-data) (:user-id current-user-data))
+                            [:span.internal-name
+                              "My posts"
+                              [:span.count (:contributor-count org-data)]]
+                            [:span.internal-name
+                              (str (lib-user/name-for contributor-user-data) "'s posts")])]
+                        [:div.board-name-with-icon-internal
+                          {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
+                                                                  (not is-drafts-board))
+                                                    :public (= (:access current-board-data) "public")})
+                           :dangerouslySetInnerHTML (utils/emojify (cond
+                                                     is-inbox
+                                                     "Unread"
 
-                                                   is-all-posts
-                                                   "Recent"
+                                                     is-all-posts
+                                                     "Recent"
 
-                                                   is-bookmarks
-                                                   "Bookmarks"
+                                                     is-bookmarks
+                                                     "Bookmarks"
 
-                                                   is-contributor
-                                                   (str (lib-user/name-for contributor-user-data) "'s posts")
+                                                     (and is-contributor
+                                                          (= (:user-id contributor-user-data) (:user-id current-user-data)))
+                                                     "My posts"
 
-                                                   :default
-                                                   ;; Fallback to the org board data
-                                                   ;; to avoid showing an empty name while loading
-                                                   ;; the board data
-                                                   (:name current-board-data)))}]])
+                                                     is-contributor
+                                                     (str (lib-user/name-for contributor-user-data) "'s posts")
+
+                                                     :default
+                                                     ;; Fallback to the org board data
+                                                     ;; to avoid showing an empty name while loading
+                                                     ;; the board data
+                                                     (:name current-board-data)))}])])
                   (when (and (= (:access current-board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
