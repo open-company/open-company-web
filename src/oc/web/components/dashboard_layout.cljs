@@ -24,6 +24,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.direct-picker :refer (direct-picker)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
@@ -42,6 +43,7 @@
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
+                              (drv/drv :team-roster)
                               (drv/drv :board-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
@@ -86,10 +88,12 @@
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
         team-data (drv/react s :team-data)
+        team-roster (drv/react s :team-roster)
         activity-data (drv/react s :activity-data)
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
+        is-board (not (or is-inbox is-all-posts is-bookmarks))
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
@@ -232,12 +236,14 @@
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
-                                                                (not is-drafts-board))
+                                                                (not is-drafts-board)
+                                                                (not (:direct current-board-data)))
+                                                  :direct (:direct current-board-data)
                                                   :public (= (:access current-board-data) "public")})
-                         :data-toggle (when (and (not is-mobile?) (:direct current-board-data)) "tooltip")
+                         :data-toggle (when (and (:direct current-board-data) (not is-mobile?)) "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :title (:name current-board-data)
+                         :title (or (:original-name current-board-data) (:name current-board-data))
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"
@@ -252,24 +258,37 @@
                                                    ;; Fallback to the org board data
                                                    ;; to avoid showing an empty name while loading
                                                    ;; the board data
-                                                   (:name current-board-data)))}]])
-                  (when (and (= (:access current-board-data) "private")
-                             (not is-drafts-board))
-                    [:div.private-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= current-board-slug utils/default-drafts-board-slug)
-                               "Only visible to you"
-                               "Only visible to invited team members")}])
-                  (when (= (:access current-board-data) "public")
-                    [:div.public-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])
+                                                   (:name current-board-data)))}]
+                    (when (and (= (:access current-board-data) "private")
+                               (not (:direct current-board-data))
+                               (not is-drafts-board))
+                      [:div.private-board
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title (if (= current-board-slug utils/default-drafts-board-slug)
+                                 "Only visible to you"
+                                 "Only visible to invited team members")}])
+                    (when (= (:access current-board-data) "public")
+                      [:div.public-board
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title "Visible to the world, including search engines"}])
+                    (when (:direct current-board-data)
+                      [:div.direct-board
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title "Direct board, visible only to the included users"
+                         :class (when (> (count (:authors current-board-data)) 0) "multi")}
+                        (when (> (count (:authors current-board-data)) 2)
+                          (let [direct-user-id (some #(not= (:user-id current-user-data) (:user-id %)) (:authors current-board-data))
+                                direct-user-data (some #(= (:user-id %) direct-user-id) (:users team-roster))]
+                            (user-avatar-image direct-user-data)))])])
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button
