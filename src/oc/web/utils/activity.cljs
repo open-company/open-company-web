@@ -279,13 +279,19 @@
       (assoc :fixed-video-id fixed-video-id)
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
+(defn name-for [user]
+  (or (:first-name user)
+      (:last-name user)
+      (:name user)
+      (:email user)))
+
 (defn fix-direct-board [board-data roster-users]
   (if (or (not (:direct board-data))
           (not (seq roster-users)))
     board-data
     (let [calc-name (fn [users user]
                       (let [user-id (if (map? user) (:user-id user) user)]
-                        (user-lib/name-for (some #(when (= (:user-id %) user-id) %) users))))
+                        (name-for (some #(when (= (:user-id %) user-id) %) users))))
           except-me (filterv #(when (and (not= % (jwt/user-id))
                                          (not= (:user-id %) (jwt/user-id)))
                                 %)
