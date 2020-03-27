@@ -17,7 +17,7 @@
   [org-data]
   (let [fixed-boards (mapv #(-> %
                              (assoc :read-only (-> % :links activity-utils/readonly-board?))
-                             (activity-utils/direct-board-name (:users (dispatcher/team-roster)) "fix-org"))
+                             (activity-utils/fix-direct-board (:users (dispatcher/team-roster))))
                       (:boards org-data))]
     (-> org-data
      read-only-org

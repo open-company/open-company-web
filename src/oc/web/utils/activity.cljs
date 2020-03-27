@@ -279,7 +279,7 @@
       (assoc :fixed-video-id fixed-video-id)
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
-(defn direct-board-name [board-data roster-users callee]
+(defn fix-direct-board [board-data roster-users]
   (if (or (not (:direct board-data))
           (not (seq roster-users)))
     board-data
@@ -296,7 +296,9 @@
                           (when (> (count except-me) 1)
                             " and ")
                           (calc-name roster-users (last except-me)))]
-      (assoc board-data :name board-name))))
+      (-> board-data
+       (assoc :name board-name)
+       (assoc :original-name (or (:original-name board-data) (:name board-data)))))))
 
 (defn fix-board
   "Parse board data coming from the API."
@@ -347,7 +349,7 @@
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
           with-fixed-direct-name (if (:direct with-posts-separators)
-                                   (direct-board-name with-posts-separators (:users team-roster) "fix-board")
+                                   (fix-direct-board with-posts-separators (:users team-roster))
                                    with-posts-separators)]
       with-fixed-direct-name)))
 

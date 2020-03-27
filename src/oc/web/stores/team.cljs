@@ -17,12 +17,12 @@
   [db [_ org-slug roster-data]]
   (if roster-data
     (let [org-boards-key (concat (dispatcher/org-data-key org-slug) [:boards])
-          next-db* (update-in db org-boards-key #(mapv (fn [board] (au/direct-board-name board (:users roster-data) "team-roster-loaded/fix-org-boards")) %))
+          next-db* (update-in db org-boards-key #(mapv (fn [board] (au/fix-direct-board board (:users roster-data))) %))
           boards-key (dispatcher/boards-key org-slug)
           next-db (reduce (fn [tdb board-key]
                            (let [board-data-key (concat boards-key [board-key :board-data])
                                  old-board-data (get-in tdb board-data-key)]
-                             (assoc-in tdb board-data-key (au/direct-board-name old-board-data (:users roster-data) "team-roster-loaded/fix-boards"))))
+                             (assoc-in tdb board-data-key (au/fix-direct-board old-board-data (:users roster-data)))))
                    next-db*
                    (keys (get-in db boards-key)))]
       (assoc-in next-db (dispatcher/team-roster-key (:team-id roster-data)) roster-data))
