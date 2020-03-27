@@ -14,7 +14,7 @@
                      db)
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db) (dispatcher/team-roster db))
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
         old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
