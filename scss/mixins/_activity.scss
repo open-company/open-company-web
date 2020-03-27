@@ -215,11 +215,11 @@ $header_top_margin: 24;
 }
 
 @mixin code-blocks($font-size: 14, $line-height: $bottom_margin, $paragraph-spacing: $line-height) {
-  pre {
+  pre, pre > code {
     font-family: 'IBM Plex Mono', monospace;
     color: var(--color);
-    font-size: 14px;
-    line-height: $line-height;
+    font-size: #{$font-size}px;
+    line-height: #{$line-height}px;
     background-color: var(--code-background-color);
     border: 1px solid var(--code-border-color);
     border-radius: 4px;
@@ -236,9 +236,9 @@ $header_top_margin: 24;
 
   code {
     font-family: 'IBM Plex Mono', monospace;
-    color: var(--inline-color);
-    font-size: $font-size;
-    line-height: $line-height;
+    color: var(--inline-code-color);
+    font-size: #{$font-size}px;
+    line-height: #{$line-height}px;
     background-color: var(--code-background-color);
     border: 1px solid var(--code-border-color);
     border-radius: 4px;
