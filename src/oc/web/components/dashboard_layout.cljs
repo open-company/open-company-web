@@ -260,13 +260,6 @@
                                                      is-bookmarks
                                                      "Bookmarks"
 
-                                                     (and is-contributor
-                                                          (= (:user-id contributor-user-data) (:user-id current-user-data)))
-                                                     "My posts"
-
-                                                     is-contributor
-                                                     (str (lib-user/name-for contributor-user-data) "'s posts")
-
                                                      :default
                                                      ;; Fallback to the org board data
                                                      ;; to avoid showing an empty name while loading
