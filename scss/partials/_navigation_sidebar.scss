@@ -652,7 +652,7 @@ div.left-navigation-sidebar {
         }
       }
 
-      div.board-name, div.direct-board-name {
+      div.board-name {
         width: calc(100% - 8px);
         float: left;
 
@@ -671,6 +671,49 @@ div.left-navigation-sidebar {
 
           .emojione {
             @include emoji-size(12);
+          }
+        }
+      }
+
+      div.direct-board-name {
+        width: calc(100% - 8px);
+        float: left;
+
+        @include user-profile(16) {
+          float: left;
+          margin-top: 4px;
+        }
+
+        span.direct-users-icon {
+          width: 16px;
+          height: 21px;
+          float: left;
+          background-image: cdnUrl("/img/ML/invite_people_bt.svg");
+          background-size: 14px 13px;
+          background-repeat: no-repeat;
+          background-position: center;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+          }
+
+          @include mobile() {
+            opacity: 1;
+            height: 24px;
+          }
+        }
+
+        div.internal {
+          padding: 1px 0px 0px 12px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          cursor: pointer;
+          max-width: 100%;
+
+          @include mobile() {
+            width: auto;
+            margin-left: 0px;
           }
         }
       }
