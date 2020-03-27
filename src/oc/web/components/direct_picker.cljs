@@ -140,8 +140,7 @@
              :on-click #(do
                           (toggle-user s u)
                           (utils/event-stop %))}
-            (carrot-checkbox {:selected selected?
-                              :did-change-cb #(toggle-user s u)})
+            (carrot-checkbox {:selected selected?})
             (user-avatar-image u)
             [:span.direct-picker-user
               (user-lib/name-for u)]])]]))

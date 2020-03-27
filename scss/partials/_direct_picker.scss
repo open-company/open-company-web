@@ -44,9 +44,7 @@ div.direct-picker {
       border-radius: 4px;
       padding: 0 8px 4px;
       margin-right: 8px;
-
       flex: 1 1 auto;
-
       display: flex;
       flex-wrap: wrap;
       flex-direction: row;
@@ -60,7 +58,7 @@ div.direct-picker {
         padding: 4px 20px 4px 8px;
         margin-right: 4px;
         margin-top: 4px;
-        background-color: var(--light-color);
+        background-color: var(--opac-background-color-2);
         border-radius: 4px;
         flex: 0 0 auto;
         display: flex;
@@ -76,7 +74,7 @@ div.direct-picker {
           width: 20px;
           height: 24px;
           display: block;
-          background-image: cdnUrl("/img/ML/mobile_close_x@dark.svg");
+          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
           background-position: center;
           background-repeat: no-repeat;
           background-size: 8px 8px;
@@ -85,7 +83,7 @@ div.direct-picker {
           top: 0;
 
           @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+            background-image: cdnUrl("/img/ML/mobile_close_x@dark.svg");
           }
         }
 
@@ -97,7 +95,7 @@ div.direct-picker {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 16px;
-          color: var(--overlay-background-color);
+          color: var(--color);
           float: left;
           margin-left: 4px;
           flex: 1 0 auto;
