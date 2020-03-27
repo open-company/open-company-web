@@ -93,7 +93,7 @@
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
-                                ui-mixins/refresh-tooltips-mixin
+                                ui-mixins/strict-refresh-tooltips-mixin
 
                                 {:will-mount (fn [s]
                                   (save-window-size s)
