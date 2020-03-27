@@ -283,7 +283,7 @@
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Direct board, visible only to the included users"
+                         :title "Visible only to the included users"
                          :class (when (> (count (:authors current-board-data)) 2) "multi")}
                         (when (= (count (:authors current-board-data)) 2)
                           (let [direct-user-id (some #(not= (:user-id current-user-data) (:user-id %)) (:authors current-board-data))
