@@ -404,27 +404,27 @@
             }
 
             // If there's no selection element, selection element doesn't belong to this editor
-            // or toolbar is disabled for this selection element
-            // hide toolbar
+            // or toolbar is disabled for this selection element or for one of the node involved
+            // in the selection, then hide toolbar
             var selectionElement = MediumEditor.selection.getSelectionElement(this.window),
                 rangySelection = rangy.getSelection(),
-                rangyRange = rangySelection.length > 0 && rangySelection.getRangeAt(0),
+                rangyRange = rangySelection && rangySelection.rangeCount > 0 && rangySelection.getRangeAt(0),
                 selectedParent = rangyRange && rangyRange.commonAncestorContainer,
                 allDisabledChildren = selectedParent && selectedParent.querySelectorAll && selectedParent.querySelectorAll('[data-disable-toolbar]');
-            // element is text node and parent has data-disable-toolbar attribute
-            // element is an element node and has data-disable-toolbar attribute
-            // the range contains at least one element with data-disabled-toolbar (even if partially)
+
             if (!selectionElement ||
                     selectionElement.getAttribute('data-disable-toolbar') ||
                     (selectedParent &&
+                     // node is TEXT_NODE and parent has data-disable-toolbar attribute
                      ((selectedParent.nodeType === Node.TEXT_NODE &&
                        selectedParent.parentNode.getAttribute('data-disable-toolbar')) ||
+                      // node is an ELEMENT_NODE and has data-disable-toolbar attribute
                       (selectedParent.nodeType === Node.ELEMENT_NODE &&
                        selectedParent.getAttribute('data-disable-toolbar')) ||
+                      // the range contains at least one element with data-disabled-toolbar (even if partially)
+                      // selectedNodes.some(function(node){return Array.prototype.contains.call(allDisabledChildren, node);})
                       (allDisabledChildren && allDisabledChildren.length &&
-                       // selectedNodes.some(function(node){return Array.prototype.contains.call(allDisabledChildren, node);})
-                       Array.prototype.some.call(allDisabledChildren, function(e){return rangyRange.containsNode(e, true);})
-                       )))) {
+                       Array.prototype.some.call(allDisabledChildren, function(e){return rangyRange.containsNode(e, true);}))))) {
                 return this.hideToolbar();
             }
 
