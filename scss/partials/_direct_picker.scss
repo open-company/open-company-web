@@ -1,11 +1,15 @@
 div.direct-picker {
   width: 100%;
   border: 1px solid var(--divider-line);
-  background-color: white;
+  background-color: var(--background-color);
   border-radius: 4px;
   padding: 24px;
   margin-bottom: 24px;
   min-height: calc(100vh - 190px);
+
+  @include mobile() {
+    background-color: var(--mobile-background-color);
+  }
 
   h3.direct-picker-title {
     @include OC_Body_Bold();
