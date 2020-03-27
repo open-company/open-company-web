@@ -48,12 +48,13 @@
   (reset! (::saving s) true)
   (let [all-users (:users @(drv/get-ref s :team-roster))
         current-user-data @(drv/get-ref s :current-user-data)
+        authors (concat [(:user-id current-user-data)] (vec @(::users s)))
         users (concat [current-user-data] (mapv #(some (fn [user] (when (= % (:user-id user)) user)) all-users) @(::users s)))
         direct-name (str (clojure.string/join ", " (mapv user-lib/name-for (butlast users))) " and " (user-lib/name-for (last users)))]
     (section-actions/section-save
       {:name direct-name
        :access :private
-       :authors (vec users)
+       :authors authors
        :direct true}
       ""
       (fn [board-data]
