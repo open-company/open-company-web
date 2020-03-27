@@ -285,7 +285,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
-                                          :dropdown-arrow (not (seq sorted-direct-boards))})
+                                          :dropdown-arrow (seq sorted-direct-boards)})
                  :on-click #(toggle-collapse-users s)}
                 [:span.sections "Direct"]]
               (when create-link
