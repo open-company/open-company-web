@@ -90,7 +90,7 @@ $dark_mode: "dark";
   // Code blocks
   --code-background-color: #{rgba($deep_navy, 0.08)};
   --code-border-color: #{rgba($deep_navy, 0.24)};
-  --inline-color: #FB4884;
+  --inline-code-color: #FB4884;
 
   // Collapsed post
   --collapse-post-start-bg: #{rgba($grey_num_2, 0)};
@@ -184,7 +184,7 @@ $dark_mode: "dark";
   // Code blocks
   --code-background-color: #2C313A;
   --code-border-color: #{rgba(white, 0.32)};
-  --inline-color: #FF5D93;
+  --inline-code-color: #FFFD93;
 
   // Collapsed post
   --collapse-post-start-bg: rgba(27, 32, 42, 0);
