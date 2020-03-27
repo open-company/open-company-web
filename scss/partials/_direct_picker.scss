@@ -74,7 +74,7 @@ div.direct-picker {
           width: 20px;
           height: 24px;
           display: block;
-          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+          background-image: cdnUrl("/img/ML/black_close.svg");
           background-position: center;
           background-repeat: no-repeat;
           background-size: 8px 8px;
@@ -83,7 +83,7 @@ div.direct-picker {
           top: 0;
 
           @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_close_x@dark.svg");
+            background-image: cdnUrl("/img/ML/black_close@dark.svg");
           }
         }
 
