@@ -93,6 +93,7 @@
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
+                                ui-mixins/refresh-tooltips-mixin
 
                                 {:will-mount (fn [s]
                                   (save-window-size s)
@@ -319,7 +320,7 @@
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
                      :data-container "body"
-                     :title (:name direct-board)
+                     :title (or (:original-name direct-board) (:name direct-board))
                      :dangerouslySetInnerHTML (utils/emojify (or (:name direct-board) (:slug direct-board)))}]]])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer
