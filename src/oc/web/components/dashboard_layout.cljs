@@ -243,11 +243,9 @@
                       (if is-contributor
                         [:div.board-name-with-icon-internal
                           (if (= (:user-id contributor-user-data) (:user-id current-user-data))
-                            [:span.internal-name
-                              "My posts"
-                              [:span.count (:contributor-count org-data)]]
-                            [:span.internal-name
-                              (str (lib-user/name-for contributor-user-data) "'s posts")])]
+                            "My posts"
+                            (str (lib-user/name-for contributor-user-data) "'s posts"))
+                          [:span.count (:total-count contributor-data)]]
                         [:div.board-name-with-icon-internal
                           {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                   (not is-drafts-board))
