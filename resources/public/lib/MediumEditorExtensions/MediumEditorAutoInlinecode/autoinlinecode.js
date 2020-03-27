@@ -46,12 +46,16 @@ var AutoInlinecode = MediumEditor.Extension.extend({
           // Replace text contained btw 2 backquote
           var r = /([^`]*)`([^`]+)`([^`]*)/; //NB Do not use g option or it will infinite loop since it uses look behind
           element.innerHTML = element.innerHTML.replace(r, function(all, prev, center, after){
-            var cleanText = center.replace(/<\/?[^>]+(>|$)/ig, '');
-            return prev + "<code class=\"oc-latest-code\" data-disable-toolbar=\"true\">" + cleanText + "</code>" + (after || "&nbsp;");
+            var cleanText = center.replace(/<\/?[^>]+(>|$)/ig, ''),
+                fixedAfter = (after.search(/^(\s|&nbsp;)/i) > -1)? after : " " + after;
+            return prev + "<code class=\"oc-latest-code\" data-disable-toolbar=\"true\">" + cleanText + "</code>" + fixedAfter;
           });
-          var lastAddedCode = element.querySelector("code.oc-latest-code");
+          var lastAddedCode = element.querySelector("code.oc-latest-code"),
+              nextSiblingText = lastAddedCode.nextSibling &&
+                                (lastAddedCode.nextSibling.nodeType == Node.TEXT_NODE? lastAddedCode.nextSibling.textContent :
+                                                                                       lastAddedCode.nextSibling.innerText);
           if (lastAddedCode) {
-            MediumEditor.selection.moveCursor(this.document, lastAddedCode.nextSibling, 1);
+            MediumEditor.selection.moveCursor(this.document, nextSibling, Math.max(1, nextSiblingText.length));
             lastAddedCode.classList.remove("oc-latest-code");
           }
         }
