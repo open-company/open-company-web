@@ -55,7 +55,7 @@ var AutoInlinecode = MediumEditor.Extension.extend({
                                 (lastAddedCode.nextSibling.nodeType == Node.TEXT_NODE? lastAddedCode.nextSibling.textContent :
                                                                                        lastAddedCode.nextSibling.innerText);
           if (lastAddedCode) {
-            MediumEditor.selection.moveCursor(this.document, nextSibling, Math.max(1, nextSiblingText.length));
+            MediumEditor.selection.moveCursor(this.document, nextSibling, (nextSiblingText.length > 0? 1 : 0));
             lastAddedCode.classList.remove("oc-latest-code");
           }
         }
