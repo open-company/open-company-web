@@ -7,12 +7,16 @@ div.theme-settings-modal {
   height: 100vh;
   position: fixed;
   overflow: visible;
-  padding: 24px;
+  padding: 0;
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
   opacity: 1;
   transition: opacity 180ms ease-in;
+
+  @include mobile(){
+    padding: 0;
+  }
 
   button.modal-close-bt {
     position: absolute;
@@ -33,6 +37,10 @@ div.theme-settings-modal {
       background-repeat: no-repeat;
       background-color: var(--mobile-background-color);
       border-radius: 4px;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      }
     }
   }
 
@@ -55,6 +63,7 @@ div.theme-settings-modal {
       min-height: 100vh;
       overflow-y: auto;
       padding: #{$mobile_navbar_height}px 16px 16px;
+      margin-top: 0;
       z-index: 1;
     }
 
@@ -113,6 +122,10 @@ div.theme-settings-modal {
     div.theme-settings-body {
       width: 272px;
       margin: 24px auto 0;
+
+      @include mobile() {
+        width: 100%;
+      }
 
       div.theme-settings-auto-container {
         height: 18px;
