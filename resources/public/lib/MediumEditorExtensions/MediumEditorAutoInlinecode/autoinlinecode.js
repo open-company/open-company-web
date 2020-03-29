@@ -51,9 +51,9 @@ var AutoInlinecode = MediumEditor.Extension.extend({
             return prev + "<code class=\"oc-latest-code\" data-disable-toolbar=\"true\">" + cleanText + "</code>" + fixedAfter;
           });
           var lastAddedCode = element.querySelector("code.oc-latest-code"),
-              nextSiblingText = lastAddedCode.nextSibling &&
-                                (lastAddedCode.nextSibling.nodeType == Node.TEXT_NODE? lastAddedCode.nextSibling.textContent :
-                                                                                       lastAddedCode.nextSibling.innerText);
+              nextSibling = lastAddedCode.nextSibling;
+              nextSiblingText = nextSibling && (nextSibling.nodeType === Node.TEXT_NODE? nextSibling.textContent :
+                                                                                         nextSibling.innerText);
           if (lastAddedCode) {
             MediumEditor.selection.moveCursor(this.document, nextSibling, (nextSiblingText.length > 0? 1 : 0));
             lastAddedCode.classList.remove("oc-latest-code");
