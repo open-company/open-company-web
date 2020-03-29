@@ -265,7 +265,7 @@
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
-                 :key (str "board-list-" (name (:slug board)) "-" (rand 100))
+                 :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug board) board-url))}
@@ -312,7 +312,7 @@
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug direct-board))
-                 :key (str "board-list-" (name (:slug direct-board)) "-" (rand 100))
+                 :key (str "board-list-" (name (:slug direct-board)))
                  :href board-url
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug direct-board) board-url))}

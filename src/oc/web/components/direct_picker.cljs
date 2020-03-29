@@ -107,7 +107,7 @@
                 :let [u (some #(when (= (:user-id %) user-id) %) (:users roster))]]
             [:button.mlb-reset.direct-picker-selected-user
               {:on-click #(swap! (::users s) disj user-id)
-               :key (str "direct-picker-selected-" user-id "-" (rand 100))}
+               :key (str "direct-picker-selected-" user-id)}
               (user-avatar-image u)
               [:span.direct-picker-selected-user-name
                 (user-lib/name-for u)]])
