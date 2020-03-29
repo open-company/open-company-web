@@ -47,7 +47,7 @@ var AutoInlinecode = MediumEditor.Extension.extend({
           var r = /([^`]*)`([^`]+)`([^`]*)/; //NB Do not use g option or it will infinite loop since it uses look behind
           element.innerHTML = element.innerHTML.replace(r, function(all, prev, center, after){
             var cleanText = center.replace(/<\/?[^>]+(>|$)/ig, ''),
-                fixedAfter = (after.search(/^(\s|&nbsp;)/i) > -1)? after : " " + after;
+                fixedAfter = (after.search(/^(\s|&nbsp;)/i) > -1)? after : "&nbsp;" + after;
             return prev + "<code class=\"oc-latest-code\" data-disable-toolbar=\"true\">" + cleanText + "</code>" + fixedAfter;
           });
           var lastAddedCode = element.querySelector("code.oc-latest-code"),
