@@ -20,7 +20,7 @@
         new-users-map (zipmap
                        (map :user-id filtered-users)
                        (map #(select-keys % [:user-id :first-name :last-name :name :location :timezone :title]) filtered-users))]
-    (merge (or old-users-map {}) new-users-map)))
+    (merge-with merge (or old-users-map {}) new-users-map)))
 
 (defmethod dispatcher/action :team-roster-loaded
   [db [_ org-slug roster-data]]
