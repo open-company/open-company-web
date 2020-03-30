@@ -102,7 +102,8 @@
     s)}
   [s {:keys [disabled user-data current-user-id leave-delay?]}]
   ;; Return an empty DOM for mobile since we don't show the hover popup
-  (when-not (responsive/is-mobile-size?)
+  (if (responsive/is-mobile-size?)
+    [:div.user-info-hover]
     (let [my-profile? (= (:user-id user-data) current-user-id)
           pos @(::positioning s)
           users-info (drv/react s :users-info-hover)
