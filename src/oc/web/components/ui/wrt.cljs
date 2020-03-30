@@ -91,13 +91,13 @@
               {user-id "An error occurred, please retry..."})))))))))
 
 (defn- remind-to-all [s {:keys [unopened-count] :as props}]
-  (let [alert-data {:icon "/img/ML/trash.svg"
-                    :action "rerecord-video"
+  (let [alert-data {:emoji-icon "👌"
+                    :action "remind-all-unseens"
                     :message (str "Do you want to send a reminder to everyone that hasn’t yet opened it? (" unopened-count " users)")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
-                    :solid-button-title "Yes, send"
+                    :solid-button-title "Yes, remind all"
                     :solid-button-cb (fn []
                                       (remind-to s props)
                                       (alert-modal/hide-alert))}]
@@ -174,16 +174,7 @@
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
-            "Post analytics"]
-          (when (and (> (count remind-all-users) 1)
-                        @(::show-remind-all-bt s))
-            [:button.mlb-reset.send-to-all-bt
-              {:on-click #(remind-to-all s {:activity-data activity-data
-                                            :current-user-data current-user-data
-                                            :users-list remind-all-users
-                                            :slack-bot-data slack-bot-data
-                                            :unopened-count (count unseen-users)})}
-              "Remind all"])]
+            "Post analytics"]]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
           (small-loading)
@@ -236,7 +227,16 @@
                            (dis/board-data (router/current-org-slug) (:board-slug activity-data)))
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
-                    "Manage section members?"])]]
+                    "Manage section members?"])
+                (when (and (> (count remind-all-users) 0)
+                              @(::show-remind-all-bt s))
+                  [:button.mlb-reset.send-to-all-bt
+                    {:on-click #(remind-to-all s {:activity-data activity-data
+                                                  :current-user-data current-user-data
+                                                  :users-list remind-all-users
+                                                  :slack-bot-data slack-bot-data
+                                                  :unopened-count (count unseen-users)})}
+                    "Remind if still unseen"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select.oc-input

@@ -142,29 +142,6 @@ div.wrt-popup-container {
         }
       }
 
-      button.send-to-all-bt {
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 32px;
-        color: $carrot_green;
-        height: 32px;
-        padding: 0;
-        margin: 0;
-        float: right;
-        text-align: right;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: pre;
-
-        @include mobile(){
-          height: 24px;
-          max-width: 24vw;
-          position: absolute;
-          right: 16px;
-          top: 12px;
-        }
-      }
-
       button.mobile-close-bt {
         display: none;
 
@@ -256,6 +233,29 @@ div.wrt-popup-container {
             @include OC_Body_Book();
             font-size: 14px;
             text-align: center;
+          }
+
+          button.send-to-all-bt {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: white;
+            background-color: $carrot_green;
+            border-radius: 4px;
+            height: 32px;
+            padding: 0;
+            margin: 8px auto 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 7px 16px;
+
+            @include mobile(){
+              height: 24px;
+              position: absolute;
+              right: 16px;
+              top: 12px;
+            }
           }
         }
       }
