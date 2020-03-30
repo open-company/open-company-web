@@ -128,7 +128,7 @@
               {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
               (if my-profile?
                 "My posts"
-                "Post")]
+                "Posts")]
             [:button.mlb-reset.profile-bt
               {:on-click #(nav-actions/show-user-info (:user-id user-data))}
               (if my-profile?
