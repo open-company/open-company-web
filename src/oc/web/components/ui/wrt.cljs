@@ -228,7 +228,7 @@
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
                     "Manage section members?"])
-                (when (and (> (count remind-all-users) 0)
+                (when (and (> (count remind-all-users) 1)
                               @(::show-remind-all-bt s))
                   [:button.mlb-reset.send-to-all-bt
                     {:on-click #(remind-to-all s {:activity-data activity-data
