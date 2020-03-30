@@ -35,6 +35,13 @@
    :reply-id (new-reply-id)
    :votes []})
 
+(defn- poll-default-replies [user-data]
+  (let [ts (.getTime (utils/js-date))
+        reps (map
+              #(poll-reply user-data "" (.toISOString (js/Date. (+ ts %))))
+              (range min-poll-replies))]
+    (zipmap (map (comp keyword :reply-id) reps) reps)))
+
 (defn poll-data [user-data poll-id]
   {:question ""
    :poll-uuid poll-id
@@ -42,9 +49,7 @@
    :created-at (created-at)
    :updated-at (created-at)
    :author (author-for-user user-data)
-   :replies (let [ts (.getTime (utils/js-date))
-                  reps (mapv #(poll-reply user-data "" (.toISOString (js/Date. (inc ts)))) (range min-poll-replies))]
-              (zipmap (mapv (comp keyword :reply-id) reps) reps))})
+   :replies (poll-default-replies user-data)})
 
 (defn clean-poll-reply [poll-reply-data]
   (dissoc poll-reply-data :links))

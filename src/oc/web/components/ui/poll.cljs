@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.poll
   (:require [rum.core :as rum]
+            [cuerdas.core :as string]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.poll :as poll-utils]
@@ -34,10 +35,11 @@
         {:class (utils/class-set {:can-vote can-vote?
                                   :animate @(::animate s)})}
         (for [reply (poll-utils/sorted-replies poll-data)
+              :when (seq (string/trim (:body reply)))
               :let [votes-percent (-> reply :votes count (/ total-votes-count) (* 100))
                     rounded-votes-percent (if (js/isNaN votes-percent)
                                             0
-                                            (/ (.round js/Math (* 100 votes-percent)) 100))
+                                            (/ (.round js/Math (* 10 votes-percent)) 10))
                     reply-voted? (and can-vote?
                                       (some #(when (= % current-user-id) %) (:votes reply)))]]
           [:div.poll-reply-outer.group
@@ -98,6 +100,12 @@
                    :on-click #(poll-actions/hide-preview poll-key)}
                   "Edit poll"])]))]))
 
+(defn- add-option [s poll-key poll-data]
+  (poll-actions/add-reply poll-key)
+  (utils/after 400
+   #(when-let [last-option (rum/ref-node s (str "choice-" (inc (count (:replies poll-data)))))]
+      (.focus last-option))))
+
 (rum/defcs poll-edit < rum/static
                        (rum/local "" ::new-reply)
                        (rum/local nil ::tab-index-base)
@@ -148,7 +156,8 @@
              :on-change #(poll-actions/update-question poll-key poll-data (.. % -target -value))}]
           (let [idx (atom 0)]
             (for [reply (poll-utils/sorted-replies poll-data)
-                  :let [idx (swap! idx inc)]]
+                  :let [idx (swap! idx inc)
+                        last-option? (= idx (count (:replies poll-data)))]]
               [:div.poll-reply.group
                 {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))}
                 [:div.poll-reply-label
@@ -157,8 +166,17 @@
                   {:type "text"
                    :tab-index (+ tab-index-base idx)
                    :value (:body reply)
+                   :ref (str "choice-" idx)
                    :max-length poll-utils/max-reply-length
                    :placeholder (str "Choice " idx)
+                   :on-key-down (fn [e]
+                                  (when (= (.-keyCode e) 9)
+                                     (js/console.log "DBG tab on:" idx "last?" last-option? "count" (count (:replies poll-data))))
+                                   (when (and last-option?
+                                              (= (.-keyCode e) 9)
+                                              (not (.-shiftKey e)))
+                                     (utils/event-stop e)
+                                     (add-option s poll-key poll-data)))
                    :on-key-press (fn [e]
                                    (when (or (= (.-key e) "Enter")
                                              (= (.-keyCode e) 13))
@@ -171,7 +189,7 @@
         [:div.poll-reply-new
           [:button.mlb-reset.poll-reply-new
             {:type "button"
-             :on-click #(poll-actions/add-reply poll-key)}
+             :on-click (partial add-option s poll-key poll-data)}
             "Add option"]
           [:button.mlb-reset.poll-preview-bt
             {:type "button"
