@@ -229,14 +229,17 @@
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
                     "Manage section members?"])
                 (when (and (> (count remind-all-users) 1)
-                              @(::show-remind-all-bt s))
+                           @(::show-remind-all-bt s))
                   [:button.mlb-reset.send-to-all-bt
                     {:on-click #(remind-to-all s {:activity-data activity-data
                                                   :current-user-data current-user-data
                                                   :users-list remind-all-users
                                                   :slack-bot-data slack-bot-data
-                                                  :unopened-count (count unseen-users)})}
-                    "Remind if still unseen"])]]
+                                                  :unopened-count (count unseen-users)})
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :title "Send a reminder to everyone that hasn’t yet opened it"}
+                    "Send reminders"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select.oc-input
