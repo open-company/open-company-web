@@ -101,8 +101,7 @@
         (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
         (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
-      (when (and (>= status 500)
-                 (<= status 599))
+      (when (<= 500 status 599)
         (dis/dispatch! [:input [:team-data-requested] false])))))
 
 (defn teams-get []

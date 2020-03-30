@@ -13,7 +13,8 @@
 
 (defn set-route! [route parts]
   (timbre/info "set-route!" route parts)
-  (reset! path {})
+  ;; Keep the ap-redirect-done flag
+  (reset! path {:ap-redirect-done (:ap-redirect-done @path)})
   (swap! path assoc :route route)
   (doseq [[k v] parts] (swap! path assoc k v)))
 
@@ -135,6 +136,12 @@
 
 (defn query-param [k]
   (get (:query-params @path) k nil))
+
+(defn ap-redirect []
+  (:ap-redirect-done @path))
+
+(defn ap-redirect-done! []
+  (swap! path merge {:ap-redirect-done true}))
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"
