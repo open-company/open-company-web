@@ -12,10 +12,22 @@
   [db [_ teams]]
   (assoc-in db [:teams-data :teams] teams))
 
+(defn- users-info-hover-from-roster
+  "Given the previous users map and the new users vector coming from team or roster.
+   Create a map of the new users with only some arbitrary data and merge them with the old users."
+  [old-users-map roster-data]
+  (let [filtered-users (filter #(#{"active" "unverified"} (:status %)) (:users roster-data))
+        new-users-map (zipmap
+                       (map :user-id filtered-users)
+                       (map #(select-keys % [:user-id :first-name :last-name :name :location :timezone :title]) filtered-users))]
+    (merge (or old-users-map {}) new-users-map)))
+
 (defmethod dispatcher/action :team-roster-loaded
-  [db [_ roster-data]]
+  [db [_ org-slug roster-data]]
   (if roster-data
-    (assoc-in db (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
+    (-> db
+     (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
+     (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data)))
     db))
 
 (defn parse-team-data [team-data]
@@ -28,10 +40,12 @@
      (assoc :can-add-bot (and (not team-has-bot?) can-add-bot?)))))
 
 (defmethod dispatcher/action :team-loaded
-  [db [_ team-data]]
+  [db [_ org-slug team-data]]
   (if team-data
     ;; if team is the current org team, load the slack chennels
-    (assoc-in db (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
+    (-> db
+     (assoc-in (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
+     (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data)))
     db))
 
 (defmethod dispatcher/action :channels-enumerate

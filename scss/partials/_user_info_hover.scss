@@ -1,23 +1,22 @@
-$user_info_width: 296;
-$user_info_height: 96;
+$user_info_width: 248;
 $user_info_vertical_spacing: 8;
 
 div.user-info-hover {
   display: none;
   position: absolute;
   width: #{$user_info_width}px;
-  height: #{$user_info_height + $user_info_vertical_spacing}px;
+  height: auto;
   z-index: #{$navbar_zindex - 1};
   text-align: center;
   background-color: transparent;
 
   &.top {
-    top: -#{$user_info_height + $user_info_vertical_spacing}px;
+    bottom: 100%;
     padding-bottom: #{$user_info_vertical_spacing}px;
   }
 
   &.bottom {
-    bottom: -#{$user_info_height + $user_info_vertical_spacing}px;
+    top: 100%;
     padding-top: #{$user_info_vertical_spacing}px;
   }
 
@@ -35,52 +34,79 @@ div.user-info-hover {
 
   div.user-info-inner {
     border: 1px solid var(--divider-line);
-    background-color: var(--tooltip-background-color);
+    background-color: var(--overlay-background-color);
     padding: 16px;
-    box-shadow: none;
+    box-shadow: var(--user-info-hover-shadow);
     border-radius: 4px;
     width: #{$user_info_width}px;
-    height: #{$user_info_height}px;
+    height: auto;
 
     div.user-info-header {
-      height: 24px;
 
-      @include user-profile(24) {
-        float: left!important;
-        margin: 0 8px 0 0!important;
-        width: 24px!important;
-        height: 24px!important;
-        text-align: left!important;
+      @include user-profile(56) {
+        float: unset!important;
+        margin: 0 auto!important;
+        width: 56px!important;
+        height: 56px!important;
+        text-align: center!important;
         white-space: nowrap!important;
 
         img.user-avatar-img {
-          width: 24px!important;
-          height: 24px!important;
+          width: 56px!important;
+          height: 56px!important;
         }
       }
 
-      div.user-info-title {
+      div.user-info-name {
         @include OC_Body_Bold();
-        float: left;
-        width: calc(100% - 24px - 8px);
-        text-align: left;
-        font-size: 16px;
-        line-height: 24px;
-        color: var(--tooltip-color);
+        text-align: center;
+        font-size: 18px;
+        line-height: 23px;
+        margin-top: 8px;
+        color: var(--color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+
+      div.user-info-title {
+        @include OC_Body_Book();
+        text-align: center;
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+
+      div.user-info-locale {
+        @include OC_Body_Book();
+        text-align: center;
+        font-size: 14px;
+        line-height: 18px;
+        margin-top: 8px;
+        color: var(--light-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
       }
     }
 
     div.user-info-buttons {
-      height: 32px;
+      height: 40px;
       margin-top: 8px;
 
       button.profile-bt {
-        float: left;
-        width: calc(50% - 8px);
-        padding: 7px 12px;
-        background-color: $carrot_green;
+        float: right;
+        width: calc(50% - 4px);
+        padding: 11px 0;
+        background-color: var(--opac-background-color-1);
         @include OC_Body_Bold();
-        color: white;
+        color: var(--color);
         font-size: 14px;
         line-height: 18px;
         border-radius: 4px;
@@ -93,12 +119,12 @@ div.user-info-hover {
       }
 
       button.posts-bt {
-        float: right;
-        width: calc(50% - 8px);
-        padding: 7px 12px;
-        background-color: $carrot_green;
+        float: left;
+        width: calc(50% - 4px);
+        padding: 11px 0;
+        background-color: var(--opac-background-color-1);
         @include OC_Body_Bold();
-        color: white;
+        color: var(--color);
         font-size: 14px;
         line-height: 18px;
         border-radius: 4px;

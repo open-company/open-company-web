@@ -4,19 +4,11 @@
             [clojure.string :as string]
             [oc.web.lib.utils :as utils]
             [oc.lib.user :as lib-user]
+            [oc.web.utils.user :as user-utils]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
-
-(defn- time-with-timezone [timezone]
-  (utils/time-without-leading-zeros
-    (.toLocaleTimeString (js/Date.)
-     (.. js/window -navigator -language)
-     #js {:hour "2-digit"
-          :minute "2-digit"
-          :format "hour:minute"
-          :timeZone timezone})))
 
 (rum/defcs user-info-modal < rum/reactive
                              (drv/drv :panel-stack)
@@ -64,15 +56,9 @@
               (when (:blurb user-data)
                 [:p.user-info-about-blurb
                   (:blurb user-data)])
-              (when (or (:location user-data)
-                        (:timezone user-data))
+              (when-let [timezone-location-string (user-utils/timezone-location-string user-data)]
                 [:div.user-info-about-location
-                  (when (:timezone user-data)
-                    (str (time-with-timezone (:timezone user-data)) " local time"))
-                  (when (:location user-data)
-                    (if (:timezone user-data)
-                      (str " (" (:location user-data) ")")
-                      (:location user-data)))])
+                  timezone-location-string])
               (when (:email user-data)
                 [:div.user-info-about-email
                   [:a

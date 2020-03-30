@@ -121,6 +121,9 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
+(defn users-info-hover-key [org-slug]
+  (vec (conj (org-key org-slug) :users-info-hover)))
+
 (defn uploading-video-key [org-slug video-id]
   (vec (concat (org-key org-slug) [:uploading-videos video-id])))
 
@@ -514,7 +517,8 @@
                                     (get-in base (reminder-edit-key org-slug)))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
    :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
-   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})
+   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]
+   :users-info-hover      [[:base :org-slug] (fn [base org-slug] (get-in base (users-info-hover-key org-slug)))]})
 
 ;; Action Loop =================================================================
 

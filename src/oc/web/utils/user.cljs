@@ -6,6 +6,7 @@
             [oc.lib.oauth :as oauth]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
@@ -164,3 +165,23 @@
         new-state-string (oauth/encode-state-string combined-state)]
     (.. parsed-url -searchParams (set "state" new-state-string))
     (str parsed-url)))
+
+(defn time-with-timezone [timezone]
+  (utils/time-without-leading-zeros
+    (.toLocaleTimeString (js/Date.)
+     (.. js/window -navigator -language)
+     #js {:hour "2-digit"
+          :minute "2-digit"
+          :format "hour:minute"
+          :timeZone timezone})))
+
+(defn timezone-location-string [user-data]
+  (str
+   (when (:timezone user-data)
+     (str (time-with-timezone (:timezone user-data)) " local time"))
+   (if (:location user-data)
+     (if (:timezone user-data)
+       (str " (" (:location user-data) ")")
+       (:location user-data))
+     (when (:timezone user-data)
+       (str " (" (:timezone user-data) ")")))))
