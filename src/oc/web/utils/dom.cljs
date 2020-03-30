@@ -51,3 +51,11 @@
     (let [rect (.getBoundingClientRect element)]
       {:x (.-left rect)
        :y (.-top rect)})))
+
+(defn event-inside? [e el]
+  (loop [element (.-target e)]
+    (if element
+      (if (= element el)
+        true
+        (recur (.-parentElement element)))
+      false)))

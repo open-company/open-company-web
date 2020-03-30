@@ -266,7 +266,4 @@
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
-               (when (or (not is-mobile?)
-                         (and (or (not open-panel)
-                                  (= open-panel :menu))))
-                 (dashboard-layout))]]])])))
+               (dashboard-layout)]]])])))

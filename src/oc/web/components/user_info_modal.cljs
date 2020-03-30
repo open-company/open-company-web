@@ -27,9 +27,12 @@
         team-role (when member? (utils/get-user-type user-data org-data))
         panel-stack (drv/react s :panel-stack)]
     [:div.user-info-modal
+      {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :user-info))
+                    (nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
       [:div.user-info
+        {:ref :user-info}
         [:div.user-info-header
           [:div.user-info-header-title
             (if my-profile? "My profile" "Profile")]
@@ -58,20 +61,18 @@
                 "View posts")])
           (when (some seq (vals (-> user-data (select-keys [:location :timezone :email :profiles :slack-users]))))
             [:div.user-info-about
-              [:div.user-info-about-label
-                "About"]
+              (when (:blurb user-data)
+                [:p.user-info-about-blurb
+                  (:blurb user-data)])
               (when (or (:location user-data)
                         (:timezone user-data))
                 [:div.user-info-about-location
-                  (when (:location user-data)
-                    (:location user-data))
                   (when (:timezone user-data)
-                    (str
-                     (when (:location user-data)
-                       " (")
-                     (str (time-with-timezone (:timezone user-data)) " local time")
-                     (when (:location user-data)
-                       ")")))])
+                    (str (time-with-timezone (:timezone user-data)) " local time"))
+                  (when (:location user-data)
+                    (if (:timezone user-data)
+                      (str " (" (:location user-data) ")")
+                      (:location user-data)))])
               (when (:email user-data)
                 [:div.user-info-about-email
                   [:a
@@ -96,7 +97,4 @@
                        :href (if (or (string/starts-with? v "http")
                                      (string/starts-with? v "//"))
                                v
-                               (str "https://" v))}])])
-              (when (:blurb user-data)
-                [:p.user-info-about-blurb
-                  (:blurb user-data)])])]]]))
+                               (str "https://" v))}])])])]]]))
