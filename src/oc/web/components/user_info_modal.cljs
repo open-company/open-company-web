@@ -56,7 +56,7 @@
               (when (:blurb user-data)
                 [:p.user-info-about-blurb
                   (:blurb user-data)])
-              (when-let [timezone-location-string (user-utils/timezone-location-string user-data)]
+              (when-let [timezone-location-string (user-utils/timezone-location-string user-data true)]
                 [:div.user-info-about-location
                   timezone-location-string])
               (when (:email user-data)

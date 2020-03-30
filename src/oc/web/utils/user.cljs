@@ -175,10 +175,13 @@
           :format "hour:minute"
           :timeZone timezone})))
 
-(defn timezone-location-string [user-data]
+(defn timezone-location-string [user-data & [local-time-string?]]
   (str
    (when (:timezone user-data)
-     (str (time-with-timezone (:timezone user-data)) " local time"))
+     (str
+      (time-with-timezone (:timezone user-data))
+      (when local-time-string?
+        " local time")))
    (if (:location user-data)
      (if (:timezone user-data)
        (str " (" (:location user-data) ")")
