@@ -1,4 +1,5 @@
 (ns oc.web.components.ui.user-info-hover
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -77,17 +78,16 @@
   (rum/local nil ::enter-timeout)
   (rum/local nil ::leave-timeout)
   {:did-mount (fn [s]
-   (let [el (rum/dom-node s)
-         parent-el (.-parentElement el)]
-    (when parent-el
-      (if (responsive/is-mobile-size?)
-        (reset! (::click s) (events/listen parent-el EventType/CLICK
-         (partial click s)))
-        (do
-          (reset! (::mouse-enter s) (events/listen parent-el EventType/MOUSEENTER
-           #(enter-ev s parent-el)))
-          (reset! (::mouse-leave s) (events/listen parent-el EventType/MOUSELEAVE
-           #(leave-ev s)))))))
+   (when-let* [el (rum/dom-node s)
+               parent-el (.-parentElement el)]
+    (if (responsive/is-mobile-size?)
+      (reset! (::click s) (events/listen parent-el EventType/CLICK
+       (partial click s)))
+      (do
+        (reset! (::mouse-enter s) (events/listen parent-el EventType/MOUSEENTER
+         #(enter-ev s parent-el)))
+        (reset! (::mouse-leave s) (events/listen parent-el EventType/MOUSELEAVE
+         #(leave-ev s))))))
    s)
    :will-unmount (fn [s]
     (when @(::mouse-enter s)
