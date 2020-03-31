@@ -593,6 +593,13 @@
       callback)
     (handle-missing-link "handle-invite-link" invite-token-link callback)))
 
+(defn get-active-users [active-users-link callback]
+  (if active-users-link
+    (auth-http (method-for-link active-users-link) (relative-href active-users-link)
+     {:headers (headers-for-link active-users-link)}
+     callback)
+    (handle-missing-link "get-active-users" active-users-link callback)))
+
 ;; User
 
 (defn user-action [action-link payload callback]
