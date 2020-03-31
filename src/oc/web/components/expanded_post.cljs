@@ -213,12 +213,14 @@
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
           [:span.expanded-post-author-inner-label
-            (str (:name publisher) " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))
+            (if (= (:board-access activity-data) "direct")
+              (:name publisher)
+              (str (:name publisher) " in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)")))
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)

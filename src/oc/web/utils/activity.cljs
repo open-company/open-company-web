@@ -271,7 +271,9 @@
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
-      (update :board-access #(or % (:access board-data)))
+      (update :board-access #(if (:direct board-data)
+                               "direct"
+                               (or % (:access board-data))))
       (assoc :has-comments (boolean comments-link))
       (assoc :can-comment (boolean add-comment-link))
       (assoc :stream-view-body stream-view-body)

@@ -269,14 +269,16 @@
                  :data-container "body"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (str
-                 (:name publisher)
-                 " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))]
+                (if (= (:board-access activity-data) "direct")
+                  (:name publisher)
+                  (str
+                   (:name publisher)
+                   " in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)")))]
               [:div.time-since
                 (let [t (or (:published-at activity-data) (:created-at activity-data))]
                   [:time
