@@ -51,6 +51,7 @@
                                           s)}
   "Customizable alert modal. It gets the following property from the :alert-modal derivative:
    :icon The src to use for an image, it's encapsulated in utils/cdn.
+   :emoji-icon The emoji char to use instead of an image at the top.
    :title The title of the view.
    :message A description message to show in the view.
    :link-button-style The color of the font for the link button
@@ -81,8 +82,10 @@
         [:div.alert-modal
           {:class (utils/class-set {:has-buttons has-buttons
                                     :has-bottom-button (seq (:bottom-button-title alert-modal))})}
-          (when (:icon alert-modal)
-            [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}])
+          (if (:emoji-icon alert-modal)
+            [:div.alert-modal-emoji-icon (:emoji-icon alert-modal)]
+            (when (:icon alert-modal)
+              [:img.alert-modal-icon {:src (utils/cdn (:icon alert-modal))}]))
           (when (:title alert-modal)
             [:div.alert-modal-title
               (:title alert-modal)])
