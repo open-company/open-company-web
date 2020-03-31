@@ -2,7 +2,6 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [clojure.string :as s]
             [defun.core :refer (defun)]
-            [oc.lib.schema :as lib-schema]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]

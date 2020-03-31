@@ -3,7 +3,6 @@
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
-            [oc.lib.schema :as lib-schema]
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
