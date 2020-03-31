@@ -22,6 +22,7 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.direct-picker :refer (direct-picker)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -150,7 +151,8 @@
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
-        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)]
+        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
+        show-direct-picker? (= open-panel :direct-picker)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -223,7 +225,10 @@
           (wrt org-data)
           ;; UI Theme settings panel
           (= open-panel :theme)
-          (theme-settings-modal (drv/react s :ui-theme)))
+          (theme-settings-modal (drv/react s :ui-theme))
+          ;; Direct boards picker
+          show-direct-picker?
+          (direct-picker))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

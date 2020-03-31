@@ -33,16 +33,7 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 ;; :theme
-
-;; Direct picker
-
-(defn hide-direct-picker []
-  (dis/dispatch! [:input (conj dis/direct-messages-key :visible) false]))
-
-(defn show-direct-picker []
-  (dis/dispatch! [:update dis/direct-messages-key #(-> %
-                                                    (assoc :users (or (:users %) #{}))
-                                                    (assoc :visible true))]))
+;; :direct-picker
 
 (defn- container-data [board-slug]
   (if (dis/is-container? board-slug)
@@ -291,3 +282,15 @@
 
 (defn hide-theme-settings []
   (pop-panel))
+
+;; Direct
+
+(defn hide-direct-picker []
+  ; (dis/dispatch! [:input (conj dis/direct-messages-key :visible) false])
+  (pop-panel))
+
+(defn show-direct-picker []
+  ; (dis/dispatch! [:update dis/direct-messages-key #(-> %
+  ;                                                   (assoc :users (or (:users %) #{}))
+  ;                                                   (assoc :visible true))])
+  (push-panel :direct-picker))

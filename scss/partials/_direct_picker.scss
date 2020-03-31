@@ -1,198 +1,339 @@
 div.direct-picker {
+  // width: 100%;
+  // position: fixed;
+  // top: 0;
+  // left: 0;
+  // width: 100vw;
+  // height: 100vw;
+  // background-color: $carrot_modal_bg;
+  // z-index: #{$navbar_zindex + 156};
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  border: 1px solid var(--divider-line);
-  background-color: var(--background-color);
-  border-radius: 4px;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
   padding: 24px;
-  margin-bottom: 24px;
-  min-height: calc(100vh - 190px);
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
 
-  @include mobile() {
-    background-color: var(--mobile-background-color);
-  }
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
 
-  h3.direct-picker-title {
-    @include OC_Body_Bold();
-    font-size: 20px;
-    line-height: 26px;
-    color: var(--color);
-    margin: 0;
-    padding: 0;
-  }
-
-  div.direct-picker-subtitle {
-    @include OC_Body_Book();
-    font-size: 16px;
-    color: var(--color);
-    margin-top: 4px;
-  }
-
-  div.direct-picker-selected-users {
-    margin-top: 8px;
-    width: auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-    align-content: stretch;
-    
-    div.direct-picker-selected-users-list {
-      background-color: var(--opac-background-color-05);
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: var(--mobile-background-color);
       border-radius: 4px;
-      padding: 0 8px 4px;
-      margin-right: 8px;
-      flex: 1 1 auto;
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: flex-start;
-      align-content: flex-start;
+    }
+  }
 
-      button.direct-picker-selected-user {
-        display: inline-block;
-        height: 24px;
-        padding: 4px 20px 4px 8px;
-        margin-right: 4px;
-        margin-top: 4px;
-        background-color: var(--opac-background-color-2);
-        border-radius: 4px;
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        align-items: flex-start;
-        align-content: flex-start;
-        position: relative;
+  div.direct-picker-modal {
+    // border: 1px solid var(--divider-line);
+    // background-color: var(--background-color);
+    // border-radius: 4px;
+    // padding: 24px;
+    // margin-bottom: 24px;
+    // min-height: calc(100vh - 190px);
+    // position: relative;
+    // width: #{$board_container_width}px;
+    // margin: 40px auto;
 
-        &:after {
-          content: "";
-          width: 20px;
-          height: 24px;
-          display: block;
-          background-image: cdnUrl("/img/ML/black_close.svg");
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: 8px 8px;
-          position: absolute;
-          right: 0;
-          top: 0;
+    width: 320px;
+    background-color: var(--overlay-background-color);
+    position: absolute;
+    top: 0;
+    height: calc(100vh - #{$navbar_height}px);
+    right: 0;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/black_close@dark.svg");
-          }
-        }
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+    }
 
-        @include user-profile(16) {
-          flex: 0 0 16px;
-        }
+    div.direct-picker-header {
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
-        span.direct-picker-selected-user-name {
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--color);
-          float: left;
-          margin-left: 4px;
-          flex: 1 0 auto;
-        }
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
       }
 
-      input.direct-picker-search-field-input {
-        display: block;
-        height: 24px;
-        padding: 0;
-        margin: 0;
-        background-color: transparent;
-        @include OC_Body_Book();
-        font-size: 12px;
-        line-height: 24px;
+      div.direct-picker-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
         color: var(--color);
-        max-width: 100%;
-        width: auto;
-        border: none;
-        outline: none;
-        vertical-align: super;
-        margin-top: 4px;
-        min-width: 160px;
-        flex: 1 1 auto;
+        line-height: 32px;
+        float: left;
 
-        &:focus, &:active {
-          border: none;
-          outline: none;
-        }
-
-        @include placeholder() {
-          @include OC_Body_Book();
-          color: var(--light-color);
-          font-size: 14px;
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
           line-height: 24px;
         }
       }
-    }
 
-    button.direct-picker-create-bt {
-      width: auto;
-      height: 32px;
-      @include OC_Body_Bold();
-      font-size: 14px;
-      line-height: 18px;
-      color: white;
-      background-color: $carrot_green;
-      border-radius: 4px;
-      padding: 7px 14px;
-      flex: 0 0 auto;
+      button.direct-picker-create-bt {
+        // height: 32px;
+        // padding: 0;
+        // @include OC_Body_Book();
+        // font-size: 14px;
+        // color: var(--light-color);
+        // float: right;
 
-      &.disabled, &:disabled {
-        opacity: 1!important;
-        background-color: var(--opac-background-color-05);
-        color: var(--light-color);
-      }
-    }
-  }
+        // @include mobile() {
+        //   display: none;
+        // }
 
-  div.direct-picker-users-list {
-    margin-top: 16px;
-    width: calc(100% + 48px);
-    margin-left: -24px;
-
-    button.direct-picker-user-row {
-      height: 40px;
-      padding: 4px 24px;
-      border: none;
-      outline: none;
-      width: 100%;
-      display: block;
-
-      &.selected {
-        background-color: var(--opac-background-color-05);
-      }
-
-      div.carrot-checkbox {
-        margin-right: 8px;
-        float: left;
-        margin-top: 8px;
-      }
-
-      @include user-profile(32) {
-        float: left;
-        margin-right: 8px;
-      }
-
-      span.direct-picker-user {
-        display: block;
-        @include OC_Body_Book();
+        width: auto;
+        height: 32px;
+        @include OC_Body_Bold();
         font-size: 14px;
-        line-height: 32px;
-        float: left;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        line-height: 18px;
+        color: white;
+        background-color: $carrot_green;
+        border-radius: 4px;
+        padding: 7px 14px;
+        float: right;
+
+        &.disabled, &:disabled {
+          opacity: 1!important;
+          background-color: var(--opac-background-color-05);
+          color: var(--light-color);
+        }
+      }
+    }
+
+    div.direct-picker-body {
+      width: 272px;
+      margin: 24px auto 0;
+
+      h3.direct-picker-title {
+        @include OC_Body_Bold();
+        font-size: 20px;
+        line-height: 26px;
+        color: var(--color);
+        margin: 0;
+        padding: 0;
+      }
+
+      div.direct-picker-subtitle {
+        @include OC_Body_Book();
+        font-size: 16px;
+        color: var(--color);
+        margin-top: 4px;
+      }
+
+      div.direct-picker-selected-users {
+        margin-top: 8px;
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+        align-content: stretch;
+
+        div.direct-picker-selected-users-list {
+          background-color: var(--opac-background-color-05);
+          border-radius: 4px;
+          padding: 0 8px 4px;
+          margin-right: 8px;
+          flex: 1 1 auto;
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
+          align-content: flex-start;
+
+          button.direct-picker-selected-user {
+            display: inline-block;
+            height: 24px;
+            padding: 4px 20px 4px 8px;
+            margin-right: 4px;
+            margin-top: 4px;
+            background-color: var(--opac-background-color-2);
+            border-radius: 4px;
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+            align-content: flex-start;
+            position: relative;
+
+            &:after {
+              content: "";
+              width: 20px;
+              height: 24px;
+              display: block;
+              background-image: cdnUrl("/img/ML/black_close.svg");
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: 8px 8px;
+              position: absolute;
+              right: 0;
+              top: 0;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/black_close@dark.svg");
+              }
+            }
+
+            @include user-profile(16) {
+              flex: 0 0 16px;
+            }
+
+            span.direct-picker-selected-user-name {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 16px;
+              color: var(--color);
+              float: left;
+              margin-left: 4px;
+              flex: 1 0 auto;
+            }
+          }
+
+          input.direct-picker-search-field-input {
+            display: block;
+            height: 24px;
+            padding: 0;
+            margin: 0;
+            background-color: transparent;
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 24px;
+            color: var(--color);
+            max-width: 100%;
+            width: auto;
+            border: none;
+            outline: none;
+            vertical-align: super;
+            margin-top: 4px;
+            min-width: 160px;
+            flex: 1 1 auto;
+
+            &:focus, &:active {
+              border: none;
+              outline: none;
+            }
+
+            @include placeholder() {
+              @include OC_Body_Book();
+              color: var(--light-color);
+              font-size: 14px;
+              line-height: 24px;
+            }
+          }
+        }
+
+        // button.direct-picker-create-bt {
+        //   width: auto;
+        //   height: 32px;
+        //   @include OC_Body_Bold();
+        //   font-size: 14px;
+        //   line-height: 18px;
+        //   color: white;
+        //   background-color: $carrot_green;
+        //   border-radius: 4px;
+        //   padding: 7px 14px;
+        //   flex: 0 0 auto;
+
+        //   &.disabled, &:disabled {
+        //     opacity: 1!important;
+        //     background-color: var(--opac-background-color-05);
+        //     color: var(--light-color);
+        //   }
+        // }
+      }
+
+      div.direct-picker-users-list {
+        margin-top: 16px;
+        width: calc(100% + 48px);
+        margin-left: -24px;
+
+        button.direct-picker-user-row {
+          height: 40px;
+          padding: 4px 24px;
+          border: none;
+          outline: none;
+          width: 100%;
+          display: block;
+
+          &.selected {
+            background-color: var(--opac-background-color-05);
+          }
+
+          div.carrot-checkbox {
+            margin-right: 8px;
+            float: left;
+            margin-top: 8px;
+          }
+
+          @include user-profile(32) {
+            float: left;
+            margin-right: 8px;
+          }
+
+          span.direct-picker-user {
+            display: block;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 32px;
+            float: left;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
       }
     }
   }

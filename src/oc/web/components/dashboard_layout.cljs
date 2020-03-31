@@ -25,7 +25,6 @@
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.direct-picker :refer (direct-picker)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -59,7 +58,6 @@
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
                               (drv/drv search/search-active?)
-                              (drv/drv :direct-messages)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -127,8 +125,7 @@
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
-        search-active? (drv/react s search/search-active?)
-        direct-messages (drv/react s :direct-messages)]
+        search-active? (drv/react s search/search-active?)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -225,8 +222,7 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when (and (not show-expanded-post)
-                       (not (:visible direct-messages)))
+            (when-not show-expanded-post
             ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
@@ -321,8 +317,6 @@
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
-              (:visible direct-messages)
-              (direct-picker)
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)

@@ -33,9 +33,11 @@
     db))
 
 (defn- deep-merge-users [new-users old-users]
-  (let [new-users-map (if (map? new-users)
-                        new-users
-                        (zipmap (map :user-id new-users) new-users))]
+  (let [filtered-new-users (filter
+                            #(and (seq (:user-id %))
+                                  (#{"active" "unverified"} (:status %)))
+                            (if (map? new-users) (vals new-users) new-users))
+        new-users-map (zipmap (map :user-id filtered-new-users) filtered-new-users)]
     (merge-with merge old-users new-users-map)))
 
 (defmethod dispatcher/action :team-roster-loaded
