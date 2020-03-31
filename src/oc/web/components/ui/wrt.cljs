@@ -93,7 +93,7 @@
 (defn- remind-to-all [s {:keys [unopened-count] :as props}]
   (let [alert-data {:emoji-icon "👌"
                     :action "remind-all-unseens"
-                    :message (str "Do you want to send a reminder to everyone that hasn’t yet opened it? (" unopened-count " users)")
+                    :message (str "Do you want to send a reminder to everyone that hasn’t opened it? (" unopened-count " users)")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
@@ -238,7 +238,7 @@
                                                   :unopened-count (count unseen-users)})
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
-                     :title "Send a reminder to everyone that hasn’t yet opened it"}
+                     :title "Send a reminder to everyone that hasn’t opened it"}
                     "Send reminders"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
