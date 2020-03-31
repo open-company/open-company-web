@@ -68,17 +68,18 @@
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
     (reset! (::show-post-button s) false)
-    (when (fn? dismiss-reply-cb)
-      (dismiss-reply-cb false))
-    (when (fn? add-comment-cb)
-      (add-comment-cb))
     (when (and (not (responsive/is-mobile-size?))
                (not edit-comment-data)
                (not dismiss-reply-cb)
                scroll-after-posting?
                (not (dom-utils/is-element-top-in-viewport? (sel1 [:div.stream-comments]) -40)))
-      (utils/after 10
-       #(.scrollTo js/window 0 (-> s (rum/dom-node) (.-offsetTop) (- 72)))))))
+      (when-let [vertical-offset (-> s (rum/dom-node) (.-offsetTop) (- 72))]
+        (utils/after 10
+         #(.scrollTo js/window 0 vertical-offset))))
+    (when (fn? dismiss-reply-cb)
+      (dismiss-reply-cb false))
+    (when (fn? add-comment-cb)
+      (add-comment-cb))))
 
 (defn me-options [parent-uuid]
   {:media-config ["code" "gif" "photo" "video"]
