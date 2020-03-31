@@ -254,12 +254,6 @@ $header_top_margin: 24;
     min-height: #{$line_height}px;
   }
 
-  blockquote {
-    padding: 10px 20px;
-    min-height: #{$line_height + 20}px;
-    border-left: 4px solid $ultra_light_grey;
-  }
-
   i:empty, b:empty, strong:empty {
     display: grid;
     min-width: 1px;
@@ -269,46 +263,39 @@ $header_top_margin: 24;
     color: $color;
   }
 
+  & > * {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  & > * {
+    margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
+  }
+
   & > *:first-child {
-    margin-top: 0px;
+    margin-top: 0;
   }
 
-  & > *:not(:first-child):not(:last-child) {
-    margin: #{$paragraph_spacing}px 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+  & > *:last-child {
+    margin-bottom: 0;
   }
 
-  & > *:last-child:not(:first-child) {
-    margin: #{$paragraph_spacing}px 0px 0px;
-    padding-bottom: 0px;
-  }
-
-  & > blockquote:not(:first-child):not(:last-child) {
-    margin: #{$paragraph_spacing}px 0px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  & > blockquote:last-child:not(:first-child) {
-    margin: #{$paragraph_spacing}px 0px 0px;
-    padding-bottom: 10px;
-  }
-
-  & > h1:not(:first-child):not(:last-child) {
+  & > h1, & > h2 {
     margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
-  & > h1:last-child:not(:first-child) {
-    margin: #{$header_top_margin}px 0px 0px;
+  & > h1:first-child, & > h2:first-child {
+    margin-top: 0;
   }
 
-  & > h2:not(:first-child):not(:last-child) {
-    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+  & > h1:last-child, & > h2:last-child {
+    margin-bottom: 0;
   }
 
-  & > h2:last-child:not(:first-child) {
-    margin: #{$header_top_margin}px 0px 0px;
+  blockquote {
+    padding: 10px 20px;
+    min-height: #{$line_height + 20}px;
+    border-left: 4px solid $ultra_light_grey;
   }
 
   & > img, img {
@@ -359,7 +346,6 @@ $header_top_margin: 24;
     font-size: #{$font_size + 11}px;
     line-height: #{$line_height + 14}px;
     font-weight: normal;
-    padding-bottom: 0px;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -377,7 +363,6 @@ $header_top_margin: 24;
     font-size: #{$font_size + 5}px;
     line-height: #{$line_height + 6}px;
     font-weight: normal;
-    padding-bottom: 0px;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -616,14 +601,6 @@ $header_top_margin: 24;
 
   margin-bottom: 0px;
 
-  &>*:last-child {
-    margin-bottom: 0px;
-  }
-
-  & > blockquote:last-child {
-    margin-bottom: 0px;
-  }
-
   &.emoji-comment {
     font-size: 40px;
     height: 50px;
@@ -731,30 +708,28 @@ $header_top_margin: 24;
     min-height: #{$line_height}px
   }
 
+  & > * {
+    margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
+  }
+
   & > *:first-child {
-    margin-top: 0px;
+    margin-top: 0;
   }
 
-  & > *:not(:first-child):not(:last-child) {
-    margin: #{$paragraph_spacing}px 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+  & > *:last-child {
+    margin-bottom: 0;
   }
 
-  & > *:last-child:not(:first-child) {
-    margin: #{$paragraph_spacing}px 0px 0px;
-    padding-bottom: 0px;
+  & > h1, & > h2 {
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
-  & > blockquote:not(:first-child):not(:last-child) {
-    margin: #{$paragraph_spacing}px 0px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+  & > h1:first-child, & > h2:first-child {
+    margin-top: 0;
   }
 
-  & > blockquote:last-child:not(:first-child) {
-    margin: #{$paragraph_spacing}px 0px 0px;
-    padding-bottom: 10px;
+  & > h1:last-child, & > h2:last-child {
+    margin-bottom: 0;
   }
 
   & > img, img {
@@ -770,6 +745,7 @@ $header_top_margin: 24;
     font-size: #{$font_size + 11}px;
     line-height: #{$line_height + 14}px;
     font-weight: normal;
+    padding-top: 0px;
     padding-bottom: 0px;
 
     a, span[data-auto-link] {
@@ -788,6 +764,7 @@ $header_top_margin: 24;
     font-size: #{$font_size + 5}px;
     line-height: #{$line_height + 6}px;
     font-weight: normal;
+    padding-top: 0px;
     padding-bottom: 0px;
 
     a, span[data-auto-link] {
@@ -799,22 +776,6 @@ $header_top_margin: 24;
     a:hover {
       text-decoration: underline;
     }
-  }
-
-  & > h1:not(:first-child):not(:last-child) {
-    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
-  }
-
-  & > h1:last-child:not(:first-child) {
-    margin: #{$header_top_margin}px 0px 0px;
-  }
-
-  & > h2:not(:first-child):not(:last-child) {
-    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
-  }
-
-  & > h2:last-child:not(:first-child) {
-    margin: #{$header_top_margin}px 0px 0px;
   }
 
   mark, mark.highlight {
