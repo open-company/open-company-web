@@ -68,6 +68,7 @@
   [s]
   (let [{:keys [orgs
                 org-data
+                active-users
                 jwt-data
                 board-data
                 initial-section-editing
@@ -84,10 +85,15 @@
                 app-loading
                 payments-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
+        has-direct-boards? (some :direct (:boards org-data))
         loading? (or ;; force loading screen
                      app-loading
                      ;; the org data are not loaded yet
                      (not org-data)
+                     ;; the active users have not been loaded
+                     ;; and the user has some direct boards
+                     (and has-direct-boards?
+                          (not (map? active-users)))
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some

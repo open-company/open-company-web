@@ -285,23 +285,23 @@
       (:name user)
       (:email user)))
 
-(defn fix-direct-board [board-data roster-users]
+(defn fix-direct-board [board-data active-users]
   (if (or (not (:direct board-data))
-          (not (seq roster-users)))
+          (not (seq active-users)))
     board-data
     (let [calc-name (fn [users user]
                       (let [user-id (if (map? user) (:user-id user) user)]
-                        (name-for (some #(when (= (:user-id %) user-id) %) users))))
+                        (name-for (get users user-id))))
           except-me (filterv #(when (and (not= % (jwt/user-id))
                                          (not= (:user-id %) (jwt/user-id)))
                                 %)
                      (:authors board-data))
           board-name* (clojure.string/join ","
-                       (mapv (partial calc-name roster-users) (butlast except-me)))
+                       (mapv (partial calc-name active-users) (butlast except-me)))
           board-name (str board-name*
                           (when (> (count except-me) 1)
                             " and ")
-                          (calc-name roster-users (last except-me)))]
+                          (calc-name active-users (last except-me)))]
       (-> board-data
        (assoc :name board-name)
        (assoc :original-name (or (:original-name board-data) (:name board-data)))))))
@@ -309,12 +309,12 @@
 (defn fix-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {} (dis/team-roster)))
+   (fix-board board-data {} (dis/active-users)))
 
   ([board-data change-data]
-   (fix-board board-data change-data (dis/team-roster)))
+   (fix-board board-data change-data (dis/active-users)))
 
-  ([board-data change-data team-roster & [direction]]
+  ([board-data change-data active-users & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
@@ -355,7 +355,7 @@
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
           with-fixed-direct-name (if (:direct with-posts-separators)
-                                   (fix-direct-board with-posts-separators (:users team-roster))
+                                   (fix-direct-board with-posts-separators active-users)
                                    with-posts-separators)]
       with-fixed-direct-name)))
 

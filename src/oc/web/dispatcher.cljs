@@ -110,6 +110,12 @@
 (defn team-channels-key [team-id]
   [:teams-data team-id :channels])
 
+(defn active-users-key [org-slug]
+  (vec (conj (org-key org-slug) :active-users)))
+
+(defn mention-users-key [org-slug]
+  (vec (conj (org-key org-slug) :mention-users)))
+
 (defn uploading-video-key [org-slug video-id]
   (vec (concat (org-key org-slug) [:uploading-videos video-id])))
 
@@ -436,9 +442,11 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active
+                            :active-users]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active]
+                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active
+                                 active-users]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -459,7 +467,8 @@
                                :cmail-state (:cmail-state base)
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
-                               :search-active search-active})]
+                               :search-active search-active
+                               :active-users active-users})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -477,7 +486,9 @@
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
    :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
    :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]
-   :direct-messages       [[:base] (fn [base] (get-in base direct-messages-key))]})
+   :direct-messages       [[:base] (fn [base] (get-in base direct-messages-key))]
+   :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
+   :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]})
 
 ;; Action Loop =================================================================
 
@@ -731,6 +742,11 @@
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
 
+(defn ^:export active-users
+  ([] (active-users (:slug (org-data))))
+  ([org-slug] (active-users org-slug @app-state))
+  ([org-slug data] (get-in data (active-users-key org-slug))))
+
 (defn uploading-video-data
   ([video-id] (uploading-video-data (router/current-org-slug) video-id @app-state))
   ([org-slug video-id] (uploading-video-data org-slug video-id @app-state))
@@ -897,6 +913,7 @@
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
+(set! (.-OCWebPrintActiveUsers js/window) active-users)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintActivityReadData js/window) print-activity-read-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)

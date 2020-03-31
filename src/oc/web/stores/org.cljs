@@ -15,9 +15,10 @@
 (defn fix-org
   "Fix org data coming from the API."
   [org-data]
-  (let [fixed-boards (mapv #(-> %
+  (let [active-users (dispatcher/active-users (:slug org-data))
+        fixed-boards (mapv #(-> %
                              (assoc :read-only (-> % :links activity-utils/readonly-board?))
-                             (activity-utils/fix-direct-board (:users (dispatcher/team-roster (:team-id org-data)))))
+                             (activity-utils/fix-direct-board active-users))
                       (:boards org-data))]
     (-> org-data
      read-only-org

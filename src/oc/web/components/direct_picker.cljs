@@ -46,10 +46,11 @@
 
 (defn- create-section [s]
   (reset! (::saving s) true)
-  (let [all-users (:users @(drv/get-ref s :team-roster))
+  (let [all-users @(drv/get-ref s :active-users)
         current-user-data @(drv/get-ref s :current-user-data)
         authors (concat [(:user-id current-user-data)] (vec @(::users s)))
-        users (concat [current-user-data] (mapv #(some (fn [user] (when (= % (:user-id user)) user)) all-users) @(::users s)))
+        selected-users-data (map all-users @(::users s))
+        users (concat [current-user-data] selected-users-data)
         direct-name (str (clojure.string/join ", " (mapv user-lib/name-for (butlast users))) " and " (user-lib/name-for (last users)))]
     (section-actions/section-save
       {:name direct-name
@@ -75,18 +76,17 @@
 
 (rum/defcs direct-picker < rum/reactive
                            (drv/drv :editable-boards)
-                           (drv/drv :team-roster)
+                           (drv/drv :active-users)
                            (drv/drv :current-user-data)
                            (rum/local #{} ::users)
                            (rum/local "" ::query)
                            (rum/local false ::saving)
                            (rum/local nil ::existing-board)
   [s]
-  (let [roster (drv/react s :team-roster)
-        editable-boards (vec (vals (drv/react s :editable-boards)))
+  (let [editable-boards (vec (vals (drv/react s :editable-boards)))
         current-user-data (drv/react s :current-user-data)
-        active-users (filterv #(and (#{"active" "unverified"} (:status %))
-                                    (not= (:user-id current-user-data) (:user-id %))) (:users roster))
+        all-active-users (drv/react s :active-users)
+        active-users (into {} (filter #(not= (:user-id current-user-data) (first %)) all-active-users))
         sorted-users (filter-sort-users s (:user-id current-user-data) active-users @(::query s))
         existing-board (some #(when (and (:direct %)
                                          (= (clojure.core/disj (set (:authors %)) (:user-id current-user-data))
@@ -104,7 +104,7 @@
                         (when-not (utils/event-inside? % q-el)
                           (.focus q-el)))}
           (for [user-id @(::users s)
-                :let [u (some #(when (= (:user-id %) user-id) %) (:users roster))]]
+                :let [u (some #(when (= (:user-id %) user-id) %) active-users)]]
             [:button.mlb-reset.direct-picker-selected-user
               {:on-click #(swap! (::users s) disj user-id)
                :key (str "direct-picker-selected-" user-id)}
