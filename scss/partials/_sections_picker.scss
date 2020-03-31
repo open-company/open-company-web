@@ -11,6 +11,15 @@ div.sections-picker {
     padding: 8px 0;
     overflow-y: auto;
 
+    div.sections-picker-divider {
+      border-top: 1px solid var(--divider-line);
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: var(--light-color);
+      line-height: 18px;
+      padding: 8px 16px 0 16px;
+    }
+
     div.sections-picker-section {
       padding: 8px 16px;
       cursor: pointer;
@@ -39,11 +48,20 @@ div.sections-picker {
         div.private-icon {
           background-image: cdnUrl("/img/ML/board_private_green.svg");
         }
+
+        div.multi-user-direct-icon {
+          opacity: 1;
+        }
       }
 
       &.has-access-icon {
         div.sections-picker-section-name {
           max-width: calc(100% - 12px - 8px);
+        }
+
+        @include user-profile(15) {
+          float: right;
+          margin-right: -1px;
         }
       }
 
@@ -75,6 +93,17 @@ div.sections-picker {
         width: 12px;
         height: 18px;
         background-image: cdnUrl("/img/ML/board_public.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      div.multi-user-direct-icon {
+        float: right;
+        opacity: 0.5;
+        width: 12px;
+        height: 18px;
+        background-image: cdnUrl("/img/ML/invite_people_bt.svg");
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;

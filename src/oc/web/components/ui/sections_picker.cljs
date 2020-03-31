@@ -5,7 +5,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (def distance-from-bottom 80)
 
@@ -26,6 +27,8 @@
                                 (dis/dispatch! [:input [:show-sections-picker] false]))))
                              ;; Derivatives
                              (drv/drv :editable-boards)
+                             (drv/drv :current-user-data)
+                             (drv/drv :active-users)
                              ;; Locals
                              (rum/local nil ::container-max-height)
                              ;; Local mixins
@@ -44,13 +47,17 @@
         scroller-style  (if @(::container-max-height s)
                           {:max-height (str (- @(::container-max-height s) 55) "px")}
                           {})
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        current-user-data (drv/react s :current-user-data)
+        active-users (drv/react s :active-users)
+        sorted-sections (filter (comp not :direct) sorted-all-sections)
+        direct-sorted-sections (filter :direct sorted-all-sections)]
     [:div.sections-picker
       {:style container-style}
       [:div.sections-picker-content
         {:style scroller-style}
-        (when (pos? (count sorted-all-sections))
-          (for [b sorted-all-sections
+        (when (seq sorted-sections)
+          (for [b sorted-sections
                 :let [active (= (:slug b) active-slug)]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
@@ -63,4 +70,25 @@
               (case (:access b)
                 "private" [:div.private-icon]
                 "public" [:div.public-icon]
-                nil)]))]]))
+                nil)]))
+        (when (seq direct-sorted-sections)
+          [:div.sections-picker-divider
+            "Direct:"])
+        (when (seq direct-sorted-sections)
+          (for [b direct-sorted-sections
+                :let [active (= (:slug b) active-slug)
+                      not-self-users (filter #(not= (:user-id current-user-data) %) (:authors b))
+                      author-data (when (= (count not-self-users) 1)
+                                    (get active-users (first not-self-users)))]]
+            [:div.sections-picker-section.has-access-icon
+              {:key (str "sections-picker-" (:uuid b))
+               :class (utils/class-set {:active active})
+               :on-click #(when (fn? on-change)
+                            (on-change b))}
+              [:div.sections-picker-section-name
+                (:name b)]
+              (cond
+                author-data
+                (user-avatar-image author-data)
+                :else
+                [:div.multi-user-direct-icon])]))]]))
