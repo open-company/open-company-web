@@ -347,7 +347,7 @@
 ;; Setup ME
 
 (defn setup-editor [s body-on-change options]
-  (let [users-list (:mention-users @(drv/get-ref s :team-roster))]
+  (let [users-list @(drv/get-ref s :mention-users)]
     (when (and (seq users-list)
                (nil? @(:me/editor s)))
       (let [mobile-editor (responsive/is-tablet-or-mobile?)

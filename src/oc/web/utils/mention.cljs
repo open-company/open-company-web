@@ -14,3 +14,20 @@
                                              panel-el))
                        :activeTriggerList ["@"]}]
     (js/TCMention. (clj->js mention-props))))
+
+(defn- get-slack-usernames [user]
+  (let [slack-display-name [(:slack-display-name user)]
+        slack-users-usernames (vec (map :display-name (vals (:slack-users user))))]
+    (remove #(or (nil? %) (= % "-")) (concat slack-users-usernames slack-display-name))))
+
+(defn- compact-slack-usernames [users]
+  (doall (map #(assoc % :slack-usernames (get-slack-usernames %)) users)))
+
+(defn users-for-mentions [users]
+  (let [fixed-users (if (map? users) (vals users) users)]
+    (compact-slack-usernames (filterv #(and ;; is a carrot user
+                                            (seq (:user-id %))
+                                            ;; is active
+                                            (or (= (:status %) "active")
+                                                (= (:status %) "unverified")))
+     fixed-users))))

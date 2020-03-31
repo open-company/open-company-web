@@ -154,7 +154,7 @@
                          (drv/drv :media-input)
                          (drv/drv :add-comment-focus)
                          (drv/drv :add-comment-data)
-                         (drv/drv :team-roster)
+                         (drv/drv :mention-users)
                          (drv/drv :current-user-data)
                          (drv/drv :attachment-uploading)
                          ;; Locals
@@ -223,7 +223,7 @@
   [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
-        _team-roster (drv/react s :team-roster)
+        _mention-users (drv/react s :mention-users)
         add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
