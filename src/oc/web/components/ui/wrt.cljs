@@ -97,7 +97,7 @@
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
-                    :solid-button-title "Yes, remind all"
+                    :solid-button-title "Yes, remind them"
                     :solid-button-cb (fn []
                                       (remind-to s props)
                                       (alert-modal/hide-alert))}]
