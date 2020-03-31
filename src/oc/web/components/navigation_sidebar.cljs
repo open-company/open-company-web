@@ -80,7 +80,7 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
-                                (drv/drv :team-roster)
+                                (drv/drv :active-users)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
@@ -128,7 +128,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        team-roster (drv/react s :team-roster)
+        active-users (drv/react s :active-users)
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
@@ -320,7 +320,7 @@
                   (if (> (count (:authors direct-board)) 2)
                     [:span.direct-users-icon]
                     (let [direct-user-id (some #(not= (:user-id current-user-data) (:user-id %)) (:authors direct-board))
-                          direct-user-data (some #(= (:user-id %) direct-user-id) (:users team-roster))]
+                          direct-user-data (get active-users direct-user-id)]
                       (user-avatar-image direct-user-data)))
                   [:div.internal
                     {:class (utils/class-set {:new (seq (:unread board-change-data))})
