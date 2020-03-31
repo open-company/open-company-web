@@ -79,7 +79,6 @@
          org-slug (router/current-org-slug)
          is-container? (dis/is-container? board-slug)
          org-data (dis/org-data)]
-     (hide-direct-picker)
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -124,7 +123,6 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
-    (hide-direct-picker)
     (nav-to-url! e board to-url back-y should-refresh-data?)))
 
 (defn open-post-modal [activity-data dont-scroll]
@@ -139,7 +137,6 @@
         query-params (router/query-params)
         route [org board activity "activity"]
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
-    (hide-direct-picker)
     (router/set-route! route {:org org
                               :board board
                               :activity activity
