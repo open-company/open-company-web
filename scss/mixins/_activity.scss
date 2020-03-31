@@ -171,7 +171,7 @@ $header_top_margin: 24;
     @include OC_Body_Bold_Italic();
   }
 
-  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
+  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener, a i, a strong, a b {
     text-decoration: none;
     color: $carrot_green;
     background-color: transparent !important;
@@ -211,6 +211,39 @@ $header_top_margin: 24;
 
   .emojione {
     @include emoji-size(18);
+  }
+}
+
+@mixin code-blocks($font-size: 14, $line-height: $bottom_margin, $paragraph-spacing: $line-height) {
+  pre, pre > code {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--color);
+    font-size: #{$font-size}px;
+    line-height: #{$line-height}px;
+    background-color: var(--code-background-color);
+    border: 1px solid var(--code-border-color);
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+    padding: 16px;
+    min-height: 54px;
+    margin: 0 0 #{$paragraph-spacing}px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--inline-code-color);
+    font-size: #{$font-size}px;
+    line-height: #{$line-height}px;
+    background-color: var(--code-background-color);
+    border: 1px solid var(--code-border-color);
+    border-radius: 4px;
+    white-space: pre-wrap;
+    padding: 2px 1px 1px;
   }
 }
 
@@ -269,17 +302,17 @@ $header_top_margin: 24;
     color: $color;
   }
 
-  & > *:first-child {
+  & > *:not(blockquote, pre):first-child {
     margin-top: 0px;
   }
 
-  & > *:not(:first-child):not(:last-child) {
+  & > *:not(blockquote, pre):not(:first-child):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
-  & > *:last-child:not(:first-child) {
+  & > *:not(blockquote, pre):last-child:not(:first-child) {
     margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 0px;
   }
@@ -319,7 +352,7 @@ $header_top_margin: 24;
     @include OC_Body_Bold();
     font-weight: normal;
 
-    a, span[data-auto-link] {
+    a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
       color: $carrot_green;
       background-color: transparent;
@@ -379,7 +412,7 @@ $header_top_margin: 24;
     font-weight: normal;
     padding-bottom: 0px;
 
-    a, span[data-auto-link] {
+    a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
       color: $carrot_green;
       background-color: transparent;
@@ -390,7 +423,7 @@ $header_top_margin: 24;
     }
   }
 
-  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
+  a, span[data-auto-link], a i, a strong, a b, a.noreferrer, a.noopener, a.noreferrer.noopener {
     text-decoration: none;
     color: $carrot_green;
     background-color: transparent !important;
@@ -448,6 +481,8 @@ $header_top_margin: 24;
     color: $deep_navy;
     border-radius: 3px;
   }
+
+  @include code-blocks(#{$font_size - 3}px, #{$line_height - 3}px, $paragraph_spacing);
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -575,7 +610,6 @@ $header_top_margin: 24;
   }
 }
 
-
 @mixin activity-comment($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height){
   @include OC_Body_Book();
   font-size: #{$font_size}px;
@@ -630,7 +664,7 @@ $header_top_margin: 24;
     line-height: 50px;
   }
 
-  a, span[data-auto-link] {
+  a, span[data-auto-link], a i, a strong, a b {
     text-decoration: none;
     color: $carrot_green;
     background-color: transparent !important;
@@ -692,7 +726,7 @@ $header_top_margin: 24;
     @include OC_Body_Bold();
     font-weight: normal;
 
-    a, span[data-auto-link] {
+    a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
       color: $carrot_green;
       background-color: transparent;
@@ -731,20 +765,29 @@ $header_top_margin: 24;
     min-height: #{$line_height}px
   }
 
-  & > *:first-child {
+  h2 + p {
+    margin-top: 0px !important;
+  }
+
+  & > *:not(blockquote, pre):first-child {
     margin-top: 0px;
   }
 
-  & > *:not(:first-child):not(:last-child) {
+  *:not(blockquote, pre):first-child {
+    margin-top: 0px;
+  }
+
+  & > *:not(blockquote, pre):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
-  & > *:last-child:not(:first-child) {
+  & > *:not(blockquote, pre):last-child:not(:first-child) {
     margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 0px;
   }
+
 
   & > blockquote:not(:first-child):not(:last-child) {
     margin: #{$paragraph_spacing}px 0px;
@@ -822,4 +865,6 @@ $header_top_margin: 24;
     color: $deep_navy;
     border-radius: 3px;
   }
+
+  @include code-blocks(#{int($font-size) - 3}px, #{int($line-height) - 3}px, $paragraph-spacing);
 }

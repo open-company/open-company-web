@@ -573,8 +573,18 @@ div.stream-item {
         @include OC_Body_Book();
         line-height: 20px;
         overflow: hidden;
-
         max-height: #{20 * 2}px;
+
+        @include mobile() {
+          @include activity-body(16, 20, var(--color));
+          line-height: 20px;
+          max-height: #{20 * 2}px;
+
+          h2 {
+            font-size: 16px;
+            line-height: 20px;
+          }
+        }
 
         h1, h2, mark, mark.highlight {
           color: var(--color);
@@ -595,20 +605,13 @@ div.stream-item {
           display: none;
         }
 
-        @include mobile() {
-          @include activity-body(16, 20, var(--color));
-          line-height: 20px;
-          max-height: #{20 * 2}px;
+        pre, code {
+          display: none;
+        }
 
-          h1, h2, mark, mark.highlight {
-            color: var(--color);
-            @include OC_Body_Book();
-            font-size: 16px;
-            line-height: 20px;
-            background-color: transparent;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
+        p {
+          padding: 0;
+          margin: 0;
         }
       }
     }
