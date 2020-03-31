@@ -484,6 +484,7 @@ div.stream-comments {
 
                     @include mobile() {
                       left: -40px;
+                      padding-right: 8px;
                     }
                   }
 
