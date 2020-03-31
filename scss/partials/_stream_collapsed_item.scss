@@ -5,17 +5,86 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
+div.virtualized-list-separator:not(.expanded-list) {
+  & + div.virtualized-list-row.collapsed-item div.stream-collapsed-item {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+}
+
 div.virtualized-list-row.collapsed-item {
   background-color: var(--background-color);
 
   @include big_web() {
     z-index: 1;
 
+    &.open-item div.stream-collapsed-item {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    &.close-item div.stream-collapsed-item {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    &:not(.close-item) div.stream-collapsed-item {
+      border-bottom: 0;
+    }
+
     &:hover {
       z-index: 2;
       width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
       height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
       margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+
+      div.stream-collapsed-item {
+        background-color: var(--foc-hover-color);
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+        border-radius: 4px;
+        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+        border: 1px solid var(--foc-hover-border-color);
+
+        div.more-menu {
+          display: initial;
+
+          button {
+            display: initial;
+          }
+        }
+
+        div.more-menu {
+          background-color: var(--foc-hover-color);
+
+          &:before {
+            background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
+          }
+        }
+
+        &.expandable {
+          div.more-menu {
+            display: initial;
+
+            button {
+              display: initial;
+            }
+          }
+        }
+
+        &.unread-item {
+          background-color: var(--foc-new-color);
+          z-index: 2;
+          box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+          border-radius: 4px;
+          border: 1px solid var(--foc-new-border-color);
+          padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+          width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+          height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+        }
+      }
     }
   }
 
@@ -27,61 +96,16 @@ div.virtualized-list-row.collapsed-item {
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
   margin: 0;
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  border-bottom: 1px solid var(--foc-divider-line-color);
+  border: 1px solid var(--foc-divider-line-color);
   background-color: var(--foc-background-color);
   overflow: visible;
-
   height: #{$collapsed_foc_height}px;
   padding: 12px 12px 12px 20px;
   display: block;
   position: relative;
 
-  @include big_web() {
-    &:hover {
-      background-color: var(--foc-hover-color);
-      z-index: 2;
-      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-      border-radius: 4px;
-      padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-      height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
-      border: 1px solid var(--foc-hover-border-color);
-
-      div.more-menu {
-        display: initial;
-
-        button {
-          display: initial;
-        }
-      }
-
-      div.more-menu {
-        background-color: var(--foc-hover-color);
-
-        &:before {
-          background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
-        }
-      }
-    }
-  }
-
   &.expandable {
     cursor: pointer;
-
-    @include big_web() {
-    &:hover {
-      div.more-menu {
-        display: initial;
-
-        button {
-          display: initial;
-        }
-      }
-    }
-  }
   }
 
   &.unread-item {
@@ -91,22 +115,6 @@ div.stream-collapsed-item {
 
     &.showing-share {
       z-index: 3;
-    }
-
-    @include big_web(){
-      &:hover {
-        background-color: var(--foc-new-color);
-        z-index: 2;
-        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-        border-radius: 4px;
-        border-top: 1px solid var(--foc-new-border-color);
-        border-right: 1px solid var(--foc-new-border-color);
-        border-left: 1px solid var(--foc-new-border-color);
-        border-bottom: 1px solid var(--foc-new-border-color);
-        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
-      }
     }
 
     div.more-menu {
@@ -254,7 +262,7 @@ div.stream-collapsed-item {
           padding-left: 4px !important;
         }
 
-        * {
+        * { // We need to specify code and pre to override specific rules
           height: 24px;
           white-space: nowrap;
           margin: 0 !important;
@@ -263,6 +271,17 @@ div.stream-collapsed-item {
           overflow: hidden;
           vertical-align: top;
           display: inline !important;
+          background-color: transparent;
+          color: var(--color);
+          border: none;
+          border-radius: 0;
+          min-height: unset;
+          line-height: 24px;
+          @include OC_Body_Book();
+        }
+
+        code, pre {
+          display: none!important;
         }
 
         img, iframe, video {

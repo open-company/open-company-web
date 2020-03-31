@@ -772,7 +772,7 @@
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["poll" "gif" "photo" "video"]
+                               :media-config ["poll" "code" "gif" "photo" "video"]
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
