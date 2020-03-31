@@ -262,7 +262,7 @@ div.stream-collapsed-item {
           padding-left: 4px !important;
         }
 
-        * {
+        * { // We need to specify code and pre to override specific rules
           height: 24px;
           white-space: nowrap;
           margin: 0 !important;
@@ -271,6 +271,17 @@ div.stream-collapsed-item {
           overflow: hidden;
           vertical-align: top;
           display: inline !important;
+          background-color: transparent;
+          color: var(--color);
+          border: none;
+          border-radius: 0;
+          min-height: unset;
+          line-height: 24px;
+          @include OC_Body_Book();
+        }
+
+        code, pre {
+          display: none!important;
         }
 
         img, iframe, video {

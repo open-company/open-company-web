@@ -113,6 +113,7 @@ function PlaceCaretAtEnd(el) {
       if (this.inlinePlusButtonOptions.inlineButtons) {
         this.pickerElement.parentNode.removeChild(this.pickerElement);
       }
+
       this.pickerElement = undefined;
       this.mainButton = undefined;
       this.mediaButtonsContainer = undefined;
@@ -148,7 +149,7 @@ function PlaceCaretAtEnd(el) {
     },
 
     onFocus: function(event, editable){
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPicker: function(){
@@ -182,23 +183,9 @@ function PlaceCaretAtEnd(el) {
 
     /* Caret helpers */
 
-    moveCaret: function($el, position){
-      var range, sel, el, textEl;
+    moveCursor: function(el, position){
+      MediumEditor.selection.moveCursor(this.document, el, position);
 
-      position = position || 0;
-      range = document.createRange();
-      sel = window.getSelection();
-      el = $el.get(0);
-
-      if (!el.childNodes.length) {
-          textEl = document.createTextNode(' ');
-          el.appendChild(textEl);
-      }
-
-      range.setStart(el.childNodes[0], position);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
       this.repositionMediaPicker();
     },
 
@@ -222,6 +209,40 @@ function PlaceCaretAtEnd(el) {
       this._waitingCB = true;
       this.delegate("onPickerClick", "entry");
       $(event.target).tooltip("hide");
+    },
+
+    codeClick: function(event){
+      log("codeClick", this, event);
+      this.hidePlaceholder();
+      this.saveSelection();
+      this.collapse();
+      this.delegate("onPickerClick", "code block");
+      $(event.target).tooltip("hide");
+
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (!this.base.getFocusedElement()) {
+        PlaceCaretAtEnd(this.getEditorElements()[0]);
+      }
+      var sel = this.window.getSelection(),
+          element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
+          pre = this.document.createElement('pre');
+      pre.className = "media-codeblock"
+      pre.dataset.disableToolbar = true;
+      // if the selection is in a DIV means it's the main editor element
+      if (element && element.nodeName.toLowerCase() === 'p'){
+        // add the PRE before the P
+        element.parentNode.insertBefore(pre, element);
+        element.parentNode.removeChild(element);
+      } else {
+        element.appendChild(pre);
+      }
+      this.moveCursor(pre, 0);
+
+      this.base.checkContentChanged();
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     gifClick: function(event){
@@ -304,12 +325,12 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     videoClick: function(event){
@@ -370,12 +391,12 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     chartClick: function(event){
@@ -431,12 +452,12 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     attachmentClick: function(event){
@@ -516,12 +537,12 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     insertAfter: function(newNode, referenceNode) {
@@ -531,7 +552,6 @@ function PlaceCaretAtEnd(el) {
     dividerLineClick: function(event){
       log("dividerLineClick", this, event);
       this.collapse();
-      event.stopPropagation();
       this.delegate("onPickerClick", "divider-line");
       $(event.target).tooltip("hide");
 
@@ -567,11 +587,11 @@ function PlaceCaretAtEnd(el) {
       var br = this.document.createElement("br");
       nextP.appendChild(br);
       this.insertAfter(nextP, p);
-      this.moveCaret($(nextP), 0);
+      this.moveCursor(nextP, 0);
       this.base.checkContentChanged();
       this.delayedRepositionMediaPicker();
 
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPickerMediaButtons: function(){
@@ -589,6 +609,11 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'code') {
+          button.classList.add('media-code');
+          button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add code block or text snippet");
+          this.on(button, 'click', this.codeClick.bind(this));
         } else if (opt === 'gif') {
           button.classList.add('media-gif');
           button.classList.add('media-' + idx);
@@ -766,8 +791,11 @@ function PlaceCaretAtEnd(el) {
     },
 
     paragraphIsEmpty: function(element){
+      if (element.nodeName.toLowerCase() === "pre" || element.nodeName.toLowerCase() === "blockquote") {
+        return false;
+      }
       // Empty body
-      if (element.childNodes.length == 0 && $(element).html() == "") {
+      if (element.childNodes.length == 0 && element.innerHTML == "") {
         return true;
       }
       // Empty body like: <p><br/><p/>

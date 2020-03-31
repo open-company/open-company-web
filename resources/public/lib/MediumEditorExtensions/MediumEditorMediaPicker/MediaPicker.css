@@ -61,6 +61,10 @@ div.medium-editor-media-picker div.media-picker-container {
     overflow: hidden;
 }
 
+div.medium-editor-media-picker div.media-picker-container.expanded {
+  width: auto;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media {
   transform: rotate(0deg);
   transition: transform 0ms, margin-left 0ms, opacity 0ms;
@@ -159,6 +163,34 @@ div.medium-editor-media-picker div.media-picker-container button.media-video:not
   margin-right: 5px;
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-code i.fa.fa-code:before {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 19px;
+  vertical-align: bottom;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code {
+  background-image: url("/img/ML/media_code.svg");
+  background-size: 20px 18px;
+}
+
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-code {
+  background-image: url("/img/ML/media_code@dark.svg");
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-code:hover {
+  opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code:not(:first-child) {
+  margin-left: 4px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code:not(:last-child) {
+  margin-right: 4px;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-chart {
   background-image: url("/img/ML/media_chart.png");
   background-size: 14px;
@@ -184,30 +216,6 @@ div.medium-editor-media-picker div.media-picker-container button.media-divider {
 
 div.medium-editor-media-picker div.media-picker-container button.media-divider:hover {
   background-image: url("/img/ML/media_divider_white.png");
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-1 {
-  width: 24px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-2 {
-  width: 64px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-3 {
-  width: 94px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-4 {
-  width: 144px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-5 {
-  width: 184px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded.media-6 {
-  width: 224px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded button.media {
