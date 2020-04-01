@@ -70,7 +70,7 @@
     (let [is-mobile? (responsive/is-mobile-size?)
           comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
           activity-data @(drv/get-ref s :activity-data)
-          comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+          comments-count (-> activity-data :links (utils/link-for "comments") :count)]
       (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
                                        (> (count (:body activity-data)) min-body-length-for-truncation)
                                        ;; Never if they have polls
@@ -80,7 +80,7 @@
                                        ;; Only when they are read
                                        (not (:unread activity-data))
                                        ;; And only when there is at least a comment
-                                       (pos? (count comments-data)))))))
+                                       (pos? comments-count))))))
 
 (rum/defcs expanded-post <
   rum/reactive
