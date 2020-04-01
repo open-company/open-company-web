@@ -66,6 +66,7 @@
                                                  :dismiss true
                                                  :expire 3
                                                  :id :direct-create-success})
+        (nav-actions/close-all-panels)
         (nav-actions/nav-to-url! nil (:slug board-data) (oc-urls/board (router/current-org-slug) (:slug board-data))))
       (fn []
        (reset! (::saving s) false)
@@ -159,7 +160,9 @@
                 [:button.mlb-reset.direct-picker-create-bt
                   {:class (when-not (seq @(::users s)))
                    :on-click #(if existing-board
-                                (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board)))
+                                (do
+                                  (nav-actions/close-all-panels)
+                                  (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board))))
                                 (create-section s))
                    :disabled (or (not (<= 1 (count @(::users s)) 5))
                                  @(::saving s))}
