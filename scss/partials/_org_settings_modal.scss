@@ -139,21 +139,6 @@ div.org-settings-modal {
       margin-top: 16px;
       border-top: 1px solid var(--divider-line);
 
-      div.org-settings-label {
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: var(--color);
-        margin-top: 16px;
-
-        i.mdi-information-outline {
-          margin-left: 6px;
-
-          &:before {
-            font-size: 14px;
-          }
-        }
-      }
-
       div.org-settings-field-container {
         margin-top: 8px;
         height: 32px;
@@ -175,22 +160,6 @@ div.org-settings-modal {
           float: left;
           width: calc(100% - 32px);
           margin-top: 0;
-        }
-
-        button.add-email-domain-bt {
-          float: right;
-          width: auto;
-          padding: 0;
-          @include OC_Body_Bold();
-          color: $carrot_green;
-          font-size: 13px;
-          height: 18px;
-          margin-top: 7px;
-
-          &:disabled, &.disabled {
-            color: var(--light-color);
-            opacity: 1;
-          }
         }
       }
 
@@ -220,11 +189,6 @@ div.org-settings-modal {
         &.error {
           border: 1px solid $carrot_orange;
         }
-
-        &.email-domain-field {
-          background-color: transparent;
-          border: 1px solid transparent;
-        }
       }
 
       div.error {
@@ -240,31 +204,6 @@ div.org-settings-modal {
         @include OC_Body_Book();
         font-size: 14px;
         color: var(--light-color);
-      }
-
-      div.org-settings-email-domains {
-        margin-top: 16px;
-
-        div.org-settings-email-domain-row {
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          margin-top: 8px;
-          line-height: 18px;
-          height: 18px;
-
-          button.remove-email-bt {
-            padding: 0;
-            float: right;
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: var(--light-color);
-
-            &:hover {
-              color: var(--color);
-            }
-          }
-        }
       }
     }
 

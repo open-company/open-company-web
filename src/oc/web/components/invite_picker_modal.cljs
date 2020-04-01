@@ -6,7 +6,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]))
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.email-domains :refer (email-domains)]))
 
 
 (rum/defcs invite-picker-modal <
@@ -63,4 +64,5 @@
               [:button.mlb-reset.invite-slack-bt
                 {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
                 [:span.disabled "Invite via Slack"]
-                [:span.enabled "(add Slack)"]]))]]]))
+                [:span.enabled "(add Slack)"]]))
+          (email-domains)]]]))

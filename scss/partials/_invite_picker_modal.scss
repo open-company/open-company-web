@@ -80,7 +80,7 @@ div.invite-picker-modal {
         margin-top: 8px;
       }
 
-      button {
+      & > button {
         color: $carrot_green;
         text-decoration: none;
         @include OC_Body_Book();
