@@ -13,6 +13,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
+(def ^:private max-direct-users 5)
+
 (defn- sort-users [user-id users]
   (let [{:keys [self-user other-users]}
          (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
@@ -162,7 +164,7 @@
                                   (nav-actions/close-all-panels)
                                   (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board))))
                                 (create-section s))
-                   :disabled (or (not (<= 1 (count @(::users s)) 5))
+                   :disabled (or (not (<= 1 (count @(::users s)) (dec max-direct-users)))
                                  @(::saving s))}
                   (if existing-board
                     "Open"
