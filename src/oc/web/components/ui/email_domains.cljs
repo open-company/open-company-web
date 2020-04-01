@@ -4,6 +4,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
@@ -41,13 +42,14 @@
                            (drv/drv :org-settings-team-management)
                            ui-mixins/refresh-tooltips-mixin
   [s]
-  (let [{:keys [um-domain-invite team-data]} (drv/react s :org-settings-team-management)]
+  (let [{:keys [um-domain-invite team-data]} (drv/react s :org-settings-team-management)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.email-domain-container
       [:div.email-domain-title
         "Allowed email domains"
         [:i.mdi.mdi-information-outline
           {:title "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."
-           :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+           :data-toggle (when-not is-mobile? "tooltip")
            :data-placement "top"
            :data-container "body"}]]
       [:div.email-domain-field-container.oc-input.group
