@@ -31,6 +31,11 @@ div.empty-board {
       border-radius: 8px;
       margin: 0 auto;
 
+      &.direct {
+        background-color: transparent;
+        width: auto;
+      }
+
       div.empty-board-illustration {
         width: 56px;
         height: 56px;
@@ -39,6 +44,15 @@ div.empty-board {
         background-repeat: no-repeat;
         background-position: center;
         background-size: 24px 21px;
+
+        &.direct-board {
+          background-image: none;
+          opacity: 0.7;
+          width: auto;
+          @include face-pile(56, 25) {
+            margin: 0 auto;
+          }
+        }
 
         &.inbox {
           background-image: cdnUrl("/img/ML/empty_state_inbox_section.svg");
