@@ -114,23 +114,13 @@
                                 %)
                         editable-boards)]
     [:div.direct-picker
-      [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-direct-picker s)}]
       [:div.direct-picker-modal
-        [:div.direct-picker-header
-          [:div.direct-picker-header-title
-            "Direct discussions"]
-          [:button.mlb-reset.direct-picker-create-bt
-            {:class (when-not (seq @(::users s)))
-             :on-click #(if existing-board
-                          (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board)))
-                          (create-section s))
-             :disabled (or (not (<= 1 (count @(::users s)) 5))
-                           @(::saving s))}
-            (if existing-board
-              "Open"
-              "Create")]]
+        ; [:div.direct-picker-header]
+        [:button.mlb-reset.modal-close-bt
+          {:on-click #(close-direct-picker s)}]
         [:div.direct-picker-body
+          [:h3.direct-picker-title
+            "Direct discussions"]
           [:div.direct-picker-subtitle
             "Choose up to 5 people for a private discussion."]
           (if (zero? (count all-active-users))
@@ -165,7 +155,17 @@
                        :placeholder (if (seq @(::users s))
                                       "Search for teammates..."
                                       "Search for teammates or make your selection below...")
-                       :on-change #(reset! (::query s) (.. % -target -value))}])]]
+                       :on-change #(reset! (::query s) (.. % -target -value))}])]
+                [:button.mlb-reset.direct-picker-create-bt
+                  {:class (when-not (seq @(::users s)))
+                   :on-click #(if existing-board
+                                (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board)))
+                                (create-section s))
+                   :disabled (or (not (<= 1 (count @(::users s)) 5))
+                                 @(::saving s))}
+                  (if existing-board
+                    "Open"
+                    "Create")]]
               [:div.direct-picker-users-list
                 (for [u sorted-users
                       :let [selected? (utils/in? @(::users s) (:user-id u))]]
