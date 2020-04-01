@@ -1,13 +1,4 @@
 div.direct-picker {
-  // width: 100%;
-  // position: fixed;
-  // top: 0;
-  // left: 0;
-  // width: 100vw;
-  // height: 100vw;
-  // background-color: $carrot_modal_bg;
-  // z-index: #{$navbar_zindex + 156};
-
   top: 0;
   left: 0;
   right: 0;
@@ -46,16 +37,6 @@ div.direct-picker {
   }
 
   div.direct-picker-modal {
-    // border: 1px solid var(--divider-line);
-    // background-color: var(--background-color);
-    // border-radius: 4px;
-    // padding: 24px;
-    // margin-bottom: 24px;
-    // min-height: calc(100vh - 190px);
-    // position: relative;
-    // width: #{$board_container_width}px;
-    // margin: 40px auto;
-
     width: 320px;
     background-color: var(--overlay-background-color);
     position: absolute;
@@ -116,17 +97,6 @@ div.direct-picker {
       }
 
       button.direct-picker-create-bt {
-        // height: 32px;
-        // padding: 0;
-        // @include OC_Body_Book();
-        // font-size: 14px;
-        // color: var(--light-color);
-        // float: right;
-
-        // @include mobile() {
-        //   display: none;
-        // }
-
         width: auto;
         height: 32px;
         @include OC_Body_Bold();
@@ -166,172 +136,190 @@ div.direct-picker {
         margin-top: 4px;
       }
 
-      div.direct-picker-selected-users {
-        margin-top: 8px;
-        width: auto;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: flex-start;
-        align-content: stretch;
+      div.direct-picker-empty-users {
+        opacity: 0.7;
 
-        div.direct-picker-selected-users-list {
-          background-color: var(--opac-background-color-05);
-          border-radius: 4px;
-          padding: 0 8px 4px;
-          margin-right: 8px;
-          flex: 1 1 auto;
+        div.direct-picker-empty-icon {
+          margin: 32px auto 0;
+          width: 40px;
+          height: 40px;
+          background-image: cdnUrl("/img/ML/invite_people_bt.svg");
+          background-size: 40px 40px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+          }
+        }
+
+        div.direct-picker-empty-copy {
+          margin: 8px 0 0;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: var(--color);
+          text-align: center;
+
+          button.direct-picker-empty-invite-bt {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            color: $carrot_green;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      div.direct-picker-body-inner {
+
+        div.direct-picker-selected-users {
+          margin-top: 8px;
+          width: auto;
           display: flex;
-          flex-wrap: wrap;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: nowrap;
           flex-direction: row;
           justify-content: flex-start;
           align-items: flex-start;
-          align-content: flex-start;
+          align-content: stretch;
 
-          button.direct-picker-selected-user {
-            display: inline-block;
-            height: 24px;
-            padding: 4px 20px 4px 8px;
-            margin-right: 4px;
-            margin-top: 4px;
-            background-color: var(--opac-background-color-2);
+          div.direct-picker-selected-users-list {
+            background-color: var(--opac-background-color-05);
             border-radius: 4px;
-            flex: 0 0 auto;
+            padding: 0 8px 4px;
+            margin-right: 8px;
+            flex: 1 1 auto;
             display: flex;
+            flex-wrap: wrap;
             flex-direction: row;
-            flex-wrap: nowrap;
             justify-content: flex-start;
             align-items: flex-start;
             align-content: flex-start;
-            position: relative;
 
-            &:after {
-              content: "";
-              width: 20px;
+            button.direct-picker-selected-user {
+              display: inline-block;
               height: 24px;
-              display: block;
-              background-image: cdnUrl("/img/ML/black_close.svg");
-              background-position: center;
-              background-repeat: no-repeat;
-              background-size: 8px 8px;
-              position: absolute;
-              right: 0;
-              top: 0;
+              padding: 4px 20px 4px 8px;
+              margin-right: 4px;
+              margin-top: 4px;
+              background-color: var(--opac-background-color-2);
+              border-radius: 4px;
+              flex: 0 0 auto;
+              display: flex;
+              flex-direction: row;
+              flex-wrap: nowrap;
+              justify-content: flex-start;
+              align-items: flex-start;
+              align-content: flex-start;
+              position: relative;
 
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/black_close@dark.svg");
+              &:after {
+                content: "";
+                width: 20px;
+                height: 24px;
+                display: block;
+                background-image: cdnUrl("/img/ML/black_close.svg");
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: 8px 8px;
+                position: absolute;
+                right: 0;
+                top: 0;
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/black_close@dark.svg");
+                }
+              }
+
+              @include user-profile(16) {
+                flex: 0 0 16px;
+              }
+
+              span.direct-picker-selected-user-name {
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 16px;
+                color: var(--color);
+                float: left;
+                margin-left: 4px;
+                flex: 1 0 auto;
               }
             }
 
-            @include user-profile(16) {
-              flex: 0 0 16px;
-            }
-
-            span.direct-picker-selected-user-name {
+            input.direct-picker-search-field-input {
+              display: block;
+              height: 24px;
+              padding: 0;
+              margin: 0;
+              background-color: transparent;
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 16px;
+              font-size: 12px;
+              line-height: 24px;
               color: var(--color);
-              float: left;
-              margin-left: 4px;
-              flex: 1 0 auto;
-            }
-          }
-
-          input.direct-picker-search-field-input {
-            display: block;
-            height: 24px;
-            padding: 0;
-            margin: 0;
-            background-color: transparent;
-            @include OC_Body_Book();
-            font-size: 12px;
-            line-height: 24px;
-            color: var(--color);
-            max-width: 100%;
-            width: auto;
-            border: none;
-            outline: none;
-            vertical-align: super;
-            margin-top: 4px;
-            min-width: 160px;
-            flex: 1 1 auto;
-
-            &:focus, &:active {
+              max-width: 100%;
+              width: auto;
               border: none;
               outline: none;
-            }
+              vertical-align: super;
+              margin-top: 4px;
+              min-width: 160px;
+              flex: 1 1 auto;
 
-            @include placeholder() {
-              @include OC_Body_Book();
-              color: var(--light-color);
-              font-size: 14px;
-              line-height: 24px;
+              &:focus, &:active {
+                border: none;
+                outline: none;
+              }
+
+              @include placeholder() {
+                @include OC_Body_Book();
+                color: var(--light-color);
+                font-size: 14px;
+                line-height: 24px;
+              }
             }
           }
         }
 
-        // button.direct-picker-create-bt {
-        //   width: auto;
-        //   height: 32px;
-        //   @include OC_Body_Bold();
-        //   font-size: 14px;
-        //   line-height: 18px;
-        //   color: white;
-        //   background-color: $carrot_green;
-        //   border-radius: 4px;
-        //   padding: 7px 14px;
-        //   flex: 0 0 auto;
+        div.direct-picker-users-list {
+          margin-top: 16px;
+          width: calc(100% + 48px);
+          margin-left: -24px;
 
-        //   &.disabled, &:disabled {
-        //     opacity: 1!important;
-        //     background-color: var(--opac-background-color-05);
-        //     color: var(--light-color);
-        //   }
-        // }
-      }
-
-      div.direct-picker-users-list {
-        margin-top: 16px;
-        width: calc(100% + 48px);
-        margin-left: -24px;
-
-        button.direct-picker-user-row {
-          height: 40px;
-          padding: 4px 24px;
-          border: none;
-          outline: none;
-          width: 100%;
-          display: block;
-
-          &.selected {
-            background-color: var(--opac-background-color-05);
-          }
-
-          div.carrot-checkbox {
-            margin-right: 8px;
-            float: left;
-            margin-top: 8px;
-          }
-
-          @include user-profile(32) {
-            float: left;
-            margin-right: 8px;
-          }
-
-          span.direct-picker-user {
+          button.direct-picker-user-row {
+            height: 40px;
+            padding: 4px 24px;
+            border: none;
+            outline: none;
+            width: 100%;
             display: block;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 32px;
-            float: left;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
+            &.selected {
+              background-color: var(--opac-background-color-05);
+            }
+
+            div.carrot-checkbox {
+              margin-right: 8px;
+              float: left;
+              margin-top: 8px;
+            }
+
+            @include user-profile(32) {
+              float: left;
+              margin-right: 8px;
+            }
+
+            span.direct-picker-user {
+              display: block;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 32px;
+              float: left;
+              max-width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
           }
         }
       }

@@ -98,6 +98,10 @@
                            (rum/local "" ::query)
                            (rum/local false ::saving)
                            (rum/local nil ::existing-board)
+                           {:did-mount (fn [s]
+                            (when-let [query-field (rum/ref-node s :query)]
+                              (.focus query-field))
+                            s)}
   [s]
   (let [editable-boards (vec (vals (drv/react s :editable-boards)))
         current-user-data (drv/react s :current-user-data)
@@ -115,7 +119,7 @@
       [:div.direct-picker-modal
         [:div.direct-picker-header
           [:div.direct-picker-header-title
-            "Direct messages"]
+            "Direct discussions"]
           [:button.mlb-reset.direct-picker-create-bt
             {:class (when-not (seq @(::users s)))
              :on-click #(if existing-board
@@ -127,54 +131,51 @@
               "Open"
               "Create")]]
         [:div.direct-picker-body
-          ; [:h3.direct-picker-title
-          ;   "Direct messages"]
           [:div.direct-picker-subtitle
-            "Send messages privately to a person or a group."]
-          [:div.direct-picker-selected-users
-            [:div.direct-picker-selected-users-list
-              {:on-click #(when-let [q-el (rum/ref-node s :query)]
-                            (when-not (utils/event-inside? % q-el)
-                              (.focus q-el)))}
-              (for [user-id @(::users s)
-                    :let [u (get active-users user-id)]]
-                [:button.mlb-reset.direct-picker-selected-user
-                  {:on-click #(swap! (::users s) disj user-id)
-                   :key (str "direct-picker-selected-" user-id)}
-                  (user-avatar-image u)
-                  [:span.direct-picker-selected-user-name
-                    (user-lib/name-for u)]])
-              (when (not= (count @(::users s)) (count active-users))
-                [:input.direct-picker-search-field-input
-                  {:class (when-not (seq @(::users s)) "empty")
-                   :value @(::query s)
-                   :type "text"
-                   :ref :query
-                   :placeholder (if (seq @(::users s))
-                                  "Search for teammates..."
-                                  "Search for teammates or make your selection below...")
-                   :on-change #(reset! (::query s) (.. % -target -value))}])]
-            ; [:button.mlb-reset.direct-picker-create-bt
-            ;   {:class (when-not (seq @(::users s)))
-            ;    :on-click #(if existing-board
-            ;                 (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board)))
-            ;                 (create-section s))
-            ;    :disabled (or (not (<= 1 (count @(::users s)) 5))
-            ;                  @(::saving s))}
-            ;   (if existing-board
-            ;     "Open"
-            ;     "Create")]
-              ]
-          [:div.direct-picker-users-list
-            (for [u sorted-users
-                  :let [selected? (utils/in? @(::users s) (:user-id u))]]
-              [:button.mlb-reset.direct-picker-user-row.group
-                {:key (str "direct-picker-" (:user-id u))
-                 :class (when (utils/in? @(::users s) (:user-id u)) "selected")
-                 :on-click #(do
-                              (toggle-user s u)
-                              (utils/event-stop %))}
-                (carrot-checkbox {:selected selected?})
-                (user-avatar-image u)
-                [:span.direct-picker-user
-                  (user-lib/name-for u)]])]]]]))
+            "Choose up to 5 people for a private discussion."]
+          (if (zero? (count all-active-users))
+            [:div.direct-picker-empty-users
+              [:div.direct-picker-empty-icon]
+              [:div.direct-picker-empty-copy
+                "There are no active team members yet. "
+                [:button.mlb-reset.direct-picker-empty-invite-bt
+                  {:on-click #(nav-actions/show-org-settings :invite-picker)}
+                  "Invite your team"]
+                " to get started."]]
+            [:div.direct-picker-body-inner
+              [:div.direct-picker-selected-users
+                [:div.direct-picker-selected-users-list
+                  {:on-click #(when-let [q-el (rum/ref-node s :query)]
+                                (when-not (utils/event-inside? % q-el)
+                                  (.focus q-el)))}
+                  (for [user-id @(::users s)
+                        :let [u (get active-users user-id)]]
+                    [:button.mlb-reset.direct-picker-selected-user
+                      {:on-click #(swap! (::users s) disj user-id)
+                       :key (str "direct-picker-selected-" user-id)}
+                      (user-avatar-image u)
+                      [:span.direct-picker-selected-user-name
+                        (user-lib/name-for u)]])
+                  (when (not= (count @(::users s)) (count active-users))
+                    [:input.direct-picker-search-field-input
+                      {:class (when-not (seq @(::users s)) "empty")
+                       :value @(::query s)
+                       :type "text"
+                       :ref :query
+                       :placeholder (if (seq @(::users s))
+                                      "Search for teammates..."
+                                      "Search for teammates or make your selection below...")
+                       :on-change #(reset! (::query s) (.. % -target -value))}])]]
+              [:div.direct-picker-users-list
+                (for [u sorted-users
+                      :let [selected? (utils/in? @(::users s) (:user-id u))]]
+                  [:button.mlb-reset.direct-picker-user-row.group
+                    {:key (str "direct-picker-" (:user-id u))
+                     :class (when (utils/in? @(::users s) (:user-id u)) "selected")
+                     :on-click #(do
+                                  (toggle-user s u)
+                                  (utils/event-stop %))}
+                    (carrot-checkbox {:selected selected?})
+                    (user-avatar-image u)
+                    [:span.direct-picker-user
+                      (user-lib/name-for u)]])]])]]]))
