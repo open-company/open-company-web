@@ -61,8 +61,8 @@
       ""
       (fn [board-data]
         (reset! (::saving s) false)
-        (notification-actions/show-notification {:title "Direct created"
-                                                 :description (str "Direct with " direct-name " creation succeded.")
+        (notification-actions/show-notification {:title "Direct discussion created"
+                                                 :description (str "Direct discussion with " direct-name " creation succeded.")
                                                  :dismiss true
                                                  :expire 3
                                                  :id :direct-create-success})
@@ -153,9 +153,7 @@
                        :value @(::query s)
                        :type "text"
                        :ref :query
-                       :placeholder (if (seq @(::users s))
-                                      "Search for teammates..."
-                                      "Search for teammates or make your selection below...")
+                       :placeholder "Start or find a discussion..."
                        :on-change #(reset! (::query s) (.. % -target -value))}])]
                 [:button.mlb-reset.direct-picker-create-bt
                   {:class (when-not (seq @(::users s)))
