@@ -52,7 +52,7 @@
         authors (concat [(:user-id current-user-data)] (vec @(::users s)))
         selected-users-data (map all-users @(::users s))
         users (concat [current-user-data] selected-users-data)
-        direct-name (str (clojure.string/join ", " (mapv user-lib/name-for (butlast users))) " and " (user-lib/name-for (last users)))]
+        direct-name (str (clojure.string/join ", " (mapv user-lib/name-for (butlast users))))]
     (section-actions/section-save
       {:name direct-name
        :access :private
@@ -155,7 +155,7 @@
                        :key (str "direct-picker-selected-" user-id)}
                       (user-avatar-image u)
                       [:span.direct-picker-selected-user-name
-                        (user-lib/name-for u)]])
+                        (user-lib/short-name-for u)]])
                   (when (not= (count @(::users s)) (count active-users))
                     [:input.direct-picker-search-field-input
                       {:class (when-not (seq @(::users s)) "empty")

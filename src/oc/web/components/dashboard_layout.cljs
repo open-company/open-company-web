@@ -24,7 +24,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -43,6 +43,7 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :team-roster)
+                              (drv/drv :active-users)
                               (drv/drv :board-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
@@ -87,6 +88,7 @@
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         team-roster (drv/react s :team-roster)
+        active-users (drv/react s :active-users)
         activity-data (drv/react s :activity-data)
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
@@ -230,6 +232,16 @@
                 [:div.board-name
                   (when current-board-slug
                     [:div.board-name-with-icon
+                      (when (:direct current-board-data)
+                        [:div.direct-board
+                          {:data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                           :title "Visible only to the included users"}
+                          (let [except-me (filter #(not= (:user-id current-user-data) (:user-id %)) (:authors current-board-data))
+                                authors-data (map #(->> % :user-id (get active-users)) except-me)]
+                            (face-pile {:users-data authors-data}))])
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board)
@@ -239,7 +251,7 @@
                          :data-toggle (when (and (:direct current-board-data) (not is-mobile?)) "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :title (or (:original-name current-board-data) (:name current-board-data))
+                         :title (or (:complete-name current-board-data) (:original-name current-board-data) (:name current-board-data))
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"
@@ -255,36 +267,24 @@
                                                    ;; to avoid showing an empty name while loading
                                                    ;; the board data
                                                    (:name current-board-data)))}]
-                    (when (and (= (:access current-board-data) "private")
-                               (not (:direct current-board-data))
-                               (not is-drafts-board))
-                      [:div.private-board
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (if (= current-board-slug utils/default-drafts-board-slug)
-                                 "Only visible to you"
-                                 "Only visible to invited team members")}])
-                    (when (= (:access current-board-data) "public")
-                      [:div.public-board
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Visible to the world, including search engines"}])
-                    (when (:direct current-board-data)
-                      [:div.direct-board
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Visible only to the included users"
-                         :class (when (> (count (:authors current-board-data)) 2) "multi")}
-                        (when (= (count (:authors current-board-data)) 2)
-                          (let [direct-user-id (some #(not= (:user-id current-user-data) (:user-id %)) (:authors current-board-data))
-                                direct-user-data (some #(= (:user-id %) direct-user-id) (:users team-roster))]
-                            (user-avatar-image direct-user-data)))])])
+                      (when (and (= (:access current-board-data) "private")
+                                 (not (:direct current-board-data))
+                                 (not is-drafts-board))
+                        [:div.private-board
+                          {:data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                           :title (if (= current-board-slug utils/default-drafts-board-slug)
+                                   "Only visible to you"
+                                   "Only visible to invited team members")}])
+                      (when (= (:access current-board-data) "public")
+                        [:div.public-board
+                          {:data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                           :title "Visible to the world, including search engines"}])])
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button

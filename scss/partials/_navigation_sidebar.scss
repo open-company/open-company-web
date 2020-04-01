@@ -615,6 +615,13 @@ div.left-navigation-sidebar {
             background-image: cdnUrl("/img/ML/board_private_white.svg");
             opacity: 1;
           }
+
+          div.direct-board-name {
+            span.direct-users-count {
+              background-color: white;
+              color: $deep_navy;
+            }
+          }
         }
       }
 
@@ -678,21 +685,37 @@ div.left-navigation-sidebar {
       div.direct-board-name {
         width: calc(100% - 8px);
         float: left;
+        position: relative;
 
-        @include user-profile(16) {
+        // @include user-profile(16) {
+        //   float: left;
+        //   margin-top: 4px;
+        // }
+
+        div.face-pile-container {
           float: left;
-          margin-top: 4px;
+          width: 40px;
+          position: absolute;
+          top: 0;
+          left: -20px;
+
+          @include face-pile(20, 10) {
+            float: right;
+          }
         }
 
-        span.direct-users-icon {
-          width: 16px;
-          height: 21px;
+        span.direct-users-count {
+          min-width: 16px;
+          height: 16px;
+          margin-top: 3px;
           float: left;
-          background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-          background-size: 14px 13px;
-          background-repeat: no-repeat;
-          background-position: center;
-          opacity: 0.5;
+          background-color: var(--navigation-sidebar-count-bg);
+          color: var(--color);
+          border-radius: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          padding: 0 4px;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
@@ -705,7 +728,7 @@ div.left-navigation-sidebar {
         }
 
         div.internal {
-          padding: 1px 0px 0px 12px;
+          padding: 1px 0px 0px 28px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;

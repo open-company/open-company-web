@@ -234,3 +234,26 @@
     }
   }
 }
+
+@mixin face-pile($face_size: 22, $face_space: 10) {
+  div.face-pile {
+    height: #{$face_size}px;
+
+    div.face {
+      background-color: transparent;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      width: #{$face_size}px;
+      height: #{$face_size}px;
+      float: left;
+      margin-left: -#{$face_space}px;
+      &:first-of-type {
+        margin-left: 0;
+      }
+
+      @include user-profile($face_size - 4);
+    }
+
+    @content
+  }
+}

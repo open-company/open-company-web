@@ -281,31 +281,24 @@
       (assoc :fixed-video-id fixed-video-id)
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
-(defn name-for [user]
-  (or (:first-name user)
-      (:last-name user)
-      (:name user)
-      (:email user)))
-
 (defn fix-direct-board [board-data active-users]
   (if (or (not (:direct board-data))
           (not (seq active-users)))
     board-data
-    (let [calc-name (fn [users user]
+    (let [calc-name (fn [users name-fn user]
                       (let [user-id (if (map? user) (:user-id user) user)]
-                        (name-for (get users user-id))))
+                        (name-fn (get users user-id))))
           except-me (filterv #(when (and (not= % (jwt/user-id))
                                          (not= (:user-id %) (jwt/user-id)))
                                 %)
                      (:authors board-data))
-          board-name* (clojure.string/join ","
-                       (mapv (partial calc-name active-users) (butlast except-me)))
-          board-name (str board-name*
-                          (when (> (count except-me) 1)
-                            " and ")
-                          (calc-name active-users (last except-me)))]
+          complete-name (clojure.string/join ", "
+                         (mapv (partial calc-name active-users user-lib/name-for) except-me))
+          board-name (clojure.string/join ", "
+                      (mapv (partial calc-name active-users user-lib/short-name-for) except-me))]
       (-> board-data
        (assoc :name board-name)
+       (assoc :complete-name complete-name)
        (assoc :original-name (or (:original-name board-data) (:name board-data)))))))
 
 (defn fix-board

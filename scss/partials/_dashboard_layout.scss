@@ -466,29 +466,12 @@ div.dashboard-layout {
 
             div.direct-board {
               position: relative;
-              width: 18px;
-              height: 18px;
+              height: 22px;
               float: left;
-              margin-top: 6px;
-              margin-left: 6px;
+              margin-top: 5px;
+              margin-right: 4px;
 
-              &.multi {
-                background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-                width: 12px;
-                height: 23px;
-                margin-top: 0;
-                background-size: 12px 12px;
-                background-repeat: no-repeat;
-                background-position: left 0 bottom 1px;
-
-                @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
-                }
-              }
-
-              @include user-profile(18) {
-                margin-top: 0px;
-              }
+              @include face-pile();
 
               @include mobile(){
                 left: unset;
