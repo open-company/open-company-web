@@ -106,6 +106,11 @@ div.invite-picker-modal {
           color: $carrot_green;
         }
       }
+
+      div.email-domain-container {
+        border-top: 1px solid var(--divider-line);
+        padding-top: 16px;
+      }
     }
   }
 }
