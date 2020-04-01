@@ -56,7 +56,7 @@ function PlaceCaretAtEnd(el) {
     /* Selector to identify the click that needs save the caret position */
     saveSelectionClickElementId: undefined,
     /* Contains the picker buttons */
-    options: {buttons: ['entry', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
+    options: {buttons: ['entry', 'poll', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
               delegateMethods: {}},
     /* Force placeholder hide of MediumEditor when the button expands*/
     hidePlaceholderOnExpand: false,
@@ -74,23 +74,24 @@ function PlaceCaretAtEnd(el) {
 
     init: function(){
       rangy.init();
+      var editor = this.getEditorElements()[0];
       // Create picker
       if (this.inlinePlusButtonOptions.inlineButtons) {
         this.pickerElement = this.createPicker();
-        this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
+        editor.parentNode.appendChild(this.pickerElement);
       }
       // Picker button events
-      this.getEditorElements().forEach(function(element){
-        if (this.inlinePlusButtonOptions.inlineButtons) {
-          this.on(element, 'click', this.togglePicker.bind(this));
-          this.on(element, 'keyup', this.togglePicker.bind(this));
-          this.on(element, 'focus', this.onFocus.bind(this));
-          this.on(element, 'paste', this.togglePicker.bind(this));
-          this.subscribe('editableInput', this.togglePicker.bind(this));
-        }
-        // this.on(element, 'blur', this.hide.bind(this));
-        this.on(this.window, 'click', this.windowClick.bind(this));
-      }, this);
+      if (this.inlinePlusButtonOptions.inlineButtons) {
+        this.on(editor, 'click', this.checkAvailableParagraph.bind(this));
+        this.on(editor, 'click', this.togglePicker.bind(this));
+        this.on(editor, 'keyup', this.togglePicker.bind(this));
+        this.on(editor, 'focus', this.onFocus.bind(this));
+        this.on(editor, 'paste', this.togglePicker.bind(this));
+        this.subscribe('editableKeydown', this.onKeydown.bind(this));
+        this.subscribe('editableInput', this.togglePicker.bind(this));
+      }
+      // this.on(editor, 'blur', this.hide.bind(this));
+      this.on(this.window, 'click', this.windowClick.bind(this));
 
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
@@ -99,6 +100,61 @@ function PlaceCaretAtEnd(el) {
       if (this.inlinePlusButtonOptions.initiallyVisible) {
         // Force show the media picker buttons
         this.togglePicker();
+      }
+
+      this.checkPollsSpacing(editor);
+    },
+
+    checkAvailableParagraph: function() {
+      var editor = this.getEditorElements()[0];
+      if (editor && !this.isTextElement(editor.firstElementChild)) {
+        this.prependParagraph();
+      }
+    },
+
+    newP: function() {
+      var newParagraph = this.document.createElement('p');
+      newParagraph.innerHTML = "<br/>";
+      return newParagraph;
+    },
+
+    appendParagraph: function() {
+      var meEl = this.getEditorElements()[0],
+          newParagraph;
+      if (meEl) {
+        newParagraph =  this.newP();
+        meEl.appendChild(newParagraph);
+        return newParagraph;
+      }
+    },
+
+    prependParagraph: function() {
+      var meEl = this.getEditorElements()[0],
+          newParagraph = this.newP();
+      meEl.insertBefore(newParagraph, meEl.firstElementChild);
+      return newParagraph;
+    },
+
+    onKeydown: function(keydownEvent) {
+      if (MediumEditor.util.isKey(keydownEvent, [40])) {
+        // In case the last child of the editor is a poll add a new paragraph when user press down arrow
+        var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+        if (meEl &&
+            meEl.lastElementChild &&
+            meEl.lastElementChild.nodeName.toLowerCase() === "div" &&
+            meEl.lastElementChild.classList.contains("media-poll")) {
+          this.appendParagraph();
+        }
+      }
+
+      if (MediumEditor.util.isKey(keydownEvent, [38])) {
+        if (meEl &&
+            meEl.firstElementChild &&
+            meEl.firstElementChild.nodeName.toLowerCase() === "div" &&
+            meEl.firstElementChild.classList.contains("media-poll")) {
+          // In case the last child of the editor is a poll add a new paragraph when user press down arrow
+          this.prependParagraph();
+        }
       }
     },
 
@@ -181,6 +237,29 @@ function PlaceCaretAtEnd(el) {
       return mButton;
     },
 
+    /* Poll helper */
+
+    isPollElement: function(el) {
+      return (el &&
+              el.nodeType === Node.ELEMENT_NODE &&
+              el.classList.contains("media-poll"));
+    },
+
+    checkPollsSpacing: function(editor) {
+      var editorEl = editor || this.getEditorElements()[0],
+          pollDivs = editor.querySelectorAll(":scope > div.media-poll");
+      pollDivs.forEach(function(pollEl) {
+        if (!pollEl.previousElementSibling) {
+          var newParagraph = this.newP();
+          pollEl.parentElement.insertBefore(newParagraph, pollEl);
+        }
+        if (!pollEl.nextElementSibling) {
+          var newParagraph = this.newP();
+          this.insertAfter(newParagraph, pollEl);
+        }
+      }, this);
+    },
+
     /* Caret helpers */
 
     moveCursor: function(el, position){
@@ -191,7 +270,7 @@ function PlaceCaretAtEnd(el) {
 
     /**/
     getAddableElement: function(element) {
-      // If the element is not a P or a DIV clib the tree back to the first P or DIV
+      // If the element is not a P or a DIV climb the tree back to the first P or DIV
       while(!MediumEditor.util.isMediumEditorElement(element) &&  element.tagName !== "DIV" && element.tagName !== "P") {
         element = element.parentNode;
       }
@@ -290,16 +369,16 @@ function PlaceCaretAtEnd(el) {
             p;
         element = this.getAddableElement(element);
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // If the paragraph is empty
           if (element.innerText.length === 0 || element.innerText === "\n") {
               // if it has a BR inside
-            if (element.childNodes.length == 1){
+            if (element.childNodes.length === 1){
               // remove it
               element.removeChild(element.childNodes[0]);
             }
@@ -333,6 +412,90 @@ function PlaceCaretAtEnd(el) {
       setTimeout(this.togglePicker.bind(this), 100);
     },
 
+    pollClick: function(event){
+      log("pollClick");
+      if (this.inlinePlusButtonOptions.alwaysExpanded) {
+        this.hidePlaceholder();
+        this.saveSelection();
+      }
+      this.collapse();
+      this._waitingCB = true;
+      this.delegate("onPickerClick", "poll");
+      $(event.target).tooltip("hide");
+    },
+
+    isTextElement: function(el){
+      return (el && el.nodeType &&
+              el.nodeType === Node.ELEMENT_NODE &&
+              ['p', 'h1', 'h2'].indexOf(el.nodeName.toLowerCase()) >= 0);
+    },
+
+    addPoll: function(pollId) {
+      log("addPoll", pollId);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (pollId) {
+        if (!this.base.getFocusedElement()) {
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
+        var sel = this.window.getSelection(),
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
+            div;
+        // if the selection is in a DIV and it's the main editor element:
+        if (element.tagName === "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
+          // we need to add a DIV to insert the poll in
+          div = this.document.createElement("div");
+          var tempParagraph = this.appendParagraph();
+          element.appendChild(div);
+          element = tempParagraph;
+        } else if (element.tagName === "DIV"){
+          // if it's a DIV we clean out the content
+          div = this.document.createElement("div");
+          element.parentElement.replaceChild(div, element);
+        } else if (element.tagName === "P"){
+          var editor = this.getEditorElements()[0],
+              div = this.document.createElement("div"),
+              nextElSibling;
+          if (editor && editor.firstElementChild === element) {
+            nextElSibling = element.nextElementSibling;
+            // Add a div below it
+            element.parentNode.appendChild(div);
+          } else if (editor && editor.lastElementChild === element) {
+            element.parentNode.insertBefore(div, element);
+            nextElSibling = element;
+          } else {
+            nextElSibling = element.nextElementSibling;
+            // Replace current P with the div
+            element.parentNode.replaceChild(div, element);
+          }
+
+          // If the poll element we are about to add has not a paragraph after let's add one
+          if (!this.isTextElement(nextElSibling)) {
+            this.insertAfter(this.newP(), element);
+          }
+        }
+
+        div.className = "group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.dataset.mediaType = "poll";
+        div.dataset.pollId = pollId;
+
+        if (!this.isTextElement(div.previousElementSibling)) {
+          div.parentElement.insertBefore(this.newP(), div);
+        }
+
+        if (!this.isTextElement(div.nextElementSibling)) {
+          this.insertAfter(this.newP(), div);
+        }
+
+        this.base.checkContentChanged();
+      }
+      this._waitingCB = false;
+      setTimeout(this.togglePicker.bind(this), 100);
+    },
+
     videoClick: function(event){
       if (this.inlinePlusButtonOptions.alwaysExpanded) {
         this.hidePlaceholder();
@@ -359,14 +522,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -421,14 +584,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -482,14 +645,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -545,8 +708,12 @@ function PlaceCaretAtEnd(el) {
       setTimeout(this.togglePicker.bind(this), 100);
     },
 
-    insertAfter: function(newNode, referenceNode) {
-      referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+    insertAfter: function(newNode, refNode) {
+      if (refNode.nextSibling) {
+        refNode.parentNode.insertBefore(newNode, refNode.nextSibling);
+      } else {
+        refNode.parentNode.appendChild(newNode);
+      }
     },
 
     dividerLineClick: function(event){
@@ -566,14 +733,14 @@ function PlaceCaretAtEnd(el) {
           element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           p;
       // if the selection is in a DIV means it's the main editor element
-      if (element.tagName == "DIV") {
+      if (element.tagName === "DIV") {
         // we need to add a p to insert the HR in
         p = this.document.createElement("p");
         element.appendChild(p);
       // if it's a P already
-      } else if (element.tagName == "P"){
+      } else if (element.tagName === "P"){
         // if it has a BR inside
-        if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+        if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
           // remove it
           element.removeChild(element.childNodes[0]);
         }
@@ -609,6 +776,11 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'poll') {
+          button.classList.add('media-poll');
+          button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add poll");
+          this.on(button, 'click', this.pollClick.bind(this));
         } else if (opt === 'code') {
           button.classList.add('media-code');
           button.classList.add('media-' + idx);
@@ -774,7 +946,9 @@ function PlaceCaretAtEnd(el) {
       this.delegate("willHide");
       this.collapse();
       this._lastParagraphElement = undefined;
-      this.pickerElement.style.display = 'none';
+      if (this.pickerElement) {
+        this.pickerElement.style.display = 'none';
+      }
       this.delegate("didHide");
     },
 
@@ -787,28 +961,23 @@ function PlaceCaretAtEnd(el) {
     },
 
     isBR: function(el) {
-      return (el.tagName == "BR");
+      return (el.tagName === "BR");
     },
 
-    paragraphIsEmpty: function(element){
-      if (element.nodeName.toLowerCase() === "pre" || element.nodeName.toLowerCase() === "blockquote") {
-        return false;
-      }
-      // Empty body
-      if (element.childNodes.length == 0 && element.innerHTML == "") {
-        return true;
-      }
-      // Empty body like: <p><br/><p/>
-      if ((element.childNodes.length == 1 &&
-           this.isBR(element.childNodes[0])) ||
-          (element.childNodes.length == 2 &&
-            ((this.isBR(element.childNodes[0]) &&
-              this.isRangySelectionBoundary(element.childNodes[1])) ||
-             (this.isBR(element.childNodes[1]) &&
-              this.isRangySelectionBoundary(element.childNodes[0]))))) {
-        return true;
-      }
-      return false;
+    isEmptyParagraph: function(element){
+      return (element &&
+              element.nodeName.toLowerCase() === 'p' &&
+              ( // Paragraph without childrens
+                element.childNodes.length === 0 ||
+                // Empty paragraph like: <p><br/><p/>
+                (element.childNodes.length === 1 &&
+                 this.isBR(element.childNodes[0])) ||
+                // Empty paragraph like: <p><br/><span class="rangySelectionBoundary"></span><p/>
+                (element.childNodes.length === 2 &&
+                 ((this.isBR(element.childNodes[0]) &&
+                   this.isRangySelectionBoundary(element.childNodes[1])) ||
+                  (this.isBR(element.childNodes[1]) &&
+                   this.isRangySelectionBoundary(element.childNodes[0]))))));
     },
 
     delayedRepositionMediaPicker: function() {
@@ -840,14 +1009,13 @@ function PlaceCaretAtEnd(el) {
           }else {
             element = sel.getRangeAt(0).commonAncestorContainer;
           }
+
           this.initialButtonsShown = true;
-          if (sel !== undefined || element !== undefined) {
-            if (this.paragraphIsEmpty(element)){
-              this._lastParagraphElement = element;
-              this.repositionMediaPicker();
-              this.show();
-              return;
-            }
+          if (element && (MediumEditor.util.isMediumEditorElement(element) || this.isEmptyParagraph(element))) {
+            this._lastParagraphElement = element;
+            this.repositionMediaPicker();
+            this.show();
+            return;
           }
         }
         this.hide();

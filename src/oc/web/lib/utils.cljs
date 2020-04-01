@@ -561,16 +561,21 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
+(defn- remove-elements [$container el-selector re-check]
+  (loop [$el (.find $container el-selector)]
+    (when (and (pos? (.-length $el))
+               (.match (.html $el) re-check))
+      (.remove $el)
+      (recur (.find $container el-selector)))))
+
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
         _ (.remove (js/$ ".oc-mention-popup" $container))
-        reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
-        last-p-html (.html (.find $container "p:last-child"))
-        has-empty-ending-paragraph (when (seq last-p-html)
-                                     (.match last-p-html reg-ex))
-        _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))]
+        _ (.remove (js/$ ".oc-poll-container" $container))
+        re-check (js/RegExp "^([\\s]*|[\\<br\\s*/?\\>]{0,1}|[\\s]*|[\\&nbsp;]*)*$" "i")
+        _ (remove-elements $container "p:last-child" re-check)
+        _ (remove-elements $container "p:first-child" re-check)]
     (.html $container)))
 
 (defn your-digest-url []

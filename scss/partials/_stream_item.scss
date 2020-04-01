@@ -568,50 +568,10 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body(16, 20, var(--color));
-        color: var(--color);
-        @include OC_Body_Book();
-        line-height: 20px;
-        overflow: hidden;
-        max-height: #{20 * 2}px;
+        @include activity-body-preview(16, 20, var(--color), 2);
 
         @include mobile() {
-          @include activity-body(16, 20, var(--color));
-          line-height: 20px;
-          max-height: #{20 * 2}px;
-
-          h2 {
-            font-size: 16px;
-            line-height: 20px;
-          }
-        }
-
-        h1, h2, mark, mark.highlight {
-          color: var(--color);
-          @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 20px;
-          background-color: transparent;
-          padding: 0 !important;
-          margin: 0 !important;
-        }
-
-        b, strong, &.editing b, &.editing strong {
-          @include OC_Body_Book();
-          font-weight: normal;
-        }
-
-        .carrot-no-preview {
-          display: none;
-        }
-
-        pre, code {
-          display: none;
-        }
-
-        p {
-          padding: 0;
-          margin: 0;
+          @include activity-body-preview(16, 20, var(--color), 2);
         }
       }
     }

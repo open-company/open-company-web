@@ -74,6 +74,7 @@ var InlineCodeButton = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
+MediaPicker.addPoll = function(){};
 MediaPicker.addGIF = function(){};
 MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};

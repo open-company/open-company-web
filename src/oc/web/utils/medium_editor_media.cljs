@@ -5,12 +5,14 @@
             [cljsjs.medium-editor]
             [cuerdas.core :as string]
             [cljsjs.react-giphy-selector]
-            [oops.core :refer (oget oget+)]
+            [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.poll :as poll-utils]
+            [oc.web.actions.poll :as poll-actions]
             [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
@@ -20,6 +22,25 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(defn get-media-picker-extension [s]
+  (let [body-el (rum/ref-node s "editor-node")
+        editor (js/MediumEditor.getEditorFromElement body-el)
+        media-picker-ext (.getExtensionByName editor "media-picker")]
+    media-picker-ext))
+
+;; Polls
+
+(defn add-poll [s options editable]
+  (let [delay (if (:collapsed (:cmail-state @dis/app-state)) 500 0)]
+    (utils/maybe-after delay #(do
+     (when-not (:use-inline-media-picker options)
+       (let [editable (or editable (get-media-picker-extension s))]
+         (.saveSelection editable)))
+       (let [poll-id (poll-utils/new-poll-id)
+             dispatch-input-key (:dispatch-input-key options)]
+         (.addPoll editable poll-id)
+         (poll-actions/add-poll dispatch-input-key poll-id))))))
+
 ;; Gif handling
 
 (defn add-gif [s editable]
@@ -28,14 +49,14 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF editable nil nil nil nil)
-    (let [original (oget+ gif-data ["images" "original"])
-          original-url (or (oget+ original "?url")
-                           (oget+ original "?gif_url"))
-          fixed-width-still (oget+ gif-data ["images" "fixed_width_still"])
-          fixed-width-still-url (or (oget+ fixed-width-still "?url")
-                                    (oget+ fixed-width-still "?gif_url"))
-          original-width (oget+ original "width")
-          original-height (oget+ original "height")]
+    (let [original (oget gif-data ["images" "original"])
+          original-url (or (oget original "?url")
+                           (oget original "?gif_url"))
+          fixed-width-still (oget gif-data ["images" "fixed_width_still"])
+          fixed-width-still-url (or (oget fixed-width-still "?url")
+                                    (oget fixed-width-still "?gif_url"))
+          original-width (oget original "width")
+          original-height (oget original "height")]
       (.addGIF
        editable
        original-url
@@ -86,12 +107,6 @@
 
 (defn attachment-upload-error-cb [state editable res error]
   (attachment-upload-failed-cb state editable))
-
-(defn get-media-picker-extension [s]
-  (let [body-el (rum/ref-node s "editor-node")
-        editor (js/MediumEditor.getEditorFromElement body-el)
-        media-picker-ext (.getExtensionByName editor "media-picker")]
-    media-picker-ext))
 
 (defn add-attachment [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
@@ -248,6 +263,8 @@
 
 (defn on-picker-click [s options editable type]
   (cond
+    (= type "poll")
+    (add-poll s options editable)
     (= type "gif")
     (add-gif s editable)
     (= type "photo")
@@ -405,6 +422,7 @@
                      :imageDragging false
                      :targetBlank true
                      :autoLink true
+                     :spellcheck false
                      :anchor #js {:customClassOption nil
                                   :customClassOptionText "Button"
                                   :linkValidation true

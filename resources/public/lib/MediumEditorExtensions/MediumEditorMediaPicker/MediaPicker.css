@@ -100,6 +100,27 @@ div.medium-editor-media-picker div.media-picker-container button.media-entry:not
   margin-right: 3px;
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-poll {
+  background-image: url("/img/ML/media_poll.svg");
+  background-size: 16px 11px;
+}
+
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-poll {
+  background-image: url("/img/ML/media_poll@dark.svg");
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-poll:hover {
+  opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-poll:not(:first-child) {
+  margin-left: 5px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-poll:not(:last-child) {
+  margin-right: 5px;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-photo {
   background-image: url("/img/ML/media_photo.svg");
   background-size: 16px 14px;
