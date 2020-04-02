@@ -252,7 +252,9 @@
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data changes]
+  ([entry-data board-data changes]
+   (fix-entry entry-data board-data changes (dis/active-users)))
+  ([entry-data board-data changes active-users]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
         fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
@@ -260,11 +262,13 @@
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
-        fixed-video-id (:video-id entry-data)]
+        fixed-video-id (:video-id entry-data)
+        fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
     (when (seq fixed-video-id)
       (ziggeo/init-ziggeo true))
     (-> entry-data
       (assoc :content-type "entry")
+      (update :publisher merge fixed-publisher)
       (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
@@ -279,7 +283,7 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
-      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data)))))))
 
 (defn fix-direct-board [board-data active-users]
   (if (or (not (:direct board-data))
@@ -288,18 +292,23 @@
     (let [calc-name (fn [users name-fn user]
                       (let [user-id (if (map? user) (:user-id user) user)]
                         (name-fn (get users user-id))))
-          except-me-uuids (remove nil?
-                           (map #(when (and (not= % (jwt/user-id))
-                                            (not= (:user-id %) (jwt/user-id)))
-                                   (or (:user-id %) %))
-                            (:authors board-data)))
-          complete-name (clojure.string/join ", "
-                         (mapv (partial calc-name active-users user-lib/name-for) except-me-uuids))
-          board-name (clojure.string/join ", "
-                      (mapv (partial calc-name active-users user-lib/short-name-for) except-me-uuids))]
+          except-me (remove nil?
+                     (map #(when (and (not= % (jwt/user-id))
+                                      (not= (:user-id %) (jwt/user-id)))
+                             (if (map? %)
+                               %
+                               (get active-users %)))
+                      (:authors board-data)))
+          with-names (map #(-> %
+                            (assoc :short-name (calc-name active-users user-lib/short-name-for %))
+                            (assoc :name (calc-name active-users user-lib/name-for %)))
+                      except-me)
+          sorted-users (sort-by :short-name with-names)
+          complete-name (clojure.string/join ", " (mapv :name sorted-users))
+          board-name (clojure.string/join ", " (mapv :short-name sorted-users))]
       (-> board-data
        (assoc :name board-name)
-       (assoc :direct-users (mapv #(get active-users %) except-me-uuids))
+       (assoc :direct-users sorted-users)
        (assoc :complete-name complete-name)
        (assoc :original-name (or (:original-name board-data) (:name board-data)))))))
 
@@ -318,7 +327,8 @@
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
-                                           change-data))
+                                           change-data
+                                           active-users))
                                  with-read-only
                                  (:entries board-data))
           next-links (when direction
@@ -360,13 +370,20 @@
   "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
    (fix-container container-data {} (dis/org-data)))
-  ([container-data change-data org-data & [direction]]
+
+  ([container-data change-data]
+   (fix-container container-data change-data (dis/org-data) (dis/active-users)))
+
+  ([container-data change-data org-data]
+   (fix-container container-data change-data org-data (dis/active-users)))
+
+  ([container-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
                                                             all-boards))]
                                             (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data))))
+                                             (fix-entry item board-data change-data active-users))))
                                  container-data
                                  (:items container-data))
           next-links (when direction
