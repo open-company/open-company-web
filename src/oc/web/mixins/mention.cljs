@@ -17,12 +17,12 @@
         win-width (.width $win)
         win-height (.height $win)
         left-pos (- (.-left mention-offset) (.scrollLeft $win))
-        top-pos (- (+ (.-top mention-offset) 24) (.scrollTop $win))
+        top-pos (- (+ (.-top mention-offset) 16) (.scrollTop $win))
                        ;; If left positoin plus the maximum width of the screen less 20px padding
         fixed-left-pos (if (> (+ left-pos 280) (- win-width 20))
                           (- left-pos (- (+ left-pos 280) (- win-width 20)))
                           left-pos)
-        fixed-top-pos (if (> (+ top-pos 56) (- win-height 20))
+        fixed-top-pos (if (> (+ top-pos 74) (- win-height 20))
                         (- (.-top mention-offset) (.scrollTop $win) 56 8)
                         top-pos)
         avatar-div (when user-avatar-url
@@ -32,10 +32,12 @@
         subline-div (when user-subline
                      (str "<div class=\"oc-mention-popup-subline" (when has-slack-username " slack-icon")
                           "\">" user-subline "</div>"))
-        format-str (str avatar-div
+        format-str (str "<div class=\"oc-mention-popup-inner\">"
+                        avatar-div
                         name-div
-                        subline-div)
-        popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\">") format-str)]
+                        subline-div
+                        "</div>")
+        popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\"></div>") format-str)]
     (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
                                                :top (str fixed-top-pos "px")}))))
 

@@ -113,68 +113,74 @@ div.oc-mention-panel {
 
 div.oc-mention-popup {
   position: fixed;
-  top: 24px;
-  left: -500px;
+  top: 0;
+  left: -280px;
   width: auto;
   max-width: 280px;
-  background-color: $deep_navy;
-  border-radius: 6px;
-  padding: 16px;
-  max-height: 56px;
+  max-height: 74px;
   overflow: hidden;
   z-index: 1000;
+  padding: 8px 0;
+  background-color: transparent;
 
-  div.oc-mention-popup-avatar {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px;
-    background-size: 24px auto;
-    background-position: center;
-    background-repeat: no-repeat;
-    float: left;
-    border-radius: 50%;
-    overflow: hidden;
-  }
+  div.oc-mention-popup-inner {
+    background-color: $deep_navy;
+    border-radius: 6px;
+    padding: 16px;
 
-  div.oc-mention-popup-name {
-    @include OC_Body_Bold();
-    font-size: 14px !important;
-    color: white !important;
-    line-height: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-top: -2px;
-    margin-bottom: 4px;
-    max-width: 208px;
-    min-width: 140px;
-  }
+    div.oc-mention-popup-avatar {
+      width: 24px;
+      height: 24px;
+      margin-right: 16px;
+      background-size: 24px auto;
+      background-position: center;
+      background-repeat: no-repeat;
+      float: left;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-top: 2px;
+    }
 
-  div.oc-mention-popup-subline {
-    @include OC_Body_Book();
-    font-size: 12px !important;
-    color: rgba(white, 0.8) !important;
-    text-align: left;
-    line-height: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 208px;
+    div.oc-mention-popup-name {
+      @include OC_Body_Bold();
+      font-size: 14px !important;
+      color: white !important;
+      line-height: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: -2px;
+      margin-bottom: 4px;
+      max-width: 208px;
+      min-width: 140px;
+    }
 
-    &.slack-icon {
-      &:before {
-        display: block;
-        content: "";
-        float: left;
-        width: 12px;
-        height: 12px;
-        opacity: 0.5;
-        background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
-        margin-right: 4px;
-        margin-top: 0px;
+    div.oc-mention-popup-subline {
+      @include OC_Body_Book();
+      font-size: 12px !important;
+      color: rgba(white, 0.8) !important;
+      text-align: left;
+      line-height: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 208px;
+
+      &.slack-icon {
+        &:before {
+          display: block;
+          content: "";
+          float: left;
+          width: 12px;
+          height: 12px;
+          opacity: 0.5;
+          background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+          margin-right: 4px;
+          margin-top: 0px;
+        }
       }
     }
   }
