@@ -28,7 +28,6 @@
                              ;; Derivatives
                              (drv/drv :editable-boards)
                              (drv/drv :current-user-data)
-                             (drv/drv :active-users)
                              ;; Locals
                              (rum/local nil ::container-max-height)
                              ;; Local mixins
@@ -49,7 +48,6 @@
                           {})
         is-mobile? (responsive/is-tablet-or-mobile?)
         current-user-data (drv/react s :current-user-data)
-        active-users (drv/react s :active-users)
         sorted-sections (filter (comp not :direct) sorted-all-sections)
         direct-sorted-sections (filter :direct sorted-all-sections)]
     [:div.sections-picker
@@ -76,11 +74,8 @@
             "Direct:"])
         (when (seq direct-sorted-sections)
           (for [b direct-sorted-sections
-                :let [active (= (:slug b) active-slug)
-                      not-self-users (filter #(not= (:user-id current-user-data) %) (:authors b))
-                      author-data (when (= (count not-self-users) 1)
-                                    (get active-users (first not-self-users)))]]
-            [:div.sections-picker-section.has-access-icon
+                :let [active (= (:slug b) active-slug)]]
+            [:div.sections-picker-section.has-access-icon.group
               {:key (str "sections-picker-" (:uuid b))
                :class (utils/class-set {:active active})
                :on-click #(when (fn? on-change)
@@ -88,7 +83,8 @@
               [:div.sections-picker-section-name
                 (:name b)]
               (cond
-                author-data
-                (user-avatar-image author-data)
+                (= (count (:direct-users b)) 1)
+                (user-avatar-image (first (:direct-users b)))
                 :else
-                [:div.multi-user-direct-icon])]))]]))
+                [:div.multi-user-direct-count
+                  (count (:direct-users b))])]))]]))

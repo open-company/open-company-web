@@ -17,7 +17,7 @@ div.sections-picker {
       font-size: 14px;
       color: var(--light-color);
       line-height: 18px;
-      padding: 8px 16px 0 16px;
+      padding: 2px 16px;
     }
 
     div.sections-picker-section {
@@ -49,8 +49,9 @@ div.sections-picker {
           background-image: cdnUrl("/img/ML/board_private_green.svg");
         }
 
-        div.multi-user-direct-icon {
-          opacity: 1;
+        div.multi-user-direct-count {
+          background-color: white;
+          color: $deep_navy;
         }
       }
 
@@ -86,6 +87,10 @@ div.sections-picker {
         background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/board_private_white.svg");
+        }
       }
 
       div.public-icon {
@@ -96,30 +101,26 @@ div.sections-picker {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/board_public_white.svg");
+        }
       }
 
-      div.multi-user-direct-icon {
+      div.multi-user-direct-count {
         float: right;
-        opacity: 0.5;
-        width: 12px;
-        height: 18px;
-        background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
+        min-width: 12px;
+        height: 12px;
+        @include OC_Body_Book();
+        font-size: 11px;
+        line-height: 12px;
+        padding: 0 2px;
+        border-radius: 3px;
+        background-color: var(--navigation-sidebar-count-bg);
+        color: var(--light-color);
+        margin-top: 3px;
+        text-align: center;
       }
-    }
-  }
-}
-
-@include dark_mode() {
-  div.sections-picker div.sections-picker-content div.sections-picker-section {
-    div.private-icon {
-      background-image: cdnUrl("/img/ML/board_private_white.svg");  
-    }
-
-    div.public-icon {
-      background-image: cdnUrl("/img/ML/board_public_white.svg");
     }
   }
 }
