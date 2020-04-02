@@ -164,7 +164,7 @@
                                   (nav-actions/close-all-panels)
                                   (nav-actions/nav-to-url! % (:slug existing-board) (oc-urls/board (router/current-org-slug) (:slug existing-board))))
                                 (create-section s))
-                   :disabled (or (not (<= 1 (count @(::users s)) (dec max-direct-users)))
+                   :disabled (or (not (<= 1 (count @(::users s)) max-direct-users))
                                  @(::saving s))}
                   (if existing-board
                     "Open"

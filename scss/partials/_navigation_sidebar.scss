@@ -685,23 +685,10 @@ div.left-navigation-sidebar {
       div.direct-board-name {
         width: calc(100% - 8px);
         float: left;
-        position: relative;
 
-        // @include user-profile(16) {
-        //   float: left;
-        //   margin-top: 4px;
-        // }
-
-        div.face-pile-container {
+        @include user-profile(16) {
           float: left;
-          width: 40px;
-          position: absolute;
-          top: 0;
-          left: -20px;
-
-          @include face-pile(20, 10) {
-            float: right;
-          }
+          margin-top: 3px;
         }
 
         span.direct-users-count {
@@ -717,10 +704,6 @@ div.left-navigation-sidebar {
           line-height: 16px;
           padding: 0 4px;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
-          }
-
           @include mobile() {
             opacity: 1;
             height: 24px;
@@ -728,7 +711,7 @@ div.left-navigation-sidebar {
         }
 
         div.internal {
-          padding: 1px 0px 0px 28px;
+          padding: 1px 0px 0px 12px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;

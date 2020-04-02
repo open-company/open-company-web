@@ -11,7 +11,6 @@
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :current-user-data)
                          (drv/drv :board-data)
-                         (drv/drv :active-users)
                          section-mixins/container-nav-in
   [s]
   (let [is-inbox? (= (router/current-board-slug) "inbox")
@@ -24,15 +23,7 @@
                               (not is-bookmarks?)
                               (not is-drafts-board?)
                               (:direct board-data))
-        current-user-data (drv/react s :current-user-data)
-        active-users (drv/react s :active-users)
-        direct-users (when is-direct-board?
-                       (map #(get active-users %)
-                        (remove nil?
-                         (map #(let [user-id (if (map? %) (:user-id %) %)] (map? %)
-                                 (when (not= user-id (:user-id current-user-data))
-                                   user-id))
-                          (:authors board-data)))))]
+        current-user-data (drv/react s :current-user-data)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
         [:div.empty-board-illustration-container
@@ -44,7 +35,9 @@
                                       :bookmarks is-bookmarks?
                                       :direct-board is-direct-board?})}
             (when is-direct-board?
-              (face-pile {:users-data direct-users :face-size 56 :face-space 25}))]]
+              (face-pile {:users-data (:direct-users board-data)
+                          :face-size 56
+                          :face-space 25}))]]
         [:div.empty-board-title
           (cond
            is-inbox? "You’re all caught up!"

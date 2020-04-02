@@ -239,9 +239,7 @@
                            :data-container "body"
                            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                            :title "Visible only to the included users"}
-                          (let [except-me (filter #(not= (:user-id current-user-data) (:user-id %)) (:authors current-board-data))
-                                authors-data (map #(->> % :user-id (get active-users)) except-me)]
-                            (face-pile {:users-data authors-data}))])
+                          (face-pile {:users-data (:direct-users current-board-data)})])
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board)

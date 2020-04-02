@@ -288,16 +288,18 @@
     (let [calc-name (fn [users name-fn user]
                       (let [user-id (if (map? user) (:user-id user) user)]
                         (name-fn (get users user-id))))
-          except-me (filterv #(when (and (not= % (jwt/user-id))
-                                         (not= (:user-id %) (jwt/user-id)))
-                                %)
-                     (:authors board-data))
+          except-me-uuids (remove nil?
+                           (map #(when (and (not= % (jwt/user-id))
+                                            (not= (:user-id %) (jwt/user-id)))
+                                   (or (:user-id %) %))
+                            (:authors board-data)))
           complete-name (clojure.string/join ", "
-                         (mapv (partial calc-name active-users user-lib/name-for) except-me))
+                         (mapv (partial calc-name active-users user-lib/name-for) except-me-uuids))
           board-name (clojure.string/join ", "
-                      (mapv (partial calc-name active-users user-lib/short-name-for) except-me))]
+                      (mapv (partial calc-name active-users user-lib/short-name-for) except-me-uuids))]
       (-> board-data
        (assoc :name board-name)
+       (assoc :direct-users (mapv #(get active-users %) except-me-uuids))
        (assoc :complete-name complete-name)
        (assoc :original-name (or (:original-name board-data) (:name board-data)))))))
 

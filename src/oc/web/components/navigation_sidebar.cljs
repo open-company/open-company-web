@@ -16,7 +16,6 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
@@ -81,7 +80,6 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
-                                (drv/drv :active-users)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
@@ -129,7 +127,6 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        active-users (drv/react s :active-users)
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
@@ -318,16 +315,11 @@
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug direct-board) board-url))}
                 [:div.direct-board-name.group
-                  ; (if (> (count (:authors direct-board)) 2)
-                  ;   [:span.direct-users-count
-                  ;     (dec (count (:authors direct-board)))]
-                  ;   (let [direct-user-id (some #(not= (:user-id current-user-data) (:user-id %)) (:authors direct-board))
-                  ;         direct-user-data (get active-users direct-user-id)]
-                  ;     (user-avatar-image direct-user-data)))
-                  [:div.face-pile-container
-                    (let [direct-user-ids (filter #(not= (:user-id current-user-data) %) (:authors direct-board))
-                          users-data (take 2 (map #(get active-users %) direct-user-ids))]
-                      (face-pile {:users-data users-data :face-size 20 :face-space 10}))]
+                  (if (> (count (:authors direct-board)) 2)
+                    [:span.direct-users-count
+                      (count (:authors direct-board))]
+                    [:div.face-pile-container
+                      (user-avatar-image (first (:direct-users direct-board)))])
                   [:div.internal
                     {:class (utils/class-set {:new (seq (:unread board-change-data))})
                      :key (str "board-list-" (name (:slug direct-board)) "-internal")
