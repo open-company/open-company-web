@@ -296,7 +296,7 @@
                      (map #(when (and (not= % (jwt/user-id))
                                       (not= (:user-id %) (jwt/user-id)))
                              (if (map? %)
-                               %
+                               (merge % (get active-users (:user-id %)))
                                (get active-users %)))
                       (:authors board-data)))
           with-names (map #(-> %
