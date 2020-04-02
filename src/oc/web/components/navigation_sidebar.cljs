@@ -293,7 +293,7 @@
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-direct-picker)
-                   :title "Create a new direct"
+                   :title "Start or find a discussion..."
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
