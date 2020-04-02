@@ -317,9 +317,9 @@
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug direct-board) board-url))}
                 [:div.direct-board-name.group
-                  (if (> (count (:authors direct-board)) 2)
+                  (if (> (count (:direct-users direct-board)) 1)
                     [:span.direct-users-count
-                      (count (:authors direct-board))]
+                      (count (:direct-users direct-board))]
                     [:div.face-pile-container
                       (user-avatar-image (first (:direct-users direct-board)))])
                   [:div.internal
