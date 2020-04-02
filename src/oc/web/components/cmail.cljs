@@ -23,6 +23,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -559,7 +560,6 @@
                            (:has-changes cmail-data))
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
-        current-user-id (jwt/user-id)
         unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
@@ -772,10 +772,17 @@
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["gif" "photo" "video"]
+                               :media-config ["poll" "code" "gif" "photo" "video"]
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
-                               :attachments-enabled true})]]
+                               :attachments-enabled true})
+            (when (seq (:polls cmail-data))
+              (polls-wrapper {:polls-data (:polls cmail-data)
+                              :editing? true
+                              :current-user-id (jwt/user-id)
+                              :container-selector "div.cmail-content"
+                              :dispatch-key :cmail-data
+                              :activity-data cmail-data}))]]
       (when-not is-fullscreen?
         [:div.cmail-footer
           (when-not is-fullscreen?

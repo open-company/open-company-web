@@ -11,6 +11,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.poll :as poll-utils]
             [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
@@ -182,10 +183,10 @@
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
-                  (and (>= status 500) (<= status 599)))
+                  (<= 500 status 599))
           (network-error-handler))
         ; report all 5xx to sentry
-        (when (or (and (>= status 500) (<= status 599))
+        (when (or (<= 500 status 599)
                   (= status 400)
                   (= status 422))
           (let [report {:response response
@@ -232,7 +233,7 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :polls])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :direct])
 
@@ -393,7 +394,10 @@
 (defn create-board [create-board-link board-data note callback]
   (if (and create-board-link board-data)
     (let [fixed-board-data (select-keys board-data board-allowed-keys)
-          fixed-entries (map #(select-keys % (conj entry-allowed-keys :uuid :secure-uuid)) (:entries board-data))
+          fixed-entries (mapv #(-> %
+                                (select-keys (conj entry-allowed-keys :uuid :secure-uuid))
+                                (poll-utils/clean-polls))
+                         (:entries board-data))
           with-entries (if (pos? (count fixed-entries))
                          (assoc fixed-board-data :entries fixed-entries)
                          fixed-board-data)
@@ -774,7 +778,9 @@
 (defn create-entry
   [create-entry-link entry-data edit-key callback]
   (if (and create-entry-link entry-data)
-    (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
+    (let [cleaned-entry-data (-> entry-data
+                              (select-keys entry-allowed-keys)
+                              (poll-utils/clean-polls))]
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
        {:headers (headers-for-link create-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -786,7 +792,9 @@
 (defn publish-entry
   [publish-entry-link entry-data callback]
   (if (and entry-data publish-entry-link)
-    (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
+    (let [cleaned-entry-data (-> entry-data
+                              (select-keys entry-allowed-keys)
+                              (poll-utils/clean-polls))]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
@@ -797,7 +805,9 @@
 (defn patch-entry
   [patch-entry-link entry-data edit-key callback]
   (if patch-entry-link
-    (let [cleaned-entry-data (select-keys entry-data entry-allowed-keys)]
+    (let [cleaned-entry-data (-> entry-data
+                              (select-keys entry-allowed-keys)
+                              (poll-utils/clean-polls))]
       (storage-http (method-for-link patch-entry-link) (relative-href patch-entry-link)
        {:headers (headers-for-link patch-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -967,6 +977,30 @@
       :body dismiss-at}
      callback)
     (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
+
+;; Polls
+
+(defn poll-vote [vote-link callback]
+  (if vote-link
+    (storage-http (method-for-link vote-link) (relative-href vote-link)
+     {:headers (headers-for-link vote-link)}
+     callback)
+    (handle-missing-link "vote-link" vote-link callback)))
+
+(defn poll-add-reply [add-reply-link reply-body callback]
+  (if add-reply-link
+    (storage-http (method-for-link add-reply-link) (relative-href add-reply-link)
+     {:headers (headers-for-link add-reply-link)
+      :body reply-body}
+     callback)
+    (handle-missing-link "poll-add-reply" add-reply-link callback {:reply-body reply-body})))
+
+(defn poll-delete-reply [delete-reply-link callback]
+  (if delete-reply-link
+    (storage-http (method-for-link delete-reply-link) (relative-href delete-reply-link)
+     {:headers (headers-for-link delete-reply-link)}
+     callback)
+    (handle-missing-link "poll-delete-reply" delete-reply-link callback)))
 
 ;; WRT
 

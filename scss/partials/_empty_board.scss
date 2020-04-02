@@ -1,8 +1,10 @@
 div.empty-board {
-  margin: 124px auto 0;
+  margin: 0 auto;
+  padding-top: 124px;
   float: left;
   text-align: center;
   width: 100%;
+  border-top: 1px solid var(--divider-line);
 
   @include mobile() {
     float: unset;
