@@ -364,8 +364,11 @@
 
 (defn user-profile-save
   ([current-user-data edit-data]
-   (user-profile-save current-user-data edit-data nil))
+   (user-profile-save current-user-data edit-data nil nil))
   ([current-user-data edit-data org-editing-kw]
+   (user-profile-save current-user-data edit-data nil nil))
+
+  ([current-user-data edit-data org-editing-kw callback]
     (let [org-editing (when org-editing-kw
                         (get @dis/app-state org-editing-kw))
           edit-user-profile (or (:user-data edit-data) edit-data)
@@ -402,7 +405,9 @@
                     (utils/after 2000
                       (fn[]
                         (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
-             (dis/dispatch! [:user-data (json->cljs body)]))))))))
+             (dis/dispatch! [:user-data (json->cljs body)])
+             (when (fn? callback)
+               (callback success)))))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}

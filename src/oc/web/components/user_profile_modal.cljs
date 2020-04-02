@@ -113,7 +113,18 @@
         (reset! (::password-error s) true)
 
         :else
-        (user-actions/user-profile-save current-user-data edit-user-profile)))))
+        (user-actions/user-profile-save current-user-data edit-user-profile nil
+         (fn [success]
+           (when success
+             (real-close-cb edit-user-profile #(nav-actions/show-user-settings nil) nil))
+           (notification-actions/show-notification
+            {:title (if success "Profile saved" "Error")
+             :description (if success
+                            "Your profile has been updated."
+                            "An error occurred while saving your profile. Please retry.")
+             :expire 3
+             :id (if success :user-profile-save-succeeded :user-profile-save-failed)
+             :dismiss true})))))))
 
 (defn- placeholder [k]
   (case k
