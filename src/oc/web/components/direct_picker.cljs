@@ -155,7 +155,7 @@
                        :value @(::query s)
                        :type "text"
                        :ref :query
-                       :placeholder "Start or find a discussion..."
+                       :placeholder "Find or start a discussion..."
                        :on-change #(reset! (::query s) (.. % -target -value))}])]
                 [:button.mlb-reset.direct-picker-create-bt
                   {:class (when-not (seq @(::users s)))
