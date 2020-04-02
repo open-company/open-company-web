@@ -259,7 +259,7 @@
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
         fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
         fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
-        fixed-board-name (or (:board-name entry-data) (:name board-data))
+        fixed-board-name (or (:name board-data) (:board-name entry-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
         fixed-video-id (:video-id entry-data)

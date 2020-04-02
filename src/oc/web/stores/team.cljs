@@ -26,10 +26,19 @@
                                  old-board-data (get-in tdb board-data-key)]
                              (assoc-in tdb board-data-key (au/fix-direct-board old-board-data users-map))))
                    next-db*
-                   (keys (get-in db boards-key)))]
+                   (keys (get-in db boards-key)))
+          org-data (get-in next-db (dispatcher/org-data-key org-slug))
+          cmail-data (get next-db :cmail-data)
+          updated-cmail-data (if-let [cmail-board (some #(when (or (= (:board-uuid cmail-data) (:uuid %))
+                                                                   (= (:board-slug cmail-data) (:slug %)))
+                                                           %)
+                                                   (:boards org-data))]
+                               (assoc cmail-data :board-name (:name cmail-board))
+                               cmail-data)]
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
-       (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))))
+       (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
+       (assoc :cmail-data updated-cmail-data)))
     db))
 
 (defn- deep-merge-users [new-users old-users]
