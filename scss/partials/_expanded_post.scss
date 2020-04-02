@@ -239,6 +239,7 @@ div.expanded-post {
         color: var(--light-color);
         line-height: 18px;
         opacity: 1;
+        display: inline-block;
         position: relative;
 
         span.hover-info-popup-container {
