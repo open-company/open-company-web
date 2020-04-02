@@ -685,33 +685,40 @@ div.left-navigation-sidebar {
       div.direct-board-name {
         width: calc(100% - 8px);
         float: left;
+        position: relative;
 
         @include user-profile(16) {
-          float: left;
-          margin-top: 3px;
+          position: absolute;
+          top: 3px;
+          left: 2px;
         }
 
         span.direct-users-count {
-          min-width: 14px;
-          height: 14px;
-          margin-top: 4px;
-          float: left;
+          min-width: 12px;
+          height: 12px;
           background-color: var(--navigation-sidebar-count-bg);
           color: var(--light-color);
-          border-radius: 4px;
+          border-radius: 3px;
           @include OC_Body_Book();
-          font-size: 12px;
-          line-height: 14px;
-          padding: 0 3px;
+          font-size: 11px;
+          line-height: 12px;
+          padding: 0 2px;
+          text-align: center;
+          position: absolute;
+          transform: translateX(-50%);
+          top: 5px;
+          left: 10px;
 
           @include mobile() {
             opacity: 1;
-            height: 22px;
+            height: 20px;
+            margin-top: 5px;
+            margin-left: 8px;
           }
         }
 
         div.internal {
-          padding: 1px 0px 0px 12px;
+          padding: 1px 0px 0px 28px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
