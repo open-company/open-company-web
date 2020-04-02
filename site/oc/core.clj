@@ -15,6 +15,8 @@
 
 (defn head []
   [:head
+    pages/tag-manager-head
+    ;; -------------
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
     [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
@@ -269,6 +271,7 @@
                (head)
                [:body
                 {:class (when (env :covid-banner) "covid-banner")}
+                pages/tag-manager-body
                 [:div
                  {:class "outer header"}
                  ph-banner

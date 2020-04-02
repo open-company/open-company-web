@@ -33,6 +33,7 @@
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
+            [oc.web.components.ui.poll :refer (poll-portal)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 

@@ -82,7 +82,7 @@
       (add-comment-cb))))
 
 (defn me-options [parent-uuid]
-  {:media-config ["gif" "photo" "video"]
+  {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
    :placeholder (if parent-uuid "Reply…" "Add a comment…")
    :use-inline-media-picker true

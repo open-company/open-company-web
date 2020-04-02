@@ -68,18 +68,25 @@ var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
 var AutoQuote = function(){};
+var AutoCode = function(){};
+var AutoInlinecode = function(){};
+var InlineCodeButton = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
+MediaPicker.addPoll = function(){};
 MediaPicker.addGIF = function(){};
 MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};
 MediaPicker.addChart = function(){};
+MediaPicker.addCode = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
 MediaPicker.togglePicker = function(){};
 MediaPicker.hide = function(){};
+// MediumEditorPaste
+var OCPaste = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
