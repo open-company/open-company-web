@@ -44,5 +44,5 @@
            is-all-posts? "Recent is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
            is-bookmarks? "You don't have any bookmarks"
-           is-direct-board? "There are no discussions yet"
+           is-direct-board? (str "Start a new discussion with " (:name board-data))
            :else "This section is empty")]]]))
