@@ -692,21 +692,21 @@ div.left-navigation-sidebar {
         }
 
         span.direct-users-count {
-          min-width: 16px;
-          height: 16px;
-          margin-top: 3px;
+          min-width: 14px;
+          height: 14px;
+          margin-top: 4px;
           float: left;
           background-color: var(--navigation-sidebar-count-bg);
-          color: var(--color);
+          color: var(--light-color);
           border-radius: 4px;
           @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          padding: 0 4px;
+          font-size: 12px;
+          line-height: 14px;
+          padding: 0 3px;
 
           @include mobile() {
             opacity: 1;
-            height: 24px;
+            height: 22px;
           }
         }
 

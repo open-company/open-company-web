@@ -38,10 +38,10 @@
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
-(defn- toggle-collapse-users [s]
-  (let [next-value (not @(::users-list-collapsed s))]
-    (cook/set-cookie! (router/collapse-users-list-cookie) next-value (* 60 60 24 365))
-    (reset! (::users-list-collapsed s) next-value)
+(defn- toggle-collapse-direct [s]
+  (let [next-value (not @(::direct-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-direct-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::direct-list-collapsed s) next-value)
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
@@ -90,7 +90,7 @@
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local false ::sections-list-collapsed)
-                                (rum/local false ::users-list-collapsed)
+                                (rum/local false ::direct-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -100,7 +100,7 @@
                                   (save-window-size s)
                                   (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
-                                  (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
+                                  (reset! (::direct-list-collapsed s) (= (cook/get-cookie (router/collapse-direct-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -168,7 +168,7 @@
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
                                 :collapsed-sections @(::sections-list-collapsed s)
-                                :collapsed-users @(::users-list-collapsed s)})
+                                :collapsed-direct @(::direct-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -250,8 +250,7 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when (and show-boards
-                   (not @(::sections-list-collapsed s)))
+        (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
@@ -259,7 +258,9 @@
                                               (not is-all-posts)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
-                        board-change-data (get change-data (:uuid board))]]
+                        board-change-data (get change-data (:uuid board))]
+                  :when (or (not @(::sections-list-collapsed s))
+                            is-current-board)]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
@@ -286,9 +287,9 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
+                {:class (utils/class-set {:collapsed @(::direct-list-collapsed s)
                                           :dropdown-arrow (seq sorted-direct-boards)})
-                 :on-click #(toggle-collapse-users s)}
+                 :on-click #(toggle-collapse-direct s)}
                 [:span.sections "Direct"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
@@ -297,8 +298,7 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when (and show-boards
-                   (not @(::users-list-collapsed s)))
+        (when show-direct
           [:div.left-navigation-sidebar-items.group
             (for [direct-board sorted-direct-boards
                   :let [board-url (oc-urls/board org-slug (:slug direct-board))
@@ -306,7 +306,9 @@
                                               (not is-all-posts)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug direct-board)))
-                        board-change-data (get change-data (:uuid direct-board))]]
+                        board-change-data (get change-data (:uuid direct-board))]
+                  :when (or (not @(::direct-list-collapsed s))
+                            is-current-board)]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug direct-board))
