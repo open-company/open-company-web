@@ -112,6 +112,8 @@
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true
                                   :left true})
+         :on-click #(when-not (utils/button-clicked? %)
+                      (utils/event-stop %))
          :style {:margin-left (str (:horizontal-offset pos) "px")}}
         [:div.user-info-inner
           [:div.user-info-header
