@@ -21,6 +21,7 @@
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -70,7 +71,7 @@
     (let [is-mobile? (responsive/is-mobile-size?)
           comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
           activity-data @(drv/get-ref s :activity-data)
-          comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+          comments-count (-> activity-data :links (utils/link-for "comments") :count)]
       (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
                                        (> (count (:body activity-data)) min-body-length-for-truncation)
                                        ;; Never if they have polls
@@ -80,7 +81,7 @@
                                        ;; Only when they are read
                                        (not (:unread activity-data))
                                        ;; And only when there is at least a comment
-                                       (pos? (count comments-data)))))))
+                                       (pos? comments-count))))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -262,6 +263,13 @@
           {:on-click #(reset! (::collapse-post s) false)}
           [:div.expand-button-inner
             "View entire post"]])
+      (when (seq (:polls activity-data))
+        (polls-wrapper {:polls-data (:polls activity-data)
+                        :editing? false
+                        :current-user-id current-user-id
+                        :container-selector "div.expanded-post"
+                        :activity-data activity-data
+                        :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions

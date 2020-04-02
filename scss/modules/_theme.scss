@@ -87,6 +87,15 @@ $dark_mode: "dark";
   // Theme settings
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
+  // Polls
+  --poll-background-color: white;
+  --poll-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+
+  // Code blocks
+  --code-background-color: #{rgba($deep_navy, 0.08)};
+  --code-border-color: #{rgba($deep_navy, 0.24)};
+  --inline-code-color: #FB4884;
+
   // Collapsed post
   --collapse-post-start-bg: #{rgba($grey_num_2, 0)};
   --collapse-post-stop-bg: #{rgba($grey_num_2, 1)};
@@ -178,6 +187,15 @@ $dark_mode: "dark";
 
   // Theme settings
   --ui-theme-border-color: #{rgba(white, 0.22)};
+
+  // Polls
+  --poll-background-color: #2c313a;
+  --poll-box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.16);
+
+  // Code blocks
+  --code-background-color: #2C313A;
+  --code-border-color: #{rgba(white, 0.32)};
+  --inline-code-color: #FFFD93;
 
   // Collapsed post
   --collapse-post-start-bg: rgba(27, 32, 42, 0);
