@@ -2,7 +2,64 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
+            [oc.lib.user :as user-lib]
+            [oc.web.utils.activity :as au]
+            [oc.web.utils.mention :as mu]
             [oc.web.lib.utils :as utils]))
+
+(defmethod dispatcher/action :active-users
+  [db [_ org-slug active-users-data]]
+  (if-let [users (-> active-users-data :collection :items)]
+    (let [fixed-users (map (fn [u] (-> u
+                                    (update :name #(or % (user-lib/name-for u)))
+                                    (update :short-name #(or % (user-lib/short-name-for u)))))
+                       active-users-data)
+          users-map (zipmap (map :user-id users) fixed-users)
+          change-data (dispatcher/change-data db)
+          org-data (dispatcher/org-data db org-slug)
+          boards-key (dispatcher/boards-key org-slug)
+          next-db** (reduce (fn [tdb board-key]
+                             (let [board-data-key (concat boards-key [board-key :board-data])
+                                   old-board-data (get-in tdb board-data-key)]
+                               (assoc-in tdb board-data-key (au/fix-board old-board-data change-data users-map))))
+                     db
+                     (keys (get-in db boards-key)))
+          containers-key (dispatcher/containers-key org-slug)
+          next-db* (reduce (fn [tdb container-key]
+                             (let [container-data-key (concat containers-key [container-key])
+                                   old-container-data (get-in tdb container-data-key)]
+                               (assoc-in tdb container-data-key (au/fix-container old-container-data change-data org-data users-map))))
+                    next-db**
+                    (keys (get-in db containers-key)))
+          posts-key (dispatcher/posts-data-key org-slug)
+          next-db (reduce (fn [tdb post-uuid]
+                           (let [post-data-key (concat posts-key [post-uuid])
+                                 old-post-data (get-in tdb post-data-key)
+                                 board-data (get-in tdb (dispatcher/board-data-key org-slug (:board-slug old-post-data)))]
+                            (assoc-in tdb post-data-key (au/fix-entry old-post-data change-data users-map))))
+                   next-db*
+                   (keys (get-in db posts-key)))
+          org-data (get-in next-db (dispatcher/org-data-key org-slug))
+          cmail-data (get next-db :cmail-data)
+          updated-cmail-data (if-let [cmail-board (some #(when (or (= (:board-uuid cmail-data) (:uuid %))
+                                                                   (= (:board-slug cmail-data) (:slug %)))
+                                                           %)
+                                                   (:boards org-data))]
+                               (assoc cmail-data :board-name (:name cmail-board))
+                               cmail-data)]
+      (-> next-db
+       (assoc-in (dispatcher/active-users-key org-slug) users-map)
+       (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
+       (assoc :cmail-data updated-cmail-data)))
+    db))
+
+(defn- deep-merge-users [new-users old-users]
+  (let [filtered-new-users (filter
+                            #(and (seq (:user-id %))
+                                  (#{"active" "unverified"} (:status %)))
+                            (if (map? new-users) (vals new-users) new-users))
+        new-users-map (zipmap (map :user-id filtered-new-users) filtered-new-users)]
+    (merge-with merge old-users new-users-map)))
 
 (defmethod dispatcher/action :teams-get
   [db [_]]
@@ -25,9 +82,12 @@
 (defmethod dispatcher/action :team-roster-loaded
   [db [_ org-slug roster-data]]
   (if roster-data
-    (-> db
-     (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
-     (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data)))
+    (let [merged-users-data (deep-merge-users (:users roster-data) (dispatcher/active-users org-slug db))]
+      (-> db
+       (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
+       (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
+       (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data))))
     db))
 
 (defn parse-team-data [team-data]
@@ -43,9 +103,12 @@
   [db [_ org-slug team-data]]
   (if team-data
     ;; if team is the current org team, load the slack chennels
-    (-> db
-     (assoc-in (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
-     (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data)))
+    (let [merged-users-data (deep-merge-users (:users team-data) (dispatcher/active-users org-slug db))]
+      (-> db
+       (assoc-in (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
+       (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
+       (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data))))
     db))
 
 (defmethod dispatcher/action :channels-enumerate

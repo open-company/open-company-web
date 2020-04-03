@@ -61,7 +61,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           bookmarks-data (when success (json->cljs body))
-          fixed-bookmarks (au/fix-container (:collection bookmarks-data) (dis/change-data) org-data)]
+          fixed-bookmarks (au/fix-container (:collection bookmarks-data) (dis/change-data) org-data (dis/active-users))]
       (when (= (router/current-board-slug) "bookmarks")
         (cook/set-cookie! (router/last-board-cookie org) "bookmarks" (* 60 60 24 365))
         (request-reads-count (keys (:fixed-items fixed-bookmarks)))
@@ -96,7 +96,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data)]
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data (dis/active-users))]
       (when (= (router/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365))
         (request-reads-count (keys (:fixed-items fixed-all-posts)))
@@ -131,7 +131,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           inbox-data (when success (json->cljs body))
-          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data)]
+          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data (dis/active-users))]
       (when (= (router/current-board-slug) "inbox")
         (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
         (request-reads-count (keys (:fixed-items fixed-inbox-data)))

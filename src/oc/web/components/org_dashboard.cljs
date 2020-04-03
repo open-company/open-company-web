@@ -85,7 +85,8 @@
                 panel-stack
                 app-loading
                 payments-data
-                user-info-data]} (drv/react s :org-dashboard-data)
+                user-info-data
+                active-users]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
                      app-loading
@@ -110,6 +111,8 @@
                                 (get posts-data (router/current-activity-id)))
         entry-not-found (and ;; org is present
                              (not org-not-found)
+                             ;; Users for mentions has not been loaded
+                             (not (map? active-users))
                              ;; section is present
                              (not section-not-found)
                              ;; route is for a single post and it's been loaded

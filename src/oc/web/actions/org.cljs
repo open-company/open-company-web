@@ -64,6 +64,20 @@
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
+;; Active users
+
+(def max-retry-count 3)
+
+(defn load-active-users [active-users-link & [retry]]
+  (when active-users-link
+    (api/get-active-users active-users-link
+     (fn [{:keys [status success body]}]
+       (if success
+         (let [resp (when success (json->cljs body))]
+           (dis/dispatch! [:active-users (router/current-org-slug) resp]))
+         (when (< retry max-retry-count)
+           (utils/after 1000 #(load-active-users active-users-link (inc (or retry 0))))))))))
+
 ;; Org get
 (defn check-org-404 []
   (let [orgs (dis/orgs-data)]
@@ -143,12 +157,16 @@
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
-        contributor-delay (if is-contributor? 0 (* other-resources-delay (swap! delay-count inc)))]
+        contributor-delay (if is-contributor? 0 (* other-resources-delay (swap! delay-count inc)))
+        active-users-link (utils/link-for (:links org-data) "active-users")]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
         (aa/secure-activity-get)
         (do
+          ;; Load the active users
+          (when active-users-link
+            (load-active-users active-users-link))
           ;; Load the current activity
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))

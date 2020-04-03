@@ -12,23 +12,6 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
-(defn- get-slack-usernames [user]
-  (let [slack-display-name [(:slack-display-name user)]
-        slack-users-usernames (vec (map :display-name (vals (:slack-users user))))]
-    (remove #(or (nil? %) (= % "-")) (concat slack-users-usernames slack-display-name))))
-
-(defn- compact-slack-usernames [users]
-  (doall (map #(assoc % :slack-usernames (get-slack-usernames %)) users)))
-
-(defn- users-for-mentions [users]
-  (compact-slack-usernames
-    (filterv #(and ;; is a carrot user
-                (seq (:user-id %))
-                ;; is active
-                (or (= (:status %) "active")
-                    (= (:status %) "unverified")))
-     users)))
-
 (defn roster-get [roster-link]
   (api/get-team roster-link
    (fn [{:keys [success body status]}]
@@ -37,8 +20,7 @@
          (let [users (-> fixed-body :collection :items)
                fixed-roster-data {:team-id (:team-id fixed-body)
                                   :links (-> fixed-body :collection :links)
-                                  :users users
-                                  :mention-users (users-for-mentions users)}]
+                                  :users users}]
            (dis/dispatch! [:team-roster-loaded (router/current-org-slug) fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]

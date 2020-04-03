@@ -2,6 +2,7 @@
   (:require [cuerdas.core :as s]
             [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -252,7 +253,9 @@
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data changes]
+  ([entry-data board-data changes]
+   (fix-entry entry-data board-data changes (dis/active-users)))
+  ([entry-data board-data changes active-users]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
         fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
@@ -260,11 +263,13 @@
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
-        fixed-video-id (:video-id entry-data)]
+        fixed-video-id (:video-id entry-data)
+        fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
     (when (seq fixed-video-id)
       (ziggeo/init-ziggeo true))
     (-> entry-data
       (assoc :content-type "entry")
+      (update :publisher merge fixed-publisher)
       (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
@@ -277,20 +282,25 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
-      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data)))))))
 
 (defn fix-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {}))
-  ([board-data change-data & [direction]]
+   (fix-board board-data {} (dis/active-users)))
+
+  ([board-data change-data]
+   (fix-board board-data change-data (dis/active-users)))
+
+  ([board-data change-data active-users & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
-                                           change-data))
+                                           change-data
+                                           active-users))
                                  with-read-only
                                  (:entries board-data))
           next-links (when direction
@@ -328,14 +338,21 @@
 (defn fix-contributor
   "Parse data coming from the API for a certain user's posts."
   ([contributor-data]
-   (fix-contributor contributor-data {} (dis/org-data)))
-  ([contributor-data change-data org-data & [direction]]
+   (fix-contributor contributor-data {} (dis/org-data) (dis/active-users)))
+
+  ([contributor-data change-data]
+   (fix-contributor contributor-data change-data (dis/org-data) (dis/active-users)))
+
+  ([contributor-data change-data org-data]
+   (fix-contributor contributor-data change-data org-data (dis/active-users)))
+
+  ([contributor-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
                                                             all-boards))]
                                             (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data))))
+                                             (fix-entry item board-data change-data active-users))))
                                  contributor-data
                                  (:items contributor-data))
           next-links (when direction
@@ -374,13 +391,20 @@
   "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
    (fix-container container-data {} (dis/org-data)))
-  ([container-data change-data org-data & [direction]]
+
+  ([container-data change-data]
+   (fix-container container-data change-data (dis/org-data) (dis/active-users)))
+
+  ([container-data change-data org-data]
+   (fix-container container-data change-data org-data (dis/active-users)))
+
+  ([container-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
                                                             all-boards))]
                                             (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data))))
+                                             (fix-entry item board-data change-data active-users))))
                                  container-data
                                  (:items container-data))
           next-links (when direction
