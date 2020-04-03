@@ -779,7 +779,7 @@ div.cmail-outer {
             color: var(--cmail-section-bt-color);
             position: relative;
             text-align: left;
-            max-width: calc(100% - 60px);
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1207,6 +1207,10 @@ div.cmail-outer {
             line-height: 18px;
             color: var(--color);
             position: relative;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             @include mobile() {
               height: 28px;
