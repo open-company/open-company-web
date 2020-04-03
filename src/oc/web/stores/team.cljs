@@ -19,7 +19,7 @@
   (let [filtered-users (filter #(#{"active" "unverified"} (:status %)) (:users roster-data))
         new-users-map (zipmap
                        (map :user-id filtered-users)
-                       (map #(select-keys % [:user-id :first-name :last-name :name :location :timezone :title]) filtered-users))]
+                       (map #(select-keys % [:user-id :first-name :last-name :avatar-url :name :short-name :location :timezone :title]) filtered-users))]
     (merge-with merge (or old-users-map {}) new-users-map)))
 
 (defmethod dispatcher/action :team-roster-loaded
