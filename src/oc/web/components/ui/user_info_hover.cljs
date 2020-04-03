@@ -15,7 +15,6 @@
 
 (rum/defc user-info-view < rum/static
   [{:keys [user-data user-id my-profile?]}]
-  (js/console.log "DBG user-info-view" user-data)
   [:div.user-info-view
     [:div.user-info-header
       (user-avatar-image user-data)
