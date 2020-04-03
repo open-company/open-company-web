@@ -170,8 +170,6 @@
                    :max-length poll-utils/max-reply-length
                    :placeholder (str "Choice " idx)
                    :on-key-down (fn [e]
-                                  (when (= (.-keyCode e) 9)
-                                     (js/console.log "DBG tab on:" idx "last?" last-option? "count" (count (:replies poll-data))))
                                    (when (and last-option?
                                               (= (.-keyCode e) 9)
                                               (not (.-shiftKey e)))
