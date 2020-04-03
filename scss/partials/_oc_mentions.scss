@@ -127,11 +127,12 @@ div.oc-mention-popup {
     background-color: $deep_navy;
     border-radius: 6px;
     padding: 16px;
+    max-height: 58px;
 
     div.oc-mention-popup-avatar {
       width: 24px;
       height: 24px;
-      margin-right: 16px;
+      margin-right: 8px;
       background-size: 24px auto;
       background-position: center;
       background-repeat: no-repeat;
@@ -150,9 +151,8 @@ div.oc-mention-popup {
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-top: -2px;
-      margin-bottom: 4px;
-      max-width: 208px;
-      min-width: 140px;
+      margin-bottom: 2px;
+      width: calc(100% - 32px);
     }
 
     div.oc-mention-popup-subline {
@@ -160,11 +160,11 @@ div.oc-mention-popup {
       font-size: 12px !important;
       color: rgba(white, 0.8) !important;
       text-align: left;
-      line-height: 12px;
+      line-height: 14px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 208px;
+      width: calc(100% - 32px);
 
       &.slack-icon {
         &:before {

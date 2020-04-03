@@ -103,7 +103,7 @@ $dark_mode: "dark";
   --mobile-collapse-post-stop-bg: #{rgba(white, 1)};
 
   // User info hover
-  --user-info-hover-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+  --user-info-view-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
 
   html, body {
     scrollbar-color: light;
@@ -204,7 +204,7 @@ $dark_mode: "dark";
   --mobile-collapse-post-stop-bg: rgba(27, 32, 42, 1);
 
   // User info hover
-  --user-info-hover-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
+  --user-info-view-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
 
   &, body {
     scrollbar-color: dark;

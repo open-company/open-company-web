@@ -182,6 +182,7 @@
     height: #{$size}px;
     white-space: nowrap;
     text-align: center;
+    display: block;
 
     div.user-avatar-img-helper {
       display: inline-block;
@@ -195,6 +196,9 @@
       border-radius: 50%;
       vertical-align: top;
       object-fit: cover;
+      padding-bottom: 0!important;
+      display: inline-block!important;
+      cursor: default;
     }
 
     @content

@@ -93,6 +93,8 @@
   (drv/drv :expand-image-src)
   (drv/drv :add-comment-force-update)
   (drv/drv :editable-boards)
+  (drv/drv :users-info-hover)
+  (drv/drv :current-user-data)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -139,7 +141,8 @@
         org-data (dis/org-data)
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        current-user-id (jwt/user-id)
+        current-user-data (drv/react s :current-user-data)
+        current-user-id (:user-id current-user-data)
         is-publisher? (= (:user-id publisher) current-user-id)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video

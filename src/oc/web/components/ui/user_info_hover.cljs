@@ -13,6 +13,39 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
+(rum/defc user-info-view < rum/static
+  [{:keys [user-data user-id my-profile?]}]
+  (js/console.log "DBG user-info-view" user-data)
+  [:div.user-info-view
+    [:div.user-info-header
+      (user-avatar-image user-data)
+      [:div.user-info-name
+        (user-lib/name-for user-data)]
+      (when (:title user-data)
+        [:div.user-info-title
+          (:title user-data)])
+      (when-let [timezone-location-string (user-utils/timezone-location-string user-data)]
+        [:div.user-info-locale
+          timezone-location-string])]
+    [:div.user-info-buttons.group
+      [:button.mlb-reset.posts-bt
+        {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
+        (if my-profile?
+          "My posts"
+          "Posts")]
+      [:button.mlb-reset.profile-bt
+        {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+        (if my-profile?
+          "My profile"
+          "Profile")]]])
+
+(rum/defc user-info-otf < rum/static
+  [{:keys [portal-el] :as props}]
+  (when (and (not (responsive/is-mobile-size?))
+             portal-el
+             (.-parentElement portal-el))
+    (rum/portal (user-info-view props) portal-el)))
+
 (def ^:private default-positioning {:vertical-position nil :horizontal-position nil})
 
 (def ^:private popup-size
@@ -115,25 +148,4 @@
          :on-click #(when-not (utils/button-clicked? %)
                       (utils/event-stop %))
          :style {:margin-left (str (:horizontal-offset pos) "px")}}
-        [:div.user-info-inner
-          [:div.user-info-header
-            (user-avatar-image user-data)
-            [:div.user-info-name
-              (user-lib/name-for user-data)]
-            (when (:title complete-user-data)
-              [:div.user-info-title
-                (:title complete-user-data)])
-            (when-let [timezone-location-string (user-utils/timezone-location-string complete-user-data)]
-              [:div.user-info-locale
-                timezone-location-string])]
-          [:div.user-info-buttons.group
-            [:button.mlb-reset.posts-bt
-              {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
-              (if my-profile?
-                "My posts"
-                "Posts")]
-            [:button.mlb-reset.profile-bt
-              {:on-click #(nav-actions/show-user-info (:user-id user-data))}
-              (if my-profile?
-                "My profile"
-                "Profile")]]]])))
+        (user-info-view {:user-data complete-user-data :my-profile? my-profile?})])))

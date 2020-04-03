@@ -827,6 +827,7 @@ $header_top_margin: 24;
     background-color: var(--highlighter-bg-color);
     color: $deep_navy;
     border-radius: 3px;
+    padding: 0 3px;
   }
 
   @include poll($paragraph_spacing);
@@ -1181,6 +1182,7 @@ $header_top_margin: 24;
     background-color: var(--highlighter-bg-color);
     color: $deep_navy;
     border-radius: 3px;
+    padding: 0 3px;
   }
 
   @include code-blocks(int($font-size) - 3, int($line-height) - 3, $paragraph_spacing);

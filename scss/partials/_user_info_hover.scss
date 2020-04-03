@@ -2,14 +2,14 @@ $user_info_width: 248;
 $user_info_vertical_spacing: 8;
 
 div.user-info-hover {
-  display: none;
   position: absolute;
-  width: #{$user_info_width}px;
-  height: auto;
-  z-index: #{$navbar_zindex - 1};
-  text-align: center;
-  background-color: transparent;
-  cursor: default;
+  display: none;
+
+  div.user-info-view {
+    position: relative;
+    top: unset;
+    left: unset;
+  }
 
   &.top {
     bottom: 100%;
@@ -32,111 +32,117 @@ div.user-info-hover {
   &.show {
     display: block;
   }
+}
 
-  div.user-info-inner {
-    border: 1px solid var(--divider-line);
-    background-color: var(--overlay-background-color);
-    padding: 16px;
-    box-shadow: var(--user-info-hover-shadow);
-    border-radius: 4px;
-    width: #{$user_info_width}px;
-    height: auto;
+div.user-info-view {
+  position: absolute;
+  width: #{$user_info_width}px;
+  height: auto;
+  z-index: #{$navbar_zindex - 1};
+  text-align: center;
+  border: 1px solid var(--divider-line);
+  background-color: var(--overlay-background-color);
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: var(--user-info-view-shadow);
+  cursor: default;
+  top: 100%;
+  left: 0;
 
-    div.user-info-header {
+  div.user-info-header {
 
-      @include user-profile(56) {
-        float: unset!important;
-        margin: 0 auto!important;
+    @include user-profile(56) {
+      float: unset!important;
+      margin: 0 auto!important;
+      width: 56px!important;
+      height: 56px!important;
+      text-align: center!important;
+      white-space: nowrap!important;
+
+      img.user-avatar-img {
         width: 56px!important;
         height: 56px!important;
-        text-align: center!important;
-        white-space: nowrap!important;
-
-        img.user-avatar-img {
-          width: 56px!important;
-          height: 56px!important;
-        }
-      }
-
-      div.user-info-name {
-        @include OC_Body_Bold();
-        text-align: center;
-        font-size: 18px;
-        line-height: 23px;
-        margin-top: 8px;
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-        cursor: text;
-      }
-
-      div.user-info-title {
-        @include OC_Body_Book();
-        text-align: center;
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-        cursor: text;
-      }
-
-      div.user-info-locale {
-        @include OC_Body_Book();
-        text-align: center;
-        font-size: 14px;
-        line-height: 18px;
-        margin-top: 8px;
-        color: var(--light-color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-        cursor: text;
       }
     }
 
-    div.user-info-buttons {
-      height: 40px;
+    div.user-info-name {
+      @include OC_Body_Bold();
+      text-align: center;
+      font-size: 18px;
+      line-height: 23px;
       margin-top: 8px;
+      color: var(--color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      white-space: nowrap;
+      cursor: text;
+    }
 
-      button.profile-bt {
-        float: right;
-        width: calc(50% - 4px);
-        padding: 11px 0;
-        background-color: var(--opac-background-color-1);
-        @include OC_Body_Bold();
-        color: var(--color);
-        font-size: 14px;
-        line-height: 18px;
-        border-radius: 4px;
+    div.user-info-title {
+      @include OC_Body_Book();
+      text-align: center;
+      font-size: 14px;
+      line-height: 18px;
+      color: var(--color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      white-space: nowrap;
+      cursor: text;
+    }
 
-        @include big_web() {
-          &:hover {
-            opacity: 0.9;
-          }
+    div.user-info-locale {
+      @include OC_Body_Book();
+      text-align: center;
+      font-size: 14px;
+      line-height: 18px;
+      margin-top: 8px;
+      color: var(--light-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      white-space: nowrap;
+      cursor: text;
+    }
+  }
+
+  div.user-info-buttons {
+    height: 40px;
+    margin-top: 8px;
+
+    button.profile-bt {
+      float: right;
+      width: calc(50% - 4px);
+      padding: 11px 0;
+      background-color: var(--opac-background-color-1);
+      @include OC_Body_Bold();
+      color: var(--color);
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
+
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
         }
       }
+    }
 
-      button.posts-bt {
-        float: left;
-        width: calc(50% - 4px);
-        padding: 11px 0;
-        background-color: var(--opac-background-color-1);
-        @include OC_Body_Bold();
-        color: var(--color);
-        font-size: 14px;
-        line-height: 18px;
-        border-radius: 4px;
+    button.posts-bt {
+      float: left;
+      width: calc(50% - 4px);
+      padding: 11px 0;
+      background-color: var(--opac-background-color-1);
+      @include OC_Body_Bold();
+      color: var(--color);
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
 
-        @include big_web() {
-          &:hover {
-            opacity: 0.9;
-          }
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
         }
       }
     }

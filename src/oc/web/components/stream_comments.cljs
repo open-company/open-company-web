@@ -312,7 +312,6 @@
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :add-comment-data)
-                             (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
                              (rum/local [] ::expanded-comments)
@@ -324,7 +323,7 @@
                              (rum/local [] ::threads)
                              (drv/drv :add-comment-force-update)
                              ;; Mixins
-                             (mention-mixins/oc-mentions-hover {:click? true})
+                             ; (mention-mixins/oc-mentions-hover {:click? true})
                              ui-mixins/refresh-tooltips-mixin
                              (ui-mixins/interactive-images-mixin "div.stream-comment-body")
                              (ui-mixins/on-window-click-mixin (fn [s e]
