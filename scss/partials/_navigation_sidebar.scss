@@ -651,6 +651,18 @@ div.left-navigation-sidebar {
         }
       }
 
+      &.contributor {
+        div.board-name {
+          @include user-profile(16) {
+            margin: 3px 0 0 2px;
+          }
+
+          div.internal {
+            padding: 1px 0px 0px 11px;
+          }
+        }
+      }
+
       div.board-name {
         width: calc(100% - 8px);
         float: left;

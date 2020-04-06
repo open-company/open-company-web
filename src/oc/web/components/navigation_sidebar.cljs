@@ -5,6 +5,7 @@
             [oc.lib.user :as lib-user]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -17,6 +18,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
@@ -35,6 +37,13 @@
   (let [next-value (not @(::sections-list-collapsed s))]
     (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
     (reset! (::sections-list-collapsed s) next-value)
+    (reset! (::content-height s) nil)
+    (utils/after 100 #(save-content-height s))))
+
+(defn- toggle-collapse-users [s]
+  (let [next-value (not @(::users-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-users-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::users-list-collapsed s) next-value)
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
@@ -67,12 +76,14 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :bookmarks-data)
+                                (drv/drv :active-users)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local false ::sections-list-collapsed)
+                                (rum/local false ::users-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -81,6 +92,7 @@
                                   (save-window-size s)
                                   (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
+                                  (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -140,11 +152,14 @@
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)]
+                                 is-admin-or-author?)
+        active-users (drv/react s :active-users)
+        show-users-list? (seq active-users)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
-                                :collapsed-sections @(::sections-list-collapsed s)})
+                                :collapsed-sections @(::sections-list-collapsed s)
+                                :collapsed-users @(::users-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -238,7 +253,7 @@
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
-                 :key (str "board-list-" (name (:slug board)) "-" (rand 100))
+                 :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug board) board-url))}
@@ -254,7 +269,40 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]
+                  [:div.private])])])
+        (when show-users-list?
+          [:div.left-navigation-sidebar-top.group
+            ;; Boards header
+            [:h3.left-navigation-sidebar-top-title.group
+              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                {:class (when @(::users-list-collapsed s) "collapsed")
+                 :on-click #(toggle-collapse-users s)}
+                [:span.sections "People"]]
+              ; (when create-link
+              ;   [:button.left-navigation-sidebar-top-title-button.btn-reset
+              ;     {:on-click #(nav-actions/show-section-add)
+              ;      :title "Create a new section"
+              ;      :data-placement "top"
+              ;      :data-toggle (when-not is-mobile? "tooltip")
+              ;      :data-container "body"}])
+              ]])
+        (when (and show-users-list?
+                   (not @(::users-list-collapsed s)))
+          [:div.left-navigation-sidebar-items.group
+            (for [user (sort-by :short-name (vals active-users))
+                  :let [user-url (oc-urls/contributor org-slug (:user-id user))
+                        is-current-user (and (router/current-contributor-id)
+                                             (= (:user-id user) (router/current-contributor-id)))]]
+              [:a.left-navigation-sidebar-item.hover-item.contributor
+                {:class (utils/class-set {:item-selected is-current-user})
+                 :data-user-id (:user-id user)
+                 :key (str "user-list-" (:user-id user))
+                 :href user-url
+                 :on-click #(nav-actions/nav-to-author! % (:user-id user) user-url)}
+                [:div.board-name.group
+                  (user-avatar-image user)
+                  [:div.internal
+                    (:short-name user)]]])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer
           [:button.mlb-reset.invite-people-bt
