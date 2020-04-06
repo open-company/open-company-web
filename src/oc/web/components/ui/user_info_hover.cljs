@@ -14,11 +14,13 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defc user-info-view < rum/static
-  [{:keys [user-data user-id my-profile? hide-buttons]}]
+  [{:keys [user-data user-id my-profile? hide-buttons otf above?]}]
   (let [timezone-location-string (user-utils/timezone-location-string user-data)
         subline-string (clojure.string/trim
                         (str (:title user-data) " " timezone-location-string))]
     [:div.user-info-view
+      {:class (utils/class-set {:otf otf
+                                :above above?})}
       [:div.user-info-header
         (user-avatar-image user-data)
         [:div.user-info-right
@@ -46,7 +48,12 @@
   (when (and (not (responsive/is-mobile-size?))
              portal-el
              (.-parentElement portal-el))
-    (rum/portal (user-info-view props) portal-el)))
+    (let [viewport-size (dom-utils/viewport-size)
+          pos (dom-utils/viewport-offset portal-el)
+          above? (>= (:y pos) (/ (:height viewport-size) 2))
+          next-props (merge props {:above? above?
+                                   :otf true})]
+      (rum/portal (user-info-view (assoc props :above? above?)) portal-el))))
 
 (def ^:private default-positioning {:vertical-position nil :horizontal-position nil})
 
@@ -61,11 +68,10 @@
    :y (+ padding responsive/navbar-height)})
 
 (defn- check-hover [s parent-el]
-  (let [viewport-size (dom-utils/viewport-size)
-        pos (dom-utils/viewport-offset parent-el)
+  (let [pos (dom-utils/viewport-offset parent-el)
         vertical-position (if (> (- (:y pos) (:y popup-offset)) (:height popup-size))
-                            :top
-                            :bottom)
+                            :above
+                            :below)
         horizontal-offset (if (> (:x pos) (:x popup-offset))
                             0
                             (if (neg? (:x pos))
@@ -145,8 +151,7 @@
           complete-user-data (get users-info (:user-id user-data))]
       [:div.user-info-hover
         {:class (utils/class-set {:show @(::hovering s)
-                                  (:vertical-position pos) true
-                                  :left true})
+                                  (:vertical-position pos) true})
          :on-click #(when-not (utils/button-clicked? %)
                       (utils/event-stop %))
          :style {:margin-left (str (:horizontal-offset pos) "px")}}
