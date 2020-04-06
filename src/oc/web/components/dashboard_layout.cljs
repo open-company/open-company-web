@@ -31,6 +31,7 @@
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.poll :refer (poll-portal)]
@@ -238,34 +239,37 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (when (or current-board-slug
-                            current-contributor-id)
+                  (cond
+                    current-contributor-id
+                    [:div.board-name-with-icon.contributor
+                      (user-avatar-image contributor-user-data)
+                      [:div.board-name-with-icon-internal
+                        (if (= (:user-id contributor-user-data) (:user-id current-user-data))
+                          "My posts"
+                          (str (lib-user/name-for contributor-user-data) "'s posts"))
+                        (when (pos? (:total-count contributor-data))
+                          [:span.count (:total-count contributor-data)])]]
+                    current-board-slug
                     [:div.board-name-with-icon
-                      (if is-contributor
-                        [:div.board-name-with-icon-internal
-                          (if (= (:user-id contributor-user-data) (:user-id current-user-data))
-                            "My posts"
-                            (str (lib-user/name-for contributor-user-data) "'s posts"))
-                          [:span.count (:total-count contributor-data)]]
-                        [:div.board-name-with-icon-internal
-                          {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
-                                                                  (not is-drafts-board))
-                                                    :public (= (:access current-board-data) "public")})
-                           :dangerouslySetInnerHTML (utils/emojify (cond
-                                                     is-inbox
-                                                     "Unread"
+                      [:div.board-name-with-icon-internal
+                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
+                                                                (not is-drafts-board))
+                                                  :public (= (:access current-board-data) "public")})
+                         :dangerouslySetInnerHTML (utils/emojify (cond
+                                                   is-inbox
+                                                   "Unread"
 
-                                                     is-all-posts
-                                                     "Recent"
+                                                   is-all-posts
+                                                   "Recent"
 
-                                                     is-bookmarks
-                                                     "Bookmarks"
+                                                   is-bookmarks
+                                                   "Bookmarks"
 
-                                                     :default
-                                                     ;; Fallback to the org board data
-                                                     ;; to avoid showing an empty name while loading
-                                                     ;; the board data
-                                                     (:name current-board-data)))}])])
+                                                   :default
+                                                   ;; Fallback to the org board data
+                                                   ;; to avoid showing an empty name while loading
+                                                   ;; the board data
+                                                   (:name current-board-data)))}]])
                   (when (and (= (:access current-board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
