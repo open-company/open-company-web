@@ -77,25 +77,16 @@ div.user-info-view {
         div.user-info-name {
           flex: 0 1 auto;
           margin-top: 0;
-          font-size: 16px;
-          line-height: 20px;
-          min-height: 20px;
         }
 
         div.user-info-line {
           flex: 0 1 auto;
           margin-top: 0;
-          font-size: 12px;
-          line-height: 15px;
-          min-height: 15px;
         }
 
         div.user-info-subline {
           flex: 0 1 auto;
           margin-top: 0;
-          font-size: 12px;
-          line-height: 15px;
-          min-height: 15px;
         }
       }
     }
@@ -118,7 +109,7 @@ div.user-info-view {
     align-content: center;
     align-items: center;
 
-    @include user-profile(56);
+    @include user-profile(48);
 
     div.user-info-right {
       flex: 0 1 auto;
@@ -133,8 +124,9 @@ div.user-info-view {
 
       div.user-info-name {
         @include OC_Body_Bold();
-        font-size: 18px;
-        line-height: 23px;
+        font-size: 16px;
+        line-height: 20px;
+        min-height: 20px;
         color: var(--tooltip-color);
         overflow: hidden;
         text-overflow: ellipsis;
@@ -146,8 +138,9 @@ div.user-info-view {
 
       div.user-info-line {
         @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
+        font-size: 12px;
+        line-height: 15px;
+        min-height: 15px;
         color: var(--tooltip-color);
         overflow: hidden;
         text-overflow: ellipsis;
@@ -158,8 +151,9 @@ div.user-info-view {
 
       div.user-info-subline {
         @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
+        font-size: 12px;
+        line-height: 15px;
+        min-height: 15px;
         color: var(--tooltip-color);
         opacity: 0.5;
         overflow: hidden;
@@ -174,15 +168,14 @@ div.user-info-view {
             display: block;
             content: "";
             float: left;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 15px;
             opacity: 0.5;
             background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
-            background-size: 14px 14px;
+            background-size: 12px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            margin-right: 6px;
-            margin-top: 2px;
+            margin-right: 5px;
           }
         }
       }
