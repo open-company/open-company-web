@@ -92,7 +92,8 @@
                                   (save-window-size s)
                                   (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
-                                  (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
+                                  ;; Default users list to collapsed unless cookie says it
+                                  (reset! (::users-list-collapsed s) (not= (cook/get-cookie (router/collapse-users-list-cookie)) "false"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -240,8 +241,7 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when (and show-boards
-                   (not @(::sections-list-collapsed s)))
+        (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
@@ -249,7 +249,9 @@
                                               (not is-all-posts)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
-                        board-change-data (get change-data (:uuid board))]]
+                        board-change-data (get change-data (:uuid board))]
+                  :when (or (not @(::sections-list-collapsed s))
+                            is-current-board)]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
@@ -286,13 +288,14 @@
               ;      :data-toggle (when-not is-mobile? "tooltip")
               ;      :data-container "body"}])
               ]])
-        (when (and show-users-list?
-                   (not @(::users-list-collapsed s)))
+        (when show-users-list?
           [:div.left-navigation-sidebar-items.group
             (for [user (sort-by :short-name (vals active-users))
                   :let [user-url (oc-urls/contributor org-slug (:user-id user))
                         is-current-user (and (router/current-contributor-id)
-                                             (= (:user-id user) (router/current-contributor-id)))]]
+                                             (= (:user-id user) (router/current-contributor-id)))]
+                  :when (or (not @(::users-list-collapsed s))
+                            is-current-user)]
               [:a.left-navigation-sidebar-item.hover-item.contributor
                 {:class (utils/class-set {:item-selected is-current-user})
                  :data-user-id (:user-id user)
