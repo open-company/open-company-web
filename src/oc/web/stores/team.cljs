@@ -5,7 +5,8 @@
             [oc.lib.user :as user-lib]
             [oc.web.utils.activity :as au]
             [oc.web.utils.mention :as mu]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]))
 
 (defmethod dispatcher/action :active-users
   [db [_ org-slug active-users-data]]
@@ -56,7 +57,7 @@
 (defn- deep-merge-users [new-users old-users]
   (let [filtered-new-users (filter
                             #(and (seq (:user-id %))
-                                  (#{"active" "unverified"} (:status %)))
+                                  (uu/active? %))
                             (if (map? new-users) (vals new-users) new-users))
         new-users-map (zipmap (map :user-id filtered-new-users) filtered-new-users)]
     (merge-with merge old-users new-users-map)))
@@ -73,7 +74,7 @@
   "Given the previous users map and the new users vector coming from team or roster.
    Create a map of the new users with only some arbitrary data and merge them with the old users."
   [old-users-map roster-data]
-  (let [filtered-users (filter #(#{"active" "unverified"} (:status %)) (:users roster-data))
+  (let [filtered-users (uu/filter-active-users (:users roster-data))
         new-users-map (zipmap
                        (map :user-id filtered-users)
                        (map #(select-keys % [:user-id :first-name :last-name :avatar-url :name :short-name :location :timezone :title]) filtered-users))]

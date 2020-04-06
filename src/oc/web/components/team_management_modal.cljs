@@ -6,6 +6,7 @@
             [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
@@ -199,7 +200,7 @@
                               "</span>")
                      :class (utils/class-set {:pending pending?
                                               :removing removing?})
-                     :on-click #(when (#{"active" "unverified"} (:status user))
+                     :on-click #(when (uu/active? user)
                                   (utils/event-stop %)
                                   (nav-actions/show-user-info (:user-id user)))
                      :data-toggle "tooltip"

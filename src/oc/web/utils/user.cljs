@@ -1,5 +1,6 @@
 (ns oc.web.utils.user
   (:require [clojure.edn :as edn]
+            [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
@@ -188,3 +189,13 @@
        (:location user-data))
      (when (:timezone user-data)
        (str " (" (:timezone user-data) ")")))))
+
+(defun active?
+  ([user :guard map?] (active? (:status user)))
+
+  ([_user-status :guard not] false)
+
+  ([user-status :guard string?] (#{"active" "unverified"} user-status)))
+
+(defn filter-active-users [users-list]
+  (filter active? users-list))

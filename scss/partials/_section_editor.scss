@@ -201,9 +201,11 @@ div.section-editor-container {
           div.section-editor-private-users-result {
             height: 32px;
             cursor: pointer;
-            padding: 7px 8px;
+            padding: 4px 8px;
 
-            @include user-profile(24);
+            @include user-profile(24) {
+              float: left;
+            }
 
             &.no-more-invites {
               height: auto;
@@ -218,15 +220,12 @@ div.section-editor-container {
               }
             }
 
-            div.user-avatar-img-container {
-              float: left;
-            }
-
             div.name {
               float: left;
               width: calc(100% - 40px);
               @include OC_Body_Book();
               font-size: 14px;
+              line-height: 24px;
               color: var(--color);
               margin-left: 16px;
             }

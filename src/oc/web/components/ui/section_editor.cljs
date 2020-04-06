@@ -6,6 +6,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -339,7 +340,7 @@
               "Add members to this private section"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
-                  available-users (:mention-users roster)
+                  available-users (uu/filter-active-users all-users-data)
                   addable-users (get-addable-users section-editing available-users)
                   filtered-users (filter-users addable-users @query)]
               (when can-change

@@ -4,6 +4,7 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]))
 
 (defn add-remove-item-from-all-posts
@@ -488,7 +489,7 @@
         org-data        (dispatcher/org-data db org-slug)
         board-data      (first (filter #(= (:slug %) (:board-slug activity-data)) (:boards org-data)))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
-        team-users      (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
+        team-users      (uu/filter-active-users (:users team-roster))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
         all-private-users (when private-access?
