@@ -59,8 +59,7 @@
        (let [enter-ev (events/listen this EventType/MOUSEENTER
                         (fn [e]
                           (when-let [mount-el (::mount-el s)]
-                            (if-let* [_false false
-                                      active-users (when click?
+                            (if-let* [active-users (when click?
                                                      @(drv/get-ref s :users-info-hover))
                                       current-user-data (when click?
                                                           @(drv/get-ref s :current-user-data))
