@@ -4,7 +4,7 @@ $user_info_vertical_spacing: 8;
 div.user-info-hover {
   position: absolute;
   display: none;
-  left: -50%;
+  left: 0;
 
   &.above {
     bottom: 100%;
@@ -37,7 +37,7 @@ div.user-info-view {
   &.otf {
     position: absolute;
     top: 100%;
-    left: -50%;
+    left: 0;
 
     &.above {
       top: unset;
