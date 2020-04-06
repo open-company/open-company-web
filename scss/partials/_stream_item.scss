@@ -280,9 +280,9 @@ div.stream-item {
 
       div.hover-container {
         flex: 0 1 auto;
-        height: 24px;
         white-space: nowrap;
-        overflow: hidden;
+        overflow: hidden; // needed for name truncation
+        z-index: 2;
 
         @include activity-author(24);
 
@@ -319,7 +319,7 @@ div.stream-item {
           content: "";
           width: 3px;
           height: 3px;
-          background-color: var(--light-color);
+          background-color: var(--divider-line);
           border-radius: 50%;
           position: absolute;
           top: 12px;
