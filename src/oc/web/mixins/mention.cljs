@@ -33,16 +33,16 @@
                                                :portal-el this
                                                :my-profile (= (:user-id current-user-data) user-id)})
                                mount-el)
-                              (let [slack-username (oget this "dataset" "?slackUsername")
-                                    user-data {:first-name (oget this "dataset" "?firstName")
+                              (let [user-data {:first-name (oget this "dataset" "?firstName")
                                                :last-name (oget this "dataset" "?lastName")
+                                               :name (oget this "dataset" "?name")
                                                :avatar-url (oget this "dataset" "?avatarUrl")
-                                               :title (if (seq slack-username)
-                                                        slack-username
-                                                        (oget this "dataset" "?email"))
-                                               :slack-icon (seq slack-username)}]
+                                               :title (oget this "dataset" "?title")
+                                               :slack-username (oget this "dataset" "?slackUsername")
+                                               :email (oget this "dataset" "?email")}]
                                 (rum/mount
                                  (user-info-otf {:user-data user-data
+                                                 :inline? true
                                                  :portal-el this
                                                  :hide-buttons true})
                                  mount-el)))
