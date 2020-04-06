@@ -250,58 +250,60 @@ div.stream-item {
   div.stream-item-header {
     position: relative;
     height: 24px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
 
     @include mobile() {
       width: 100%;
+      display: block;
     }
 
     div.stream-header-head-author {
       height: 24px;
+      flex: 0 0 auto;
+      margin-right: 8px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      justify-items: center;
+      width: calc(100% - 140px);
 
       @include mobile() {
         min-height: 24px;
         height: auto;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
+        width: auto;
+        margin-right: 0;
       }
 
       div.hover-container {
-        float: left;
-        margin-right: 8px;
-        max-width: 70%;
+        flex: 0 1 auto;
+        height: 24px;
+        white-space: nowrap;
+        overflow: hidden;
 
-        @include mobile() {
-          float: unset;
-          max-width: calc(100% - 32px);
-          width: auto;
-          flex: 0 1 auto;
+        @include activity-author(24);
+
+        div.user-avatar-img-container {
+          margin-right: 8px;
         }
 
-        div.stream-header-head-avatar {
-          @include activity-author(24);
-
-          div.user-avatar-img-container {
-            margin-right: 8px;
-          }
-
-          span.name {
-            height: 24px;
-            float: left;
-            color: var(--light-color);
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            line-height: 24px;
-            float: left;
-            max-width: calc(100% - 32px);
-          }
+        span.name {
+          height: 24px;
+          color: var(--light-color);
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          line-height: 24px;
+          max-width: calc(100% - 32px);
+          display: block;
         }
       }
 
       span.time-since {
         display: block;
-        float: left;
         height: 24px;
         line-height: 24px;
         text-align: left;
@@ -309,19 +311,16 @@ div.stream-item {
         font-size: 12px;
         color: var(--light-color);
         position: relative;
-        margin-left: 6px;
-        white-sapce: nowrap;
-
-        @include mobile() {
-          float: unset;
-          flex: 0 0 auto;
-        }
+        margin-left: 12px;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        overflow: visible;
 
         &:before {
           content: "";
           width: 3px;
           height: 3px;
-          background-color: var(--ultralight-color);
+          background-color: var(--light-color);
           border-radius: 50%;
           position: absolute;
           top: 12px;
@@ -330,34 +329,40 @@ div.stream-item {
       }
 
       div.bookmark-tag-small {
-        float: right;
         margin-right: 0;
+        flex: 0 0 auto;
+        align-self: center;
       }
 
       @include mobile() {
         div.bookmark-tag-small {
-          margin-top: 3px;
+          margin-left: auto;
         }
       }
 
       div.bookmark-tag, div.must-see-tag {
-        margin-top: 3px;
+        align-self: center;
+        flex: 0 0 auto;
       }
 
       div.muted-activity {
-        margin-top: 5px;
+        align-self: center;
         opacity: 0.5;
+        flex: 0 0 auto;
+
+        @include mobile() {
+          margin-right: 8px;
+        }
       }
     }
 
     div.more-menu {
       height: 32px;
+      flex: 0 0 auto;
 
       @include big_web() {
         display: none;
-        position: absolute;
-        right: -12px;
-        top: -4px;
+        margin-left: 7px;
 
         &:not(.menu-expanded) button {
           display: none;
@@ -472,7 +477,6 @@ div.stream-item {
 
       div.body-thumbnail-wrapper {
         width: 106px;
-        // height: 80px;
         max-height: 80px;
         background-repeat: no-repeat;
         background-size: contain;
