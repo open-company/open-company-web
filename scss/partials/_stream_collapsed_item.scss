@@ -149,10 +149,12 @@ div.stream-collapsed-item {
       flex: 0 0 20px;
       position: relative;
 
-      @include activity-author(20);
+      div.stream-collapsed-item-avatar {
+        @include activity-author(20);
 
-      div.user-avatar-img-container {
-        margin-right: 0;
+        div.user-avatar-img-container {
+          margin-right: 0;
+        }
       }
     }
 

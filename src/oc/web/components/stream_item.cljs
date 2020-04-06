@@ -262,17 +262,18 @@
         [:div.stream-header-head-author
           [:div.hover-container.group
             (user-info-hover {:user-data publisher :current-user-id current-user-id})
-            (user-avatar-image publisher)
-            [:span.name
-              {:class utils/hide-class}
-              (str
-               (:name publisher)
-               " in "
-               (:board-name activity-data)
-               (when (= (:board-access activity-data) "private")
-                 " (private)")
-               (when (= (:board-access activity-data) "public")
-                 " (public)"))]]
+            [:div.stream-header-head-avatar
+              (user-avatar-image publisher)
+              [:span.name
+                {:class utils/hide-class}
+                (str
+                 (:name publisher)
+                 " in "
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)"))]]]
           (let [t (or (:published-at activity-data) (:created-at activity-data))]
             [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")

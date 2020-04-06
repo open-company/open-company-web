@@ -41,7 +41,7 @@ div.user-info-view {
   z-index: #{$navbar_zindex - 1};
   text-align: center;
   border: 1px solid var(--divider-line);
-  background-color: var(--overlay-background-color);
+  background-color: var(--tooltip-background-color);
   border-radius: 4px;
   padding: 16px;
   box-shadow: var(--user-info-view-shadow);
@@ -50,74 +50,94 @@ div.user-info-view {
   left: 0;
 
   div.user-info-header {
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: center;
+    justify-items: flex-start;
+    align-items: center;
 
-    @include user-profile(56) {
-      float: unset!important;
-      margin: 0 auto!important;
-      width: 56px!important;
-      height: 56px!important;
-      text-align: center!important;
-      white-space: nowrap!important;
+    @include user-profile(32, true) {
+      margin-right: 8px;
+      white-space: nowrap;
+      flex: 0 0 auto;
 
       img.user-avatar-img {
-        width: 56px!important;
-        height: 56px!important;
+        width: 32px!important;
+        height: 32px!important;
       }
     }
 
-    div.user-info-name {
-      @include OC_Body_Bold();
-      text-align: center;
-      font-size: 18px;
-      line-height: 23px;
-      margin-top: 8px;
-      color: var(--color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      white-space: nowrap;
-      cursor: text;
-    }
+    div.user-info-right {
+      flex: 0 1 auto;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      justify-items: center;
+      align-content: flex-start;
+      align-items: flex-start;
+      max-width: calc(100% - 40px);
 
-    div.user-info-title {
-      @include OC_Body_Book();
-      text-align: center;
-      font-size: 14px;
-      line-height: 18px;
-      color: var(--color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      white-space: nowrap;
-      cursor: text;
-    }
+      div.user-info-name {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--tooltip-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: text;
+        max-width: 100%;
+        flex: 1 1 auto;
+      }
 
-    div.user-info-locale {
-      @include OC_Body_Book();
-      text-align: center;
-      font-size: 14px;
-      line-height: 18px;
-      margin-top: 8px;
-      color: var(--light-color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      white-space: nowrap;
-      cursor: text;
+      div.user-info-subline {
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 15px;
+        color: var(--tooltip-color);
+        opacity: 0.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: text;
+        max-width: 100%;
+        flex: 1 1 auto;
+
+        &.slack-icon {
+          &:before {
+            display: block;
+            content: "";
+            float: left;
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+            background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-right: 6px;
+            margin-top: 2px;
+          }
+        }
+      }
     }
   }
 
   div.user-info-buttons {
-    height: 40px;
+    height: 30px;
     margin-top: 8px;
 
     button.profile-bt {
       float: right;
       width: calc(50% - 4px);
-      padding: 11px 0;
-      background-color: var(--opac-background-color-1);
+      padding: 6px 0;
+      background-color: var(--tooltip-button-background);
       @include OC_Body_Bold();
-      color: var(--color);
+      color: var(--tooltip-color);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;
@@ -132,10 +152,10 @@ div.user-info-view {
     button.posts-bt {
       float: left;
       width: calc(50% - 4px);
-      padding: 11px 0;
-      background-color: var(--opac-background-color-1);
+      padding: 6px 0;
+      background-color: var(--tooltip-button-background);
       @include OC_Body_Bold();
-      color: var(--color);
+      color: var(--tooltip-color);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;

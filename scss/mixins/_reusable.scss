@@ -176,32 +176,44 @@
   }
 }
 
-@mixin user-profile($size) {
-  div.user-avatar-img-container {
+@mixin user-profile-inner($size) {
+  width: #{$size}px;
+  height: #{$size}px;
+  white-space: nowrap;
+  text-align: center;
+  display: block;
+
+  div.user-avatar-img-helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+  }
+
+  img.user-avatar-img {
     width: #{$size}px;
     height: #{$size}px;
-    white-space: nowrap;
-    text-align: center;
-    display: block;
+    border-radius: 50%;
+    vertical-align: top;
+    object-fit: cover;
+    padding-bottom: 0!important;
+    display: inline-block!important;
+    cursor: default;
+  }
+}
 
-    div.user-avatar-img-helper {
-      display: inline-block;
-      height: 100%;
-      vertical-align: middle;
+@mixin user-profile($size, $child: true) {
+  @if $child {
+    & > div.user-avatar-img-container {
+      @include user-profile-inner($size);
+
+      @content
     }
+  } @else {
+    div.user-avatar-img-container {
+      @include user-profile-inner($size);
 
-    img.user-avatar-img {
-      width: #{$size}px;
-      height: #{$size}px;
-      border-radius: 50%;
-      vertical-align: top;
-      object-fit: cover;
-      padding-bottom: 0!important;
-      display: inline-block!important;
-      cursor: default;
+      @content
     }
-
-    @content
   }
 }
 

@@ -85,7 +85,8 @@
                                   :no-comments has-zero-comments?})}
         [:div.stream-collapsed-item-avatar-container
           (user-info-hover {:user-data publisher :current-user-id current-user-id})
-          (user-avatar-image publisher)]
+          [:div.stream-collapsed-item-avatar
+            (user-avatar-image publisher)]]
         [:div.stream-collapsed-item-fill
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"

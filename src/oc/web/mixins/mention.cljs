@@ -8,42 +8,42 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn- add-popup-on-hover [mention-el]
-  (let [$mention-el (js/$ mention-el)
-        user-avatar-url (.data $mention-el "avatar-url")
-        user-name (or (.data $mention-el "name") (str (.data $mention-el "first-name") " " (.data $mention-el "last-name")))
-        has-slack-username (seq (.data $mention-el "slack-username"))
-        user-subline (if has-slack-username
-                      (.data $mention-el "slack-username")
-                      (.data $mention-el "email"))
-        $win (js/$ js/window)
-        mention-offset (.offset $mention-el)
-        win-width (.width $win)
-        win-height (.height $win)
-        left-pos (- (.-left mention-offset) (.scrollLeft $win))
-        top-pos (- (+ (.-top mention-offset) 16) (.scrollTop $win))
-                       ;; If left positoin plus the maximum width of the screen less 20px padding
-        fixed-left-pos (if (> (+ left-pos 280) (- win-width 20))
-                          (- left-pos (- (+ left-pos 280) (- win-width 20)))
-                          left-pos)
-        fixed-top-pos (if (> (+ top-pos 74) (- win-height 20))
-                        (- (.-top mention-offset) (.scrollTop $win) 56 8)
-                        top-pos)
-        avatar-div (when user-avatar-url
-                    (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"))
-        name-div (when (and user-name (not= user-name " "))
-                  (str "<div class=\"oc-mention-popup-name\">" user-name "</div>"))
-        subline-div (when user-subline
-                     (str "<div class=\"oc-mention-popup-subline" (when has-slack-username " slack-icon")
-                          "\">" user-subline "</div>"))
-        format-str (str "<div class=\"oc-mention-popup-inner\">"
-                        avatar-div
-                        name-div
-                        subline-div
-                        "</div>")
-        popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\"></div>") format-str)]
-    (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
-                                               :top (str fixed-top-pos "px")}))))
+; (defn- add-popup-on-hover [mention-el]
+;   (let [$mention-el (js/$ mention-el)
+;         user-avatar-url (.data $mention-el "avatar-url")
+;         user-name (or (.data $mention-el "name") (str (.data $mention-el "first-name") " " (.data $mention-el "last-name")))
+;         has-slack-username (seq (.data $mention-el "slack-username"))
+;         user-subline (if has-slack-username
+;                       (.data $mention-el "slack-username")
+;                       (.data $mention-el "email"))
+;         $win (js/$ js/window)
+;         mention-offset (.offset $mention-el)
+;         win-width (.width $win)
+;         win-height (.height $win)
+;         left-pos (- (.-left mention-offset) (.scrollLeft $win))
+;         top-pos (- (+ (.-top mention-offset) 16) (.scrollTop $win))
+;                        ;; If left positoin plus the maximum width of the screen less 20px padding
+;         fixed-left-pos (if (> (+ left-pos 280) (- win-width 20))
+;                           (- left-pos (- (+ left-pos 280) (- win-width 20)))
+;                           left-pos)
+;         fixed-top-pos (if (> (+ top-pos 74) (- win-height 20))
+;                         (- (.-top mention-offset) (.scrollTop $win) 56 8)
+;                         top-pos)
+;         avatar-div (when user-avatar-url
+;                     (str "<div class=\"oc-mention-popup-avatar\" style=\"background-image: url('" user-avatar-url "');\"></div>"))
+;         name-div (when (and user-name (not= user-name " "))
+;                   (str "<div class=\"oc-mention-popup-name\">" user-name "</div>"))
+;         subline-div (when user-subline
+;                      (str "<div class=\"oc-mention-popup-subline" (when has-slack-username " slack-icon")
+;                           "\">" user-subline "</div>"))
+;         format-str (str "<div class=\"oc-mention-popup-inner\">"
+;                         avatar-div
+;                         name-div
+;                         subline-div
+;                         "</div>")
+;         popup-node (.html (js/$ "<div contenteditable=\"false\" class=\"oc-mention-popup\"></div>") format-str)]
+;     (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
+;                                                :top (str fixed-top-pos "px")}))))
 
 (defn- remove-events [s events-list]
   (doseq [hover-ev @events-list]
@@ -58,22 +58,37 @@
      #(this-as this
        (let [enter-ev (events/listen this EventType/MOUSEENTER
                         (fn [e]
-                          (if-let* [active-users (when click?
-                                                   @(drv/get-ref s :users-info-hover))
-                                    current-user-data (when click?
-                                                        @(drv/get-ref s :current-user-data))
-                                    user-id (oget this "dataset" "?userId")
-                                    user-data (get active-users user-id)
-                                    mount-el (::mount-el s)]
-                            (do
+                          (when-let [mount-el (::mount-el s)]
+                            (if-let* [_false false
+                                      active-users (when click?
+                                                     @(drv/get-ref s :users-info-hover))
+                                      current-user-data (when click?
+                                                          @(drv/get-ref s :current-user-data))
+                                      user-id (oget this "dataset" "?userId")
+                                      user-data (get active-users user-id)]
                               (rum/mount
                                (user-info-otf {:user-data user-data
                                                :portal-el this
                                                :my-profile (= (:user-id current-user-data) user-id)})
                                mount-el)
-                              (reset! (::portal-mounted s) true))
-                            (when (zero? (.-length (.find (js/$ this) ".oc-mention-popup")))
-                              (add-popup-on-hover this)))))
+                              (let [slack-username (oget this "dataset" "?slackUsername")
+                                    user-data {:first-name (oget this "dataset" "?firstName")
+                                               :last-name (oget this "dataset" "?lastName")
+                                               :avatar-url (oget this "dataset" "?avatarUrl")
+                                               :title (if (seq slack-username)
+                                                        slack-username
+                                                        (oget this "dataset" "?email"))
+                                               :slack-icon (seq slack-username)}]
+                                (rum/mount
+                                 (user-info-otf {:user-data user-data
+                                                 :portal-el this
+                                                 :hide-buttons true
+                                                 ; :my-profile false
+                                                 })
+                                 mount-el)))
+                            (reset! (::portal-mounted s) true))))
+                            ; (when (zero? (.-length (.find (js/$ this) ".oc-mention-popup")))
+                            ;   (add-popup-on-hover this)))))
              leave-ev (events/listen this EventType/MOUSELEAVE
                         (fn [e]
                           (.remove (.find (js/$ this) ".oc-mention-popup"))

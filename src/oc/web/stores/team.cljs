@@ -13,7 +13,7 @@
     (let [fixed-users (map (fn [u] (-> u
                                     (update :name #(or % (user-lib/name-for u)))
                                     (update :short-name #(or % (user-lib/short-name-for u)))))
-                       active-users-data)
+                       users)
           users-map (zipmap (map :user-id users) fixed-users)
           change-data (dispatcher/change-data db)
           org-data (dispatcher/org-data db org-slug)

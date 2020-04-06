@@ -256,9 +256,11 @@ div.stream-item {
     }
 
     div.stream-header-head-author {
+      height: 24px;
 
       @include mobile() {
         min-height: 24px;
+        height: auto;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -268,7 +270,6 @@ div.stream-item {
         float: left;
         margin-right: 8px;
         max-width: 70%;
-        @include activity-author(24);
 
         @include mobile() {
           float: unset;
@@ -277,20 +278,24 @@ div.stream-item {
           flex: 0 1 auto;
         }
 
-        div.user-avatar-img-container {
-          margin-right: 8px;
-        }
+        div.stream-header-head-avatar {
+          @include activity-author(24);
 
-        span.name {
-          height: 24px;
-          float: left;
-          color: var(--light-color);
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          line-height: 24px;
-          float: left;
-          max-width: calc(100% - 32px);
+          div.user-avatar-img-container {
+            margin-right: 8px;
+          }
+
+          span.name {
+            height: 24px;
+            float: left;
+            color: var(--light-color);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 24px;
+            float: left;
+            max-width: calc(100% - 32px);
+          }
         }
       }
 

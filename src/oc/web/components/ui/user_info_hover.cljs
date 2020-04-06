@@ -14,29 +14,32 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defc user-info-view < rum/static
-  [{:keys [user-data user-id my-profile?]}]
-  [:div.user-info-view
-    [:div.user-info-header
-      (user-avatar-image user-data)
-      [:div.user-info-name
-        (user-lib/name-for user-data)]
-      (when (:title user-data)
-        [:div.user-info-title
-          (:title user-data)])
-      (when-let [timezone-location-string (user-utils/timezone-location-string user-data)]
-        [:div.user-info-locale
-          timezone-location-string])]
-    [:div.user-info-buttons.group
-      [:button.mlb-reset.posts-bt
-        {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
-        (if my-profile?
-          "My posts"
-          "Posts")]
-      [:button.mlb-reset.profile-bt
-        {:on-click #(nav-actions/show-user-info (:user-id user-data))}
-        (if my-profile?
-          "My profile"
-          "Profile")]]])
+  [{:keys [user-data user-id my-profile? hide-buttons]}]
+  (let [timezone-location-string (user-utils/timezone-location-string user-data)
+        subline-string (clojure.string/trim
+                        (str (:title user-data) " " timezone-location-string))]
+    [:div.user-info-view
+      [:div.user-info-header
+        (user-avatar-image user-data)
+        [:div.user-info-right
+          [:div.user-info-name
+            (user-lib/name-for user-data)]
+          (when (seq subline-string)
+            [:div.user-info-subline
+              {:class (when (:slack-icon user-data) "slack-icon")}
+              subline-string])]]
+      (when-not hide-buttons
+        [:div.user-info-buttons.group
+          [:button.mlb-reset.posts-bt
+            {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
+            (if my-profile?
+              "My posts"
+              "Posts")]
+          [:button.mlb-reset.profile-bt
+            {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+            (if my-profile?
+              "My profile"
+              "Profile")]])]))
 
 (rum/defc user-info-otf < rum/static
   [{:keys [portal-el] :as props}]

@@ -278,6 +278,7 @@
   (let [dom-node (rum/dom-node s)
         imgs (dommy/sel dom-node (str el-selector " img"))]
     (doseq [img  imgs
+            :when (not (.contains (.-classList img) "user-avatar-img"))
             :let [href (.-src img)]]
       (dommy/add-class! img :interactive-image)
       (dommy/listen! img :click #(dis/dispatch! [:input [:expand-image-src] href])))
