@@ -797,7 +797,7 @@
   ([team-id data] (get-in data (team-channels-key team-id))))
 
 (defn ^:export active-users
-  ([] (active-users (:slug (org-data))))
+  ([] (active-users (:slug (org-data)) @app-state))
   ([org-slug] (active-users org-slug @app-state))
   ([org-slug data] (get-in data (active-users-key org-slug))))
 
