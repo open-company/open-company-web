@@ -66,7 +66,7 @@
 (def ^:private default-positioning {:vertical-position nil :horizontal-position nil})
 
 (def ^:private popup-size
-  {:width 248
+  {:width 200
    :height 211})
 
 (def ^:private padding 16)

@@ -1,4 +1,4 @@
-$user_info_width: 248;
+$user_info_width: 200;
 $user_info_vertical_spacing: 8;
 
 div.user-info-hover {
@@ -120,7 +120,7 @@ div.user-info-view {
       justify-items: center;
       align-content: center;
       align-items: center;
-      max-width: calc(100% - 40px);
+      max-width: 100%;
 
       div.user-info-name {
         @include OC_Body_Bold();
@@ -147,6 +147,7 @@ div.user-info-view {
         white-space: nowrap;
         cursor: text;
         max-width: 100%;
+        margin-top: 2px;
       }
 
       div.user-info-subline {
@@ -161,7 +162,7 @@ div.user-info-view {
         white-space: nowrap;
         cursor: text;
         max-width: 100%;
-        margin-top: 8px;
+        margin-top: 4px;
 
         &.slack-icon {
           &:before {
@@ -183,13 +184,13 @@ div.user-info-view {
   }
 
   div.user-info-buttons {
-    height: 40px;
+    height: 30px;
     margin-top: 8px;
 
     button.profile-bt {
       float: right;
       width: calc(50% - 4px);
-      padding: 11px 0;
+      padding: 6px 0;
       background-color: var(--tooltip-button-background);
       @include OC_Body_Bold();
       color: var(--tooltip-color);
@@ -207,7 +208,7 @@ div.user-info-view {
     button.posts-bt {
       float: left;
       width: calc(50% - 4px);
-      padding: 11px 0;
+      padding: 6px 0;
       background-color: var(--tooltip-button-background);
       @include OC_Body_Bold();
       color: var(--tooltip-color);
