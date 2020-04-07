@@ -2,8 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.sections-picker :refer (sections-picker)]))
+            [oc.web.lib.utils :as utils]))
 
 (def missing-title-tooltip "Please add a title to post")
 (def abstract-max-length-exceeded-tooltip "Abstract too long")

@@ -9,6 +9,13 @@
 
 (def distance-from-bottom 80)
 
+(defn- self-board [user-data]
+  {:name "Post as yourself"
+   :slug (:user-id user-data)
+   :publisher-board true
+   :access "team"
+   :authors [(:user-id user-data)]})
+
 (defn calc-max-height [s]
   (let [win-height (or (.-clientHeight (.-documentElement js/document))
                        (.-innerHeight js/window))
@@ -35,9 +42,13 @@
                               :did-remount (fn [_ s]
                                (calc-max-height s)
                                s)}
-  [s active-slug on-change moving?]
-  (let [all-sections (vals (drv/react s :editable-boards))
-        sorted-all-sections (sort-by :name all-sections)
+  [s {:keys [active-slug on-change moving? current-user-data]}]
+  (js/console.log "DBG sections-picker" on-change current-user-data)
+  (let [editable-boards (vals (drv/react s :editable-boards))
+        post-as-self-board (some #(when (= (:slug %) (:user-id current-user-data)) %) editable-boards)
+        filtered-boards (filter #(not= (:slug %) (:user-id current-user-data)) editable-boards)
+        sorted-boards (sort-by :name filtered-boards)
+        all-sections (concat [(or post-as-self-board (self-board current-user-data))] sorted-boards)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
                           {})
@@ -49,13 +60,14 @@
       {:style container-style}
       [:div.sections-picker-content
         {:style scroller-style}
-        (when (pos? (count sorted-all-sections))
-          (for [b sorted-all-sections
+        (when (pos? (count all-sections))
+          (for [b all-sections
                 :let [active (= (:slug b) active-slug)]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
                :class (utils/class-set {:active active
-                                        :has-access-icon (#{"public" "private"} (:access b))})
+                                        :has-access-icon (#{"public" "private"} (:access b))
+                                        :bottom-border (:publisher-board b)})
                :on-click #(when (fn? on-change)
                             (on-change b))}
               [:div.sections-picker-section-name

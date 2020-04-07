@@ -20,9 +20,23 @@ div.sections-picker {
       padding: 8px 16px;
       cursor: pointer;
 
+      &.bottom-border {
+        border-bottom: 1px solid var(--divider-line);
+      }
+
+      &.bottom-border + div.sections-picker-section {
+        &.active, &:hover {
+          border-top: 1px solid $carrot_green;
+        }
+      }
+
       &.active, &:hover {
         background-color: $feint_emerald;
         color: $carrot_green;
+
+        &.bottom-border {
+          border-bottom: 1px solid $carrot_green;
+        }
 
         @include mobile() {
           -webkit-tap-highlight-color: $feint_emerald;
@@ -87,18 +101,6 @@ div.sections-picker {
           background-image: cdnUrl("/img/ML/board_public_white.svg");
         }
       }
-    }
-  }
-}
-
-@include dark_mode() {
-  div.sections-picker div.sections-picker-content div.sections-picker-section {
-    div.private-icon {
-      background-image: cdnUrl("/img/ML/board_private_white.svg");  
-    }
-
-    div.public-icon {
-      background-image: cdnUrl("/img/ML/board_public_white.svg");
     }
   }
 }

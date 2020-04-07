@@ -565,6 +565,7 @@
                             "Save"
                             "Post")
         did-pick-section (fn [board-data note dismiss-action]
+                           (js/console.log "DBG did-pick-section" board-data)
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
                            (when (and board-data
@@ -668,7 +669,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker (:board-slug cmail-data) did-pick-section)])]
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])]
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
@@ -688,7 +691,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])])
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -830,7 +835,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 32
                            :height 32
