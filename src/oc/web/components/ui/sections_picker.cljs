@@ -43,7 +43,6 @@
                                (calc-max-height s)
                                s)}
   [s {:keys [active-slug on-change moving? current-user-data]}]
-  (js/console.log "DBG sections-picker" on-change current-user-data)
   (let [editable-boards (vals (drv/react s :editable-boards))
         post-as-self-board (some #(when (= (:slug %) (:user-id current-user-data)) %) editable-boards)
         filtered-boards (filter #(not= (:slug %) (:user-id current-user-data)) editable-boards)

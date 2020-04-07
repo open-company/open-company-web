@@ -565,7 +565,6 @@
                             "Save"
                             "Post")
         did-pick-section (fn [board-data note dismiss-action]
-                           (js/console.log "DBG did-pick-section" board-data)
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
                            (when (and board-data
