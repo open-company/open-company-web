@@ -102,14 +102,13 @@
                 " to get started."]]
             [:div.follow-picker-body-inner
               [:div.follow-picker-selected-users
-                (when (not= (count @(::users s)) (count active-users))
-                  [:input.follow-picker-search-field-input.oc-input
-                    {:class (when-not (seq @(::users s)) "empty")
-                     :value @(::query s)
-                     :type "text"
-                     :ref :query
-                     :placeholder "Search for teammates or make your selection below..."
-                     :on-change #(reset! (::query s) (.. % -target -value))}])
+                [:input.follow-picker-search-field-input.oc-input
+                  {:class (when-not (seq @(::users s)) "empty")
+                   :value @(::query s)
+                   :type "text"
+                   :ref :query
+                   :placeholder "Search for teammates or make your selection below..."
+                   :on-change #(reset! (::query s) (.. % -target -value))}]
                 [:button.mlb-reset.follow-picker-create-bt
                   {:class (when-not (seq @(::users s)))
                    :on-click #(create-section s)
