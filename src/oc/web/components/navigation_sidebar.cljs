@@ -225,6 +225,39 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
+        (when show-users-list?
+          [:div.left-navigation-sidebar-top.group
+            ;; Boards header
+            [:h3.left-navigation-sidebar-top-title.group
+              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                {:class (when @(::users-list-collapsed s) "collapsed")
+                 :on-click #(toggle-collapse-users s)}
+                [:span.sections "People"]]
+              (when user-is-part-of-the-team?
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
+                  {:on-click #(nav-actions/show-follow-picker)
+                   :title "Follow or unfollow posts from your teammates"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-container "body"}])]])
+        (when show-users-list?
+          [:div.left-navigation-sidebar-items.group
+            (for [user (sort-by :short-name (vals active-users))
+                  :let [user-url (oc-urls/contributor org-slug (:user-id user))
+                        is-current-user (and (router/current-contributor-id)
+                                             (= (:user-id user) (router/current-contributor-id)))]
+                  :when (or (not @(::users-list-collapsed s))
+                            is-current-user)]
+              [:a.left-navigation-sidebar-item.hover-item.contributor
+                {:class (utils/class-set {:item-selected is-current-user})
+                 :data-user-id (:user-id user)
+                 :key (str "user-list-" (:user-id user))
+                 :href user-url
+                 :on-click #(nav-actions/nav-to-author! % (:user-id user) user-url)}
+                [:div.board-name.group
+                  (user-avatar-image user)
+                  [:div.internal
+                    (:short-name user)]]])])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
@@ -271,41 +304,7 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])
-        (when show-users-list?
-          [:div.left-navigation-sidebar-top.group
-            ;; Boards header
-            [:h3.left-navigation-sidebar-top-title.group
-              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::users-list-collapsed s) "collapsed")
-                 :on-click #(toggle-collapse-users s)}
-                [:span.sections "People"]]
-              ; (when create-link
-              ;   [:button.left-navigation-sidebar-top-title-button.btn-reset
-              ;     {:on-click #(nav-actions/show-section-add)
-              ;      :title "Create a new section"
-              ;      :data-placement "top"
-              ;      :data-toggle (when-not is-mobile? "tooltip")
-              ;      :data-container "body"}])
-              ]])
-        (when show-users-list?
-          [:div.left-navigation-sidebar-items.group
-            (for [user (sort-by :short-name (vals active-users))
-                  :let [user-url (oc-urls/contributor org-slug (:user-id user))
-                        is-current-user (and (router/current-contributor-id)
-                                             (= (:user-id user) (router/current-contributor-id)))]
-                  :when (or (not @(::users-list-collapsed s))
-                            is-current-user)]
-              [:a.left-navigation-sidebar-item.hover-item.contributor
-                {:class (utils/class-set {:item-selected is-current-user})
-                 :data-user-id (:user-id user)
-                 :key (str "user-list-" (:user-id user))
-                 :href user-url
-                 :on-click #(nav-actions/nav-to-author! % (:user-id user) user-url)}
-                [:div.board-name.group
-                  (user-avatar-image user)
-                  [:div.internal
-                    (:short-name user)]]])])]
+                  [:div.private])])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer
           [:button.mlb-reset.invite-people-bt

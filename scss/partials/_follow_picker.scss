@@ -1,0 +1,286 @@
+div.follow-picker {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  div.follow-picker-modal {
+    width: #{$board_container_width}px;
+    background-color: var(--overlay-background-color);
+    // position: absolute;
+    // top: 0;
+    // height: calc(100vh - #{$navbar_height}px);
+    // right: 0;
+    // margin-top: #{$navbar_height}px;
+    margin: 40px auto 32px;
+    padding: 24px;
+    transition: right 180ms ease-in;
+    border-radius: 4px;
+    position: relative;
+
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+    }
+
+    button.modal-close-bt {
+      position: absolute;
+      right: -48px;
+      top: 12px;
+
+      @include mobile() {
+        left: 16px;
+        top: 11px;
+        right: unset;
+        z-index: 2;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: var(--mobile-background-color);
+        border-radius: 4px;
+      }
+    }
+
+    // div.follow-picker-header {
+    //   width: 320px;
+    //   height: #{$navbar_height}px;
+    //   background-color: var(--panel-header-background);
+    //   padding: 12px 24px;
+    //   position: fixed;
+    //   top: 0;
+    //   right: 0;
+    //   z-index: 100;
+
+    //   @include mobile() {
+    //     height: #{$mobile_navbar_height}px;
+    //     position: fixed;
+    //     top: 0;
+    //     left: 0;
+    //     width: 100%;
+    //     border-bottom: 1px solid var(--divider-line);
+    //     background-color: var(--mobile-background-color);
+    //     padding: 15px 16px 15px 24px;
+    //     margin: 0;
+    //     z-index: 2;
+    //   }
+
+    //   div.follow-picker-header-title {
+    //     @include OC_Body_Bold();
+    //     font-size: 14px;
+    //     color: var(--color);
+    //     line-height: 32px;
+    //     float: left;
+
+    //     @include mobile() {
+    //       float: unset;
+    //       text-align: center;
+    //       font-size: 16px;
+    //       line-height: 24px;
+    //     }
+    //   }
+
+    //   button.follow-picker-create-bt {
+    //     width: auto;
+    //     height: 32px;
+    //     @include OC_Body_Bold();
+    //     font-size: 14px;
+    //     line-height: 18px;
+    //     color: white;
+    //     background-color: $carrot_green;
+    //     border-radius: 4px;
+    //     padding: 7px 14px;
+    //     float: right;
+
+    //     &.disabled, &:disabled {
+    //       opacity: 1!important;
+    //       background-color: var(--opac-background-color-05);
+    //       color: var(--light-color);
+    //     }
+    //   }
+    // }
+
+    div.follow-picker-body {
+      // width: 272px;
+      // margin: 24px auto 0;
+
+      h3.follow-picker-title {
+        @include OC_Body_Bold();
+        font-size: 20px;
+        line-height: 26px;
+        color: var(--color);
+        margin: 0;
+        padding: 0;
+      }
+
+      div.follow-picker-subtitle {
+        @include OC_Body_Book();
+        font-size: 16px;
+        color: var(--color);
+        margin-top: 4px;
+      }
+
+      div.follow-picker-empty-users {
+        opacity: 0.7;
+
+        div.follow-picker-empty-icon {
+          margin: 32px auto 0;
+          width: 40px;
+          height: 40px;
+          background-image: cdnUrl("/img/ML/invite_people_bt.svg");
+          background-size: 40px 40px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+          }
+        }
+
+        div.follow-picker-empty-copy {
+          margin: 8px 0 0;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: var(--color);
+          text-align: center;
+
+          button.follow-picker-empty-invite-bt {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            color: $carrot_green;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      div.follow-picker-body-inner {
+
+        div.follow-picker-selected-users {
+          margin-top: 8px;
+          width: auto;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: nowrap;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
+          align-content: stretch;
+
+          input.follow-picker-search-field-input {
+            display: block;
+            height: 32px;
+            padding: 4px 8px;
+            margin: 0 8px 0 0;
+            background-color: transparent;
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 24px;
+            color: var(--color);
+            width: auto;
+            border: none;
+            outline: none;
+            vertical-align: super;
+            border-radius: 4px;
+            background-color: var(--opac-background-color-1);
+            flex: 1 0 auto;
+
+            &:focus, &:active {
+              border: none;
+              outline: none;
+            }
+
+            @include placeholder() {
+              @include OC_Body_Book();
+              color: var(--light-color);
+              font-size: 14px;
+              line-height: 24px;
+            }
+          }
+
+          button.follow-picker-create-bt {
+            width: auto;
+            height: 32px;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: white;
+            background-color: $carrot_green;
+            border-radius: 4px;
+            padding: 7px 14px;
+            // float: right;
+            flex: 0 0 auto;
+
+            &.disabled, &:disabled {
+              opacity: 1!important;
+              background-color: var(--opac-background-color-05);
+              color: var(--light-color);
+            }
+          }
+        }
+
+        div.follow-picker-users-list {
+          margin-top: 16px;
+          width: calc(100% + 48px);
+          margin-left: -24px;
+
+          button.follow-picker-user-row {
+            height: 40px;
+            padding: 4px 24px;
+            border: none;
+            outline: none;
+            width: 100%;
+            display: block;
+
+            &.selected {
+              background-color: var(--opac-background-color-05);
+            }
+
+            div.carrot-checkbox {
+              margin-right: 8px;
+              float: left;
+              margin-top: 8px;
+            }
+
+            @include user-profile(32) {
+              float: left;
+              margin-right: 8px;
+            }
+
+            span.follow-picker-user {
+              display: block;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 32px;
+              float: left;
+              max-width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+}

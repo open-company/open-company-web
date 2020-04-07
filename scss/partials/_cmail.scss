@@ -282,6 +282,10 @@ div.cmail-outer {
               line-height: 18px;
               color: var(--cmail-section-bt-color);
               position: relative;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 200px;
+              white-space: nowrap;
 
               @include mobile() {
                 height: 28px;
