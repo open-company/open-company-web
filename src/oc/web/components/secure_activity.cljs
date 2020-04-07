@@ -93,10 +93,9 @@
                  :data-placement "bottom"
                  :data-container "body"
                  :title "Log in to view all posts"}
-                [:span
-                  [:span.login-as
-                    "Log in as " (:first-name id-token)]
-                  (user-avatar-image id-token)]]]
+                [:span.login-as
+                  "Log in as " (:first-name id-token)]
+                (user-avatar-image id-token)]]
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
                 {:on-click #(router/redirect! oc-urls/home)}
