@@ -66,7 +66,9 @@
                      :target "_blank"}
                     (:email user-data)]])
               (when (:slack-users user-data)
-                (for [slack-user (vals (:slack-users user-data))]
+                (for [slack-user (vals (:slack-users user-data))
+                      :when (and (seq (:display-name slack-user))
+                                 (not= (:display-name slack-user) "-"))]
                   [:div.user-info-about-slack
                     {:key (str "slack-user-" (:slack-org-id slack-user) "-" (:id slack-user))}
                     (if (string/starts-with? (:display-name slack-user) "@")
