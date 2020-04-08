@@ -97,7 +97,15 @@
                      (and (not (router/current-board-slug))
                           (not (router/current-contributor-id))
                           ;; but there are some
-                          (pos? (count (:boards org-data)))))
+                          (pos? (count (:boards org-data))))
+                     ;; Active users have not been loaded yet:
+                     ;; they are blocking since they are used to:
+                     ;; - init entries body and comments body for mentions
+                     ;; - show the people list in the navigation sidebar
+                     ;; - show user's info on hover and in profile panels
+                     ;; - on mobile it's not blocking since cmail is closed
+                     (and (not is-mobile?)
+                          (not (map? active-users))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
