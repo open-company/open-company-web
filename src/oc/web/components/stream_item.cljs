@@ -267,12 +267,13 @@
               {:class utils/hide-class}
               (str
                (:name publisher)
-               " in "
-               (:board-name activity-data)
-               (when (= (:board-access activity-data) "private")
-                 " (private)")
-               (when (= (:board-access activity-data) "public")
-                 " (public)"))]]
+               (when-not (:publisher-board activity-data)
+                 (str " in "
+                      (:board-name activity-data)
+                      (when (= (:board-access activity-data) "private")
+                        " (private)")
+                      (when (= (:board-access activity-data) "public")
+                        " (public)"))))]]
           (let [t (or (:published-at activity-data) (:created-at activity-data))]
             [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")

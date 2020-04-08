@@ -80,6 +80,23 @@
   (timbre/debug "Sending item/who-read for item-ids:" item-ids)
   (send! chsk-send! [:item/who-read item-ids]))
 
+;; Publishers follow
+
+(defn publisher-watch []
+  (send! chsk-send! [:user/watch {:org-slug @current-org :user-ids [@current-uid]}]))
+
+(defn publishers-list []
+  (timbre/debug "Sending publishers/list for user-id:" @current-uid "org-slug:" @current-org)
+  (send! chsk-send! [:publishers/list {:user-id @current-uid
+                                       :org-slug @current-org}]))
+
+(defn publishers-follow [publisher-uuids]
+  (timbre/debug "Sending publishers/follow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuids:" publisher-uuids)
+  (send! chsk-send! [:publishers/follow {:user-id @current-uid
+                                         :org-slug @current-org
+                                         :publisher-uuids (vec publisher-uuids)}]))
+
 (defn subscribe
   [topic handler-fn]
   (let [ws-cc-chan (chan)]
@@ -139,6 +156,13 @@
   (timbre/debug "Change event :entry/inbox-action" body)
   (go (>! ch-pub { :topic :entry/inbox-action :data body })))
 
+;; Publishers event handler
+
+(defmethod event-handler :publishers/list
+  [_ body]
+  (timbre/debug "Change event :publishers/list" body)
+  (go (>! ch-pub { :topic :publishers/list :data body })))
+
 ;; ----- Sente event handlers -----
 
 (defmulti -event-msg-handler
@@ -172,7 +196,9 @@
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
-    (container-watch)))
+    (container-watch)
+    (publisher-watch)
+    (publishers-list)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 

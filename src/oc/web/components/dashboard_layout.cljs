@@ -108,8 +108,12 @@
                               container-data
                               :else
                               board-data)
-        empty-board? (and (map? board-container-data)
-                          (zero? (count (:posts-list board-container-data))))
+        empty-board? (or (and (not is-contributor)
+                              (map? board-container-data)
+                              (zero? (count (:posts-list board-container-data))))
+                         (and is-contributor
+                              (map? contributor-data)
+                              (zero? (count (:posts-list contributor-data)))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))

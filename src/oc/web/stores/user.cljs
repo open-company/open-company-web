@@ -274,3 +274,35 @@
   (if push-token
     (assoc-in db dispatcher/expo-push-token-key push-token)
     db))
+
+;; Publishers
+
+(defn- publishers-list-with-users [publishers-list active-users-map]
+  (->> publishers-list
+   (map active-users-map)
+   (sort-by :short-name)
+   vec))
+
+(defmethod dispatcher/action :publishers/loaded
+  [db [_ org-slug {:keys [publisher-uuids user-id] :as resp}]]
+  (if (= org-slug (:org-slug resp))
+    (let [publishers-list-key (dispatcher/publishers-list-key org-slug)
+          active-users (dispatcher/active-users org-slug db)]
+      (if active-users
+        (assoc-in db publishers-list-key
+         (publishers-list-with-users publisher-uuids active-users))
+        ;; If users have not been loaded yet save the publishers list for later
+        (assoc-in db publishers-list-key publisher-uuids)))
+      db))
+
+(defmethod dispatcher/action :publishers/follow
+  [db [_ org-slug {:keys [publisher-uuids] :as resp}]]
+  (if (= org-slug (:org-slug resp))
+    (let [publishers-list-key (dispatcher/publishers-list-key org-slug)
+          active-users (dispatcher/active-users org-slug db)]
+      (if active-users
+        (assoc-in db publishers-list-key
+                     (publishers-list-with-users publisher-uuids active-users))
+        ;; If users have not been loaded yet save the publishers list for later
+        (assoc-in db publishers-list-key publisher-uuids)))
+    db))

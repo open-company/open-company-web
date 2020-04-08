@@ -14,6 +14,8 @@
             [oc.web.utils.activity :as activity-utils]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(def publisher-board-slug-prefix "publisher-board-")
+
 (def user-avatar-filestack-config
   {:accept "image/*"
    :fromSources ["local_file_system"]

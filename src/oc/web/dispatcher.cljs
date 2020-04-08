@@ -123,6 +123,9 @@
 (defn active-users-key [org-slug]
   (vec (conj (org-key org-slug) :active-users)))
 
+(defn publishers-list-key [org-slug]
+  (vec (conj (org-key org-slug) :publishers-list)))
+
 (defn mention-users-key [org-slug]
   (vec (conj (org-key org-slug) :mention-users)))
 
@@ -481,10 +484,10 @@
                                   (some #(when (= (:user-id %) user-id) %) (:users team-roster)))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :contributor-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
-                            :active-users]
+                            :active-users :publishers-list]
                             (fn [base orgs org-data board-data contributor-data container-data posts-data activity-data
                                  show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data
-                                 active-users]
+                                 active-users publishers-list]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -508,7 +511,8 @@
                                :app-loading loading
                                :search-active search-active
                                :user-info-data user-info-data
-                               :active-users active-users})]
+                               :active-users active-users
+                               :publishers-list publishers-list})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -528,7 +532,8 @@
    :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]
    :users-info-hover      [[:base :org-slug] (fn [base org-slug] (get-in base (users-info-hover-key org-slug)))]
    :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
-   :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]})
+   :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]
+   :publishers-list       [[:base :org-slug] (fn [base org-slug] (get-in base (publishers-list-key org-slug)))]})
 
 ;; Action Loop =================================================================
 
@@ -800,6 +805,11 @@
   ([] (active-users (:slug (org-data)) @app-state))
   ([org-slug] (active-users org-slug @app-state))
   ([org-slug data] (get-in data (active-users-key org-slug))))
+
+(defn ^:export publishers-list
+  ([] (publishers-list (:slug (org-data)) @app-state))
+  ([org-slug] (publishers-list org-slug @app-state))
+  ([org-slug data] (get-in data (publishers-list-key org-slug))))
 
 (defn uploading-video-data
   ([video-id] (uploading-video-data (router/current-org-slug) video-id @app-state))

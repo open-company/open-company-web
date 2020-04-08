@@ -47,10 +47,16 @@
                                                            %)
                                                    (:boards org-data))]
                                (assoc cmail-data :board-name (:name cmail-board))
-                               cmail-data)]
+                               cmail-data)
+          publishers-list-key (dispatcher/publishers-list-key org-slug)
+          old-publishers-list (get-in db publishers-list-key)]
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
+       (update-in publishers-list-key
+        ;; In case we have a list
+        #(when (and (seq %) (every? string? %))
+           (mapv users-map (dispatcher/publishers-list org-slug db))))
        (assoc :cmail-data updated-cmail-data)))
     db))
 
@@ -88,7 +94,11 @@
        (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
-       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data))))
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data))
+       (update-in (dispatcher/publishers-list-key org-slug)
+        ;; In case we have a list
+        #(when (and (seq %) (every? string? %))
+           (mapv merged-users-data (dispatcher/publishers-list org-slug db))))))
     db))
 
 (defn parse-team-data [team-data]
@@ -109,7 +119,11 @@
        (assoc-in (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
-       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data))))
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data))
+       (update-in (dispatcher/publishers-list-key org-slug)
+        ;; In case we have a list
+        #(when (and (seq %) (every? string? %))
+           (mapv merged-users-data (dispatcher/publishers-list org-slug db))))))
     db))
 
 (defmethod dispatcher/action :channels-enumerate

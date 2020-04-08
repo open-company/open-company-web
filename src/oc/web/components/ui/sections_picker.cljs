@@ -44,7 +44,7 @@
                                s)}
   [s {:keys [active-slug on-change moving? current-user-data]}]
   (let [editable-boards (vals (drv/react s :editable-boards))
-        post-as-self-board (some #(when (= (:slug %) (:user-id current-user-data)) %) editable-boards)
+        post-as-self-board (some #(when (= (-> % :author :user-id) (:user-id current-user-data)) %) editable-boards)
         filtered-boards (filter #(not= (:slug %) (:user-id current-user-data)) editable-boards)
         sorted-boards (sort-by :name filtered-boards)
         all-sections (concat [(or post-as-self-board (self-board current-user-data))] sorted-boards)

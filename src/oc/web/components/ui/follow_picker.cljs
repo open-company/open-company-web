@@ -5,7 +5,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.section :as section-actions]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
@@ -44,12 +44,13 @@
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) (vals users))))
 
-(defn- create-section [s]
+(defn- follow! [s]
   (reset! (::saving s) true)
-  )
+  (user-actions/follow-publishers @(::users s))
+  (nav-actions/close-all-panels))
 
 (defn- close-follow-picker [s]
-  (if (seq @(::users s))
+  (if (not= @(::initial-users s) @(::users s))
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "follow-picker-unsaved-exit"
                       :message "Leave without saving your changes?"
@@ -64,19 +65,32 @@
     (nav-actions/close-all-panels)))
 
 (rum/defcs follow-picker < rum/reactive
-                           (drv/drv :editable-boards)
-                           (drv/drv :active-users)
-                           (drv/drv :current-user-data)
-                           (rum/local #{} ::users)
-                           (rum/local "" ::query)
-                           (rum/local false ::saving)
-                           (rum/local nil ::existing-board)
-                           {:did-mount (fn [s]
-                            (when-let [query-field (rum/ref-node s :query)]
-                              (.focus query-field))
-                            s)}
+
+ (drv/drv :active-users)
+ (drv/drv :publishers-list)
+ (drv/drv :current-user-data)
+ (rum/local #{} ::users)
+ (rum/local #{} ::initial-users)
+ (rum/local "" ::query)
+ (rum/local false ::saving)
+ (rum/local nil ::existing-board)
+ {:init (fn [s]
+   ;; Refresh the following list
+   (user-actions/load-publishers-list)
+   s)
+  :will-mount (fn [s]
+   ;; setup the currently followed users
+   (let [users (set (map :user-id @(drv/get-ref s :publishers-list)))]
+     (reset! (::users s) users)
+     (reset! (::initial-users s) users))
+   s)
+  :did-mount (fn [s]
+   (when-let [query-field (rum/ref-node s :query)]
+     (.focus query-field))
+   s)}
+
   [s]
-  (let [editable-boards (vec (vals (drv/react s :editable-boards)))
+  (let [publishers-list (drv/react s :publishers-list)
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
         active-users (into {} (filter #(not= (:user-id current-user-data) (first %)) all-active-users))
@@ -111,7 +125,7 @@
                    :on-change #(reset! (::query s) (.. % -target -value))}]
                 [:button.mlb-reset.follow-picker-create-bt
                   {:class (when-not (seq @(::users s)))
-                   :on-click #(create-section s)
+                   :on-click #(follow! s)
                    :disabled (or (not (> (count @(::users s)) 0))
                                  @(::saving s))}
                   "Follow"]]

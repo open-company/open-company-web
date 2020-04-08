@@ -12,6 +12,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
@@ -49,10 +50,15 @@
 
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
-    (and (not= (:slug board-data) utils/default-drafts-board-slug)
+    (and ;; Filter out the draft board
+         (not= (:slug board-data) utils/default-drafts-board-slug)
+         ;; Filter every publisher board used for `post as myself`
+         (not (:publisher-board board-data))
+         ;; Filter out boards with a count of posts equal to zero (?)
          (or (not (contains? self-link :count))
              (and (contains? self-link :count)
                   (pos? (:count self-link))))
+         ;; Filter out draft boards (marked for delete)
          (or (not (contains? board-data :draft))
              (not (:draft board-data))))))
 
@@ -76,7 +82,7 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :bookmarks-data)
-                                (drv/drv :active-users)
+                                (drv/drv :publishers-list)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
@@ -154,8 +160,8 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        active-users (drv/react s :active-users)
-        show-users-list? (seq active-users)]
+        publishers-list (drv/react s :publishers-list)
+        show-users-list? user-is-part-of-the-team?]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -233,19 +239,21 @@
                 {:class (when @(::users-list-collapsed s) "collapsed")
                  :on-click #(toggle-collapse-users s)}
                 [:span.sections "People"]]
-              (when user-is-part-of-the-team?
-                [:button.left-navigation-sidebar-top-title-button.btn-reset
-                  {:on-click #(nav-actions/show-follow-picker)
-                   :title "Follow or unfollow posts from your teammates"
-                   :data-placement "top"
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"}])]])
+              [:button.left-navigation-sidebar-top-title-button.btn-reset
+                {:on-click #(nav-actions/show-follow-picker)
+                 :title "Follow or unfollow posts from your teammates"
+                 :data-placement "top"
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-container "body"}]]])
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
-            (for [user (sort-by :short-name (vals active-users))
+            (for [user publishers-list
                   :let [user-url (oc-urls/contributor org-slug (:user-id user))
                         is-current-user (and (router/current-contributor-id)
-                                             (= (:user-id user) (router/current-contributor-id)))]
+                                             (= (:user-id user) (router/current-contributor-id)))
+                        board (some #(when (= (:slug %) (str user-utils/publisher-board-slug-prefix (:user-id user))) %)
+                               all-boards)
+                        board-change-data (when board (get change-data (:uuid board)))]
                   :when (or (not @(::users-list-collapsed s))
                             is-current-user)]
               [:a.left-navigation-sidebar-item.hover-item.contributor
@@ -257,6 +265,7 @@
                 [:div.board-name.group
                   (user-avatar-image user)
                   [:div.internal
+                    {:class (when (seq (:unread board-change-data)) "new")}
                     (:short-name user)]]])])
         ;; Boards list
         (when show-boards
@@ -266,7 +275,7 @@
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
                  :on-click #(toggle-collapse-sections s)}
-                [:span.sections "Sections"]]
+                [:span.sections "Boards"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
