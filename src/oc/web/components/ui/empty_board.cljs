@@ -38,7 +38,7 @@
         [:div.empty-board-title
           (cond
            current-user-contrib? "You haven't published any posts yet"
-           is-contributor? "This user hasn't published any posts yet"
+           is-contributor? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-inbox? "You’re all caught up!"
            is-all-posts? "Recent is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
