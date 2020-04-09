@@ -42,7 +42,7 @@
                (string/split q #"\s"))))))
 
 (defn- filter-sort-users [s current-user-id users q]
-  (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) (vals users))))
+  (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
 
 (defn- follow! [s]
   (reset! (::saving s) true)
@@ -95,9 +95,15 @@
         publishers-list (drv/react s :publishers-list)
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
-        all-authors (filter #((set (:authors org-data)) (:user-id %)) all-active-users)
-        active-users (into {} (filter #(not= (:user-id current-user-data) (first %)) all-authors))
-        sorted-users (filter-sort-users s (:user-id current-user-data) active-users @(::query s))]
+        authors-uuids (->> org-data :authors (map :user-id) set)
+        all-authors (filter #(and (authors-uuids (:user-id %))
+                                  (not= (:user-id current-user-data) (:user-id %)))
+                     (vals all-active-users))
+        sorted-users (filter-sort-users s (:user-id current-user-data) all-authors @(::query s))]
+    (js/console.log "DBG org-data" org-data "->" (:authors org-data))
+    (js/console.log "DBG    authors-set" (->> org-data :authors (map :user-id) set))
+    (js/console.log "DBG    all-authors" all-authors)
+    (js/console.log "DBG    all-active-users" all-active-users)
     [:div.follow-picker
       [:div.follow-picker-modal
         ; [:div.follow-picker-header]
