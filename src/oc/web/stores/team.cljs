@@ -55,8 +55,9 @@
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
        (update-in publishers-list-key
         ;; In case we have a list
-        #(when (and (seq %) (every? string? %))
-           (mapv users-map (dispatcher/publishers-list org-slug db))))
+        #(if (and (seq %) (every? string? %))
+           (mapv users-map %)
+           %))
        (assoc :cmail-data updated-cmail-data)))
     db))
 
@@ -97,8 +98,9 @@
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data))
        (update-in (dispatcher/publishers-list-key org-slug)
         ;; In case we have a list
-        #(when (and (seq %) (every? string? %))
-           (mapv merged-users-data (dispatcher/publishers-list org-slug db))))))
+        #(if (and (seq %) (every? string? %))
+           (mapv merged-users-data %)
+           %))))
     db))
 
 (defn parse-team-data [team-data]
@@ -122,8 +124,9 @@
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data))
        (update-in (dispatcher/publishers-list-key org-slug)
         ;; In case we have a list
-        #(when (and (seq %) (every? string? %))
-           (mapv merged-users-data (dispatcher/publishers-list org-slug db))))))
+        #(if (and (seq %) (every? string? %))
+           (mapv merged-users-data %)
+           %))))
     db))
 
 (defmethod dispatcher/action :channels-enumerate
