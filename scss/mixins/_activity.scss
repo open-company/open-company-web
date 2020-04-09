@@ -667,11 +667,11 @@ $header_top_margin: 24;
     margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
   }
 
-  & > *:not(blockquote, pre):first-child {
+  & > *:not(blockquote):not(pre):first-child {
     margin-top: 0;
   }
 
-  & > *:not(blockquote, pre):last-child {
+  & > *:not(blockquote):not(pre):last-child {
     margin-bottom: 0;
   }
 
@@ -1091,11 +1091,11 @@ $header_top_margin: 24;
     margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
   }
 
-  & > *:not(blockquote, pre):first-child {
+  & > *:not(blockquote):not(pre):first-child {
     margin-top: 0;
   }
 
-  & > *:not(blockquote, pre):last-child {
+  & > *:not(blockquote):not(pre):last-child {
     margin-bottom: 0;
   }
 
