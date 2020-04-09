@@ -269,7 +269,11 @@ div.stream-item {
       flex-wrap: nowrap;
       align-items: flex-start;
       justify-items: center;
-      width: calc(100% - 140px);
+      max-width: calc(100% - 140px);
+
+      &.has-inbox {
+        max-width: calc(100% - 170px);
+      }
 
       @include mobile() {
         min-height: 24px;
@@ -358,10 +362,10 @@ div.stream-item {
     div.more-menu {
       height: 32px;
       flex: 0 0 auto;
+      margin-left: auto;
 
       @include big_web() {
         display: none;
-        margin-left: 7px;
 
         &:not(.menu-expanded) button {
           display: none;
