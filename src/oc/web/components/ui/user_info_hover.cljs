@@ -61,7 +61,7 @@
           above? (>= (:y pos) (/ (:height viewport-size) 2))
           next-props (merge props {:above? above?
                                    :otf true})]
-      (rum/portal (user-info-view (assoc props :above? above?)) portal-el))))
+      (rum/portal (user-info-view (assoc next-props :above? above?)) portal-el))))
 
 (def ^:private default-positioning {:vertical-position nil :horizontal-position nil})
 
