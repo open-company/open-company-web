@@ -145,7 +145,7 @@ div.invite-slack-modal {
         }
 
         div.invites-list-title {
-          @include OC_Body_Book();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: var(--color);
           letter-spacing: .1px;
