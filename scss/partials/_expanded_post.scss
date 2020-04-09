@@ -244,6 +244,12 @@ div.expanded-post {
 
         span.hover-info-popup-container {
           position: relative;
+
+          span.name {
+            margin-right: 4px;
+            min-height: 18px;
+            line-height: 18px;  
+          }
         }
 
         time {

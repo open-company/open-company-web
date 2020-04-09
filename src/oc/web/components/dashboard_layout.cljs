@@ -251,8 +251,9 @@
                         (if (= (:user-id contributor-user-data) (:user-id current-user-data))
                           "My posts"
                           (str (lib-user/name-for contributor-user-data) "'s posts"))
-                        (when (pos? (:total-count contributor-data))
-                          [:span.count (:total-count contributor-data)])]]
+                        ; (when (pos? (:total-count contributor-data))
+                        ;   [:span.count (:total-count contributor-data)])
+                        ]]
                     current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal

@@ -302,7 +302,21 @@ div.stream-item {
           overflow: hidden;
           line-height: 24px;
           display: block;
+          margin-right: 4px;
         }
+      }
+
+      @include activity-author(24);
+
+      span.name {
+        height: 24px;
+        color: var(--light-color);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 24px;
+        display: block;
+        flex: 0 1 auto;
       }
 
       span.time-since {
