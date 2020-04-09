@@ -241,10 +241,6 @@ div.expanded-post {
         opacity: 1;
         display: inline-block;
         position: relative;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
 
         span.hover-info-popup-container {
           position: relative;
