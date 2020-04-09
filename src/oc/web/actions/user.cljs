@@ -21,6 +21,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.utils.comment :as comment-utils]
+            [oc.web.utils.notification :as notif-utils]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -530,11 +531,11 @@
 (defn subscribe []
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [data]}]
-      (let [fixed-notifications (user-utils/fix-notifications (:notifications data))]
+      (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
         (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
-      (when-let [fixed-notification (user-utils/fix-notification data true)]
+      (when-let [fixed-notification (notif-utils/fix-notification data true)]
         (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
         (notification-actions/show-notification
          {:title (:title fixed-notification)

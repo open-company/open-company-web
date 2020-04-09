@@ -17,7 +17,7 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
@@ -299,50 +299,13 @@
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
-    (entry-save-finish (:board-slug entry-data) (json->cljs body) (:uuid entry-data) edit-key)
+    (entry-save-finish (:board-slug entry-data) (when body (json->cljs body)) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
-
-(defn entry-modal-save-with-board-finish [activity-data response]
-  (let [fixed-board-data (au/fix-board response)
-        org-slug (router/current-org-slug)
-        saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
-    (au/save-last-used-section (:slug fixed-board-data))
-    (cmail-actions/remove-cached-item (:uuid activity-data))
-    ;; reset initial revision after successful save.
-    ;; need a new revision number on the next edit.
-    (swap! initial-revision dissoc (:uuid activity-data))
-    (refresh-org-data)
-    (when-not (= (:slug fixed-board-data) (router/current-board-slug))
-      ;; If creating a new board, start watching changes
-      (ws-cc/container-watch (:uuid fixed-board-data)))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
-    (when (= (:status saved-activity-data) "published")
-      (send-item-read (:uuid saved-activity-data)))))
 
 (defn board-name-exists-error [edit-key]
   (dis/dispatch! [:update [edit-key] #(-> %
                                         (assoc :section-name-error utils/section-name-exists-error)
                                         (dissoc :loading))]))
-
-(defn entry-modal-save [activity-data section-editing]
-  (if (and (= (:board-slug activity-data) utils/default-section-slug)
-           section-editing)
-    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
-          final-board-data (assoc section-editing :entries [fixed-entry-data])
-          create-board-link (utils/link-for (:links (dis/org-data)) "create")]
-      (api/create-board create-board-link final-board-data (:invite-note activity-data)
-        (fn [{:keys [success status body]}]
-          (if (= status 409)
-            ;; Board name exists
-            (board-name-exists-error :modal-editing-data)
-            (let [board-data (when success (json->cljs body))]
-              (when (router/current-activity-id)
-                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data)
-                              (:uuid activity-data))))
-              (entry-modal-save-with-board-finish activity-data board-data))))))
-    (let [patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-      (api/patch-entry patch-entry-link activity-data :modal-editing-data create-update-entry-cb)))
-  (dis/dispatch! [:entry-modal-save]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data])
@@ -385,38 +348,61 @@
 
   ([edit-key edited-data section-editing entry-save-cb]
      (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
-       (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
+       (let [publisher-board (some #(when (:publisher-board %) %) (dis/editable-boards-data))
+             fixed-edited-data (merge edited-data {:status (or (:status edited-data) "draft")
+                                                   :board-slug (if (and publisher-board
+                                                                        (:publisher-board edited-data))
+                                                                 (:slug publisher-board)
+                                                                 (:board-slug edited-data))})
              fixed-edit-key (or edit-key :entry-editing)
              org-data (dis/org-data)]
          (dis/dispatch! [:entry-save fixed-edit-key])
          (if (:links fixed-edited-data)
            (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-                    section-editing)
+                    (:publisher-board fixed-edited-data))
              ;; Save existing post to new board
-             (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-                   final-board-data (assoc section-editing :entries [fixed-entry-data])
+             (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note :publisher-board)
+                   final-board-data {:name (:board-name fixed-edited-data)
+                                     :entries [fixed-entry-data]
+                                     :access (:board-access fixed-edited-data)
+                                     :publisher-board (:publisher-board fixed-edited-data)}
                    create-board-link (utils/link-for (:links org-data) "create")]
                (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                  (fn [{:keys [success status body] :as response}]
                    (if (= status 409)
                      ;; Board name exists
                      (board-name-exists-error fixed-edit-key)
-                     (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+                     (let [response-board-data (when success (json->cljs body))
+                           updated-entry-data (merge fixed-edited-data {:board-name (:name response-board-data)
+                                                                        :board-slug (:slug response-board-data)
+                                                                        :board-access (:access response-board-data)
+                                                                        :publisher-board (:publisher-board response-board-data)
+                                                                        :board-uuid (:uuid response-board-data)})]
+                       (entry-save-cb updated-entry-data fixed-edit-key response))))))
              ;; Update existing post
              (let [patch-entry-link (utils/link-for (:links edited-data) "partial-update")]
                (api/patch-entry patch-entry-link fixed-edited-data fixed-edit-key entry-save-cb)))
            (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
-                    section-editing)
+                    (:publisher-board fixed-edited-data))
              ;; Save new post to new board
-             (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
-                   final-board-data (assoc section-editing :entries [fixed-entry-data])
+             (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note :publisher-board)
+                   final-board-data {:name (:board-name fixed-edited-data)
+                                     :entries [fixed-entry-data]
+                                     :access (:board-access fixed-edited-data)
+                                     :publisher-board (:publisher-board fixed-edited-data)}
                    create-board-link (utils/link-for (:links org-data) "create")]
                (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                  (fn [{:keys [success status body] :as response}]
                    (if (= status 409)
                      ;; Board name exists
                      (board-name-exists-error fixed-edit-key)
-                     (entry-save-cb fixed-edited-data fixed-edit-key response)))))
+                     (let [response-board-data (when success (json->cljs body))
+                           updated-entry-data (merge fixed-edited-data {:board-name (:name response-board-data)
+                                                                        :board-slug (:slug response-board-data)
+                                                                        :board-access (:access response-board-data)
+                                                                        :publisher-board (:publisher-board response-board-data)
+                                                                        :board-uuid (:uuid response-board-data)})]
+                       (entry-save-cb updated-entry-data fixed-edit-key response))))))
              ;; Save new post to existing board
              (let [org-slug (router/current-org-slug)
                    entry-board-data (first (filter #(= (:slug %) (:board-slug fixed-edited-data)) (:boards org-data)))

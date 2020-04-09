@@ -575,6 +575,7 @@
                               (dis/dispatch! [:input [:cmail-data]
                                (merge cmail-data {:board-slug (:slug board-data)
                                                   :board-name (:name board-data)
+                                                  :board-access (:access board-data)
                                                   :publisher-board (:publisher-board board-data)
                                                   :has-changes has-changes
                                                   :invite-note note})])

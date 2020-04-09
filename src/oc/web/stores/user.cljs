@@ -4,7 +4,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]
+            [oc.web.utils.notification :as notif-utils]
             [cljsjs.moment-timezone]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
@@ -250,7 +250,7 @@
   [db [_ org-slug notification]]
   (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
         old-notifications (get-in db user-notifications-key)
-        new-notifications (user-utils/sorted-notifications (concat [notification] old-notifications))]
+        new-notifications (notif-utils/sorted-notifications (concat [notification] old-notifications))]
     (assoc-in db user-notifications-key new-notifications)))
 
 (defmethod dispatcher/action :user-notifications/read

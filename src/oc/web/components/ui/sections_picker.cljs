@@ -4,17 +4,18 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
-(def distance-from-bottom 80)
-
 (defn- self-board [user-data]
-  {:name "Post as yourself"
-   :slug (:user-id user-data)
+  {:name user-utils/publisher-board-name
+   :slug utils/default-section-slug
    :publisher-board true
    :access "team"
    :authors [(:user-id user-data)]})
+
+(def distance-from-bottom 80)
 
 (defn calc-max-height [s]
   (let [win-height (or (.-clientHeight (.-documentElement js/document))
@@ -44,10 +45,13 @@
                                s)}
   [s {:keys [active-slug on-change moving? current-user-data]}]
   (let [editable-boards (vals (drv/react s :editable-boards))
-        post-as-self-board (some #(when (= (-> % :author :user-id) (:user-id current-user-data)) %) editable-boards)
-        filtered-boards (filter #(not= (:slug %) (:user-id current-user-data)) editable-boards)
+        user-publisher-board (some #(when (and (:publisher-board %)
+                                               (= (-> % :author :user-id) (:user-id current-user-data)))
+                                      %)
+                              editable-boards)
+        filtered-boards (filter (comp not :publisher-board) editable-boards)
         sorted-boards (sort-by :name filtered-boards)
-        all-sections (concat [(or post-as-self-board (self-board current-user-data))] sorted-boards)
+        all-sections (concat [(or user-publisher-board (self-board current-user-data))] sorted-boards)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
                           {})

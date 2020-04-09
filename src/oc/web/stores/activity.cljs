@@ -108,10 +108,6 @@
   [db [_ enabled?]]
   (assoc db :entry-save-on-exit enabled?))
 
-(defmethod dispatcher/action :entry-modal-save
-  [db [_]]
-  (assoc-in db [:modal-editing-data :loading] true))
-
 (defmethod dispatcher/action :nux-next-step
   [db [_ next-step]]
   (assoc db :nux next-step))
