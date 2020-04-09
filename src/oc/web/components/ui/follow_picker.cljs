@@ -100,10 +100,6 @@
                                   (not= (:user-id current-user-data) (:user-id %)))
                      (vals all-active-users))
         sorted-users (filter-sort-users s (:user-id current-user-data) all-authors @(::query s))]
-    (js/console.log "DBG org-data" org-data "->" (:authors org-data))
-    (js/console.log "DBG    authors-set" (->> org-data :authors (map :user-id) set))
-    (js/console.log "DBG    all-authors" all-authors)
-    (js/console.log "DBG    all-active-users" all-active-users)
     [:div.follow-picker
       [:div.follow-picker-modal
         ; [:div.follow-picker-header]
