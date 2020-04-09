@@ -66,6 +66,7 @@
 
 (rum/defcs follow-picker < rum/reactive
 
+ (drv/drv :org-data)
  (drv/drv :active-users)
  (drv/drv :publishers-list)
  (drv/drv :current-user-data)
@@ -90,10 +91,12 @@
    s)}
 
   [s]
-  (let [publishers-list (drv/react s :publishers-list)
+  (let [org-data (drv/react s :org-data)
+        publishers-list (drv/react s :publishers-list)
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
-        active-users (into {} (filter #(not= (:user-id current-user-data) (first %)) all-active-users))
+        all-authors (filter #((set (:authors org-data)) (:user-id %)) all-active-users)
+        active-users (into {} (filter #(not= (:user-id current-user-data) (first %)) all-authors))
         sorted-users (filter-sort-users s (:user-id current-user-data) active-users @(::query s))]
     [:div.follow-picker
       [:div.follow-picker-modal
@@ -105,7 +108,7 @@
             "People"]
           [:div.follow-picker-subtitle
             "Select someone to follow their posts and comments more easily."]
-          (if (zero? (count all-active-users))
+          (if (zero? (count all-authors))
             [:div.follow-picker-empty-users
               [:div.follow-picker-empty-icon]
               [:div.follow-picker-empty-copy
@@ -141,4 +144,4 @@
                     (carrot-checkbox {:selected selected?})
                     (user-avatar-image u)
                     [:span.follow-picker-user
-                      (:name u)]])]])]]])) 
+                      (:name u)]])]])]]]))
