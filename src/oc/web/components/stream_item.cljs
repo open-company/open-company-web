@@ -260,6 +260,7 @@
         [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
+          {:class (when is-inbox? "has-inbox")}
           [:div.hover-container
             (user-info-hover {:user-data publisher :current-user-id current-user-id})
             (user-avatar-image publisher)
