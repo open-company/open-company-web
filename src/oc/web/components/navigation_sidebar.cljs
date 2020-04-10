@@ -240,7 +240,7 @@
                 [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                   {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
                                             :new (and @(::users-list-collapsed s)
-                                                      publisher-boards-change-data)})
+                                                      (some :unread publisher-boards-change-data))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
