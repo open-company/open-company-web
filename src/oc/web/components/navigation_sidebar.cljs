@@ -235,10 +235,14 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::users-list-collapsed s) "collapsed")
-                 :on-click #(toggle-collapse-users s)}
-                [:span.sections "People"]]
+              (let [user-ids (map :user-id publishers-list)
+                    publisher-boards-change-data (map change-data user-ids)]
+                [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                  {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
+                                            :new (and @(::users-list-collapsed s)
+                                                      publisher-boards-change-data)})
+                   :on-click #(toggle-collapse-users s)}
+                  [:span.sections "People"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-follow-picker)
                  :title "Follow posts from your teammates"
@@ -274,10 +278,14 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::sections-list-collapsed s) "collapsed")
-                 :on-click #(toggle-collapse-sections s)}
-                [:span.sections "Boards"]]
+              (let [boards-uuids (map :uuid sorted-boards)
+                    boards-change-data (map change-data boards-uuids)]
+                [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                  {:class (utils/class-set {:collapsed @(::sections-list-collapsed s)
+                                            :new (and @(::sections-list-collapsed s)
+                                                      (some :unread boards-change-data))})
+                   :on-click #(toggle-collapse-sections s)}
+                  [:span.sections "Boards"]])
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)

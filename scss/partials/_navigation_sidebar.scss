@@ -508,6 +508,10 @@ div.left-navigation-sidebar {
           transform: rotate(-180deg);
         }
 
+        &.collapsed.new span.sections {
+          @include OC_Body_Bold();
+        }
+
         &:before {
           content: "";
           position: absolute;
