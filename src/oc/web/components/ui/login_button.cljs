@@ -3,31 +3,34 @@
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.responsive :as responsive]))
 
-(rum/defcs login-button < rum/static
-                          rum/reactive
-                          {:will-mount (fn [s]
-                                        (when-not (utils/is-test-env?)
-                                          (user/auth-settings-get))
-                                        s)}
-  [s {:keys [button-classes]}]
-  [:div.login-button
-    [:a.signup-signin
-      {:class (when button-classes button-classes)
-       :href oc-urls/sign-up
-       :on-click (fn [e]
-                   (utils/event-stop e)
-                   (router/nav! oc-urls/sign-up))
-       :on-touch-start identity}
-      "Get started"]
-    [:span.signup-signin]
-    [:a.signup-signin
-      {:class (when button-classes button-classes)
-       :href oc-urls/login
-       :on-click (fn [e]
-                   (utils/event-stop e)
-                   (router/nav! oc-urls/login))
-       :on-touch-start identity}
-      "Login"]])
+(rum/defc login-button <
+
+  rum/static
+  rum/reactive
+
+  {:will-mount (fn [s]
+    (js/console.log "DBG will-mount" s)
+    (when-not (utils/is-test-env?)
+      (user/auth-settings-get))
+    s)}
+
+  []
+  (let [is-mobile? (responsive/is-mobile-size?)]
+    [:div.login-button-container.group
+      [:a.login-bt
+        {:href oc-urls/login
+         :on-click #(do
+                     (utils/event-stop %)
+                     (user/show-login :login-with-email))}
+        "Log in"]
+      [:span.or " or "]
+      [:a.signup-bt
+        {:href oc-urls/sign-up
+         :on-click #(do
+                     (utils/event-stop %)
+                     (router/nav! oc-urls/sign-up))}
+        "Sign up"]]))

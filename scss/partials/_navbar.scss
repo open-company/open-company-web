@@ -202,6 +202,13 @@ nav.oc-navbar {
         position: absolute;
         left: calc(100vw - 72px - 16px);
         min-width: 72px;
+        width: auto;
+
+        &.anonymous-user {
+          position: relative;
+          left: unset;
+          float: right;
+        }
 
         &.create-post {
           min-width: 112px; // 72 + 32 + 8
