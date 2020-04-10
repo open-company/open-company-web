@@ -51,7 +51,8 @@
                               editable-boards)
         filtered-boards (filter (comp not :publisher-board) editable-boards)
         sorted-boards (sort-by :name filtered-boards)
-        all-sections (concat [(or user-publisher-board (self-board current-user-data))] sorted-boards)
+        fixed-publisher-board (or user-publisher-board (self-board current-user-data))
+        all-sections (cons fixed-publisher-board sorted-boards)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
                           {})
