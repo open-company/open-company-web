@@ -251,7 +251,9 @@
                   :let [user-url (oc-urls/contributor org-slug (:user-id user))
                         is-current-user (and (router/current-contributor-id)
                                              (= (:user-id user) (router/current-contributor-id)))
-                        board (some #(when (= (:slug %) (str user-utils/publisher-board-slug-prefix (:user-id user))) %)
+                        board (some #(when (and (:publisher-board %)
+                                                (= (-> % :author :user-id) (:user-id user)))
+                                       %)
                                all-boards)
                         board-change-data (when board (get change-data (:uuid board)))]
                   :when (or (not @(::users-list-collapsed s))
