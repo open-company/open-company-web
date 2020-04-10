@@ -5,7 +5,6 @@
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.lib.user :as user-lib]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.user :as user-utils]
@@ -24,7 +23,7 @@
         (user-avatar-image user-data {:preferred-avatar-size 96})
         [:div.user-info-right
           [:div.user-info-name
-            (user-lib/name-for user-data)]
+            (:name user-data)]
           (when (seq (:title user-data))
             [:div.user-info-line
               (:title user-data)])
