@@ -21,7 +21,7 @@
                                 :inline inline?
                                 :above above?})}
       [:div.user-info-header
-        (user-avatar-image user-data)
+        (user-avatar-image user-data {:preferred-avatar-size 96})
         [:div.user-info-right
           [:div.user-info-name
             (user-lib/name-for user-data)]

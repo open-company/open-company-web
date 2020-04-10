@@ -475,13 +475,13 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :user-info-data        [[:base :team-roster :panel-stack]
-                            (fn [base team-roster panel-stack]
+   :user-info-data        [[:base :active-users :panel-stack]
+                            (fn [base active-users panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
-                                  (some #(when (= (:user-id %) user-id) %) (:users team-roster)))))]
+                                  (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :contributor-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
                             :active-users :publishers-list]

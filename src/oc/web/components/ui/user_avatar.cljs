@@ -11,12 +11,16 @@
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
                                ui-mixins/refresh-tooltips-mixin
-  [s user-data tooltip?]
+  [s user-data {:keys [preferred-avatar-size tooltip?] :or {preferred-avatar-size 72}}]
   (let [use-default @(::use-default s)
         default-avatar (store/user-icon (:user-id user-data))
-        user-avatar-url (if (or use-default (empty? (:avatar-url user-data)))
+        user-avatar-url (cond
+                         (or use-default (empty? (:avatar-url user-data)))
                          (utils/cdn default-avatar)
-                         (-> user-data :avatar-url (img/optimize-user-avatar-url 72)))]
+                         (pos? preferred-avatar-size)
+                         (-> user-data :avatar-url (img/optimize-user-avatar-url preferred-avatar-size))
+                         :else
+                         (:avatar-url user-data))]
     [:div.user-avatar-img-container
       {:data-user-id (:user-id user-data)
        :data-intercom-target "User avatar dropdown"
@@ -41,4 +45,4 @@
        :on-click #(when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (drv/react s :current-user-data) not-mobile?)]))
+      (user-avatar-image (drv/react s :current-user-data) {:tooltip? not-mobile?})]))

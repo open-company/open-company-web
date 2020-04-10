@@ -14,7 +14,7 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.contributor :as contributor-actions]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
@@ -39,7 +39,7 @@
 
 (defn- refresh-contributor-data [author-uuid]
   (when author-uuid
-    (contributor-actions/contributor-get author-uuid)))
+    (contributions-actions/contributions-get author-uuid)))
 
 (defn nav-to-author!
   ([e author-uuid url]

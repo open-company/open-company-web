@@ -88,29 +88,9 @@
     (dissoc :entry-editing)
     (assoc :entry-edit-dissmissing true)))
 
-(defmethod dispatcher/action :capture-video/dismiss
-  [db [_]]
-  (-> db
-    (dissoc :capture-video)
-    (assoc :capture-video-dissmissing true)))
-
-(defmethod dispatcher/action :modal-editing-deactivate
-  [db [_]]
-  (dissoc db :modal-editing))
-
-(defmethod dispatcher/action :modal-editing-activate
-  [db [_]]
-  (-> db
-    (assoc :modal-editing true)
-    (assoc :entry-save-on-exit true)))
-
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
   (assoc db :entry-save-on-exit enabled?))
-
-(defmethod dispatcher/action :nux-next-step
-  [db [_ next-step]]
-  (assoc db :nux next-step))
 
 (defmethod dispatcher/action :activity-add-attachment
   [db [_ dispatch-input-key attachment-data]]
@@ -164,7 +144,7 @@
   [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
         board-key (dispatcher/board-data-key org-slug board-slug)
@@ -172,7 +152,7 @@
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
     (-> db
-      (update-in contributor-count-key inc)
+      (update-in contributions-count-key inc)
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
       (assoc-in posts-key merged-items)
       (dissoc :section-editing)
@@ -185,12 +165,12 @@
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
         org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
         with-published-at (update fixed-activity-data :published-at #(if (seq %) % (utils/as-of-now)))]
     (-> db
-      (update-in contributor-count-key inc)
+      (update-in contributions-count-key inc)
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
       (add-remove-item-from-all-posts org-slug with-published-at)
       (add-remove-item-from-bookmarks org-slug with-published-at)
@@ -208,7 +188,7 @@
 (defmethod dispatcher/action :activity-delete
   [db [_ org-slug activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         posts-key (dispatcher/posts-data-key org-slug)
         posts-data (dispatcher/posts-data)
         next-posts (dissoc posts-data (:uuid activity-data))
@@ -245,7 +225,7 @@
     ;; Now if the post is the one being edited in cmail let's remove it from there too
     (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
       (-> with-fixed-boards
-          (update-in contributor-count-key dec)
+          (update-in contributions-count-key dec)
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
       (assoc-in with-fixed-boards posts-key next-posts))))
@@ -359,18 +339,21 @@
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
     (assoc-in posts-key (merge (get-in db posts-key) (get fixed-board-data :fixed-items)))
     (dissoc :section-editing)
-    (update-in [:modal-editing-data] dissoc :loading)
-    (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ org-slug fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  [db [_ org-slug all-posts-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-all-posts-data (au/fix-container (:collection all-posts-data) change-data org-data active-users)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
+        merged-items (merge old-posts (:fixed-items fixed-all-posts-data))
         container-key (dispatcher/container-key org-slug :all-posts)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-all-posts-data)
       (assoc-in posts-key merged-items))))
 
 (defmethod dispatcher/action :all-posts-more
@@ -403,16 +386,20 @@
 ;; Bookmarks
 
 (defmethod dispatcher/action :bookmarks-get/finish
-  [db [_ org-slug fixed-posts]]
+  [db [_ org-slug bookmarks-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-bookmarks-data (au/fix-container (:collection bookmarks-data) change-data org-data active-users)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
+        merged-items (merge old-posts (:fixed-items fixed-bookmarks-data))
         container-key (dispatcher/container-key org-slug :bookmarks)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-bookmarks-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-posts)))))
+      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-bookmarks-data)))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug]]
@@ -599,16 +586,20 @@
 ;; Inbox
 
 (defmethod dispatcher/action :inbox-get/finish
-  [db [_ org-slug fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  [db [_ org-slug inbox-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-inbox-data (au/fix-container (:collection inbox-data) change-data org-data active-users)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
-        container-key (dispatcher/container-key org-slug :inbox)
-        org-data-key (dispatcher/org-data-key org-slug)]
+        merged-items (merge old-posts (:fixed-items fixed-inbox-data))
+        container-key (dispatcher/container-key org-slug :inbox)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-inbox-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts)))))
+      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-inbox-data)))))
 
 (defmethod dispatcher/action :inbox-more
   [db [_ org-slug]]

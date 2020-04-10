@@ -327,13 +327,18 @@
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          new-items (map :uuid (:entries board-data))
+          items-list (if (contains? board-data :entries)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:entries board-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list board-data))
           without-items (dissoc with-links :entries)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat new-items (:posts-list board-data))
-                                                              :down (concat (:posts-list board-data) new-items)
-                                                              new-items)))
+                                                              :up (concat items-list (:posts-list board-data))
+                                                              :down (concat (:posts-list board-data) items-list)
+                                                              items-list)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
                              with-posts-list)
@@ -379,13 +384,18 @@
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          new-items (map :uuid (:items contributor-data))
+          items-list (if (contains? contributor-data :items)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:items contributor-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list contributor-data))
           without-items (dissoc with-links :items)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat new-items (:posts-list contributor-data))
-                                                              :down (concat (:posts-list contributor-data) new-items)
-                                                              new-items)))
+                                                              :up (concat items-list (:posts-list contributor-data))
+                                                              :down (concat (:posts-list contributor-data) items-list)
+                                                              items-list)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list contributor-data)))
                              with-posts-list)
@@ -408,8 +418,8 @@
   ([container-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
-                                          (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
-                                                            all-boards))]
+                                          (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
+                                                            all-boards)]
                                             (assoc-in ret [:fixed-items (:uuid item)]
                                              (fix-entry item board-data change-data active-users))))
                                  container-data
@@ -431,13 +441,18 @@
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          new-items (map :uuid (:items container-data))
+          items-list (if (contains? container-data :items)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:items container-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list container-data))
           without-items (dissoc with-links :items)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat new-items (:posts-list container-data))
-                                                              :down (concat (:posts-list container-data) new-items)
-                                                              new-items)))
+                                                              :up (concat items-list (:posts-list container-data))
+                                                              :down (concat (:posts-list container-data) items-list)
+                                                              items-list)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)

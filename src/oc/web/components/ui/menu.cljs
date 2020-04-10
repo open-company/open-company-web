@@ -159,7 +159,7 @@
         ;;
         (when (and (jwt/jwt)
                    current-user-data
-                   (pos? (:contributor-count org-data)))
+                   (pos? (:contributions-count org-data)))
           [:a
             {:href (oc-urls/contributor (:user-id current-user-data))
              :on-click (partial my-posts-click s (:user-id current-user-data))}
@@ -167,7 +167,7 @@
               [:span.oc-menu-item-label
                 "My posts"]
               [:span.count
-                (:contributor-count org-data)]]])
+                (:contributions-count org-data)]]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))

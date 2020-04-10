@@ -28,9 +28,9 @@
 
 (def initial-revision (atom {}))
 
-(defn watch-boards [posts-data]
+(defn- watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users
-    (let [board-slugs (distinct (map :board-slug (vals posts-data)))
+    (let [board-slugs (distinct (map :board-slug posts-data))
           org-data (dis/org-data)
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
@@ -46,7 +46,7 @@
   [item-id]
   (api/request-reads-data item-id))
 
-(defn request-reads-count
+(defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
   [item-ids]
   (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activity-read-data))]
@@ -55,18 +55,17 @@
 
 ;; bookmarks stream
 
-(defn bookmarks-get-finish [{:keys [body success]}]
+(defn- bookmarks-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
-          bookmarks-data (when success (json->cljs body))
-          fixed-bookmarks (au/fix-container (:collection bookmarks-data) (dis/change-data) org-data (dis/active-users))]
+          bookmarks-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "bookmarks")
         (cook/set-cookie! (router/last-board-cookie org) "bookmarks" (* 60 60 24 365))
-        (request-reads-count (keys (:fixed-items fixed-bookmarks)))
-        (watch-boards (:fixed-items fixed-bookmarks)))
-      (dis/dispatch! [:bookmarks-get/finish org fixed-bookmarks]))))
+        (request-reads-count (->> bookmarks-data :collection :items (map :uuid)))
+        (watch-boards (:items (:collection bookmarks-data))))
+      (dis/dispatch! [:bookmarks-get/finish org bookmarks-data]))))
 
 (defn- bookmarks-real-get [bookmarks-link org-slug finish-cb]
   (api/get-all-posts bookmarks-link
@@ -79,9 +78,9 @@
   (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
     (bookmarks-real-get bookmarks-link (:slug org-data) finish-cb)))
 
-(defn bookmarks-more-finish [direction {:keys [success body]}]
+(defn- bookmarks-more-finish [direction {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+    (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
   (dis/dispatch! [:bookmarks-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn bookmarks-more [more-link direction]
@@ -90,18 +89,17 @@
 
 ;; All Posts
 
-(defn all-posts-get-finish [{:keys [body success]}]
+(defn- all-posts-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
-          all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data (dis/active-users))]
+          all-posts-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365))
-        (request-reads-count (keys (:fixed-items fixed-all-posts)))
-        (watch-boards (:fixed-items fixed-all-posts)))
-      (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
+        (request-reads-count (->> all-posts-data :collection :items (map :uuid)))
+        (watch-boards (:items (:collection all-posts-data))))
+      (dis/dispatch! [:all-posts-get/finish org all-posts-data]))))
 
 (defn- activity-real-get [activity-link org-slug finish-cb]
   (api/get-all-posts activity-link
@@ -114,9 +112,9 @@
   (when-let [activity-link (utils/link-for (:links org-data) "entries" "GET")]
     (activity-real-get activity-link (:slug org-data) finish-cb)))
 
-(defn all-posts-more-finish [direction {:keys [success body]}]
+(defn- all-posts-more-finish [direction {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+    (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
@@ -125,18 +123,17 @@
 
 ;; Inbox
 
-(defn inbox-get-finish [{:keys [body success]}]
+(defn- inbox-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
-          inbox-data (when success (json->cljs body))
-          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data (dis/active-users))]
+          inbox-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "inbox")
         (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
-        (request-reads-count (keys (:fixed-items fixed-inbox-data)))
-        (watch-boards (:fixed-items fixed-inbox-data)))
-      (dis/dispatch! [:inbox-get/finish org fixed-inbox-data]))))
+        (request-reads-count (->> inbox-data :collection :items (map :uuid)))
+        (watch-boards (:items (:collection inbox-data))))
+      (dis/dispatch! [:inbox-get/finish org inbox-data]))))
 
 (defn inbox-get [org-data & [finish-cb]]
   (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
@@ -146,9 +143,9 @@
        (when (fn? finish-cb)
          (finish-cb resp))))))
 
-(defn inbox-more-finish [direction {:keys [success body]}]
+(defn- inbox-more-finish [direction {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+    (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
   (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn inbox-more [more-link direction]
@@ -156,7 +153,7 @@
   (dis/dispatch! [:inbox-more (router/current-org-slug)]))
 
 ;; Referesh org when needed
-(defn refresh-org-data-cb [{:keys [status body success]}]
+(defn- refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-bookmarks (= (router/current-board-slug) "bookmarks")
@@ -208,15 +205,6 @@
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
   (dis/dispatch! [:entry-edit/dismiss]))
-
-(defn activity-modal-edit
-  [activity-data activate]
-  (if activate
-    (do
-      (cmail-actions/load-cached-item activity-data :modal-editing-data)
-      (dis/dispatch! [:modal-editing-activate]))
-    (dis/dispatch! [:modal-editing-deactivate])))
-
 
 (declare entry-save)
 
@@ -302,7 +290,7 @@
     (entry-save-finish (:board-slug entry-data) (when body (json->cljs body)) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
 
-(defn board-name-exists-error [edit-key]
+(defn- board-name-exists-error [edit-key]
   (dis/dispatch! [:update [edit-key] #(-> %
                                         (assoc :section-name-error utils/section-name-exists-error)
                                         (dissoc :loading))]))
@@ -409,7 +397,7 @@
                    entry-create-link (utils/link-for (:links entry-board-data) "create")]
                (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))))))
 
-(defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
+(defn- entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
   (au/save-last-used-section board-slug)
   (refresh-org-data)
@@ -429,12 +417,12 @@
     (when drafts-link
       (sa/section-get drafts-link))))
 
-(defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
+(defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
     (entry-publish-finish entry-uuid edit-key posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed edit-key])))
 
-(defn entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
+(defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [board-slug (:slug new-board-data)
         saved-activity-data (first (:entries new-board-data))]
     (au/save-last-used-section (:slug new-board-data))
@@ -451,7 +439,7 @@
     (send-item-read (:uuid saved-activity-data))
     (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
 
-(defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
+(defn- entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
     ; Board name already exists
     (board-name-exists-error :section-editing)
@@ -482,7 +470,7 @@
               (api/publish-entry publish-entry-link fixed-entry-editing
                (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key)))))))))
 
-(defn activity-delete-finish []
+(defn- activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (refresh-org-data)))
@@ -525,7 +513,7 @@
     (api/share-entry share-link share-data callback)
     (dis/dispatch! [:activity-share share-data])))
 
-(defn entry-revert [revision-id entry-editing]
+(defn- entry-revert [revision-id entry-editing]
   (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
@@ -567,7 +555,7 @@
    :default
    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
 
-(defn org-data-from-secure-activity [secure-activity-data]
+(defn- org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
     (-> secure-activity-data
       (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height :team-id])
@@ -579,7 +567,7 @@
                                 :org-logo-height :logo-height})
       (merge old-org-data))))
 
-(defn secure-activity-get-finish [{:keys [status success body]}]
+(defn- secure-activity-get-finish [{:keys [status success body]}]
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
     (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
@@ -615,7 +603,7 @@
 
 ;; Change reaction
 
-(defn activity-change [section-uuid activity-uuid]
+(defn- activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
         activity-data (dis/activity-data (:slug org-data) activity-uuid)
@@ -763,37 +751,9 @@
     (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
     (inbox-dismiss activity-uuid)))
 
-(def wrt-timeouts-list (atom {}))
-(def wrt-wait-interval 3)
-
-(defn wrt-events-gate
-  "Gate to throttle too many wrt call for the same UUID.
-  Set a timeout to wrt-wait-interval seconds every time it's called with a certain UUID,
-  if there was already a timeout for that item remove it and reset it.
-  Once the timeout finishes it means no other events were fired for it so we can send a seen.
-  It will send seen every 3 seconds or more."
-  [activity-id]
-  (let [wait-interval-ms (* wrt-wait-interval 1000)]
-    ;; Remove the old timeout if there is
-    (if-let [uuid-timeout (get @wrt-timeouts-list activity-id)]
-      ;; Remove the previous timeout if exists
-      (.clearTimeout js/window uuid-timeout)
-      ;; Send read if it's the first timeout for the current element
-      (send-item-read activity-id))
-    ;; Set the new timeout
-    (swap! wrt-timeouts-list assoc activity-id
-     (utils/after wait-interval-ms
-      (fn []
-       (swap! wrt-timeouts-list dissoc activity-id)
-       (send-item-read activity-id))))))
-
 ;; Video handling
 
-(defn uploading-video [video-id edit-key]
-  (dis/dispatch! [:update [edit-key] #(merge % {:has-changes true})])
-  (dis/dispatch! [:uploading-video (router/current-org-slug) video-id]))
-
-(defn remove-video [edit-key activity-data]
+(defn- remove-video [edit-key activity-data]
   (let [has-changes (or (au/has-attachments? activity-data)
                         (au/has-text? activity-data))]
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
@@ -814,20 +774,6 @@
                                       (remove-video edit-key activity-data)
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
-
-(defn video-started-recording-cb [edit-key video-token]
-  (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
-                                                :video-id video-token
-                                                ;; default video error to true
-                                                :video-error true})]))
-
-(defn video-processed-cb [edit-key video-token unmounted?]
-  (when-not unmounted?
-    (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id video-token
-                                                  :video-id video-token
-                                                  ;; turn off video error since upload finished
-                                                  :video-error false
-                                                  :has-changes true})])))
 
 ;; Sample post handling
 
