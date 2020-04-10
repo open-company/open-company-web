@@ -74,8 +74,14 @@
      (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
 
 (defn update-user-data [db user-data]
-  (let [fixed-user-data (parse-user-data user-data)]
-    (-> db
+  (let [fixed-user-data (parse-user-data user-data)
+        org-data (dispatcher/org-data db)
+        active-user-key (when org-data
+                          (conj (dispatcher/active-users-key (:slug org-data)) (:user-id user-data)))
+        next-db (if org-data
+                  (update-in db active-user-key merge fixed-user-data)
+                  db)]
+    (-> next-db
         (assoc :current-user-data fixed-user-data)
         (assoc :edit-user-profile (fix-user-values fixed-user-data))
         (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
