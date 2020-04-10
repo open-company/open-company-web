@@ -241,7 +241,7 @@
                 [:span.sections "People"]]
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-follow-picker)
-                 :title "Follow or unfollow posts from your teammates"
+                 :title "Follow posts from your teammates"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-container "body"}]]])
