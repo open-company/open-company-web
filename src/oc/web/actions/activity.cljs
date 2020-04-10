@@ -206,15 +206,6 @@
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
   (dis/dispatch! [:entry-edit/dismiss]))
 
-(defn activity-modal-edit
-  [activity-data activate]
-  (if activate
-    (do
-      (cmail-actions/load-cached-item activity-data :modal-editing-data)
-      (dis/dispatch! [:modal-editing-activate]))
-    (dis/dispatch! [:modal-editing-deactivate])))
-
-
 (declare entry-save)
 
 (defn entry-save-on-exit
@@ -299,47 +290,10 @@
     (entry-save-finish (:board-slug entry-data) (json->cljs body) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
 
-(defn entry-modal-save-with-board-finish [activity-data response]
-  (let [fixed-board-data (au/fix-board response)
-        org-slug (router/current-org-slug)
-        saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
-    (au/save-last-used-section (:slug fixed-board-data))
-    (cmail-actions/remove-cached-item (:uuid activity-data))
-    ;; reset initial revision after successful save.
-    ;; need a new revision number on the next edit.
-    (swap! initial-revision dissoc (:uuid activity-data))
-    (refresh-org-data)
-    (when-not (= (:slug fixed-board-data) (router/current-board-slug))
-      ;; If creating a new board, start watching changes
-      (ws-cc/container-watch (:uuid fixed-board-data)))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
-    (when (= (:status saved-activity-data) "published")
-      (send-item-read (:uuid saved-activity-data)))))
-
 (defn- board-name-exists-error [edit-key]
   (dis/dispatch! [:update [edit-key] #(-> %
                                         (assoc :section-name-error utils/section-name-exists-error)
                                         (dissoc :loading))]))
-
-(defn entry-modal-save [activity-data section-editing]
-  (if (and (= (:board-slug activity-data) utils/default-section-slug)
-           section-editing)
-    (let [fixed-entry-data (dissoc activity-data :board-slug :board-name :invite-note)
-          final-board-data (assoc section-editing :entries [fixed-entry-data])
-          create-board-link (utils/link-for (:links (dis/org-data)) "create")]
-      (api/create-board create-board-link final-board-data (:invite-note activity-data)
-        (fn [{:keys [success status body]}]
-          (if (= status 409)
-            ;; Board name exists
-            (board-name-exists-error :modal-editing-data)
-            (let [board-data (when success (json->cljs body))]
-              (when (router/current-activity-id)
-                (router/nav! (oc-urls/entry (router/current-org-slug) (:slug board-data)
-                              (:uuid activity-data))))
-              (entry-modal-save-with-board-finish activity-data board-data))))))
-    (let [patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-      (api/patch-entry patch-entry-link activity-data :modal-editing-data create-update-entry-cb)))
-  (dis/dispatch! [:entry-modal-save]))
 
 (defn add-attachment [dispatch-input-key attachment-data]
   (dis/dispatch! [:activity-add-attachment dispatch-input-key attachment-data])

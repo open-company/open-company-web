@@ -88,33 +88,9 @@
     (dissoc :entry-editing)
     (assoc :entry-edit-dissmissing true)))
 
-(defmethod dispatcher/action :capture-video/dismiss
-  [db [_]]
-  (-> db
-    (dissoc :capture-video)
-    (assoc :capture-video-dissmissing true)))
-
-(defmethod dispatcher/action :modal-editing-deactivate
-  [db [_]]
-  (dissoc db :modal-editing))
-
-(defmethod dispatcher/action :modal-editing-activate
-  [db [_]]
-  (-> db
-    (assoc :modal-editing true)
-    (assoc :entry-save-on-exit true)))
-
 (defmethod dispatcher/action :entry-toggle-save-on-exit
   [db [_ enabled?]]
   (assoc db :entry-save-on-exit enabled?))
-
-(defmethod dispatcher/action :entry-modal-save
-  [db [_]]
-  (assoc-in db [:modal-editing-data :loading] true))
-
-(defmethod dispatcher/action :nux-next-step
-  [db [_ next-step]]
-  (assoc db :nux next-step))
 
 (defmethod dispatcher/action :activity-add-attachment
   [db [_ dispatch-input-key attachment-data]]
@@ -363,8 +339,6 @@
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
     (assoc-in posts-key (merge (get-in db posts-key) (get fixed-board-data :fixed-items)))
     (dissoc :section-editing)
-    (update-in [:modal-editing-data] dissoc :loading)
-    (assoc-in [:modal-editing-data :board-slug] (:slug fixed-board-data))
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :all-posts-get/finish
