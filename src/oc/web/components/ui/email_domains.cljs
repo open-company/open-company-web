@@ -57,7 +57,7 @@
           {:type "text"
            :placeholder "@domain.com"
            :auto-capitalize "none"
-           :value (:domain um-domain-invite)
+           :value (or (:domain um-domain-invite) "")
            :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
            :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
            :on-key-press (fn [e]
