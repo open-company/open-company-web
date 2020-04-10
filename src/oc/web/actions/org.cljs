@@ -21,7 +21,7 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
-            [oc.web.actions.contributor :as contributor-actions]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -144,7 +144,7 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
-        contrib-link (utils/link-for (:links org-data) "partial-contributor")
+        contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
@@ -184,7 +184,7 @@
           ;; Contributors data
           (when (and contrib-link
                      (router/current-contributor-id))
-            (utils/maybe-after contributor-delay #(contributor-actions/contributor-get org-data (router/current-contributor-id)))))))
+            (utils/maybe-after contributor-delay #(contributions-actions/contributions-get org-data (router/current-contributor-id)))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)

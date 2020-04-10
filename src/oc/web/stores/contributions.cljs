@@ -1,4 +1,4 @@
-(ns oc.web.stores.contributor
+(ns oc.web.stores.contributions
   (:require [cuerdas.core :as str]
             [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
@@ -6,7 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defmethod dispatcher/action :contributor-get/finish
+(defmethod dispatcher/action :contributions-get/finish
   [db [_ org-slug author-uuid contrib-data]]
   (let [org-data (dispatcher/org-data db org-slug)
         fixed-contrib-data (au/fix-contributor (:collection contrib-data) (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db))
@@ -18,14 +18,14 @@
      (update-in posts-key merge (:fixed-items fixed-contrib-data))
      (assoc-in contrib-data-key (dissoc fixed-contrib-data :fixed-items)))))
 
-(defmethod dispatcher/action :contributor-more
+(defmethod dispatcher/action :contributions-more
   [db [_ org-slug author-uuid]]
   (let [contrib-data-key (dispatcher/contributor-data-key org-slug author-uuid)
         contrib-data (get-in db contrib-data-key)
         next-contrib-data (assoc contrib-data :loading-more true)]
     (assoc-in db contrib-data-key next-contrib-data)))
 
-(defmethod dispatcher/action :contributor-more/finish
+(defmethod dispatcher/action :contributions-more/finish
   [db [_ org-slug author-uuid direction next-contrib-data]]
   (if next-contrib-data
     (let [contrib-data-key (dispatcher/contributor-data-key org-slug author-uuid)
