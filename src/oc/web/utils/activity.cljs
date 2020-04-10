@@ -5,6 +5,7 @@
             [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.utils.user :as user-utils]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.ziggeo :as ziggeo]
@@ -297,13 +298,17 @@
   ([board-data change-data active-users & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
+          with-board-name (assoc with-read-only :name (if (and (:publisher-board board-data)
+                                                               (= (-> board-data :author :user-id) (jwt/user-id)))
+                                                        user-utils/publisher-board-name
+                                                        (:name board-data)))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
                                            change-data
                                            active-users))
-                                 with-read-only
+                                 with-board-name
                                  (:entries board-data))
           next-links (when direction
                       (vec
