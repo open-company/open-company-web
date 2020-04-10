@@ -240,11 +240,15 @@
                                    (-> org-editing :name clean-org-name count (<= 1)))
                               (and (not has-org?)
                                    (-> @(::why-carrot s) utils/trim seq not)))
-        continue-fn #(when-not continue-disabled
+        continue-fn (fn [_]
+                     (when-not continue-disabled
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
                        (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
-                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
+                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing
+                        #(when-let [org-slug (or (router/current-org-slug)
+                                                 (:slug (or (dis/org-data) (first (dis/orgs-data)))))]
+                           (router/nav! (oc-urls/default-landing org-slug))))))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.onboard-lander-header
@@ -854,9 +858,12 @@
             {:disabled (and (empty? (:first-name user-data))
                             (empty? (:last-name user-data)))
              :on-touch-start identity
-             :on-click #(do
-                          (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))}
+             :on-click (fn [_]
+                        (reset! (::saving s) true)
+                        (user-actions/user-profile-save current-user-data edit-user-profile nil
+                         #(when-let [org-slug (or (router/current-org-slug)
+                                                  (:slug (or (dis/org-data) (first (dis/orgs-data)))))]
+                           (router/nav! (oc-urls/default-landing org-slug)))))}
             "Start using Carrot"]]]]))
 
 (rum/defcs email-wall < rum/reactive
