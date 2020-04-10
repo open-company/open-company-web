@@ -27,7 +27,6 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
             [goog.events :as events]

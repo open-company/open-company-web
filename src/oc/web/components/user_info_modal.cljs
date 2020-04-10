@@ -37,7 +37,7 @@
               {:on-click #(nav-actions/show-user-settings :profile)}
               "Edit profile"])]
         [:div.user-info-body
-          (user-avatar-image user-data)
+          (user-avatar-image user-data {:preferred-avatar-size 240})
           [:div.user-info-name
             (lib-user/name-for user-data)]
           (when (:title user-data)

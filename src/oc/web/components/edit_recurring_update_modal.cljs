@@ -13,8 +13,7 @@
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 ;; New/Edit reminder
 
