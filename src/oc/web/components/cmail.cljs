@@ -504,8 +504,12 @@
                             (real-close)
                             (utils/after
                              180
-                             #(router/nav! (if (= (router/current-board-slug) "all-posts")
+                             #(router/nav! (cond
+                                             (= (router/current-board-slug) "all-posts")
                                              (oc-urls/all-posts)
+                                             (:publisher-board cmail-data)
+                                             (oc-urls/contributor (:user-id @(drv/get-ref s :current-user-data)))
+                                             :else
                                              (oc-urls/board (:board-slug cmail-data)))))))))
                     s)
                    :after-render (fn [s]
