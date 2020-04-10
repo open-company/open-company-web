@@ -368,13 +368,18 @@
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ org-slug fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  [db [_ org-slug all-posts-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-all-posts-data (au/fix-container (:collection all-posts-data) change-data org-data active-users)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
+        merged-items (merge old-posts (:fixed-items fixed-all-posts-data))
         container-key (dispatcher/container-key org-slug :all-posts)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-all-posts-data)
       (assoc-in posts-key merged-items))))
 
 (defmethod dispatcher/action :all-posts-more
@@ -407,16 +412,20 @@
 ;; Bookmarks
 
 (defmethod dispatcher/action :bookmarks-get/finish
-  [db [_ org-slug fixed-posts]]
+  [db [_ org-slug bookmarks-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-bookmarks-data (au/fix-container (:collection bookmarks-data) change-data org-data active-users)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
+        merged-items (merge old-posts (:fixed-items fixed-bookmarks-data))
         container-key (dispatcher/container-key org-slug :bookmarks)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-bookmarks-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-posts)))))
+      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-bookmarks-data)))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug]]
@@ -603,16 +612,20 @@
 ;; Inbox
 
 (defmethod dispatcher/action :inbox-get/finish
-  [db [_ org-slug fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  [db [_ org-slug inbox-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-inbox-data (au/fix-container (:collection inbox-data) change-data org-data active-users)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-posts))
-        container-key (dispatcher/container-key org-slug :inbox)
-        org-data-key (dispatcher/org-data-key org-slug)]
+        merged-items (merge old-posts (:fixed-items fixed-inbox-data))
+        container-key (dispatcher/container-key org-slug :inbox)]
     (-> db
-      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in container-key fixed-inbox-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts)))))
+      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-inbox-data)))))
 
 (defmethod dispatcher/action :inbox-more
   [db [_ org-slug]]
