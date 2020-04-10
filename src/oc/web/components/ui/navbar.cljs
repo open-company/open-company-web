@@ -133,32 +133,32 @@
               [:div.navbar-center
                 {:class (when search-active "search-active")}
                 (search-box)])
-            [:div.navbar-right
-              {:class (when show-plus-button? "create-post")}
-              (if (jwt/jwt)
-                [:div.group
-                  (when show-plus-button?
-                    [:button.mlb-reset.navbar-create-bt
-                      {:class (utils/class-set {:scrolled @(::scrolled s)})
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "bottom"
-                       :title utils/default-body-placeholder
-                       :on-click #(if (:collapsed cmail-state)
-                                    (do
-                                      (.stopPropagation %)
-                                      (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
-                                    (cmail-actions/cmail-toggle-fullscreen))}
-                      [:span.plus-icon]
-                      [:span.plus-icon-active]])
-                  (when-not is-mobile?
-                    (user-notifications))
-                  [:div.user-menu
-                    [:div.user-menu-button
-                      {:ref "user-menu"
-                       :class (when show-whats-new-green-dot "green-dot")
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "bottom"
-                       :title "Menu"}
-                      (user-avatar
-                       {:click-cb #(nav-actions/menu-toggle)})]]]
-                (login-button))]]])]))
+            (if (jwt/jwt)
+              [:div.navbar-right.group
+                {:class (when show-plus-button? "create-post")}
+                (when show-plus-button?
+                  [:button.mlb-reset.navbar-create-bt
+                    {:class (utils/class-set {:scrolled @(::scrolled s)})
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "bottom"
+                     :title utils/default-body-placeholder
+                     :on-click #(if (:collapsed cmail-state)
+                                  (do
+                                    (.stopPropagation %)
+                                    (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
+                                  (cmail-actions/cmail-toggle-fullscreen))}
+                    [:span.plus-icon]
+                    [:span.plus-icon-active]])
+                (when-not is-mobile?
+                  (user-notifications))
+                [:div.user-menu
+                  [:div.user-menu-button
+                    {:ref "user-menu"
+                     :class (when show-whats-new-green-dot "green-dot")
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "bottom"
+                     :title "Menu"}
+                    (user-avatar
+                     {:click-cb #(nav-actions/menu-toggle)})]]]
+              [:div.navbar-right.anonymous-user
+                (login-button)])]])]))

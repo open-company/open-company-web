@@ -61,11 +61,18 @@ div.secure-activity-container {
         @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_green;
-        @include user-profile(32);
         padding: 0;
 
+        @include user-profile(32) {
+          margin-left: 16px;
+          float: right;
+        }
+
         @include tablet() {
-          @include user-profile(40);
+          @include user-profile(40){
+            margin-left: 16px;
+            float: right;
+          }
         }
 
         span.login-as {
@@ -75,11 +82,6 @@ div.secure-activity-container {
           @include tablet() {
             display: none;
           }
-        }
-
-        div.user-avatar-img-container {
-          margin-left: 16px;
-          float: right;
         }
       }
 

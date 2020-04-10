@@ -267,7 +267,7 @@
         [:button.mlb-reset.expand-button
           {:on-click #(reset! (::collapse-post s) false)}
           [:div.expand-button-inner
-            "View entire post"]])
+            "View more"]])
       (when (seq (:polls activity-data))
         (polls-wrapper {:polls-data (:polls activity-data)
                         :editing? false

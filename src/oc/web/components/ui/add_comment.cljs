@@ -84,7 +84,7 @@
 (defn me-options [parent-uuid]
   {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
-   :placeholder (if parent-uuid "Reply…" "Add a comment…")
+   :placeholder (if parent-uuid "Reply…" "Add a reply…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
@@ -283,9 +283,7 @@
                :class (when uploading? "separator-line")}
               (if edit-comment-data
                 "Save"
-                (if dismiss-reply-cb
-                  "Reply"
-                  "Comment"))]
+                "Reply")]
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                            :width 32
                            :height 32

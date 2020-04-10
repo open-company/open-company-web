@@ -872,16 +872,17 @@
   (let [dismiss-at (utils/as-of-now)
         activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
-    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid dismiss-at])
-    (api/inbox-dismiss dismiss-link dismiss-at
-     (fn [{:keys [status success body]}]
-       (if (and (= status 404)
-                (= (:uuid activity-data) (router/current-activity-id)))
-         (do
-           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
-           (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-        (inbox-get (dis/org-data))))))
+    (when dismiss-link
+      (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid dismiss-at])
+      (api/inbox-dismiss dismiss-link dismiss-at
+       (fn [{:keys [status success body]}]
+         (if (and (= status 404)
+                  (= (:uuid activity-data) (router/current-activity-id)))
+           (do
+             (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+             (routing-actions/maybe-404))
+           (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+          (inbox-get (dis/org-data)))))))
 
 (declare inbox-unread)
 
