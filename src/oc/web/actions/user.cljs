@@ -402,11 +402,8 @@
              (utils/after 100
               (fn []
                 (jwt-actions/jwt-refresh
-                 #(if org-editing
-                    (org-actions/create-or-update-org org-editing)
-                    (utils/after 2000
-                      (fn[]
-                        (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
+                 #(when org-editing
+                    (org-actions/create-or-update-org org-editing)))))
              (dis/dispatch! [:user-data (json->cljs body)])
              (when (fn? callback)
                (callback success)))))))))
