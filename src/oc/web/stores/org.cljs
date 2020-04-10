@@ -17,7 +17,12 @@
 (defn fix-org
   "Fix org data coming from the API."
   [org-data]
-  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
+  (let [fixed-boards (mapv #(-> %
+                              (assoc :read-only (-> % :links activity-utils/readonly-board?))
+                              (assoc :name (if (and (:publisher-board %)
+                                                    (= (-> % :author :user-id) (jwt/user-id)))
+                                             user-utils/publisher-board-name
+                                             (:name %))))
                       (:boards org-data))]
     (-> org-data
      read-only-org
