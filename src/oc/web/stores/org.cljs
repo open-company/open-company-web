@@ -1,7 +1,9 @@
 (ns oc.web.stores.org
   (:require [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.utils.activity :as activity-utils]
+            [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.router :as router]
             [oc.web.actions.cmail :as cmail-actions]))
@@ -15,7 +17,12 @@
 (defn fix-org
   "Fix org data coming from the API."
   [org-data]
-  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
+  (let [fixed-boards (mapv #(-> %
+                             (assoc :read-only (-> % :links activity-utils/readonly-board?))
+                             (assoc :name (if (and (:publisher-board %)
+                                                   (= (-> % :author :user-id) (jwt/user-id)))
+                                            user-utils/publisher-board-name
+                                            (:name %))))
                       (:boards org-data))]
     (-> org-data
      read-only-org
