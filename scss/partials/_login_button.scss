@@ -1,20 +1,38 @@
-div.login-button{
-  margin-top: 10px;
+div.login-button-container {
+  width: auto;
+  display: block;
+  height: 32px;
+  text-align: left;
 
-  a.signup-signin {
-    color: $ui_grey;
-    @include OC_Body_Bold();
-    font-size: 12px;
-    float: left;
+  span.or {
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    height: 32px;
+    line-height: 32px;
+    padding: 0 8px;
+    display: inline-block;
   }
 
-  span.signup-signin {
-    display: block;
-    width: 3px;
-    height: 3px;
-    background-color: $ui_grey;
-    margin: 6px 6px 0;
-    float: left;
-    border-radius: 50%;
+  a.login-bt {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    height: 32px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: $carrot_green;
+    text-decoration: none;
+  }
+
+  a.signup-bt {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    height: 32px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: $carrot_green;
+    text-decoration: none;
   }
 }
