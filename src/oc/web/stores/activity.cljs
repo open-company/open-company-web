@@ -168,7 +168,7 @@
   [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
         board-key (dispatcher/board-data-key org-slug board-slug)
@@ -176,7 +176,7 @@
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
     (-> db
-      (update-in contributor-count-key inc)
+      (update-in contributions-count-key inc)
       (assoc-in board-key (dissoc fixed-board-data :fixed-items))
       (assoc-in posts-key merged-items)
       (dissoc :section-editing)
@@ -189,12 +189,12 @@
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
         org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
         with-published-at (update fixed-activity-data :published-at #(if (seq %) % (utils/as-of-now)))]
     (-> db
-      (update-in contributor-count-key inc)
+      (update-in contributions-count-key inc)
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
       (add-remove-item-from-all-posts org-slug with-published-at)
       (add-remove-item-from-bookmarks org-slug with-published-at)
@@ -212,7 +212,7 @@
 (defmethod dispatcher/action :activity-delete
   [db [_ org-slug activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
-        contributor-count-key (vec (conj org-data-key :contributor-count))
+        contributions-count-key (vec (conj org-data-key :contributions-count))
         posts-key (dispatcher/posts-data-key org-slug)
         posts-data (dispatcher/posts-data)
         next-posts (dissoc posts-data (:uuid activity-data))
@@ -249,7 +249,7 @@
     ;; Now if the post is the one being edited in cmail let's remove it from there too
     (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
       (-> with-fixed-boards
-          (update-in contributor-count-key dec)
+          (update-in contributions-count-key dec)
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
       (assoc-in with-fixed-boards posts-key next-posts))))
