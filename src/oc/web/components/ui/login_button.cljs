@@ -13,7 +13,6 @@
   rum/reactive
 
   {:will-mount (fn [s]
-    (js/console.log "DBG will-mount" s)
     (when-not (utils/is-test-env?)
       (user/auth-settings-get))
     s)}
