@@ -5,6 +5,8 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :refer (strict-refresh-tooltips-mixin)]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -75,6 +77,7 @@
  (rum/local "" ::query)
  (rum/local false ::saving)
  (rum/local nil ::existing-board)
+ strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
    (user-actions/load-publishers-list)
@@ -99,7 +102,8 @@
         all-authors (filter #(and (authors-uuids (:user-id %))
                                   (not= (:user-id current-user-data) (:user-id %)))
                      (vals all-active-users))
-        sorted-users (filter-sort-users s (:user-id current-user-data) all-authors @(::query s))]
+        sorted-users (filter-sort-users s (:user-id current-user-data) all-authors @(::query s))
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.follow-picker
       [:div.follow-picker-modal
         ; [:div.follow-picker-header]
@@ -129,10 +133,12 @@
                    :placeholder "Search for teammates or make your selection below..."
                    :on-change #(reset! (::query s) (.. % -target -value))}]
                 [:button.mlb-reset.follow-picker-create-bt
-                  {:class (when-not (seq @(::users s)))
-                   :on-click #(follow! s)
-                   :disabled (or (not (> (count @(::users s)) 0))
-                                 @(::saving s))}
+                  {:on-click #(follow! s)
+                   :disabled (or (= @(::users s) @(::initial-users s))
+                                 @(::saving s))
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :title "Save & close"}
                   "Follow"]]
               [:div.follow-picker-users-list
                 (for [u sorted-users
