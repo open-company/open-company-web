@@ -9,8 +9,8 @@
 (defmethod dispatcher/action :contributions-get/finish
   [db [_ org-slug author-uuid contrib-data]]
   (let [org-data (dispatcher/org-data db org-slug)
-        fixed-contrib-data (au/fix-contributor (:collection contrib-data) (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db))
-        contrib-data-key (dispatcher/contributor-data-key org-slug author-uuid)
+        fixed-contrib-data (au/fix-contributions (:collection contrib-data) (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db))
+        contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid)
         posts-key (dispatcher/posts-data-key org-slug)
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-contrib-data))]
@@ -20,7 +20,7 @@
 
 (defmethod dispatcher/action :contributions-more
   [db [_ org-slug author-uuid]]
-  (let [contrib-data-key (dispatcher/contributor-data-key org-slug author-uuid)
+  (let [contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid)
         contrib-data (get-in db contrib-data-key)
         next-contrib-data (assoc contrib-data :loading-more true)]
     (assoc-in db contrib-data-key next-contrib-data)))
@@ -28,14 +28,14 @@
 (defmethod dispatcher/action :contributions-more/finish
   [db [_ org-slug author-uuid direction next-contrib-data]]
   (if next-contrib-data
-    (let [contrib-data-key (dispatcher/contributor-data-key org-slug author-uuid)
+    (let [contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid)
           contrib-data (get-in db contrib-data-key)
           posts-data-key (dispatcher/posts-data-key org-slug)
           old-posts (get-in db posts-data-key)
           prepare-contrib-data (merge next-contrib-data {:posts-list (:posts-list contrib-data)
                                                          :old-links (:links contrib-data)})
           org-data (dispatcher/org-data db org-slug)
-          fixed-contrib-data (au/fix-contributor prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) direction)
+          fixed-contrib-data (au/fix-contributions prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) direction)
           new-items-map (merge old-posts (:fixed-items fixed-contrib-data))
           new-contrib-data (-> fixed-contrib-data
                             (assoc :direction direction)

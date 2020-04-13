@@ -40,7 +40,7 @@
       (when-not hide-buttons
         [:div.user-info-buttons.group
           [:button.mlb-reset.posts-bt
-            {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data)))}
+            {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
             (if my-profile?
               "My posts"
               "Posts")]

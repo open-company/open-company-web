@@ -29,13 +29,13 @@
           users-map (zipmap (map :user-id users) fixed-users)
           change-data (dispatcher/change-data db)
           org-data (dispatcher/org-data db org-slug)
-          contributors-key (dispatcher/contributors-key org-slug)
+          contributions-list-key (dispatcher/contributions-list-key org-slug)
           next-db*** (reduce (fn [tdb contrib-key]
-                             (let [contrib-data-key (concat contributors-key [contrib-key])
-                                   old-contributor-data (get-in tdb contrib-data-key)]
-                               (assoc-in tdb contrib-data-key (au/fix-contributor old-contributor-data change-data org-data users-map))))
+                             (let [contrib-data-key (concat contributions-list-key [contrib-key])
+                                   old-contributions-data (get-in tdb contrib-data-key)]
+                               (assoc-in tdb contrib-data-key (au/fix-contributions old-contributions-data change-data org-data users-map))))
                       db
-                      (keys (get-in db contributors-key)))
+                      (keys (get-in db contributions-list-key)))
           boards-key (dispatcher/boards-key org-slug)
           next-db** (reduce (fn [tdb board-key]
                              (let [board-data-key (concat boards-key [board-key :board-data])

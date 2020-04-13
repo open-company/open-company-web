@@ -46,7 +46,7 @@ div.empty-board {
         background-position: center;
         background-size: 24px 21px;
 
-        &.contributor {
+        &.contributions {
           background-image: none;
           @include user-profile(56);
 

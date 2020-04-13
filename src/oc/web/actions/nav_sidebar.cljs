@@ -37,7 +37,7 @@
 ;; :user-info-{uuid}
 ;; :follow-picker
 
-(defn- refresh-contributor-data [author-uuid]
+(defn- refresh-contributions-data [author-uuid]
   (when author-uuid
     (contributions-actions/contributions-get author-uuid)))
 
@@ -65,21 +65,21 @@
            ;; the internal router state
          (router/set-route! [org-slug author-uuid "dashboard"]
           {:org org-slug
-           :contributor author-uuid
+           :contributions author-uuid
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
-           (utils/after 0 #(refresh-contributor-data author-uuid))))))
+           (utils/after 0 #(refresh-contributions-data author-uuid))))))
    (user-actions/hide-mobile-user-notifications)))))
 
 (defn- container-data [back-to]
   (cond
-   (contains? back-to :contributor)
-   (dis/contributor-data @dis/app-state (router/current-org-slug) (:contributor back-to))
+   (contains? back-to :contributions)
+   (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
    (dis/is-container? (:board back-to))
-   (dis/contributor-data @dis/app-state (router/current-org-slug) (:board back-to))
+   (dis/contributions-data @dis/app-state (router/current-org-slug) (:board back-to))
    :else
    (dis/board-data @dis/app-state (router/current-org-slug) (:board back-to))))
 
@@ -155,9 +155,9 @@
   (let [org-data (dis/org-data)
         ;; Go back to
         back-to (utils/back-to org-data)
-        is-contributor? (contains? back-to :contributor)
-        to-url (if is-contributor?
-                 (oc-urls/contributor (:contributor back-to))
+        is-contributions? (contains? back-to :contributions)
+        to-url (if is-contributions?
+                 (oc-urls/contributions (:contributions back-to))
                  (oc-urls/board (:board back-to)))
         cont-data (container-data back-to)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
@@ -170,20 +170,20 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
-    (if is-contributor?
-      (nav-to-author! e (:contributor back-to) to-url back-y should-refresh-data?)
+    (if is-contributions?
+      (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal [activity-data dont-scroll]
   (let [org (router/current-org-slug)
-        previous-slug (or (router/current-board-slug) (router/current-contributor-id))
+        previous-slug (or (router/current-board-slug) (router/current-contributions-id))
         board (:board-slug activity-data)
         back-to (cond
                   (and (seq (router/current-board-slug))
                        (not= (router/current-board-slug) utils/default-drafts-board-slug))
                   {:board (router/current-board-slug)}
-                  (seq (router/current-contributor-id))
-                  {:contributor (router/current-contributor-id)}
+                  (seq (router/current-contributions-id))
+                  {:contributions (router/current-contributions-id)}
                   :else
                   {:board board})
         activity (:uuid activity-data)

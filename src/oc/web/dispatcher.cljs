@@ -59,15 +59,15 @@
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
 
-(defn contributors-key [org-slug]
+(defn contributions-list-key [org-slug]
   (vec (conj (org-key org-slug) :contribs)))
 
-(defn contributor-key
+(defn contributions-key
   [org-slug author-uuid]
-   (vec (conj (contributors-key org-slug) (keyword author-uuid))))
+   (vec (conj (contributions-list-key org-slug) (keyword author-uuid))))
 
-(defn contributor-data-key [org-slug slug-or-uuid]
-  (conj (contributor-key org-slug slug-or-uuid) :contrib-data))
+(defn contributions-data-key [org-slug slug-or-uuid]
+  (conj (contributions-key org-slug slug-or-uuid) :contrib-data))
 
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
@@ -187,8 +187,8 @@
   (let [cnt-key (cond
                   (is-container? container-slug)
                   (container-key org-slug container-slug)
-                  (seq (:contributor route))
-                  (contributor-data-key org-slug container-slug)
+                  (seq (:contributions route))
+                  (contributions-data-key org-slug container-slug)
                   :else
                   (board-data-key org-slug container-slug))
         container-data (get-in base cnt-key)
@@ -214,7 +214,7 @@
 
 (declare org-data)
 (declare board-data)
-(declare contributor-data)
+(declare contributions-data)
 (declare editable-boards-data)
 (declare activity-data)
 (declare secure-activity-data)
@@ -228,7 +228,7 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :contributor-id      [[:route] (fn [route] (:contributor route))]
+   :contributions-id      [[:route] (fn [route] (:contributions route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
@@ -319,15 +319,15 @@
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
-                                   container-slug (or (:contributor route) (:board route))]
+                                   container-slug (or (:contributions route) (:board route))]
                               (get-container-posts base route posts-data org-slug container-slug :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route
-                                      (or (:contributor route)
+                                      (or (:contributions route)
                                           (:board route)))
                              (let [org-slug (:slug org-data)
-                                   container-slug (or (:contributor route) (:board route))]
+                                   container-slug (or (:contributions route) (:board route))]
                               (get-container-posts base route posts-data org-slug container-slug :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
@@ -340,30 +340,30 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributor-id]
-                         (fn [base org-slug board-slug contributor-id]
+   :container-data      [[:base :org-slug :board-slug :contributions-id]
+                         (fn [base org-slug board-slug contributions-id]
                            (when (and org-slug
                                       (or board-slug
-                                          contributor-id))
+                                          contributions-id))
                              (let [container-key (cond
-                                                   (seq contributor-id)
-                                                   (contributor-data-key org-slug contributor-id)
+                                                   (seq contributions-id)
+                                                   (contributions-data-key org-slug contributions-id)
                                                    (is-container? board-slug)
                                                    (container-key org-slug board-slug)
                                                    :else
                                                    (board-data-key org-slug board-slug))]
                                (get-in base container-key))))]
-   :contributor-data    [[:base :org-slug :contributor-id]
-                         (fn [base org-slug contributor-id]
-                           (when (and org-slug contributor-id)
-                             (contributor-data org-slug contributor-id)))]
+   :contributions-data    [[:base :org-slug :contributions-id]
+                         (fn [base org-slug contributions-id]
+                           (when (and org-slug contributions-id)
+                             (contributions-data org-slug contributions-id)))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
-   :contributor-user-data [[:base :team-roster :contributor-id]
-                           (fn [base team-roster contributor-id]
-                            (when (and team-roster contributor-id)
-                              (some #(when (= (:user-id %) contributor-id) %) (:users team-roster))))]
+   :contributions-user-data [[:base :team-roster :contributions-id]
+                           (fn [base team-roster contributions-id]
+                            (when (and team-roster contributions-id)
+                              (some #(when (= (:user-id %) contributions-id) %) (:users team-roster))))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -401,8 +401,8 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data :current-user-data :contributor-user-data]
-                          (fn [base org-data board-data current-user-data contributor-user-data]
+   :navbar-data         [[:base :org-data :board-data :current-user-data :contributions-user-data]
+                          (fn [base org-data board-data current-user-data contributions-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
@@ -413,7 +413,7 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
-                                (assoc :contributor-user-data contributor-user-data)
+                                (assoc :contributions-user-data contributions-user-data)
                                 (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]
@@ -482,10 +482,10 @@
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :contributor-data :container-data :posts-data :activity-data
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :contributions-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
                             :active-users :publishers-list]
-                            (fn [base orgs org-data board-data contributor-data container-data posts-data activity-data
+                            (fn [base orgs org-data board-data contributions-data container-data posts-data activity-data
                                  show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data
                                  active-users publishers-list]
                               {:jwt-data jwt
@@ -494,7 +494,7 @@
                                :payments-data payments
                                :container-data container-data
                                :board-data board-data
-                               :contributor-data contributor-data
+                               :contributions-data contributions-data
                                :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
@@ -638,21 +638,21 @@
     (when (and org-slug board-slug)
       (get-in data (board-data-key org-slug board-slug)))))
 
-(defun ^:export contributor-data
-  "Get contributor data"
+(defun ^:export contributions-data
+  "Get contributions data"
   ([]
-    (contributor-data @app-state))
+    (contributions-data @app-state))
   ([data :guard map?]
-    (contributor-data data (router/current-org-slug) (router/current-contributor-id)))
-  ([contributor-id :guard #(or (keyword? %) (string? %))]
-    (contributor-data @app-state (router/current-org-slug) contributor-id))
-  ([org-slug :guard #(or (keyword? %) (string? %)) contributor-id :guard #(or (keyword? %) (string? %))]
-    (contributor-data @app-state org-slug contributor-id))
+    (contributions-data data (router/current-org-slug) (router/current-contributions-id)))
+  ([contributions-id :guard #(or (keyword? %) (string? %))]
+    (contributions-data @app-state (router/current-org-slug) contributions-id))
+  ([org-slug :guard #(or (keyword? %) (string? %)) contributions-id :guard #(or (keyword? %) (string? %))]
+    (contributions-data @app-state org-slug contributions-id))
   ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
-    (contributor-data @app-state org-slug (router/current-contributor-id)))
-  ([data org-slug contributor-id]
-    (when (and org-slug contributor-id)
-      (get-in data (contributor-data-key org-slug contributor-id)))))
+    (contributions-data @app-state org-slug (router/current-contributions-id)))
+  ([data org-slug contributions-id]
+    (when (and org-slug contributions-id)
+      (get-in data (contributions-data-key org-slug contributions-id)))))
 
 (defn editable-boards-data
   ([] (editable-boards-data @app-state (router/current-org-slug)))

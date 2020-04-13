@@ -12,7 +12,7 @@
 (defn focus-reload
   []
   (let [slug (or (router/current-board-slug)
-                 (router/current-contributor-id))]
+                 (router/current-contributions-id))]
     (timbre/info "Reloading data for:" slug)
    (activity-actions/refresh-board-data slug)))
 

@@ -344,59 +344,59 @@
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
-(defn fix-contributor
+(defn fix-contributions
   "Parse data coming from the API for a certain user's posts."
-  ([contributor-data]
-   (fix-contributor contributor-data {} (dis/org-data) (dis/active-users)))
+  ([contributions-data]
+   (fix-contributions contributions-data {} (dis/org-data) (dis/active-users)))
 
-  ([contributor-data change-data]
-   (fix-contributor contributor-data change-data (dis/org-data) (dis/active-users)))
+  ([contributions-data change-data]
+   (fix-contributions contributions-data change-data (dis/org-data) (dis/active-users)))
 
-  ([contributor-data change-data org-data]
-   (fix-contributor contributor-data change-data org-data (dis/active-users)))
+  ([contributions-data change-data org-data]
+   (fix-contributions contributions-data change-data org-data (dis/active-users)))
 
-  ([contributor-data change-data org-data active-users & [direction]]
+  ([contributions-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
                                                             all-boards))]
                                             (assoc-in ret [:fixed-items (:uuid item)]
                                              (fix-entry item board-data change-data active-users))))
-                                 contributor-data
-                                 (:items contributor-data))
+                                 contributions-data
+                                 (:items contributions-data))
           next-links (when direction
                       (vec
                        (remove
                         #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
-                        (:links contributor-data))))
+                        (:links contributions-data))))
           link-to-move (when direction
                          (if (= direction :down)
-                           (utils/link-for (:old-links contributor-data) "previous")
-                           (utils/link-for (:old-links contributor-data) "next")))
+                           (utils/link-for (:old-links contributions-data) "previous")
+                           (utils/link-for (:old-links contributions-data) "next")))
           fixed-next-links (if direction
                              (if link-to-move
                                (vec (conj next-links link-to-move))
                                next-links)
-                             (:links contributor-data))
+                             (:links contributions-data))
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          items-list (if (contains? contributor-data :items)
+          items-list (if (contains? contributions-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map :uuid (:items contributor-data))
+                       (map :uuid (:items contributions-data))
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
-                       (:posts-list contributor-data))
+                       (:posts-list contributions-data))
           without-items (dissoc with-links :items)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat items-list (:posts-list contributor-data))
-                                                              :down (concat (:posts-list contributor-data) items-list)
+                                                              :up (concat items-list (:posts-list contributions-data))
+                                                              :down (concat (:posts-list contributions-data) items-list)
                                                               items-list)))
           with-saved-items (if direction
-                             (assoc with-posts-list :saved-items (count (:posts-list contributor-data)))
+                             (assoc with-posts-list :saved-items (count (:posts-list contributions-data)))
                              with-posts-list)
-          with-posts-separators (if (show-separators? (:href contributor-data))
+          with-posts-separators (if (show-separators? (:href contributions-data))
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))

@@ -67,7 +67,7 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
-        (seq (router/current-contributor-id))
+        (seq (router/current-contributions-id))
         (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)

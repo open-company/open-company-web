@@ -36,7 +36,7 @@
 (defn my-posts-click [s cur-user-id e]
   (.preventDefault e)
   (menu-close s)
-  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributor cur-user-id)))
+  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn notifications-settings-click [s e]
   (.preventDefault e)
@@ -161,7 +161,7 @@
                    current-user-data
                    (pos? (:contributions-count org-data)))
           [:a
-            {:href (oc-urls/contributor (:user-id current-user-data))
+            {:href (oc-urls/contributions (:user-id current-user-data))
              :on-click (partial my-posts-click s (:user-id current-user-data))}
             [:div.oc-menu-item.my-posts.group
               [:span.oc-menu-item-label

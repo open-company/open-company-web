@@ -11,7 +11,7 @@
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn- is-currently-shown? [author-uuid]
-  (= (router/current-contributor-id) author-uuid))
+  (= (router/current-contributions-id) author-uuid))
 
 (defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
@@ -50,7 +50,7 @@
 
   ([org-data author-uuid]
   (when-let [contrib-link (contributions-link org-data author-uuid)]
-    (api/get-contributor contrib-link
+    (api/get-contributions contrib-link
      (fn [{:keys [status body success] :as resp}]
        (contributions-get-finish author-uuid resp))))))
 
@@ -61,6 +61,6 @@
    direction (when success (:collection (json->cljs body)))]))
 
 (defn contributions-more [more-link direction]
-  (let [author-uuid (router/current-contributor-id)]
+  (let [author-uuid (router/current-contributions-id)]
     (api/load-more-items more-link direction (partial contributions-more-finish author-uuid direction))
     (dis/dispatch! [:contributions-more (router/current-org-slug) author-uuid])))
