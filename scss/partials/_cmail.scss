@@ -91,6 +91,10 @@ div.cmail-outer {
               div.rich-body-editor {
                 margin-top: 0;
                 min-height: 24px;
+
+                p:first-child {
+                  display: none;
+                }
               }
             }
           }
