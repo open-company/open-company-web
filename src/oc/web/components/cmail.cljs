@@ -30,7 +30,7 @@
             [oc.web.components.carrot-abstract :refer (carrot-abstract)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.sections-picker :as sections-picker]
+            [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
@@ -39,6 +39,8 @@
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)])
   (:import [goog.async Debouncer]))
+
+(def self-board-name "#None")
 
 ;; Attachments handling
 
@@ -534,7 +536,7 @@
         cmail-data* (drv/react s :cmail-data)
         cmail-data (update cmail-data* :board-name
                     #(if (:publisher-board cmail-data*)
-                       sections-picker/self-board-name
+                       self-board-name
                        %))
         payments-data (drv/react s :payments)
         show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
@@ -678,9 +680,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
-                                                      :on-change did-pick-section
-                                                      :current-user-data current-user-data})])]
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])]
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
@@ -700,9 +702,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
-                                                      :on-change did-pick-section
-                                                      :current-user-data current-user-data})])])
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])])
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -844,9 +846,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
-                                                      :on-change did-pick-section
-                                                      :current-user-data current-user-data})])])
+                    (sections-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-section
+                                      :current-user-data current-user-data})])])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 32
                            :height 32
