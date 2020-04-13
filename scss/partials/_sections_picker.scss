@@ -20,16 +20,17 @@ div.sections-picker {
       padding: 8px 16px;
       cursor: pointer;
 
-      &.publisher-board {
-        opacity: 0.6;
-      }
-
       &.active, &:hover {
         background-color: $feint_emerald;
         color: $carrot_green;
 
         &.publisher-board {
-          opacity: 1;
+          background-color: transparent;
+          color: var(--color);
+
+          div.sections-picker-section-name {
+            color: var(--color)
+          }
         }
 
         @include mobile() {
