@@ -221,13 +221,14 @@
               (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
               [:span.name
                 (:name publisher)]]
-            [:span.name
-              (str  "in "
-                   (:board-name activity-data)
-                   (when (= (:board-access activity-data) "private")
-                     " (private)")
-                   (when (= (:board-access activity-data) "public")
-                     " (public)"))]
+            (when-not (:publisher-board activity-data)
+              [:span.name
+                (str  "in "
+                     (:board-name activity-data)
+                     (when (= (:board-access activity-data) "private")
+                       " (private)")
+                     (when (= (:board-access activity-data) "public")
+                       " (public)"))])
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)
