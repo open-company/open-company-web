@@ -153,7 +153,7 @@ rangy.getSelection = function(){};
 var jwt_decode = function(){};
 // CarrotGA
 var CarrotGA = function(){};
-CarrotGA.dimentions = {};
+CarrotGA.dimensions = {};
 CarrotGA.metrics = {};
 CarrotGA.init = function(){};
 CarrotGA.trackEvent = function(){};

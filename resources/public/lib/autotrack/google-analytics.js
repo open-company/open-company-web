@@ -126,6 +126,54 @@ var sendNavigationTimingMetrics = function() {
   }
 };
 
+// Rewrite the URL to remove any utm_* parameters
+// source: https://stackoverflow.com/questions/48506722/remove-utm-parameters-from-url
+var removeUTMQueryParameters = function() {
+  function paramIsNotUtm(param) { return param.slice(0, 4) !== 'utm_'; }
+  if (history && history.replaceState && location.search) {
+    var params = location.search.slice(1).split('&');
+    var newParams = params.filter(paramIsNotUtm);
+    if (newParams.length < params.length) {
+      var search = newParams.length ? '?' + newParams.join('&') : '';
+      var url = location.pathname + search + location.hash;
+      history.replaceState(null, null, url);
+    }
+  }
+};
+
+// Get URL parameters by their name
+// source: https://code.broker/en/tutorials/store-utm-and-other-tracking-links-url-parameters-in-a-cookie/
+var getParameterByName = function(name) {
+  var params = window.location.search.substr(1).split('&');
+  for (var i = 0; i < params.length; i++) {
+    var p=params[i].split('=');
+     if (p[0] == name) {
+      return decodeURIComponent(p[1]);
+    }
+  }
+  return null;
+};
+
+// Given a cookie name and value, set the cookie to the value unless the cookie
+// already contains a value, or the value is null
+// source: https://stackoverflow.com/questions/32497923/how-to-get-this-cookie-to-expire-after-14-days
+var setCookie = function(name, value) {
+  if (value != null) {
+    var today = new Date();
+    var expire = new Date();
+    expire.setTime(today.getTime() + 3600000*24*14); // 2 weeks
+    document.cookie = name + "=" + encodeURI(value) + ";expires=" + expire.toGMTString();
+  }
+};
+
+// Get the utm URL parameters and store them in a cookie if they exist
+var storeUTMQueryParameters = function() {
+  setCookie('utm_source', getParameterByName('utm_source'));
+  setCookie('utm_medium', getParameterByName('utm_medium'));
+  setCookie('utm_term', getParameterByName('utm_term'));
+  setCookie('utm_campaign', getParameterByName('utm_campaign'));
+};
+
 var CarrotGA = {
 
   NULL_VALUE: '(not set)',
@@ -166,6 +214,8 @@ var CarrotGA = {
     trackCustomDimensions();
     requireAutotrackPlugins();
     sendNavigationTimingMetrics();
+    storeUTMQueryParameters();
+    removeUTMQueryParameters();
   },
 
   /* Track an event */
