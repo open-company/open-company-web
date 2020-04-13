@@ -8,13 +8,24 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]))
 
+(defn- parse-users [users-list]
+  (map (fn [u] (-> u
+                (update :name #(or % (user-lib/name-for u)))
+                (update :short-name #(or % (user-lib/short-name-for u)))))
+   users-list))
+
+(defn- deep-merge-users [new-users old-users]
+  (let [filtered-new-users (filter
+                            #(and (seq (:user-id %))
+                                  (uu/active? %))
+                            (if (map? new-users) (vals new-users) new-users))
+        new-users-map (zipmap (map :user-id filtered-new-users) filtered-new-users)]
+    (merge-with merge old-users new-users-map)))
+
 (defmethod dispatcher/action :active-users
   [db [_ org-slug active-users-data]]
   (if-let [users (-> active-users-data :collection :items)]
-    (let [fixed-users (map (fn [u] (-> u
-                                    (update :name #(or % (user-lib/name-for u)))
-                                    (update :short-name #(or % (user-lib/short-name-for u)))))
-                       users)
+    (let [fixed-users (parse-users users)
           users-map (zipmap (map :user-id users) fixed-users)
           change-data (dispatcher/change-data db)
           org-data (dispatcher/org-data db org-slug)
@@ -55,26 +66,20 @@
                                                    (:boards org-data))]
                                (assoc cmail-data :board-name (:name cmail-board))
                                cmail-data)
-          publishers-list-key (dispatcher/publishers-list-key org-slug)
-          old-publishers-list (get-in db publishers-list-key)]
+          publishers-list-key (dispatcher/publishers-list-key org-slug)]
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
        (update-in publishers-list-key
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
-           (mapv users-map %)
+           (->> %
+            (map users-map)
+            (sort-by :short-name)
+            vec)
            %))
        (assoc :cmail-data updated-cmail-data)))
     db))
-
-(defn- deep-merge-users [new-users old-users]
-  (let [filtered-new-users (filter
-                            #(and (seq (:user-id %))
-                                  (uu/active? %))
-                            (if (map? new-users) (vals new-users) new-users))
-        new-users-map (zipmap (map :user-id filtered-new-users) filtered-new-users)]
-    (merge-with merge old-users new-users-map)))
 
 (defmethod dispatcher/action :teams-get
   [db [_]]
@@ -97,16 +102,20 @@
 (defmethod dispatcher/action :team-roster-loaded
   [db [_ org-slug roster-data]]
   (if roster-data
-    (let [merged-users-data (deep-merge-users (:users roster-data) (dispatcher/active-users org-slug db))]
+    (let [parsed-roster-data (update roster-data :users parse-users)
+          merged-users-data (deep-merge-users (:users parsed-roster-data) (dispatcher/active-users org-slug db))]
       (-> db
-       (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) roster-data)
+       (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) parsed-roster-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
-       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % roster-data))
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-roster-data))
        (update-in (dispatcher/publishers-list-key org-slug)
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
-           (mapv merged-users-data %)
+           (->> %
+            (map merged-users-data)
+            (sort-by :short-name)
+            vec)
            %))))
     db))
 
@@ -117,22 +126,27 @@
         can-add-bot? (some #(->> % :slack-org-id keyword (get slack-users)) slack-orgs)]
     (-> team-data
      (assoc :can-slack-invite team-has-bot?)
-     (assoc :can-add-bot (and (not team-has-bot?) can-add-bot?)))))
+     (assoc :can-add-bot (and (not team-has-bot?) can-add-bot?))
+     (update :users parse-users))))
 
 (defmethod dispatcher/action :team-loaded
   [db [_ org-slug team-data]]
   (if team-data
     ;; if team is the current org team, load the slack chennels
-    (let [merged-users-data (deep-merge-users (:users team-data) (dispatcher/active-users org-slug db))]
+    (let [parsed-team-data (parse-team-data team-data)
+          merged-users-data (deep-merge-users (:users parsed-team-data) (dispatcher/active-users org-slug db))]
       (-> db
-       (assoc-in (dispatcher/team-data-key (:team-id team-data)) (parse-team-data team-data))
+       (assoc-in (dispatcher/team-data-key (:team-id team-data)) parsed-team-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
-       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % team-data))
+       (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-team-data))
        (update-in (dispatcher/publishers-list-key org-slug)
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
-           (mapv merged-users-data %)
+           (->> %
+            (map merged-users-data)
+            (sort-by :short-name)
+            vec)
            %))))
     db))
 
