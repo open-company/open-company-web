@@ -236,11 +236,11 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               (let [user-ids (map :user-id publishers-list)
-                    publisher-boards-change-data (map change-data user-ids)]
+                    publisher-boards-change-data (map (partial get change-data) user-ids)]
                 [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                   {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
                                             :new (and @(::users-list-collapsed s)
-                                                      (some :unread publisher-boards-change-data))})
+                                                      (seq (mapcat :unread publisher-boards-change-data)))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
@@ -279,11 +279,11 @@
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               (let [boards-uuids (map :uuid sorted-boards)
-                    boards-change-data (map change-data boards-uuids)]
+                    boards-change-data (map (partial get change-data) boards-uuids)]
                 [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                   {:class (utils/class-set {:collapsed @(::sections-list-collapsed s)
                                             :new (and @(::sections-list-collapsed s)
-                                                      (some :unread boards-change-data))})
+                                                      (seq (mapcat :unread boards-change-data)))})
                    :on-click #(toggle-collapse-sections s)}
                   [:span.sections "Boards"]])
               (when create-link
