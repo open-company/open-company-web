@@ -144,7 +144,8 @@
            (when-let* [nav-to-board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
              (dis/dispatch! [:input [:cmail-data] {:board-slug (:slug nav-to-board-data)
-                                                   :board-name (:name nav-to-board-data)}])
+                                                   :board-name (:name nav-to-board-data)
+                                                   :publisher-board (:publisher-board nav-to-board-data)}])
              (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)])))
          (when refresh?
            (utils/after 0 #(refresh-board-data board-slug))))))

@@ -30,7 +30,7 @@
             [oc.web.components.carrot-abstract :refer (carrot-abstract)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.sections-picker :as sections-picker]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
@@ -161,7 +161,7 @@
   (dis/dispatch! [:input [:cmail-data :has-changes] true])
   (debounced-autosave! state)
   (let [last-body-count @(::last-body-count state)]
-    (when-let [body-el (sel1 [:div.rich-body-editor])]
+    (when-let [body-el (body-element)]
       ;; If the body exceeds a certain length and the user is adding chars, not removing them
       ;; show the abstract
       (when (and (> (count (.-innerText body-el)) body-length-to-show-abstract)
@@ -246,7 +246,7 @@
      (body-on-change s))))
 
 (defn- clean-body [s]
-  (when-let [body-el (sel1 [:div.rich-body-editor])]
+  (when-let [body-el (body-element)]
     (dis/dispatch! [:input [:cmail-data :body] (utils/clean-body-html (.-innerHTML body-el))])))
 
 (defn- fix-headline [cmail-data]
@@ -438,7 +438,7 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
-                    (let [body-el (sel1 [:div.rich-body-editor])
+                    (let [body-el (body-element)
                           abstract-text (.text (.html (js/$ "<div/>") @(::initial-abstract s)))]
                       (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
                                 (seq abstract-text))
@@ -531,7 +531,11 @@
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         cmail-state (drv/react s :cmail-state)
-        cmail-data (drv/react s :cmail-data)
+        cmail-data* (drv/react s :cmail-data)
+        cmail-data (update cmail-data* :board-name
+                    #(if (:publisher-board cmail-data*)
+                       sections-picker/self-board-name
+                       %))
         payments-data (drv/react s :payments)
         show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
         published? (= (:status cmail-data) "published")
@@ -669,14 +673,14 @@
                   {:on-click #(swap! (::show-sections-picker s) not)
                    :data-placement "bottom"
                    :data-toggle "tooltip"
-                   :title "Post to this section"}
+                   :title "Post to"}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker {:active-slug (:board-slug cmail-data)
-                                      :on-change did-pick-section
-                                      :current-user-data current-user-data})])]
+                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
+                                                      :on-change did-pick-section
+                                                      :current-user-data current-user-data})])]
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
@@ -696,9 +700,9 @@
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker {:active-slug (:board-slug cmail-data)
-                                      :on-change did-pick-section
-                                      :current-user-data current-user-data})])])
+                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
+                                                      :on-change did-pick-section
+                                                      :current-user-data current-user-data})])])
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -835,14 +839,14 @@
                   {:on-click #(swap! (::show-sections-picker s) not)
                    :data-placement "top"
                    :data-toggle "tooltip"
-                   :title "Post to this section"}
+                   :title "Post to"}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker {:active-slug (:board-slug cmail-data)
-                                      :on-change did-pick-section
-                                      :current-user-data current-user-data})])])
+                    (sections-picker/sections-picker {:active-slug (:board-slug cmail-data)
+                                                      :on-change did-pick-section
+                                                      :current-user-data current-user-data})])])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 32
                            :height 32

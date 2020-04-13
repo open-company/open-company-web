@@ -59,13 +59,6 @@
                    next-db*
                    (keys (get-in db posts-key)))
           org-data (get-in next-db (dispatcher/org-data-key org-slug))
-          cmail-data (get next-db :cmail-data)
-          updated-cmail-data (if-let [cmail-board (some #(when (or (= (:board-uuid cmail-data) (:uuid %))
-                                                                   (= (:board-slug cmail-data) (:slug %)))
-                                                           %)
-                                                   (:boards org-data))]
-                               (assoc cmail-data :board-name (:name cmail-board))
-                               cmail-data)
           publishers-list-key (dispatcher/publishers-list-key org-slug)]
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
@@ -77,8 +70,7 @@
             (map users-map)
             (sort-by :short-name)
             vec)
-           %))
-       (assoc :cmail-data updated-cmail-data)))
+           %))))
     db))
 
 (defmethod dispatcher/action :teams-get

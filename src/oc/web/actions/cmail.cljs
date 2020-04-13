@@ -10,7 +10,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.json :refer (json->cljs)]))
 
@@ -35,7 +34,7 @@
        (if (and (not err)
                 (map? item)
                 (= (:updated-at entry-data) (:updated-at item)))
-         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name]))]
+         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name :publisher-board]))]
            (dis/dispatch! [:input [edit-key] entry-to-save]))
          (do
            ;; If we got an item remove it since it won't be used
@@ -48,12 +47,6 @@
 
 ;; Last used and default section for editing
 
-(defn get-board-name [board-data]
-  (if (and (:publisher-board board-data)
-           (= (-> board-data :author :user-id) (jwt/user-id)))
-    user-utils/publisher-board-name
-    (:name board-data)))
-
 (defn get-default-section [& [editable-boards]]
   (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (router/current-org-slug))))
         cookie-value (au/last-used-section)
@@ -63,8 +56,9 @@
         filtered-boards (filterv #(not (:draft %)) editable-boards)
         board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
     (when board-data
-      {:board-name (get-board-name board-data)
-       :board-slug (:slug board-data)})))
+      {:board-name (:name board-data)
+       :board-slug (:slug board-data)
+       :publisher-board (:publisher-board board-data)})))
 
 (defn get-board-for-edit [& [board-slug editable-boards]]
   (let [sorted-editable-boards (sort-by :name editable-boards)
@@ -77,8 +71,9 @@
             (:draft board-data)
             (not (utils/link-for (:links board-data) "create")))
       (get-default-section sorted-editable-boards)
-      {:board-name (get-board-name board-data)
-       :board-slug (:slug board-data)})))
+      {:board-name (:name board-data)
+       :board-slug (:slug board-data)
+       :publisher-board (:publisher-board board-data)})))
 
 ;; Entry
 

@@ -4,12 +4,13 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
+(def self-board-name "Board (optional)")
+
 (defn- self-board [user-data]
-  {:name user-utils/publisher-board-name
+  {:name ""
    :slug utils/default-section-slug
    :publisher-board true
    :access "team"
@@ -66,16 +67,22 @@
         {:style scroller-style}
         (when (pos? (count all-sections))
           (for [b all-sections
-                :let [active (= (:slug b) active-slug)]]
+                :let [active (= (:slug b) active-slug)
+                      self-board? (:publisher-board b)
+                      fixed-board (update b :name #(if self-board?
+                                                     self-board-name
+                                                     %))]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
                :class (utils/class-set {:active active
                                         :has-access-icon (#{"public" "private"} (:access b))
-                                        :bottom-border (:publisher-board b)})
+                                        :publisher-board (:publisher-board b)})
                :on-click #(when (fn? on-change)
-                            (on-change b))}
+                            (on-change fixed-board))}
               [:div.sections-picker-section-name
-                (:name b)]
+                (if self-board?
+                  self-board-name
+                  (:name b))]
               (case (:access b)
                 "private" [:div.private-icon]
                 "public" [:div.public-icon]

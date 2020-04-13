@@ -455,7 +455,7 @@
           (dis/dispatch! [:entry-publish fixed-edit-key])
           (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
                    section-editing)
-            (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
+            (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note :publisher-board)
                   final-board-data (assoc section-editing :entries [fixed-entry-data])
                   create-board-link (utils/link-for (:links org-data) "create")]
               (api/create-board create-board-link final-board-data (:invite-note section-editing)

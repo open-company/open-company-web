@@ -147,7 +147,8 @@
                      (when (and editable-board?
                                 (-> @dispatcher/app-state :cmail-state :collapsed))
                         (dispatcher/dispatch! [:input [:cmail-data] {:board-slug (:slug section-data)
-                                                              :board-name (:name section-data)}])
+                                                                     :board-name (:name section-data)
+                                                                     :publisher-board (:publisher-board section-data)}])
                         (dispatcher/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)]))
                      (router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data)))))
                   (utils/after 500 refresh-org-data)

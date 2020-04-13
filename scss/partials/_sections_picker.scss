@@ -20,22 +20,16 @@ div.sections-picker {
       padding: 8px 16px;
       cursor: pointer;
 
-      &.bottom-border {
-        border-bottom: 1px solid var(--divider-line);
-      }
-
-      &.bottom-border + div.sections-picker-section {
-        &.active, &:hover {
-          border-top: 1px solid $carrot_green;
-        }
+      &.publisher-board {
+        opacity: 0.6;
       }
 
       &.active, &:hover {
         background-color: $feint_emerald;
         color: $carrot_green;
 
-        &.bottom-border {
-          border-bottom: 1px solid $carrot_green;
+        &.publisher-board {
+          opacity: 1;
         }
 
         @include mobile() {

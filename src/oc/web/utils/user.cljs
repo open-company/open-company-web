@@ -6,8 +6,6 @@
 
 (def publisher-board-slug-prefix "publisher-board-")
 
-(def publisher-board-name "Post as yourself")
-
 (def user-avatar-filestack-config
   {:accept "image/*"
    :fromSources ["local_file_system"]
