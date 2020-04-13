@@ -17,6 +17,7 @@
   (let [is-inbox? (= (router/current-board-slug) "inbox")
         is-all-posts? (= (router/current-board-slug) "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
+        is-following? (= (router/current-board-slug) "following")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
         current-user-data (drv/react s :current-user-data)
@@ -32,7 +33,8 @@
                                       :inbox is-inbox?
                                       :all-posts is-all-posts?
                                       :drafts is-drafts-board?
-                                      :bookmarks is-bookmarks?})}
+                                      :bookmarks is-bookmarks?
+                                      :following is-following?})}
             (when is-contributions?
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
@@ -43,4 +45,5 @@
            is-all-posts? "Recent is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
            is-bookmarks? "You don't have any bookmarks"
+           is-following? "This is a stream of people you follow"
            :else "This section is empty")]]]))

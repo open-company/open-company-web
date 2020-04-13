@@ -543,6 +543,14 @@
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
       (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
 
+    (defroute following-route (urls/following ":org") {:as params}
+      (timbre/info "Routing following-route" (urls/following ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "following")))
+
+    (defroute following-slash-route (str (urls/following ":org") "/") {:as params}
+      (timbre/info "Routing following-slash-route" (str (urls/following ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "following")))
+
     (defroute first-ever-landing-route (urls/first-ever-landing ":org") {:as params}
       (timbre/info "Routing first-ever-landing-route" (urls/first-ever-landing ":org"))
       (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))

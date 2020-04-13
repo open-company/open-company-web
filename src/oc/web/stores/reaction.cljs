@@ -235,12 +235,27 @@
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
+(defmethod reducer :all-posts-more/finish
+  [db [_ org direction fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
+  db)
+
 (defmethod reducer :inbox-get/finish
   [db [_ org fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :bookmarks-get/finish
+  [db [_ org fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
+  db)
+
+(defmethod reducer :following-get/finish
+  [db [_ org fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
+  db)
+
+(defmethod reducer :following-get/finish
   [db [_ org fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)

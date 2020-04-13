@@ -96,6 +96,7 @@
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
+        is-following (= current-board-slug "following")
         is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -270,6 +271,9 @@
                                                    is-bookmarks
                                                    "Bookmarks"
 
+                                                   is-following
+                                                   "Following"
+
                                                    :default
                                                    ;; Fallback to the org board data
                                                    ;; to avoid showing an empty name while loading
@@ -335,5 +339,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" :else (:slug current-board-data))))
+               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" is-following "FL" :else (:slug current-board-data))))
               )]]]))

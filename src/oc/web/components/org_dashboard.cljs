@@ -115,6 +115,7 @@
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
                                (not= (router/current-board-slug) "bookmarks")
+                               (not= (router/current-board-slug) "following")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         current-activity-data (when (router/current-activity-id)
                                 (get posts-data (router/current-activity-id)))

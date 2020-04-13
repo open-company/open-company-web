@@ -67,6 +67,11 @@ div.empty-board {
           background-size: 18px 24px;
         }
 
+        &.following {
+          background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
+          background-size: 24px 21px;
+        }
+
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
 
@@ -80,6 +85,10 @@ div.empty-board {
 
           &.bookmarks {
             background-image: cdnUrl("/img/ML/empty_state_bookmarks_section@dark.svg");
+          }
+
+          &.following {
+            background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
           }
         }
       }

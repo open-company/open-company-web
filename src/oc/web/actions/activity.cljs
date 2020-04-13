@@ -153,12 +153,47 @@
   (api/load-more-items more-link direction (partial inbox-more-finish direction))
   (dis/dispatch! [:inbox-more (router/current-org-slug)]))
 
+;; Following stream
+
+(defn- following-get-finish [{:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          following-data (when success (json->cljs body))]
+      (when (= (router/current-board-slug) "following")
+        (cook/set-cookie! (router/last-board-cookie org) "following" (* 60 60 24 365))
+        (request-reads-count (->> following-data :collection :items (map :uuid)))
+        (watch-boards (:items (:collection following-data))))
+      (dis/dispatch! [:following-get/finish org following-data]))))
+
+(defn- following-real-get [following-link org-slug finish-cb]
+  (api/get-all-posts following-link
+   (fn [resp]
+     (following-get-finish resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
+(defn following-get [org-data & [finish-cb]]
+  (when-let [following-link (utils/link-for (:links org-data) "following")]
+    (following-real-get following-link (:slug org-data) finish-cb)))
+
+(defn- following-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
+  (dis/dispatch! [:following-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn following-more [more-link direction]
+  (api/load-more-items more-link direction (partial following-more-finish direction))
+  (dis/dispatch! [:following-more (router/current-org-slug)]))
+
 ;; Referesh org when needed
 (defn- refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-bookmarks (= (router/current-board-slug) "bookmarks")
         is-inbox (= (router/current-board-slug) "inbox")
+        is-following (= (router/current-board-slug) "following")
         is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
@@ -173,6 +208,9 @@
 
       is-bookmarks
       (bookmarks-get org-data)
+
+      is-following
+      (following-get org-data)
 
       (seq board-link)
       (sa/section-get board-link))))
@@ -625,6 +663,8 @@
           (all-posts-get (dis/org-data)))
         (when (= (router/current-board-slug) "bookmarks")
           (bookmarks-get (dis/org-data)))
+        (when (= (router/current-board-slug) "following")
+          (following-get (dis/org-data)))
         (when (= (router/current-board-slug) "inbox")
           (inbox-get (dis/org-data))))))
   (ws-cc/subscribe :entry/inbox-action
@@ -695,6 +735,8 @@
             (all-posts-get org-data dispatch-unread)
             (= (router/current-board-slug) "bookmarks")
             (bookmarks-get org-data dispatch-unread)
+            (= (router/current-board-slug) "following")
+            (following-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -852,6 +894,9 @@
 
         (= to-slug "bookmarks")
         (bookmarks-get org-data)
+
+        (= to-slug "following")
+        (following-get org-data)
 
         (and (not board-data)
              is-contributions?)

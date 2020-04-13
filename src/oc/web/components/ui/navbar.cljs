@@ -88,6 +88,8 @@
                        "Recent"
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
+                       (= (router/current-board-slug) "following")
+                       "Following"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else

@@ -99,6 +99,9 @@
         (= board-slug "bookmarks")
         (activity-actions/bookmarks-get org-data)
 
+        (= board-slug "following")
+        (activity-actions/following-get org-data)
+
         :default
         (let [fixed-board-data (or board-data
                                    (some #(when (= (:slug %) board-slug) %) (:boards org-data)))

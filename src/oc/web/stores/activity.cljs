@@ -82,6 +82,35 @@
       (assoc-in db bm-key next-bm-data))
     db))
 
+(defn add-remove-item-from-following
+  "Given an activity map adds or remove it from the bookmarks list of posts."
+  [db org-slug activity-data]
+  (if (:uuid activity-data)
+    (let [;; Add/remove item from MS
+          publishers-list (dispatcher/publishers-list org-slug db)
+          publisher-id (-> activity-data :publisher :user-id)
+          is-following? (and (not= (:status activity-data) "draft")
+                             (or ((set publishers-list) publisher-id)
+                                 (= publisher-id (j/user-id))))
+          fl-key (dispatcher/container-key org-slug :following)
+          old-fl-data (get-in db fl-key)
+          old-fl-data-posts (get old-fl-data :posts-list)
+          fl-without-uuid (utils/vec-dissoc old-fl-data-posts (:uuid activity-data))
+          new-fl-uuids (vec
+                        (if is-following?
+                          (conj fl-without-uuid (:uuid activity-data))
+                          fl-without-uuid))
+          new-fl-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-fl-uuids)
+          sorted-new-fl-posts (reverse (sort-by :published-at new-fl-data-posts))
+          sorted-new-fl-uuids (mapv :uuid sorted-new-fl-posts)
+          grouped-fl-uuids (if (au/show-separators? "following")
+                             (au/grouped-posts (assoc old-fl-data :posts-list sorted-new-fl-uuids))
+                             sorted-new-fl-uuids)
+          next-fl-data (merge old-fl-data {:posts-list sorted-new-fl-uuids
+                                           :items-to-render grouped-fl-uuids})]
+      (assoc-in db fl-key next-fl-data))
+    db))
+
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
   (-> db
@@ -174,6 +203,7 @@
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
       (add-remove-item-from-all-posts org-slug with-published-at)
       (add-remove-item-from-bookmarks org-slug with-published-at)
+      (add-remove-item-from-following org-slug with-published-at)
       (add-remove-item-from-board org-slug with-published-at)
       (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
@@ -685,3 +715,50 @@
     (-> db
       (assoc-in inbox-key without-items)
       (assoc-in (conj org-data-key :inbox-count) 0))))
+
+;; Following
+
+(defmethod dispatcher/action :following-get/finish
+  [db [_ org-slug following-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-following-data (au/fix-container (:collection following-data) change-data org-data active-users)
+        posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge old-posts (:fixed-items fixed-following-data))
+        container-key (dispatcher/container-key org-slug :following)]
+    (-> db
+      (assoc-in container-key fixed-following-data)
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-data-key :following-count) (:total-count fixed-following-data)))))
+
+(defmethod dispatcher/action :following-more
+  [db [_ org-slug]]
+  (let [container-key (dispatcher/container-key org-slug :following)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
+
+(defmethod dispatcher/action :following-more/finish
+  [db [_ org direction posts-data]]
+  (if posts-data
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
+          container-key (dispatcher/container-key org :following)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-data-key :following-count) (:total-count fixed-posts-data))))
+    db))

@@ -181,7 +181,7 @@
 
 (defn is-container? [container-slug]
   ;; Rest of containers
-  (#{"inbox" "all-posts" "bookmarks"} container-slug))
+  (#{"inbox" "all-posts" "bookmarks" "following"} container-slug))
 
 (defn- get-container-posts [base route posts-data org-slug container-slug posts-key]
   (let [cnt-key (cond
@@ -285,6 +285,9 @@
    :bookmarks-data     [[:base :org-slug]
                           (fn [base org-slug]
                             (get-in base (container-key org-slug :bookmarks)))]
+   :following-data     [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (container-key org-slug :following)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

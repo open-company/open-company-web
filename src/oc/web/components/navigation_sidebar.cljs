@@ -81,7 +81,6 @@
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
-                                (drv/drv :bookmarks-data)
                                 (drv/drv :publishers-list)
                                 ;; Locals
                                 (rum/local false ::content-height)
@@ -138,6 +137,7 @@
         is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-bookmarks (= selected-slug "bookmarks")
+        is-following (= selected-slug "following")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
@@ -148,12 +148,13 @@
                             (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks"))
+        show-following (and user-is-part-of-the-team?
+                            (utils/link-for (:links org-data) "following"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
-        bookmarks-data (drv/react s :bookmarks-data)
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
         user-role (user-store/user-role org-data current-user-data)
@@ -231,6 +232,17 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
+        ;; Following
+        (when show-following
+          [:a.following.hover-item.group.top-margin
+            {:class (utils/class-set {:item-selected is-following})
+             :href (oc-urls/following)
+             :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
+            [:div.following-icon]
+            [:div.following-label
+              "Following"]
+            (when (pos? (:following-count org-data))
+              [:span.count (:following-count org-data)])])
         (when show-users-list?
           [:div.left-navigation-sidebar-top.group
             ;; Boards header

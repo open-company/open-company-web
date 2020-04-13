@@ -144,18 +144,21 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        following-link (utils/link-for (:links org-data) "following")
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
+        is-following? (= (router/current-board-slug) "following")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
         delay-count (atom 0)
         inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
+        following-delay (if is-following? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
         active-users-link (utils/link-for (:links org-data) "active-users")]
@@ -179,6 +182,10 @@
           ;; Preload bookmarks data
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
+          ;; Preload following data
+          (when following-link
+            (utils/maybe-after following-delay #(aa/following-get org-data)))
+          ;; Drafts
           (when drafts-link
             (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
           ;; contributions data
@@ -193,7 +200,9 @@
                  (and is-all-posts?
                       (not all-posts-link))
                  (and is-bookmarks?
-                      (not bookmarks-link)))
+                      (not bookmarks-link))
+                 (and is-following?
+                      (not following-link)))
         (check-org-404))
       
       ; If there is a board slug let's load the board data

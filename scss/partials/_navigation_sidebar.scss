@@ -67,12 +67,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -106,7 +106,7 @@
     border-radius: 0;
   }
 
-  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -137,7 +137,7 @@
     color: $deep_navy;
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -197,7 +197,7 @@
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     color: var(--color);
     text-decoration: none;
 
@@ -326,12 +326,16 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions {
+  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions, a.following {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
     padding-left: 16px;
+
+    &.top-margin {
+      margin-top: 16px;
+    }
 
     @include mobile() {
       padding-left: 0px;
@@ -372,9 +376,13 @@ div.left-navigation-sidebar {
       div.drafts-icon {
         background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
       }
+
+      div.following-icon {
+        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+      }
     }
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -454,6 +462,25 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         background-position: center;
+        opacity: 1;
+        height: 24px;
+      }
+    }
+
+    div.following-icon {
+      background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
+      background-size: 14px 13px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 16px;
+      height: 23px;
+      float: left;
+      transform: rotate(90deg);
+
+      @include mobile() {
+        margin-left: 0px;
+        margin-top: 0px;
+        background-position: center 5px;
         opacity: 1;
         height: 24px;
       }
@@ -744,7 +771,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    a.inbox, a.all-posts, a.bookmarks, a.drafts {
+    a.inbox, a.all-posts, a.bookmarks, a.drafts, a.following {
       div.inbox-icon {
         background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
       }
@@ -759,6 +786,10 @@ div.left-navigation-sidebar {
 
       div.drafts-icon {
         background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
+      }
+
+      div.following-icon {
+        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
     }
 
