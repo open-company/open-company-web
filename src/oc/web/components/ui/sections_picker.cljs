@@ -7,7 +7,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
-(def self-board-name "Board (optional)")
+(def self-board-name "(None)")
 
 (defn- self-board [user-data]
   {:name ""
