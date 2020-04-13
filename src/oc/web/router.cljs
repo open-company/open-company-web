@@ -128,8 +128,8 @@
 (defn current-comment-id []
   (:comment @path))
 
-(defn current-contributor-id []
-  (:contributor @path))
+(defn current-contributions-id []
+  (:contributions @path))
 
 (defn query-params []
   (:query-params @path))

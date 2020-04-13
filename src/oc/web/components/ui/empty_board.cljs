@@ -11,34 +11,34 @@
 
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :current-user-data)
-                         (drv/drv :contributor-user-data)
+                         (drv/drv :contributions-user-data)
                          section-mixins/container-nav-in
   [s]
   (let [is-inbox? (= (router/current-board-slug) "inbox")
         is-all-posts? (= (router/current-board-slug) "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-contributor? (seq (router/current-contributor-id))
+        is-contributions? (seq (router/current-contributions-id))
         current-user-data (drv/react s :current-user-data)
-        contrib-user-data (drv/react s :contributor-user-data)
-        current-user-contrib? (and is-contributor?
+        contrib-user-data (drv/react s :contributions-user-data)
+        current-user-contrib? (and is-contributions?
                                    (= (:user-id contrib-user-data) (:user-id current-user-data)))]
     [:div.empty-board.group
       [:div.empty-board-grey-box
         [:div.empty-board-illustration-container
-          {:class (when is-contributor? "contrib")}
+          {:class (when is-contributions? "contrib")}
           [:div.empty-board-illustration
-            {:class (utils/class-set {:contributor is-contributor?
+            {:class (utils/class-set {:contributions is-contributions?
                                       :inbox is-inbox?
                                       :all-posts is-all-posts?
                                       :drafts is-drafts-board?
                                       :bookmarks is-bookmarks?})}
-            (when is-contributor?
+            (when is-contributions?
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
           (cond
            current-user-contrib? "You haven't published any posts yet"
-           is-contributor? (str (:short-name contrib-user-data) " hasn't posted anything yet")
+           is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-inbox? "You’re all caught up!"
            is-all-posts? "Recent is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"

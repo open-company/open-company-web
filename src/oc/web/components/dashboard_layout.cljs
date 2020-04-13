@@ -45,8 +45,8 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
-                              (drv/drv :contributor-data)
-                              (drv/drv :contributor-user-data)
+                              (drv/drv :contributions-data)
+                              (drv/drv :contributions-user-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
                               (drv/drv :items-to-render)
@@ -79,15 +79,15 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        contributor-data (drv/react s :contributor-data)
-        contributor-user-data (drv/react s :contributor-user-data)
+        contributions-data (drv/react s :contributions-data)
+        contributions-user-data (drv/react s :contributions-user-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
-        current-contributor-id (router/current-contributor-id)
+        current-contributions-id (router/current-contributions-id)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
@@ -96,14 +96,14 @@
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
-        is-contributor (seq current-contributor-id)
+        is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
         board-container-data (cond
-                              (seq current-contributor-id)
-                              contributor-data
+                              (seq current-contributions-id)
+                              contributions-data
                               (dis/is-container? current-board-slug)
                               container-data
                               :else
@@ -240,15 +240,15 @@
                 ;; Board name and settings button
                 [:div.board-name
                   (cond
-                    current-contributor-id
-                    [:div.board-name-with-icon.contributor
-                      (user-avatar-image contributor-user-data)
+                    current-contributions-id
+                    [:div.board-name-with-icon.contributions
+                      (user-avatar-image contributions-user-data)
                       [:div.board-name-with-icon-internal
-                        (if (= (:user-id contributor-user-data) (:user-id current-user-data))
+                        (if (= (:user-id contributions-user-data) (:user-id current-user-data))
                           "My posts"
-                          (lib-user/name-for contributor-user-data))
-                        ; (when (pos? (:total-count contributor-data))
-                        ;   [:span.count (:total-count contributor-data)])
+                          (lib-user/name-for contributions-user-data))
+                        ; (when (pos? (:total-count contributions-data))
+                        ;   [:span.count (:total-count contributions-data)])
                         ]]
                     current-board-slug
                     [:div.board-name-with-icon

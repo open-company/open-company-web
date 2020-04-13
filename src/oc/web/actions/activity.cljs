@@ -813,7 +813,7 @@
           active-users (dis/active-users)
           is-container? (dis/is-container? to-slug)
           is-board? (some #(when (= (:slug %) to-slug) %) (:boards org-data))
-          is-contributor? (get active-users to-slug)
+          is-contributions? (get active-users to-slug)
           board-data (cond
                        is-container?
                        (dis/container-data @dis/app-state (router/current-org-slug) to-slug)
@@ -831,7 +831,7 @@
         (bookmarks-get org-data)
 
         (and (not board-data)
-             is-contributor?)
+             is-contributions?)
         (contrib-actions/contributions-get to-slug)
 
         :default

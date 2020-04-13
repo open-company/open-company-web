@@ -385,7 +385,7 @@ div.dashboard-layout {
             display: inline-block;
             position: relative;
 
-            &.contributor {
+            &.contributions {
               @include user-profile(24) {
                 float: left;
                 margin: 4px 8px 0 0;

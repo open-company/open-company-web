@@ -67,12 +67,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributor-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributor-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -106,7 +106,7 @@
     border-radius: 0;
   }
 
-  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributor-label {
+  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -137,7 +137,7 @@
     color: $deep_navy;
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributor-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributor-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributor-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -197,7 +197,7 @@
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributor-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     color: var(--color);
     text-decoration: none;
 
@@ -326,7 +326,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributor {
+  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions {
     display: block;
     background-color: transparent;
     border: none;
@@ -374,7 +374,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributor-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -387,7 +387,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.contributor-label {
+    div.contributions-label {
       margin-left: 7px;
       max-width: 92px;
 
@@ -674,7 +674,7 @@ div.left-navigation-sidebar {
         }
       }
 
-      &.contributor {
+      &.contributions {
         @include user_profile(22);
 
         div.user-avatar-img-container {

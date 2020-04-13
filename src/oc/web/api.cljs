@@ -972,14 +972,14 @@
      callback)
     (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
 
-;; Contributors
+;; contributions
 
-(defn get-contributor [contrib-link callback]
+(defn get-contributions [contrib-link callback]
   (if contrib-link
     (storage-http (method-for-link contrib-link) (relative-href contrib-link)
      {:headers (headers-for-link contrib-link)}
      callback)
-    (handle-missing-link "get-contributor" contrib-link callback)))
+    (handle-missing-link "get-contributions" contrib-link callback)))
 
 ;; Polls
 

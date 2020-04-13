@@ -66,7 +66,7 @@
   (let [{:keys [org-data
                 board-data
                 current-user-data
-                contributor-user-data
+                contributions-user-data
                 show-login-overlay
                 orgs-dropdown-visible
                 search-active
@@ -88,8 +88,8 @@
                        "Recent"
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
-                       (and (router/current-contributor-id) (seq contributor-user-data))
-                       (lib-user/name-for contributor-user-data)
+                       (and (router/current-contributions-id) (seq contributions-user-data))
+                       (lib-user/name-for contributions-user-data)
                        :else
                        (:name board-data))
          search-active? (drv/react s search/search-active?)

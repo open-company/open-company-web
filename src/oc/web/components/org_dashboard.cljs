@@ -71,7 +71,7 @@
                 org-data
                 jwt-data
                 board-data
-                contributor-data
+                contributions-data
                 initial-section-editing
                 container-data
                 posts-data
@@ -92,16 +92,16 @@
                      app-loading
                      ;; the org data are not loaded yet
                      (not org-data)
-                     ;; No board or contributor specified
+                     ;; No board or contributions specified
                      (and (not (router/current-board-slug))
-                          (not (router/current-contributor-id))
+                          (not (router/current-contributions-id))
                           ;; but there are some
                           (pos? (count (:boards org-data)))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-                               (not (router/current-contributor-id))
+                               (not (router/current-contributions-id))
                                (not= (router/current-board-slug) "inbox")
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")

@@ -47,7 +47,7 @@
             [:button.mlb-reset.view-posts-bt
               {:on-click #(do
                             (nav-actions/close-all-panels)
-                            (nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data))))}
+                            (nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data))))}
               (if my-profile?
                 "View my posts"
                 "View posts")])
