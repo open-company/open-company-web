@@ -23,6 +23,7 @@
             [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -828,27 +829,37 @@
 
 ;; Refresh data
 
-(defn refresh-board-data [board-slug]
+(defn refresh-board-data [to-slug]
   (when (and (not (router/current-activity-id))
-             board-slug)
+             to-slug)
     (let [org-data (dis/org-data)
-          board-data (if (dis/is-container? board-slug)
-                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-                       (dis/board-data board-slug))]
+          active-users (dis/active-users)
+          is-container? (dis/is-container? to-slug)
+          is-board? (some #(when (= (:slug %) to-slug) %) (:boards org-data))
+          is-contributor? (get active-users to-slug)
+          board-data (cond
+                       is-container?
+                       (dis/container-data @dis/app-state (router/current-org-slug) to-slug)
+                       is-board?
+                       (dis/board-data to-slug))]
        (cond
 
-        (= board-slug "inbox")
+        (= to-slug "inbox")
         (inbox-get org-data)
 
-        (= board-slug "all-posts")
+        (= to-slug "all-posts")
         (all-posts-get org-data)
 
-        (= board-slug "bookmarks")
+        (= to-slug "bookmarks")
         (bookmarks-get org-data)
+
+        (and (not board-data)
+             is-contributor?)
+        (contrib-actions/contributions-get to-slug)
 
         :default
         (when-let* [fixed-board-data (or board-data
-                     (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+                     (some #(when (= (:slug %) to-slug) %) (:boards org-data)))
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (sa/section-get board-link))))))
 

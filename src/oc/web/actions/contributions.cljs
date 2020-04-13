@@ -42,7 +42,7 @@
     (contributions-get-success author-uuid (if success (json->cljs body) {}))))
 
 (defn- contributions-link [org-data author-uuid]
-  (when-let* [partial-link (utils/link-for (:links org-data) "partial-contributions")]
+  (when-let [partial-link (utils/link-for (:links org-data) "partial-contributions")]
     (utils/link-replace-href partial-link {:author-uuid author-uuid})))
 
 (defn contributions-get
@@ -57,7 +57,7 @@
 (defn- contributions-more-finish [author-uuid direction {:keys [success body]}]
   (when success
     (request-reads-count author-uuid (json->cljs body)))
-  (dis/dispatch! [:contributor-more/finish (router/current-org-slug) author-uuid
+  (dis/dispatch! [:contributions-more/finish (router/current-org-slug) author-uuid
    direction (when success (:collection (json->cljs body)))]))
 
 (defn contributions-more [more-link direction]

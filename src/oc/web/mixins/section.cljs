@@ -11,8 +11,9 @@
 
 (defn focus-reload
   []
-  (let [slug      (router/current-board-slug)]
-    (timbre/info "Reloading board" slug)
+  (let [slug (or (router/current-board-slug)
+                 (router/current-contributor-id))]
+    (timbre/info "Reloading data for:" slug)
    (activity-actions/refresh-board-data slug)))
 
 (def window-focus-auto-loader
