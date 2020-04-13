@@ -79,9 +79,10 @@ div.alert-modal-container {
       }
 
       img.alert-modal-icon {
-        max-width: 42px;
-        max-height: 42px;
+        width: 42px;
+        height: 42px;
         margin-bottom: 12px;
+        object-fit: contain;
       }
 
       div.alert-modal-title {
