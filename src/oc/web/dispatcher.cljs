@@ -64,7 +64,7 @@
 
 (defn contributions-key
   [org-slug author-uuid]
-   (vec (conj (contributions-key org-slug) (keyword author-uuid))))
+   (vec (conj (contributions-list-key org-slug) (keyword author-uuid))))
 
 (defn contributions-data-key [org-slug slug-or-uuid]
   (conj (contributions-key org-slug slug-or-uuid) :contrib-data))
