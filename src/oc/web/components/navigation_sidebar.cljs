@@ -252,9 +252,9 @@
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
             (for [user publishers-list
-                  :let [user-url (oc-urls/contributor org-slug (:user-id user))
-                        is-current-user (and (router/current-contributor-id)
-                                             (= (:user-id user) (router/current-contributor-id)))
+                  :let [user-url (oc-urls/contributions org-slug (:user-id user))
+                        is-current-user (and (router/current-contributions-id)
+                                             (= (:user-id user) (router/current-contributions-id)))
                         board (some #(when (and (:publisher-board %)
                                                 (= (-> % :author :user-id) (:user-id user)))
                                        %)
@@ -262,7 +262,7 @@
                         board-change-data (when board (get change-data (:uuid board)))]
                   :when (or (not @(::users-list-collapsed s))
                             is-current-user)]
-              [:a.left-navigation-sidebar-item.hover-item.contributor
+              [:a.left-navigation-sidebar-item.hover-item.contributions
                 {:class (utils/class-set {:item-selected is-current-user})
                  :data-user-id (:user-id user)
                  :key (str "user-list-" (:user-id user))
