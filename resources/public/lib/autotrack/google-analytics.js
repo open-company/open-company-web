@@ -2,23 +2,23 @@ var NULL_VALUE = '(not set)';
 var TRACKING_VERSION = 'dev';
 var TRACKING_ID = 'UA-113733066-1';
 
-var uuid = function b(a) {
+var CarrotGAUuid = function b(a) {
   return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) :
     ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
 };
 
-var getDefinitionIndex = function(definition) {
+var CarrotGAGetDefinitionIndex = function(definition) {
   +/\d+$/.exec(definition)[0];
 };
 
-var createTracker = function(version, tracking_id) {
+var CarrotGACreateTracker = function(version, tracking_id) {
   var version = version || 'dev';
   var tracking_id = tracking_id || '';
   ga('create', tracking_id, 'auto');
   ga('set', 'transport', 'beacon');
 };
 
-var trackCustomDimensions = function() {
+var CarrotGATrackCustomDimensions = function() {
   // Sets a default dimension value for all custom dimensions to ensure
   // that every dimension in every hit has *some* value. This is necessary
   // because Google Analytics will drop rows with empty dimension values
@@ -32,7 +32,7 @@ var trackCustomDimensions = function() {
     params[CarrotGA.dimensions.TRACKING_VERSION] = TRACKING_VERSION;
     CarrotGA.clientid = tracker.get('clientId');
     params[CarrotGA.dimensions.CLIENT_ID] = tracker.get('clientId');
-    params[CarrotGA.dimensions.WINDOW_ID] = uuid();
+    params[CarrotGA.dimensions.WINDOW_ID] = CarrotGAUuid();
     tracker.set(params);
   });
 
@@ -53,7 +53,7 @@ var trackCustomDimensions = function() {
   });
 };
 
-var requireAutotrackPlugins = function() {
+var CarrotGARequireAutotrackPlugins = function() {
   ga('require', 'cleanUrlTracker', {
     stripQuery: true,
     queryDimensionIndex:
@@ -85,13 +85,13 @@ var requireAutotrackPlugins = function() {
   });
 };
 
-var sendNavigationTimingMetrics = function() {
+var CarrotGASendNavigationTimingMetrics = function() {
   // Only track performance in supporting browsers.
   if (!(window.performance && window.performance.timing)) return;
 
   // If the window hasn't loaded, run this function after the `load` event.
   if (document.readyState != 'complete') {
-    window.addEventListener('load', sendNavigationTimingMetrics);
+    window.addEventListener('load', CarrotGASendNavigationTimingMetrics);
     return;
   }
 
@@ -128,7 +128,7 @@ var sendNavigationTimingMetrics = function() {
 
 // Rewrite the URL to remove any utm_* parameters
 // source: https://stackoverflow.com/questions/48506722/remove-utm-parameters-from-url
-var removeUTMQueryParameters = function() {
+var CarrotGARemoveUTMQueryParameters = function() {
   function paramIsNotUtm(param) { return param.slice(0, 4) !== 'utm_'; }
   if (history && history.replaceState && location.search) {
     var params = location.search.slice(1).split('&');
@@ -143,7 +143,7 @@ var removeUTMQueryParameters = function() {
 
 // Get URL parameters by their name
 // source: https://code.broker/en/tutorials/store-utm-and-other-tracking-links-url-parameters-in-a-cookie/
-var getParameterByName = function(name) {
+var CarrotGAGetParameterByName = function(name) {
   var params = window.location.search.substr(1).split('&');
   for (var i = 0; i < params.length; i++) {
     var p=params[i].split('=');
@@ -157,7 +157,7 @@ var getParameterByName = function(name) {
 // Given a cookie name and value, set the cookie to the value unless the cookie
 // already contains a value, or the value is null
 // source: https://stackoverflow.com/questions/32497923/how-to-get-this-cookie-to-expire-after-14-days
-var setCookie = function(name, value) {
+var CarrotGASetCookie = function(name, value) {
   if (value != null) {
     var today = new Date();
     var expire = new Date();
@@ -168,13 +168,13 @@ var setCookie = function(name, value) {
 
 // Get the utm URL parameters and store them in a cookie if they exist
 var storeUTMQueryParameters = function() {
-  setCookie('utm_source', getParameterByName('utm_source'));
-  setCookie('utm_medium', getParameterByName('utm_medium'));
-  setCookie('utm_term', getParameterByName('utm_term'));
-  setCookie('utm_campaign', getParameterByName('utm_campaign'));
+  CarrotGASetCookie('utm_source', CarrotGAGetParameterByName('utm_source'));
+  CarrotGASetCookie('utm_medium', CarrotGAGetParameterByName('utm_medium'));
+  CarrotGASetCookie('utm_term', CarrotGAGetParameterByName('utm_term'));
+  CarrotGASetCookie('utm_campaign', CarrotGAGetParameterByName('utm_campaign'));
 };
 
-var CarrotGA = {
+window.CarrotGA = {
 
   NULL_VALUE: '(not set)',
 
@@ -210,12 +210,12 @@ var CarrotGA = {
     if (tracking_id) {
       TRACKING_ID = tracking_id;
     }
-    createTracker(TRACKING_VERSION, TRACKING_ID);
-    trackCustomDimensions();
-    requireAutotrackPlugins();
-    sendNavigationTimingMetrics();
-    storeUTMQueryParameters();
-    removeUTMQueryParameters();
+    CarrotGACreateTracker(TRACKING_VERSION, TRACKING_ID);
+    CarrotGATrackCustomDimensions();
+    CarrotGARequireAutotrackPlugins();
+    CarrotGASendNavigationTimingMetrics();
+    CarrotGAStoreUTMQueryParameters();
+    CarrotGARemoveUTMQueryParameters();
   },
 
   /* Track an event */
