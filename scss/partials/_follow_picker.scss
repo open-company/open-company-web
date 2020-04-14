@@ -16,14 +16,13 @@ div.follow-picker {
   overflow-x: hidden;
   overflow-y: auto;
 
+  @include mobile() {
+    height: 100vh;
+  }
+
   div.follow-picker-modal {
     width: #{$board_container_width}px;
     background-color: var(--overlay-background-color);
-    // position: absolute;
-    // top: 0;
-    // height: calc(100vh - #{$navbar_height}px);
-    // right: 0;
-    // margin-top: #{$navbar_height}px;
     margin: 40px auto 32px;
     padding: 24px;
     transition: right 180ms ease-in;
@@ -31,12 +30,22 @@ div.follow-picker {
     position: relative;
 
     @include mobile() {
-      width: 100%;
-      left: 0;
-      min-height: 100vh;
-      overflow-y: auto;
-      padding: #{$mobile_navbar_height}px 16px 16px;
-      z-index: 1;
+      position: absolute;
+      top: #{$mobile_navbar_height}px;
+      left: unset;
+      right: 0;
+      width: 85vw;
+      height: auto;
+      max-height: initial;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
+      border: none;
+      box-shadow: none;
+      display: block;
+      text-align: left;
+      background-color: var(--mobile-background-color);
+      padding: 0 16px 32px;
+      margin: 0;
+      border-radius: 0;
     }
 
     button.modal-close-bt {
@@ -45,10 +54,9 @@ div.follow-picker {
       top: 12px;
 
       @include mobile() {
-        left: 16px;
+        position: fixed;
+        right: 16px;
         top: 11px;
-        right: unset;
-        z-index: 2;
         width: 32px;
         height: 32px;
         padding: 0;
@@ -56,72 +64,17 @@ div.follow-picker {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        background-color: var(--mobile-background-color);
+        background-color: var(--divider-line);
         border-radius: 4px;
+        z-index: 3;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
       }
     }
 
-    // div.follow-picker-header {
-    //   width: 320px;
-    //   height: #{$navbar_height}px;
-    //   background-color: var(--panel-header-background);
-    //   padding: 12px 24px;
-    //   position: fixed;
-    //   top: 0;
-    //   right: 0;
-    //   z-index: 100;
-
-    //   @include mobile() {
-    //     height: #{$mobile_navbar_height}px;
-    //     position: fixed;
-    //     top: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     border-bottom: 1px solid var(--divider-line);
-    //     background-color: var(--mobile-background-color);
-    //     padding: 15px 16px 15px 24px;
-    //     margin: 0;
-    //     z-index: 2;
-    //   }
-
-    //   div.follow-picker-header-title {
-    //     @include OC_Body_Bold();
-    //     font-size: 14px;
-    //     color: var(--color);
-    //     line-height: 32px;
-    //     float: left;
-
-    //     @include mobile() {
-    //       float: unset;
-    //       text-align: center;
-    //       font-size: 16px;
-    //       line-height: 24px;
-    //     }
-    //   }
-
-    //   button.follow-picker-create-bt {
-    //     width: auto;
-    //     height: 32px;
-    //     @include OC_Body_Bold();
-    //     font-size: 14px;
-    //     line-height: 18px;
-    //     color: white;
-    //     background-color: $carrot_green;
-    //     border-radius: 4px;
-    //     padding: 7px 14px;
-    //     float: right;
-
-    //     &.disabled, &:disabled {
-    //       opacity: 1!important;
-    //       background-color: var(--opac-background-color-05);
-    //       color: var(--light-color);
-    //     }
-    //   }
-    // }
-
     div.follow-picker-body {
-      // width: 272px;
-      // margin: 24px auto 0;
 
       h3.follow-picker-title {
         @include OC_Body_Bold();
@@ -129,7 +82,20 @@ div.follow-picker {
         line-height: 26px;
         color: var(--color);
         margin: 0;
+        width: 100%;
         padding: 0;
+
+        @include mobile() {
+          width: 85vw;
+          height: #{$mobile_navbar_height}px;
+          border-bottom: 1px solid var(--divider-line);
+          padding: 13px 16px;
+          position: fixed;
+          top: 0;
+          right: 0;
+          background-color: var(--mobile-background-color);
+          z-index: 2;
+        }
       }
 
       div.follow-picker-subtitle {
@@ -137,6 +103,10 @@ div.follow-picker {
         font-size: 16px;
         color: var(--color);
         margin-top: 4px;
+
+        @include mobile() {
+          margin-top: 16px;
+        }
       }
 
       div.follow-picker-empty-users {

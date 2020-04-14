@@ -562,6 +562,10 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         display: none;
+
+        &.people-plus-bt {
+          display: block;
+        }
       }
     }
   }

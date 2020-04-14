@@ -152,4 +152,43 @@
                     (carrot-checkbox {:selected selected?})
                     (user-avatar-image u)
                     [:span.follow-picker-user
+                      (:name u)]])
+
+                (for [u sorted-users
+                      :let [selected? (utils/in? @(::users s) (:user-id u))]]
+                  [:button.mlb-reset.follow-picker-user-row.group
+                    {:key (str "follow-picker-1" (:user-id u))
+                     :class (when (utils/in? @(::users s) (:user-id u)) "selected")
+                     :on-click #(do
+                                  (toggle-user s u)
+                                  (utils/event-stop %))}
+                    (carrot-checkbox {:selected selected?})
+                    (user-avatar-image u)
+                    [:span.follow-picker-user
+                      (:name u)]])
+
+                (for [u sorted-users
+                      :let [selected? (utils/in? @(::users s) (:user-id u))]]
+                  [:button.mlb-reset.follow-picker-user-row.group
+                    {:key (str "follow-picker-2" (:user-id u))
+                     :class (when (utils/in? @(::users s) (:user-id u)) "selected")
+                     :on-click #(do
+                                  (toggle-user s u)
+                                  (utils/event-stop %))}
+                    (carrot-checkbox {:selected selected?})
+                    (user-avatar-image u)
+                    [:span.follow-picker-user
+                      (:name u)]])
+
+                (for [u sorted-users
+                      :let [selected? (utils/in? @(::users s) (:user-id u))]]
+                  [:button.mlb-reset.follow-picker-user-row.group
+                    {:key (str "follow-picker-3" (:user-id u))
+                     :class (when (utils/in? @(::users s) (:user-id u)) "selected")
+                     :on-click #(do
+                                  (toggle-user s u)
+                                  (utils/event-stop %))}
+                    (carrot-checkbox {:selected selected?})
+                    (user-avatar-image u)
+                    [:span.follow-picker-user
                       (:name u)]])]])]]]))
