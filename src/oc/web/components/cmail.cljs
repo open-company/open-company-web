@@ -41,6 +41,7 @@
   (:import [goog.async Debouncer]))
 
 (def self-board-name "#None")
+(def board-tooltip "Select a board")
 
 ;; Attachments handling
 
@@ -675,7 +676,7 @@
                   {:on-click #(swap! (::show-sections-picker s) not)
                    :data-placement "bottom"
                    :data-toggle "tooltip"
-                   :title "Post to"}
+                   :title board-tooltip}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
@@ -841,7 +842,7 @@
                   {:on-click #(swap! (::show-sections-picker s) not)
                    :data-placement "top"
                    :data-toggle "tooltip"
-                   :title "Post to"}
+                   :title board-tooltip}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
