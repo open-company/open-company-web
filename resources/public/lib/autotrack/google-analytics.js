@@ -167,7 +167,7 @@ var CarrotGASetCookie = function(name, value) {
 };
 
 // Get the utm URL parameters and store them in a cookie if they exist
-var storeUTMQueryParameters = function() {
+var CarrotGAStoreUTMQueryParameters = function() {
   CarrotGASetCookie('utm_source', CarrotGAGetParameterByName('utm_source'));
   CarrotGASetCookie('utm_medium', CarrotGAGetParameterByName('utm_medium'));
   CarrotGASetCookie('utm_term', CarrotGAGetParameterByName('utm_term'));
