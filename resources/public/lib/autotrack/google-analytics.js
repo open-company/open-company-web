@@ -57,14 +57,14 @@ var CarrotGARequireAutotrackPlugins = function() {
   ga('require', 'cleanUrlTracker', {
     stripQuery: true,
     queryDimensionIndex:
-      getDefinitionIndex(CarrotGA.dimensions.URL_QUERY_PARAMS),
+      CarrotGAGetDefinitionIndex(CarrotGA.dimensions.URL_QUERY_PARAMS),
     trailingSlash: 'remove',
   });
   ga('require', 'maxScrollTracker', {
     sessionTimeout: 30,
     timeZone: 'America/New_York',
     maxScrollMetricIndex:
-    getDefinitionIndex(CarrotGA.metrics.MAX_SCROLL_PERCENTAGE),
+    CarrotGAGetDefinitionIndex(CarrotGA.metrics.MAX_SCROLL_PERCENTAGE),
   });
   ga('require', 'outboundLinkTracker', {
     events: ['click', 'contextmenu'],
@@ -73,8 +73,8 @@ var CarrotGARequireAutotrackPlugins = function() {
   objs[CarrotGA.dimensions.HIT_SOURCE] = 'pageVisibilityTracker';
   ga('require', 'pageVisibilityTracker', {
     sendInitialPageview: true,
-    pageLoadsMetricIndex: getDefinitionIndex(CarrotGA.metrics.PAGE_LOADS),
-    visibleMetricIndex: getDefinitionIndex(CarrotGA.metrics.PAGE_VISIBLE),
+    pageLoadsMetricIndex: CarrotGAGetDefinitionIndex(CarrotGA.metrics.PAGE_LOADS),
+    visibleMetricIndex: CarrotGAGetDefinitionIndex(CarrotGA.metrics.PAGE_VISIBLE),
     timeZone: 'America/New_York',
     fieldsObj: objs,
   });
