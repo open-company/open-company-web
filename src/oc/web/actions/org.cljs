@@ -363,6 +363,26 @@
   [s n]
   (subs s 0 (min (count s) n)))
 
+(defn- add-utm-data
+  "
+  Augment org data with utm values stored in cookies.
+
+  Remove utm cookies if present.
+  "
+  [org-data]
+  (let [source (cook/get-cookie "utm_source")
+        term (cook/get-cookie "utm_term")
+        medium (cook/get-cookie "utm_medium")
+        campaign (cook/get-cookie "utm_campaign")]
+    (doseq [c-name ["utm_source" "utm_term" "utm_medium" "utm_campaign"]]
+      (js/OCStaticDeleteCookie c-name))
+    (if (or source term medium campaign)
+      (merge org-data {:utm-data {:utm-source (or source "")
+                                  :utm-term (or term "")
+                                  :utm-medium (or medium "")
+                                  :utm-campaign (or campaign "")}})
+      org-data)))
+
 (defn create-or-update-org [org-data]
   (dis/dispatch! [:input [:org-editing :error] false])
   (let [email-domain (:email-domain org-data)
@@ -377,7 +397,7 @@
       (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
         (api/patch-org org-patch-link clean-org-data (partial org-update-cb email-domain)))
       (let [create-org-link (utils/link-for (dis/api-entry-point) "create")]
-        (api/create-org create-org-link clean-org-data (partial org-create-cb email-domain))))))
+        (api/create-org create-org-link (add-utm-data clean-org-data) (partial org-create-cb email-domain))))))
 
 ;; Org edit
 

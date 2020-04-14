@@ -255,7 +255,7 @@
                                                       (seq (mapcat :unread publisher-boards-change-data)))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
-              [:button.left-navigation-sidebar-top-title-button.btn-reset
+              [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-picker)
                  :title "Follow posts from your teammates"
                  :data-placement "top"
