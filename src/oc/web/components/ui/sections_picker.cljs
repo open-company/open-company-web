@@ -34,6 +34,7 @@
                               (when-not (utils/event-inside? e (rum/dom-node s))
                                 (dis/dispatch! [:input [:show-sections-picker] false]))))
                              ;; Derivatives
+                             (drv/drv :org-data)
                              (drv/drv :editable-boards)
                              ;; Locals
                              (rum/local nil ::container-max-height)
@@ -45,7 +46,9 @@
                                (calc-max-height s)
                                s)}
   [s {:keys [active-slug on-change moving? current-user-data]}]
-  (let [editable-boards (vals (drv/react s :editable-boards))
+  (let [org-data (drv/react s :org-data)
+        editable-boards (vals (drv/react s :editable-boards))
+        author? (not= (utils/get-user-type current-user-data org-data) :viewer)
         user-publisher-board (some #(when (and (:publisher-board %)
                                                (= (-> % :author :user-id) (:user-id current-user-data)))
                                       %)
@@ -53,7 +56,9 @@
         filtered-boards (filter (comp not :publisher-board) editable-boards)
         sorted-boards (sort-by :name filtered-boards)
         fixed-publisher-board (or user-publisher-board (self-board current-user-data))
-        all-sections (cons fixed-publisher-board sorted-boards)
+        all-sections (if author?
+                       (cons fixed-publisher-board sorted-boards)
+                       sorted-boards)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
                           {})
@@ -69,9 +74,13 @@
           (for [b all-sections
                 :let [active (= (:slug b) active-slug)
                       self-board? (:publisher-board b)
-                      fixed-board (update b :name #(if self-board?
-                                                     self-board-name
-                                                     %))]]
+                      fixed-board (if (and author? (not self-board?) active)
+                                    ;; When user selects again the currently selected board,
+                                    ;; unselect it and go back to publisher board if he has/can have one
+                                    fixed-publisher-board
+                                    (update b :name #(if self-board?
+                                                       self-board-name
+                                                       %)))]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
                :class (utils/class-set {:active active
