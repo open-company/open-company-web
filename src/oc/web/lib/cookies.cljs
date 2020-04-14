@@ -24,19 +24,6 @@
   [c-name]
   (.get cookies-static-obj (cookie-name c-name)))
 
-(defn ^:export read-cookie
-  "Read a cookie with the exact name provided."
-  [c-name]
-  (.get cookies-static-obj c-name))
-
-(defn ^:export delete-cookie!
-  "Delete a cookie with the exact name provided."
-  ([c-name]
-   (.remove cookies-static-obj c-name))
-
-  ([c-name opt-path opt-domain]
-   (.remove cookies-static-obj c-name opt-path opt-domain)))
-
 (defn remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
   ([c-name]

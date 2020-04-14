@@ -168,10 +168,13 @@ var CarrotGASetCookie = function(name, value) {
 
 // Get the utm URL parameters and store them in a cookie if they exist
 var CarrotGAStoreUTMQueryParameters = function() {
-  CarrotGASetCookie('utm_source', CarrotGAGetParameterByName('utm_source'));
-  CarrotGASetCookie('utm_medium', CarrotGAGetParameterByName('utm_medium'));
-  CarrotGASetCookie('utm_term', CarrotGAGetParameterByName('utm_term'));
-  CarrotGASetCookie('utm_campaign', CarrotGAGetParameterByName('utm_campaign'));
+  function storeParameter(name) {
+    CarrotGASetCookie(OCStaticCookieName(name), CarrotGAGetParameterByName(name));
+  }
+  storeParameter('utm_source');
+  storeParameter('utm_medium');
+  storeParameter('utm_term');
+  storeParameter('utm_campaign');
 };
 
 window.CarrotGA = {

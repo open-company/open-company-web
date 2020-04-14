@@ -224,13 +224,13 @@
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+          ;; Static js files
+          [:script {:type "text/javascript" :src (shared/cdn "/js/static-js.js")}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ie-jquery-fix
-          ;; Static js files
-          [:script {:type "text/javascript" :src (shared/cdn "/js/static-js.js")}]
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy

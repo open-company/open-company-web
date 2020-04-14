@@ -9,7 +9,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
@@ -335,13 +334,13 @@
   Remove utm cookies if present.
   "
   [org-data]
-  (let [source (cook/read-cookie "utm_source")
-        term (cook/read-cookie "utm_term")
-        medium (cook/read-cookie "utm_medium")
-        campaign (cook/read-cookie "utm_campaign")]
+  (let [source (cook/get-cookie "utm_source")
+        term (cook/get-cookie "utm_term")
+        medium (cook/get-cookie "utm_medium")
+        campaign (cook/get-cookie "utm_campaign")]
     (doseq [c-name ["utm_source" "utm_term" "utm_medium" "utm_campaign"]]
       (js/console.log "DBG deleting utm cookie:" c-name)
-      (js/console.log "DBG    ->" (cook/delete-cookie! c-name "/" ls/web-server)))
+      (js/console.log "DBG    ->" (cook/remove-cookie! c-name)))
     (if (or source term medium campaign)
       (merge org-data {:utm-data {:utm-source (or source "")
                                   :utm-term (or term "")
