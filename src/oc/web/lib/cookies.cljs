@@ -19,11 +19,25 @@
   ([c-name c-value expiry c-path c-domain c-secure]
     (.set cookies-static-obj (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
-(defn get-cookie [c-name]
+(defn get-cookie
+  "Get a cookie with the name provided pre-fixed by the environment."
+  [c-name]
   (.get cookies-static-obj (cookie-name c-name)))
 
+(defn read-cookie
+  "Read a cookie with the exact name provided."
+  [c-name]
+  (.get cookies-static-obj c-name))
+
+(defn delete-cookie!
+  "Delete a cookie with the exact name provided."
+  [c-name]
+  (.remove cookies-static-obj c-name))
+
 (defn remove-cookie!
+  "Remove a cookie with the name provided pre-fixed by the environment."
   ([c-name]
-    (remove-cookie! (name c-name) "/"))
+  (remove-cookie! (name c-name) "/"))
+  
   ([c-name opt-path]
-    (.remove cookies-static-obj (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
+  (.remove cookies-static-obj (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
