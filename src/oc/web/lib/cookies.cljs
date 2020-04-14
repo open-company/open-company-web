@@ -32,7 +32,7 @@
 (defn delete-cookie!
   "Delete a cookie with the exact name provided."
   [c-name]
-  (.remove cookies-static-obj c-name))
+  (.remove cookies-static-obj c-name "/" ls/jwt-cookie-domain))
 
 (defn remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
