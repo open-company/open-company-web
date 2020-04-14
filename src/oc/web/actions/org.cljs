@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
@@ -339,7 +340,7 @@
         medium (cook/read-cookie "utm_medium")
         campaign (cook/read-cookie "utm_campaign")]
     (doseq [name ["utm_source" "utm_term" "utm_medium" "utm_campaign"]]
-      (cook/delete-cookie! name))
+      (cook/delete-cookie! name "/" ls/web-server))
     (if (or source term medium campaign)
       (merge org-data {:utm-data {:utm-source (or source "")
                                   :utm-term (or term "")
