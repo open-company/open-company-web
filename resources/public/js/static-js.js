@@ -48,6 +48,10 @@ function OCStaticCookieName(name){
   return prefix + name;
 }
 
+function OCStaticDeleteCookie(name) {
+  document.cookie = OCStaticCookieName(name) + "=;expires=Thu Jan 01 1970 01:00:00 UTC;path=/;";
+}
+
 function OCStaticGetDecodedJWT(jwt) {
   if (jwt && typeof jwt_decode === "function") {
     try {

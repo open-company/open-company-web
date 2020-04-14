@@ -339,8 +339,7 @@
         medium (cook/get-cookie "utm_medium")
         campaign (cook/get-cookie "utm_campaign")]
     (doseq [c-name ["utm_source" "utm_term" "utm_medium" "utm_campaign"]]
-      (js/console.log "DBG deleting utm cookie:" c-name)
-      (js/console.log "DBG    ->" (cook/remove-cookie! c-name)))
+      (js/OCStaticDeleteCookie c-name))
     (if (or source term medium campaign)
       (merge org-data {:utm-data {:utm-source (or source "")
                                   :utm-term (or term "")
