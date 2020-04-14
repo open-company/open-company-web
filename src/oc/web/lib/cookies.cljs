@@ -24,12 +24,12 @@
   [c-name]
   (.get cookies-static-obj (cookie-name c-name)))
 
-(defn read-cookie
+(defn ^:export read-cookie
   "Read a cookie with the exact name provided."
   [c-name]
   (.get cookies-static-obj c-name))
 
-(defn delete-cookie!
+(defn ^:export delete-cookie!
   "Delete a cookie with the exact name provided."
   ([c-name]
    (.remove cookies-static-obj c-name))
