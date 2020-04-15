@@ -33,3 +33,5 @@
       (and (>= (+ (.-top rect) fixed-offset) responsive/navbar-height)
            ;; and less than the screen height
            (< (- (.-top rect) fixed-offset) win-height))))
+
+(def empty-body-html "<p><br/></>")
