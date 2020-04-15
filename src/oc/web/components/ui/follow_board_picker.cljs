@@ -127,12 +127,12 @@
                   [:div.follow-board-picker-board-row.group
                     {:key (str "follow-board-picker-" (:uuid b))
                      :class (when (utils/in? @(::boards s) (:uuid b)) "selected")}
+                    (carrot-checkbox {:selected selected?
+                                      :did-change-cb #(toggle-board s b)})
                     [:button.mlb-reset.follow-board-bt
                       {:on-click #(if @(::selecting-multiple s)
                                     (toggle-board s b)
                                     (toggle-board-and-exit s b))}
-                      (carrot-checkbox {:selected selected?
-                                        :did-change-cb #(toggle-board s b)})
                       [:span.follow-board-picker-board
                         (:name b)]]])]
               [:button.mlb-reset.follow-board-picker-create-bt

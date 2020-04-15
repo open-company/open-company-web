@@ -220,12 +220,12 @@ div.follow-board-picker {
 
             button.follow-board-bt {
               float: left;
-              height: 40px;
+              height: 32px;
               width: calc(100% - 24px);
               padding: 0;
+              text-align: left;
 
               span.follow-board-picker-board {
-                display: block;
                 @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 32px;
@@ -233,6 +233,7 @@ div.follow-board-picker {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                text-align: left;
               }
             }
           }
