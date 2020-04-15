@@ -87,10 +87,11 @@
   [db org-slug activity-data]
   (if (:uuid activity-data)
     (let [;; Add/remove item from MS
-          publishers-list (dispatcher/publishers-list org-slug db)
+          follow-list (dispatcher/follow-list org-slug db)
           publisher-id (-> activity-data :publisher :user-id)
           is-following? (and (not= (:status activity-data) "draft")
-                             (or ((set publishers-list) publisher-id)
+                             (or ((set (:publisher-uuids follow-list)) publisher-id)
+                                 ((set (:board-uuids follow-list)) (:board-uuid activity-data))
                                  (= publisher-id (j/user-id))))
           fl-key (dispatcher/container-key org-slug :following)
           old-fl-data (get-in db fl-key)

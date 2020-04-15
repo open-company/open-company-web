@@ -81,7 +81,8 @@
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
-                                (drv/drv :publishers-list)
+                                (drv/drv :follow-publishers-list)
+                                (drv/drv :follow-boards-list)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
@@ -161,8 +162,9 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        publishers-list (drv/react s :publishers-list)
-        show-users-list? user-is-part-of-the-team?]
+        follow-publishers-list (drv/react s :follow-publishers-list)
+        show-users-list? user-is-part-of-the-team?
+        follow-boards-list (drv/react s :follow-boards-list)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -191,17 +193,6 @@
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
-        ;; Inbox
-        (when show-inbox
-          [:a.inbox.hover-item.group
-            {:class (utils/class-set {:item-selected is-inbox})
-             :href (oc-urls/inbox)
-             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
-            [:div.inbox-icon]
-            [:div.inbox-label
-              "Unread"]
-            (when (pos? (:inbox-count org-data))
-              [:span.count (:inbox-count org-data)])])
         ;; Bookmarks
         (when show-bookmarks
           [:a.bookmarks.hover-item.group
@@ -241,29 +232,48 @@
             [:div.following-icon]
             [:div.following-label
               "Following"]
-            (when (pos? (:following-count org-data))
-              [:span.count (:following-count org-data)])])
+            ; (when (pos? (:following-count org-data))
+            ;   [:span.count (:following-count org-data)])
+            ])
+        ;; Inbox
+        (when show-inbox
+          [:a.inbox.hover-item.group
+            {:class (utils/class-set {:item-selected is-inbox})
+             :href (oc-urls/inbox)
+             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
+            [:div.inbox-icon]
+            [:div.inbox-label
+              "Unread"]
+            (when (pos? (:inbox-count org-data))
+              [:span.count (:inbox-count org-data)])])
         (when show-users-list?
-          [:div.left-navigation-sidebar-top.group
+          [:div.left-navigation-sidebar-top.top-margin.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              (let [user-ids (map :user-id publishers-list)
+              [:button.mlb-reset.left-navigation-sidebar-title-arrow
+                {:class (utils/class-set {:collapsed @(::users-list-collapsed s)})
+                 :on-click #(toggle-collapse-users s)}]
+              (let [user-ids (map :user-id follow-publishers-list)
                     publisher-boards-change-data (map (partial get change-data) user-ids)]
-                [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                  {:class (utils/class-set {:collapsed @(::users-list-collapsed s)
-                                            :new (and @(::users-list-collapsed s)
+                [:button.mlb-reset.left-navigation-sidebar-title
+                  {:class (utils/class-set {:new (and @(::users-list-collapsed s)
                                                       (seq (mapcat :unread publisher-boards-change-data)))})
-                   :on-click #(toggle-collapse-users s)}
+                   :on-click #(nav-actions/show-follow-user-picker)
+                   :title "Follow your teammates"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-container "body"}
                   [:span.sections "People"]])
-              [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
-                {:on-click #(nav-actions/show-follow-picker)
-                 :title "Follow posts from your teammates"
-                 :data-placement "top"
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-container "body"}]]])
+              (when show-invite-people?
+                [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
+                  {:on-click #(nav-actions/show-org-settings :invite-picker)
+                   :title "Invite more teammates"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-container "body"}])]])
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
-            (for [user publishers-list
+            (for [user follow-publishers-list
                   :let [user-url (oc-urls/contributions org-slug (:user-id user))
                         is-current-user (and (router/current-contributions-id)
                                              (= (:user-id user) (router/current-contributions-id)))
@@ -290,13 +300,18 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              (let [boards-uuids (map :uuid sorted-boards)
-                    boards-change-data (map (partial get change-data) boards-uuids)]
-                [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                  {:class (utils/class-set {:collapsed @(::sections-list-collapsed s)
-                                            :new (and @(::sections-list-collapsed s)
+              [:button.mlb-reset.left-navigation-sidebar-title-arrow
+                {:class (utils/class-set {:collapsed @(::sections-list-collapsed s)})
+                 :on-click #(toggle-collapse-sections s)}]
+              (let [follow-board-uuids (map :uuid follow-boards-list)
+                    boards-change-data (map (partial get change-data) follow-board-uuids)]
+                [:button.mlb-reset.left-navigation-sidebar-title
+                  {:class (utils/class-set {:new (and @(::sections-list-collapsed s)
                                                       (seq (mapcat :unread boards-change-data)))})
-                   :on-click #(toggle-collapse-sections s)}
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :title "Follow the topics you care about"
+                   :on-click #(nav-actions/show-follow-board-picker)}
                   [:span.sections "Boards"]])
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
@@ -305,9 +320,9 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when show-boards
+        (when (seq follow-boards-list)
           [:div.left-navigation-sidebar-items.group
-            (for [board sorted-boards
+            (for [board follow-boards-list
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (and (not is-inbox)
                                               (not is-all-posts)

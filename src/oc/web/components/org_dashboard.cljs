@@ -22,7 +22,8 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.follow-picker :refer (follow-picker)]
+            [oc.web.components.ui.follow-user-picker :refer (follow-user-picker)]
+            [oc.web.components.ui.follow-board-picker :refer (follow-board-picker)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -165,7 +166,8 @@
         show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
-        show-follow-picker (= open-panel :follow-picker)]
+        show-follow-user-picker (= open-panel :follow-user-picker)
+        show-follow-board-picker (= open-panel :follow-board-picker)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -242,9 +244,12 @@
           ;; User info modal
           show-user-info?
           (user-info-modal {:user-data user-info-data :org-data org-data})
-          ;; Follow picker
-          show-follow-picker
-          (follow-picker))
+          ;; Follow user picker
+          show-follow-user-picker
+          (follow-user-picker)
+          ;; Follow section picker
+          show-follow-board-picker
+          (follow-board-picker))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

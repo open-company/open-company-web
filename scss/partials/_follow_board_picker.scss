@@ -1,0 +1,243 @@
+div.follow-board-picker {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @include mobile() {
+    height: 100vh;
+  }
+
+  div.follow-board-picker-modal {
+    width: #{$board_container_width}px;
+    background-color: var(--overlay-background-color);
+    margin: 40px auto 32px;
+    padding: 24px;
+    transition: right 180ms ease-in;
+    border-radius: 4px;
+    position: relative;
+
+    @include mobile() {
+      position: absolute;
+      top: #{$mobile_navbar_height}px;
+      left: unset;
+      right: 0;
+      width: 85vw;
+      height: auto;
+      max-height: initial;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
+      border: none;
+      box-shadow: none;
+      display: block;
+      text-align: left;
+      background-color: var(--mobile-background-color);
+      padding: 0 16px 32px;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    button.modal-close-bt {
+      position: absolute;
+      right: -48px;
+      top: 12px;
+
+      @include mobile() {
+        position: fixed;
+        right: 16px;
+        top: 11px;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: var(--divider-line);
+        border-radius: 4px;
+        z-index: 3;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+
+    div.follow-board-picker-body {
+
+      h3.follow-board-picker-title {
+        @include OC_Body_Bold();
+        font-size: 20px;
+        line-height: 26px;
+        color: var(--color);
+        margin: 0;
+        width: 100%;
+        padding: 0;
+
+        @include mobile() {
+          width: 85vw;
+          height: #{$mobile_navbar_height}px;
+          border-bottom: 1px solid var(--divider-line);
+          padding: 13px 16px;
+          position: fixed;
+          top: 0;
+          right: 0;
+          background-color: var(--mobile-background-color);
+          z-index: 2;
+        }
+      }
+
+      div.follow-board-picker-subtitle {
+        @include OC_Body_Book();
+        font-size: 16px;
+        color: var(--color);
+        margin-top: 4px;
+
+        @include mobile() {
+          margin-top: 16px;
+        }
+      }
+
+      div.follow-board-picker-empty-boards {
+        opacity: 0.7;
+
+        div.follow-board-picker-empty-icon {
+          margin: 32px auto 0;
+          width: 40px;
+          height: 40px;
+          background-image: cdnUrl("/img/ML/invite_people_bt.svg");
+          background-size: 40px 40px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+          }
+        }
+
+        div.follow-board-picker-empty-copy {
+          margin: 8px 0 0;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: var(--color);
+          text-align: center;
+
+          button.follow-board-picker-empty-invite-bt {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            color: $carrot_green;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      div.follow-board-picker-body-inner {
+
+        input.follow-board-picker-search-field-input {
+          display: block;
+          height: 32px;
+          width: 100%;
+          padding: 4px 8px;
+          margin: 8px 0 0;
+          background-color: transparent;
+          @include OC_Body_Book();
+          font-size: 12px;
+          line-height: 24px;
+          color: var(--color);
+          border: none;
+          outline: none;
+          vertical-align: super;
+          border-radius: 4px;
+          background-color: var(--opac-background-color-1);
+
+          &:focus, &:active {
+            border: none;
+            outline: none;
+          }
+
+          @include placeholder() {
+            @include OC_Body_Book();
+            color: var(--light-color);
+            font-size: 14px;
+            line-height: 24px;
+          }
+        }
+
+        button.follow-board-picker-create-bt {
+          width: auto;
+          height: 32px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: white;
+          background-color: $carrot_green;
+          border-radius: 4px;
+          padding: 7px 14px;
+          margin-top: 16px;
+          float: right;
+
+          &.disabled, &:disabled {
+            opacity: 1!important;
+            background-color: var(--opac-background-color-05);
+            color: var(--light-color);
+          }
+        }
+
+        div.follow-board-picker-boards-list {
+          margin-top: 16px;
+          width: calc(100% + 48px);
+          margin-left: -24px;
+
+          div.follow-board-picker-board-row {
+            height: 40px;
+            padding: 4px 24px;
+            border: none;
+            outline: none;
+            width: 100%;
+            display: block;
+
+            &.selected {
+              background-color: var(--opac-background-color-05);
+            }
+
+            div.carrot-checkbox {
+              margin-right: 8px;
+              float: left;
+              margin-top: 8px;
+            }
+
+            button.follow-board-bt {
+              float: left;
+              height: 40px;
+              width: calc(100% - 24px);
+              padding: 0;
+
+              span.follow-board-picker-board {
+                display: block;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 32px;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

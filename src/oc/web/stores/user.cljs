@@ -281,7 +281,7 @@
     (assoc-in db dispatcher/expo-push-token-key push-token)
     db))
 
-;; Publishers
+;; Follow
 
 (defn- publishers-list-with-users [publishers-list active-users-map]
   (->> publishers-list
@@ -289,26 +289,45 @@
    (sort-by :short-name)
    vec))
 
-(defmethod dispatcher/action :publishers/loaded
-  [db [_ org-slug {:keys [publisher-uuids user-id] :as resp}]]
+(defn- enrich-boards-list [board-uuids org-boards]
+  (let [boards-map (zipmap (map :uuid org-boards) org-boards)]
+    (->> board-uuids
+     (map boards-map)
+     (sort-by :name)
+     vec)))
+
+(defmethod dispatcher/action :follow/loaded
+  [db [_ org-slug {:keys [publisher-uuids board-uuids user-id] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [publishers-list-key (dispatcher/publishers-list-key org-slug)
+    (let [org-data (dispatcher/org-data db)
+          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+          follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
+          active-users (dispatcher/active-users org-slug db)
+          next-db (assoc-in db follow-boards-list-key
+                   (enrich-boards-list board-uuids (:boards org-data)))]
+      (if active-users
+        (assoc-in next-db follow-publishers-list-key
+         (publishers-list-with-users publisher-uuids active-users))
+        ;; If users have not been loaded yet save the publishers list for later
+        (assoc-in next-db follow-publishers-list-key publisher-uuids)))
+      db))
+
+(defmethod dispatcher/action :publishers/follow
+  [db [_ org-slug {:keys [publisher-uuids] :as resp}]]
+  (if (= org-slug (:org-slug resp))
+    (let [publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)]
       (if active-users
         (assoc-in db publishers-list-key
          (publishers-list-with-users publisher-uuids active-users))
         ;; If users have not been loaded yet save the publishers list for later
         (assoc-in db publishers-list-key publisher-uuids)))
-      db))
+    db))
 
-(defmethod dispatcher/action :publishers/follow
-  [db [_ org-slug {:keys [publisher-uuids] :as resp}]]
+(defmethod dispatcher/action :boards/follow
+  [db [_ org-slug {:keys [board-uuids] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [publishers-list-key (dispatcher/publishers-list-key org-slug)
-          active-users (dispatcher/active-users org-slug db)]
-      (if active-users
-        (assoc-in db publishers-list-key
-                     (publishers-list-with-users publisher-uuids active-users))
-        ;; If users have not been loaded yet save the publishers list for later
-        (assoc-in db publishers-list-key publisher-uuids)))
+    (let [org-data (dispatcher/org-data db)]
+      (assoc-in db (dispatcher/follow-boards-list-key org-slug)
+       (enrich-boards-list board-uuids (:boards org-data))))
     db))

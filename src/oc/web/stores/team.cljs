@@ -59,11 +59,11 @@
                    next-db*
                    (keys (get-in db posts-key)))
           org-data (get-in next-db (dispatcher/org-data-key org-slug))
-          publishers-list-key (dispatcher/publishers-list-key org-slug)]
+          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)]
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
-       (update-in publishers-list-key
+       (update-in follow-publishers-list-key
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
            (->> %
@@ -101,7 +101,7 @@
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-roster-data))
-       (update-in (dispatcher/publishers-list-key org-slug)
+       (update-in (dispatcher/follow-publishers-list-key org-slug)
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
            (->> %
@@ -132,7 +132,7 @@
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-team-data))
-       (update-in (dispatcher/publishers-list-key org-slug)
+       (update-in (dispatcher/follow-publishers-list-key org-slug)
         ;; In case we have a list
         #(if (and (seq %) (every? string? %))
            (->> %

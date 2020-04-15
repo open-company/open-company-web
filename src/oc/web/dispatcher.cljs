@@ -123,8 +123,14 @@
 (defn active-users-key [org-slug]
   (vec (conj (org-key org-slug) :active-users)))
 
-(defn publishers-list-key [org-slug]
-  (vec (conj (org-key org-slug) :publishers-list)))
+(defn follow-list-key [org-slug]
+  (vec (conj (org-key org-slug) :follow-list)))
+
+(defn follow-publishers-list-key [org-slug]
+  (vec (conj (follow-list-key org-slug) :publisher-uuids)))
+
+(defn follow-boards-list-key [org-slug]
+  (vec (conj (follow-list-key org-slug) :board-uuids)))
 
 (defn mention-users-key [org-slug]
   (vec (conj (org-key org-slug) :mention-users)))
@@ -487,10 +493,10 @@
                                   (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :contributions-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
-                            :active-users :publishers-list]
+                            :active-users :follow-publishers-list :follow-boards-list]
                             (fn [base orgs org-data board-data contributions-data container-data posts-data activity-data
                                  show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data
-                                 active-users publishers-list]
+                                 active-users follow-publishers-list follow-boards-list]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -515,7 +521,8 @@
                                :search-active search-active
                                :user-info-data user-info-data
                                :active-users active-users
-                               :publishers-list publishers-list})]
+                               :follow-publishers-list follow-publishers-list
+                               :follow-boards-list follow-boards-list})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -536,7 +543,10 @@
    :users-info-hover      [[:base :org-slug] (fn [base org-slug] (get-in base (users-info-hover-key org-slug)))]
    :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
    :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]
-   :publishers-list       [[:base :org-slug] (fn [base org-slug] (get-in base (publishers-list-key org-slug)))]})
+   :follow-list           [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-key org-slug)))]
+   :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
+   :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
+   })
 
 ;; Action Loop =================================================================
 
@@ -809,10 +819,20 @@
   ([org-slug] (active-users org-slug @app-state))
   ([org-slug data] (get-in data (active-users-key org-slug))))
 
-(defn ^:export publishers-list
+(defn ^:export follow-list
+  ([] (follow-list (:slug (org-data)) @app-state))
+  ([org-slug] (follow-list org-slug @app-state))
+  ([org-slug data] (get-in data (follow-list-key org-slug))))
+
+(defn ^:export follow-publishers-list
   ([] (publishers-list (:slug (org-data)) @app-state))
   ([org-slug] (publishers-list org-slug @app-state))
-  ([org-slug data] (get-in data (publishers-list-key org-slug))))
+  ([org-slug data] (get-in data (follow-publishers-list-key org-slug))))
+
+(defn ^:export follow-boards-list
+  ([] (follow-boards-list (:slug (org-data)) @app-state))
+  ([org-slug] (follow-boards-list org-slug @app-state))
+  ([org-slug data] (get-in data (follow-boards-list-key org-slug))))
 
 (defn uploading-video-data
   ([video-id] (uploading-video-data (router/current-org-slug) video-id @app-state))

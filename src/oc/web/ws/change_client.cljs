@@ -80,15 +80,17 @@
   (timbre/debug "Sending item/who-read for item-ids:" item-ids)
   (send! chsk-send! [:item/who-read item-ids]))
 
+;; Follow
+
+(defn follow-list []
+  (timbre/debug "Sending follow-list for user-id:" @current-uid "org-slug:" @current-org)
+  (send! chsk-send! [:follow/list {:user-id @current-uid
+                                   :org-slug @current-org}]))
+
 ;; Publishers follow
 
 (defn publisher-watch []
   (send! chsk-send! [:user/watch {:org-slug @current-org :user-ids [@current-uid]}]))
-
-(defn publishers-list []
-  (timbre/debug "Sending publishers/list for user-id:" @current-uid "org-slug:" @current-org)
-  (send! chsk-send! [:publishers/list {:user-id @current-uid
-                                       :org-slug @current-org}]))
 
 (defn publishers-follow [publisher-uuids]
   (timbre/debug "Sending publishers/follow for user-id:" @current-uid
@@ -96,6 +98,15 @@
   (send! chsk-send! [:publishers/follow {:user-id @current-uid
                                          :org-slug @current-org
                                          :publisher-uuids (vec publisher-uuids)}]))
+
+;; Boards follow
+
+(defn boards-follow [board-uuids]
+  (timbre/debug "Sending boards/follow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuids:" board-uuids)
+  (send! chsk-send! [:boards/follow {:user-id @current-uid
+                                     :org-slug @current-org
+                                     :board-uuids (vec board-uuids)}]))
 
 (defn subscribe
   [topic handler-fn]
@@ -156,12 +167,12 @@
   (timbre/debug "Change event :entry/inbox-action" body)
   (go (>! ch-pub { :topic :entry/inbox-action :data body })))
 
-;; Publishers event handler
+;; Follow event handler
 
-(defmethod event-handler :publishers/list
+(defmethod event-handler :follow/list
   [_ body]
-  (timbre/debug "Change event :publishers/list" body)
-  (go (>! ch-pub { :topic :publishers/list :data body })))
+  (timbre/debug "Change event :follow/list" body)
+  (go (>! ch-pub { :topic :follow/list :data body })))
 
 ;; ----- Sente event handlers -----
 
@@ -198,7 +209,7 @@
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
     (container-watch)
     (publisher-watch)
-    (publishers-list)))
+    (follow-list)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 

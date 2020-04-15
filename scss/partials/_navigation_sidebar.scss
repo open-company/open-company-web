@@ -503,7 +503,10 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
-    margin-top: 16px;
+
+    &.top-margin {
+      margin-top: 16px;
+    }
 
     .left-navigation-sidebar-top-title {
       padding: 0 16px;
@@ -526,31 +529,38 @@ div.left-navigation-sidebar {
         }
       }
 
-      button.left-navigation-sidebar-sections-arrow {
+      button.left-navigation-sidebar-title-arrow {
         position: relative;
         height: 32px;
-        padding: 0 0 0 28px;
+        width: 16px;
+        padding: 0;
+        // position: absolute;
+        // top: 0;
+        // left: 3px;
+        float: left;
+        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
+        background-size: 12px 6px;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: 180ms transform;
 
-        &.collapsed:before {
+        &.collapsed {
           transform: rotate(-90deg);
         }
 
-        &.collapsed.new span.sections {
-          @include OC_Body_Bold();
+        @include mobile() {
+          cursor: default;
         }
+      }
 
-        &:before {
-          content: "";
-          position: absolute;
-          top: 12px;
-          left: 3px;
-          background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
-          background-size: 12px 6px;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 12px;
-          height: 6px;
-          transition: 180ms transform;
+      button.left-navigation-sidebar-title {
+        position: relative;
+        height: 32px;
+        float: left;
+        padding: 0 0 0 12px;
+
+        &.new span.sections {
+          @include OC_Body_Bold();
         }
 
         span.sections {
@@ -798,7 +808,7 @@ div.left-navigation-sidebar {
     }
 
     div.left-navigation-sidebar-top {
-      .left-navigation-sidebar-top-title button.left-navigation-sidebar-sections-arrow:before {
+      .left-navigation-sidebar-top-title button.left-navigation-sidebar-title-arrow {
         background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
       }
 

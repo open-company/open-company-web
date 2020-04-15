@@ -543,23 +543,29 @@
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
           :expire 5}))))
-  (ws-cc/subscribe :publishers/list
+  (ws-cc/subscribe :follow/list
     (fn [{:keys [data]}]
-      (dis/dispatch! [:publishers/loaded (router/current-org-slug) data]))))
+      (dis/dispatch! [:follow/loaded (router/current-org-slug) data]))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
 
 ;; Publishers
 
-(defn load-publishers-list []
-  (ws-cc/publishers-list))
+(defn load-follow-list []
+  (ws-cc/follow-list))
 
 (defn follow-publishers [publisher-uuids]
   (dis/dispatch! [:publishers/follow (router/current-org-slug)
                                      {:org-slug (router/current-org-slug)
                                       :publisher-uuids publisher-uuids}])
   (ws-cc/publishers-follow publisher-uuids))
+
+(defn follow-boards [board-uuids]
+  (dis/dispatch! [:boards/follow (router/current-org-slug)
+                                 {:org-slug (router/current-org-slug)
+                                  :board-uuids board-uuids}])
+  (ws-cc/boards-follow board-uuids))
 
 ;; Debug
 
