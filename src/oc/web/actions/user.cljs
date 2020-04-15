@@ -559,13 +559,15 @@
   (dis/dispatch! [:publishers/follow (router/current-org-slug)
                                      {:org-slug (router/current-org-slug)
                                       :publisher-uuids publisher-uuids}])
-  (ws-cc/publishers-follow publisher-uuids))
+  (ws-cc/publishers-follow publisher-uuids)
+  (utils/after 500 #(activity-actions/following-get (dis/org-data))))
 
 (defn follow-boards [board-uuids]
   (dis/dispatch! [:boards/follow (router/current-org-slug)
                                  {:org-slug (router/current-org-slug)
                                   :board-uuids board-uuids}])
-  (ws-cc/boards-follow board-uuids))
+  (ws-cc/boards-follow board-uuids)
+  (utils/after 500 #(activity-actions/following-get (dis/org-data))))
 
 ;; Debug
 
