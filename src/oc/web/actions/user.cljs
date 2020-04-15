@@ -378,25 +378,32 @@
         timezone (or (:timezone edit-user-profile) (:timezone current-user-data) (.. js/moment -tz guess))]
     (assoc with-email :timezone timezone)))
 
-(defn- user-profile-patch [user-data user-profile-link success-cb]
+(defn- user-profile-patch [user-data user-profile-link patch-cb]
   (dis/dispatch! [:user-profile-save])
   (api/patch-user user-profile-link user-data
    (fn [status body success]
      (if (= status 422)
        (dis/dispatch! [:user-profile-update/failed])
-       (when success
-         (let [resp (json->cljs body)]
-           (success-cb resp)
+       (let [resp (when success (json->cljs body))]
+         (when (fn? patch-cb)
+           (patch-cb success resp))
+         (when success
            (dis/dispatch! [:user-data resp])))))))
 
-(defn user-profile-save [current-user-data edit-data]
-  (let [user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
-        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-    (user-profile-patch user-data user-profile-link
-     (fn [resp]
-       (utils/after 100 (fn []
-         (jwt-actions/jwt-refresh (fn []
-           (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))))
+(defn user-profile-save
+  ([current-user-data edit-data]
+   (user-profile-save current-user-data edit-data nil))
+  ([current-user-data edit-data save-cb]
+   (let [user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
+         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+     (user-profile-patch user-data user-profile-link
+      (fn [success resp]
+        (when success
+          (utils/after 100 (fn []
+            (jwt-actions/jwt-refresh (fn []
+              (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data)))))))))))
+        (when (fn? save-cb)
+          (utils/after 280 #(save-cb success resp))))))))
 
 (defn onboard-profile-save
   ([current-user-data edit-data]
@@ -408,7 +415,7 @@
          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
      (dis/dispatch! [:user-profile-save])
      (user-profile-patch user-data user-profile-link
-      (fn [resp]
+      (fn [success resp]
        (when-not org-editing
          (dis/dispatch! [:input [:ap-loading] true]))
        (utils/after 100 (fn []
