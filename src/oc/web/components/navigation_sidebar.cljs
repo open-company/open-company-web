@@ -310,6 +310,7 @@
                                                       (seq (mapcat :unread boards-change-data)))})
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
+                   :data-container "body"
                    :title "Follow the topics you care about"
                    :on-click #(nav-actions/show-follow-board-picker)}
                   [:span.sections "Boards"]])
