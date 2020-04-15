@@ -825,8 +825,8 @@
   ([org-slug data] (get-in data (follow-list-key org-slug))))
 
 (defn ^:export follow-publishers-list
-  ([] (publishers-list (:slug (org-data)) @app-state))
-  ([org-slug] (publishers-list org-slug @app-state))
+  ([] (follow-publishers-list (:slug (org-data)) @app-state))
+  ([org-slug] (follow-publishers-list org-slug @app-state))
   ([org-slug data] (get-in data (follow-publishers-list-key org-slug))))
 
 (defn ^:export follow-boards-list
