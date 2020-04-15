@@ -263,7 +263,7 @@
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
                        (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
-                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
+                       (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.onboard-lander-header
@@ -875,7 +875,7 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))}
+                          (user-actions/onboard-profile-save current-user-data edit-user-profile))}
             "Start using Carrot"]]]]))
 
 (rum/defcs email-wall < rum/reactive

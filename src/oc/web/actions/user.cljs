@@ -362,47 +362,61 @@
 
 ;; User Profile
 
-(defn user-profile-save
+(defn- clean-user-data [current-user-data edit-user-profile]
+  (let [new-password (:password edit-user-profile)
+        password-did-change (pos? (count new-password))
+        with-pswd (if (and password-did-change
+                           (>= (count new-password) 8))
+                    edit-user-profile
+                    (dissoc edit-user-profile :password))
+        new-email (:email edit-user-profile)
+        email-did-change (not= new-email (:email current-user-data))
+        with-email (if (and email-did-change
+                            (utils/valid-email? new-email))
+                     (assoc with-pswd :email new-email)
+                     (assoc with-pswd :email (:email current-user-data)))
+        timezone (or (:timezone edit-user-profile) (:timezone current-user-data) (.. js/moment -tz guess))]
+    (assoc with-email :timezone timezone)))
+
+(defn- user-profile-patch [user-data user-profile-link success-cb]
+  (dis/dispatch! [:user-profile-save])
+  (api/patch-user user-profile-link user-data
+   (fn [status body success]
+     (if (= status 422)
+       (dis/dispatch! [:user-profile-update/failed])
+       (when success
+         (let [resp (json->cljs body)]
+           (success-cb resp)
+           (dis/dispatch! [:user-data resp])))))))
+
+(defn user-profile-save [current-user-data edit-data]
+  (let [user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
+        user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+    (user-profile-patch user-data user-profile-link
+     (fn [resp]
+       (utils/after 100 (fn []
+         (jwt-actions/jwt-refresh (fn []
+           (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))))
+
+(defn onboard-profile-save
   ([current-user-data edit-data]
-   (user-profile-save current-user-data edit-data nil))
+   (onboard-profile-save current-user-data edit-data nil))
   ([current-user-data edit-data org-editing-kw]
-    (let [org-editing (when org-editing-kw
+   (let [org-editing (when org-editing-kw
                         (get @dis/app-state org-editing-kw))
-          edit-user-profile (or (:user-data edit-data) edit-data)
-          new-password (:password edit-user-profile)
-          password-did-change (pos? (count new-password))
-          with-pswd (if (and password-did-change
-                             (>= (count new-password) 8))
-                      edit-user-profile
-                      (dissoc edit-user-profile :password))
-          new-email (:email edit-user-profile)
-          email-did-change (not= new-email (:email current-user-data))
-          with-email (if (and email-did-change
-                              (utils/valid-email? new-email))
-                       (assoc with-pswd :email new-email)
-                       (assoc with-pswd :email (:email current-user-data)))
-          timezone (or (:timezone edit-user-profile) (:timezone current-user-data) (.. js/moment -tz guess))
-          with-timezone (assoc with-email :timezone timezone)
-          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
-      (dis/dispatch! [:user-profile-save])
-      (api/patch-user user-profile-link with-timezone
-       (fn [status body success]
-         (if (= status 422)
-           (dis/dispatch! [:user-profile-update/failed])
-           (when success
-             ;; If user is not creating a new company let's show the spinner
-             ;; then we will delay the redirect to AP to show the carrot more
-             (when-not org-editing
-               (dis/dispatch! [:input [:ap-loading] true]))
-             (utils/after 100
-              (fn []
-                (jwt-actions/jwt-refresh
-                 #(if org-editing
-                    (org-actions/create-or-update-org org-editing)
-                    (utils/after 2000
-                      (fn[]
-                        (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
-             (dis/dispatch! [:user-data (json->cljs body)]))))))))
+         user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
+         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
+     (dis/dispatch! [:user-profile-save])
+     (user-profile-patch user-data user-profile-link
+      (fn [resp]
+       (when-not org-editing
+         (dis/dispatch! [:input [:ap-loading] true]))
+       (utils/after 100 (fn []
+        (jwt-actions/jwt-refresh (fn []
+         (if org-editing
+           (org-actions/create-or-update-org org-editing)
+           (api/get-entry-point nil (fn [_ entry-point-body]
+            (router/nav! (oc-urls/default-landing (-> entry-point-body :collection :items first :slug)))))))))))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}
