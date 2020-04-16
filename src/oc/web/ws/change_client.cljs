@@ -207,9 +207,9 @@
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
+    (follow-list)
     (container-watch)
-    (publisher-watch)
-    (follow-list)))
+    (publisher-watch)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 
