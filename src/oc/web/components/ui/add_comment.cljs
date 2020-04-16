@@ -55,7 +55,7 @@
         save-done-cb (fn [success]
                       (if success
                         (when add-comment-div
-                          (set! (.-innerHTML add-comment-div) ""))
+                          (set! (.-innerHTML add-comment-div) dom-utils/empty-body-html))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -63,7 +63,7 @@
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
     (reset! (::add-button-disabled s) true)
-    (set! (.-innerHTML add-comment-div) "")
+    (set! (.-innerHTML add-comment-div) dom-utils/empty-body-html)
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
@@ -160,7 +160,7 @@
                          (drv/drv :attachment-uploading)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
-                         (rum/local "" ::initial-add-comment)
+                         (rum/local dom-utils/empty-body-html ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
                          (rum/local false ::last-add-comment-focus)
@@ -185,7 +185,7 @@
                                 add-comment-data @(drv/get-ref s :add-comment-data)
                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                                 activity-add-comment-data (get add-comment-data add-comment-key)]
-                            (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
+                            (reset! (::initial-add-comment s) (or activity-add-comment-data dom-utils/empty-body-html))
                             (reset! (::show-post-button s) (or (seq activity-add-comment-data) (should-focus-field? s)))
                             (when (seq activity-add-comment-data)
                               (reset! (::did-change s) true)))
@@ -234,7 +234,7 @@
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
                                      (not is-focused?)
-                                     (not (seq @(::initial-add-comment s))))
+                                     (= @(::initial-add-comment s) dom-utils/empty-body-html))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
