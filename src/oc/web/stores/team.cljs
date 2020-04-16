@@ -59,18 +59,23 @@
                    next-db*
                    (keys (get-in db posts-key)))
           org-data (get-in next-db (dispatcher/org-data-key org-slug))
-          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)]
+          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+
+          old-publishers-list (get-in db follow-publishers-list-key)
+          next-publishers-list (if (and (seq old-publishers-list) (every? string? old-publishers-list))
+                                 (->> old-publishers-list
+                                  (map users-map)
+                                  (sort-by :short-name)
+                                  vec)
+                                 old-publishers-list)]
+      (js/console.log "DBG :active-users data:" active-users-data "->" users-map)
+      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
-       (update-in follow-publishers-list-key
+       (assoc-in follow-publishers-list-key
         ;; In case we have a list
-        #(if (and (seq %) (every? string? %))
-           (->> %
-            (map users-map)
-            (sort-by :short-name)
-            vec)
-           %))))
+        next-publishers-list)))
     db))
 
 (defmethod dispatcher/action :teams-get
@@ -95,20 +100,23 @@
   [db [_ org-slug roster-data]]
   (if roster-data
     (let [parsed-roster-data (update roster-data :users parse-users)
-          merged-users-data (deep-merge-users (:users parsed-roster-data) (dispatcher/active-users org-slug db))]
+          merged-users-data (deep-merge-users (:users parsed-roster-data) (dispatcher/active-users org-slug db))
+          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+          old-publishers-list (get-in db follow-publishers-list-key)
+          next-publishers-list (if (and (seq old-publishers-list) (every? string? old-publishers-list))
+                                 (->> old-publishers-list
+                                  (map merged-users-data)
+                                  (sort-by :short-name)
+                                  vec)
+                                 old-publishers-list)]
+      (js/console.log "DBG :team-roster-loaded data:" roster-data "->" merged-users-data)
+      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> db
        (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) parsed-roster-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-roster-data))
-       (update-in (dispatcher/follow-publishers-list-key org-slug)
-        ;; In case we have a list
-        #(if (and (seq %) (every? string? %))
-           (->> %
-            (map merged-users-data)
-            (sort-by :short-name)
-            vec)
-           %))))
+       (assoc-in follow-publishers-list-key next-publishers-list)))
     db))
 
 (defn parse-team-data [team-data]
@@ -126,20 +134,24 @@
   (if team-data
     ;; if team is the current org team, load the slack chennels
     (let [parsed-team-data (parse-team-data team-data)
-          merged-users-data (deep-merge-users (:users parsed-team-data) (dispatcher/active-users org-slug db))]
+          merged-users-data (deep-merge-users (:users parsed-team-data) (dispatcher/active-users org-slug db))
+
+          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+          old-publishers-list (get-in db follow-publishers-list-key)
+          next-publishers-list (if (and (seq old-publishers-list) (every? string? old-publishers-list))
+                                 (->> old-publishers-list
+                                  (map merged-users-data)
+                                  (sort-by :short-name)
+                                  vec)
+                                 old-publishers-list)]
+      (js/console.log "DBG :team-loaded data:" team-data "->" merged-users-data)
+      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> db
        (assoc-in (dispatcher/team-data-key (:team-id team-data)) parsed-team-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
        (assoc-in (dispatcher/active-users-key org-slug) merged-users-data)
        (update-in (dispatcher/users-info-hover-key org-slug) #(users-info-hover-from-roster % parsed-team-data))
-       (update-in (dispatcher/follow-publishers-list-key org-slug)
-        ;; In case we have a list
-        #(if (and (seq %) (every? string? %))
-           (->> %
-            (map merged-users-data)
-            (sort-by :short-name)
-            vec)
-           %))))
+       (assoc-in follow-publishers-list-key next-publishers-list)))
     db))
 
 (defmethod dispatcher/action :channels-enumerate
