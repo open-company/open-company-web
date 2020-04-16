@@ -113,7 +113,7 @@
         (reset! (::password-error s) true)
 
         :else
-        (user-actions/user-profile-save current-user-data edit-user-profile nil
+        (user-actions/user-profile-save current-user-data edit-user-profile
          (fn [success]
            (when success
              (real-close-cb edit-user-profile #(nav-actions/show-user-settings nil) nil))

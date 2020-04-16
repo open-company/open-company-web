@@ -8,6 +8,10 @@ div.add-comment-box-container {
       cursor: text;
       padding: 12px 16px;
 
+      p:first-child {
+        display: none;
+      }
+
       @include mobile() {
         padding: 11px 14px;
       }
