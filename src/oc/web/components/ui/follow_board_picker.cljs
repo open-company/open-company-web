@@ -134,11 +134,16 @@
                                     (toggle-board-and-exit s b))}
                       [:span.follow-board-picker-board
                         (:name b)]]])]
-              [:button.mlb-reset.follow-board-picker-create-bt
-                {:on-click #(follow! s)
-                 :disabled (or (= @(::boards s) @(::initial-boards s))
-                               @(::saving s))
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :title "Save & close"}
-                "Follow"]])]]]))
+              [:div.follow-board-picker-footer.group
+                [:button.mlb-reset.create-board-bt
+                  {:on-click #(nav-actions/show-section-add)}
+                  "Create a new board"]
+                [:button.mlb-reset.follow-board-picker-create-bt
+                  {:on-click #(follow! s)
+                   :disabled (or (= @(::boards s) @(::initial-boards s))
+                                 @(::saving s))
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-container "body"
+                   :data-placement "top"
+                   :title "Save & close"}
+                  "Follow"]]])]]]))

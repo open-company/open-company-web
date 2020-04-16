@@ -175,23 +175,44 @@ div.follow-board-picker {
           }
         }
 
-        button.follow-board-picker-create-bt {
-          width: auto;
-          height: 32px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          line-height: 18px;
-          color: white;
-          background-color: $carrot_green;
-          border-radius: 4px;
-          padding: 7px 14px;
-          margin-top: 16px;
-          float: right;
+        div.follow-board-picker-footer {
+          margin-top: 8px;
+          padding-top: 16px;
+          border-top: 1px solid var(--divider-line);
 
-          &.disabled, &:disabled {
-            opacity: 1!important;
-            background-color: var(--opac-background-color-05);
-            color: var(--light-color);
+          button.create-board-bt {
+            float: left;
+            padding: 0;
+            display: block;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 32px;
+            color: $carrot_green;
+            height: 32px;
+
+            &:hover {
+              text-decoration: underline;
+              opacity: 1;
+            }
+          }
+
+          button.follow-board-picker-create-bt {
+            width: auto;
+            height: 32px;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: white;
+            background-color: $carrot_green;
+            border-radius: 4px;
+            padding: 7px 14px;
+            float: right;
+
+            &.disabled, &:disabled {
+              opacity: 1!important;
+              background-color: var(--opac-background-color-05);
+              color: var(--light-color);
+            }
           }
         }
 
