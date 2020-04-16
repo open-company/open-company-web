@@ -258,19 +258,14 @@
                 [:button.mlb-reset.left-navigation-sidebar-title
                   {:class (utils/class-set {:new (and @(::users-list-collapsed s)
                                                       (seq (mapcat :unread publisher-boards-change-data)))})
-                   :on-click #(nav-actions/show-follow-user-picker)
-                   :title "Follow your teammates"
-                   :data-placement "top"
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"}
+                   :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
-              (when show-invite-people?
-                [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
-                  {:on-click #(nav-actions/show-org-settings :invite-picker)
-                   :title "Invite more teammates"
-                   :data-placement "top"
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"}])]])
+              [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
+                {:on-click #(nav-actions/show-follow-user-picker)
+                 :title "Follow your teammates"
+                 :data-placement "top"
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-container "body"}]]])
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
             (for [user follow-publishers-list
@@ -308,19 +303,14 @@
                 [:button.mlb-reset.left-navigation-sidebar-title
                   {:class (utils/class-set {:new (and @(::sections-list-collapsed s)
                                                       (seq (mapcat :unread boards-change-data)))})
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-placement "top"
-                   :data-container "body"
-                   :title "Follow the topics you care about"
-                   :on-click #(nav-actions/show-follow-board-picker)}
+                   :on-click #(toggle-collapse-sections s)}
                   [:span.sections "Boards"]])
-              (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset
-                  {:on-click #(nav-actions/show-section-add)
-                   :title "Create a new section"
-                   :data-placement "top"
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"}])]])
+              [:button.left-navigation-sidebar-top-title-button.btn-reset
+                {:on-click #(nav-actions/show-follow-board-picker)
+                 :title "Follow the topics you care about"
+                 :data-placement "top"
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-container "body"}]]])
         (when (seq follow-boards-list)
           [:div.left-navigation-sidebar-items.group
             (for [board follow-boards-list
