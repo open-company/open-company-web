@@ -153,7 +153,7 @@ rangy.getSelection = function(){};
 var jwt_decode = function(){};
 // CarrotGA
 var CarrotGA = function(){};
-CarrotGA.dimentions = {};
+CarrotGA.dimensions = {};
 CarrotGA.metrics = {};
 CarrotGA.init = function(){};
 CarrotGA.trackEvent = function(){};
@@ -195,6 +195,7 @@ var Intercom = function(){};
 var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
+var OCStaticDeleteCookie = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};

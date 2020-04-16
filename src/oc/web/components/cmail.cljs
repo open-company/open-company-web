@@ -401,7 +401,7 @@
                           cmail-state @(drv/get-ref s :cmail-state)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
-                                         "")
+                                         dom-utils/empty-body-html)
                           initial-headline (utils/emojify
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
