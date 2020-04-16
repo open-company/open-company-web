@@ -33,9 +33,8 @@
 (defn- filter-board [s board q]
   (and (not= (:slug board) utils/default-drafts-board-slug)
        (or (not (seq q))
-           (and (not (utils/in? @(::boards s) (:uuid board)))
-                (or (search-board board q)
-                    (some (partial search-board board) (string/split q #"\s")))))))
+           (search-board board q)
+           (some (partial search-board board) (string/split q #"\s")))))
 
 (defn- filter-sort-boards [s boards q]
   (sort-boards (filterv #(filter-board s % (string/lower q)) boards)))

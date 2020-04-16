@@ -39,9 +39,8 @@
 
 (defn- filter-user [s user q]
   (or (not (seq q))
-      (and (not (utils/in? @(::users s) (:user-id user)))
-           (or (search-user user q)
-               (some (partial search-user user) (string/split q #"\s"))))))
+      (search-user user q)
+      (some (partial search-user user) (string/split q #"\s"))))
 
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
