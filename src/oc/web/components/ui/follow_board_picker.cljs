@@ -100,25 +100,25 @@
           {:on-click #(close-follow-board-picker s)}]
         [:div.follow-board-picker-body
           [:h3.follow-board-picker-title
-            "Topics"]
+            "Boards"]
           [:div.follow-board-picker-subtitle
-            "Select some topics to follow the related posts more easily."]
+            "Select the boards you would like to follow."]
           (if (zero? (count all-boards))
             [:div.follow-board-picker-empty-boards
               [:div.follow-board-picker-empty-icon]
               [:div.follow-board-picker-empty-copy
-                "There are no topics to follow yet. "
+                "There are no boards to follow yet. "
                 (when (utils/link-for (:links org-data) "create")
                   [:button.mlb-reset.follow-board-picker-empty-invite-bt
                     {:on-click #(nav-actions/show-org-settings :invite-picker)}
-                    "Add a topic to get started."])]]
+                    "Add a board to get started."])]]
             [:div.follow-board-picker-body-inner.group
               [:input.follow-board-picker-search-field-input.oc-input
                 {:class (when-not (seq @(::boards s)) "empty")
                  :value @(::query s)
                  :type "text"
                  :ref :query
-                 :placeholder "Search for topics or make your selection below..."
+                 :placeholder "Search for boards or make your selection below..."
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-board-picker-boards-list.group
                 (for [b sorted-boards

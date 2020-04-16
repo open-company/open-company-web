@@ -263,7 +263,7 @@
                   [:span.sections "People"]])
               [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
-                 :title "Follow your teammates"
+                 :title "Add teammates to follow"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-container "body"}]]])
