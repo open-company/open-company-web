@@ -297,7 +297,7 @@
                     (:short-name user)]]])])
         ;; Boards list
         (when show-boards
-          [:div.left-navigation-sidebar-top.group
+          [:div.left-navigation-sidebar-top.top-margin.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-title-arrow
