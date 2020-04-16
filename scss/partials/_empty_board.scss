@@ -100,6 +100,24 @@ div.empty-board {
       color: var(--color);
       line-height: 20px;
       margin: 16px auto 0;
+
+      div.empty-follow {
+        text-align: center;
+
+        button {
+          margin: 16px auto 0;
+          width: auto;
+          display: block;
+          @include OC_Body_Bold();
+          font-size: 16px;
+          color: $carrot_green;
+
+          &:hover {
+            text-decoration: underline;
+            opacity: 1;
+          }
+        }
+      }
     }
   }
 }

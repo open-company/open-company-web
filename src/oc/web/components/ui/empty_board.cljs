@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.activity :as activity-actions]))
@@ -45,5 +46,13 @@
            is-all-posts? "Recent is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
            is-bookmarks? "You don't have any bookmarks"
-           is-following? "This is a stream of people you follow"
+           is-following?
+           [:div.empty-follow
+             "Follow your teammates and topics to see what's happening"
+             [:button.mlb-reset.follow-users-bt
+               {:on-click #(nav-actions/show-follow-user-picker)}
+               "Follow teammates"]
+             [:button.mlb-reset.follow-boards-bt
+               {:on-click #(nav-actions/show-follow-board-picker)}
+               "Follow boards"]]
            :else "This section is empty")]]]))
