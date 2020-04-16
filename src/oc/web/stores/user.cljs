@@ -298,6 +298,7 @@
 
 (defmethod dispatcher/action :follow/loaded
   [db [_ org-slug {:keys [publisher-uuids board-uuids user-id] :as resp}]]
+  (js/console.log "DBG :follow/loaded publisher-uuids" publisher-uuids "board-uuids" board-uuids "org-slugs" org-slug (:org-slug resp))
   (if (= org-slug (:org-slug resp))
     (let [org-data (dispatcher/org-data db)
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
@@ -305,6 +306,10 @@
           active-users (dispatcher/active-users org-slug db)
           next-db (assoc-in db follow-boards-list-key
                    (enrich-boards-list board-uuids (:boards org-data)))]
+      (js/console.log "DBG   active-users" active-users)
+      (js/console.log "DBG   boards" (:boards org-data))
+      (js/console.log "DBG   followed publishers" (publishers-list-with-users publisher-uuids active-users))
+      (js/console.log "DBG   followed boards" (get-in next-db follow-boards-list-key))
       (if active-users
         (assoc-in next-db follow-publishers-list-key
          (publishers-list-with-users publisher-uuids active-users))
