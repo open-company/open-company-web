@@ -59,3 +59,5 @@
         true
         (recur (.-parentElement element)))
       false)))
+
+(def empty-body-html "<p><br/></>")
