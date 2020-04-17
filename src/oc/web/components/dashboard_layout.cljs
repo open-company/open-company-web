@@ -266,7 +266,7 @@
                                                    "Unread"
 
                                                    is-all-posts
-                                                   "Recent"
+                                                   "All"
 
                                                    is-bookmarks
                                                    "Bookmarks"
