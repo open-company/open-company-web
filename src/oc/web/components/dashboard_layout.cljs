@@ -160,15 +160,15 @@
                                                              no-phisical-home-button)
                                         :ios-web-tabbar (and (not ua/mobile-app?)
                                                              no-phisical-home-button)})}
-              [:button.mlb-reset.tab-button.all-posts-tab
+              [:button.mlb-reset.tab-button.following-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
+                              (nav-actions/nav-to-url! % "following" (oc-urls/following)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "all-posts"))
+                                   (= current-board-slug "following"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Recent"]]
+                [:span.tab-label "Home"]]
               [:button.mlb-reset.tab-button.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)

@@ -166,6 +166,30 @@ div.dashboard-layout {
             }
           }
 
+          &.following-tab {
+            span.tab-icon {
+              width: 18px;
+              height: 16px;
+              background-size: 18px 16px;
+              background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
+              transform: rotate(90deg);
+
+              @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
+              }
+            }
+
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+              }
+            }
+          }
+
           &.inbox-tab {
             span.tab-icon {
               width: 18px;

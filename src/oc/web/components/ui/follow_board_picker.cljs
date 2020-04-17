@@ -141,9 +141,5 @@
                 [:button.mlb-reset.follow-board-picker-create-bt
                   {:on-click #(follow! s)
                    :disabled (or (= @(::boards s) @(::initial-boards s))
-                                 @(::saving s))
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"
-                   :data-placement "top"
-                   :title "Save & close"}
-                  "Follow"]]])]]]))
+                                 @(::saving s))}
+                  "Save"]]])]]]))

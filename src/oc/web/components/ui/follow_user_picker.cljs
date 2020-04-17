@@ -155,8 +155,5 @@
                 [:button.mlb-reset.follow-user-picker-create-bt
                   {:on-click #(follow! s)
                    :disabled (or (= @(::users s) @(::initial-users s))
-                                 @(::saving s))
-                   :data-toggle (when-not is-mobile? "tooltip")
-                   :data-placement "top"
-                   :title "Save & close"}
-                  "Follow"]]])]]]))
+                                 @(::saving s))}
+                  "Save"]]])]]]))

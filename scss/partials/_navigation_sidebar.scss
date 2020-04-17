@@ -335,6 +335,10 @@ div.left-navigation-sidebar {
 
     &.top-margin {
       margin-top: 16px;
+
+      @include mobile() {
+        margin-top: 16px;
+      }
     }
 
     @include mobile() {

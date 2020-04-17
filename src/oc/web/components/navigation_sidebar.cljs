@@ -190,7 +190,7 @@
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Recent"]
+              "All"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
@@ -232,7 +232,7 @@
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
             [:div.following-icon]
             [:div.following-label
-              "Following"]
+              "Home"]
             ; (when (pos? (:following-count org-data))
             ;   [:span.count (:following-count org-data)])
             ])
@@ -308,7 +308,7 @@
                   [:span.sections "Boards"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-follow-board-picker)
-                 :title "Follow the topics you care about"
+                 :title "Add boards to follow"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-container "body"}]]])
