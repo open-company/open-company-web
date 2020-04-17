@@ -144,7 +144,7 @@
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         show-inbox (and user-is-part-of-the-team?
-                        (utils/link-for (:links org-data) "inbox"))
+                        (utils/link-for (:links org-data) "following-inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
@@ -245,8 +245,8 @@
             [:div.inbox-icon]
             [:div.inbox-label
               "Unread"]
-            (when (pos? (:inbox-count org-data))
-              [:span.count (:inbox-count org-data)])])
+            (when (pos? (:following-inbox-count org-data))
+              [:span.count (:following-inbox-count org-data)])])
         (when show-users-list?
           [:div.left-navigation-sidebar-top.top-margin.group
             ;; Boards header

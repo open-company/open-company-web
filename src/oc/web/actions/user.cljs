@@ -574,19 +574,27 @@
 (defn load-follow-list []
   (ws-cc/follow-list))
 
+(defn- refresh-follow-containers []
+  (let [is-inbox? (= (router/current-org-slug) "inbox")
+        is-following? (= (router/current-org-slug) "following")
+        inbox-delay (if is-inbox? 1 500)
+        following-delay (if is-following? 1 500)]
+    (utils/maybe-after inbox-delay #(activity-actions/inbox-get (dis/org-data)))
+    (utils/maybe-after following-delay #(activity-actions/following-get (dis/org-data)))))
+
 (defn follow-publishers [publisher-uuids]
   (dis/dispatch! [:publishers/follow (router/current-org-slug)
                                      {:org-slug (router/current-org-slug)
                                       :publisher-uuids publisher-uuids}])
   (ws-cc/publishers-follow publisher-uuids)
-  (utils/after 500 #(activity-actions/following-get (dis/org-data))))
+  (refresh-follow-containers))
 
 (defn follow-boards [board-uuids]
   (dis/dispatch! [:boards/follow (router/current-org-slug)
                                  {:org-slug (router/current-org-slug)
                                   :board-uuids board-uuids}])
   (ws-cc/boards-follow board-uuids)
-  (utils/after 500 #(activity-actions/following-get (dis/org-data))))
+  (refresh-follow-containers))
 
 ;; Debug
 

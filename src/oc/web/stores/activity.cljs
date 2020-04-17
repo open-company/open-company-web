@@ -630,7 +630,7 @@
     (-> db
       (assoc-in container-key fixed-inbox-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-inbox-data)))))
+      (assoc-in (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data)))))
 
 (defmethod dispatcher/action :inbox-more
   [db [_ org-slug]]
@@ -658,7 +658,7 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts-data))))
+        (assoc-in (conj org-data-key :following-inbox-count) (:total-count fixed-posts-data))))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss
@@ -673,7 +673,7 @@
           update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
       (-> db
         (assoc-in inbox-key without-item)
-        (update-in (conj org-data-key :inbox-count) (if update-count? dec identity))))
+        (update-in (conj org-data-key :following-inbox-count) (if update-count? dec identity))))
     db))
 
 (defmethod dispatcher/action :inbox/unread
@@ -701,7 +701,7 @@
           update-count? (and inbox-data
                              (not= (count (get-in db posts-list-key)) (count (get-in next-db posts-list-key))))]
       (-> next-db
-       (update-in (conj org-data-key :inbox-count) (if update-count? inc identity))
+       (update-in (conj org-data-key :following-inbox-count) (if update-count? inc identity))
        (assoc-in activity-key fixed-activity-data)))
     db))
 
@@ -715,7 +715,7 @@
         org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
       (assoc-in inbox-key without-items)
-      (assoc-in (conj org-data-key :inbox-count) 0))))
+      (assoc-in (conj org-data-key :following-inbox-count) 0))))
 
 ;; Following
 

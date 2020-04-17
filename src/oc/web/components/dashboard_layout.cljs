@@ -177,9 +177,9 @@
                                    (= current-board-slug "inbox"))
                           "active")}
                 [:span.tab-icon
-                  (when (-> org-data :inbox-count pos?)
+                  (when (-> org-data :following-inbox-count pos?)
                     [:span.count-badge
-                      (:inbox-count org-data)])]
+                      (:following-inbox-count org-data)])]
                 [:span.tab-label "Unread"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do

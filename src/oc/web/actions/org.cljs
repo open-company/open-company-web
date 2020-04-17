@@ -97,7 +97,7 @@
            (utils/link-for (:links org-data) "entries"))
       {:slug "all-posts"}
       (and (= last-board-slug "inbox")
-           (utils/link-for (:links org-data) "inbox"))
+           (utils/link-for (:links org-data) "following-inbox"))
       {:slug "inbox"}
       :else
       (let [boards (:boards org-data)
@@ -110,14 +110,14 @@
 
 (defn- redirect-to-ap? [org-data]
   (when-not (router/ap-redirect)
-    (let [inbox-count (int (:inbox-count org-data))
+    (let [inbox-count (int (:following-inbox-count org-data))
           is-inbox? (= (router/current-board-slug) "inbox")]
       (when (and is-inbox?
                  (zero? inbox-count)
                  (not (router/current-activity-id))
                  (not (router/current-secure-activity-id))
                  (not (router/ap-redirect)))
-        (timbre/info "Redirect to all-posts for empty inbox:" (:inbox-count org-data))
+        (timbre/info "Redirect to all-posts for empty inbox:" (:following-inbox-count org-data))
         (router/set-route! [(:slug org-data) "all-posts" "dashboard"]
          {:org (:slug org-data)
           :board "all-posts"
@@ -141,7 +141,7 @@
   ;; Check the loaded org
   (let [boards (:boards org-data)
         current-board-slug (router/current-board-slug)
-        inbox-link (utils/link-for (:links org-data) "inbox")
+        inbox-link (utils/link-for (:links org-data) "following-inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         following-link (utils/link-for (:links org-data) "following")

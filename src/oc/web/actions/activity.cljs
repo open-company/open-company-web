@@ -137,7 +137,7 @@
       (dis/dispatch! [:inbox-get/finish org inbox-data]))))
 
 (defn inbox-get [org-data & [finish-cb]]
-  (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
+  (when-let [inbox-link (utils/link-for (:links org-data) "following-inbox")]
     (api/get-all-posts inbox-link
      (fn [resp]
        (inbox-get-finish resp)
