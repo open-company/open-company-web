@@ -32,6 +32,7 @@
 
 (defn- filter-board [s board q]
   (and (not= (:slug board) utils/default-drafts-board-slug)
+       (not (:publisher-board board))
        (or (not (seq q))
            (search-board board q)
            (some (partial search-board board) (string/split q #"\s")))))
