@@ -165,7 +165,6 @@
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? user-is-part-of-the-team?
         follow-boards-list (drv/react s :follow-boards-list)]
-    (js/console.log "DBG navigation-sidebar/render follow-publishers-list" follow-publishers-list)
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)

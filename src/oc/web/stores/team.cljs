@@ -68,8 +68,6 @@
                                   (sort-by :short-name)
                                   vec)
                                  old-publishers-list)]
-      (js/console.log "DBG :active-users data:" active-users-data "->" users-map)
-      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
@@ -109,8 +107,6 @@
                                   (sort-by :short-name)
                                   vec)
                                  old-publishers-list)]
-      (js/console.log "DBG :team-roster-loaded data:" roster-data "->" merged-users-data)
-      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> db
        (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) parsed-roster-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
@@ -144,8 +140,6 @@
                                   (sort-by :short-name)
                                   vec)
                                  old-publishers-list)]
-      (js/console.log "DBG :team-loaded data:" team-data "->" merged-users-data)
-      (js/console.log "DBG    old-publishers-list" old-publishers-list "next:" next-publishers-list)
       (-> db
        (assoc-in (dispatcher/team-data-key (:team-id team-data)) parsed-team-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
