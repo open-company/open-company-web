@@ -16,6 +16,7 @@ $dark_mode: "dark";
   --ultralight-color: #{rgba($deep_navy,0.25)};
   --tooltip-background-color: #{$deep_navy};
   --tooltip-color: white;
+  --tooltip-button-background: #{rgba(white, 0.1)};
   --selection-color: rgba(250,100,82, 0.5);
   --divider-line: #{$divider_line_grey};
   --overlay-background-color: white;
@@ -102,6 +103,9 @@ $dark_mode: "dark";
   --mobile-collapse-post-start-bg: #{rgba(white, 0)};
   --mobile-collapse-post-stop-bg: #{rgba(white, 1)};
 
+  // User info hover
+  --user-info-view-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+
   html, body {
     scrollbar-color: light;
   }
@@ -114,6 +118,7 @@ $dark_mode: "dark";
   --ultralight-color: #{rgba(white,0.25)};
   --tooltip-background-color: white;
   --tooltip-color: #1B202A;
+  --tooltip-button-background: #{rgba($deep_navy, 0.1)};
   --selection-color: #{$carrot_orange};
   --divider-line: #{rgba(white, 0.16)};
   --overlay-background-color: #1B202A;
@@ -199,6 +204,9 @@ $dark_mode: "dark";
   --collapse-post-stop-bg: rgba(27, 32, 42, 1);
   --mobile-collapse-post-start-bg: rgba(27, 32, 42, 0);
   --mobile-collapse-post-stop-bg: rgba(27, 32, 42, 1);
+
+  // User info hover
+  --user-info-view-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
 
   &, body {
     scrollbar-color: dark;

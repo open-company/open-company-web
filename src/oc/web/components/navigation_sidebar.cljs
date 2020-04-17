@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
+            [oc.lib.user :as lib-user]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -106,15 +107,15 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
+        current-user-data (drv/react s :current-user-data)
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
-        current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
-        selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-bookmarks (= selected-slug "bookmarks")

@@ -79,12 +79,12 @@ div.stream-comments {
       div.stream-comment-outer {
         padding: 0;
         position: relative;
+        width: calc(100% + 16px);
+        padding-left: 8px;
+        padding-right: 8px;
+        margin-left: -8px;
 
         @include big_web() {
-          width: calc(100% + 16px);
-          padding-left: 8px;
-          padding-right: 8px;
-          margin-left: -8px;
 
           &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
             background-color: var(--comments-floating-bt-background);
@@ -111,6 +111,8 @@ div.stream-comments {
 
           @include mobile() {
             display: block;
+            margin-left: 32px;
+            width: calc(100% - 24px);
 
             div.more-menu {
               button.more-menu-bt {
@@ -390,16 +392,12 @@ div.stream-comments {
             }
           }
 
-          div.stream-comment-author-avatar {
-            float: left;
-            width: 32px;
-            height: 32px;
-
-            @include user-profile(32);
-          }
-
           div.stream-comment-right {
             margin-left: 48px;
+
+            @include mobile() {
+              margin-left: 40px;
+            }
 
             @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
 
@@ -466,8 +464,29 @@ div.stream-comments {
                   max-width: calc(100% - 43px);
                 }
 
-                div.stream-comment-author-name {
+                div.stream-comment-author-name-container {
                   flex: 1 0 auto;
+                  position: relative;
+
+                  div.user-info-hover {
+                    transform: translateX(-48px);
+                  }
+
+                  div.stream-comment-author-avatar {
+                    position: absolute;
+                    left: -48px;
+                    top: 0;
+                    width: 48px;
+                    height: 32px;
+                    padding-right: 16px;
+
+                    @include user-profile(32);
+
+                    @include mobile() {
+                      left: -40px;
+                      padding-right: 8px;
+                    }
+                  }
 
                   @include mobile() {
                     flex: 1 1 auto;

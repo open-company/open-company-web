@@ -237,7 +237,7 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
-(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
+(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
 
@@ -597,6 +597,13 @@
       callback)
     (handle-missing-link "handle-invite-link" invite-token-link callback)))
 
+(defn get-active-users [active-users-link callback]
+  (if active-users-link
+    (auth-http (method-for-link active-users-link) (relative-href active-users-link)
+     {:headers (headers-for-link active-users-link)}
+     callback)
+    (handle-missing-link "get-active-users" active-users-link callback)))
+
 ;; User
 
 (defn user-action [action-link payload callback]
@@ -835,18 +842,12 @@
     (handle-missing-link "share-entry" share-link callback
      {:share-data share-data})))
 
-(defn get-secure-entry [org-slug secure-activity-id callback]
-  (let [activity-link {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
-                         :method "GET"
-                         :rel ""
-                         :accept "application/vnd.open-company.entry.v1+json"}]
-    (if secure-activity-id
-      (storage-http (method-for-link activity-link) (relative-href activity-link)
-       {:headers (headers-for-link activity-link)}
-       callback)
-      (handle-missing-link "get-secure-entry" activity-link callback
-       {:org-slug org-slug
-        :secure-activity-id secure-activity-id}))))
+(defn get-secure-entry [secure-link callback]
+  (if secure-link
+    (storage-http (method-for-link secure-link) (relative-href secure-link)
+     {:headers (headers-for-link secure-link)}
+     callback)
+    (handle-missing-link "get-secure-entry" secure-link callback)))
 
 (defn get-current-entry [org-slug board-slug activity-uuid callback]
   (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
@@ -970,6 +971,15 @@
       :body dismiss-at}
      callback)
     (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
+
+;; contributions
+
+(defn get-contributions [contrib-link callback]
+  (if contrib-link
+    (storage-http (method-for-link contrib-link) (relative-href contrib-link)
+     {:headers (headers-for-link contrib-link)}
+     callback)
+    (handle-missing-link "get-contributions" contrib-link callback)))
 
 ;; Polls
 

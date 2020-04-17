@@ -24,10 +24,9 @@ div.theme-settings-modal {
     top: 12px;
 
     @include mobile() {
-      left: 16px;
+      position: fixed;
+      right: 16px;
       top: 11px;
-      right: unset;
-      z-index: 2;
       width: 32px;
       height: 32px;
       padding: 0;
@@ -35,8 +34,9 @@ div.theme-settings-modal {
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: var(--mobile-background-color);
+      background-color: var(--divider-line);
       border-radius: 4px;
+      z-index: 3;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -58,8 +58,7 @@ div.theme-settings-modal {
     overflow-y: auto;
 
     @include mobile() {
-      width: 100%;
-      left: 0;
+      width: 85vw;
       min-height: 100vh;
       overflow-y: auto;
       padding: #{$mobile_navbar_height}px 16px 16px;
@@ -79,13 +78,10 @@ div.theme-settings-modal {
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
+        width: 85vw;
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
-        padding: 15px 16px 15px 24px;
+        padding: 15px 16px;
         margin: 0;
         z-index: 2;
       }
@@ -99,7 +95,7 @@ div.theme-settings-modal {
 
         @include mobile() {
           float: unset;
-          text-align: center;
+          text-align: left;
           font-size: 16px;
           line-height: 24px;
         }

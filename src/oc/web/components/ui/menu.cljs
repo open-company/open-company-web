@@ -29,9 +29,14 @@
   (menu-close s)
   (jwt-actions/logout))
 
-(defn user-profile-click [s e]
+(defn my-profile-click [s user-id e]
   (.preventDefault e)
-  (nav-actions/show-user-settings :profile))
+  (nav-actions/show-user-info user-id))
+
+(defn my-posts-click [s cur-user-id e]
+  (.preventDefault e)
+  (menu-close s)
+  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn notifications-settings-click [s e]
   (.preventDefault e)
@@ -94,6 +99,7 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
+                  (drv/drv :editable-boards)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
@@ -123,7 +129,8 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))]
+                           (router/current-org-slug))
+        can-compose? (pos? (count (drv/react s :editable-boards)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -143,13 +150,24 @@
           (when-not is-mobile?
             (user-avatar-image current-user-data))]
         ;; Profile
-        (when (and (jwt/jwt)
-                   (not is-mobile?))
+        (when (jwt/jwt)
           [:a
             {:href "#"
-             :on-click (partial user-profile-click s)}
+             :on-click (partial my-profile-click s (:user-id current-user-data))}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
+        ;;
+        (when (and (jwt/jwt)
+                   current-user-data
+                   (pos? (:contributions-count org-data)))
+          [:a
+            {:href (oc-urls/contributions (:user-id current-user-data))
+             :on-click (partial my-posts-click s (:user-id current-user-data))}
+            [:div.oc-menu-item.my-posts.group
+              [:span.oc-menu-item-label
+                "My posts"]
+              [:span.count
+                (:contributions-count org-data)]]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))
@@ -159,8 +177,7 @@
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
         ;; Theme switcher separator
-        (when (and (jwt/jwt)
-                   (not is-mobile?))
+        (when (jwt/jwt)
           [:div.oc-menu-separator])
         ;; Theme switcher
         [:a

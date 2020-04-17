@@ -4,7 +4,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]

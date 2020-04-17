@@ -278,6 +278,7 @@
   (let [dom-node (rum/dom-node s)
         imgs (dommy/sel dom-node (str el-selector " img"))]
     (doseq [img  imgs
+            :when (not (.contains (.-classList img) "user-avatar-img"))
             :let [href (.-src img)]]
       (dommy/add-class! img :interactive-image)
       (dommy/listen! img :click #(dis/dispatch! [:input [:expand-image-src] href])))
@@ -287,3 +288,20 @@
   {:did-mount (fn [s] (make-images-interactive! s el-sel))
    :did-remount (fn [_ new-state]
                   (make-images-interactive! new-state el-sel))})
+
+(defn autoresize-textarea [ref]
+  (let [lst (atom nil)]
+    (letfn [(autoresize [e]
+              (when-let [this (.-target e)]
+                (set! (.. this -style -cssText) "height:auto;")
+                (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))]
+      {:did-mount (fn [s]
+       (reset! lst
+        (events/listen (rum/ref-node s ref) EventType/KEYUP autoresize))
+       (autoresize #js {:target (rum/ref-node s ref)})
+       s)
+       :will-unmount (fn [s]
+        (when @lst
+          (events/unlistenByKey @lst)
+          (reset! lst nil))
+       s)})))

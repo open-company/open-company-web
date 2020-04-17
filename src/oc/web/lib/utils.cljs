@@ -131,12 +131,15 @@
       :else
       (if short? "now" "Just now"))))
 
+(defn time-without-leading-zeros [time-string]
+  (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1"))
+
 (defn local-date-time [past-date]
   (let [time-string (.toLocaleTimeString past-date (.. js/window -navigator -language)
                      #js {:hour "2-digit"
                           :minute "2-digit"
                           :format "hour:minute"})
-        without-leading-zeros (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1")]
+        without-leading-zeros (time-without-leading-zeros time-string)]
     (s/upper without-leading-zeros)))
 
 (defn foc-date-time [past-date & [flags]]
@@ -153,7 +156,7 @@
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
-  (clojure.string/join (map #(str " " (name %)) (keys (filter second classes)))))
+  (clojure.string/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
 
 (defun link-for
 
@@ -178,6 +181,10 @@
                         (= (:rel link) rel)
                         (every? #(= (% params) (% link)) (keys params)))
             link)) links)))
+
+(defn link-replace-href [link replacements]
+  (update link :href
+   #(reduce (fn [href [k v]] (s/replace href v (get replacements k))) % (:replace link))))
 
 (defn readonly-org? [links]
   (let [update-link (link-for links "partial-update")]
@@ -726,9 +733,9 @@
 (defn back-to [org-data]
   (cond
     ;; the board specified in the router if there is one
-    (:back-to @router/path) (:back-to @router/path)
+    (map? (:back-to @router/path)) (:back-to @router/path)
     ;; if the user is part of the team we can go back to all posts
-    (jwt/user-is-part-of-the-team (:team-id org-data)) "all-posts"
+    (jwt/user-is-part-of-the-team (:team-id org-data)) {:board "all-posts"}
     ;; else go back to the current post board since it's probably the
     ;; only one the user can see
-    :else (router/current-board-slug)))
+    :else {:board (router/current-board-slug)}))

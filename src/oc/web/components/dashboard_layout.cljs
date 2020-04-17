@@ -1,8 +1,9 @@
- (ns oc.web.components.dashboard-layout
+(ns oc.web.components.dashboard-layout
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -30,6 +31,7 @@
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.poll :refer (poll-portal)]
@@ -43,6 +45,8 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
+                              (drv/drv :contributions-data)
+                              (drv/drv :contributions-user-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
                               (drv/drv :items-to-render)
@@ -75,12 +79,15 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
+        contributions-data (drv/react s :contributions-data)
+        contributions-user-data (drv/react s :contributions-user-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
+        current-contributions-id (router/current-contributions-id)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
@@ -89,11 +96,18 @@
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
+        is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
-        board-container-data (if (dis/is-container? current-board-slug) container-data board-data)
+        board-container-data (cond
+                              (seq current-contributions-id)
+                              contributions-data
+                              (dis/is-container? current-board-slug)
+                              container-data
+                              :else
+                              board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
@@ -121,7 +135,8 @@
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
-        search-active? (drv/react s search/search-active?)]
+        search-active? (drv/react s search/search-active?)
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -133,7 +148,7 @@
                      (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
-                     (jwt/user-is-part-of-the-team (:team-id org-data)))
+                     member?)
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
                                         :ios-app-tabbar (and ua/mobile-app?
@@ -224,7 +239,18 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (when current-board-slug
+                  (cond
+                    current-contributions-id
+                    [:div.board-name-with-icon.contributions
+                      (user-avatar-image contributions-user-data)
+                      [:div.board-name-with-icon-internal
+                        (if (= (:user-id contributions-user-data) (:user-id current-user-data))
+                          "My posts"
+                          (lib-user/name-for contributions-user-data))
+                        ; (when (pos? (:total-count contributions-data))
+                        ;   [:span.count (:total-count contributions-data)])
+                        ]]
+                    current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")

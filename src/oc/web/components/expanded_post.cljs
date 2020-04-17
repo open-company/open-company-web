@@ -24,9 +24,9 @@
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn close-expanded-post [e]
   (nav-actions/dismiss-post-modal e))
@@ -92,6 +92,8 @@
   (drv/drv :expand-image-src)
   (drv/drv :add-comment-force-update)
   (drv/drv :editable-boards)
+  (drv/drv :users-info-hover)
+  (drv/drv :current-user-data)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -102,7 +104,7 @@
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
   ;; Mixins
-  (mention-mixins/oc-mentions-hover)
+  (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
     (check-collapse-post s)
@@ -138,7 +140,8 @@
         org-data (dis/org-data)
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        current-user-id (jwt/user-id)
+        current-user-data (drv/react s :current-user-data)
+        current-user-id (:user-id current-user-data)
         is-publisher? (= (:user-id publisher) current-user-id)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
@@ -213,13 +216,18 @@
       [:div.expanded-post-author.group
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
-          [:span.expanded-post-author-inner-label
-            (str (:name publisher) " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))
+          [:div.expanded-post-author-inner-label
+            [:span.hover-info-popup-container
+              (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
+              [:span.name
+                (:name publisher)]]
+            [:span.name
+              (str  "in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)"))]
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)
@@ -285,5 +293,6 @@
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
+                          :member? user-is-part-of-the-team
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

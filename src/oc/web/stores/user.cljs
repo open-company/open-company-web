@@ -60,30 +60,28 @@
     (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))))
 
 (defn- fix-user-values [user-data]
-  (let [with-first-name (if (empty? (:first-name user-data))
-                          (merge user-data {:first-name ""})
-                          user-data)
-        with-last-name (if (empty? (:last-name with-first-name))
-                         (merge with-first-name {:last-name ""})
-                         with-first-name)
-        with-current-password (if (empty? (:current-password with-last-name))
-                               (merge with-last-name {:current-password ""})
-                               with-last-name)
-        with-new-password (if (empty? (:password with-current-password))
-                               (merge with-current-password {:password ""})
-                               with-current-password)
-        with-email (if (empty? (:email with-new-password))
-                     (merge with-new-password {:email ""})
-                     with-new-password)
-        with-timezone (if (empty? (:timezone with-email))
-                       (merge with-email {:timezone (or (.. js/moment -tz guess) "")})
-                       with-email)
-        with-has-changes (assoc with-timezone :has-changes false)]
-    with-has-changes))
+    (cond-> user-data
+     true (assoc :has-changes false)
+     (empty? (:first-name user-data)) (merge {:first-name ""})
+     (empty? (:last-name user-data)) (merge {:last-name ""})
+     (empty? (:current-password user-data)) (merge {:current-password ""})
+     (empty? (:password user-data)) (merge {:password ""})
+     (empty? (:email user-data)) (merge {:email ""})
+     (empty? (:timezone user-data)) (merge {:timezone (or (.. js/moment -tz guess) "")})
+     (empty? (:blurb user-data)) (merge {:blurb ""})
+     (empty? (:location user-data)) (merge {:location ""})
+     (empty? (:title user-data)) (merge {:title ""})
+     (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
 
 (defn update-user-data [db user-data]
-  (let [fixed-user-data (parse-user-data user-data)]
-    (-> db
+  (let [fixed-user-data (parse-user-data user-data)
+        org-data (dispatcher/org-data db)
+        active-user-key (when org-data
+                          (conj (dispatcher/active-users-key (:slug org-data)) (:user-id user-data)))
+        next-db (if org-data
+                  (update-in db active-user-key merge fixed-user-data)
+                  db)]
+    (-> next-db
         (assoc :current-user-data fixed-user-data)
         (assoc :edit-user-profile (fix-user-values fixed-user-data))
         (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))

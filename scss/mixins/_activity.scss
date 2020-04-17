@@ -5,14 +5,13 @@ $bottom_margin: 16;
 $header_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
-  div.user-avatar-img-container {
+
+  @include user-profile($avatar_size) {
     float: left;
     margin-right: 13px;
   }
 
-  @include user-profile($avatar_size);
-
-  div.name {
+  div.name, span.name {
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
@@ -22,7 +21,7 @@ $header_top_margin: 24;
     white-space: nowrap;
   }
 
-  div.time-since {
+  div.time-since, span.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
@@ -668,11 +667,11 @@ $header_top_margin: 24;
     margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
   }
 
-  & > *:not(blockquote, pre):first-child {
+  & > *:not(blockquote):not(pre):first-child {
     margin-top: 0;
   }
 
-  & > *:not(blockquote, pre):last-child {
+  & > *:not(blockquote):not(pre):last-child {
     margin-bottom: 0;
   }
 
@@ -828,6 +827,7 @@ $header_top_margin: 24;
     background-color: var(--highlighter-bg-color);
     color: $deep_navy;
     border-radius: 3px;
+    padding: 0 3px;
   }
 
   @include poll($paragraph_spacing);
@@ -1091,11 +1091,11 @@ $header_top_margin: 24;
     margin: #{$paragraph_spacing}px 0 #{$paragraph_spacing}px 0;
   }
 
-  & > *:not(blockquote, pre):first-child {
+  & > *:not(blockquote):not(pre):first-child {
     margin-top: 0;
   }
 
-  & > *:not(blockquote, pre):last-child {
+  & > *:not(blockquote):not(pre):last-child {
     margin-bottom: 0;
   }
 
@@ -1182,6 +1182,7 @@ $header_top_margin: 24;
     background-color: var(--highlighter-bg-color);
     color: $deep_navy;
     border-radius: 3px;
+    padding: 0 3px;
   }
 
   @include code-blocks(int($font-size) - 3, int($line-height) - 3, $paragraph_spacing);

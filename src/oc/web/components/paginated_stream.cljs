@@ -14,6 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -66,6 +67,8 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
+        (seq (router/current-contributions-id))
+        (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
@@ -95,7 +98,8 @@
            is-mobile
            open-item
            close-item] :as props}]
-  (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
+  (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-wrt? (and member?
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -109,11 +113,13 @@
                                :comments-data comments-data
                                :read-data reads-data
                                :show-wrt? show-wrt?
+                               :member? member?
                                :editable-boards editable-boards})
        (stream-item {:activity-data entry
                      :comments-data comments-data
                      :read-data reads-data
                      :show-wrt? show-wrt?
+                     :member? member?
                      :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static

@@ -8,6 +8,7 @@
 (rum/defcs lazy-stream < rum/static
                          rum/reactive
                          (drv/drv :board-data)
+                         (drv/drv :contributions-data)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
                          (drv/drv :foc-layout)
@@ -16,23 +17,37 @@
                            s)}
   [s stream-comp]
   (let [board-data (drv/react s :board-data)
+        contributions-data (drv/react s :contributions-data)
         container-data (drv/react s :container-data)
         activity-data (drv/react s :activity-data)
         foc-layout (drv/react s :foc-layout)
         is-container? (dis/is-container? (router/current-board-slug))
-        loading? (or ;; Board specified
-                     (and (not (router/current-activity-id))
-                          (not is-container?)
-                          ;; But no board data yet
-                          (not board-data))
-                     ;; Another container
-                     (and (not (router/current-activity-id))
-                          is-container?
-                          ;; But no all-posts data yet
-                         (not container-data))
-                     ;; Activity loaded
-                     (and (router/current-activity-id)
-                          (not activity-data)))]
+        is-contributions? (seq (router/current-contributions-id))
+        is-expanded-post? (seq (router/current-activity-id))
+        container-loaded? (and ;; Another container
+                               (not is-expanded-post?)
+                               is-container?
+                               ;; But no container data yet
+                              (not container-data))
+        board-loaded? (and ;; board specified
+                           (not is-expanded-post?)
+                           (not is-container?)
+                           (not is-contributions?)
+                           ;; But no board data yet
+                           (not board-data))
+        contributions-loaded? (and ;; Contrib specified
+                                 (not is-expanded-post?)
+                                 is-contributions?
+                                 ;; But no contributions data data yet
+                                 (not contributions-data))
+        post-loaded? (and ;; Post specified
+                          is-expanded-post?
+                          ;; but not post data yet
+                          (not activity-data))
+        loading? (or container-loaded?
+                     board-loaded?
+                     contributions-loaded?
+                     post-loaded?)]
     [:div.lazy-stream
       (if-not loading?
         (stream-comp)

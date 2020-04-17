@@ -119,6 +119,7 @@ var OCWebPrintRouterPath = function(){};
 var OCWebPrintSecureActivityData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
+var OCWebPrintActiveUsers = function(){};
 var OCWebPrintUserNotifications = function(){};
 // Cljs utility externs
 var OCWebUtils = {};

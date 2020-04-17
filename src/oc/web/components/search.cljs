@@ -28,7 +28,7 @@
      [:div.search-result-box
       (user-avatar-image {:user-id (first (:author-id result))
                           :name author
-                          :avatar-url (first (:author-url result))} false)
+                          :avatar-url (first (:author-url result))})
       [:div.title {:dangerouslySetInnerHTML title}]
       [:div.time-since
        (let [t (or (:published-at result) (:created-at result))]

@@ -233,7 +233,31 @@ div.expanded-post {
         }
       }
 
-      span.expanded-post-author-inner-label {
+      div.expanded-post-author-inner-label {
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--light-color);
+        line-height: 18px;
+        opacity: 1;
+        display: inline-block;
+        position: relative;
+
+        span.hover-info-popup-container {
+          position: relative;
+
+          span.name {
+            margin-right: 4px;
+            min-height: 18px;
+            line-height: 18px;  
+          }
+        }
+
+        time {
+          min-height: 18px;
+          line-height: 18px;
+          display: inline-block;
+        }
+
         @include mobile() {
           margin-right: 0;
           margin-bottom: 8px;

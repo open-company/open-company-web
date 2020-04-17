@@ -18,12 +18,14 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
@@ -159,8 +161,9 @@
   [{:keys [activity-data comment-data closing-thread editing?
            edit-comment-key is-indented-comment? mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
-           is-mobile? can-show-edit-bt? can-show-delete-bt?
-           show-more-menu showing-picker? did-react-cb new-thread?]}]
+           is-mobile? can-show-edit-bt? can-show-delete-bt? member?
+           show-more-menu showing-picker? did-react-cb new-thread?
+           current-user-id]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -190,17 +193,18 @@
                         :can-reply? true
                         :reply-cb reply-cb})
             emoji-picker])
-        [:div.stream-comment-author-avatar
-          (user-avatar-image (:author comment-data))]
-
         [:div.stream-comment-right
           [:div.stream-comment-header.group
             {:class utils/hide-class}
             [:div.stream-comment-author-right
               [:div.stream-comment-author-right-group
                 {:class (when (:new comment-data) "new-comment")}
-                [:div.stream-comment-author-name
-                  (:name (:author comment-data))]
+                [:div.stream-comment-author-name-container
+                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
+                  [:div.stream-comment-author-avatar
+                    (user-avatar-image (:author comment-data))]
+                  [:div.stream-comment-author-name
+                    (:name (:author comment-data))]]
                 [:div.stream-comment-author-timestamp
                   [:time
                     {:date-time (:created-at comment-data)
@@ -308,7 +312,6 @@
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :add-comment-data)
-                             (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
                              (rum/local [] ::expanded-comments)
@@ -320,7 +323,7 @@
                              (rum/local [] ::threads)
                              (drv/drv :add-comment-force-update)
                              ;; Mixins
-                             (mention-mixins/oc-mentions-hover)
+                             ; (mention-mixins/oc-mentions-hover {:click? true})
                              ui-mixins/refresh-tooltips-mixin
                              (ui-mixins/interactive-images-mixin "div.stream-comment-body")
                              (ui-mixins/on-window-click-mixin (fn [s e]
@@ -367,7 +370,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data last-read-at current-user-id]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id member?]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads @(::threads s)
@@ -420,7 +423,9 @@
                                :show-more-menu (::show-more-menu s)
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key
-                               :new-thread? (:new root-comment-data)}))
+                               :new-thread? (:new root-comment-data)
+                               :member? member?
+                               :current-user-id current-user-id}))
                (when (and (not expanded-thread?)
                           (pos? (:collapsed-count root-comment-data)))
                  [:button.mlb-reset.expand-thead-bt
@@ -470,7 +475,9 @@
                                     :show-more-menu (::show-more-menu s)
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
                                     :edit-comment-key ind-edit-comment-key
-                                    :new-thread? (:new root-comment-data)}))])
+                                    :new-thread? (:new root-comment-data)
+                                    :member? member?
+                                    :current-user-id current-user-id}))])
           (when show-add-comment?
             [:div.stream-comment-outer
               {:key (str "stream-comment-add-" (:uuid root-comment-data))

@@ -22,6 +22,7 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -70,6 +71,7 @@
                 org-data
                 jwt-data
                 board-data
+                contributions-data
                 initial-section-editing
                 container-data
                 posts-data
@@ -82,20 +84,24 @@
                 force-login-wall
                 panel-stack
                 app-loading
-                payments-data]} (drv/react s :org-dashboard-data)
+                payments-data
+                user-info-data
+                active-users]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
                      app-loading
                      ;; the org data are not loaded yet
                      (not org-data)
-                     ;; No board specified
+                     ;; No board or contributions specified
                      (and (not (router/current-board-slug))
+                          (not (router/current-contributions-id))
                           ;; but there are some
                           (pos? (count (:boards org-data)))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
+                               (not (router/current-contributions-id))
                                (not= (router/current-board-slug) "inbox")
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
@@ -105,6 +111,8 @@
                                 (get posts-data (router/current-activity-id)))
         entry-not-found (and ;; org is present
                              (not org-not-found)
+                             ;; Users for mentions has not been loaded
+                             (not (map? active-users))
                              ;; section is present
                              (not section-not-found)
                              ;; route is for a single post and it's been loaded
@@ -144,7 +152,9 @@
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
-        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)]
+        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
+        show-user-info? (and open-panel
+                             (s/starts-with? (name open-panel) "user-info-"))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -217,7 +227,10 @@
           (wrt org-data)
           ;; UI Theme settings panel
           (= open-panel :theme)
-          (theme-settings-modal (drv/react s :ui-theme)))
+          (theme-settings-modal (drv/react s :ui-theme))
+          ;; User info modal
+          show-user-info?
+          (user-info-modal {:user-data user-info-data :org-data org-data}))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -256,7 +269,4 @@
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
-               (when (or (not is-mobile?)
-                         (and (or (not open-panel)
-                                  (= open-panel :menu))))
-                 (dashboard-layout))]]])])))
+               (dashboard-layout)]]])])))

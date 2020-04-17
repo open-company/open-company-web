@@ -10,7 +10,8 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn- prefixed-html
   "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.
@@ -30,7 +31,7 @@
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
                                    (drv/drv :activity-share-container)
-  [s {:keys [activity-data read-data comments-data editable-boards]}]
+  [s {:keys [activity-data read-data comments-data editable-boards :member? member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-inbox? (= (router/current-board-slug) "inbox")
@@ -82,7 +83,10 @@
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
-        (user-avatar-image publisher)
+        [:div.stream-collapsed-item-avatar-container
+          (user-info-hover {:user-data publisher :current-user-id current-user-id})
+          [:div.stream-collapsed-item-avatar
+            (user-avatar-image publisher)]]
         [:div.stream-collapsed-item-fill
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"

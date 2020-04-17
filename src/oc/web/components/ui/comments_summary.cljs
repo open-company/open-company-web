@@ -80,7 +80,7 @@
             (for [user-data faces-to-render]
               [:div.is-comments-author
                 {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-                (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])])
+                (user-avatar-image user-data {:tooltip? (not (responsive/is-tablet-or-mobile?))})])])
         (when-not (and hide-label?
                        (zero? comments-count))
 

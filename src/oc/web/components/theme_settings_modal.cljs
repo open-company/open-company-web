@@ -1,6 +1,7 @@
 (ns oc.web.components.theme-settings-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.ui-theme :as theme-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -10,14 +11,17 @@
   [:div.theme-description
     "Chosen automatically by your OS"])
 
-(rum/defc theme-settings-modal <
+(rum/defcs theme-settings-modal <
   rum/static
-  [theme-data]
+  [s theme-data]
   (let [{:keys [setting-value computed-value]} theme-data]
     [:div.theme-settings-modal
+      {:on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :theme-settings))
+                    (nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
       [:div.theme-settings
+        {:ref :theme-settings}
         [:div.theme-settings-header
           [:div.theme-settings-header-title
             "Theme"]

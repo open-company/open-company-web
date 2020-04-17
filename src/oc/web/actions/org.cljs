@@ -21,6 +21,7 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -62,6 +63,20 @@
                                                       :expire 5
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
+
+;; Active users
+
+(def max-retry-count 3)
+
+(defn load-active-users [active-users-link & [retry]]
+  (when active-users-link
+    (api/get-active-users active-users-link
+     (fn [{:keys [status success body]}]
+       (if success
+         (let [resp (when success (json->cljs body))]
+           (dis/dispatch! [:active-users (router/current-org-slug) resp]))
+         (when (< retry max-retry-count)
+           (utils/after 1000 #(load-active-users active-users-link (inc (or retry 0))))))))))
 
 ;; Org get
 (defn check-org-404 []
@@ -129,22 +144,29 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
+        is-contributions? (seq (router/current-contributions-id))
         delay-count (atom 0)
         inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
-        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
+        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
+        active-users-link (utils/link-for (:links org-data) "active-users")]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
         (aa/secure-activity-get)
         (do
+          ;; Load the active users
+          (when active-users-link
+            (load-active-users active-users-link))
           ;; Load the current activity
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
@@ -158,7 +180,11 @@
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           (when drafts-link
-            (utils/maybe-after drafts-delay #(sa/section-get drafts-link))))))
+            (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
+          ;; contributions data
+          (when (and contrib-link
+                     (router/current-contributions-id))
+            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id)))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
@@ -195,7 +221,8 @@
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation"))
-           (not (utils/in? (:route @router/path) "secure-activity")))
+           (not (utils/in? (:route @router/path) "secure-activity"))
+           (not (router/current-contributions-id)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]
         (router/nav!

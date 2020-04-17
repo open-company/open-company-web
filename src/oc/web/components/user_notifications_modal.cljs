@@ -14,8 +14,7 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn change! [s k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])

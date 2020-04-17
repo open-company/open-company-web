@@ -18,6 +18,22 @@ div.user-profile-modal-container {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: var(--mobile-background-color);
+      border-radius: 4px;
+    }
   }
 
   div.user-profile-modal {
@@ -33,6 +49,16 @@ div.user-profile-modal-container {
     overflow-x: hidden;
     overflow-y: auto;
 
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+      margin-top: 0;
+    }
+
     div.user-profile-header {
       width: 320px;
       height: #{$navbar_height}px;
@@ -43,12 +69,32 @@ div.user-profile-modal-container {
       right: 0;
       z-index: 100;
 
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
+
       div.user-profile-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
         color: var(--color);
         line-height: 32px;
         float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+        }
       }
 
       button.cancel-bt {
@@ -59,6 +105,10 @@ div.user-profile-modal-container {
         color: var(--light-color);
         float: right;
         margin-right: 8px;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       button.save-bt {
@@ -71,6 +121,21 @@ div.user-profile-modal-container {
         line-height: 18px;
         float: right;
         border-radius: 4px;
+
+        &.disabled {
+          opacity: 0.4;
+        }
+
+        @include mobile() {
+          @include OC_Body_Book();
+          position: absolute;
+          height: 24px;
+          top: 15px;
+          right: 16px;
+          background-color: transparent;
+          color: $carrot_green;
+          padding: 0;
+        }
       }
     }
 
@@ -79,6 +144,11 @@ div.user-profile-modal-container {
       margin: 24px auto 32px;
       position: relative;
       color: var(--color);
+
+      @include mobile() {
+        padding: 0;
+        width: initial;
+      }
 
       div.user-profile-avatar {
         height: 32px;
@@ -118,13 +188,49 @@ div.user-profile-modal-container {
         border-top: 1px solid var(--divider-line);
         padding-top: 16px;
 
-        div.field-label {
-          &:not(:first-child) {
-            margin-top: 16px;
-          }
+        div.fields-divider-line {
+          width: 100%;
+          height: 1px;
+          background-color: var(--divider-line);
+        }
+
+        *:first-child {
+          margin-top: 0;
+        }
+
+        .profile-group {
+          margin-top: 16px;
+        }
+
+        .field-label {
+          margin: 16px 0 0;
           color: var(--color);
           @include OC_Body_Book();
           font-size: 14px;
+
+          &:first-child {
+            margin: 0;
+          }
+
+          .half-field-label {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+            color: var(--color);
+            @include OC_Body_Book();
+            font-size: 14px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
+          }
+
+          span.error {
+            display: block;
+            width: 100%;
+            color: $carrot_orange;
+          }
         }
 
         input.field-value {
@@ -151,6 +257,67 @@ div.user-profile-modal-container {
 
           &.not-allowed {
             cursor: not-allowed;
+          }
+
+          &.half-field {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
+
+            @include mobile() {
+              width: 100%;
+              display: block;
+              margin-left: 0;
+
+              &:first-of-type {
+                marign-left: 0;
+                margin-right: 0;
+              }
+            }
+          }
+        }
+
+        textarea.field-value {
+          width: 100%;
+          resize: none;
+          background-color: var(--opac-background-color-1);
+          border-radius: 4px;
+          padding: 7px 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          margin-top: 8px;
+          border: none;
+          outline: none;
+          display: block;
+
+          @include placeholder(){
+            color: var(--light-color);
+          }
+
+          &:focus, &:active {
+            border: none;
+            outline: none;
+          }
+
+          &.not-allowed {
+            cursor: not-allowed;
+          }
+
+          &.half-field {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
           }
         }
 

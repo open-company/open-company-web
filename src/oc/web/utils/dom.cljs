@@ -34,4 +34,30 @@
            ;; and less than the screen height
            (< (- (.-top rect) fixed-offset) win-height))))
 
+(defn viewport-width []
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
+
+(defn viewport-height []
+  (or (.-clientHeight (.-documentElement js/document))
+      (.-innerHeight js/window)))
+
+(defn viewport-size []
+  {:width (viewport-width)
+   :height (viewport-height)})
+
+(defn viewport-offset [element]
+  (when element
+    (let [rect (.getBoundingClientRect element)]
+      {:x (.-left rect)
+       :y (.-top rect)})))
+
+(defn event-inside? [e el]
+  (loop [element (.-target e)]
+    (if element
+      (if (= element el)
+        true
+        (recur (.-parentElement element)))
+      false)))
+
 (def empty-body-html "<p><br/></>")

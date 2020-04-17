@@ -13,6 +13,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.utils.ui :as ui-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
@@ -26,31 +27,11 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
-
-(defn- autoresize-textarea [ref]
-  (let [lst (atom nil)]
-
-    (letfn [(autoresize [_e]
-              (this-as this
-                (utils/after 0
-                 #(do
-                    (set! (.. this -style -cssText) "height:auto;")
-                    (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))))]
-      {:did-mount (fn [s]
-       (reset! lst
-        (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
-       s)
-       :will-unmount (fn [s]
-        (when @lst
-          (events/unlistenByKey @lst)
-          (reset! lst nil))
-       s)})))
 
 (def why-carrot-label "Why you are giving Carrot a try?")
 
@@ -227,7 +208,7 @@
                             (drv/drv :orgs)
                             (rum/local false ::saving)
                             (rum/local "" ::why-carrot)
-                            (autoresize-textarea "why-carrot")
+                            (ui-mixins/autoresize-textarea "why-carrot")
                             {:will-mount (fn [s]
                               (dis/dispatch! [:input [:org-editing :name] ""])
                               (user-actions/user-profile-reset)
