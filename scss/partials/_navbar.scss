@@ -75,9 +75,9 @@ nav.oc-navbar {
           position: absolute;
           top: 15px;
           left: 50%;
-          width: 250px;
+          width: 60vw;
           height: 24px;
-          margin: 0 0 0 -125px;
+          margin: 0 0 0 -30vw;
           text-align: center;
 
           div.navbar-mobile-title {
@@ -202,6 +202,13 @@ nav.oc-navbar {
         position: absolute;
         left: calc(100vw - 72px - 16px);
         min-width: 72px;
+        width: auto;
+
+        &.anonymous-user {
+          position: relative;
+          left: unset;
+          float: right;
+        }
 
         &.create-post {
           min-width: 112px; // 72 + 32 + 8

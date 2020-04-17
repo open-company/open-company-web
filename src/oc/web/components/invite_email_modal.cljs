@@ -12,7 +12,6 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn close-clicked [s dismiss-action]

@@ -14,6 +14,7 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
@@ -33,17 +34,59 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 ;; :theme
+;; :user-info-{uuid}
 
-(defn- container-data [board-slug]
-  (if (dis/is-container? board-slug)
-    (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-    (dis/board-data board-slug)))
+(defn- refresh-contributions-data [author-uuid]
+  (when author-uuid
+    (contributions-actions/contributions-get author-uuid)))
+
+(defn nav-to-author!
+  ([e author-uuid url]
+  (nav-to-author! e author-uuid url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+
+  ([e author-uuid url back-y refresh?]
+  (when (and e
+             (.-preventDefault e))
+    (.preventDefault e))
+  (when ua/mobile?
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+  (utils/after 0 (fn []
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+         org-slug (router/current-org-slug)
+         org-data (dis/org-data)]
+     (if (= current-path url)
+       (do ;; In case user is clicking on the currently highlighted section
+           ;; let's refresh the posts list only
+         (routing-actions/routing @router/path)
+         (user-actions/initial-loading true))
+       (do ;; If user clicked on a different section/container
+           ;; let's switch to it using pushState and changing
+           ;; the internal router state
+         (router/set-route! [org-slug author-uuid "dashboard"]
+          {:org org-slug
+           :contributions author-uuid
+           :scroll-y back-y
+           :query-params (router/query-params)})
+         (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         (when refresh?
+           (utils/after 0 #(refresh-contributions-data author-uuid))))))
+   (user-actions/hide-mobile-user-notifications)))))
+
+(defn- container-data [back-to]
+  (cond
+   (contains? back-to :contributions)
+   (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
+   (dis/is-container? (:board back-to))
+   (dis/contributions-data @dis/app-state (router/current-org-slug) (:board back-to))
+   :else
+   (dis/board-data @dis/app-state (router/current-org-slug) (:board back-to))))
 
 (defn- refresh-board-data [board-slug]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (container-data board-slug)]
+          board-data (container-data {:board board-slug})]
        (cond
 
         (= board-slug "inbox")
@@ -109,12 +152,15 @@
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)
         ;; Go back to
-        board (utils/back-to org-data)
-        to-url (oc-urls/board board)
-        board-data (container-data board)
+        back-to (utils/back-to org-data)
+        is-contributions? (contains? back-to :contributions)
+        to-url (if is-contributions?
+                 (oc-urls/contributions (:contributions back-to))
+                 (oc-urls/board (:board back-to)))
+        cont-data (container-data back-to)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
                                  (:refresh @router/path)
-                                 (not board-data))
+                                 (not cont-data))
         ;; Get the previous scroll top position
         default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
         ;; Scroll back to the previous scroll position only if the posts are
@@ -122,15 +168,22 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
-    (nav-to-url! e board to-url back-y should-refresh-data?)))
+    (if is-contributions?
+      (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
+      (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal [activity-data dont-scroll]
   (let [org (router/current-org-slug)
-        old-board (router/current-board-slug)
+        previous-slug (or (router/current-board-slug) (router/current-contributions-id))
         board (:board-slug activity-data)
-        back-to (if (= old-board utils/default-drafts-board-slug)
-                  board
-                  old-board)
+        back-to (cond
+                  (and (seq (router/current-board-slug))
+                       (not= (router/current-board-slug) utils/default-drafts-board-slug))
+                  {:board (router/current-board-slug)}
+                  (seq (router/current-contributions-id))
+                  {:contributions (router/current-contributions-id)}
+                  :else
+                  {:board board})
         activity (:uuid activity-data)
         post-url (oc-urls/entry board activity)
         query-params (router/query-params)
@@ -277,4 +330,12 @@
   (push-panel :theme))
 
 (defn hide-theme-settings []
+  (pop-panel))
+
+;; User info modal
+
+(defn show-user-info [user-id]
+  (push-panel (str "user-info-" user-id)))
+
+(defn hide-user-info []
   (pop-panel))

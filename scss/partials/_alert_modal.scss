@@ -68,10 +68,21 @@ div.alert-modal-container {
         }
       }
 
-      img.alert-modal-icon {
+      div.alert-modal-emoji-icon {
         max-width: 42px;
         max-height: 42px;
+        font-size: 36px;
+        text-align: center;
+        margin: 0 auto 12px;
+
+        @include no-user-select();
+      }
+
+      img.alert-modal-icon {
+        width: 42px;
+        height: 42px;
         margin-bottom: 12px;
+        object-fit: contain;
       }
 
       div.alert-modal-title {

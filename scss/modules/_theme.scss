@@ -16,9 +16,11 @@ $dark_mode: "dark";
   --ultralight-color: #{rgba($deep_navy,0.25)};
   --tooltip-background-color: #{$deep_navy};
   --tooltip-color: white;
+  --tooltip-button-background: #{rgba(white, 0.1)};
   --selection-color: rgba(250,100,82, 0.5);
   --divider-line: #{$divider_line_grey};
   --overlay-background-color: white;
+  --highlighter-bg-color: #FEDF95;
 
   --opac-background-color-05: #{rgba($deep_navy, 0.05)};
   --opac-background-color-1: #{rgba($deep_navy, 0.1)};
@@ -60,7 +62,7 @@ $dark_mode: "dark";
   --search-background-color: #{rgba($light_ui_grey, 0.2)};
 
   // Comments
-  --comments-floating-bt-background: #{rgba($ultra_light_grey, 0.3)};
+  --comments-floating-bt-background: #{rgba($deep_navy, 0.05)};
   --add-comment-background: white;
   --mobile-add-comment-background: white;
 
@@ -86,11 +88,23 @@ $dark_mode: "dark";
   // Theme settings
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
+  // Polls
+  --poll-background-color: white;
+  --poll-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+
+  // Code blocks
+  --code-background-color: #{rgba($deep_navy, 0.08)};
+  --code-border-color: #{rgba($deep_navy, 0.24)};
+  --inline-code-color: #FB4884;
+
   // Collapsed post
   --collapse-post-start-bg: #{rgba($grey_num_2, 0)};
   --collapse-post-stop-bg: #{rgba($grey_num_2, 1)};
   --mobile-collapse-post-start-bg: #{rgba(white, 0)};
   --mobile-collapse-post-stop-bg: #{rgba(white, 1)};
+
+  // User info hover
+  --user-info-view-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
 
   html, body {
     scrollbar-color: light;
@@ -104,9 +118,11 @@ $dark_mode: "dark";
   --ultralight-color: #{rgba(white,0.25)};
   --tooltip-background-color: white;
   --tooltip-color: #1B202A;
+  --tooltip-button-background: #{rgba($deep_navy, 0.1)};
   --selection-color: #{$carrot_orange};
   --divider-line: #{rgba(white, 0.16)};
   --overlay-background-color: #1B202A;
+  --highlighter-bg-color: #FEDF95;
 
   --opac-background-color-05: #{rgba(white, 0.05)};
   --opac-background-color-1: #{rgba(white, 0.1)};
@@ -148,7 +164,7 @@ $dark_mode: "dark";
   --search-background-color: #{rgba(white, 0.09)};
 
   // Comments
-  --comments-floating-bt-background: #{rgba(white, 0.3)};
+  --comments-floating-bt-background: #{rgba(white, 0.05)};
   --add-comment-background: rgb(27, 32, 42);
   --mobile-add-comment-background: #1B202A;
 
@@ -174,11 +190,23 @@ $dark_mode: "dark";
   // Theme settings
   --ui-theme-border-color: #{rgba(white, 0.22)};
 
+  // Polls
+  --poll-background-color: #2c313a;
+  --poll-box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.16);
+
+  // Code blocks
+  --code-background-color: #2C313A;
+  --code-border-color: #{rgba(white, 0.32)};
+  --inline-code-color: #FFFD93;
+
   // Collapsed post
   --collapse-post-start-bg: rgba(27, 32, 42, 0);
   --collapse-post-stop-bg: rgba(27, 32, 42, 1);
   --mobile-collapse-post-start-bg: rgba(27, 32, 42, 0);
   --mobile-collapse-post-stop-bg: rgba(27, 32, 42, 1);
+
+  // User info hover
+  --user-info-view-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
 
   &, body {
     scrollbar-color: dark;

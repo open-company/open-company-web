@@ -9,11 +9,12 @@
             [oc.web.lib.jwt :as jwt]
             [clojure.string :as cstr]))
 
-(def path (atom {}))
+(def ^{:export true} path (atom {}))
 
 (defn set-route! [route parts]
   (timbre/info "set-route!" route parts)
-  (reset! path {})
+  ;; Keep the ap-redirect-done flag
+  (reset! path {:ap-redirect-done (:ap-redirect-done @path)})
   (swap! path assoc :route route)
   (doseq [[k v] parts] (swap! path assoc k v)))
 
@@ -127,11 +128,20 @@
 (defn current-comment-id []
   (:comment @path))
 
+(defn current-contributions-id []
+  (:contributions @path))
+
 (defn query-params []
   (:query-params @path))
 
 (defn query-param [k]
   (get (:query-params @path) k nil))
+
+(defn ap-redirect []
+  (:ap-redirect-done @path))
+
+(defn ap-redirect-done! []
+  (swap! path merge {:ap-redirect-done true}))
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"
@@ -182,6 +192,11 @@
   "Cookie used to remember if the sections list was collapsed or not."
   []
   (str "collapse-sections-list-" (jwt/user-id)))
+
+(defn collapse-users-list-cookie
+  "Cookie used to remember if the users list was collapsed or not."
+  []
+  (str "collapse-users-list-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
 

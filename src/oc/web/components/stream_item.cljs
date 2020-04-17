@@ -24,6 +24,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [cljsjs.hammer]))
 
@@ -151,7 +152,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -176,7 +177,7 @@
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
                                ;; and that's after the user last read
-                               (< (.getTime (utils/js-date (:last-read-at read-data)))
+                               (< (.getTime (utils/js-date (:last-read-at activity-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
@@ -214,7 +215,7 @@
                                 :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
-       :data-last-read-at (:last-read-at read-data)
+       :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
                    (if-not (nil? mobile-swipe-menu-uuid)
@@ -259,41 +260,38 @@
         [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
-          (user-avatar-image publisher)
-          [:div.name
-            [:div.mobile-name
-              [:div.name-inner
-                {:class utils/hide-class
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (str
-                 (:name publisher)
-                 " in "
+          {:class (when is-inbox? "has-inbox")}
+          [:div.hover-container
+            (user-info-hover {:user-data publisher :current-user-id current-user-id})
+            (user-avatar-image publisher)
+            [:span.name
+              {:class utils/hide-class}
+              (:name publisher)]]
+          [:span.name
+            {:class utils/hide-class}
+            (str "in "
                  (:board-name activity-data)
                  (when (= (:board-access activity-data) "private")
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time t)])]]
-            [:div.muted-activity
+          (let [t (or (:published-at activity-data) (:created-at activity-data))]
+            [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
-               :title "Muted"}]
-            [:div.must-see-tag]
-            [:div.bookmark-tag-small.mobile-only]
-            [:div.bookmark-tag.big-web-tablet-only]]]
+               :data-container "body"
+               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+               :data-title (utils/activity-date-tooltip activity-data)}
+              [:time
+                {:date-time t}
+                (utils/foc-date-time t)]])
+          [:div.muted-activity
+            {:data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :title "Muted"}]
+          [:div.must-see-tag]
+          [:div.bookmark-tag-small.mobile-only]
+          [:div.bookmark-tag.big-web-tablet-only]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?
@@ -350,7 +348,7 @@
                   ; {:on-click #(expand s true true)}
                   (comments-summary {:entry-data activity-data
                                      :comments-data comments-data
-                                     :show-new-tag? has-new-comments?
+                                     :new-comments-count (:new-comments-count activity-data)
                                      :hide-label? is-mobile?})]
                 (when show-wrt?
                   [:div.stream-item-wrt

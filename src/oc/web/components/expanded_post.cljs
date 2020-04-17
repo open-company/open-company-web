@@ -21,11 +21,12 @@
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn close-expanded-post [e]
   (nav-actions/dismiss-post-modal e))
@@ -50,14 +51,11 @@
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (defn- save-initial-read-data [s]
-  (let [activity-data @(drv/get-ref s :activity-data)
-        reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
-    (when (and (not @(::initial-last-read-at s))
-               (:last-read-at reads-data))
-      (reset! (::initial-last-read-at s) (:last-read-at reads-data)))
-    (when (and (not @(::initial-new-at s))
-               (:new-at activity-data))
-      (reset! (::initial-new-at s) (:new-at activity-data)))))
+  (let [activity-data @(drv/get-ref s :activity-data)]
+    (when (and (nil? @(::initial-last-read-at s))
+               (or (:last-read-at activity-data)
+                   (:unread activity-data)))
+      (reset! (::initial-last-read-at s) (or (:last-read-at activity-data) "")))))
 
 (defn- mark-read [s]
   (when @(::mark-as-read? s)
@@ -72,7 +70,7 @@
     (let [is-mobile? (responsive/is-mobile-size?)
           comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
           activity-data @(drv/get-ref s :activity-data)
-          comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+          comments-count (-> activity-data :links (utils/link-for "comments") :count)]
       (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
                                        (> (count (:body activity-data)) min-body-length-for-truncation)
                                        ;; Never if they have polls
@@ -82,7 +80,7 @@
                                        ;; Only when they are read
                                        (not (:unread activity-data))
                                        ;; And only when there is at least a comment
-                                       (pos? (count comments-data)))))))
+                                       (pos? comments-count))))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -91,22 +89,22 @@
   (drv/drv :comments-data)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
-  (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
   (drv/drv :add-comment-force-update)
   (drv/drv :editable-boards)
+  (drv/drv :users-info-hover)
+  (drv/drv :current-user-data)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
-  (rum/local nil ::initial-new-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
   ;; Mixins
-  (mention-mixins/oc-mentions-hover)
+  (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
     (check-collapse-post s)
@@ -115,12 +113,12 @@
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
     (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
-    (mark-read s)
     (load-comments s true)
+    (mark-read s)
     s)
    :did-remount (fn [_ s]
-    (load-comments s false)
     (save-initial-read-data s)
+    (load-comments s false)
     s)
    :will-unmount (fn [s]
     (mark-read s)
@@ -142,7 +140,8 @@
         org-data (dis/org-data)
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        current-user-id (jwt/user-id)
+        current-user-data (drv/react s :current-user-data)
+        current-user-id (:user-id current-user-data)
         is-publisher? (= (:user-id publisher) current-user-id)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
@@ -152,16 +151,10 @@
                        {:width 638
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
-        add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)
         add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
-        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and @(::initial-new-at s)
-                               ;; and that's after the user last read
-                               (< (.getTime (utils/js-date (:last-read-at reads-data)))
-                                  (.getTime (utils/js-date @(::initial-new-at s)))))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                       mobile-more-menu-el)
@@ -189,11 +182,10 @@
                                 :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
-       :data-initial-new-at @(::initial-new-at s)
        :data-new-at (:new-at activity-data)
        :data-initial-last-read-at @(::initial-last-read-at s)
-       :data-last-read-at (:last-read-at reads-data)
-       :data-has-new-comments has-new-comments?}
+       :data-last-read-at (:last-read-at activity-data)
+       :data-new-comments-count (:new-comments-count activity-data)}
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
@@ -224,13 +216,18 @@
       [:div.expanded-post-author.group
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
-          [:span.expanded-post-author-inner-label
-            (str (:name publisher) " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))
+          [:div.expanded-post-author-inner-label
+            [:span.hover-info-popup-container
+              (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
+              [:span.name
+                (:name publisher)]]
+            [:span.name
+              (str  "in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)"))]
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)
@@ -270,7 +267,14 @@
         [:button.mlb-reset.expand-button
           {:on-click #(reset! (::collapse-post s) false)}
           [:div.expand-button-inner
-            "View entire post"]])
+            "View more"]])
+      (when (seq (:polls activity-data))
+        (polls-wrapper {:polls-data (:polls activity-data)
+                        :editing? false
+                        :current-user-id current-user-id
+                        :container-selector "div.expanded-post"
+                        :activity-data activity-data
+                        :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions
@@ -280,7 +284,7 @@
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-drv
-                             :show-new-tag? has-new-comments?
+                             :new-comments-count 0
                              :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
@@ -289,6 +293,6 @@
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
-                          :new-added-comment add-comment-highlight
+                          :member? user-is-part-of-the-team
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

@@ -34,7 +34,7 @@
                                (rum/local false :me/upload-lock)
                                ;; Derivatives
                                (drv/drv :media-input)
-                               (drv/drv :team-roster)
+                               (drv/drv :mention-users)
                                ;; Mixins
                                (mention-mixins/oc-mentions-hover)
                                (on-window-click-mixin (fn [s e]
@@ -90,7 +90,7 @@
              fullscreen
              cmail-key
              paywall?]}]
-  (let [_team-roster (drv/react s :team-roster)
+  (let [_mention-users (drv/react s :mention-users)
         _media-input (drv/react s :media-input)
         hide-placeholder? (or (not show-placeholder) @(::did-change s))]
     [:div.rich-body-editor-outer-container

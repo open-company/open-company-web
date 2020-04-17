@@ -21,6 +21,7 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -63,6 +64,20 @@
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
+;; Active users
+
+(def max-retry-count 3)
+
+(defn load-active-users [active-users-link & [retry]]
+  (when active-users-link
+    (api/get-active-users active-users-link
+     (fn [{:keys [status success body]}]
+       (if success
+         (let [resp (when success (json->cljs body))]
+           (dis/dispatch! [:active-users (router/current-org-slug) resp]))
+         (when (< retry max-retry-count)
+           (utils/after 1000 #(load-active-users active-users-link (inc (or retry 0))))))))))
+
 ;; Org get
 (defn check-org-404 []
   (let [orgs (dis/orgs-data)]
@@ -93,6 +108,23 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
+(defn- redirect-to-ap? [org-data]
+  (when-not (router/ap-redirect)
+    (let [inbox-count (int (:inbox-count org-data))
+          is-inbox? (= (router/current-board-slug) "inbox")]
+      (when (and is-inbox?
+                 (zero? inbox-count)
+                 (not (router/current-activity-id))
+                 (not (router/current-secure-activity-id))
+                 (not (router/ap-redirect)))
+        (timbre/info "Redirect to all-posts for empty inbox:" (:inbox-count org-data))
+        (router/set-route! [(:slug org-data) "all-posts" "dashboard"]
+         {:org (:slug org-data)
+          :board "all-posts"
+          :query-params (router/query-params)})
+        (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/all-posts (:slug org-data)))))
+    (router/ap-redirect-done!)))
+
 (def other-resources-delay 1000)
 
 (defn org-loaded
@@ -104,6 +136,7 @@
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
+    (redirect-to-ap? org-data)
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [boards (:boards org-data)
@@ -111,22 +144,29 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
+        is-contributions? (seq (router/current-contributions-id))
         delay-count (atom 0)
         inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
-        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
+        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
+        active-users-link (utils/link-for (:links org-data) "active-users")]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
         (aa/secure-activity-get)
         (do
+          ;; Load the active users
+          (when active-users-link
+            (load-active-users active-users-link))
           ;; Load the current activity
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
@@ -140,7 +180,11 @@
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           (when drafts-link
-            (utils/maybe-after drafts-delay #(sa/section-get drafts-link))))))
+            (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
+          ;; contributions data
+          (when (and contrib-link
+                     (router/current-contributions-id))
+            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id)))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
@@ -177,7 +221,8 @@
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation"))
-           (not (utils/in? (:route @router/path) "secure-activity")))
+           (not (utils/in? (:route @router/path) "secure-activity"))
+           (not (router/current-contributions-id)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]
         (router/nav!
@@ -309,6 +354,26 @@
   [s n]
   (subs s 0 (min (count s) n)))
 
+(defn- add-utm-data
+  "
+  Augment org data with utm values stored in cookies.
+
+  Remove utm cookies if present.
+  "
+  [org-data]
+  (let [source (cook/get-cookie "utm_source")
+        term (cook/get-cookie "utm_term")
+        medium (cook/get-cookie "utm_medium")
+        campaign (cook/get-cookie "utm_campaign")]
+    (doseq [c-name ["utm_source" "utm_term" "utm_medium" "utm_campaign"]]
+      (js/OCStaticDeleteCookie c-name))
+    (if (or source term medium campaign)
+      (merge org-data {:utm-data {:utm-source (or source "")
+                                  :utm-term (or term "")
+                                  :utm-medium (or medium "")
+                                  :utm-campaign (or campaign "")}})
+      org-data)))
+
 (defn create-or-update-org [org-data]
   (dis/dispatch! [:input [:org-editing :error] false])
   (let [email-domain (:email-domain org-data)
@@ -323,7 +388,7 @@
       (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
         (api/patch-org org-patch-link clean-org-data (partial org-update-cb email-domain)))
       (let [create-org-link (utils/link-for (dis/api-entry-point) "create")]
-        (api/create-org create-org-link clean-org-data (partial org-create-cb email-domain))))))
+        (api/create-org create-org-link (add-utm-data clean-org-data) (partial org-create-cb email-domain))))))
 
 ;; Org edit
 

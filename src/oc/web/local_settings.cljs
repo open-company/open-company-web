@@ -10,7 +10,7 @@
 
 ;; Sentry
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
-(def local-whitelist-array ["localhost" "127.0.0.1"])
+(def local-whitelist-array (remove nil? ["localhost" "127.0.0.1" (env :web-hostname)]))
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network
@@ -93,3 +93,6 @@
 (def win-app-url "https://github.com/open-company/open-company-web/releases/download/untagged-a060f76d2ed11d47ff35/Carrot.exe")
 (def ios-app-url "https://apps.apple.com/us/app/carrot-mobile/id1473028573")
 (def android-app-url "https://play.google.com/apps/testing/io.carrot.mobile")
+
+;; Polls
+(def poll-can-add-reply false)

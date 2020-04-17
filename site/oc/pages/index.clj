@@ -12,7 +12,7 @@
           "Remote teams communicate differently"]
         [:div.subheadline.big-web-tablet-only
           "Teams struggle to stay in-sync with chat alone." [:br]
-          "With Carrot, it’s easy to have thoughtful," [:br]
+          "With Carrot, distributed teams have productive,"[:br]
           "asynchronous discussions without the chatter."]
         [:div.subheadline.mobile-only
           "It’s hard to stay in-sync with chat alone. Stay informed without the chatter."]
@@ -21,9 +21,13 @@
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
             "Try Carrot for free"]
-          ; [:span.get-started-subtitle
-          ;   "Free for small teams"]
-            ]
+          [:span.get-started-subtitle
+            "Carrot is open source. "
+            [:a
+              {:href (:oc-github options)
+               :target "_blank"}
+              "Join us"]
+            "."]]
 
         [:div.main-animation-container
           [:img.main-animation

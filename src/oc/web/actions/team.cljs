@@ -12,23 +12,6 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
-(defn- get-slack-usernames [user]
-  (let [slack-display-name [(:slack-display-name user)]
-        slack-users-usernames (vec (map :display-name (vals (:slack-users user))))]
-    (remove #(or (nil? %) (= % "-")) (concat slack-users-usernames slack-display-name))))
-
-(defn- compact-slack-usernames [users]
-  (doall (map #(assoc % :slack-usernames (get-slack-usernames %)) users)))
-
-(defn- users-for-mentions [users]
-  (compact-slack-usernames
-    (filterv #(and ;; is a carrot user
-                (seq (:user-id %))
-                ;; is active
-                (or (= (:status %) "active")
-                    (= (:status %) "unverified")))
-     users)))
-
 (defn roster-get [roster-link]
   (api/get-team roster-link
    (fn [{:keys [success body status]}]
@@ -37,9 +20,8 @@
          (let [users (-> fixed-body :collection :items)
                fixed-roster-data {:team-id (:team-id fixed-body)
                                   :links (-> fixed-body :collection :links)
-                                  :users users
-                                  :mention-users (users-for-mentions users)}]
-           (dis/dispatch! [:team-roster-loaded fixed-roster-data])
+                                  :users users}]
+           (dis/dispatch! [:team-roster-loaded (router/current-org-slug) fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]
              (doseq [[activity-uuid read-data] activities-read]
@@ -64,7 +46,7 @@
     (fn [{:keys [success body status]}]
       (let [team-data (when success (json->cljs body))]
         (when success
-          (dis/dispatch! [:team-loaded team-data])
+          (dis/dispatch! [:team-loaded (router/current-org-slug) team-data])
           (utils/after 100 org-actions/maybe-show-integration-added-notification?)
           (enumerate-channels team-data))))))
 
@@ -101,8 +83,7 @@
         (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
         (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
-      (when (and (>= status 500)
-                 (<= status 599))
+      (when (<= 500 status 599)
         (dis/dispatch! [:input [:team-data-requested] false])))))
 
 (defn teams-get []
@@ -383,7 +364,7 @@
     (api/handle-invite-link create-token-link
      (fn [{:keys [body success status]}]
       (when success
-        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (dis/dispatch! [:team-loaded (router/current-org-slug) (json->cljs body)])
         (when (fn? cb)
           (cb success)))))))
 
@@ -392,6 +373,6 @@
     (api/handle-invite-link delete-invite-link
      (fn [{:keys [body success status]}]
       (when success
-        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (dis/dispatch! [:team-loaded (router/current-org-slug) (json->cljs body)])
         (when (fn? cb)
           (cb success)))))))

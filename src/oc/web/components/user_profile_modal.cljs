@@ -1,6 +1,6 @@
 (ns oc.web.components.user-profile-modal
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [cuerdas.core :as str]
             [goog.object :as googobj]
             [cljsjs.moment-timezone]
             [org.martinklepsch.derivatives :as drv]
@@ -79,12 +79,12 @@
 (defn upload-user-profile-pictuer-clicked []
   (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))
 
-(defn change! [s k v]
+(defn change! [s kc v]
   (reset! (::name-error s) false)
   (reset! (::email-error s) false)
   (reset! (::password-error s) false)
   (reset! (::current-password-error s) false)
-  (dis/dispatch! [:input [:edit-user-profile k] v])
+  (dis/dispatch! [:input (vec (concat [:edit-user-profile] kc)) v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
 (defn save-clicked [s]
@@ -113,7 +113,48 @@
         (reset! (::password-error s) true)
 
         :else
-        (user-actions/user-profile-save current-user-data edit-user-profile)))))
+        (user-actions/user-profile-save current-user-data edit-user-profile
+         (fn [success]
+           (when success
+             (real-close-cb edit-user-profile #(nav-actions/show-user-settings nil) nil))
+           (notification-actions/show-notification
+            {:title (if success "Profile saved" "Error")
+             :description (if success
+                            "Your profile has been updated."
+                            "An error occurred while saving your profile. Please retry.")
+             :expire 3
+             :id (if success :user-profile-save-succeeded :user-profile-save-failed)
+             :dismiss true})))))))
+
+(defn- placeholder [k]
+  (case k
+   :facebook
+   "facebook.com/..."
+   :linked-in
+   "linkedin.com/in/..."
+   :instagram
+   "instagram.com/..."
+   :twitter
+   "twitter.com/..."
+   :email
+   "Your email address"
+   :title
+   "CEO, CTO, Designer, Engineer..."
+   :location
+   "New York, NY"
+   ""))
+
+(defn- default-value [k]
+  (case k
+   :facebook
+   "facebook.com/"
+   :linked-in
+   "linkedin.com/in/"
+   :instagram
+   "instagram.com/"
+   :twitter
+   "twitter.com/"
+   ""))
 
 (rum/defcs user-profile-modal <
   rum/reactive
@@ -129,24 +170,27 @@
   (rum/local false ::current-password-error)
   ;; Mixins
   ui-mixins/refresh-tooltips-mixin
+  (ui-mixins/autoresize-textarea :blurb)
   {:will-mount (fn [s]
     (user-actions/get-user nil)
     s)
-    :did-remount (fn [old-state new-state]
-    (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
-      (when (and @(::loading new-state)
-                 (not (:has-changes user-data)))
-        (reset! (::show-success new-state) true)
-        (reset! (::loading new-state) false)
-        (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
-    new-state)}
+    :did-update (fn [s]
+     (let [user-data (:user-data @(drv/get-ref s :edit-user-profile))]
+       (when (and @(::loading s)
+                  (not (:has-changes s)))
+         (reset! (::show-success s) true)
+         (reset! (::loading s) false)
+         (utils/after 2500 (fn [] (reset! (::show-success s) false)))))
+     s)}
   [s]
   (let [edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
-        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
+        is-jelly-head-avatar (str/includes? edit-user-profile-avatar "/img/ML/happy_face_")
         user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
-        timezones (.names (.-tz js/moment))]
+        timezones (.names (.-tz js/moment))
+        show-password? (= (:auth-source current-user-data) "email")
+        links-tab-index (atom 5)]
     [:div.user-profile-modal-container
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-cb current-user-data nav-actions/close-all-panels)}]
@@ -159,8 +203,9 @@
                           (if (:has-changes current-user-data)
                             (save-clicked s)
                             (nav-actions/show-user-settings nil)))
-             :class (when @(::show-success s) "no-disable")
-             :disabled @(::loading s)}
+             :class (utils/class-set {:disabled (or (not (:has-changes current-user-data))
+                                                    @(::show-success s)
+                                                    @(::loading s))})}
             (if @(::show-success s)
               "Saved!"
               "Save")]
@@ -176,68 +221,160 @@
               (user-avatar-image user-for-avatar))
             [:div.user-profile-avatar-label "Edit profile photo"]]
           [:div.user-profile-modal-fields
-            [:div.field-label "First name"
-              (when @(::name-error s)
-                [:span.error "Please provide your name."])]
-            [:input.field-value.oc-input
-              {:value (:first-name current-user-data)
-               :type "text"
-               :tab-index 1
-               :max-length user-utils/user-name-max-lenth
-               :on-change #(change! s :first-name (.. % -target -value))}]
-            [:div.field-label "Last name"]
-            [:input.field-value.oc-input
-              {:value (:last-name current-user-data)
-               :type "text"
-               :tab-index 2
-               :max-length user-utils/user-name-max-lenth
-               :on-change #(change! s :last-name (.. % -target -value))}]
-            [:div.field-label "Email"
-              (when @(::email-error s)
-                [:span.error "This email isn't valid."])]
-            [:input.field-value.not-allowed.oc-input
-              {:value (:email current-user-data)
-               :placeholder "Your email address"
-               :read-only true
-               :type "text"}]
-            ;; Current password
-            (when (= (:auth-source current-user-data) "email")
-              [:div.field-label "Currrent password"
-                (when @(::current-password-error s)
-                    [:span.error "Current password required"])])
-            (when (= (:auth-source current-user-data) "email")
+            [:form
+              {:action "."
+               :on-submit #(utils/event-stop %)}
+              [:div.field-label.big-web-tablet-only
+                [:label.half-field-label
+                  {:for "profile-first-name"}
+                  "First name"]
+                [:label.half-field-label
+                  {:for "profile-last-name"}
+                  "Last name"]
+                (when @(::name-error s)
+                  [:span.error "Please provide your name."])]
+
+              [:label.field-label.mobile-only
+                {:for "profile-first-name"}
+                "First name"
+                (when @(::name-error s)
+                  [:span.error "Please provide your name."])]
+
+              [:input.field-value.oc-input.half-field
+                {:value (:first-name current-user-data)
+                 :type "text"
+                 :tab-index 1
+                 :placeholder (placeholder :first-name)
+                 :id "profile-first-name"
+                 :max-length user-utils/user-name-max-lenth
+                 :on-change #(change! s [:first-name] (.. % -target -value))}]
+
+              [:label.field-label.mobile-only
+                  {:for "profile-last-name"}
+                  "Last name"]
+
+              [:input.field-value.oc-input.half-field
+                {:value (:last-name current-user-data)
+                 :type "text"
+                 :tab-index 2
+                 :id "profile-last-name"
+                 :placeholder (placeholder :last-name)
+                 :max-length user-utils/user-name-max-lenth
+                 :on-change #(change! s [:last-name] (.. % -target -value))}]
+
+              [:label.field-label
+                {:for "profile-role"}
+                "Role"]
               [:input.field-value.oc-input
-                {:type "password"
+                {:value (:title current-user-data)
+                 :type "text"
+                 :id "profile-role"
+                 :placeholder (placeholder :title)
                  :tab-index 3
-                 :on-change #(change! s :current-password (.. % -target -value))
-                 :value (:current-password current-user-data)}])
-            (when (= (:auth-source current-user-data) "email")
-              [:div.field-label "New password"
-                (when @(::password-error s)
-                  [:span.error "Minimum 8 characters"])])
-            (when (= (:auth-source current-user-data) "email")
+                 :max-length 56
+                 :on-change #(change! s [:title] (.. % -target -value))}]
+              [:div.field-label
+                "Email"
+                (when @(::email-error s)
+                  [:span.error "This email isn't valid."])]
+              [:input.field-value.not-allowed.oc-input
+                {:value (:email current-user-data)
+                 :placeholder (placeholder :email)
+                 :read-only true
+                 :type "text"}]
+              [:label.field-label
+                {:for "profile-blurb"}
+                "Blurb"]
+              [:textarea.field-value.oc-input
+                {:value (:blurb current-user-data)
+                 :ref :blurb
+                 :id "profile-blurb"
+                 :placeholder (placeholder :blurb)
+                 :tab-index 3
+                 :columns 2
+                 :max-length 256
+                 :on-change #(change! s [:blurb] (.. % -target -value))}]
+              [:label.field-label
+                {:for "profile-location"}
+                "Location"]
               [:input.field-value.oc-input
-                {:type "password"
-                   :tab-index 4
+                {:value (:location current-user-data)
+                 :type "text"
+                 :id "profile-location"
+                 :placeholder (placeholder :location)
+                 :tab-index 4
+                 :max-length 56
+                 :on-change #(change! s [:location] (.. % -target -value))}]
+              [:label.field-label
+                {:for "profile-timezone"}
+                "Timezone"]
+              [:select.field-value.oc-input
+                {:value (:timezone current-user-data)
+                 :id "profile-timezone"
+                 :tab-index 5
+                 :on-change #(change! s [:timezone] (.. % -target -value))}
+                ;; Promoted timezones
+                (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+                  [:option
+                    {:key (str "timezone-" t "-promoted")
+                     :value t} t])
+                ;; Divider line option
+                [:option
+                  {:disabled true
+                   :value ""}
+                  "------------"]
+                ;; All the timezones, repeating the promoted
+                (for [t timezones]
+                  [:option
+                    {:key (str "timezone-" t)
+                     :value t}
+                    t])]
+              (for [[k v] (:profiles current-user-data)
+                    :let [field-name (str "profile-profiles-" (name k))
+                          tab-index (swap! links-tab-index inc)]]
+                [:div.profile-group
+                  {:key field-name}
+                  [:label.field-label
+                    {:for field-name}
+                    (str/capital (str/camel k))]
+                  [:input.field-value.oc-input
+                    {:value (get (:profiles current-user-data) k)
+                     :placeholder (placeholder k)
+                     :max-length 128
+                     :id field-name
+                     :tab-index tab-index
+                     :on-focus #(when-not (seq v)
+                                  (set! (.. % -target -value) (default-value k)))
+                     :on-change #(change! s [:profiles k] (.. % -target -value))
+                     :type "text"}]])
+              (when show-password?
+                [:div.fields-divider-line])
+              ;; Current password
+              (when show-password?
+                [:label.field-label
+                  {:for "profile-password"}
+                  "Currrent password"
+                  (when @(::current-password-error s)
+                      [:span.error "Current password required"])])
+              (when show-password?
+                [:input.field-value.oc-input
+                  {:type "password"
+                   :id "profile-password"
+                   :tab-index (+ 4 (count (:profiles current-user-data)) 1)
+                   :placeholder (placeholder :password)
+                   :on-change #(change! s :current-password (.. % -target -value))
+                   :value (:current-password current-user-data)}])
+              (when show-password?
+                [:label.field-label
+                  {:for "profile-new-password"}
+                  "New password"
+                  (when @(::password-error s)
+                    [:span.error "Minimum 8 characters"])])
+              (when show-password?
+                [:input.field-value.oc-input
+                  {:type "password"
+                   :id "profile-new-password"
+                   :tab-index (+ 4 (count (:profiles current-user-data)) 1)
+                   :placeholder (placeholder :new-password)
                    :on-change #(change! s :password (.. % -target -value))
-                   :value (:password current-user-data)}])
-            [:div.field-label "Timezone"]
-            [:select.field-value.oc-input
-              {:value (:timezone current-user-data)
-               :on-change #(change! s :timezone (.. % -target -value))}
-              ;; Promoted timezones
-              (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
-                [:option
-                  {:key (str "timezone-" t "-promoted")
-                   :value t} t])
-              ;; Divider line option
-              [:option
-                {:disabled true
-                 :value ""}
-                "------------"]
-              ;; All the timezones, repeating the promoted
-              (for [t timezones]
-                [:option
-                  {:key (str "timezone-" t)
-                   :value t}
-                  t])]]]]]))
+                   :value (:password current-user-data)}])]]]]]))

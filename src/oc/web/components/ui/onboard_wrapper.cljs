@@ -13,6 +13,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.utils.ui :as ui-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
@@ -26,31 +27,11 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
-
-(defn- autoresize-textarea [ref]
-  (let [lst (atom nil)]
-
-    (letfn [(autoresize [_e]
-              (this-as this
-                (utils/after 0
-                 #(do
-                    (set! (.. this -style -cssText) "height:auto;")
-                    (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))))]
-      {:did-mount (fn [s]
-       (reset! lst
-        (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
-       s)
-       :will-unmount (fn [s]
-        (when @lst
-          (events/unlistenByKey @lst)
-          (reset! lst nil))
-       s)})))
 
 (def why-carrot-label "Why you are giving Carrot a try?")
 
@@ -63,9 +44,9 @@
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
   [s r]
-  (utils/after 2500
+  (utils/after 0
    #(when-let [field (rum/ref-node s r)]
-     (.focus field))))
+      (.focus field))))
 
 (rum/defcs lander < rum/static
                     rum/reactive
@@ -220,31 +201,31 @@
             (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-profile < rum/reactive
-                                  (drv/drv :edit-user-profile)
-                                  (drv/drv :current-user-data)
-                                  (drv/drv :teams-data)
-                                  (drv/drv :org-editing)
-                                  (drv/drv :orgs)
-                                  (rum/local false ::saving)
-                                  (rum/local "" ::why-carrot)
-                                  (autoresize-textarea "why-carrot")
-                                  {:will-mount (fn [s]
-                                    (dis/dispatch! [:input [:org-editing :name] ""])
-                                    (user-actions/user-profile-reset)
-                                    s)
-                                   :did-mount (fn [s]
-                                    (profile-setup-team-data s)
-                                    (delay-focus-field-with-ref s "first-name")
-                                   s)
-                                   :will-update (fn [s]
-                                    (profile-setup-team-data s)
-                                    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-                                          org-editing @(drv/get-ref s :org-editing)]
-                                      (when (and @(::saving s)
-                                                 (or (:error edit-user-profile)
-                                                     (:error org-editing)))
-                                        (reset! (::saving s) false)))
-                                   s)}
+                            (drv/drv :edit-user-profile)
+                            (drv/drv :current-user-data)
+                            (drv/drv :teams-data)
+                            (drv/drv :org-editing)
+                            (drv/drv :orgs)
+                            (rum/local false ::saving)
+                            (rum/local "" ::why-carrot)
+                            (ui-mixins/autoresize-textarea "why-carrot")
+                            {:will-mount (fn [s]
+                              (dis/dispatch! [:input [:org-editing :name] ""])
+                              (user-actions/user-profile-reset)
+                              s)
+                             :did-mount (fn [s]
+                              (profile-setup-team-data s)
+                              (delay-focus-field-with-ref s "first-name")
+                             s)
+                             :will-update (fn [s]
+                              (profile-setup-team-data s)
+                              (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+                                    org-editing @(drv/get-ref s :org-editing)]
+                                (when (and @(::saving s)
+                                           (or (:error edit-user-profile)
+                                               (:error org-editing)))
+                                  (reset! (::saving s) false)))
+                             s)}
   [s]
   (let [has-org? (pos? (count (drv/react s :orgs)))
         edit-user-profile (drv/react s :edit-user-profile)
@@ -263,7 +244,7 @@
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
                        (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
-                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
+                       (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.onboard-lander-header
@@ -624,8 +605,7 @@
                                       (when (and (not @(::auth-settings-loaded s))
                                                  auth-settings
                                                  (not (:team auth-settings)))
-                                        (reset! (::auth-settings-loaded s) true)
-                                        (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search)))
+                                        (reset! (::auth-settings-loaded s) true)))
                                   s)}
   [s]
   (let [team-invite-drv (drv/react s :team-invite)
@@ -729,11 +709,7 @@
     (when (and (:auth-settings confirm-invitation)
                (not @(::exchange-started s)))
       (reset! (::exchange-started s) true)
-      (user-actions/confirm-invitation (:token confirm-invitation)))
-    (when (and @(::exchange-started s)
-               (not @(::exchange-ended s))
-               (:invitation-error confirm-invitation))
-      (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search))))
+      (user-actions/confirm-invitation (:token confirm-invitation)))))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
@@ -880,7 +856,7 @@
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
-                          (user-actions/user-profile-save current-user-data edit-user-profile))}
+                          (user-actions/onboard-profile-save current-user-data edit-user-profile))}
             "Start using Carrot"]]]]))
 
 (rum/defcs email-wall < rum/reactive
@@ -1005,11 +981,19 @@
 
 (rum/defcs onboard-wrapper < rum/reactive
                              (drv/drv :ap-loading)
+                             (drv/drv :current-user-data)
   [s component]
-  [:div.onboard-wrapper-container
-    (loading {:loading (drv/react s :ap-loading)})
-    [:div.onboard-wrapper
-      {:class (str "onboard-" (name component))}
-      (get-component component)]
-    [:div.bottom-gradient.big-web-only
-      [:div.onboard-box]]])
+  (let [ap-loading (drv/react s :ap-loading)
+        user-data (drv/react s :current-user-data)
+        loading? (or ap-loading
+                     (and (jwt/jwt)
+                          (not user-data)))]
+    [:div.onboard-wrapper-container
+      (if loading?
+        (loading {:loading true})
+        [:div
+          [:div.onboard-wrapper
+            {:class (str "onboard-" (name component))}
+            (get-component component)]
+          [:div.bottom-gradient.big-web-only
+            [:div.onboard-box]]])]))

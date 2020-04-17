@@ -46,6 +46,7 @@
         new-comment-map {:body comment-body
                          :created-at (utils/as-of-now)
                          :parent-uuid parent-comment-uuid
+                         :resource-uuid (:uuid activity-data)
                          :uuid new-comment-uuid
                          :author {:name (:name user-data)
                                   :avatar-url (:avatar-url user-data)
@@ -60,7 +61,7 @@
     (dis/dispatch! [:comment-add org-slug activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
     ;; Send WRT read on comment add
     (activity-actions/send-item-read (:uuid activity-data))
-    (api/add-comment add-comment-link comment-body parent-comment-uuid
+    (api/add-comment add-comment-link comment-body new-comment-uuid parent-comment-uuid
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
@@ -187,8 +188,7 @@
       (dis/dispatch! [:ws-interaction/comment-add
                       org-slug
                       entry-data
-                      interaction-data]))
-    (dis/dispatch! [:input [:add-comment-highlight] new-comment-uuid])))
+                      interaction-data]))))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
@@ -197,6 +197,3 @@
                    #(ws-comment-update (:data %)))
   (ws-ic/subscribe :interaction-comment/delete
                    #(ws-comment-delete (:data %))))
-
-(defn add-comment-highlight-reset []
-  (dis/dispatch! [:add-comment-highlight-reset]))

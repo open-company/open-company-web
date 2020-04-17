@@ -347,12 +347,9 @@ div.dashboard-layout {
         padding: 0px 0px 8px;
         position: relative;
         height: 40px;
-        // Use 0.19 opacity on this to make it look like the rest of the lines
-        // that are on a darker background
-        border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
-          height: 65px;
+          height: 64px;
           border-bottom: none;
           padding: 0;
           background-color: var(--mobile-background-color);
@@ -388,6 +385,13 @@ div.dashboard-layout {
             display: inline-block;
             position: relative;
 
+            &.contributions {
+              @include user-profile(24) {
+                float: left;
+                margin: 4px 8px 0 0;
+              }
+            }
+
             &:before {
               display: none;
 
@@ -415,6 +419,27 @@ div.dashboard-layout {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+              @include OC_Body_Bold();
+              font-size: 18px;
+              color: var(--color);
+              line-height: 32px;
+
+              span.count {
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 20px;
+                text-align: center;
+                color: var(--color);
+                min-width: 20px;
+                height: 20px;
+                display: inline-block;
+                background-color: var(--navigation-sidebar-count-bg);
+                border-radius: 4px;
+                vertical-align: top;
+                margin-top: 6px;
+                margin-left: 8px;
+                padding: 0 6px;
+              }
             }
 
             @include mobile() {

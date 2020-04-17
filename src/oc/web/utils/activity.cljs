@@ -2,6 +2,7 @@
   (:require [cuerdas.core :as s]
             [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -17,7 +18,8 @@
        (not (responsive/is-mobile-size?))
        (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks"} (name container-slug-or-href))
                 (and (string? container-slug-or-href)
-                     (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)"))))))
+                     (or (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)")
+                         (.match container-slug-or-href #"(?i)/u/(\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4}(/|$)")))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -251,7 +253,9 @@
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
-  [entry-data board-data changes]
+  ([entry-data board-data changes]
+   (fix-entry entry-data board-data changes (dis/active-users)))
+  ([entry-data board-data changes active-users]
   (let [comments-link (utils/link-for (:links entry-data) "comments")
         add-comment-link (utils/link-for (:links entry-data) "create" "POST")
         fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
@@ -259,11 +263,13 @@
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
-        fixed-video-id (:video-id entry-data)]
+        fixed-video-id (:video-id entry-data)
+        fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
     (when (seq fixed-video-id)
       (ziggeo/init-ziggeo true))
     (-> entry-data
       (assoc :content-type "entry")
+      (update :publisher merge fixed-publisher)
       (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
@@ -276,20 +282,25 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
-      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data)))))))
 
 (defn fix-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {}))
-  ([board-data change-data & [direction]]
+   (fix-board board-data {} (dis/active-users)))
+
+  ([board-data change-data]
+   (fix-board board-data change-data (dis/active-users)))
+
+  ([board-data change-data active-users & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
-                                           change-data))
+                                           change-data
+                                           active-users))
                                  with-read-only
                                  (:entries board-data))
           next-links (when direction
@@ -309,13 +320,18 @@
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          new-items (map :uuid (:entries board-data))
+          items-list (if (contains? board-data :entries)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:entries board-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list board-data))
           without-items (dissoc with-links :entries)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat new-items (:posts-list board-data))
-                                                              :down (concat (:posts-list board-data) new-items)
-                                                              new-items)))
+                                                              :up (concat items-list (:posts-list board-data))
+                                                              :down (concat (:posts-list board-data) items-list)
+                                                              items-list)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
                              with-posts-list)
@@ -324,17 +340,81 @@
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
-(defn fix-container
-  "Parse container data coming from the API, like All posts or Must see."
-  ([container-data]
-   (fix-container container-data {} (dis/org-data)))
-  ([container-data change-data org-data & [direction]]
+(defn fix-contributions
+  "Parse data coming from the API for a certain user's posts."
+  ([contributions-data]
+   (fix-contributions contributions-data {} (dis/org-data) (dis/active-users)))
+
+  ([contributions-data change-data]
+   (fix-contributions contributions-data change-data (dis/org-data) (dis/active-users)))
+
+  ([contributions-data change-data org-data]
+   (fix-contributions contributions-data change-data org-data (dis/active-users)))
+
+  ([contributions-data change-data org-data active-users & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
                                                             all-boards))]
                                             (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data))))
+                                             (fix-entry item board-data change-data active-users))))
+                                 contributions-data
+                                 (:items contributions-data))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        (:links contributions-data))))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links contributions-data) "previous")
+                           (utils/link-for (:old-links contributions-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             (:links contributions-data))
+          with-links (-> with-fixed-activities
+                       (dissoc :old-links)
+                       (assoc :links fixed-next-links))
+          items-list (if (contains? contributions-data :items)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:items contributions-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list contributions-data))
+          without-items (dissoc with-links :items)
+          with-posts-list (assoc without-items :posts-list (vec
+                                                             (case direction
+                                                              :up (concat items-list (:posts-list contributions-data))
+                                                              :down (concat (:posts-list contributions-data) items-list)
+                                                              items-list)))
+          with-saved-items (if direction
+                             (assoc with-posts-list :saved-items (count (:posts-list contributions-data)))
+                             with-posts-list)
+          with-posts-separators (if (show-separators? (:href contributions-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
+      with-posts-separators)))
+
+(defn fix-container
+  "Parse container data coming from the API, like All posts or Must see."
+  ([container-data]
+   (fix-container container-data {} (dis/org-data)))
+
+  ([container-data change-data]
+   (fix-container container-data change-data (dis/org-data) (dis/active-users)))
+
+  ([container-data change-data org-data]
+   (fix-container container-data change-data org-data (dis/active-users)))
+
+  ([container-data change-data org-data active-users & [direction]]
+    (let [all-boards (:boards org-data)
+          with-fixed-activities (reduce (fn [ret item]
+                                          (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
+                                                            all-boards)]
+                                            (assoc-in ret [:fixed-items (:uuid item)]
+                                             (fix-entry item board-data change-data active-users))))
                                  container-data
                                  (:items container-data))
           next-links (when direction
@@ -354,13 +434,18 @@
           with-links (-> with-fixed-activities
                        (dissoc :old-links)
                        (assoc :links fixed-next-links))
-          new-items (map :uuid (:items container-data))
+          items-list (if (contains? container-data :items)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:items container-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:posts-list container-data))
           without-items (dissoc with-links :items)
           with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
-                                                              :up (concat new-items (:posts-list container-data))
-                                                              :down (concat (:posts-list container-data) new-items)
-                                                              new-items)))
+                                                              :up (concat items-list (:posts-list container-data))
+                                                              :down (concat (:posts-list container-data) items-list)
+                                                              items-list)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)

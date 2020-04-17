@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="13px" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Polls" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Poll:-Start" transform="translate(-802.000000, -262.000000)" fill="#34414F">
+            <g id="Group-2" transform="translate(320.000000, 40.000000)">
+                <path d="M483.5,222 L488.5,222 C489.328427,222 490,222.671573 490,223.5 C490,224.328427 489.328427,225 488.5,225 L483.5,225 C482.671573,225 482,224.328427 482,223.5 C482,222.671573 482.671573,222 483.5,222 Z M483.5,227 L496.5,227 C497.328427,227 498,227.671573 498,228.5 C498,229.328427 497.328427,230 496.5,230 L483.5,230 C482.671573,230 482,229.328427 482,228.5 C482,227.671573 482.671573,227 483.5,227 Z M483.5,232 L492.5,232 C493.328427,232 494,232.671573 494,233.5 C494,234.328427 493.328427,235 492.5,235 L483.5,235 C482.671573,235 482,234.328427 482,233.5 C482,232.671573 482.671573,232 483.5,232 Z" id="Combined-Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

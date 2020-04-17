@@ -68,21 +68,30 @@ var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
 var AutoQuote = function(){};
+var AutoCode = function(){};
+var AutoInlinecode = function(){};
+var InlineCodeButton = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
+MediaPicker.addPoll = function(){};
 MediaPicker.addGIF = function(){};
 MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};
 MediaPicker.addChart = function(){};
+MediaPicker.addCode = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
 MediaPicker.togglePicker = function(){};
 MediaPicker.hide = function(){};
+// MediumEditorPaste
+var OCPaste = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
+// MediumEditorHighlighterButton
+var HighlighterButton = function(){};
 // Debug app state
 var OCWebConfigLogLevel = function(){};
 var OCWebForceRefreshToken = function(){};
@@ -110,6 +119,7 @@ var OCWebPrintRouterPath = function(){};
 var OCWebPrintSecureActivityData = function(){};
 var OCWebPrintTeamData = function(){};
 var OCWebPrintTeamRoster = function(){};
+var OCWebPrintActiveUsers = function(){};
 var OCWebPrintUserNotifications = function(){};
 // Cljs utility externs
 var OCWebUtils = {};
@@ -144,7 +154,7 @@ rangy.getSelection = function(){};
 var jwt_decode = function(){};
 // CarrotGA
 var CarrotGA = function(){};
-CarrotGA.dimentions = {};
+CarrotGA.dimensions = {};
 CarrotGA.metrics = {};
 CarrotGA.init = function(){};
 CarrotGA.trackEvent = function(){};
@@ -186,6 +196,7 @@ var Intercom = function(){};
 var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
+var OCStaticDeleteCookie = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};

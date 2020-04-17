@@ -8,6 +8,10 @@ div.add-comment-box-container {
       cursor: text;
       padding: 12px 16px;
 
+      p:first-child {
+        display: none;
+      }
+
       @include mobile() {
         padding: 11px 14px;
       }
@@ -77,10 +81,10 @@ div.add-comment-box-container {
           @include emoji-size(13);
         }
 
-        @include activity-comment(15px, 18px, 12px);
+        @include activity-comment(15, 18, 12);
 
         @include mobile() {
-          @include activity-comment(18px, 24px, 16px);
+          @include activity-comment(18, 24, 16);
         }
       }
 

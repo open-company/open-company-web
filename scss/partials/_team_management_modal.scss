@@ -135,7 +135,7 @@ div.team-management-modal {
             div.user-name {
               line-height: 19px;
 
-              div.user-name-label {
+              button.user-name-label {
                 line-height: 19px;
               }
             }
@@ -175,7 +175,7 @@ div.team-management-modal {
               }
             }
 
-            div.user-name-label {
+            button.user-name-label {
               @include OC_Body_Book();
               font-size: 14px;
               color: var(--color);
@@ -184,6 +184,9 @@ div.team-management-modal {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+              border: none;
+              outline: none;
+              text-align: left;
 
               &.removing {
                 max-width: calc(100% - 23px);

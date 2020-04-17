@@ -67,12 +67,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -106,7 +106,7 @@
     border-radius: 0;
   }
 
-  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -137,7 +137,7 @@
     color: $deep_navy;
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -197,7 +197,7 @@
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
     color: var(--color);
     text-decoration: none;
 
@@ -271,6 +271,7 @@ div.left-navigation-sidebar {
     width: #{$left_navigation_sidebar_width}px;
     overflow-x: hidden;
     overflow-y: auto;
+    padding-bottom: 10px;
 
     @include mobile() {
       position: relative;
@@ -325,7 +326,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.inbox, a.all-posts, a.bookmarks, a.drafts {
+  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions {
     display: block;
     background-color: transparent;
     border: none;
@@ -365,7 +366,7 @@ div.left-navigation-sidebar {
       }
 
       div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/bookmark_icon_white.svg");
+        background-image: cdnUrl("/img/ML/bookmarks_icon_white.svg");
       }
 
       div.drafts-icon {
@@ -373,7 +374,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -383,6 +384,15 @@ div.left-navigation-sidebar {
       @include mobile() {
         padding: 0px;
         line-height: 18px;
+      }
+    }
+
+    div.contributions-label {
+      margin-left: 7px;
+      max-width: 92px;
+
+      @include mobile() {
+        max-width: initial;
       }
     }
 
@@ -495,7 +505,7 @@ div.left-navigation-sidebar {
         padding: 0 0 0 28px;
 
         &.collapsed:before {
-          transform: rotate(-180deg);
+          transform: rotate(-90deg);
         }
 
         &:before {
@@ -578,14 +588,6 @@ div.left-navigation-sidebar {
 
       &.drafts-board {
         margin-top: 24px;
-      }
-
-      &:last-child {
-        margin-bottom: 10px;
-
-        @include mobile() {
-          margin-bottom: 0px;
-        }
       }
 
       &.hover-item {
@@ -671,6 +673,14 @@ div.left-navigation-sidebar {
           }
         }
       }
+
+      &.contributions {
+        @include user_profile(22);
+
+        div.user-avatar-img-container {
+          float: left;
+        }
+      }
     }
   }
 
@@ -728,7 +738,7 @@ div.left-navigation-sidebar {
       }
 
       div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/bookmark_icon_white.svg");
+        background-image: cdnUrl("/img/ML/bookmarks_icon_white.svg");
       }
 
       div.drafts-icon {

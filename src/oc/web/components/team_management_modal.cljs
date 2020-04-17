@@ -6,6 +6,7 @@
             [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
@@ -192,13 +193,16 @@
                   (small-loading)
                   (user-avatar-image user))
                 [:div.user-name
-                  [:div.user-name-label
+                  [:button.mlb-reset.user-name-label
                     {:title (str "<span>" (:email user)
                               (when (seq fixed-display-name)
                                 (str " | <i class=\"mdi mdi-slack\"></i>" (when-not (= fixed-display-name "-") (str " " fixed-display-name))))
                               "</span>")
                      :class (utils/class-set {:pending pending?
                                               :removing removing?})
+                     :on-click #(when (uu/active? user)
+                                  (utils/event-stop %)
+                                  (nav-actions/show-user-info (:user-id user)))
                      :data-toggle "tooltip"
                      :data-html "true"
                      :data-placement "top"}

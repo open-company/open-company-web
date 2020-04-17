@@ -7,12 +7,16 @@
 
 (def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
+(def oc-github "https://github.com/open-company")
 
 (def options {:contact-email contact-email
-              :contact-mail-to contact-mail-to})
+              :contact-mail-to contact-mail-to
+              :oc-github oc-github})
 
 (defn head []
   [:head
+    pages/tag-manager-head
+    ;; -------------
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
     [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
@@ -182,7 +186,7 @@
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
-          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href oc-github :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
 
         [:div.column.column-resources
@@ -237,7 +241,7 @@
     [:div.covid-banner-content
       [:div.covid-banner-carrot-logo]
       [:div.covid-banner-copy.mobile-only
-        "Pricing update for COVID-19."
+        "Given COVID-19, Carrot is now free."
         (when-not (= page :pricing)
           [:br])
         (when-not (= page :pricing)
@@ -247,8 +251,7 @@
         (when-not (= page :pricing)
           ".")]
       [:div.covid-banner-copy.big-web-tablet-only
-        [:span.heavy "March 11, 2020 pricing update"]
-        " - Carrot is free for unlimited users during the COVID-19 outbreak. "
+        "Given the COVID-19 crisis, Carrot is free for unlimited users until further notice. "
         (when-not (= page :pricing)
           [:a
             {:href "/pricing"}
@@ -268,6 +271,7 @@
                (head)
                [:body
                 {:class (when (env :covid-banner) "covid-banner")}
+                pages/tag-manager-body
                 [:div
                  {:class "outer header"}
                  ph-banner

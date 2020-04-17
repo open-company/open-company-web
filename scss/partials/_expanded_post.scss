@@ -137,6 +137,10 @@ div.expanded-post {
         border-radius: 4px;
         margin: 0 0 0 9px;
 
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+        }
+
         &:active, &:focus {
           opacity: 0.9;
         }
@@ -229,7 +233,31 @@ div.expanded-post {
         }
       }
 
-      span.expanded-post-author-inner-label {
+      div.expanded-post-author-inner-label {
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--light-color);
+        line-height: 18px;
+        opacity: 1;
+        display: inline-block;
+        position: relative;
+
+        span.hover-info-popup-container {
+          position: relative;
+
+          span.name {
+            margin-right: 4px;
+            min-height: 18px;
+            line-height: 18px;  
+          }
+        }
+
+        time {
+          min-height: 18px;
+          line-height: 18px;
+          display: inline-block;
+        }
+
         @include mobile() {
           margin-right: 0;
           margin-bottom: 8px;
@@ -343,23 +371,23 @@ $mobile-collapse-height: 160;
         left: 0;
         z-index: 2;
         height: #{$big-web-collapse-height - 47}px;
-        background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* FF3.6+ */
-        background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(95%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* Opera 11.10+ */
-        background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* IE10+ */
-        background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* W3C */
+        background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(100%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* W3C */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--collapse-post-start-bg), endColorstr=var(--collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
 
         @include mobile() {
           top: 65px;
           height: #{$mobile-collapse-height - 65}px;
-          background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* FF3.6+ */
-          background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(95%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
-          background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* Chrome10+,Safari5.1+ */
-          background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* Opera 11.10+ */
-          background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* IE10+ */
-          background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* W3C */
+          background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(100%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* IE10+ */
+          background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* W3C */
           filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--mobile-collapse-post-start-bg), endColorstr=var(--mobile-collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
         }
       }
@@ -370,21 +398,20 @@ $mobile-collapse-height: 160;
     display: block;
     width: 100%;
     height: 72px;
-    background-color: transparent;
     opacity: 1;
 
     @include big_web() {
       &:hover {
-        opacity: 1;
         div.expand-button-inner {
-          background-color: var(--opac-background-color-1);
+          color: var(--color);
+          background-color: var(--ultralight-color);
         }
       }
     }
 
     div.expand-button-inner {
       margin: 16px auto 24px;
-      width: 164px;
+      width: 132px;
       height: 32px;  
       padding: 7px 18px 7px 43px;
       @include OC_Body_Book();
@@ -392,6 +419,8 @@ $mobile-collapse-height: 160;
       line-height: 18px;
       color: var(--color);
       position: relative;
+      border-radius: 4px;
+      background-color: var(--reaction-bt-background);
 
       &:before {
         content: "";

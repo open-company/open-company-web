@@ -14,6 +14,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -31,7 +32,7 @@
       (.-innerWidth js/window)))
 
 (defn- maybe-load-comments [s]
-  (let [activity-data @(drv/get-ref s :secure-activity-data)
+  (let [activity-data (:activity-data @(drv/get-ref s :secure-activity-data))
         comments-data @(drv/get-ref s :comments-data)]
     (comment-utils/get-comments-if-needed activity-data comments-data)))
 
@@ -40,7 +41,6 @@
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :comments-data)
-                             (drv/drv :add-comment-highlight)
                              ;; Locals
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
@@ -58,7 +58,6 @@
                                s)}
   [s]
   (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
-        add-comment-highlight (drv/react s :add-comment-highlight)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         video-size (when (:fixed-video-id activity-data)
@@ -94,10 +93,9 @@
                  :data-placement "bottom"
                  :data-container "body"
                  :title "Log in to view all posts"}
-                [:span
-                  [:span.login-as
-                    "Log in as " (:first-name id-token)]
-                  (user-avatar-image id-token)]]]
+                [:span.login-as
+                  "Log in as " (:first-name id-token)]
+                (user-avatar-image id-token)]]
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
                 {:on-click #(router/redirect! oc-urls/home)}
@@ -142,6 +140,9 @@
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
+            (when (seq (:polls activity-data))
+              (polls-wrapper {:polls-data (:polls activity-data)
+                              :container-selector "div.secure-activity-container"}))
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
               (comments-summary {:activity-data activity-data :comments-data comments-drv})
@@ -154,7 +155,6 @@
             (when comments-data
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
-                                :new-added-comment add-comment-highlight
                                 :current-user-id (:user-id id-token)}))]])
       [:div.secure-activity-footer
         (if id-token

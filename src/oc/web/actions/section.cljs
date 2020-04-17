@@ -154,17 +154,18 @@
                   (ws-cc/container-watch (:uuid section-data))
                   (dispatcher/dispatch! [:section-edit-save/finish section-data])
                   (when (fn? success-cb)
-                    (success-cb))))))))
+                    (success-cb section-data))))))))
       (let [board-patch-link (utils/link-for (:links section-data) "partial-update")]
         (api/patch-board board-patch-link section-data note (fn [success body status]
-          (if-not success
-            (when (fn? error-cb)
-              (error-cb status))
-            (do
-              (refresh-org-data)
-              (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])
-              (when (fn? success-cb)
-                (success-cb))))))))))
+          (let [section-data (when success (json->cljs body))]
+            (if-not success
+              (when (fn? error-cb)
+                (error-cb status))
+              (do
+                (refresh-org-data)
+                (dispatcher/dispatch! [:section-edit-save/finish ])
+                (when (fn? success-cb)
+                  (success-cb section-data)))))))))))
 
 (defn private-section-user-add
   [user user-type]

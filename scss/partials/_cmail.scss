@@ -91,6 +91,10 @@ div.cmail-outer {
               div.rich-body-editor {
                 margin-top: 0;
                 min-height: 24px;
+
+                p:first-child {
+                  display: none;
+                }
               }
             }
           }
@@ -779,7 +783,7 @@ div.cmail-outer {
             color: var(--cmail-section-bt-color);
             position: relative;
             text-align: left;
-            max-width: calc(100% - 60px);
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1207,6 +1211,10 @@ div.cmail-outer {
             line-height: 18px;
             color: var(--color);
             position: relative;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             @include mobile() {
               height: 28px;

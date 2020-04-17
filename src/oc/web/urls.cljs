@@ -190,3 +190,11 @@
   ([] (secure-activity (router/current-org-slug) (router/current-secure-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))
+
+;; contributions
+
+(defn contributions
+  "contributions url"
+  ([] (contributions (router/current-org-slug) (router/current-contributions-id)))
+  ([author-uuid] (contributions (router/current-org-slug) author-uuid))
+  ([org-slug author-uuid] (str (org org-slug) "/u/" author-uuid)))

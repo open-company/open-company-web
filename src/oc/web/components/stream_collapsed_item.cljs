@@ -10,7 +10,8 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
 
 (defn- prefixed-html
   "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.
@@ -30,7 +31,7 @@
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
                                    (drv/drv :activity-share-container)
-  [s {:keys [activity-data read-data comments-data editable-boards]}]
+  [s {:keys [activity-data read-data comments-data editable-boards :member? member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-inbox? (= (router/current-board-slug) "inbox")
@@ -45,7 +46,7 @@
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
                                ;; and that's after the user last read
-                               (< (.getTime (utils/js-date (:last-read-at read-data)))
+                               (< (.getTime (utils/js-date (:last-read-at activity-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
@@ -58,7 +59,7 @@
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
-       :data-last-read-at (:last-read-at read-data)
+       :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
                    (if is-drafts-board
@@ -82,7 +83,10 @@
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
-        (user-avatar-image publisher)
+        [:div.stream-collapsed-item-avatar-container
+          (user-info-hover {:user-data publisher :current-user-id current-user-id})
+          [:div.stream-collapsed-item-avatar
+            (user-avatar-image publisher)]]
         [:div.stream-collapsed-item-fill
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"
@@ -96,7 +100,7 @@
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
-                             :show-new-tag? has-new-comments?
+                             :new-comments-count (:new-comments-count activity-data)
                              :hide-label? is-mobile?}))
         [:div.collapsed-time
           (let [t (or (:published-at activity-data) (:created-at activity-data))]

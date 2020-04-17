@@ -51,11 +51,11 @@
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
-         edit-comment-data scroll-after-posting?]} (first (:rum/args s))
+         edit-comment-data scroll-after-posting? add-comment-cb]} (first (:rum/args s))
         save-done-cb (fn [success]
                       (if success
                         (when add-comment-div
-                          (set! (.-innerHTML add-comment-div) ""))
+                          (set! (.-innerHTML add-comment-div) dom-utils/empty-body-html))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -63,25 +63,28 @@
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
     (reset! (::add-button-disabled s) true)
-    (set! (.-innerHTML add-comment-div) "")
+    (set! (.-innerHTML add-comment-div) dom-utils/empty-body-html)
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
     (reset! (::show-post-button s) false)
-    (when (fn? dismiss-reply-cb)
-      (dismiss-reply-cb false))
     (when (and (not (responsive/is-mobile-size?))
                (not edit-comment-data)
                (not dismiss-reply-cb)
                scroll-after-posting?
                (not (dom-utils/is-element-top-in-viewport? (sel1 [:div.stream-comments]) -40)))
-      (utils/after 10
-       #(.scrollTo js/window 0 (-> s (rum/dom-node) (.-offsetTop) (- 72)))))))
+      (when-let [vertical-offset (-> s (rum/dom-node) (.-offsetTop) (- 72))]
+        (utils/after 10
+         #(.scrollTo js/window 0 vertical-offset))))
+    (when (fn? dismiss-reply-cb)
+      (dismiss-reply-cb false))
+    (when (fn? add-comment-cb)
+      (add-comment-cb))))
 
 (defn me-options [parent-uuid]
-  {:media-config ["gif" "photo" "video"]
+  {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
-   :placeholder (if parent-uuid "Reply…" "Add a comment…")
+   :placeholder (if parent-uuid "Reply…" "Add a reply…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
@@ -152,12 +155,12 @@
                          (drv/drv :media-input)
                          (drv/drv :add-comment-focus)
                          (drv/drv :add-comment-data)
-                         (drv/drv :team-roster)
+                         (drv/drv :mention-users)
                          (drv/drv :current-user-data)
                          (drv/drv :attachment-uploading)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
-                         (rum/local "" ::initial-add-comment)
+                         (rum/local dom-utils/empty-body-html ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
                          (rum/local false ::last-add-comment-focus)
@@ -182,7 +185,7 @@
                                 add-comment-data @(drv/get-ref s :add-comment-data)
                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                                 activity-add-comment-data (get add-comment-data add-comment-key)]
-                            (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
+                            (reset! (::initial-add-comment s) (or activity-add-comment-data dom-utils/empty-body-html))
                             (reset! (::show-post-button s) (or (seq activity-add-comment-data) (should-focus-field? s)))
                             (when (seq activity-add-comment-data)
                               (reset! (::did-change s) true)))
@@ -218,10 +221,10 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting?]}]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
-        _team-roster (drv/react s :team-roster)
+        _mention-users (drv/react s :mention-users)
         add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
@@ -231,7 +234,7 @@
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
                                      (not is-focused?)
-                                     (not (seq @(::initial-add-comment s))))
+                                     (= @(::initial-add-comment s) dom-utils/empty-body-html))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
@@ -280,9 +283,7 @@
                :class (when uploading? "separator-line")}
               (if edit-comment-data
                 "Save"
-                (if dismiss-reply-cb
-                  "Reply"
-                  "Comment"))]
+                "Reply")]
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                            :width 32
                            :height 32
