@@ -231,7 +231,7 @@
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
             [:div.following-icon]
             [:div.following-label
-              "Home"]
+              "Following"]
             ; (when (pos? (:following-count org-data))
             ;   [:span.count (:following-count org-data)])
             ])
