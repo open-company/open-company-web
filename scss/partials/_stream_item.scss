@@ -105,7 +105,10 @@ div.stream-item {
     width: 100%;
     margin: 0;
     border-radius: 0;
-    border: 1px solid var(--foc-divider-line-color);
+    border-top: none;
+    border-right: none;
+    border-bottom: 1px solid var(--foc-divider-line-color);
+    border-left: none;
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px;
     height: #{$mobile_foc_height}px;

@@ -349,7 +349,7 @@ div.dashboard-layout {
         height: 40px;
 
         @include mobile() {
-          height: 65px;
+          height: 64px;
           border-bottom: none;
           padding: 0;
           background-color: var(--mobile-background-color);
