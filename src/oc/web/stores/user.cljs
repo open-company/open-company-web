@@ -303,15 +303,18 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          next-db (assoc-in db follow-boards-list-key
-                   (if (:boards org-data)
-                     (enrich-boards-list board-uuids (:boards org-data))
-                     board-uuids))]
-      (if active-users
-        (assoc-in next-db follow-publishers-list-key
-         (publishers-list-with-users publisher-uuids active-users))
-        ;; If users have not been loaded yet save the publishers list for later
-        (assoc-in next-db follow-publishers-list-key publisher-uuids)))
+          next-follow-boards-data (if (:boards org-data)
+                                    (enrich-boards-list board-uuids (:boards org-data))
+                                    board-uuids)
+          next-follow-publishers-data (if active-users
+                                        (publishers-list-with-users publisher-uuids active-users)
+                                        publisher-uuids)]
+      (js/console.log "DBG :follow/loaded publisher-uuids" publisher-uuids "board-uuids" board-uuids "org-slugs" org-slug (:org-slug resp))
+      (js/console.log "DBG   boards:" next-follow-boards-data)
+      (js/console.log "DBG   publishers:" next-follow-publishers-data)
+      (-> db
+       (assoc-in follow-publishers-list-key next-follow-publishers-data)
+       (assoc-in follow-boards-list-key next-follow-boards-data))
       db))
 
 (defmethod dispatcher/action :publishers/follow
