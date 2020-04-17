@@ -616,7 +616,7 @@
 
 (def default-headline "Add a title")
 
-(def default-body-placeholder "What's happening...")
+(def default-body-placeholder "What's happening")
 
 (def default-abstract "Quick summary (optional)")
 
