@@ -283,18 +283,28 @@
 
 ;; Follow
 
-(defn- publishers-list-with-users [publishers-list active-users-map]
-  (->> publishers-list
-   (map active-users-map)
-   (sort-by :short-name)
-   vec))
+(defn enrich-publishers-list [publishers-list active-users-map]
+  (if (and (seq publishers-list) (seq active-users-map))
+    (let [publisher-uuids (remove nil? (if (every? map? publishers-list)
+                           (map :user-id publishers-list)
+                           publishers-list))]
+      (->> publisher-uuids
+       (map active-users-map)
+       (sort-by :short-name)
+       vec))
+    publishers-list))
 
-(defn- enrich-boards-list [board-uuids org-boards]
-  (let [boards-map (zipmap (map :uuid org-boards) org-boards)]
-    (->> board-uuids
-     (map boards-map)
-     (sort-by :name)
-     vec)))
+(defn enrich-boards-list [boards-list org-boards]
+  (if (and (seq boards-list) (seq org-boards))
+    (let [board-uuids (remove nil? (if (every? map? boards-list)
+                       (map :uuid boards-list)
+                       boards-list))
+          boards-map (zipmap (map :uuid org-boards) org-boards)]
+      (->> board-uuids
+       (map boards-map)
+       (sort-by :name)
+       vec))
+    boards-list))
 
 (defmethod dispatcher/action :follow/loaded
   [db [_ org-slug {:keys [publisher-uuids board-uuids user-id] :as resp}]]
@@ -303,30 +313,31 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          next-follow-boards-data (if (:boards org-data)
-                                    (enrich-boards-list board-uuids (:boards org-data))
-                                    board-uuids)
-          next-follow-publishers-data (if active-users
-                                        (publishers-list-with-users publisher-uuids active-users)
-                                        publisher-uuids)]
+          next-follow-boards-data (enrich-boards-list board-uuids (:boards org-data))
+          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
       (js/console.log "DBG :follow/loaded publisher-uuids" publisher-uuids "board-uuids" board-uuids "org-slugs" org-slug (:org-slug resp))
       (js/console.log "DBG   boards:" next-follow-boards-data)
       (js/console.log "DBG   publishers:" next-follow-publishers-data)
+      (when (some nil? next-follow-publishers-data)
+        (js/console.log "DBG   publisher-uuids" publisher-uuids)
+        (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
+        (js/console.warn "DBG Null publishers:" next-follow-publishers-data))
       (-> db
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
-       (assoc-in follow-boards-list-key next-follow-boards-data))
+       (assoc-in follow-boards-list-key next-follow-boards-data)))
       db))
 
 (defmethod dispatcher/action :publishers/follow
   [db [_ org-slug {:keys [publisher-uuids] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
-          active-users (dispatcher/active-users org-slug db)]
-      (if active-users
-        (assoc-in db publishers-list-key
-         (publishers-list-with-users publisher-uuids active-users))
-        ;; If users have not been loaded yet save the publishers list for later
-        (assoc-in db publishers-list-key publisher-uuids)))
+    (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+          active-users (dispatcher/active-users org-slug db)
+          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
+      (when (some nil? next-follow-publishers-data)
+        (js/console.log "DBG   publisher-uuids" publisher-uuids)
+        (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
+        (js/console.warn "DBG Null publishers:" next-follow-publishers-data))
+      (assoc-in db follow-publishers-list-key next-follow-publishers-data))
     db))
 
 (defmethod dispatcher/action :boards/follow

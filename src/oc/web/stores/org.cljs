@@ -6,7 +6,8 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.router :as router]
-            [oc.web.actions.cmail :as cmail-actions]))
+            [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.stores.user :as user-store]))
 
 (defn read-only-org
   [org-data]
@@ -58,12 +59,17 @@
                                          :fullscreen false
                                          :collapsed true})
                     (update :cmail-data merge editing-board))
-                  db)]
+                  db)
+        active-users (dispatcher/active-users (:slug org-data) db)
+        follow-boards-list-key (dispatcher/follow-boards-list-key (:slug org-data))]
+    (js/console.log "DBG :org-loaded old-boards-list" (get-in db follow-boards-list-key))
+    (js/console.log "DBG   boards:" (user-store/enrich-boards-list (get-in db follow-boards-list-key) (:boards fixed-org-data)))
     (-> next-db
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing next-org-editing)
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
-      (assoc-in boards-key next-boards))))
+      (assoc-in boards-key next-boards)
+      (update-in follow-boards-list-key #(user-store/enrich-boards-list % (:boards fixed-org-data))))))
 
 (defmethod dispatcher/action :org-avatar-update/failed
   [db [_]]
