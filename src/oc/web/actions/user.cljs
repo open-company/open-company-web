@@ -3,6 +3,7 @@
   (:require [cljsjs.moment-timezone]
             [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [cuerdas.core :as s]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -543,28 +544,17 @@
 (defn hide-mobile-user-notifications []
   (dis/dispatch! [:input [:mobile-user-notifications] false]))
 
-;; subscribe to websocket events
-(defn subscribe []
-  (ws-nc/subscribe :user/notifications
-    (fn [{:keys [data]}]
-      (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
-        (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
-  (ws-nc/subscribe :user/notification
-    (fn [{:keys [data]}]
-      (when-let [fixed-notification (notif-utils/fix-notification data true)]
-        (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
-        (notification-actions/show-notification
-         {:title (:title fixed-notification)
-          :mention true
-          :dismiss true
-          :click (:click fixed-notification)
-          :mention-author (:author fixed-notification)
-          :description (:body fixed-notification)
-          :id (str "notif-" (:created-at fixed-notification))
-          :expire 5}))))
-  (ws-cc/subscribe :follow/list
-    (fn [{:keys [data]}]
-      (dis/dispatch! [:follow/loaded (router/current-org-slug) data]))))
+(defn- identify-general-board []
+  (when-let [org-data (dis/org-data)]
+    (let [named-general (some #(when (and (= (s/lower (:name %))) (= (:access %) "team"))
+                                 %)
+                         (:boards org-data))]
+      (if named-general
+        named-general
+        (->> org-data
+             :boards
+             (filter #(= (:access %) "team"))
+             (sort-by :created-at))))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
@@ -595,6 +585,40 @@
                                   :board-uuids board-uuids}])
   (ws-cc/boards-follow board-uuids)
   (refresh-follow-containers))
+
+;; subscribe to websocket events
+(defn subscribe []
+  (ws-nc/subscribe :user/notifications
+    (fn [{:keys [data]}]
+      (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
+        (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
+  (ws-nc/subscribe :user/notification
+    (fn [{:keys [data]}]
+      (when-let [fixed-notification (notif-utils/fix-notification data true)]
+        (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
+        (notification-actions/show-notification
+         {:title (:title fixed-notification)
+          :mention true
+          :dismiss true
+          :click (:click fixed-notification)
+          :mention-author (:author fixed-notification)
+          :description (:body fixed-notification)
+          :id (str "notif-" (:created-at fixed-notification))
+          :expire 5}))))
+  (ws-cc/subscribe :follow/list
+    (fn [{:keys [data]}]
+      ;; In case :board-uuids is nil it means the user has not following record yet
+      ;; so we have to default him to follow the general board
+      (js/console.log "DBG :follow/list" data)
+      (let [follow-general-by-default? (nil? (:board-uuids data))
+            general-board (when follow-general-by-default?
+                            (identify-general-board))
+            fixed-data (when (and follow-general-by-default?
+                                  general-board)
+                         (assoc data :board-uuids [(:uuid general-board)]))]
+        (when follow-general-by-default?
+          (utils/after 0 #(follow-boards [(:uuid general-board)])))
+        (dis/dispatch! [:follow/loaded (router/current-org-slug) fixed-data])))))
 
 ;; Debug
 
