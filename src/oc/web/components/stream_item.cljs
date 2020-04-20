@@ -174,8 +174,10 @@
                        {:width 136
                         :height (utils/calc-video-height 136)}))
         ;; Add NEW tag besides comment summary
-        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and (:new-at activity-data)
+        has-new-comments? ;; if the user is part of the team
+                          (and member?
+                               ;; the post has a last comment timestamp (a comment not from current user)
+                               (:new-at activity-data)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at activity-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
