@@ -334,6 +334,7 @@
           active-users (dispatcher/active-users org-slug db)
           next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
       (when (some nil? next-follow-publishers-data)
+        (js/console.log "DBG :publishers/follow")
         (js/console.log "DBG   publisher-uuids" publisher-uuids)
         (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
         (js/console.warn "DBG Null publishers:" next-follow-publishers-data))
