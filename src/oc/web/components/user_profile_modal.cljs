@@ -141,7 +141,9 @@
    :title
    "CEO, CTO, Designer, Engineer..."
    :location
-   "ie: New York, NY"
+   "e.g. New York, NY"
+   :blurb
+   "Fascinating facts..."
    ""))
 
 (defn- default-value [k]
