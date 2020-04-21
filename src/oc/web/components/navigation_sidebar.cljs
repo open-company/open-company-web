@@ -266,6 +266,7 @@
                  :title "Add teammates to follow"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :data-container "body"}]]])
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
@@ -311,6 +312,7 @@
                  :title "Add boards to follow"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :data-container "body"}]]])
         (when (seq follow-boards-list)
           [:div.left-navigation-sidebar-items.group
