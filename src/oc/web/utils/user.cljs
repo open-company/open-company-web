@@ -167,31 +167,34 @@
     (.. parsed-url -searchParams (set "state" new-state-string))
     (str parsed-url)))
 
+(defn- localized-time [tz]
+  (try
+   (.toLocaleTimeString (js/Date.)
+    (.. js/window -navigator -language)
+    #js {:hour "2-digit"
+         :minute "2-digit"
+         :format "hour:minute"
+         :timeZone tz})
+   (catch :default e
+    nil)))
+
 (defn time-with-timezone [timezone]
-  (utils/time-without-leading-zeros
-    (try
-     (.toLocaleTimeString (js/Date.)
-      (.. js/window -navigator -language)
-      #js {:hour "2-digit"
-           :minute "2-digit"
-           :format "hour:minute"
-           :timeZone timezone})
-     (catch :default e
-      nil))))
+  (when-let [localized-time (localized-time timezone)]
+    (utils/time-without-leading-zeros localized-time)))
 
 (defn timezone-location-string [user-data & [local-time-string?]]
   (str
-   (when (:timezone user-data)
+   (when-let [twt (time-with-timezone (:timezone user-data))]
      (str
-      (time-with-timezone (:timezone user-data))
+      twt
       (when local-time-string?
         " local time")))
-   (if (:location user-data)
-     (if (:timezone user-data)
+   (if (seq (:location user-data))
+     (if (seq (:timezone user-data))
        (str " (" (:location user-data) ")")
        (:location user-data))
-     (when (:timezone user-data)
-       (str " (" (:timezone user-data) ")")))))
+     (when (seq (:timezone user-data))
+       (str (:timezone user-data))))))
 
 (defun active?
   ([user :guard map?] (active? (:status user)))
