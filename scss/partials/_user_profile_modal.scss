@@ -247,7 +247,7 @@ div.user-profile-modal-container {
           outline: none;
 
           @include placeholder(){
-            color: var(--light-color);
+            color: var(--ultralight-color);
           }
 
           &:focus, &:active {

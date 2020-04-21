@@ -183,18 +183,21 @@
     (utils/time-without-leading-zeros localized-time)))
 
 (defn timezone-location-string [user-data & [local-time-string?]]
-  (str
-   (when-let [twt (time-with-timezone (:timezone user-data))]
-     (str
-      twt
-      (when local-time-string?
-        " local time")))
-   (if (seq (:location user-data))
-     (if (seq (:timezone user-data))
-       (str " (" (:location user-data) ")")
-       (:location user-data))
-     (when (seq (:timezone user-data))
-       (str (:timezone user-data))))))
+  (let [twt (time-with-timezone (:timezone user-data))]
+    (str
+     (when (seq twt)
+       (str
+        twt
+        (when local-time-string?
+          " local time")))
+     (if (seq (:location user-data))
+       (if (seq twt)
+         (str " (" (:location user-data) ")")
+         (:location user-data))
+       (when (seq (:timezone user-data))
+         (if (seq twt)
+           (str " (" (:timezone user-data) ")")
+           (str (:timezone user-data))))))))
 
 (defun active?
   ([user :guard map?] (active? (:status user)))
