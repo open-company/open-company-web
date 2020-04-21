@@ -169,12 +169,15 @@
 
 (defn time-with-timezone [timezone]
   (utils/time-without-leading-zeros
-    (.toLocaleTimeString (js/Date.)
-     (.. js/window -navigator -language)
-     #js {:hour "2-digit"
-          :minute "2-digit"
-          :format "hour:minute"
-          :timeZone timezone})))
+    (try
+     (.toLocaleTimeString (js/Date.)
+      (.. js/window -navigator -language)
+      #js {:hour "2-digit"
+           :minute "2-digit"
+           :format "hour:minute"
+           :timeZone timezone})
+     (catch :default e
+      nil))))
 
 (defn timezone-location-string [user-data & [local-time-string?]]
   (str
