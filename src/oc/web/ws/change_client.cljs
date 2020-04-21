@@ -99,6 +99,20 @@
                                          :org-slug @current-org
                                          :publisher-uuids (vec publisher-uuids)}]))
 
+(defn publisher-follow [publisher-uuid]
+  (timbre/debug "Sending publisher/follow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuid:" publisher-uuid)
+  (send! chsk-send! [:publisher/follow {:user-id @current-uid
+                                        :org-slug @current-org
+                                        :publisher-uuid publisher-uuid}]))
+
+(defn publisher-unfollow [publisher-uuid]
+  (timbre/debug "Sending publisher/unfollow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuid:" publisher-uuid)
+  (send! chsk-send! [:publisher/unfollow {:user-id @current-uid
+                                          :org-slug @current-org
+                                          :publisher-uuid publisher-uuid}]))
+
 ;; Boards follow
 
 (defn boards-follow [board-uuids]
@@ -107,6 +121,20 @@
   (send! chsk-send! [:boards/follow {:user-id @current-uid
                                      :org-slug @current-org
                                      :board-uuids (vec board-uuids)}]))
+
+(defn board-follow [board-uuid]
+  (timbre/debug "Sending board/follow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuid:" board-uuid)
+  (send! chsk-send! [:board/follow {:user-id @current-uid
+                                    :org-slug @current-org
+                                    :board-uuid board-uuid}]))
+
+(defn board-unfollow [board-uuid]
+  (timbre/debug "Sending board/unfollow for user-id:" @current-uid
+   "org-slug:" @current-org "with uuid:" board-uuid)
+  (send! chsk-send! [:board/unfollow {:user-id @current-uid
+                                      :org-slug @current-org
+                                      :board-uuid board-uuid}]))
 
 (defn subscribe
   [topic handler-fn]
