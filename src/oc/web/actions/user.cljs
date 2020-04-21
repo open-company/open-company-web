@@ -564,7 +564,7 @@
 (defn load-follow-list []
   (ws-cc/follow-list))
 
-(defn- refresh-follow-containers []
+(defn refresh-follow-containers []
   (let [is-inbox? (= (router/current-org-slug) "inbox")
         is-following? (= (router/current-org-slug) "following")
         inbox-delay (if is-inbox? 1 500)
@@ -579,12 +579,40 @@
   (ws-cc/publishers-follow publisher-uuids)
   (refresh-follow-containers))
 
+(defn toggle-publisher [publisher-uuid]
+  (let [org-slug (router/current-org-slug)
+        current-publishers (map :user-id (dis/follow-publishers-list org-slug))
+        follow? (not (utils/in? current-publishers publisher-uuid))
+        next-publishers (if follow?
+                          (vec (conj (set current-publishers) publisher-uuid))
+                          (vec (disj (set current-publishers) publisher-uuid)))]
+    (dis/dispatch! [:publishers/follow (router/current-org-slug)
+                                       {:org-slug org-slug
+                                        :publisher-uuids next-publishers}])
+    (if follow?
+      (ws-cc/publisher-follow publisher-uuid)
+      (ws-cc/publisher-unfollow publisher-uuid))))
+
 (defn follow-boards [board-uuids]
   (dis/dispatch! [:boards/follow (router/current-org-slug)
                                  {:org-slug (router/current-org-slug)
                                   :board-uuids board-uuids}])
   (ws-cc/boards-follow board-uuids)
   (refresh-follow-containers))
+
+(defn toggle-board [board-uuid]
+  (let [org-slug (router/current-org-slug)
+        current-boards (map :uuid (dis/follow-boards-list org-slug))
+        follow? (not (utils/in? current-boards board-uuid))
+        next-boards (if follow?
+                      (vec (conj (set current-boards) board-uuid))
+                      (vec (disj (set current-boards) board-uuid)))]
+    (dis/dispatch! [:boards/follow (router/current-org-slug)
+                                   {:org-slug org-slug
+                                    :board-uuids next-boards}])
+    (if follow?
+      (ws-cc/board-follow board-uuid)
+      (ws-cc/board-unfollow board-uuid))))
 
 ;; subscribe to websocket events
 (defn subscribe []
@@ -613,9 +641,9 @@
       (let [follow-general-by-default? (nil? (:board-uuids data))
             general-board (when follow-general-by-default?
                             (identify-general-board))
-            fixed-data (when (and follow-general-by-default?
-                                  general-board)
-                         (assoc data :board-uuids [(:uuid general-board)]))]
+            fixed-data (update data :board-uuids #(if general-board
+                                                   [(:uuid general-board)]
+                                                   %))]
         (when follow-general-by-default?
           (utils/after 0 #(follow-boards [(:uuid general-board)])))
         (dis/dispatch! [:follow/loaded (router/current-org-slug) fixed-data])))))
