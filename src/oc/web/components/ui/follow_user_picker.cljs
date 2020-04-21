@@ -9,23 +9,14 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- sort-users [user-id users]
   (let [{:keys [self-user other-users]}
          (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
         sorted-other-users (sort-by :short-name other-users)]
     (remove nil? (concat self-user sorted-other-users))))
-
-(defn- toggle-user [s u]
-  (compare-and-set! (::selecting-multiple s) false true)
-  (swap! (::users s)
-   #(if (utils/in? % (:user-id u))
-     (disj % (:user-id u))
-     (conj % (:user-id u)))))
 
 (defn- search-string [v q]
   (-> v string/lower (string/includes? q)))
@@ -45,44 +36,15 @@
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
 
-(defn- follow! [s]
-  (reset! (::saving s) true)
-  (user-actions/follow-publishers @(::users s))
-  (nav-actions/close-all-panels))
-
-(defn- toggle-user-and-exit [s user]
-  (let [users (swap! (::users s)
-               #(if (utils/in? % (:user-id user))
-                 (disj % (:user-id user))
-                 (conj % (:user-id user))))]
-    (follow! s)))
-
-(defn- close-follow-user-picker [s]
-  (if (not= @(::initial-users s) @(::users s))
-    (let [alert-data {:icon "/img/ML/trash.svg"
-                      :action "follow-user-picker-unsaved-exit"
-                      :message "Leave without saving your changes?"
-                      :link-button-title "Stay"
-                      :link-button-cb #(alert-modal/hide-alert)
-                      :solid-button-style :red
-                      :solid-button-title "Lose changes"
-                      :solid-button-cb #(do
-                                          (alert-modal/hide-alert)
-                                          (nav-actions/close-all-panels))}]
-      (alert-modal/show-alert alert-data))
-    (nav-actions/close-all-panels)))
-
 (rum/defcs follow-user-picker < rum/reactive
 
  (drv/drv :org-data)
  (drv/drv :active-users)
  (drv/drv :follow-publishers-list)
  (drv/drv :current-user-data)
- (rum/local #{} ::users)
  (rum/local #{} ::initial-users)
  (rum/local "" ::query)
  (rum/local false ::saving)
- (rum/local false ::selecting-multiple)
  strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
@@ -91,29 +53,38 @@
   :will-mount (fn [s]
    ;; setup the currently followed users
    (let [users (set (map :user-id @(drv/get-ref s :follow-publishers-list)))]
-     (reset! (::users s) users)
      (reset! (::initial-users s) users))
+   s)
+  :will-unmount (fn [s]
+   (user-actions/refresh-follow-containers)
    s)}
 
   [s]
   (let [org-data (drv/react s :org-data)
-        follow-publishers-list (drv/react s :follow-publishers-list)
+        follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
         authors-uuids (->> org-data :authors (map :user-id) set)
         all-authors (filter #(and (authors-uuids (:user-id %))
                                   (not= (:user-id current-user-data) (:user-id %)))
                      (vals all-active-users))
-        sorted-users (filter-sort-users s (:user-id current-user-data) all-authors @(::query s))
-        is-mobile? (responsive/is-mobile-size?)]
+        with-follow (map #(assoc % :follow (utils/in? follow-publishers-list (:user-id %))) all-authors)
+        sorted-users (filter-sort-users s (:user-id current-user-data) with-follow @(::query s))
+        is-mobile? (responsive/is-mobile-size?)
+        following-users (filter #(->> % :user-id (utils/in? @(::initial-users s))) sorted-users)
+        unfollowing-users (filter #(->> % :user-id (utils/in? @(::initial-users s)) not) sorted-users)]
     [:div.follow-user-picker
       [:div.follow-user-picker-modal
-        ; [:div.follow-user-picker-header]
         [:button.mlb-reset.modal-close-bt
-          {:on-click #(close-follow-user-picker s)}]
-        [:div.follow-user-picker-body
+          {:on-click #(nav-actions/close-all-panels)}]
+        [:div.follow-user-picker-header
+          [:button.mlb-reset.invite-user-bt
+            {:on-click #(nav-actions/show-section-add)}
+            "Invite teammates"]
           [:h3.follow-user-picker-title
-            "People"]
+            "People"]]
+        [:div.follow-user-picker-body
+          
           [:div.follow-user-picker-subtitle
             "Select someone to follow their posts and comments more easily."]
           (if (zero? (count all-authors))
@@ -127,33 +98,53 @@
                 " to get started."]]
             [:div.follow-user-picker-body-inner.group
               [:input.follow-user-picker-search-field-input.oc-input
-                {:class (when-not (seq @(::users s)) "empty")
-                 :value @(::query s)
+                {:value @(::query s)
                  :type "text"
                  :ref :query
-                 :placeholder "Search for teammates or make your selection below..."
+                 :placeholder "Find a person"
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-user-picker-users-list.group
-                (for [u sorted-users
-                      :let [selected? (utils/in? @(::users s) (:user-id u))]]
-                  [:div.follow-user-picker-user-row.group
-                    {:key (str "follow-user-picker-" (:user-id u))
-                     :class (when (utils/in? @(::users s) (:user-id u)) "selected")}
-                    (carrot-checkbox {:selected selected?
-                                      :did-change-cb #(toggle-user s u)})
-                    [:button.mlb-reset.follow-user-bt
-                      {:on-click #(if @(::selecting-multiple s)
-                                    (toggle-user s u)
-                                    (toggle-user-and-exit s u))}
+                ;; Following
+                (when (seq following-users)
+                  [:div.follow-user-picker-row-header
+                    (str "Following (" (count following-users) ")")])
+                (when (seq following-users)
+                  (for [u following-users]
+                    [:div.follow-user-picker-user-row.group
+                      {:key (str "follow-user-picker-" (:user-id u))
+                       :class (when (:follow u) "selected")}
                       (user-avatar-image u)
-                      [:span.follow-user-picker-user
-                        (:name u)]]])]
-              [:div.follow-user-picker-footer.group
-                [:button.mlb-reset.invite-user-bt
-                  {:on-click #(nav-actions/show-section-add)}
-                  "Invite people"]
-                [:button.mlb-reset.follow-user-picker-create-bt
-                  {:on-click #(follow! s)
-                   :disabled (or (= @(::users s) @(::initial-users s))
-                                 @(::saving s))}
-                  "Save"]]])]]]))
+                      [:div.follow-user-picker-user
+                        [:span.user-name
+                          (:name u)]
+                        (when (seq (:role u))
+                          [:span.user-role
+                            (:role u)])]
+                      [:button.mlb-reset.follow-bt
+                        {:on-click #(user-actions/toggle-publisher (:user-id u))
+                         :class (when (:follow u) "unfollow")}
+                        (if (:follow u)
+                          "Unfollow"
+                          "Follow")]]))
+                ;; Unfollowing
+                (when (seq unfollowing-users)
+                  [:div.follow-user-picker-row-header
+                    (str "Other people (" (count unfollowing-users) ")")])
+                (when (seq unfollowing-users)
+                  (for [u unfollowing-users]
+                    [:div.follow-user-picker-user-row.group
+                      {:key (str "unfollow-user-picker-" (:user-id u))
+                       :class (when (:follow u) "selected")}
+                      (user-avatar-image u)
+                      [:div.follow-user-picker-user
+                        [:span.user-name
+                          (:name u)]
+                        (when (seq (:role u))
+                          [:span.user-role
+                            (:role u)])]
+                      [:button.mlb-reset.follow-bt
+                        {:on-click #(user-actions/toggle-publisher (:user-id u))
+                         :class (when (:follow u) "unfollow")}
+                        (if (:follow u)
+                          "Unfollow"
+                          "Follow")]]))]])]]]))

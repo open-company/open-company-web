@@ -24,7 +24,7 @@ div.follow-board-picker {
     width: #{$board_container_width}px;
     background-color: var(--overlay-background-color);
     margin: 40px auto 32px;
-    padding: 24px;
+    padding: 0;
     transition: right 180ms ease-in;
     border-radius: 4px;
     position: relative;
@@ -74,16 +74,54 @@ div.follow-board-picker {
       }
     }
 
-    div.follow-board-picker-body {
+    div.follow-board-picker-header {
+      width: 100%;
+      height: #{$navbar_height}px;
+      border-bottom: 1px solid var(--divider-line);
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      padding: 12px 16px;
+      text-align: center;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        display: block;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+
+      button.create-board-bt {
+        padding: 0;
+        display: block;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 32px;
+        color: $carrot_green;
+        height: 32px;
+        float: right;
+
+        &:hover {
+          text-decoration: underline;
+          opacity: 1;
+        }
+
+        @include mobile() {
+          display: none;
+        }
+      }
 
       h3.follow-board-picker-title {
         @include OC_Body_Bold();
         font-size: 20px;
-        line-height: 26px;
+        line-height: 32px;
         color: var(--color);
         margin: 0;
-        width: 100%;
         padding: 0;
+        width: 100px;
+        position: absolute;
+        left: 50%;
+        top: 12px;
+        transform: translateX(-50%);
 
         @include mobile() {
           width: 85vw;
@@ -95,8 +133,13 @@ div.follow-board-picker {
           right: 0;
           background-color: var(--mobile-background-color);
           z-index: 2;
+          transform: unset;
         }
       }
+    }
+    
+    div.follow-board-picker-body {
+      padding: 24px;
 
       div.follow-board-picker-subtitle {
         @include OC_Body_Book();
@@ -180,22 +223,6 @@ div.follow-board-picker {
           padding-top: 16px;
           border-top: 1px solid var(--divider-line);
 
-          button.create-board-bt {
-            float: left;
-            padding: 0;
-            display: block;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 32px;
-            color: $carrot_green;
-            height: 32px;
-
-            &:hover {
-              text-decoration: underline;
-              opacity: 1;
-            }
-          }
-
           button.follow-board-picker-create-bt {
             width: auto;
             height: 32px;
@@ -221,40 +248,68 @@ div.follow-board-picker {
           width: calc(100% + 48px);
           margin-left: -24px;
 
+          div.follow-board-picker-row-header {
+            height: 32px;
+            padding: 8px 24px;
+            @include OC_Body_Bold();
+            text-transform: uppercase;
+            font-size: 12px;
+            line-height: 16px;
+            color: var(--light-color);
+          }
+
           div.follow-board-picker-board-row {
             height: 40px;
             padding: 4px 24px;
             border: none;
             outline: none;
             width: 100%;
-            display: block;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
 
-            &.selected {
-              background-color: var(--opac-background-color-05);
-            }
-
-            div.carrot-checkbox {
+            div.follow-board-picker-board {
+              display: block;
+              white-space: nowrap;
               margin-right: 8px;
-              float: left;
-              margin-top: 8px;
+              flex: 1 1 auto;
+              align-self: center;
+              max-width: calc(100% - 90px);
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 20px;
+              color: var(--color);
             }
 
-            button.follow-board-bt {
-              float: left;
+            button.follow-bt {
+              margin-left: auto;
+              align-self: center;
+              background-color: $carrot_green;
               height: 32px;
-              width: calc(100% - 24px);
-              padding: 0;
-              text-align: left;
+              border-radius: 4px;
+              width: 82px;
+              padding: 8px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: white;
 
-              span.follow-board-picker-board {
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 32px;
-                max-width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                text-align: left;
+              @include big_web(){
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              &.unfollow {
+                background-color: var(--opac-background-color-05);
+                color: var(--light-color);
+
+                @include big_web(){
+                  &:hover {
+                    background-color: var(--opac-background-color-2);
+                    color: var(--color);
+                  }
+                }
               }
             }
           }

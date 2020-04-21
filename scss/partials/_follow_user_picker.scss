@@ -24,7 +24,7 @@ div.follow-user-picker {
     width: #{$board_container_width}px;
     background-color: var(--overlay-background-color);
     margin: 40px auto 32px;
-    padding: 24px;
+    padding: 0;
     transition: right 180ms ease-in;
     border-radius: 4px;
     position: relative;
@@ -74,16 +74,54 @@ div.follow-user-picker {
       }
     }
 
-    div.follow-user-picker-body {
+    div.follow-user-picker-header {
+      width: 100%;
+      height: #{$navbar_height}px;
+      border-bottom: 1px solid var(--divider-line);
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      padding: 12px 16px;
+      text-align: center;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        display: block;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+
+      button.invite-user-bt {
+        padding: 0;
+        display: block;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 32px;
+        color: $carrot_green;
+        height: 32px;
+        float: right;
+
+        &:hover {
+          text-decoration: underline;
+          opacity: 1;
+        }
+
+        @include mobile() {
+          display: none;
+        }
+      }
 
       h3.follow-user-picker-title {
         @include OC_Body_Bold();
         font-size: 20px;
-        line-height: 26px;
+        line-height: 32px;
         color: var(--color);
         margin: 0;
-        width: 100%;
         padding: 0;
+        width: 100px;
+        position: absolute;
+        left: 50%;
+        top: 12px;
+        transform: translateX(-50%);
 
         @include mobile() {
           width: 85vw;
@@ -95,8 +133,13 @@ div.follow-user-picker {
           right: 0;
           background-color: var(--mobile-background-color);
           z-index: 2;
+          transform: unset;
         }
       }
+    }
+
+    div.follow-user-picker-body {
+      padding: 24px;
 
       div.follow-user-picker-subtitle {
         @include OC_Body_Book();
@@ -172,6 +215,11 @@ div.follow-user-picker {
             color: var(--light-color);
             font-size: 14px;
             line-height: 24px;
+            background-image: cdnUrl("/img/ML/wrt_search_lens.svg");
+            background-size: 12px 12px;
+            background-position: left calc(50% - 52px) top 5px;
+            background-repeat: no-repeat;
+            text-align: center;
           }
         }
 
@@ -179,22 +227,6 @@ div.follow-user-picker {
           margin-top: 8px;
           padding-top: 16px;
           border-top: 1px solid var(--divider-line);
-
-          button.invite-user-bt {
-            float: left;
-            padding: 0;
-            display: block;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 32px;
-            color: $carrot_green;
-            height: 32px;
-
-            &:hover {
-              text-decoration: underline;
-              opacity: 1;
-            }
-          }
 
           button.follow-user-picker-create-bt {
             width: auto;
@@ -221,6 +253,16 @@ div.follow-user-picker {
           width: calc(100% + 48px);
           margin-left: -24px;
 
+          div.follow-user-picker-row-header {
+            height: 32px;
+            padding: 8px 24px;
+            @include OC_Body_Bold();
+            text-transform: uppercase;
+            font-size: 12px;
+            line-height: 16px;
+            color: var(--light-color);
+          }
+
           div.follow-user-picker-user-row {
             height: 40px;
             padding: 4px 24px;
@@ -228,44 +270,81 @@ div.follow-user-picker {
             outline: none;
             width: 100%;
             display: block;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
 
-            &.selected {
-              background-color: var(--opac-background-color-05);
-            }
-
-            div.carrot-checkbox {
+            @include user-profile(32) {
               margin-right: 8px;
-              float: left;
-              margin-top: 8px;
-              opacity: 0.6;
-
-              &:hover, &.selected {
-                opacity: 1;
-              }
+              flex: 0 0 32px;
+              align-self: center;
             }
 
+            div.follow-user-picker-user {
+              display: block;
+              white-space: nowrap;
+              margin-right: 8px;
+              flex: 1 1 auto;
+              align-self: center;
+              max-width: calc(100% - 130px);
+              display: flex;
+              flex-direction: row;
+              flex-wrap: nowrap;
+              align-items: flex-start;
 
-
-            button.follow-user-bt {
-              float: left;
-              width: calc(100% - 24px);
-              padding: 0;
-
-              @include user-profile(32) {
-                float: left;
-                margin-right: 8px;
-              }
-
-              span.follow-user-picker-user {
-                display: block;
+              span.user-name {
+                margin-right: 6px;
                 @include OC_Body_Book();
                 font-size: 14px;
-                line-height: 32px;
-                float: left;
-                max-width: 100%;
+                line-height: 20px;
+                color: var(--color);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                flex: 0 1 auto;
+              }
+
+              span.user-role {
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 20px;
+                color: var(--light-color);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                flex: 0 100 auto;
+              }
+            }
+
+            button.follow-bt {
+              margin-left: auto;
+              align-self: center;
+              background-color: $carrot_green;
+              height: 32px;
+              border-radius: 4px;
+              width: 82px;
+              padding: 8px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: white;
+
+              @include big_web(){
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              &.unfollow {
+                background-color: var(--opac-background-color-05);
+                color: var(--light-color);
+
+                @include big_web(){
+                  &:hover {
+                    background-color: var(--opac-background-color-2);
+                    color: var(--color);
+                  }
+                }
               }
             }
           }
