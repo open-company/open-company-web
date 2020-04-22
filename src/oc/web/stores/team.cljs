@@ -64,8 +64,6 @@
 
           old-follow-publishers-list (get-in db follow-publishers-list-key)
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list users-map)]
-      (js/console.log "DBG :active-users data:" active-users-data "->" users-map)
-      (js/console.log "DBG    old-publishers-list" old-follow-publishers-list "next:" next-follow-publishers-list)
       (-> next-db
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
@@ -98,8 +96,6 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           old-follow-publishers-list (get-in db follow-publishers-list-key)
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list merged-users-data)]
-      (js/console.log "DBG :team-roster-loaded data:" roster-data "->" merged-users-data)
-      (js/console.log "DBG    old-publishers-list" old-follow-publishers-list "next:" next-follow-publishers-list)
       (-> db
        (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) parsed-roster-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))
@@ -128,11 +124,6 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           old-follow-publishers-list (get-in db follow-publishers-list-key)
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list merged-users-data)]
-      (js/console.log "DBG :team-loaded data:" team-data "->" merged-users-data)
-      (js/console.log "DBG    old-publishers-list" old-follow-publishers-list "next:" next-follow-publishers-list)
-      (when (some nil? next-follow-publishers-list)
-        (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
-        (js/console.warn "DBG Null publishers:" next-follow-publishers-list))
       (-> db
        (assoc-in (dispatcher/team-data-key (:team-id team-data)) parsed-team-data)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions merged-users-data))

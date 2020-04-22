@@ -62,8 +62,6 @@
                   db)
         active-users (dispatcher/active-users (:slug org-data) db)
         follow-boards-list-key (dispatcher/follow-boards-list-key (:slug org-data))]
-    (js/console.log "DBG :org-loaded old-boards-list" (get-in db follow-boards-list-key))
-    (js/console.log "DBG   boards:" (user-store/enrich-boards-list (get-in db follow-boards-list-key) (:boards fixed-org-data)))
     (-> next-db
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing next-org-editing)

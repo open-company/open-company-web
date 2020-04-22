@@ -637,7 +637,6 @@
     (fn [{:keys [data]}]
       ;; In case :board-uuids is nil it means the user has not following record yet
       ;; so we have to default him to follow the general board
-      (js/console.log "DBG :follow/list" data)
       (let [follow-general-by-default? (nil? (:board-uuids data))
             general-board (when follow-general-by-default?
                             (identify-general-board))

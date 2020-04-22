@@ -315,13 +315,6 @@
           active-users (dispatcher/active-users org-slug db)
           next-follow-boards-data (enrich-boards-list board-uuids (:boards org-data))
           next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
-      (js/console.log "DBG :follow/loaded publisher-uuids" publisher-uuids "board-uuids" board-uuids "org-slugs" org-slug (:org-slug resp))
-      (js/console.log "DBG   boards:" next-follow-boards-data)
-      (js/console.log "DBG   publishers:" next-follow-publishers-data)
-      (when (some nil? next-follow-publishers-data)
-        (js/console.log "DBG   publisher-uuids" publisher-uuids)
-        (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
-        (js/console.warn "DBG Null publishers:" next-follow-publishers-data))
       (-> db
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)))
@@ -333,11 +326,6 @@
     (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
           next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
-      (when (some nil? next-follow-publishers-data)
-        (js/console.log "DBG :publishers/follow")
-        (js/console.log "DBG   publisher-uuids" publisher-uuids)
-        (js/console.log "DBG   old-pubs" (get-in db follow-publishers-list-key))
-        (js/console.warn "DBG Null publishers:" next-follow-publishers-data))
       (assoc-in db follow-publishers-list-key next-follow-publishers-data))
     db))
 
