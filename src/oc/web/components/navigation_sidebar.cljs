@@ -261,12 +261,12 @@
                                                       (seq (mapcat :unread publisher-boards-change-data)))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
-              [:button.left-navigation-sidebar-top-title-button.people-plus-bt.btn-reset
+              [:button.left-navigation-sidebar-top-ellipsis-bt.people-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
                  :title "Add teammates to follow"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
                  :data-container "body"}]]])
         (when show-users-list?
           [:div.left-navigation-sidebar-items.group
@@ -306,13 +306,20 @@
                   {:class (utils/class-set {:new (and @(::sections-list-collapsed s)
                                                       (seq (mapcat :unread boards-change-data)))})
                    :on-click #(toggle-collapse-sections s)}
-                  [:span.sections "Boards"]])
+                  [:span.sections "Teams"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
-                {:on-click #(nav-actions/show-follow-board-picker)
-                 :title "Add boards to follow"
+                {:on-click #(nav-actions/show-section-add)
+                 :title "New team"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
+                 :data-container "body"}]
+              [:button.left-navigation-sidebar-top-ellipsis-bt.people-ellipsis-bt.btn-reset
+                {:on-click #(nav-actions/show-follow-board-picker)
+                 :title "Add teams to follow"
+                 :data-placement "top"
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
                  :data-container "body"}]]])
         (when (seq follow-boards-list)
           [:div.left-navigation-sidebar-items.group
@@ -341,6 +348,8 @@
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]
+                (when (= (:access board) "team")
+                  [:div.team])
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")

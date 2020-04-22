@@ -506,7 +506,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  div.left-navigation-sidebar-top{
+  div.left-navigation-sidebar-top {
 
     &.top-margin {
       margin-top: 16px;
@@ -542,11 +542,12 @@ div.left-navigation-sidebar {
         // top: 0;
         // left: 3px;
         float: left;
-        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
-        background-size: 12px 6px;
+        background-image: cdnUrl("/img/ML/wut_navigation_sidebar_sections_arrow.svg");
+        background-size: 8px 4px;
         background-repeat: no-repeat;
         background-position: center;
         transition: 180ms transform;
+        opacity: 0.5;
 
         &.collapsed {
           transform: rotate(-90deg);
@@ -564,15 +565,17 @@ div.left-navigation-sidebar {
         padding: 0 0 0 12px;
 
         &.new span.sections {
-          @include OC_Body_Bold();
+          opacity: 1;
         }
 
         span.sections {
-          @include OC_Body_Book();
-          font-size: 14px;
+          @include OC_Body_Bold();
+          font-size: 12px;
           line-height: 32px;
-          color: var(--color);
+          letter-spacing: 0.5;
+          color: var(--light-color);
           float: left;
+          text-transform: uppercase;
         }
 
         @include mobile() {
@@ -589,24 +592,72 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-right: -2px;
+      margin: 5px -2px 0 2px;
       float: right;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
-      background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+      background-image: cdnUrl("/img/ML/plus_deep_navy.svg");
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 16px 16px;
-      @include OC_Body_Bold();
-      margin-top: 7px;
+      background-size: 12px 12px;
+      opacity: 0.5;
+      display: none;
+
+      @include big_web() {
+        &:hover, &:active, &.active {
+          opacity: 1;
+        }
+      }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/plus_deep_navy@dark.svg");
+      }
 
       @include mobile() {
         display: none;
+      }
+    }
 
-        &.people-plus-bt {
-          display: block;
+    button.left-navigation-sidebar-top-ellipsis-bt {
+      width: 20px;
+      height: 20px;
+      margin: 5px -2px 0 2px;
+      float: right;
+      padding: 0;
+      cursor: pointer;
+      transition: 230ms;
+      background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 3px 14px;
+      opacity: 0.5;
+      display: none;
+
+      @include big_web() {
+        &:hover, &:active, &.active {
+          opacity: 1;
         }
+      }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+      }
+
+      @include mobile() {
+        display: block;
+      }
+    }
+  }
+
+  @include big_web() {
+    &:hover div.left-navigation-sidebar-top {
+      button.left-navigation-sidebar-top-title-button {
+        display: block;
+      }
+
+      button.left-navigation-sidebar-top-ellipsis-bt {
+        display: block;
       }
     }
   }
@@ -663,6 +714,11 @@ div.left-navigation-sidebar {
             background-image: cdnUrl("/img/ML/board_private_white.svg");
             opacity: 1;
           }
+
+          div.team {
+            background-image: cdnUrl("/img/ML/number_sign@dark.svg");
+            opacity: 1; 
+          }
         }
       }
 
@@ -689,6 +745,23 @@ div.left-navigation-sidebar {
         height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
         background-size: 10px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
+      }
+
+      div.team {
+        margin-left: 1px;
+        width: 16px;
+        height: 21px;
+        background-image: cdnUrl("/img/ML/number_sign.svg");
+        background-size: 10px 10px;
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
@@ -828,6 +901,10 @@ div.left-navigation-sidebar {
 
       div.private {
         background-image: cdnUrl("/img/ML/board_private_white.svg");
+      }
+
+      div.team {
+        background-image: cdnUrl("/img/ML/number_sign@dark.svg");
       }
     }
 
