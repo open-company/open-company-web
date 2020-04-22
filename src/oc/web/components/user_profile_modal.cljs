@@ -141,7 +141,9 @@
    :title
    "CEO, CTO, Designer, Engineer..."
    :location
-   "New York, NY"
+   "e.g. New York, NY"
+   :blurb
+   "Fascinating facts..."
    ""))
 
 (defn- default-value [k]
@@ -189,6 +191,7 @@
         current-user-data (:user-data user-profile-data)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         timezones (.names (.-tz js/moment))
+        guessed-timezone (.. js/moment -tz guess)
         show-password? (= (:auth-source current-user-data) "email")
         links-tab-index (atom 5)]
     [:div.user-profile-modal-container
@@ -314,7 +317,7 @@
                  :tab-index 5
                  :on-change #(change! s [:timezone] (.. % -target -value))}
                 ;; Promoted timezones
-                (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
+                (for [t (remove nil? ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific" guessed-timezone])]
                   [:option
                     {:key (str "timezone-" t "-promoted")
                      :value t} t])
