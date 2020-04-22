@@ -138,7 +138,6 @@
         is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-bookmarks (= selected-slug "bookmarks")
-        is-following (= selected-slug "following")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
@@ -146,7 +145,7 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-inbox (and user-is-part-of-the-team?
-                        (utils/link-for (:links org-data) "following-inbox"))
+                        (utils/link-for (:links org-data) "inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
@@ -155,8 +154,6 @@
         show-drafts (and user-is-part-of-the-team?
                          drafts-link
                          (integer? (:drafts-count org-data)))
-        show-following (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "following"))
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
@@ -193,9 +190,21 @@
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
-              "All"]
+              "Home"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
+            ])
+        ;; Inbox
+        (when show-inbox
+          [:a.inbox.hover-item.group
+            {:class (utils/class-set {:item-selected is-inbox})
+             :href (oc-urls/inbox)
+             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
+            [:div.inbox-icon]
+            [:div.inbox-label
+              "Unread"]
+            ; (when (pos? (:following-inbox-count org-data))
+            ;   [:span.count (:following-inbox-count org-data)])
             ])
         ;; Bookmarks
         (when show-bookmarks
@@ -227,29 +236,6 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
-        ;; Following
-        (when show-following
-          [:a.following.hover-item.group.top-margin
-            {:class (utils/class-set {:item-selected is-following})
-             :href (oc-urls/following)
-             :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
-            [:div.following-icon]
-            [:div.following-label
-              "Following"]
-            ; (when (pos? (:following-count org-data))
-            ;   [:span.count (:following-count org-data)])
-            ])
-        ;; Inbox
-        (when show-inbox
-          [:a.inbox.hover-item.group
-            {:class (utils/class-set {:item-selected is-inbox})
-             :href (oc-urls/inbox)
-             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
-            [:div.inbox-icon]
-            [:div.inbox-label
-              "Unread"]
-            (when (pos? (:following-inbox-count org-data))
-              [:span.count (:following-inbox-count org-data)])])
         (when show-users-list?
           [:div.left-navigation-sidebar-top.top-margin.group
             ;; Boards header
