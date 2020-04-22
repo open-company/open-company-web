@@ -264,7 +264,7 @@
                                                       (seq (mapcat :unread publisher-boards-change-data)))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.sections "People"]])
-              [:button.left-navigation-sidebar-top-ellipsis-bt.people-ellipsis-bt.btn-reset
+              [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
                  :title "Add teammates to follow"
                  :data-placement "top"

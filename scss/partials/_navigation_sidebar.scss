@@ -640,10 +640,6 @@ div.left-navigation-sidebar {
         }
       }
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
-      }
-
       @include mobile() {
         display: block;
       }
@@ -885,12 +881,16 @@ div.left-navigation-sidebar {
     }
 
     div.left-navigation-sidebar-top {
-      .left-navigation-sidebar-top-title button.left-navigation-sidebar-title-arrow {
+      button.left-navigation-sidebar-title-arrow {
         background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
       }
 
       button.left-navigation-sidebar-top-title-button {
         background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+      }
+
+      button.left-navigation-sidebar-top-ellipsis-bt {
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
       }
     }
 
