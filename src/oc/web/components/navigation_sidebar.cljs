@@ -266,7 +266,7 @@
                   [:span.sections "People"]])
               [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
-                 :title "Add teammates to follow"
+                 :title "People directory"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
@@ -319,7 +319,7 @@
                  :data-container "body"}]
               [:button.left-navigation-sidebar-top-ellipsis-bt.people-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-board-picker)
-                 :title "Add teams to follow"
+                 :title "Team directory"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
