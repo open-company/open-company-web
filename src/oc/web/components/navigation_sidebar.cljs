@@ -143,16 +143,20 @@
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
+        drafts-link (utils/link-for (:links drafts-board) "self")
         show-inbox (and user-is-part-of-the-team?
                         (utils/link-for (:links org-data) "following-inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "bookmarks"))
+                            (utils/link-for (:links org-data) "bookmarks")
+                            (integer? (:bookmarks-count org-data)))
+        show-drafts (and user-is-part-of-the-team?
+                         drafts-link
+                         (integer? (:drafts-count org-data)))
         show-following (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "following"))
-        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
-        drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
@@ -205,7 +209,7 @@
             (when (pos? (:bookmarks-count org-data))
               [:span.count (:bookmarks-count org-data)])])
         ;; Drafts
-        (when drafts-link
+        (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group

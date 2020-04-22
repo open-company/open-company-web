@@ -4,6 +4,7 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.org :as ou]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]))
 
@@ -430,14 +431,17 @@
     (-> db
       (assoc-in container-key fixed-bookmarks-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-bookmarks-data)))))
+      (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data))))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug]]
   (let [container-key (dispatcher/container-key org-slug :bookmarks)
         container-data (get-in db container-key)
-        next-posts-data (assoc container-data :loading-more true)]
-    (assoc-in db container-key next-posts-data)))
+        next-posts-data (assoc container-data :loading-more true)
+        bookmarks-count-key (vec (conj (dispatcher/org-data-key org-slug) :bookmarks-count))]
+    (-> db
+     (assoc-in container-key next-posts-data)
+     (update-in bookmarks-count-key #(ou/disappearing-count-value % (:total-count next-posts-data))))))
 
 (defmethod dispatcher/action :bookmarks-more/finish
   [db [_ org direction posts-data]]
@@ -458,7 +462,7 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-data-key :bookmarks-count) (:total-count fixed-posts-data))))
+        (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))))
     db))
 
 (defmethod dispatcher/action :remove-bookmark
@@ -468,14 +472,14 @@
         bookmarks-data (get-in db bookmarks-key)
         org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
-      (update-in (conj org-data-key :bookmarks-count) dec)
+      (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (dec %)))
       (assoc-in activity-key entry-data)
       (add-remove-item-from-bookmarks org-slug entry-data))))
 
 (defmethod dispatcher/action :add-bookmark
   [db [_ org-slug activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)]
-    (update-in db (conj org-data-key :bookmarks-count) inc)))
+    (update-in db (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (inc %)))))
 
 (defmethod dispatcher/action :activities-count
   [db [_ org-slug items-count]]

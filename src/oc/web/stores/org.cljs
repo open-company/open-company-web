@@ -2,6 +2,7 @@
   (:require [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.org :as org-utils]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
@@ -17,12 +18,19 @@
 
 (defn fix-org
   "Fix org data coming from the API."
-  [org-data]
+  [db org-data]
   (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
-                      (:boards org-data))]
+                      (:boards org-data))
+        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+        drafts-link (when drafts-board
+                      (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
+        previous-org-drafts-count (get-in db (conj (dispatcher/org-data-key (:slug org-data)) :drafts-count))
+        previous-bookmarks-count (get-in db (conj (dispatcher/org-data-key (:slug org-data)) :bookmarks-count))]
     (-> org-data
      read-only-org
-     (assoc :boards fixed-boards))))
+     (assoc :boards fixed-boards)
+     (assoc :drafts-count (org-utils/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
+     (assoc :bookmarks-count (org-utils/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data))))))
 
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved? email-domain]]
@@ -38,7 +46,7 @@
         section-names (:default-board-names org-data)
         selected-sections (map :name (:boards org-data))
         sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
-        fixed-org-data (fix-org org-data)
+        fixed-org-data (fix-org db org-data)
         with-saved? (if (nil? saved?)
                       ;; If saved? is nil it means no save happened, so we keep the old saved? value
                       org-data
@@ -88,3 +96,13 @@
 (defmethod dispatcher/action :org-edit-setup
   [db [_ org-data]]
   (assoc db :org-editing org-data))
+
+(defmethod dispatcher/action :bookmarks-nav/show
+  [db [_ org-slug]]
+  (let [bookmarks-count-key (vec (conj (dispatcher/org-data-key org-slug) :bookmarks-count))]
+    (update-in db bookmarks-count-key #(or % 0))))
+
+(defmethod dispatcher/action :drafts-nav/show
+  [db [_ org-slug]]
+  (let [drafts-count-key (vec (conj (dispatcher/org-data-key org-slug) :drafts-count))]
+    (update-in db drafts-count-key #(or % 0))))

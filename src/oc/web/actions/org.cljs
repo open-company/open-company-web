@@ -162,6 +162,10 @@
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
         active-users-link (utils/link-for (:links org-data) "active-users")]
+    (when is-bookmarks?
+      (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
+    (when is-drafts?
+      (dis/dispatch! [:drafts-nav/show (:slug org-data)]))
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)

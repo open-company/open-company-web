@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.lib.time :as oc-time]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.org :as ou]
             [oc.web.utils.activity :as au]))
 
 (defmethod dispatcher/action :section
@@ -25,10 +26,15 @@
                             (:fixed-items fixed-section-data))
         with-merged-items (if with-entries
                             (assoc-in db-loading posts-key merged-items)
-                            db-loading)]
-    (assoc-in with-merged-items
-              (dispatcher/board-data-key org-slug (:slug section-data))
-              (dissoc with-current-edit :fixed-items))))
+                            db-loading)
+        is-drafts-board? (= (:slug section-data) utils/default-drafts-board-slug)
+        org-drafts-count-key (vec (conj (dispatcher/org-data-key org-slug) :drafts-count))]
+    (-> with-merged-items
+     (assoc-in (dispatcher/board-data-key org-slug (:slug section-data))
+                                 (dissoc with-current-edit :fixed-items))
+     (update-in org-drafts-count-key #(if is-drafts-board?
+                                        (ou/disappearing-count-value % (:total-count section-data))
+                                        %)))))
 
 (defn fix-org-section-data
   [db org-data changes]
