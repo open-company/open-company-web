@@ -542,7 +542,7 @@ div.left-navigation-sidebar {
         // top: 0;
         // left: 3px;
         float: left;
-        background-image: cdnUrl("/img/ML/wut_navigation_sidebar_sections_arrow.svg");
+        background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
         background-size: 8px 4px;
         background-repeat: no-repeat;
         background-position: center;
@@ -886,7 +886,7 @@ div.left-navigation-sidebar {
 
     div.left-navigation-sidebar-top {
       .left-navigation-sidebar-top-title button.left-navigation-sidebar-title-arrow {
-        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
+        background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
       }
 
       button.left-navigation-sidebar-top-title-button {
