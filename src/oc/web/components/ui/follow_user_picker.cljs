@@ -42,18 +42,12 @@
  (drv/drv :active-users)
  (drv/drv :follow-publishers-list)
  (drv/drv :current-user-data)
- (rum/local #{} ::initial-users)
  (rum/local "" ::query)
  (rum/local false ::saving)
  strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
    (user-actions/load-follow-list)
-   s)
-  :will-mount (fn [s]
-   ;; setup the currently followed users
-   (let [users (set (map :user-id @(drv/get-ref s :follow-publishers-list)))]
-     (reset! (::initial-users s) users))
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)
@@ -71,8 +65,8 @@
         with-follow (map #(assoc % :follow (utils/in? follow-publishers-list (:user-id %))) all-authors)
         sorted-users (filter-sort-users s (:user-id current-user-data) with-follow @(::query s))
         is-mobile? (responsive/is-mobile-size?)
-        following-users (filter #(->> % :user-id (utils/in? @(::initial-users s))) sorted-users)
-        unfollowing-users (filter #(->> % :user-id (utils/in? @(::initial-users s)) not) sorted-users)]
+        following-users (filter #(->> % :user-id (utils/in? follow-publishers-list)) sorted-users)
+        unfollowing-users (filter #(->> % :user-id (utils/in? follow-publishers-list) not) sorted-users)]
     [:div.follow-user-picker
       [:div.follow-user-picker-modal
         [:button.mlb-reset.modal-close-bt

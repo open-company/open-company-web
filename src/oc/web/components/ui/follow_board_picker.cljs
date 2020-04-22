@@ -35,18 +35,12 @@
 
  (drv/drv :org-data)
  (drv/drv :follow-boards-list)
- (rum/local #{} ::initial-boards)
  (rum/local "" ::query)
  (rum/local false ::saving)
  strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
    (user-actions/load-follow-list)
-   s)
-  :will-mount (fn [s]
-   ;; setup the currently followed boards
-   (let [boards (set (map :uuid @(drv/get-ref s :follow-boards-list)))]
-     (reset! (::initial-boards s) boards))
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)
@@ -59,8 +53,8 @@
         with-follow (map #(assoc % :follow (utils/in? follow-boards-list (:uuid %))) all-boards)
         sorted-boards (filter-sort-boards s with-follow @(::query s))
         is-mobile? (responsive/is-mobile-size?)
-        following-boards (filter #(->> % :uuid (utils/in? @(::initial-boards s))) sorted-boards)
-        unfollowing-boards (filter #(->> % :uuid (utils/in? @(::initial-boards s)) not) sorted-boards)]
+        following-boards (filter #(->> % :uuid (utils/in? follow-boards-list)) sorted-boards)
+        unfollowing-boards (filter #(->> % :uuid (utils/in? follow-boards-list) not) sorted-boards)]
     [:div.follow-board-picker
       [:div.follow-board-picker-modal
         [:button.mlb-reset.modal-close-bt
