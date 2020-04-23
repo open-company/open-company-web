@@ -74,19 +74,19 @@ div.reactions {
           }
 
           &.reacted:hover {
-            background-color: rgba($carrot_green, 0.35);
+            background-color: rgba($wut_purple, 0.35);
             div.count {
-              color: $carrot_green;
+              color: $wut_purple;
             }
           }
         }
       }
 
       &.reacted {
-        background-color: rgba($carrot_green, 0.2);
+        background-color: rgba($wut_purple, 0.2);
 
         div.count {
-          color: $carrot_green;
+          color: $wut_purple;
         }
       }
 

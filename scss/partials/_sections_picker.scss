@@ -21,8 +21,8 @@ div.sections-picker {
       cursor: pointer;
 
       &.active, &:hover {
-        background-color: $feint_emerald;
-        color: $carrot_green;
+        background-color: $wut_feint_purple;
+        color: $wut_purple;
 
         &.publisher-board {
           background-color: transparent;
@@ -34,11 +34,11 @@ div.sections-picker {
         }
 
         @include mobile() {
-          -webkit-tap-highlight-color: $feint_emerald;
+          -webkit-tap-highlight-color: $wut_feint_purple;
         }
 
         div.sections-picker-section-name {
-          color: $carrot_green;
+          color: $wut_purple;
         }
 
         div.public-icon {

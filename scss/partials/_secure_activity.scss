@@ -60,7 +60,7 @@ div.secure-activity-container {
         float: right;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: $wut_purple;
         padding: 0;
 
         @include user-profile(32) {
@@ -102,7 +102,7 @@ div.secure-activity-container {
         height: 32px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: $wut_purple;
       }
 
       button.learn-more-bt {
@@ -111,7 +111,7 @@ div.secure-activity-container {
         text-align: left;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: $wut_purple;
         padding: 0;
         margin: 0;
       }
@@ -302,7 +302,7 @@ div.secure-activity-container {
       height: 72px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $carrot_green;
+      color: $wut_purple;
       padding: 0;
     }
   }

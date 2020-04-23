@@ -200,7 +200,7 @@
                      :cy "58"
                      :r "50"
                      :fill "transparent"
-                     :stroke "#3FBD7C"
+                     :stroke "#6833F1"
                      :stroke-width "16"
                      :class (when @(:first-render-done s) (str "wrt-donut-segment-" seen-percent))}]
                   [:g.wrt-chart-text

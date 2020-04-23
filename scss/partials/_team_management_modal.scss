@@ -63,7 +63,7 @@ div.team-management-modal {
       button.save-bt {
         height: 32px;
         padding: 7px 14px;
-        background-color: $carrot_green;
+        background-color: $wut_purple;
         @include OC_Body_Bold();
         font-size: 14px;
         color: white;
@@ -205,7 +205,7 @@ div.team-management-modal {
               line-height: 19px;
 
               button.resend-pending-bt {
-                color: $carrot_green;
+                color: $wut_purple;
                 padding: 0;
                 display: inline;
               }

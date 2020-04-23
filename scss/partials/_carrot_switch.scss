@@ -19,7 +19,7 @@ div.carrot-switch {
   }
 
   span.selected-label {
-    color: $carrot_green;
+    color: $wut_purple;
     float: left;
     @include OC_Body_Bold();
     font-size: 12px;
@@ -45,12 +45,12 @@ div.carrot-switch {
   }
 
   &.selected {
-    background-color: $feint_emerald;
-    color: $carrot_green;
+    background-color: rgba($wut_purple, 0.4);
+    color: $wut_purple;
 
     span.dot {
       margin-left: 12px;
-      background-color: $carrot_green;
+      background-color: $wut_purple;
     }
   }
 }

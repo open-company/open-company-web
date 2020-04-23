@@ -27,7 +27,7 @@ div.login-wall-container {
       }
 
       div.login-box {
-        background-image: cdnUrl("/img/ML/onboard_box.svg");
+        background-image: cdnUrl("/img/ML/wut_onboard_box.svg");
         background-position: center;
         background-repeat: no-repeat;
         background-size: 229px 234px;
@@ -321,7 +321,7 @@ div.login-wall-container {
           a {
             @include OC_Body_Book();
             font-size: 16px;
-            color: $carrot_green;
+            color: $wut_purple;
             line-height: 20px;
             margin-left: 4px;
 

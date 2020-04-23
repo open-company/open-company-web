@@ -64,7 +64,7 @@ div.is-comments {
     text-overflow: ellipsis;
 
     &.has-new-comments {
-      color: $carrot_green;
+      color: $wut_purple;
       @include OC_Body_Bold();
 
       @include mobile() {

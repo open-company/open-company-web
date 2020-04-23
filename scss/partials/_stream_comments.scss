@@ -67,7 +67,7 @@ div.stream-comments {
         }
 
         // &.has-new:before {
-        //   background-color: rgba($carrot_green, 0.4);
+        //   background-color: rgba($wut_purple, 0.4);
         // }
 
         &.open-thread:before {
@@ -138,7 +138,7 @@ div.stream-comments {
         }
 
         &.new-comment {
-          background-color: rgba(#3FBD7C, 0.16);
+          background-color: rgba($wut_purple, 0.16);
           border-radius: 8px;
           margin-bottom: 1px;
 
@@ -146,7 +146,7 @@ div.stream-comments {
             background-color: transparent;
 
             div.stream-comment div.stream-comment-inner {
-              background-color: rgba(#3FBD7C, 0.16);
+              background-color: rgba($wut_purple, 0.16);
               border-radius: 8px;
             }
           }
@@ -531,7 +531,7 @@ div.stream-comments {
                   font-size: 12px;
                   line-height: 18px;
                   content: "(NEW)";
-                  color: $carrot_green;
+                  color: $wut_purple;
                   position: absolute;
                   top: 0;
                   left: 0;
@@ -623,7 +623,7 @@ div.stream-comments {
               }
 
               &.save-bt {
-                color: $carrot_green;
+                color: $wut_purple;
               }
             }
           }

@@ -89,7 +89,7 @@ div.push-notifications-permission-modal {
     .enable-notifications-bt {
       color: #fff;
       @include OC_Body_Bold();
-      background-color: $carrot_green_2;
+      background-color: rgba($wut_purple, 0.8);
       border-radius: 6px;
       height: 48px;
       width: 100%;
@@ -100,7 +100,7 @@ div.push-notifications-permission-modal {
 
     .no-thanks-btn {
       @include OC_Body_Book();
-      color: $carrot_green_2;
+      color: rgba($wut_purple, 0.8);
       height: 48px;
       width: 100%;
       max-width: 280px;

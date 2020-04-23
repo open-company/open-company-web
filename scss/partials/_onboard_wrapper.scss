@@ -33,7 +33,7 @@ div.onboard-wrapper-container {
     }
 
     div.onboard-box {
-      background-image: cdnUrl("/img/ML/onboard_box.svg");
+      background-image: cdnUrl("/img/ML/wut_onboard_box.svg");
       background-position: center;
       background-repeat: no-repeat;
       background-size: 229px 234px;
@@ -88,7 +88,7 @@ div.onboard-email-container {
     @incldude OC_Body_Bold();
 
     div.email-wall-icon {
-      background-image: cdnUrl("/img/ML/email_wall.svg");
+      background-image: cdnUrl("/img/ML/wut_email_wall.svg");
       background-size: 48px 36px;
       background-position: center;
       width: 48px;
@@ -193,7 +193,7 @@ div.onboard-lander {
           position: absolute;
           top: 12px;
           right: 24px;
-          color: $carrot_green;
+          color: $wut_purple;
           text-align: right;
 
           &.disabled, &:disabled {
@@ -417,9 +417,9 @@ div.onboard-lander {
           width: 72px;
           height: 72px;
           background-color: #F8FCFA;
-          border: 1px dashed $carrot_green;
+          border: 1px dashed $wut_purple;
           border-radius: 8px;
-          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
@@ -483,8 +483,8 @@ div.onboard-lander {
         height: 72px;
         border-radius: 50%;
         background-color: #F8FCFA;
-        border: 1px dashed $carrot_green;
-        background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+        border: 1px dashed $wut_purple;
+        background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
@@ -493,7 +493,7 @@ div.onboard-lander {
       div.add-picture-link {
         @include OC_Body_Bold();
         font-size: 16px;
-        color: $carrot_green;
+        color: $wut_purple;
         float: left;
         margin-left: 24px;
         margin-top: 12px;
@@ -610,7 +610,7 @@ div.onboard-lander {
       a {
         @include OC_Body_Book();
         font-size: 16px;
-        color: $carrot_green;
+        color: $wut_purple;
         line-height: 20px;
         margin-left: 4px;
 
@@ -647,7 +647,7 @@ div.onboard-lander {
       }
 
       &.valid {
-        border: 1px solid rgba($carrot_green, 0.5);
+        border: 1px solid rgba($wut_purple, 0.5);
       }
 
       &.right-half-field, &.left-half-field {
@@ -773,7 +773,7 @@ div.onboard-lander {
         @include OC_Body_Book();
         font-size: 16px;
         line-height: 20px;
-        color: $carrot_green;
+        color: $wut_purple;
         padding: 0;
         display: block;
         margin: 0 auto;
@@ -918,7 +918,7 @@ div.onboard-lander {
     div.onboard-form {
       div.field-label {
         button.add-another-invite-row {
-          color: $carrot_green;
+          color: $wut_purple;
           float: right;
           @include OC_Body_Book();
           font-size: 13px;

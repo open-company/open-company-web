@@ -354,7 +354,7 @@ div.search-results {
 
         &:hover {
           div.title {
-            color: $carrot_green;
+            color: $wut_purple;
           }
         }
       }
@@ -366,7 +366,7 @@ div.search-results {
   }
 
   div.show-more {
-    color: $carrot_green_2;
+    color: $wut_purple;
     font-size: 14px;
     padding: 5px 16px 10px 16px;
     cursor: pointer;
@@ -383,7 +383,7 @@ div.search-results {
       &:before {
         position: absolute;
         content: "";
-        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+        background-image: cdnUrl("/img/ML/wut_keep_reading_chevron.svg");
         background-size: 14px 8px;
         background-position: center;
         background-repeat: no-repeat;

@@ -98,7 +98,7 @@
 }
 
 @mixin item-selected() {
-  background-color: $carrot_green;
+  background-color: $wut_purple;
   outline: none;
   border-radius: 4px;
 
@@ -107,7 +107,7 @@
   }
 
   .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
-    // color: $carrot_green;
+    // color: $wut_purple;
     @include OC_Body_Book();
     font-size: 14px;
     text-decoration: none;

@@ -172,7 +172,7 @@ $header_top_margin: 24;
 
   a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener, a i, a strong, a b {
     text-decoration: none;
-    color: $carrot_green;
+    color: $wut_purple;
     background-color: transparent !important;
   }
 
@@ -372,7 +372,7 @@ $header_top_margin: 24;
           button.poll-preview-bt {
             padding: 0;
             float: right;
-            color: $carrot_green;
+            color: $wut_purple;
             height: 18px;
             font-size: 14px;
             @include OC_Body_Book();
@@ -432,7 +432,7 @@ $header_top_margin: 24;
 
             div.poll-reply-outer.voted {
               &:before {
-                background-color: rgba($carrot_green, 0.3);
+                background-color: rgba($wut_purple, 0.3);
               }
 
               button.poll-reply {
@@ -486,7 +486,7 @@ $header_top_margin: 24;
 
                 &:hover {
                   &:before {
-                    background-color: rgba($carrot_green, 0.3);
+                    background-color: rgba($wut_purple, 0.3);
                     width: 100%;
                   }
 
@@ -703,7 +703,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 
@@ -744,7 +744,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link] {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 
@@ -761,7 +761,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 
@@ -772,7 +772,7 @@ $header_top_margin: 24;
 
   a, span[data-auto-link], a i, a strong, a b, a.noreferrer, a.noopener, a.noreferrer.noopener {
     text-decoration: none;
-    color: $carrot_green;
+    color: $wut_purple;
     background-color: transparent !important;
   }
 
@@ -989,7 +989,7 @@ $header_top_margin: 24;
 
   &:hover {
     a.read-more {
-      color: $carrot_green;
+      color: $wut_purple;
     }
   }
 
@@ -1009,7 +1009,7 @@ $header_top_margin: 24;
 
   a, span[data-auto-link], a i, a strong, a b {
     text-decoration: none;
-    color: $carrot_green;
+    color: $wut_purple;
     background-color: transparent !important;
   }
 
@@ -1131,7 +1131,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link], a i, a strong, a b {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 
@@ -1150,7 +1150,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link] {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 
@@ -1169,7 +1169,7 @@ $header_top_margin: 24;
 
     a, span[data-auto-link] {
       text-decoration: none;
-      color: $carrot_green;
+      color: $wut_purple;
       background-color: transparent;
     }
 

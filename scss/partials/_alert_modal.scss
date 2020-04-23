@@ -98,7 +98,7 @@ div.alert-modal-container {
         margin-top: 8px;
 
         a {
-          color: $carrot_green;
+          color: $wut_purple;
         }
       }
 
@@ -138,7 +138,7 @@ div.alert-modal-container {
             color: var(--color);
 
             &.green {
-              color: $carrot_green;
+              color: $wut_purple;
             }
           }
 
@@ -159,17 +159,17 @@ div.alert-modal-container {
           }
 
           &.mlb-default.green {
-            background-color: $carrot_green;
+            background-color: $wut_purple;
             color: white;
             padding: 7px 8px;
 
             &:hover, &:focus {
-              background-color: $carrot_green;
+              background-color: $wut_purple;
               color: white;
             }
 
             &:active, &.active {
-              background-color: $carrot_green;
+              background-color: $wut_purple;
               color: white;
             }
           }
