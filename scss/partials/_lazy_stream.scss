@@ -18,6 +18,7 @@ div.lazy-stream {
       min-height: calc(100vh - 140px);
       background-image: cdnUrl("/img/ML/interstitial.svg");
       background-size: #{$board_container_width}px #{$foc_height + 1}px;
+      border-top: 1px solid var(--divider-line);
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/interstitial@dark.svg");
