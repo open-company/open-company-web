@@ -755,43 +755,43 @@ div.dashboard-layout {
             }
           }
 
-        //   button.foc-layout-bt {
-        //     float: left;
-        //     height: 32px;
-        //     width: 24px;
-        //     padding: 0;
-        //     margin: 0;
-        //     background-image: cdnUrl("/img/ML/foc_layout_collapse.svg");
-        //     background-size: 14px 14px;
-        //     background-position: top 50% right 0px;
-        //     background-repeat: no-repeat;
-        //     opacity: 0.5;
-        //     margin-left: 9px;
+          // button.foc-layout-bt {
+          //   float: left;
+          //   height: 32px;
+          //   width: 24px;
+          //   padding: 0;
+          //   margin: 0;
+          //   background-image: cdnUrl("/img/ML/foc_layout_collapse.svg");
+          //   background-size: 14px 14px;
+          //   background-position: top 50% right 0px;
+          //   background-repeat: no-repeat;
+          //   opacity: 0.5;
+          //   margin-left: 9px;
 
-        //     @include dark_mode() {
-        //       background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
-        //     }
+          //   @include dark_mode() {
+          //     background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
+          //   }
 
-        //     @include mobile() {
-        //       display: none;
-        //     }
+          //   @include mobile() {
+          //     display: none;
+          //   }
 
-        //     &.collapsed {
-        //       background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
-        //       background-color: 14px 16px;
+          //   &.collapsed {
+          //     background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
+          //     background-color: 14px 16px;
 
-        //       @include dark_mode() {
-        //         background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
-        //       }
-        //     }
+          //     @include dark_mode() {
+          //       background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
+          //     }
+          //   }
 
-        //     @include big_web(){
-        //       &:hover {
-        //         opacity: 1;
-        //       }
-        //     }
-        //   }
-        // }
+          //   @include big_web(){
+          //     &:hover {
+          //       opacity: 1;
+          //     }
+          //   }
+          // }
+        }
       }
     }
   }
