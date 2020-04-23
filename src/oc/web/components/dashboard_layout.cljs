@@ -350,8 +350,8 @@
                       [:button.mlb-reset.sort-type-dropdown
                         {:on-click #(swap! (::sort-type-expanded s) not)}
                         (if (= sort-type dis/recent-activity-sort)
-                          "Recent activity"
-                          "Recently posted")]
+                          "New activity"
+                          "New posts")]
                       (when @(::sort-type-expanded s)
                         [:div.sort-type-dropdown
                           [:button.mlb-reset.sort-type-item
@@ -359,13 +359,13 @@
                              :on-click #(do
                                           (reset! (::sort-type-expanded s) false)
                                           (activity-actions/change-sort-type dis/recent-activity-sort))}
-                            "Recent activity"]
+                            "New activity"]
                           [:button.mlb-reset.sort-type-item
                             {:class (when (= sort-type dis/recently-posted-sort) "active")
                              :on-click #(do
                                           (reset! (::sort-type-expanded s) false)
                                           (activity-actions/change-sort-type dis/recently-posted-sort))}
-                            "Recently posted"]])])
+                            "New posts"]])])
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")

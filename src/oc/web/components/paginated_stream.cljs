@@ -27,9 +27,9 @@
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
-(def foc-height 188)
+(def foc-height 180)
 (def mobile-foc-height 162)
-(def foc-separators-height 50)
+(def foc-separators-height 58)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond
