@@ -474,7 +474,7 @@ div.dashboard-layout {
               padding: 0;
               float: left;
 
-              &.all-updates-bt {
+              &:not(:first-child) {
                 margin-left: 16px;
               }
 
@@ -672,10 +672,6 @@ div.dashboard-layout {
               button.sort-type-dropdown {
                 color: var(--color);
               }
-
-              button.sort-type-dropdown:after {
-                transform: rotate(90deg);
-              }
             }
 
             button.sort-type-dropdown {
@@ -699,7 +695,6 @@ div.dashboard-layout {
                 position: absolute;
                 right: 0;
                 top: 8px;
-                transition: transform 180ms;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
@@ -760,43 +755,43 @@ div.dashboard-layout {
             }
           }
 
-          button.foc-layout-bt {
-            float: left;
-            height: 32px;
-            width: 24px;
-            padding: 0;
-            margin: 0;
-            background-image: cdnUrl("/img/ML/foc_layout_collapse.svg");
-            background-size: 14px 14px;
-            background-position: top 50% right 0px;
-            background-repeat: no-repeat;
-            opacity: 0.5;
-            margin-left: 9px;
+        //   button.foc-layout-bt {
+        //     float: left;
+        //     height: 32px;
+        //     width: 24px;
+        //     padding: 0;
+        //     margin: 0;
+        //     background-image: cdnUrl("/img/ML/foc_layout_collapse.svg");
+        //     background-size: 14px 14px;
+        //     background-position: top 50% right 0px;
+        //     background-repeat: no-repeat;
+        //     opacity: 0.5;
+        //     margin-left: 9px;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
-            }
+        //     @include dark_mode() {
+        //       background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
+        //     }
 
-            @include mobile() {
-              display: none;
-            }
+        //     @include mobile() {
+        //       display: none;
+        //     }
 
-            &.collapsed {
-              background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
-              background-color: 14px 16px;
+        //     &.collapsed {
+        //       background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
+        //       background-color: 14px 16px;
 
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
-              }
-            }
+        //       @include dark_mode() {
+        //         background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
+        //       }
+        //     }
 
-            @include big_web(){
-              &:hover {
-                opacity: 1;
-              }
-            }
-          }
-        }
+        //     @include big_web(){
+        //       &:hover {
+        //         opacity: 1;
+        //       }
+        //     }
+        //   }
+        // }
       }
     }
   }

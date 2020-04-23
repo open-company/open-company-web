@@ -273,14 +273,14 @@
                         ]]
                     should-show-sort?
                     [:div.board-name-with-icon
-                      [:button.mlb-reset.board-name-with-icon-internal.following-bt
-                        {:class (when is-following "active")
-                         :on-click #(switch-home % :following)}
-                        "Following"]
                       [:button.mlb-reset.board-name-with-icon-internal.all-updates-bt
                         {:class (when is-all-posts "active")
                          :on-click #(switch-home % :all-posts)}
-                        "All updates"]]
+                        "All updates"]
+                      [:button.mlb-reset.board-name-with-icon-internal.following-bt
+                        {:class (when is-following "active")
+                         :on-click #(switch-home % :following)}
+                        "Following"]]
                     current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
@@ -295,7 +295,7 @@
                                                    "All"
 
                                                    is-bookmarks
-                                                   "Bookmarks"
+                                                   "Saved"
 
                                                    is-following
                                                    "Following"
@@ -351,29 +351,30 @@
                         {:on-click #(swap! (::sort-type-expanded s) not)}
                         (if (= sort-type dis/recent-activity-sort)
                           "New activity"
-                          "New posts")]
+                          "New updates")]
                       (when @(::sort-type-expanded s)
                         [:div.sort-type-dropdown
-                          [:button.mlb-reset.sort-type-item
-                            {:class (when (= sort-type dis/recent-activity-sort) "active")
-                             :on-click #(do
-                                          (reset! (::sort-type-expanded s) false)
-                                          (activity-actions/change-sort-type dis/recent-activity-sort))}
-                            "New activity"]
                           [:button.mlb-reset.sort-type-item
                             {:class (when (= sort-type dis/recently-posted-sort) "active")
                              :on-click #(do
                                           (reset! (::sort-type-expanded s) false)
                                           (activity-actions/change-sort-type dis/recently-posted-sort))}
-                            "New posts"]])])
-                  [:button.mlb-reset.foc-layout-bt
-                    {:on-click #(activity-actions/toggle-foc-layout)
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-offset-left "-2px"
-                     :title (if (= foc-layout dis/other-foc-layout) "Expanded view" "Compact view")
-                     :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]]])
+                            "New updates"]
+                          [:button.mlb-reset.sort-type-item
+                            {:class (when (= sort-type dis/recent-activity-sort) "active")
+                             :on-click #(do
+                                          (reset! (::sort-type-expanded s) false)
+                                          (activity-actions/change-sort-type dis/recent-activity-sort))}
+                            "New activity"]])])
+                  ; [:button.mlb-reset.foc-layout-bt
+                  ;   {:on-click #(activity-actions/toggle-foc-layout)
+                  ;    :data-toggle (when-not is-mobile? "tooltip")
+                  ;    :data-placement "top"
+                  ;    :data-container "body"
+                  ;    :data-offset-left "-2px"
+                  ;    :title (if (= foc-layout dis/other-foc-layout) "Expanded view" "Compact view")
+                  ;    :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]
+                  ]])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond

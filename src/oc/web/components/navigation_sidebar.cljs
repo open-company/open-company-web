@@ -219,7 +219,7 @@
              :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
             [:div.bookmarks-icon]
             [:div.bookmarks-label
-              "Bookmarks"]
+              "Saved"]
             (when (pos? (:bookmarks-count org-data))
               [:span.count (:bookmarks-count org-data)])])
         ;; Drafts

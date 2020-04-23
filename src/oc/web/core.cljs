@@ -136,7 +136,7 @@
   (when (= (-> params :query-params :new) "true")
     (swap! dis/app-state assoc :new-slack-user true))
   (when (contains? params :org)
-    (swap! dis/app-state assoc :foc-layout (aa/saved-foc-layout (:org params))))
+    (swap! dis/app-state assoc :foc-layout dis/default-foc-layout)) ;(aa/saved-foc-layout (:org params))))
   (inject-loading))
 
 (defn post-routing []

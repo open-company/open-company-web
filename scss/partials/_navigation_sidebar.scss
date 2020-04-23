@@ -504,12 +504,6 @@ div.left-navigation-sidebar {
         border-radius: 0;
       }
 
-      @include big_web() {
-        &:hover {
-          background-color: var(--navigation-sidebar-hover-bg);
-        }
-      }
-
       button.left-navigation-sidebar-title-arrow {
         position: relative;
         height: 32px;
@@ -621,16 +615,16 @@ div.left-navigation-sidebar {
         display: block;
       }
     }
-  }
 
-  @include big_web() {
-    &:hover div.left-navigation-sidebar-top {
-      button.left-navigation-sidebar-top-title-button {
-        display: block;
-      }
+    @include big_web() {
+      &:hover {
+        .left-navigation-sidebar-top-title {
+          background-color: var(--navigation-sidebar-hover-bg);
+        }
 
-      button.left-navigation-sidebar-top-ellipsis-bt {
-        display: block;
+        button.left-navigation-sidebar-top-title-button, button.left-navigation-sidebar-top-ellipsis-bt {
+          display: block;
+        }
       }
     }
   }

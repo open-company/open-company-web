@@ -87,7 +87,7 @@
                        (= (router/current-board-slug) "all-posts")
                        "All"
                        (= (router/current-board-slug) "bookmarks")
-                       "Bookmarks"
+                       "Saved"
                        (= (router/current-board-slug) "following")
                        "Following"
                        (and (router/current-contributions-id) (seq contributions-user-data))
