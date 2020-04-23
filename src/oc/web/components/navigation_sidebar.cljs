@@ -19,6 +19,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
@@ -136,7 +137,7 @@
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         is-inbox (= selected-slug "inbox")
-        is-all-posts (= selected-slug "all-posts")
+        is-home (#{"all-posts" "following"} selected-slug)
         is-bookmarks (= selected-slug "bookmarks")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
@@ -165,7 +166,11 @@
                                  is-admin-or-author?)
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? user-is-part-of-the-team?
-        follow-boards-list (drv/react s :follow-boards-list)]
+        follow-boards-list (drv/react s :follow-boards-list)
+        last-home (activity-actions/saved-home)
+        home-url (if (= last-home :all-posts)
+                   (oc-urls/all-posts)
+                   (oc-urls/following))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -184,9 +189,9 @@
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-all-posts})
-             :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
+            {:class (utils/class-set {:item-selected is-home})
+             :href home-url
+             :on-click #(nav-actions/nav-to-url! % (name last-home) home-url)}
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -223,7 +228,7 @@
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-inbox)
-                                 (not is-all-posts)
+                                 (not is-home)
                                  (not is-bookmarks)
                                  (= (router/current-board-slug) (:slug drafts-board)))
                         "item-selected")
@@ -315,7 +320,7 @@
             (for [board follow-boards-list
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (and (not is-inbox)
-                                              (not is-all-posts)
+                                              (not is-home)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
                         board-change-data (get change-data (:uuid board))]

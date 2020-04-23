@@ -12,8 +12,8 @@
 (defonce ^{:export true} app-state (atom {:loading false
                           :show-login-overlay false}))
 
-; (def default-sort-type :recent-activity)
-; (def other-sort-type :recently-posted)
+(def recent-activity-sort :recent-activity)
+(def recently-posted-sort :recently-posted)
 
 (def default-foc-layout :expanded)
 (def other-foc-layout :collapsed)
@@ -72,8 +72,13 @@
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
-(defn container-key [org-slug posts-filter]
-   (vec (conj (containers-key org-slug) (keyword posts-filter))))
+(defn container-key
+  ([org-slug posts-filter]
+   (container-key org-slug posts-filter nil))
+  ([org-slug posts-filter sort-type]
+   (if sort-type
+    (vec (conj (containers-key org-slug) (keyword posts-filter) (keyword sort-type)))
+    (vec (conj (containers-key org-slug) (keyword posts-filter))))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -189,10 +194,14 @@
   ;; Rest of containers
   (#{"inbox" "all-posts" "bookmarks" "following"} container-slug))
 
-(defn- get-container-posts [base route posts-data org-slug container-slug posts-key]
+(defn is-container-with-sort? [container-slug]
+  ;; Rest of containers
+  (#{"all-posts" "following"} container-slug))
+
+(defn- get-container-posts [base route posts-data org-slug container-slug sort-type posts-key]
   (let [cnt-key (cond
                   (is-container? container-slug)
-                  (container-key org-slug container-slug)
+                  (container-key org-slug container-slug sort-type)
                   (seq (:contributions route))
                   (contributions-data-key org-slug container-slug)
                   :else
@@ -234,8 +243,9 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
-   :contributions-id      [[:route] (fn [route] (:contributions route))]
+   :contributions-id    [[:route] (fn [route] (:contributions route))]
    :board-slug          [[:route] (fn [route] (:board route))]
+   :sort-type           [[:route] (fn [route] (:sort-type route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
    :loading             [[:base] (fn [base] (:loading base))]
@@ -329,7 +339,7 @@
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
                                    container-slug (or (:contributions route) (:board route))]
-                              (get-container-posts base route posts-data org-slug container-slug :posts-list))))]
+                              (get-container-posts base route posts-data org-slug container-slug (:sort-type route) :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route
@@ -337,7 +347,7 @@
                                           (:board route)))
                              (let [org-slug (:slug org-data)
                                    container-slug (or (:contributions route) (:board route))]
-                              (get-container-posts base route posts-data org-slug container-slug :items-to-render))))]
+                              (get-container-posts base route posts-data org-slug container-slug (:sort-type route) :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -349,8 +359,8 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributions-id]
-                         (fn [base org-slug board-slug contributions-id]
+   :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
+                         (fn [base org-slug board-slug contributions-id sort-type]
                            (when (and org-slug
                                       (or board-slug
                                           contributions-id))
@@ -358,7 +368,7 @@
                                                    (seq contributions-id)
                                                    (contributions-data-key org-slug contributions-id)
                                                    (is-container? board-slug)
-                                                   (container-key org-slug board-slug)
+                                                   (container-key org-slug board-slug sort-type)
                                                    :else
                                                    (board-data-key org-slug board-slug))]
                                (get-in base container-key))))]
@@ -685,24 +695,28 @@
   ([]
     (container-data @app-state))
   ([data]
-    (container-data data (router/current-org-slug) (router/current-posts-filter)))
+    (container-data data (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data org-slug]
-    (container-data data org-slug (router/current-posts-filter)))
+    (container-data data org-slug (router/current-posts-filter) (router/current-sort-type)))
   ([data org-slug posts-filter]
-    (get-in data (container-key org-slug posts-filter))))
+    (container-data data org-slug posts-filter (router/current-sort-type)))
+  ([data org-slug posts-filter sort-type]
+    (get-in data (container-key org-slug posts-filter sort-type))))
 
 (defn filtered-posts-data
   ([]
-    (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter)))
+    (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data]
-    (filtered-posts-data data @router/path (router/current-org-slug) (router/current-posts-filter)))
+    (filtered-posts-data data @router/path (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data route]
-    (filtered-posts-data data route (router/current-org-slug) (router/current-posts-filter)))
+    (filtered-posts-data data route (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data route org-slug]
-    (filtered-posts-data data route org-slug (router/current-posts-filter)))
+    (filtered-posts-data data route org-slug (router/current-posts-filter) (router/current-sort-type)))
   ([data route org-slug posts-filter]
+    (filtered-posts-data data route org-slug posts-filter (router/current-sort-type)))
+  ([data route org-slug posts-filter sort-type]
     (let [posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data route posts-data org-slug posts-filter :posts-list)))
+     (get-container-posts data route posts-data org-slug posts-filter sort-type :posts-list)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -719,14 +733,16 @@
   ([]
     (items-to-render-data @app-state))
   ([data]
-    (items-to-render-data data @router/path (router/current-org-slug) (router/current-posts-filter)))
+    (items-to-render-data data @router/path (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data route]
-    (items-to-render-data data route (router/current-org-slug) (router/current-posts-filter)))
+    (items-to-render-data data route (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data route org-slug]
-    (items-to-render-data data route org-slug (router/current-posts-filter)))
+    (items-to-render-data data route org-slug (router/current-posts-filter) (router/current-sort-type)))
   ([data route org-slug posts-filter]
+    (items-to-render-data data route org-slug (router/current-posts-filter) (router/current-sort-type)))
+  ([data route org-slug posts-filter sort-type]
     (let [posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data route posts-data org-slug posts-filter :items-to-render)))
+     (get-container-posts data route posts-data org-slug posts-filter sort-type :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))

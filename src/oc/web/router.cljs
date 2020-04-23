@@ -13,10 +13,11 @@
 
 (defn set-route! [route parts]
   (timbre/info "set-route!" route parts)
-  ;; Keep the ap-redirect-done flag
-  (reset! path {:ap-redirect-done (:ap-redirect-done @path)})
-  (swap! path assoc :route route)
-  (doseq [[k v] parts] (swap! path assoc k v)))
+  ;; Switch the path all together to avoid middle renders btw route changes
+  ;; but keep the ap-redirect-done flag
+  (reset! path (merge {:ap-redirect-done (:ap-redirect-done @path)
+                       :route route}
+                       parts)))
 
 (defn get-token []
   (when (or (not js/window.location.pathname)
@@ -119,6 +120,9 @@
 (defn current-posts-filter []
   (:board @path))
 
+(defn current-sort-type []
+  (:sort-type @path))
+
 (defn current-activity-id []
   (:activity @path))
 
@@ -162,6 +166,16 @@
   "Cookie to save the last board slug used in a post creation"
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
+
+(defn last-home-cookie
+  "Cookie to save the last selection in home: Following or All updates"
+  [org-slug]
+  (str "last-used-home-slug-" (jwt/user-id) "-" (name org-slug)))
+
+(defn last-sort-cookie
+  "Cookie to save the last sort selected"
+  [org-slug]
+  (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
 
 (defn last-foc-layout-cookie
   "Cookie to save the last FOC layout used"

@@ -90,36 +90,39 @@
 
 ;; All Posts
 
-(defn- all-posts-get-finish [{:keys [body success]}]
+(defn- all-posts-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          posts-data-key (dis/posts-data-key org)
+          posts-data-key (dis/posts-data-key org-slug)
           all-posts-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "all-posts")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365))
+        (cook/set-cookie! (router/last-board-cookie org-slug) "all-posts" (* 60 60 24 365))
         (request-reads-count (->> all-posts-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection all-posts-data))))
-      (dis/dispatch! [:all-posts-get/finish org all-posts-data]))))
+      (dis/dispatch! [:all-posts-get/finish org-slug sort-type all-posts-data]))))
 
-(defn- activity-real-get [activity-link org-slug finish-cb]
+(defn- activity-real-get [activity-link org-slug sort-type finish-cb]
   (api/get-all-posts activity-link
    (fn [resp]
-     (all-posts-get-finish resp)
+     (all-posts-get-finish org-slug sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn all-posts-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "entries" "GET")]
-    (activity-real-get activity-link (:slug org-data) finish-cb)))
+    (activity-real-get activity-link (:slug org-data) dis/recently-posted-sort finish-cb)))
 
-(defn- all-posts-more-finish [direction {:keys [success body]}]
+(defn recent-all-posts-get [org-data & [finish-cb]]
+  (when-let [activity-link (utils/link-for (:links org-data) "activity" "GET")]
+    (activity-real-get activity-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+
+(defn- all-posts-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
-  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:all-posts-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
-  (api/load-more-items more-link direction (partial all-posts-more-finish direction))
+  (api/load-more-items more-link direction (partial all-posts-more-finish (router/current-org-slug) (router/current-sort-type) direction))
   (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
 
 ;; Inbox
@@ -155,37 +158,40 @@
 
 ;; Following stream
 
-(defn- following-get-finish [{:keys [body success]}]
+(defn- following-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          posts-data-key (dis/posts-data-key org)
+          posts-data-key (dis/posts-data-key org-slug)
           following-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "following")
-        (cook/set-cookie! (router/last-board-cookie org) "following" (* 60 60 24 365))
+        (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
         (request-reads-count (->> following-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection following-data))))
-      (dis/dispatch! [:following-get/finish org following-data]))))
+      (dis/dispatch! [:following-get/finish org-slug sort-type following-data]))))
 
-(defn- following-real-get [following-link org-slug finish-cb]
+(defn- following-real-get [following-link org-slug sort-type finish-cb]
   (api/get-all-posts following-link
    (fn [resp]
-     (following-get-finish resp)
+     (following-get-finish org-slug sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn following-get [org-data & [finish-cb]]
   (when-let [following-link (utils/link-for (:links org-data) "following")]
-    (following-real-get following-link (:slug org-data) finish-cb)))
+    (following-real-get following-link (:slug org-data) dis/recently-posted-sort finish-cb)))
 
-(defn- following-more-finish [direction {:keys [success body]}]
+(defn recent-following-get [org-data & [finish-cb]]
+  (when-let [recent-following-link (utils/link-for (:links org-data) "recent-following")]
+    (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+
+(defn- following-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
-  (dis/dispatch! [:following-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:following-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn following-more [more-link direction]
-  (api/load-more-items more-link direction (partial following-more-finish direction))
-  (dis/dispatch! [:following-more (router/current-org-slug)]))
+  (api/load-more-items more-link direction (partial following-more-finish (router/current-org-slug) (router/current-sort-type) direction))
+  (dis/dispatch! [:following-more (router/current-org-slug) (router/current-sort-type)]))
 
 ;; Referesh org when needed
 (defn- refresh-org-data-cb [{:keys [status body success]}]
@@ -869,6 +875,29 @@
       (let [new-activity-data (if success (json->cljs body) {})]
         (activity-get-finish status new-activity-data nil))))))
 
+;; Sort type handling
+
+(defn saved-sort-type [org-slug board-slug]
+  (let [sort-type-cookie (cook/get-cookie (router/last-sort-cookie org-slug))]
+    (if (and (dis/is-container-with-sort? board-slug)
+             (string? sort-type-cookie))
+      (keyword sort-type-cookie)
+      dis/recently-posted-sort)))
+
+(defn change-sort-type [type]
+  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
+  (swap! router/path merge {:sort-type type}))
+
+;; Home switching
+
+(defn saved-home []
+  (if-let [last-home (cook/get-cookie (router/last-home-cookie (router/current-org-slug)))]
+    (keyword last-home)
+    :all-posts))
+
+(defn switch-home [slug]
+  (cook/set-cookie! (router/last-home-cookie (router/current-org-slug)) (name slug) cook/default-cookie-expire))
+
 ;; Refresh data
 
 (defn refresh-board-data [to-slug]
@@ -889,14 +918,24 @@
         (= to-slug "inbox")
         (inbox-get org-data)
 
-        (= to-slug "all-posts")
+        (and (= to-slug "all-posts")
+             (= (router/current-sort-type) dis/recently-posted-sort))
         (all-posts-get org-data)
+
+        (and (= to-slug "all-posts")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (recent-all-posts-get org-data)
 
         (= to-slug "bookmarks")
         (bookmarks-get org-data)
 
-        (= to-slug "following")
+        (and (= to-slug "following")
+             (= (router/current-sort-type) dis/recently-posted-sort))
         (following-get org-data)
+
+        (and (= to-slug "following")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (recent-following-get org-data)
 
         (and (not board-data)
              is-contributions?)

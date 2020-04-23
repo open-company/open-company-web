@@ -172,10 +172,21 @@
                         billing-checkout-map)]
     (swap! dis/app-state merge next-app-state)))
 
+(defn- read-sort-type-from-cookie
+  "Read the sort order from the cookie, fallback to the default,
+   if it's on drafts board force the recently posted sort since that has only that"
+  [params]
+  (let [last-sort-type (aa/saved-sort-type (:org params) (:board params))]
+    (if (and (#{"following" "all-posts"} (:board params))
+             (= last-sort-type dis/recently-posted-sort))
+      dis/recent-activity-sort
+      dis/recently-posted-sort)))
+
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (:board params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route urls/default-board-slug)
@@ -193,7 +204,7 @@
       (do
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -218,6 +229,7 @@
 (defn board-handler [route target component params]
   (let [org (:org params)
         board (:board params)
+        sort-type (read-sort-type-from-cookie params)
         entry (:entry params)
         comment (:comment params)
         query-params (:query-params params)
@@ -231,6 +243,7 @@
        [org board (when entry entry) (when comment comment) route]))
      {:org org
       :board board
+      :sort-type sort-type
       :activity entry
       :comment comment
       :query-params query-params})
@@ -242,6 +255,7 @@
 ;; Component specific to a contributions
 (defn contributions-handler [route target component params]
   (let [org (:org params)
+        sort-type (read-sort-type-from-cookie params)
         contributions (:contributions params)
         query-params (:query-params params)]
     (pre-routing params true {:query-params query-params})
@@ -250,6 +264,7 @@
      [org contributions route]
      {:org org
       :contributions contributions
+      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -318,7 +333,7 @@
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
       ;; In case user is logged in and has a last org cookie
-      
+
       (let [last-org-cookie (cook/get-cookie (router/last-org-cookie))]
         (if (and (jwt/jwt)
                    (seq last-org-cookie))

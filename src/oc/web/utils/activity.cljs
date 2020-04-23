@@ -14,13 +14,25 @@
 
 ;; Posts separators
 
-(defn show-separators? [container-slug-or-href]
-  (and container-slug-or-href
-       (not (responsive/is-mobile-size?))
-       (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks" "following"} (name container-slug-or-href))
-                (and (string? container-slug-or-href)
-                     (or (.match container-slug-or-href #"(?i)/(inbox|bookmarks|following)(/|$)")
-                         (.match container-slug-or-href #"(?i)/u/(\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4}(/|$)")))))))
+(defn show-separators?
+
+  ([container-slug-or-href] (show-separators? container-slug-or-href (router/current-sort-type)))
+
+  ([container-slug-or-href sort-type]
+   (and ;; only on board/containers/contributions pages
+        container-slug-or-href
+        ;; never on mobile
+        (not (responsive/is-mobile-size?))
+        ;; on All posts and Following only on NOT recent activity sort
+        (or (and (not= sort-type dis/recent-activity-sort)
+                 (#{"all-posts" "following"} (name container-slug-or-href)))
+            (and (string? container-slug-or-href)
+                 (not (.match container-slug-or-href #"(?i)/(entries|following)/?\?.*sort=activity"))))
+        ;; Never on inbox and bookmarks
+        (not (or (#{"inbox" "bookmarks" utils/default-drafts-board-slug} (name container-slug-or-href))
+                 (and (string? container-slug-or-href)
+                      (or (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)")
+                          (.match container-slug-or-href #"(?i)/u/(\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4}(/|$)"))))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -404,15 +416,15 @@
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
-   (fix-container container-data {} (dis/org-data)))
+   (fix-container container-data {} (dis/org-data) (dis/active-users) nil))
 
   ([container-data change-data]
-   (fix-container container-data change-data (dis/org-data) (dis/active-users)))
+   (fix-container container-data change-data (dis/org-data) (dis/active-users) nil))
 
   ([container-data change-data org-data]
-   (fix-container container-data change-data org-data (dis/active-users)))
+   (fix-container container-data change-data org-data (dis/active-users) nil))
 
-  ([container-data change-data org-data active-users & [direction]]
+  ([container-data change-data org-data active-users sort-type & [ direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
@@ -453,7 +465,7 @@
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)
-          with-posts-separators (if (show-separators? (:href container-data))
+          with-posts-separators (if (show-separators? (:href container-data) sort-type)
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))

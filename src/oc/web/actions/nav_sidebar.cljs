@@ -55,6 +55,7 @@
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (router/current-org-slug)
+         sort-type (activity-actions/saved-sort-type org-slug author-uuid)
          org-data (dis/org-data)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
@@ -64,9 +65,10 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug author-uuid "dashboard"]
+         (router/set-route! [org-slug author-uuid sort-type "dashboard"]
           {:org org-slug
            :contributions author-uuid
+           :sort-type sort-type
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
@@ -94,14 +96,24 @@
         (= board-slug "inbox")
         (activity-actions/inbox-get org-data)
 
-        (= board-slug "all-posts")
+        (and (= board-slug "all-posts")
+             (= (router/current-sort-type) dis/recently-posted-sort))
         (activity-actions/all-posts-get org-data)
+
+        (and (= board-slug "all-posts")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (activity-actions/recent-all-posts-get org-data)
 
         (= board-slug "bookmarks")
         (activity-actions/bookmarks-get org-data)
 
-        (= board-slug "following")
+        (and (= board-slug "following")
+             (= (router/current-sort-type) dis/recently-posted-sort))
         (activity-actions/following-get org-data)
+
+        (and (= board-slug "following")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (activity-actions/recent-following-get org-data)
 
         :default
         (let [fixed-board-data (or board-data
@@ -122,8 +134,9 @@
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          org-slug (router/current-org-slug)
+         sort-type (activity-actions/saved-sort-type org-slug board-slug)
+         is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          is-container? (dis/is-container? board-slug)
          org-data (dis/org-data)]
      (if (= current-path url)
@@ -134,12 +147,14 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if is-container? "dashboard" board-slug)]
+         (router/set-route! [org-slug board-slug (if is-container? "dashboard" board-slug) sort-type]
           {:org org-slug
            :board board-slug
+           :sort-type sort-type
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (dis/dispatch! [:force-list-update])
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          ;; Let's change the QP section if it's not active and going to an editable section
          (when (and (not is-container?)
@@ -182,6 +197,7 @@
   (let [org (router/current-org-slug)
         previous-slug (or (router/current-board-slug) (router/current-contributions-id))
         board (:board-slug activity-data)
+        sort-type (activity-actions/saved-sort-type org board)
         back-to (cond
                   (and (seq (router/current-board-slug))
                        (not= (router/current-board-slug) utils/default-drafts-board-slug))
@@ -193,10 +209,11 @@
         activity (:uuid activity-data)
         post-url (oc-urls/entry board activity)
         query-params (router/query-params)
-        route [org board activity "activity"]
+        route [org board sort-type activity "activity"]
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
     (router/set-route! route {:org org
                               :board board
+                              :sort-type sort-type
                               :activity activity
                               :query-params query-params
                               :back-to back-to

@@ -7,7 +7,7 @@
             [oc.web.utils.notification :as notif-utils]
             [cljsjs.moment-timezone]))
 
-(def default-user-image "/img/ML/happy_face_red.svg")
+(def default-user-image "/img/ML/happy_face_purple.svg")
 (def other-user-images
  ["/img/ML/happy_face_green.svg"
   "/img/ML/happy_face_blue.svg"

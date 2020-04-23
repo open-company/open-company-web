@@ -38,6 +38,13 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
+(defn- switch-home [e slug]
+  (let [url (if (= slug :following)
+              (oc-urls/following)
+              (oc-urls/all-posts))]
+    (activity-actions/switch-home slug)
+    (nav-actions/nav-to-url! e (name slug) url)))
+
 (rum/defcs dashboard-layout < rum/static
                               rum/reactive
                               ;; Derivative
@@ -61,8 +68,14 @@
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
                               (drv/drv search/search-active?)
+                              ;; Locals
+                              (rum/local false ::sort-type-expanded)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
+                              (ui-mixins/on-window-click-mixin (fn [s e]
+                                (when (and @(::sort-type-expanded s)
+                                           (not (utils/event-inside? e (rum/ref-node s :sort-type-dropdown))))
+                                  (reset! (::sort-type-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -141,7 +154,10 @@
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         search-active? (drv/react s search/search-active?)
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        sort-type (router/current-sort-type)
+        should-show-sort? (or is-all-posts
+                              is-following)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -255,6 +271,16 @@
                         ; (when (pos? (:total-count contributions-data))
                         ;   [:span.count (:total-count contributions-data)])
                         ]]
+                    should-show-sort?
+                    [:div.board-name-with-icon
+                      [:button.mlb-reset.board-name-with-icon-internal.following-bt
+                        {:class (when is-following "active")
+                         :on-click #(switch-home % :following)}
+                        "Following"]
+                      [:button.mlb-reset.board-name-with-icon-internal.all-updates-bt
+                        {:class (when is-all-posts "active")
+                         :on-click #(switch-home % :all-posts)}
+                        "All updates"]]
                     current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
@@ -317,6 +343,29 @@
                   (when (and (not is-drafts-board)
                              is-mobile?)
                     (search-box))
+                  (when should-show-sort?
+                    [:div.sort-type-dropdown-container
+                      {:ref :sort-type-dropdown
+                       :class (when @(::sort-type-expanded s) "expanded")}
+                      [:button.mlb-reset.sort-type-dropdown
+                        {:on-click #(swap! (::sort-type-expanded s) not)}
+                        (if (= sort-type dis/recent-activity-sort)
+                          "Recent activity"
+                          "Recently posted")]
+                      (when @(::sort-type-expanded s)
+                        [:div.sort-type-dropdown
+                          [:button.mlb-reset.sort-type-item
+                            {:class (when (= sort-type dis/recent-activity-sort) "active")
+                             :on-click #(do
+                                          (reset! (::sort-type-expanded s) false)
+                                          (activity-actions/change-sort-type dis/recent-activity-sort))}
+                            "Recent activity"]
+                          [:button.mlb-reset.sort-type-item
+                            {:class (when (= sort-type dis/recently-posted-sort) "active")
+                             :on-click #(do
+                                          (reset! (::sort-type-expanded s) false)
+                                          (activity-actions/change-sort-type dis/recently-posted-sort))}
+                            "Recently posted"]])])
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")

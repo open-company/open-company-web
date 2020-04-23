@@ -75,6 +75,8 @@
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "bookmarks")
         (activity-actions/bookmarks-more @(::has-next s) :down)
+        (= (router/current-board-slug) "following")
+        (activity-actions/following-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
@@ -165,7 +167,7 @@
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
                                 (drv/drv :force-list-update)
-                               {:did-remount (fn [o s]
+                               {:did-update (fn [s]
                                  (when-let [force-list-update @(drv/get-ref s :force-list-update)]
                                    (when (not= @(::last-force-list-update s) force-list-update)
                                      (reset! (::last-force-list-update s) force-list-update)
