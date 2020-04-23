@@ -54,7 +54,7 @@
   (vec (conj (org-key org-slug) :posts)))
 
 (defn board-key [org-slug board-slug]
-  (vec (conj (boards-key org-slug) (keyword board-slug))))
+  (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort])))
 
 (defn board-data-key [org-slug board-slug]
   (conj (board-key org-slug board-slug) :board-data))
@@ -74,7 +74,7 @@
 
 (defn container-key
   ([org-slug posts-filter]
-   (container-key org-slug posts-filter nil))
+   (container-key org-slug posts-filter recently-posted-sort))
   ([org-slug posts-filter sort-type]
    (if sort-type
     (vec (conj (containers-key org-slug) (keyword posts-filter) (keyword sort-type)))
@@ -955,7 +955,7 @@
 
 (defn print-container-data []
   (if (is-container? (router/current-board-slug))
-    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))
+    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
     (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-data []

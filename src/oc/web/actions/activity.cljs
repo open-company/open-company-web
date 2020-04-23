@@ -56,37 +56,35 @@
 
 ;; bookmarks stream
 
-(defn- bookmarks-get-finish [{:keys [body success]}]
+(defn- bookmarks-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          posts-data-key (dis/posts-data-key org)
+    (let [posts-data-key (dis/posts-data-key org-slug)
           bookmarks-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "bookmarks")
-        (cook/set-cookie! (router/last-board-cookie org) "bookmarks" (* 60 60 24 365))
+        (cook/set-cookie! (router/last-board-cookie org-slug) "bookmarks" (* 60 60 24 365))
         (request-reads-count (->> bookmarks-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection bookmarks-data))))
-      (dis/dispatch! [:bookmarks-get/finish org bookmarks-data]))))
+      (dis/dispatch! [:bookmarks-get/finish org-slug sort-type bookmarks-data]))))
 
-(defn- bookmarks-real-get [bookmarks-link org-slug finish-cb]
+(defn- bookmarks-real-get [bookmarks-link org-slug sort-type finish-cb]
   (api/get-all-posts bookmarks-link
    (fn [resp]
-     (bookmarks-get-finish resp)
+     (bookmarks-get-finish org-slug sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn bookmarks-get [org-data & [finish-cb]]
   (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
-    (bookmarks-real-get bookmarks-link (:slug org-data) finish-cb)))
+    (bookmarks-real-get bookmarks-link (:slug org-data) dis/recently-posted-sort finish-cb)))
 
-(defn- bookmarks-more-finish [direction {:keys [success body]}]
+(defn- bookmarks-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
-  (dis/dispatch! [:bookmarks-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:bookmarks-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn bookmarks-more [more-link direction]
-  (api/load-more-items more-link direction (partial bookmarks-more-finish direction))
-  (dis/dispatch! [:bookmarks-more (router/current-org-slug)]))
+  (api/load-more-items more-link direction (partial bookmarks-more-finish (router/current-org-slug) dis/recently-posted-sort direction))
+  (dis/dispatch! [:bookmarks-more (router/current-org-slug) dis/recently-posted-sort]))
 
 ;; All Posts
 
@@ -127,34 +125,32 @@
 
 ;; Inbox
 
-(defn- inbox-get-finish [{:keys [body success]}]
+(defn- inbox-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          posts-data-key (dis/posts-data-key org)
+    (let [posts-data-key (dis/posts-data-key org-slug)
           inbox-data (when success (json->cljs body))]
       (when (= (router/current-board-slug) "inbox")
-        (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
+        (cook/set-cookie! (router/last-board-cookie org-slug) "inbox" (* 60 60 24 365))
         (request-reads-count (->> inbox-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection inbox-data))))
-      (dis/dispatch! [:inbox-get/finish org inbox-data]))))
+      (dis/dispatch! [:inbox-get/finish org-slug sort-type inbox-data]))))
 
 (defn inbox-get [org-data & [finish-cb]]
   (when-let [inbox-link (utils/link-for (:links org-data) "following-inbox")]
     (api/get-all-posts inbox-link
      (fn [resp]
-       (inbox-get-finish resp)
+       (inbox-get-finish (:slug org-data) dis/recently-posted-sort resp)
        (when (fn? finish-cb)
          (finish-cb resp))))))
 
-(defn- inbox-more-finish [direction {:keys [success body]}]
+(defn- inbox-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
-  (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:inbox-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn inbox-more [more-link direction]
-  (api/load-more-items more-link direction (partial inbox-more-finish direction))
-  (dis/dispatch! [:inbox-more (router/current-org-slug)]))
+  (api/load-more-items more-link direction (partial inbox-more-finish (router/current-org-slug) dis/recently-posted-sort direction))
+  (dis/dispatch! [:inbox-more (router/current-org-slug) dis/recently-posted-sort]))
 
 ;; Following stream
 

@@ -465,7 +465,7 @@
 ;; Bookmarks
 
 (defmethod dispatcher/action :bookmarks-get/finish
-  [db [_ org-slug bookmarks-data]]
+  [db [_ org-slug sort-type bookmarks-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -481,7 +481,7 @@
       (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data))))))
 
 (defmethod dispatcher/action :bookmarks-more
-  [db [_ org-slug]]
+  [db [_ org-slug sort-type]]
   (let [container-key (dispatcher/container-key org-slug :bookmarks)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)
@@ -491,7 +491,7 @@
      (update-in bookmarks-count-key #(ou/disappearing-count-value % (:total-count next-posts-data))))))
 
 (defmethod dispatcher/action :bookmarks-more/finish
-  [db [_ org direction posts-data]]
+  [db [_ org sort-type direction posts-data]]
   (if posts-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
@@ -668,40 +668,40 @@
 ;; Inbox
 
 (defmethod dispatcher/action :inbox-get/finish
-  [db [_ org-slug inbox-data]]
+  [db [_ org-slug sort-type inbox-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
-        fixed-inbox-data (au/fix-container (:collection inbox-data) change-data org-data active-users dispatcher/recently-posted-sort)
+        fixed-inbox-data (au/fix-container (:collection inbox-data) change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-inbox-data))
-        container-key (dispatcher/container-key org-slug :inbox)]
+        container-key (dispatcher/container-key org-slug :inbox sort-type)]
     (-> db
       (assoc-in container-key fixed-inbox-data)
       (assoc-in posts-key merged-items)
       (assoc-in (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data)))))
 
 (defmethod dispatcher/action :inbox-more
-  [db [_ org-slug]]
-  (let [container-key (dispatcher/container-key org-slug :inbox)
+  [db [_ org-slug sort-type]]
+  (let [container-key (dispatcher/container-key org-slug :inbox sort-type)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-posts-data)))
 
 (defmethod dispatcher/action :inbox-more/finish
-  [db [_ org direction posts-data]]
+  [db [_ org sort-type direction posts-data]]
   (if posts-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
-          container-key (dispatcher/container-key org :inbox)
+          container-key (dispatcher/container-key org :inbox sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
                                                               :old-links (:links container-data)})
-          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) dispatcher/recently-posted-sort direction)
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
