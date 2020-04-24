@@ -14,6 +14,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
@@ -812,7 +813,8 @@
                  :title (if unpublished?
                           "Save & Close"
                           "Close")}]])
-          (when-not is-fullscreen?
+          (when (and (not ls/wut?)
+                     (not is-fullscreen?))
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
                 {:on-click #(cmail-actions/cmail-toggle-fullscreen)

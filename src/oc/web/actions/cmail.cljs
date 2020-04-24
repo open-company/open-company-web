@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.json :refer (json->cljs)]))
@@ -101,8 +102,12 @@
   (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug entry-data) "/" (:uuid entry-data)) true) (* 60 60 24 365)))
 
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:fullscreen (if (contains? cmail-state :fullscreen)
+  (let [cmail-default-state {:fullscreen (cond
+                                           ls/wut?
+                                           false
+                                           (contains? cmail-state :fullscreen)
                                            (:fullscrreen cmail-state)
+                                           :else
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
@@ -156,7 +161,7 @@
                   (:collapsed (:cmail-state @dis/app-state)))
           (let [cmail-state {:auto true
                              ;; reopen fullscreen on desktop, mobile doesn't use it
-                             :fullscreen (not (responsive/is-mobile-size?))
+                             :fullscreen false ;(not (responsive/is-mobile-size?))
                              :collapsed false
                              :key (utils/activity-uuid)}]
             (if (and (contains? (router/query-params) :new)
