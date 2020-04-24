@@ -96,3 +96,6 @@
 
 ;; Polls
 (def poll-can-add-reply false)
+
+;; Wut
+(def wut? true)
