@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
@@ -183,7 +184,8 @@
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
           ;; Load inbox data
-          (when inbox-link
+          (when (and ls/wut?
+                     inbox-link)
             (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data with recently posted sort
           (when all-posts-link

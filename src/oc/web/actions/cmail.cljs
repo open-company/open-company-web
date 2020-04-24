@@ -102,13 +102,7 @@
   (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug entry-data) "/" (:uuid entry-data)) true) (* 60 60 24 365)))
 
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:fullscreen (cond
-                                           ls/wut?
-                                           false
-                                           (contains? cmail-state :fullscreen)
-                                           (:fullscrreen cmail-state)
-                                           :else
-                                           (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
+  (let [cmail-default-state {:fullscreen false}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
     (when (:fullscreen fixed-cmail-state)
