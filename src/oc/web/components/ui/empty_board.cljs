@@ -48,11 +48,11 @@
            is-bookmarks? "You don't have any bookmarks"
            is-following?
            [:div.empty-follow
-             "Add teammates and boards you'd like to follow"
+             "Add teammates and teams you'd like to follow"
              [:button.mlb-reset.follow-users-bt
                {:on-click #(nav-actions/show-follow-user-picker)}
                "Follow teammates"]
              [:button.mlb-reset.follow-boards-bt
                {:on-click #(nav-actions/show-follow-board-picker)}
-               "Follow boards"]]
-           :else "This section is empty")]]]))
+               "Follow teams"]]
+           :else "This team has no updates")]]]))

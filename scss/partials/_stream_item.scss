@@ -620,10 +620,10 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body-preview(16, 20, var(--color), 2);
+        @include activity-body-preview(16, 22, var(--color), 2);
 
         @include mobile() {
-          @include activity-body-preview(16, 20, var(--color), 2);
+          @include activity-body-preview(16, 22, var(--color), 2);
         }
       }
     }

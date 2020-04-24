@@ -402,6 +402,8 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
+                      (and (not (:uuid cmail-data))
+                           (:has-changes cmail-data))
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -451,7 +453,7 @@
                    (fn [e]
                       (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
-                      (utils/after 100
+                      (utils/after 280
                        #(when-let [headline-el (rum/ref-node s "headline")]
                           (.focus headline-el)))))}
       (when (and show-paywall-alert?
@@ -551,6 +553,9 @@
                                     (utils/event-stop e)
                                     (utils/to-end-of-content-editable (body-element)))))
                  :dangerouslySetInnerHTML @(::initial-headline s)}]]
+            (when-not is-mobile?
+              [:div.cmail-content-collapsed-placeholder
+                utils/default-body-placeholder])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :media-picker-initially-visible false
@@ -560,7 +565,7 @@
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
-                               :placeholder utils/default-body-placeholder
+                               :placeholder (str "•  " utils/default-body-placeholder)
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]

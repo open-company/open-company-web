@@ -263,7 +263,7 @@
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
+           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :body (:body entry-map)})])
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (if-not success
