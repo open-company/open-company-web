@@ -333,8 +333,10 @@ div.left-navigation-sidebar {
     outline: none;
     padding-left: 16px;
 
-    &.top-margin {
+    &.top-border {
       margin-top: 16px;
+      border-top: 1px solid var(--divider-line);
+      padding-top: 16px;
 
       @include mobile() {
         margin-top: 16px;
@@ -485,8 +487,10 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-top {
 
-    &.top-margin {
+    &.top-border {
       margin-top: 16px;
+      border-top: 1px solid var(--opac-background-color-08);
+      padding-top: 16px;
     }
 
     .left-navigation-sidebar-top-title {

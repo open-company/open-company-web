@@ -242,7 +242,7 @@
               (when (pos? draft-count)
                 [:span.count draft-count])]))
         (when show-users-list?
-          [:div.left-navigation-sidebar-top.top-margin.group
+          [:div.left-navigation-sidebar-top.top-border.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-title-arrow
@@ -288,7 +288,7 @@
                     (:short-name user)]]])])
         ;; Boards list
         (when show-boards
-          [:div.left-navigation-sidebar-top.top-margin.group
+          [:div.left-navigation-sidebar-top.top-border.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-title-arrow
