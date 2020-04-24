@@ -143,17 +143,15 @@
 
 ;; Default url
 
-(def default-board-slug "inbox")
+(def default-url-fn following)
+(def default-board-slug "following")
 
 (defn default-landing
   ([] (default-landing (router/current-org-slug)))
   ([org-slug]
-   (case default-board-slug
-    "inbox"
-    (inbox org-slug)
-    "all-posts"
-    (all-posts org-slug)
-    (board org-slug default-board-slug))))
+   (if (fn? default-url-fn)
+    (default-url-fn org-slug)
+    (all-posts org-slug))))
 
 ;; First ever landing
 

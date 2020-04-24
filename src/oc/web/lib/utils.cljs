@@ -614,9 +614,12 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Add a title")
+(defn default-headline [team-name]
+  (if (seq team-name)
+    (str team-name " team update")
+    "Team update"))
 
-(def default-body-placeholder "What's happening")
+(def default-body-placeholder "What's happening on your team?")
 
 (def default-abstract "Quick summary (optional)")
 

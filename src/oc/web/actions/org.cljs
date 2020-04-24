@@ -111,14 +111,14 @@
 
 (defn- redirect-to-ap? [org-data]
   (when-not (router/ap-redirect)
-    (let [inbox-count (int (:following-inbox-count org-data))
-          is-inbox? (= (router/current-board-slug) "inbox")]
-      (when (and is-inbox?
-                 (zero? inbox-count)
+    (let [following-count (int (:following-count org-data))
+          is-following? (= (router/current-board-slug) "following")]
+      (when (and is-following?
+                 (zero? following-count)
                  (not (router/current-activity-id))
                  (not (router/current-secure-activity-id))
                  (not (router/ap-redirect)))
-        (timbre/info "Redirect to all-posts for empty inbox:" (:following-inbox-count org-data))
+        (timbre/info "Redirect to all-posts for empty following:" (:following-count org-data))
         (router/set-route! [(:slug org-data) "all-posts" "dashboard"]
          {:org (:slug org-data)
           :board "all-posts"

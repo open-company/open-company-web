@@ -87,6 +87,12 @@
   (send! chsk-send! [:follow/list {:user-id @current-uid
                                    :org-slug @current-org}]))
 
+;; Followers count
+
+(defn followers-count []
+  (timbre/debug "Sending followers-count for org-slug:" @current-org)
+  (send! chsk-send! [:followers/count {:org-slug @current-org}]))
+
 ;; Publishers follow
 
 (defn publisher-watch []
