@@ -23,6 +23,7 @@ $dark_mode: "dark";
   --highlighter-bg-color: #FEDF95;
 
   --opac-background-color-05: #{rgba($deep_navy, 0.05)};
+  --opac-background-color-08: #{rgba($deep_navy, 0.08)};
   --opac-background-color-1: #{rgba($deep_navy, 0.1)};
   --opac-background-color-15: #{rgba($deep_navy, 0.15)};
   --opac-background-color-2: #{rgba($deep_navy, 0.2)};
@@ -106,6 +107,9 @@ $dark_mode: "dark";
   // User info hover
   --user-info-view-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
 
+  // Wut
+  --modal-shadow: rgba(0, 0, 0, 0.07);
+
   html, body {
     scrollbar-color: light;
   }
@@ -125,6 +129,7 @@ $dark_mode: "dark";
   --highlighter-bg-color: #FEDF95;
 
   --opac-background-color-05: #{rgba(white, 0.05)};
+  --opac-background-color-08: #{rgba(white, 0.08)};
   --opac-background-color-1: #{rgba(white, 0.1)};
   --opac-background-color-15: #{rgba(white, 0.15)};
   --opac-background-color-2: #{rgba(white, 0.2)};
@@ -207,6 +212,9 @@ $dark_mode: "dark";
 
   // User info hover
   --user-info-view-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
+
+  // Wut
+  --modal-shadow: rgba(0, 0, 0, 0.16);
 
   &, body {
     scrollbar-color: dark;

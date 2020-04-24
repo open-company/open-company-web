@@ -78,9 +78,6 @@
           [:h3.follow-user-picker-title
             "People"]]
         [:div.follow-user-picker-body
-          
-          [:div.follow-user-picker-subtitle
-            "Select someone to follow their posts and comments more easily."]
           (if (zero? (count all-authors))
             [:div.follow-user-picker-empty-users
               [:div.follow-user-picker-empty-icon]
@@ -114,12 +111,12 @@
                         (when (seq (:role u))
                           [:span.user-role
                             (:role u)])]
-                      [:button.mlb-reset.follow-bt
+                      [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-publisher (:user-id u))
-                         :class (when (:follow u) "unfollow")}
-                        (if (:follow u)
-                          "Unfollow"
-                          "Follow")]]))
+                         :data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :title "Unfollow"}
+                        "Following"]]))
                 ;; Unfollowing
                 (when (seq unfollowing-users)
                   [:div.follow-user-picker-row-header
@@ -137,8 +134,5 @@
                           [:span.user-role
                             (:role u)])]
                       [:button.mlb-reset.follow-bt
-                        {:on-click #(user-actions/toggle-publisher (:user-id u))
-                         :class (when (:follow u) "unfollow")}
-                        (if (:follow u)
-                          "Unfollow"
-                          "Follow")]]))]])]]]))
+                        {:on-click #(user-actions/toggle-publisher (:user-id u))}
+                        "Follow"]]))]])]]]))

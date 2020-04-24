@@ -26,6 +26,13 @@ button.modal-close-bt {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 32px 32px;
+
+  @include wut() {
+    background-color: var(--opac-background-color-08);
+    background-image: cdnUrl("/img/ML/close_x.svg");
+    background-size: 12px 12px;
+    border-radius: 4px;
+  }
 }
 
 @include dark_mode() {

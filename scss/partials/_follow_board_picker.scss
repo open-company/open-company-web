@@ -21,12 +21,12 @@ div.follow-board-picker {
   }
 
   div.follow-board-picker-modal {
-    width: #{$board_container_width}px;
+    width: #{$modal_width}px;
     background-color: var(--overlay-background-color);
     margin: 40px auto 32px;
     padding: 0;
     transition: right 180ms ease-in;
-    border-radius: 4px;
+    border-radius: 8px;
     position: relative;
 
     @include mobile() {
@@ -50,8 +50,9 @@ div.follow-board-picker {
 
     button.modal-close-bt {
       position: absolute;
-      right: -48px;
+      left: 16px;
       top: 12px;
+      background-color: var(--opac-background-color-08);
 
       @include mobile() {
         position: fixed;
@@ -78,27 +79,31 @@ div.follow-board-picker {
       width: 100%;
       height: #{$navbar_height}px;
       border-bottom: 1px solid var(--divider-line);
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
       padding: 12px 16px;
       text-align: center;
+      box-shadow: 0px 2px 4px var(--modal-shadow);
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
         display: block;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
+        box-shadow: none;
       }
 
       button.create-board-bt {
-        padding: 0;
         display: block;
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 32px;
-        color: $wut_purple;
         height: 32px;
         float: right;
+        color: $wut_purple;
+        background-color: $wut_feint_purple;
+        border-radius: 4px;
+        padding: 0 8px;
 
         &:hover {
           text-decoration: underline;
@@ -139,7 +144,7 @@ div.follow-board-picker {
     }
     
     div.follow-board-picker-body {
-      padding: 24px;
+      padding: 40px 120px 66px;
 
       div.follow-board-picker-subtitle {
         @include OC_Body_Book();
@@ -276,9 +281,31 @@ div.follow-board-picker {
               align-self: center;
               max-width: calc(100% - 90px);
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 20px;
+              font-size: 16px;
+              line-height: 32px;
               color: var(--color);
+              position: relative;
+              padding-left: 40px;
+
+              &:before {
+                width: 32px;
+                height: 32px;
+                background-color: var(--opac-background-color-15);
+                border-radius: 50%;
+                background-image: cdnUrl("/img/ML/number_sign.svg");
+                background-size: 10px 10px;
+                background-position: center;
+                background-repeat: no-repeat;
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                opacity: 0.5;
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/number_sign@dark.svg");
+                }
+              }
             }
 
             button.follow-bt {
