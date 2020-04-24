@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.user :as user-utils]
@@ -145,7 +146,8 @@
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-inbox (and user-is-part-of-the-team?
+        show-inbox (and (not ls/wut?)
+                        user-is-part-of-the-team?
                         (utils/link-for (:links org-data) "inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "entries"))
