@@ -593,7 +593,8 @@
     (dis/dispatch! [:publishers/follow (router/current-org-slug)
                                        {:org-slug org-slug
                                         :publisher-uuids next-publishers
-                                        :follow? follow?}])
+                                        :follow? follow?
+                                        :publisher-uuid publisher-uuid}])
     (if follow?
       (ws-cc/publisher-follow publisher-uuid)
       (ws-cc/publisher-unfollow publisher-uuid))))
@@ -616,7 +617,8 @@
     (dis/dispatch! [:boards/follow (router/current-org-slug)
                                    {:org-slug org-slug
                                     :board-uuids next-boards
-                                    :follow? follow?}])
+                                    :follow? follow?
+                                    :board-uuid board-uuid}])
     (if follow?
       (ws-cc/board-follow board-uuid)
       (ws-cc/board-unfollow board-uuid))))
