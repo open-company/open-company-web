@@ -339,15 +339,15 @@
           count-fn (fn [fr]
                     (reset! found? true)
                     (let [cf (cond (true? follow?) inc (false? follow?) dec :else identity)]
-                      (update fr :count #(max (cf (:count %)) 0))))
+                      (update fr :count #(max (cf %) 0))))
           record-check-fn #(if (and (= (:resource-type %) :user)
                                     (= (:resource-uuid %) publisher-uuid))
                              (count-fn %)
                              %)
-          next-db* (update-in db followers-count-key #(map record-check-fn %))
+          next-db* (update-in db followers-count-key #(mapv record-check-fn %))
           next-db (if @found?
                     next-db*
-                    (update-in next-db* followers-count-key conj {:resource-uuid publisher-uuid :resource-type :user :count (if follow? 1 0)}))]
+                    (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid publisher-uuid :resource-type :user :count (if follow? 1 0)}))]
       (assoc-in next-db follow-publishers-list-key next-follow-publishers-data))
     db))
 
@@ -361,14 +361,14 @@
           count-fn (fn [br]
                     (reset! found? true)
                     (let [cf (cond (true? follow?) inc (false? follow?) dec :else identity)]
-                      (update br :count #(max (cf (:count %)) 0))))
+                      (update br :count #(max (cf %) 0))))
           record-check-fn #(if (and (= (:resource-type %) :board)
                                     (= (:resource-uuid %) board-uuid))
                              (count-fn %)
                              %)
-          next-db* (update-in db followers-count-key #(map record-check-fn %))
+          next-db* (update-in db followers-count-key #(mapv record-check-fn %))
           next-db (if @found?
                     next-db*
-                    (update-in next-db* followers-count-key conj {:resource-uuid board-uuid :resource-type :board :count (if follow? 1 0)}))]
+                    (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid board-uuid :resource-type :board :count (if follow? 1 0)}))]
       (assoc-in next-db (dispatcher/follow-boards-list-key org-slug) next-boards))
     db))
