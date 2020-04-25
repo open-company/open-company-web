@@ -42,12 +42,14 @@
  (drv/drv :active-users)
  (drv/drv :follow-publishers-list)
  (drv/drv :current-user-data)
+ (drv/drv :followers-publishers-count)
  (rum/local "" ::query)
  (rum/local false ::saving)
  strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
    (user-actions/load-follow-list)
+   (user-actions/load-followers-count)
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)
@@ -56,6 +58,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
+        followers-publishers-count (drv/react s :followers-publishers-count)
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
         authors-uuids (->> org-data :authors (map :user-id) set)
@@ -111,6 +114,10 @@
                         (when (seq (:role u))
                           [:span.user-role
                             (:role u)])]
+                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
+                        (when (pos? followers-count)
+                          [:span.followers-count
+                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-publisher (:user-id u))
                          :data-toggle (when-not is-mobile? "tooltip")
@@ -133,6 +140,10 @@
                         (when (seq (:role u))
                           [:span.user-role
                             (:role u)])]
+                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
+                        (when (pos? followers-count)
+                          [:span.followers-count
+                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-publisher (:user-id u))}
                         "Follow"]]))]])]]]))

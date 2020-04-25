@@ -137,6 +137,15 @@
 (defn follow-boards-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :board-uuids)))
 
+(defn followers-count-key [org-slug]
+  (vec (conj (org-key org-slug) :followers-count)))
+
+(defn followers-publishers-count-key [org-slug]
+  (vec (conj (followers-count-key org-slug) :publishers)))
+
+(defn followers-boards-count-key [org-slug]
+  (vec (conj (followers-count-key org-slug) :boards)))
+
 (defn mention-users-key [org-slug]
   (vec (conj (org-key org-slug) :mention-users)))
 
@@ -554,6 +563,9 @@
    :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
    :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]
    :follow-list           [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-key org-slug)))]
+   :followers-count       [[:base :org-slug] (fn [base org-slug] (get-in base (followers-count-key org-slug)))]
+   :followers-publishers-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-publishers-count-key org-slug)))]
+   :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
    })
@@ -839,6 +851,21 @@
   ([] (follow-list (:slug (org-data)) @app-state))
   ([org-slug] (follow-list org-slug @app-state))
   ([org-slug data] (get-in data (follow-list-key org-slug))))
+
+(defn ^:export followers-count
+  ([] (followers-count (:slug (org-data)) @app-state))
+  ([org-slug] (followers-count org-slug @app-state))
+  ([org-slug data] (get-in data (followers-count-key org-slug))))
+
+(defn ^:export followers-publishers-count
+  ([] (followers-publishers-count (:slug (org-data)) @app-state))
+  ([org-slug] (followers-publishers-count org-slug @app-state))
+  ([org-slug data] (get-in data (followers-publishers-count-key org-slug))))
+
+(defn ^:export followers-boards-count
+  ([] (followers-boards-count (:slug (org-data)) @app-state))
+  ([org-slug] (followers-boards-count org-slug @app-state))
+  ([org-slug data] (get-in data (followers-boards-count-key org-slug))))
 
 (defn ^:export follow-publishers-list
   ([] (follow-publishers-list (:slug (org-data)) @app-state))

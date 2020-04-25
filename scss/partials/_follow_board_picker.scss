@@ -277,9 +277,9 @@ div.follow-board-picker {
               display: block;
               white-space: nowrap;
               margin-right: 8px;
-              flex: 1 1 auto;
+              flex: 0 1 auto;
               align-self: center;
-              max-width: calc(100% - 90px);
+              // max-width: calc(100% - 90px);
               @include OC_Body_Book();
               font-size: 16px;
               line-height: 32px;
@@ -306,6 +306,23 @@ div.follow-board-picker {
                   background-image: cdnUrl("/img/ML/number_sign@dark.svg");
                 }
               }
+            }
+
+            span.followers-count {
+              flex: 1 10 auto;
+              align-self: center;
+              text-align: right;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 20px;
+              color: var(--light-color);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              // max-width: calc(30% - 70px);
+              justify-self: flex-end;
+              margin-left: auto;
+              margin-right: 8px;
             }
 
             button.follow-bt {

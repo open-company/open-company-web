@@ -320,19 +320,35 @@
        (assoc-in follow-boards-list-key next-follow-boards-data)))
       db))
 
+(defmethod dispatcher/action :followers-count/finish
+  [db [_ org-slug data]]
+  (let [publisher-uuids (filter #(= (:resource-type %) :user) data)
+        board-uuids (filter #(= (:resource-type %) :board) data)]
+    (-> db
+     (assoc-in (dispatcher/followers-publishers-count-key org-slug) publisher-uuids)
+     (assoc-in (dispatcher/followers-boards-count-key org-slug) board-uuids))))
+
 (defmethod dispatcher/action :publishers/follow
-  [db [_ org-slug {:keys [publisher-uuids] :as resp}]]
+  [db [_ org-slug {:keys [publisher-uuids follow?] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
-      (assoc-in db follow-publishers-list-key next-follow-publishers-data))
+          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)
+          followers-count-key (dispatcher/publishers-followers-count-key org-slug)
+          count-fn (cond (true? follow?) inc (false? follow?) dec :else identity)]
+      (-> db
+       (assoc-in follow-publishers-list-key next-follow-publishers-data)
+       (update-in followers-count-key #(max (count-fn %) 0))))
     db))
 
 (defmethod dispatcher/action :boards/follow
   [db [_ org-slug {:keys [board-uuids] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [org-data (dispatcher/org-data db)]
-      (assoc-in db (dispatcher/follow-boards-list-key org-slug)
-       (enrich-boards-list board-uuids (:boards org-data))))
+    (let [org-data (dispatcher/org-data db)
+          next-boards (enrich-boards-list board-uuids (:boards org-data))
+          followers-count-key (dispatcher/boards-followers-count-key org-slug)
+          count-fn (cond (true? follow?) inc (false? follow?) dec :else identity)]
+      (-> db
+       (assoc-in (dispatcher/follow-boards-list-key org-slug) next-boards)
+       (update-in followers-count-key #(max (count-fn %) 0))))
     db))

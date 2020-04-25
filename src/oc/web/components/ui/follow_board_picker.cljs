@@ -35,12 +35,14 @@
 
  (drv/drv :org-data)
  (drv/drv :follow-boards-list)
+ (drv/drv :followers-boards-count)
  (rum/local "" ::query)
  (rum/local false ::saving)
  strict-refresh-tooltips-mixin
  {:init (fn [s]
    ;; Refresh the following list
    (user-actions/load-follow-list)
+   (user-actions/load-followers-count)
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)
@@ -49,6 +51,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))
+        followers-boards-count (drv/react s :followers-boards-count)
         all-boards (:boards org-data)
         with-follow (map #(assoc % :follow (utils/in? follow-boards-list (:uuid %))) all-boards)
         sorted-boards (filter-sort-boards s with-follow @(::query s))
@@ -96,6 +99,10 @@
                        :class (when (:follow b) "selected")}
                       [:div.follow-board-picker-board
                         (:name b)]
+                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
+                        (when (pos? followers-count)
+                          [:span.followers-count
+                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-board (:uuid b))
                          :class (when (:follow b) "unfollow")}
@@ -113,6 +120,10 @@
                        :class (when (:follow b) "selected")}
                       [:div.follow-board-picker-board
                         (:name b)]
+                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
+                        (when (pos? followers-count)
+                          [:span.followers-count
+                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-board (:uuid b))
                          :class (when (:follow b) "unfollow")}

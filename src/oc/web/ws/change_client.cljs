@@ -208,6 +208,11 @@
   (timbre/debug "Change event :follow/list" body)
   (go (>! ch-pub { :topic :follow/list :data body })))
 
+(defmethod event-handler :followers/count
+  [_ body]
+  (timbre/debug "Change event :follow/list" body)
+  (go (>! ch-pub { :topic :followers/count :data body })))
+
 ;; ----- Sente event handlers -----
 
 (defmulti -event-msg-handler
