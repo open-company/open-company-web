@@ -546,7 +546,8 @@
 
 (defn- identify-general-board []
   (when-let [org-data (dis/org-data)]
-    (let [named-general (some #(when (and (= (s/lower (:name %))) (= (:access %) "team"))
+    (let [named-general (some #(when (and (#{(s/lower (:name %)) (:slug %)} "general")
+                                          (= (:access %) "team"))
                                  %)
                          (:boards org-data))]
       (if named-general
@@ -554,7 +555,8 @@
         (->> org-data
              :boards
              (filter #(= (:access %) "team"))
-             (sort-by :created-at))))))
+             (sort-by :created-at)
+             first)))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
