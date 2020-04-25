@@ -108,12 +108,10 @@
                       {:key (str "follow-user-picker-" (:user-id u))
                        :class (when (:follow u) "selected")}
                       (user-avatar-image u)
-                      [:div.follow-user-picker-user
-                        [:span.user-name
-                          (:name u)]
-                        (when (seq (:role u))
-                          [:span.user-role
-                            (:role u)])]
+                      [:span.user-name
+                        (:name u)]
+                      [:span.user-role
+                        (:role u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
@@ -134,12 +132,10 @@
                       {:key (str "unfollow-user-picker-" (:user-id u))
                        :class (when (:follow u) "selected")}
                       (user-avatar-image u)
-                      [:div.follow-user-picker-user
-                        [:span.user-name
-                          (:name u)]
-                        (when (seq (:role u))
-                          [:span.user-role
-                            (:role u)])]
+                      [:span.user-name
+                        (:name u)]
+                      [:span.user-role
+                        (:role u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count

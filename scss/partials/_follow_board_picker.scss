@@ -276,9 +276,6 @@ div.follow-board-picker {
             div.follow-board-picker-board {
               display: block;
               white-space: nowrap;
-              margin-right: 8px;
-              flex: 0 1 auto;
-              align-self: center;
               // max-width: calc(100% - 90px);
               @include OC_Body_Book();
               font-size: 16px;
@@ -286,6 +283,9 @@ div.follow-board-picker {
               color: var(--color);
               position: relative;
               padding-left: 40px;
+              margin-right: 16px;
+              flex: 0 1 auto;
+              align-self: center;
 
               &:before {
                 width: 32px;
@@ -309,9 +309,6 @@ div.follow-board-picker {
             }
 
             span.followers-count {
-              flex: 1 10 auto;
-              align-self: center;
-              text-align: right;
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 20px;
@@ -319,10 +316,11 @@ div.follow-board-picker {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              // max-width: calc(30% - 70px);
-              justify-self: flex-end;
+              flex: 1 0 auto;
+              align-self: center;
               margin-left: auto;
               margin-right: 8px;
+              text-align: right;
             }
 
             button.follow-bt {

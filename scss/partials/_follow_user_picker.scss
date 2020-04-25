@@ -280,46 +280,20 @@ div.follow-user-picker {
               align-self: center;
             }
 
-            div.follow-user-picker-user {
-              display: block;
+            span.user-name {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 20px;
+              color: var(--color);
+              overflow: hidden;
+              text-overflow: ellipsis;
               white-space: nowrap;
-              margin-right: 8px;
-              flex: 0 1 auto;
+              margin-right: 6px;
               align-self: center;
-              // max-width: calc(100% - 130px);
-              display: flex;
-              flex-direction: row;
-              flex-wrap: nowrap;
-              align-items: flex-start;
-
-              span.user-name {
-                margin-right: 6px;
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 20px;
-                color: var(--color);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                flex: 0 1 auto;
-              }
-
-              span.user-role {
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 20px;
-                color: var(--light-color);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                flex: 0 100 auto;
-              }
+              flex: 0 1 auto;
             }
 
-            span.followers-count {
-              flex: 1 10 auto;
-              align-self: center;
-              text-align: right;
+            span.user-role {
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 20px;
@@ -327,10 +301,24 @@ div.follow-user-picker {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              // max-width: calc(30% - 70px);
-              justify-self: flex-end;
+              margin-right: 16px;
+              align-self: center;
+              flex: 0 2 auto;
+            }
+
+            span.followers-count {
+              flex: 1 0 auto;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 20px;
+              color: var(--light-color);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              align-self: center;
               margin-left: auto;
               margin-right: 8px;
+              text-align: right;
             }
 
             button.follow-bt {
