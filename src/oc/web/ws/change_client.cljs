@@ -248,7 +248,8 @@
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
     (follow-list)
     (container-watch)
-    (publisher-watch)))
+    (publisher-watch)
+    (ws-utils/after 1000 (followers-count))))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 

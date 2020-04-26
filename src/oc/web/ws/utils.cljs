@@ -152,3 +152,5 @@
   (if (j/expired?)
     (jwt-refresh-cb auth-cb)
     (auth-cb)))
+
+(def after utils/after)
