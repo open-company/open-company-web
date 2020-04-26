@@ -96,24 +96,24 @@
             {:on-click (fn [_] (close-clicked current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-notifications-body
-          [:div.user-profile-modal-fields
-            [:div.field-label "Daily digest"]
-            [:select.field-value.oc-input
-              {:value (:digest-medium current-user-data)
-               :disabled (and (not slack-enabled?)
-                              (not= (:digest-medium current-user-data) "slack"))
-               :on-change #(change! s :digest-medium (.. % -target -value))}
-              [:option
-                {:value "email"}
-                "Via email"]
-              (when (or slack-enabled?
-                        (= (:digest-medium current-user-data) "slack"))
-                [:option
-                  {:value "slack"
-                   :disabled (not slack-enabled?)}
-                  "Via Slack"])]
-            [:div.field-description
-              "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
+          ; [:div.user-profile-modal-fields
+          ;   [:div.field-label "Daily digest"]
+          ;   [:select.field-value.oc-input
+          ;     {:value (:digest-medium current-user-data)
+          ;      :disabled (and (not slack-enabled?)
+          ;                     (not= (:digest-medium current-user-data) "slack"))
+          ;      :on-change #(change! s :digest-medium (.. % -target -value))}
+          ;     [:option
+          ;       {:value "email"}
+          ;       "Via email"]
+          ;     (when (or slack-enabled?
+          ;               (= (:digest-medium current-user-data) "slack"))
+          ;       [:option
+          ;         {:value "slack"
+          ;          :disabled (not slack-enabled?)}
+          ;         "Via Slack"])]
+          ;   [:div.field-description
+          ;     "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Comments and mentions."]
             [:select.field-value.oc-input
