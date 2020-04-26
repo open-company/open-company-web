@@ -68,14 +68,8 @@
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
                               (drv/drv search/search-active?)
-                              ;; Locals
-                              (rum/local false ::sort-type-expanded)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
-                              (ui-mixins/on-window-click-mixin (fn [s e]
-                                (when (and @(::sort-type-expanded s)
-                                           (not (utils/event-inside? e (rum/ref-node s :sort-type-dropdown))))
-                                  (reset! (::sort-type-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -154,10 +148,7 @@
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         search-active? (drv/react s search/search-active?)
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))
-        sort-type (router/current-sort-type)
-        should-show-sort? (or is-all-posts
-                              is-following)]
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -260,8 +251,7 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (cond
-                    current-contributions-id
+                  (if current-contributions-id
                     [:div.board-name-with-icon.contributions
                       (user-avatar-image contributions-user-data)
                       [:div.board-name-with-icon-internal
@@ -271,17 +261,6 @@
                         ; (when (pos? (:total-count contributions-data))
                         ;   [:span.count (:total-count contributions-data)])
                         ]]
-                    should-show-sort?
-                    [:div.board-name-with-icon
-                      [:button.mlb-reset.board-name-with-icon-internal.all-updates-bt
-                        {:class (when is-all-posts "active")
-                         :on-click #(switch-home % :all-posts)}
-                        "All updates"]
-                      [:button.mlb-reset.board-name-with-icon-internal.following-bt
-                        {:class (when is-following "active")
-                         :on-click #(switch-home % :following)}
-                        "Following"]]
-                    current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
@@ -292,7 +271,7 @@
                                                    "Unread"
 
                                                    is-all-posts
-                                                   "All"
+                                                   "All updates"
 
                                                    is-bookmarks
                                                    "Saved"
@@ -342,39 +321,7 @@
                        :title "Dismiss all"}])
                   (when (and (not is-drafts-board)
                              is-mobile?)
-                    (search-box))
-                  (when should-show-sort?
-                    [:div.sort-type-dropdown-container
-                      {:ref :sort-type-dropdown
-                       :class (when @(::sort-type-expanded s) "expanded")}
-                      [:button.mlb-reset.sort-type-dropdown
-                        {:on-click #(swap! (::sort-type-expanded s) not)}
-                        (if (= sort-type dis/recent-activity-sort)
-                          "New activity"
-                          "New updates")]
-                      (when @(::sort-type-expanded s)
-                        [:div.sort-type-dropdown
-                          [:button.mlb-reset.sort-type-item
-                            {:class (when (= sort-type dis/recently-posted-sort) "active")
-                             :on-click #(do
-                                          (reset! (::sort-type-expanded s) false)
-                                          (activity-actions/change-sort-type dis/recently-posted-sort))}
-                            "New updates"]
-                          [:button.mlb-reset.sort-type-item
-                            {:class (when (= sort-type dis/recent-activity-sort) "active")
-                             :on-click #(do
-                                          (reset! (::sort-type-expanded s) false)
-                                          (activity-actions/change-sort-type dis/recent-activity-sort))}
-                            "New activity"]])])
-                  ; [:button.mlb-reset.foc-layout-bt
-                  ;   {:on-click #(activity-actions/toggle-foc-layout)
-                  ;    :data-toggle (when-not is-mobile? "tooltip")
-                  ;    :data-placement "top"
-                  ;    :data-container "body"
-                  ;    :data-offset-left "-2px"
-                  ;    :title (if (= foc-layout dis/other-foc-layout) "Expanded view" "Compact view")
-                  ;    :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]
-                  ]])
+                    (search-box))]])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond

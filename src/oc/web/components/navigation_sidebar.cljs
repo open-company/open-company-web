@@ -137,8 +137,8 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
-        is-inbox (= selected-slug "inbox")
-        is-home (#{"all-posts" "following"} selected-slug)
+        is-following (= selected-slug "following")
+        is-home (= selected-slug "all-posts")
         is-bookmarks (= selected-slug "bookmarks")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
@@ -146,9 +146,8 @@
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-inbox (and (not ls/wut?)
-                        user-is-part-of-the-team?
-                        (utils/link-for (:links org-data) "inbox"))
+        show-following (and user-is-part-of-the-team?
+                            (utils/link-for (:links org-data) "following"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
@@ -168,11 +167,7 @@
                                  is-admin-or-author?)
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? user-is-part-of-the-team?
-        follow-boards-list (drv/react s :follow-boards-list)
-        last-home (activity-actions/saved-home)
-        home-url (if (= last-home :all-posts)
-                   (oc-urls/all-posts)
-                   (oc-urls/following))]
+        follow-boards-list (drv/react s :follow-boards-list)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -189,29 +184,30 @@
               {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
             (orgs-dropdown)])
         ;; All posts
-        (when show-all-posts
+        (when show-following
           [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-home})
-             :href home-url
-             :on-click #(nav-actions/nav-to-url! % (name last-home) home-url)}
+            {:class (utils/class-set {:item-selected is-following})
+             :href (oc-urls/following)
+             :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq all-unread-items)})}
+              ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
-        ;; Inbox
-        (when show-inbox
-          [:a.inbox.hover-item.group
-            {:class (utils/class-set {:item-selected is-inbox})
-             :href (oc-urls/inbox)
-             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
-            [:div.inbox-icon]
-            [:div.inbox-label
-              "Unread"]
-            ; (when (pos? (:following-inbox-count org-data))
-            ;   [:span.count (:following-inbox-count org-data)])
+        ;; All posts
+        (when show-all-posts
+          [:a.all-posts.hover-item.group
+            {:class (utils/class-set {:item-selected is-home})
+             :href (oc-urls/all-posts)
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
+            [:div.all-posts-icon]
+            [:div.all-posts-label
+              {:class (utils/class-set {:new (seq all-unread-items)})}
+              "All updates"]
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
             ])
         ;; Bookmarks
         (when show-bookmarks
@@ -229,7 +225,7 @@
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
-              {:class (when (and (not is-inbox)
+              {:class (when (and (not is-following)
                                  (not is-home)
                                  (not is-bookmarks)
                                  (= (router/current-board-slug) (:slug drafts-board)))
@@ -321,7 +317,7 @@
           [:div.left-navigation-sidebar-items.group
             (for [board follow-boards-list
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (and (not is-inbox)
+                        is-current-board (and (not is-following)
                                               (not is-home)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))

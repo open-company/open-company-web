@@ -85,7 +85,7 @@
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
-                       "All"
+                       "All updates"
                        (= (router/current-board-slug) "bookmarks")
                        "Saved"
                        (= (router/current-board-slug) "following")

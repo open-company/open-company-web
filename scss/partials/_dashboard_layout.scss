@@ -466,23 +466,6 @@ div.dashboard-layout {
               }
             }
 
-            button.board-name-with-icon-internal {
-              @include OC_Body_Bold();
-              font-size: 18px;
-              color: var(--light-color);
-              line-height: 32px;
-              padding: 0;
-              float: left;
-
-              &:not(:first-child) {
-                margin-left: 16px;
-              }
-
-              &.active {
-                color: var(--color);
-              }
-            }
-
             @include mobile() {
               @include OC_Body_Bold();
               font-size: 15px;
@@ -662,70 +645,6 @@ div.dashboard-layout {
             z-index: 1;
             float: unset;
             height: #{$mobile_search_header_height}px;
-          }
-
-          div.sort-type-dropdown-container {
-            float: left;
-            position: relative;
-
-            &.expanded {
-              button.sort-type-dropdown {
-                color: var(--color);
-              }
-            }
-
-            button.sort-type-dropdown {
-              @include OC_Body_Book();
-              font-size: 14px;
-              color: var(--light-color);
-              line-height: 32px;
-              padding: 0 24px 0 0;
-
-              &:after {
-                display: block;
-                content: "";
-                width: 16px;
-                height: 16px;
-                border-radius: 4px;
-                background-color: var(--opac-background-color-1);
-                background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
-                background-size: 8px 4px;
-                background-repeat: no-repeat;
-                background-position: center;
-                position: absolute;
-                right: 0;
-                top: 8px;
-
-                @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
-                }
-              }
-            }
-
-            div.sort-type-dropdown {
-              position: absolute;
-              top: 32px;
-              right: 50%;
-              margin-right: -75px;
-              border: 1px solid var(--divider-line);
-              background-color: var(--overlay-background-color);
-              border-radius: 4px;
-              padding: 4px 0;
-              width: 150px;
-              z-index: 3;
-
-              button.sort-type-item {
-                @include OC_Body_Bold();
-                font-size: 14px;
-                color: var(--light-color);
-                line-height: 18px;
-                padding: 4px 16px;
-
-                &.active {
-                  color: var(--color);
-                }
-              }
-            }
           }
 
           button.complete-all-bt {

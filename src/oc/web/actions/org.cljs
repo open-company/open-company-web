@@ -97,9 +97,9 @@
       (and (= last-board-slug "all-posts")
            (utils/link-for (:links org-data) "entries"))
       {:slug "all-posts"}
-      (and (= last-board-slug "inbox")
-           (utils/link-for (:links org-data) "following-inbox"))
-      {:slug "inbox"}
+      (and (= last-board-slug "following")
+           (utils/link-for (:links org-data) "following"))
+      {:slug "following"}
       :else
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
@@ -142,16 +142,14 @@
   ;; Check the loaded org
   (let [boards (:boards org-data)
         current-board-slug (router/current-board-slug)
-        inbox-link (utils/link-for (:links org-data) "following-inbox")
+        ; inbox-link (utils/link-for (:links org-data) "following-inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
-        recent-all-posts-link (utils/link-for (:links org-data) "activity")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         following-link (utils/link-for (:links org-data) "following")
-        recent-following-link (utils/link-for (:links org-data) "recent-following")
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
-        is-inbox? (= current-board-slug "inbox")
+        ; is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-following? (= (router/current-board-slug) "following")
@@ -159,12 +157,10 @@
         sort-type (router/current-sort-type)
         is-contributions? (seq (router/current-contributions-id))
         delay-count (atom 0)
-        inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
+        ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        recent-all-posts-delay (if (and is-all-posts? (= sort-type dis/recent-activity-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        recent-following-delay (if (and is-following? (= sort-type dis/recent-activity-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
         active-users-link (utils/link-for (:links org-data) "active-users")]
@@ -184,24 +180,18 @@
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
           ;; Load inbox data
-          (when (and ls/wut?
-                     inbox-link)
-            (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
+          ; (when (and ls/wut?
+          ;            inbox-link)
+          ;   (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data with recently posted sort
           (when all-posts-link
             (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
-          ;; Load all posts data with recent activity sort
-          (when recent-all-posts-link
-            (utils/maybe-after recent-all-posts-delay #(aa/recent-all-posts-get org-data)))
           ;; Preload bookmarks data
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           ;; Preload following data with recently posted sort
           (when following-link
             (utils/maybe-after following-delay #(aa/following-get org-data)))
-          ;; Preload following data with recent activity sort
-          (when recent-following-link
-            (utils/maybe-after recent-following-delay #(aa/recent-following-get org-data)))
           ;; Drafts
           (when drafts-link
             (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
@@ -212,14 +202,14 @@
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
-      (when (or (and is-inbox?
-                      (not inbox-link))
-                 (and is-all-posts?
-                      (not all-posts-link))
-                 (and is-bookmarks?
-                      (not bookmarks-link))
-                 (and is-following?
-                      (not following-link)))
+      (when (or ; (and is-inbox?
+                ;     (not inbox-link))
+                (and is-all-posts?
+                     (not all-posts-link))
+                (and is-bookmarks?
+                     (not bookmarks-link))
+                (and is-following?
+                     (not following-link)))
         (check-org-404))
 
       ; If there is a board slug let's load the board data

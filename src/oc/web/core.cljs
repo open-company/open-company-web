@@ -176,11 +176,13 @@
   "Read the sort order from the cookie, fallback to the default,
    if it's on drafts board force the recently posted sort since that has only that"
   [params]
-  (let [last-sort-type (aa/saved-sort-type (:org params) (:board params))]
-    (if (and (#{"following" "all-posts"} (:board params))
-             (= last-sort-type dis/recently-posted-sort))
-      dis/recent-activity-sort
-      dis/recently-posted-sort)))
+  ;; NB: Bypass saved cookie for now, always use recently posted sort
+  ; (let [last-sort-type (aa/saved-sort-type (:org params) (:board params))]
+  ;   (if (and (#{"following" "all-posts"} (:board params))
+  ;            (= last-sort-type dis/recently-posted-sort))
+  ;     dis/recent-activity-sort
+  ;     dis/recently-posted-sort))
+  dis/recently-posted-sort)
 
 ;; Company list
 (defn org-handler [route target component params]
