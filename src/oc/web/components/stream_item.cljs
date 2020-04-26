@@ -367,8 +367,7 @@
                     (wrt-count {:activity-data activity-data
                                 :reads-data read-data})]
                   (when-not white-bg?
-                    [:div.stream-item-cought-up
-                      ;"✓ Caught up"
+                    [:div.stream-item-caught-up
                       "Caught up"]))
                 (when (seq activity-attachments)
                   (if-not is-mobile?

@@ -6,6 +6,7 @@
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.lib.time :as time]
+            [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.ws.utils :as ws-utils]
             [oc.web.utils.ws-client-ids :as ws-client-ids]
@@ -249,7 +250,7 @@
     (follow-list)
     (container-watch)
     (publisher-watch)
-    (ws-utils/after 1000 (followers-count))))
+    (ws-utils/after 1000 followers-count)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 

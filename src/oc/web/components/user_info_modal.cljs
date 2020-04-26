@@ -49,7 +49,7 @@
               (:title user-data)])
           (when (pos? followers-count)
             [:div.user-info-followers-count
-              (str followers-count "follower" (when (not= followers-count 1) "s"))])
+              (str followers-count " follower" (when (not= followers-count 1) "s"))])
           (when member?
             [:button.mlb-reset.view-posts-bt
               {:on-click #(do

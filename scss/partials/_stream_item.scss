@@ -852,24 +852,25 @@ div.stream-item {
         }
       }
 
-      div.stream-item-cought-up {
+      div.stream-item-caught-up {
         float: left;
         position: relative;
-        margin-top: 3px;
         margin-right: 16px;
         @include OC_Body_Book();
         font-size: 14px;
-        line-height: 18px;
+        line-height: 28px;
+        height: 26px;
         color: var(--color);
         opacity: 0.5;
         padding-left: 18px;
+        vertical-align: super;
 
         &:before {
           position: absolute;
           top: 0;
           left: 0;
           width: 10px;
-          height: 18px;
+          height: 28px;
           background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
           background-size: 10px 8px;
           background-repeat: no-repeat;

@@ -112,21 +112,6 @@ div.user-info-modal {
         }
       }
 
-      div.user-info-followers-count {
-        @include OC_Body_Bold();
-        font-size: 14px;
-        color: var(--color);
-        line-height: 32px;
-        float: left;
-
-        @include mobile() {
-          float: unset;
-          text-align: left;
-          font-size: 16px;
-          line-height: 24px;
-        }
-      }
-
       button.cancel-bt {
         height: 32px;
         padding: 0;
@@ -177,6 +162,19 @@ div.user-info-modal {
       }
 
       div.user-info-title {
+        margin-top: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--light-color);
+        line-height: 18px;
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+      }
+
+      div.user-info-followers-count {
         margin-top: 4px;
         @include OC_Body_Book();
         font-size: 14px;
