@@ -1,5 +1,6 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
+            [defun.core :refer (defun)]
             [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
@@ -136,6 +137,18 @@
 
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
+
+(defun is-publisher?
+
+  ([entry-data :guard map?]
+   (when (jwt/jwt)
+     (is-publisher? (jwt/user-id) entry-data)))
+
+  ([user-data :guard :user-id entry-data :guard map?]
+   (is-publisher? (:user-id user-data) entry-data))
+
+  ([user-id :guard string? entry-data :guard map?]
+   (= (jwt/user-id) (-> entry-data :publisher :user-id))))
 
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)

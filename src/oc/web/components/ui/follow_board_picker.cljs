@@ -102,7 +102,7 @@
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
-                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-board (:uuid b))
                          :class (when (:follow b) "unfollow")}
@@ -123,7 +123,7 @@
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
-                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-board (:uuid b))
                          :class (when (:follow b) "unfollow")}

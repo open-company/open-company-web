@@ -9,11 +9,12 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defc user-info-view < rum/static
-  [{:keys [user-data user-id my-profile? hide-buttons otf above? inline?]}]
+  [{:keys [user-data user-id my-profile? hide-buttons otf above? inline? following followers-count]}]
   (let [timezone-location-string (user-utils/timezone-location-string user-data)]
     [:div.user-info-view
       {:class (utils/class-set {:otf otf
@@ -36,7 +37,15 @@
               (:slack-username user-data)]
             (seq (:email user-data))
             [:div.user-info-subline
-              (:email user-data)])]]
+              (:email user-data)])
+          (when (pos? followers-count)
+            [:div.user-info-subline
+              (str followers-count " follower" (when (not= followers-count 1) "s"))])
+          (when (and (not hide-buttons)
+                     (not my-profile?))
+            [:button.mlb-reset.profile-bt
+              {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+              "View full profile"])]]
       (when-not hide-buttons
         [:div.user-info-buttons.group
           [:button.mlb-reset.posts-bt
@@ -44,11 +53,16 @@
             (if my-profile?
               "My posts"
               "Posts")]
-          [:button.mlb-reset.profile-bt
-            {:on-click #(nav-actions/show-user-info (:user-id user-data))}
-            (if my-profile?
-              "My profile"
-              "Profile")]])]))
+          (if my-profile?
+            [:button.mlb-reset.profile-bt
+              {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+              "My profile"]
+            [:button.mlb-reset.follow-bt
+              {:class (when following "unfollow")
+               :on-click #(user-actions/toggle-publisher (:user-id user-data))}
+              (if following
+                "Following"
+                "Follow")])])]))
 
 (rum/defc user-info-otf < rum/static
   [{:keys [portal-el] :as props}]
@@ -118,6 +132,8 @@
   rum/static
   rum/reactive
   (drv/drv :users-info-hover)
+  (drv/drv :follow-publishers-list)
+  (drv/drv :followers-publishers-count)
   (rum/local nil ::mouse-enter)
   (rum/local nil ::mouse-leave)
   (rum/local nil ::click)
@@ -156,7 +172,10 @@
           pos @(::positioning s)
           users-info (drv/react s :users-info-hover)
           active-user-data (get users-info (:user-id user-data))
-          complete-user-data (merge user-data active-user-data)]
+          complete-user-data (merge user-data active-user-data)
+          follow-publishers-list (mapv :user-id (drv/react s :follow-publishers-list))
+          following? (utils/in? follow-publishers-list (:user-id user-data))
+          followers-publishers-count (drv/react s :followers-publishers-count)]
       [:div.user-info-hover
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true})
@@ -166,4 +185,6 @@
         (user-info-view {:user-data complete-user-data
                          :inline? (not active-user-data)
                          :hide-buttons (not active-user-data)
-                         :my-profile? my-profile?})])))
+                         :my-profile? my-profile?
+                         :following following?
+                         :followers-count (some #(when (= (:resource-uuid %) (:user-id user-data)) (:count %)) followers-publishers-count)})])))

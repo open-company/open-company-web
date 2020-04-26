@@ -112,6 +112,21 @@ div.user-info-modal {
         }
       }
 
+      div.user-info-followers-count {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: var(--color);
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: left;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+
       button.cancel-bt {
         height: 32px;
         padding: 0;

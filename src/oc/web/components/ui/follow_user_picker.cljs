@@ -115,7 +115,7 @@
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
-                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-publisher (:user-id u))
                          :data-toggle (when-not is-mobile? "tooltip")
@@ -139,7 +139,7 @@
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
-                            (str followers-count " follower" (when (> followers-count 1) "s"))]))
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-publisher (:user-id u))}
                         "Follow"]]))]])]]]))

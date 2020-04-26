@@ -248,8 +248,15 @@ div.expanded-post {
           span.name {
             margin-right: 4px;
             min-height: 18px;
-            line-height: 18px;  
+            line-height: 18px;
+            text-decoration: underline;
           }
+        }
+
+        span.section {
+          min-height: 18px;
+          line-height: 18px;
+          text-decoration: underline;
         }
 
         time {

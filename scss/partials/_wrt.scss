@@ -39,7 +39,7 @@ div.wrt-count-container {
 
   div.wrt-count {
     @include OC_Body_Book();
-    font-size: 12px;
+    font-size: 14px;
     color: var(--color);
     cursor: pointer;
     position: relative;

@@ -101,7 +101,9 @@
            open-item
            close-item] :as props}]
   (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        publisher? (activity-utils/is-publisher? entry)
         show-wrt? (and member?
+                       publisher?
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -122,6 +124,7 @@
                      :read-data reads-data
                      :show-wrt? show-wrt?
                      :member? member?
+                     :publisher? publisher?
                      :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static

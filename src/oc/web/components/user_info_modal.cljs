@@ -12,12 +12,16 @@
 
 (rum/defcs user-info-modal < rum/reactive
                              (drv/drv :panel-stack)
+                             (drv/drv :followers-publishers-count)
   [s {:keys [user-data org-data]}]
   (let [my-profile? (and (jwt/jwt)
                          (= (:user-id user-data) (jwt/user-id)))
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
         team-role (when member? (utils/get-user-type user-data org-data))
-        panel-stack (drv/react s :panel-stack)]
+        panel-stack (drv/react s :panel-stack)
+        followers-publishers-count (drv/react s :followers-publishers-count)
+        followers-count (some #(when (= (:resource-uuid %) (:user-id user-data)) (:count %))
+                         followers-publishers-count)]
     [:div.user-info-modal
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :user-info))
                     (nav-actions/close-all-panels))}
@@ -43,6 +47,9 @@
           (when (:title user-data)
             [:div.user-info-title
               (:title user-data)])
+          (when (pos? followers-count)
+            [:div.user-info-followers-count
+              (str followers-count "follower" (when (not= followers-count 1) "s"))])
           (when member?
             [:button.mlb-reset.view-posts-bt
               {:on-click #(do

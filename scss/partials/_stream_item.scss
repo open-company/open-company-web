@@ -318,10 +318,11 @@ div.stream-item {
         overflow: hidden; // needed for name truncation
         z-index: 2;
 
-        @include activity-author(24);
+        @include activity-author(24) {
 
-        div.user-avatar-img-container {
-          margin-right: 8px;
+          div.user-avatar-img-container {
+            margin-right: 8px;
+          }
         }
 
         span.name {
@@ -336,17 +337,29 @@ div.stream-item {
         }
       }
 
-      @include activity-author(24);
-
-      span.name {
-        height: 24px;
+      span.in {
+        @include OC_Body_Book();
         color: var(--light-color);
+        font-size: 12px;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
         line-height: 24px;
         display: block;
         flex: 0 1 auto;
+        margin-right: 4px;
+      }
+
+      span.section {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include OC_Body_Book();
+        color: var(--light-color);
+        font-size: 12px;
+        line-height: 24px;
+        white-space: nowrap;
+        text-decoration: underline;
+        margin-right: 4px;
       }
 
       span.time-since {
@@ -764,7 +777,7 @@ div.stream-item {
         div.stream-item-attachments-count {
           position: relative;
           @include OC_Body_Book();
-          font-size: 12px;
+          font-size: 14px;
           color: var(--color);
           opacity: 0.5;
           line-height: 26px;
@@ -833,6 +846,40 @@ div.stream-item {
         position: relative;
         margin-top: 4px;
         margin-right: 16px;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+
+      div.stream-item-cought-up {
+        float: left;
+        position: relative;
+        margin-top: 3px;
+        margin-right: 16px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+        opacity: 0.5;
+        padding-left: 18px;
+
+        &:before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 10px;
+          height: 18px;
+          background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
+          background-size: 10px 8px;
+          background-repeat: no-repeat;
+          background-position: center;
+          content: "";
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");            
+          }
+        }
 
         @include mobile() {
           display: none;

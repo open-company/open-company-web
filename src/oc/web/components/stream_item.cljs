@@ -152,7 +152,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member?]}]
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -162,11 +162,10 @@
         publisher (if is-published?
                     (:publisher activity-data)
                     (first (:author activity-data)))
-        is-publisher? (= (:user-id publisher) current-user-id)
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        video-player-show (and is-publisher? uploading-video)
+        video-player-show (and publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -200,15 +199,16 @@
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
-        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
+        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
+        white-bg? (or (pos? (:new-comments-count activity-data))
+                      (:unread activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
                                 :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
-                                :unread-item (or (pos? (:new-comments-count activity-data))
-                                                 (:unread activity-data))
+                                :unread-item white-bg?
                                 :muted-item (utils/link-for (:links activity-data) "follow")
                                 :expandable is-published?
                                 :show-mobile-more-bt true
@@ -268,14 +268,13 @@
               {:class utils/hide-class}
               (:name publisher)]]
           (when-not (:publisher-board activity-data)
-            [:span.name
+            [:span.in "in "])
+          (when-not (:publisher-board activity-data)
+            [:span.section
               {:class utils/hide-class}
-              (str "in "
-                   (:board-name activity-data)
+              (str (:board-name activity-data)
                    (when (= (:board-access activity-data) "private")
-                     " (private)")
-                   (when (= (:board-access activity-data) "public")
-                     " (public)"))])
+                     " (private)"))])
           (let [t (or (:published-at activity-data) (:created-at activity-data))]
             [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")
@@ -351,7 +350,7 @@
                                      :comments-data comments-data
                                      :new-comments-count (:new-comments-count activity-data)
                                      :hide-label? is-mobile?})]
-                (when show-wrt?
+                (if show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
                     ; (when show-post-added-tooltip?
@@ -366,7 +365,11 @@
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
-                                :reads-data read-data})])
+                                :reads-data read-data})]
+                  (when-not white-bg?
+                    [:div.stream-item-cought-up
+                      ;"✓ Caught up"
+                      "Caught up"]))
                 (when (seq activity-attachments)
                   (if-not is-mobile?
                     [:div.stream-item-attachments

@@ -28,7 +28,7 @@ div.user-info-view {
   z-index: #{$navbar_zindex - 1};
   text-align: center;
   border: 1px solid var(--divider-line);
-  background-color: var(--tooltip-background-color);
+  background-color: var(--background-color);
   border-radius: 4px;
   padding: 16px;
   box-shadow: var(--user-info-view-shadow);
@@ -109,7 +109,7 @@ div.user-info-view {
     align-content: center;
     align-items: center;
 
-    @include user-profile(48);
+    @include user-profile(120);
 
     div.user-info-right {
       flex: 0 1 auto;
@@ -125,37 +125,37 @@ div.user-info-view {
       div.user-info-name {
         @include OC_Body_Bold();
         font-size: 16px;
-        line-height: 20px;
-        min-height: 20px;
-        color: var(--tooltip-color);
+        line-height: 18px;
+        min-height: 18px;
+        color: var(--color);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: text;
         max-width: 100%;
-        margin-top: 8px;
+        margin-top: 16px;
       }
 
       div.user-info-line {
         @include OC_Body_Book();
-        font-size: 12px;
-        line-height: 15px;
-        min-height: 15px;
-        color: var(--tooltip-color);
+        font-size: 14px;
+        line-height: 18px;
+        min-height: 18px;
+        color: var(--color);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: text;
         max-width: 100%;
-        margin-top: 2px;
+        margin-top: 4px;
       }
 
       div.user-info-subline {
         @include OC_Body_Book();
-        font-size: 12px;
-        line-height: 15px;
-        min-height: 15px;
-        color: var(--tooltip-color);
+        font-size: 14px;
+        line-height: 18px;
+        min-height: 18px;
+        color: var(--color);
         opacity: 0.5;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -170,13 +170,30 @@ div.user-info-view {
             content: "";
             float: left;
             width: 12px;
-            height: 15px;
+            height: 18px;
             opacity: 0.5;
             background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
             background-size: 12px 12px;
             background-position: center;
             background-repeat: no-repeat;
             margin-right: 5px;
+          }
+        }
+      }
+
+      button.profile-bt {
+        margin: 4px auto 0;
+        padding: 0;
+        @include OC_Body_Book();
+        color: $wut_purple;
+        font-size: 14px;
+        line-height: 18px;
+        height: 18px;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+            text-decoration: underline;
           }
         }
       }
@@ -187,13 +204,13 @@ div.user-info-view {
     height: 30px;
     margin-top: 8px;
 
-    button.profile-bt {
-      float: right;
+    button.follow-bt, button.profile-bt {
+      float: left;
       width: calc(50% - 4px);
       padding: 6px 0;
-      background-color: var(--tooltip-button-background);
+      background-color: var(--opac-background-color-08);
       @include OC_Body_Bold();
-      color: var(--tooltip-color);
+      color: var(--opac-background-color-72);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;
@@ -206,12 +223,12 @@ div.user-info-view {
     }
 
     button.posts-bt {
-      float: left;
+      float: right;
       width: calc(50% - 4px);
       padding: 6px 0;
-      background-color: var(--tooltip-button-background);
+      background-color: var(--opac-background-color-08);
       @include OC_Body_Bold();
-      color: var(--tooltip-color);
+      color: var(--opac-background-color-72);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;

@@ -19,6 +19,7 @@ $header_top_margin: 24;
     font-size: 12px;
     line-height: 20px;
     white-space: nowrap;
+    text-decoration: underline;
   }
 
   div.time-since, span.time-since {
@@ -37,6 +38,8 @@ $header_top_margin: 24;
       }
     }
   }
+
+  @content
 }
 
 @mixin must-see-tag() {

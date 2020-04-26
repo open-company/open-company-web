@@ -53,6 +53,9 @@ div.follow-user-picker {
       left: 16px;
       top: 12px;
       background-color: var(--opac-background-color-08);
+      background-image: cdnUrl("/img/ML/close_x.svg");
+      background-size: 12px 12px;
+      border-radius: 4px;
 
       @include mobile() {
         position: fixed;

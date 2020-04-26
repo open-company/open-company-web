@@ -94,6 +94,8 @@
   (drv/drv :editable-boards)
   (drv/drv :users-info-hover)
   (drv/drv :current-user-data)
+  (drv/drv :follow-publishers-list)
+  (drv/drv :followers-publishers-count)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -222,9 +224,11 @@
               [:span.name
                 (:name publisher)]]
             (when-not (:publisher-board activity-data)
-              [:span.name
-                (str  "in "
-                     (:board-name activity-data)
+              [:span.in
+                "in "])
+            (when-not (:publisher-board activity-data)
+              [:span.section
+                (str (:board-name activity-data)
                      (when (= (:board-access activity-data) "private")
                        " (private)")
                      (when (= (:board-access activity-data) "public")
