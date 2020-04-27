@@ -200,10 +200,8 @@
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
-                                :must-see-item (:must-see activity-data)
                                 :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
-                                :muted-item (utils/link-for (:links activity-data) "follow")
                                 :expandable is-published?
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
@@ -279,11 +277,6 @@
               [:time
                 {:date-time t}
                 (utils/foc-date-time t)]])
-          [:div.muted-activity
-            {:data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Muted"}]
-          [:div.must-see-tag]
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
         [:div.activity-share-container]
