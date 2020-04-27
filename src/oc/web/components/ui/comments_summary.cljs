@@ -103,4 +103,4 @@
                      (str " comment" (when (not= comments-count 1) "s")))))]
               (when-not hide-label?
                 [:span.add-a-comment
-                  "Add a reply"]))])])))
+                  "Add a comment"]))])])))
