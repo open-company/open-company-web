@@ -47,7 +47,7 @@
            is-saved? "You don't have any saved update"
            is-home?
            [:div.empty-follow
-             "Your home feed shows you posts from the people and teams you're following"
+             "Your home feed shows you posts from the people and teams you're following."
              [:button.mlb-reset.follow-users-bt
                {:on-click #(nav-actions/show-follow-user-picker)}
                "Follow someone"]
