@@ -588,31 +588,29 @@
                            :title post-button-title
                            :force-show-tooltip @(::show-post-tooltip s)
                            :show-on-hover true})]
-        (when (or (:uuid cmail-data)
-                  (:has-changes cmail-data))
-          [:div.dismiss-inline-cmail-container
-            {:class (when unpublished? "long-tooltip")}
-            [:button.mlb-reset.dismiss-inline-cmail
-              {:on-click close-cb
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title (if unpublished?
-                        "Save & Close"
-                        "Close")}]])
-        (when (:uuid cmail-data)
-            [:div.delete-bt-container
-              [:button.mlb-reset.delete-bt
-                {:on-click #(delete-clicked s % cmail-data)
-                 :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "auto"
-                 :title "Delete"}]])
-        (when (and (not= (:status cmail-data) "published")
-                   (not is-mobile?))
-          (if (or (:has-changes cmail-data)
-                  (:auto-saving cmail-data))
-            [:div.saving-saved "Saving..."]
-            (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"])))
+        [:div.dismiss-inline-cmail-container
+          {:class (when unpublished? "long-tooltip")}
+          [:button.mlb-reset.dismiss-inline-cmail
+            {:on-click close-cb
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement "auto"
+             :title (if unpublished?
+                      "Save & Close"
+                      "Close")}]]
+        ; (when (:uuid cmail-data)
+        ;     [:div.delete-bt-container
+        ;       [:button.mlb-reset.delete-bt
+        ;         {:on-click #(delete-clicked s % cmail-data)
+        ;          :data-toggle (if is-mobile? "" "tooltip")
+        ;          :data-placement "auto"
+        ;          :title "Delete"}]])
+        ; (when (and (not= (:status cmail-data) "published")
+        ;            (not is-mobile?))
+        ;   (if (or (:has-changes cmail-data)
+        ;           (:auto-saving cmail-data))
+        ;     [:div.saving-saved "Saving..."]
+        ;     (when (false? (:auto-saving cmail-data))
+        ;       [:div.saving-saved "Saved"])))
         [:div.cmail-footer-right
           (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                          :width 32
