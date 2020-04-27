@@ -246,7 +246,7 @@
                          :height height
                          :width (if is-mobile?
                                   js/window.innerWidth
-                                  640)
+                                  620)
                          :isScrolling isScrolling
                          :onScroll onChildScroll
                          :rowCount (if (or show-loading-more

@@ -166,14 +166,10 @@
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
-                                    :external-follow (not is-mobile?)
-                                    :show-edit? true
-                                    :show-delete? true
-                                    :show-unread true
-                                    :mark-unread-cb #(reset! (::mark-as-read? s) false)
+                                    :show-edit? is-publisher?
+                                    :show-delete? is-publisher?
                                     :show-move? (not is-mobile?)
                                     :tooltip-position "bottom"
-                                    :show-inbox? (= (:back-to @router/path) "inbox")
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?

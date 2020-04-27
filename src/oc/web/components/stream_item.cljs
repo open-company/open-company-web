@@ -190,18 +190,13 @@
                            :editable-boards editable-boards
                            :external-share (not is-mobile?)
                            :external-bookmark (not is-mobile?)
-                           :external-follow (not is-mobile?)
-                           :show-edit? true
-                           :show-delete? true
-                           :show-unread (not (:unread activity-data))
+                           :show-edit? publisher?
+                           :show-delete? publisher?
                            :show-move? (not is-mobile?)
-                           :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
-        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
-        caught-up? (and (not (pos? (:new-comments-count activity-data)))
-                        (not (:unread activity-data)))]
+        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -364,10 +359,7 @@
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
-                                :reads-data read-data})]
-                  (when caught-up?
-                    [:div.stream-item-caught-up
-                      "Caught up"]))
+                                :reads-data read-data})])
                 (when (seq activity-attachments)
                   (if-not is-mobile?
                     [:div.stream-item-attachments
