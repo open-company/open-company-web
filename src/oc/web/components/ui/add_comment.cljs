@@ -84,7 +84,7 @@
 (defn me-options [parent-uuid]
   {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
-   :placeholder (if parent-uuid "Reply…" "Add a reply…")
+   :placeholder (if parent-uuid "Reply…" "Add a comment…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 

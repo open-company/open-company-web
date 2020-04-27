@@ -11,6 +11,7 @@
             [oc.web.actions.activity :as activity-actions]))
 
 (rum/defcs empty-board < rum/reactive
+                         (drv/drv :org-data)
                          (drv/drv :current-user-data)
                          (drv/drv :contributions-user-data)
                          section-mixins/container-nav-in
@@ -20,6 +21,7 @@
         is-home? (= (router/current-board-slug) "following")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
+        org-data (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         contrib-user-data (drv/react s :contributions-user-data)
         current-user-contrib? (and is-contributions?
@@ -40,7 +42,7 @@
           (cond
            current-user-contrib? "You haven't published any posts yet"
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
-           is-all? "All is a stream of what’s new in Wut"
+           is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"
            is-saved? "You don't have any saved update"
            is-home?

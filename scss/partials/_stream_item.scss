@@ -108,9 +108,9 @@ div.virtualized-list-row:not(.collapsed-item) {
 }
 
 div.stream-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: space-between;
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
@@ -590,7 +590,8 @@ div.stream-item {
 
     div.stream-body-left {
       position: relative;
-      margin-top: 4px;
+      margin-top: 8px;
+      padding-bottom: 16px;
 
       &.has-thumbnail, &.has-video {
         float: left;
@@ -633,16 +634,18 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body-preview(16, 22, var(--color), 2);
+        @include activity-body-preview(16, 22, var(--color), 3);
+        margin-top: 4px;
+        height: 66px;
 
         @include mobile() {
-          @include activity-body-preview(16, 22, var(--color), 2);
+          @include activity-body-preview(16, 22, var(--color), 3);
         }
       }
     }
 
     div.stream-item-footer {
-      min-height: 26px;
+      min-height: 30px;
 
       @include mobile() {
         height: auto;
@@ -757,7 +760,7 @@ div.stream-item {
       div.stream-item-attachments {
         float: left;
         margin-right: 16px;
-        height: 26px;
+        height: 30px;
         position: relative;
 
         @include mobile() {
@@ -780,7 +783,7 @@ div.stream-item {
           font-size: 14px;
           color: var(--color);
           opacity: 0.5;
-          line-height: 26px;
+          line-height: 30px;
 
           @include mobile() {
             margin-top: 0;
@@ -791,7 +794,7 @@ div.stream-item {
 
         div.stream-item-attachments-list {
           position: absolute;
-          top: 26px;
+          top: 30px;
           left: calc(50% - 120px);
           width: 240px;
           max-height: 200px;
@@ -844,7 +847,6 @@ div.stream-item {
       div.stream-item-wrt {
         float: left;
         position: relative;
-        margin-top: 4px;
         margin-right: 16px;
 
         @include mobile() {
@@ -859,7 +861,7 @@ div.stream-item {
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 28px;
-        height: 26px;
+        height: 30px;
         color: var(--color);
         opacity: 0.5;
         padding-left: 18px;

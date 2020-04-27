@@ -87,6 +87,10 @@ div.cmail-outer {
             display: none;
           }
 
+          div.stream-attachments {
+            display: none;
+          }
+
           div.cmail-content-collapsed-placeholder {
             @include OC_Body_Book();
             font-size: 16px;
@@ -152,6 +156,24 @@ div.cmail-outer {
           position: absolute;
           top: 11px;
           right: 16px;
+
+          button.mobile-attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            float: left;
+            opacity: 1;
+            background-color: var(--opac-background-color-1);
+            border-radius: 4px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+            }
+          }
         }
       }
     }
@@ -871,6 +893,30 @@ div.cmail-outer {
       div.cmail-footer-right {
         float: right;
         position: relative;
+
+        button.attachment-button {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          position: relative;
+          float: right;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+          opacity: 1;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+
+          &:not(.disabled):hover {
+            opacity: 0.9;
+          }
+        }
 
         div.emoji-picker {
           float: left;

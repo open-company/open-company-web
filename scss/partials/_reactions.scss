@@ -1,5 +1,5 @@
 div.reactions {
-  height: 26px;
+  height: 30px;
   float: left;
 
   @include mobile() {
@@ -13,7 +13,7 @@ div.reactions {
       float: left;
       outline: none;
       position: relative;
-      height: 26px;
+      height: 30px;
       cursor: default;
       padding: 4px 3px;
       @include OC_Body_Bold();

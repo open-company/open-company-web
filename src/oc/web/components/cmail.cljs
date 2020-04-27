@@ -15,6 +15,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
@@ -29,6 +30,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
@@ -38,6 +40,59 @@
 
 (def self-board-name "#None")
 (def board-tooltip "Select a team")
+
+;; Attachments handling
+
+(defn media-attachment-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::media-attachment-did-success s)
+    (reset! (::media-attachment s) false)))
+
+(defn attachment-upload-failed-cb [state]
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "attachment-upload-error"
+                    :title "Sorry!"
+                    :message "An error occurred with your file."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)
+    (utils/after 10 #(do
+                       (reset! (::media-attachment-did-success state) false)
+                       (media-attachment-dismiss-picker state)))))
+
+(defn attachment-upload-success-cb [state res]
+  (reset! (::media-attachment-did-success state) true)
+  (let [url (gobj/get res "url")]
+    (if-not url
+      (attachment-upload-failed-cb state)
+      (let [size (gobj/get res "size")
+            mimetype (gobj/get res "mimetype")
+            filename (gobj/get res "filename")
+            createdat (utils/js-date)
+            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+            icon (au/icon-for-mimetype mimetype)
+            attachment-data {:file-name filename
+                             :file-type mimetype
+                             :file-size size
+                             :file-url url}]
+        (reset! (::media-attachment state) false)
+        (activity-actions/add-attachment :cmail-data attachment-data)
+        (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
+
+(defn attachment-upload-error-cb [state res error]
+  (attachment-upload-failed-cb state))
+
+(defn add-attachment [s]
+  (reset! (::media-attachment s) true)
+  (iu/upload!
+   nil
+   (partial attachment-upload-success-cb s)
+   nil
+   (partial attachment-upload-error-cb s)
+   (fn []
+     (utils/after 400 #(media-attachment-dismiss-picker s)))))
 
 ;; Data handling
 
@@ -464,6 +519,8 @@
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
           [:div.cmail-mobile-header-right
+            [:button.mlb-reset.mobile-attachment-button
+              {:on-click #(add-attachment s)}]
             [:div.post-button-container.group
               (post-to-button {:on-submit #(post-clicked s)
                                :disabled disabled?
@@ -556,6 +613,9 @@
             (when-not is-mobile?
               [:div.cmail-content-collapsed-placeholder
                 utils/default-body-placeholder])
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :media-picker-initially-visible false
@@ -573,7 +633,7 @@
                                :media-config ["poll" "code" "gif" "photo" "video"]
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
-                               :attachments-enabled false})
+                               :attachments-enabled true})
             (when (seq (:polls cmail-data))
               (polls-wrapper {:polls-data (:polls cmail-data)
                               :editing? true
@@ -617,4 +677,10 @@
                          :height 32
                          :position "bottom"
                          :default-field-selector "div.cmail-content div.rich-body-editor"
-                         :container-selector "div.cmail-content"})]]]]))
+                         :container-selector "div.cmail-content"})
+          [:button.mlb-reset.attachment-button
+              {:on-click #(add-attachment s)
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title "Add attachment"}]]]]]))

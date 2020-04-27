@@ -1,7 +1,7 @@
 div.is-comments {
   float: left;
   text-align: right;
-  height: 26px;
+  height: 30px;
 
   @include mobile() {
     height: 22px;
@@ -29,7 +29,7 @@ div.is-comments {
     div.is-comments-author {
       float: left;
       width: 22px;
-      height: 22px;
+      height: 26px;
       background-color: transparent;
       border: 2px solid transparent;
       border-radius: 50%;
@@ -57,7 +57,7 @@ div.is-comments {
     font-size: 14px;
     color: var(--light-color);
     @include OC_Body_Book();
-    margin-top: 4px;
+    line-height: 30px;
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
@@ -121,6 +121,7 @@ div.is-comments {
 
     span.add-a-comment {
       color: var(--light-color);
+      line-height: 30px;
 
       @include mobile() {
         display: none;
