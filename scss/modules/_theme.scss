@@ -110,6 +110,8 @@ $dark_mode: "dark";
 
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.07);
+  --purple-primary-color: #{$wut_purple};
+  --purple-secondary-color: #{$wut_feint_purple};
 
   html, body {
     scrollbar-color: light;
@@ -217,6 +219,8 @@ $dark_mode: "dark";
 
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.16);
+  --purple-primary-color: white;
+  --purple-secondary-color: #{$wut_purple};
 
   &, body {
     scrollbar-color: dark;

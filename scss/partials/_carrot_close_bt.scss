@@ -31,9 +31,5 @@ button.modal-close-bt {
 @include dark_mode() {
   button.modal-close-bt {
     background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
-
-    @include wut(){
-      background-image: cdnUrl("/img/ML/close_x@dark.svg");
-    }
   }
 }

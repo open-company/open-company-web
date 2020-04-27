@@ -57,6 +57,10 @@ div.follow-board-picker {
       background-size: 12px 12px;
       border-radius: 4px;
 
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/close_x@dark.svg");
+      }
+
       @include mobile() {
         position: fixed;
         right: 16px;
@@ -103,8 +107,8 @@ div.follow-board-picker {
         line-height: 32px;
         height: 32px;
         float: right;
-        color: $wut_purple;
-        background-color: $wut_feint_purple;
+        color: var(--purple-primary-color);
+        background-color: var(--purple-secondary-color);
         border-radius: 4px;
         padding: 0 8px;
 
