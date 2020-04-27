@@ -597,6 +597,9 @@
                                         :publisher-uuids next-publishers
                                         :follow? follow?
                                         :publisher-uuid publisher-uuid}])
+    (when follow?
+      (dis/dispatch! [:follow-list-last-added org-slug {:last-added-uuid publisher-uuid
+                                                        :resource-type :user}]))
     (if follow?
       (ws-cc/publisher-follow publisher-uuid)
       (ws-cc/publisher-unfollow publisher-uuid))))
@@ -621,6 +624,9 @@
                                     :board-uuids next-boards
                                     :follow? follow?
                                     :board-uuid board-uuid}])
+    (when follow?
+      (dis/dispatch! [:follow-list-last-added org-slug {:last-added-uuid board-uuid
+                                                        :resource-type :board}]))
     (if follow?
       (ws-cc/board-follow board-uuid)
       (ws-cc/board-unfollow board-uuid))))

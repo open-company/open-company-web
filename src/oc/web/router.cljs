@@ -202,7 +202,7 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
-(defn collapse-sections-list-cookie
+(defn collapse-boards-list-cookie
   "Cookie used to remember if the sections list was collapsed or not."
   []
   (str "collapse-sections-list-" (jwt/user-id)))

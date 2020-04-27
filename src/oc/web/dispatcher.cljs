@@ -131,6 +131,9 @@
 (defn follow-list-key [org-slug]
   (vec (conj (org-key org-slug) :follow-list)))
 
+(defn follow-list-last-added-key [org-slug]
+  (vec (conj (org-key org-slug) :follow-list-last-added)))
+
 (defn follow-publishers-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :publisher-uuids)))
 
@@ -563,6 +566,7 @@
    :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
    :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]
    :follow-list           [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-key org-slug)))]
+   :follow-list-last-added [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-last-added-key org-slug)))]
    :followers-count       [[:base :org-slug] (fn [base org-slug] (get-in base (followers-count-key org-slug)))]
    :followers-publishers-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-publishers-count-key org-slug)))]
    :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]

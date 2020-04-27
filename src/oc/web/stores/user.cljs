@@ -372,3 +372,8 @@
                     (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid board-uuid :resource-type :board :count (if follow? 1 0)}))]
       (assoc-in next-db (dispatcher/follow-boards-list-key org-slug) next-boards))
     db))
+
+(defmethod dispatcher/action :follow-list-last-added
+  [db [_ org-slug {:keys [last-added-uuid resource-type] :as x}]]
+  (let [follow-list-last-added-key (conj (dispatcher/follow-list-last-added-key org-slug) resource-type)]
+    (assoc-in db follow-list-last-added-key last-added-uuid)))
