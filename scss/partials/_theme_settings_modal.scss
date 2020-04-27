@@ -171,7 +171,7 @@ div.theme-settings-modal {
                 background-image: cdnUrl("/img/ML/wut_dark_mode_light_active.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/wut_dark_mode_light_active.svg");
+                  background-image: cdnUrl("/img/ML/wut_dark_mode_light_active@dark.svg");
                 }
               }
 
@@ -197,10 +197,10 @@ div.theme-settings-modal {
 
             &.active {
               span.theme-icon {
-                background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+                background-image: cdnUrl("/img/ML/wut_dark_mode_dark_active.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+                  background-image: cdnUrl("/img/ML/wut_dark_mode_dark_active.svg");
                 }
               }
 
