@@ -526,39 +526,19 @@
                                :disabled disabled?
                                :title post-button-title
                                :force-show-tooltip @(::show-post-tooltip s)})]]]
-        [:div.cmail-header.group
-          [:div.cmail-header-left-buttons.group
-            [:div.close-bt-container
-              {:class (when unpublished? "unpublished-post")}
-              [:button.mlb-reset.close-bt
-                {:on-click close-cb
-                 :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "auto"
-                 :title (if unpublished?
-                          "Save & Go back"
-                          "Close")}]]
-            [:div.delete-button-container
-              [:button.mlb-reset.delete-button
-                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                 :data-toggle "tooltip"
-                 :data-placement "bottom"
-                 :data-container "body"
-                 :on-click #(delete-clicked s % cmail-data)}]]
-            (when (and (not= (:status cmail-data) "published")
-                       (not is-mobile?))
-              (if (or (:has-changes cmail-data)
-                      (:auto-saving cmail-data))
-                [:div.saving-saved "Saving..."]
-                (when (false? (:auto-saving cmail-data))
-                  [:div.saving-saved "Saved"])))]
-          [:div.cmail-header-center.group
-            (user-avatar-image current-user-data)
-            [:div.cmail-header-center-title
-              (:headline cmail-data)]]]
+        [:div.dismiss-inline-cmail-container
+          {:class (when unpublished? "long-tooltip")}
+          [:button.mlb-reset.dismiss-inline-cmail
+            {:on-click close-cb
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "left"
+             :title (if unpublished?
+                      "Save & Close"
+                      "Close")}]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
-            (if is-mobile?
+            (when is-mobile?
               [:div.section-picker-bt-container
                 [:span.post-to "Post to"]
                 [:button.mlb-reset.section-picker-bt
@@ -569,26 +549,7 @@
                     {:ref :sections-picker-container}
                     (sections-picker {:active-slug (:board-slug cmail-data)
                                       :on-change did-pick-section
-                                      :current-user-data current-user-data})])]
-              [:div.cmail-content-header.group
-                (user-avatar-image current-user-data)
-                [:span.cmail-content-header-author
-                  (oc.lib.user/name-for current-user-data)]
-                [:span.cmail-content-header-in
-                  "in"]
-                [:div.section-picker-bt-container
-                  [:button.mlb-reset.section-picker-bt
-                    {:on-click #(swap! (::show-sections-picker s) not)
-                     :data-placement "top"
-                     :data-toggle "tooltip"
-                     :title board-tooltip}
-                    (:board-name cmail-data)]
-                  (when @(::show-sections-picker s)
-                    [:div.sections-picker-container
-                      {:ref :sections-picker-container}
-                      (sections-picker {:active-slug (:board-slug cmail-data)
-                                        :on-change did-pick-section
-                                        :current-user-data current-user-data})])]])
+                                      :current-user-data current-user-data})])])
             ; Headline element
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline.emoji-autocomplete.emojiable
@@ -648,15 +609,19 @@
                            :title post-button-title
                            :force-show-tooltip @(::show-post-tooltip s)
                            :show-on-hover true})]
-        [:div.dismiss-inline-cmail-container
-          {:class (when unpublished? "long-tooltip")}
-          [:button.mlb-reset.dismiss-inline-cmail
-            {:on-click close-cb
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement "auto"
-             :title (if unpublished?
-                      "Save & Close"
-                      "Close")}]]
+        [:div.section-picker-bt-container
+          [:button.mlb-reset.section-picker-bt
+            {:on-click #(swap! (::show-sections-picker s) not)
+             :data-placement "top"
+             :data-toggle "tooltip"
+             :title board-tooltip}
+            (str "#" (:board-name cmail-data))]
+          (when @(::show-sections-picker s)
+            [:div.sections-picker-container
+              {:ref :sections-picker-container}
+              (sections-picker {:active-slug (:board-slug cmail-data)
+                                :on-change did-pick-section
+                                :current-user-data current-user-data})])]
         ; (when (:uuid cmail-data)
         ;     [:div.delete-bt-container
         ;       [:button.mlb-reset.delete-bt
