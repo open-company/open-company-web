@@ -101,12 +101,12 @@
                         (when (pos? followers-count)
                           [:span.followers-count
                             (str followers-count " follower" (when (not= followers-count 1) "s"))]))
-                      [:button.mlb-reset.follow-bt
+                      [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-board (:uuid b))
-                         :class (when (:follow b) "unfollow")}
-                        (if (:follow b)
-                          "Unfollow"
-                          "Follow")]]))
+                         :data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :title "Unfollow"}
+                        "Following"]]))
                 ;; Unfollowing
                 (when (seq unfollowing-boards)
                   [:div.follow-board-picker-row-header
@@ -123,8 +123,5 @@
                           [:span.followers-count
                             (str followers-count " follower" (when (not= followers-count 1) "s"))]))
                       [:button.mlb-reset.follow-bt
-                        {:on-click #(user-actions/toggle-board (:uuid b))
-                         :class (when (:follow b) "unfollow")}
-                        (if (:follow b)
-                          "Unfollow"
-                          "Follow")]]))]])]]]))
+                        {:on-click #(user-actions/toggle-board (:uuid b))}
+                        "Follow"]]))]])]]]))
