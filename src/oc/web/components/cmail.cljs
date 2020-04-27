@@ -509,8 +509,8 @@
                       (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
                       (utils/after 280
-                       #(when-let [headline-el (rum/ref-node s "headline")]
-                          (.focus headline-el)))))}
+                       #(when-let [body-el (body-element)]
+                          (.focus body-el)))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state))
         (trial-expired-alert {:top "48px" :left "50%"}))
