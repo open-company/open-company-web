@@ -225,8 +225,9 @@
                               (when (fn? mark-unread-cb)
                                 (mark-unread-cb)))}
                 "Mark as unread"])
-            (when (or is-mobile?
-                      (not external-follow))
+            (when (and show-inbox?
+                       (or is-mobile?
+                           (not external-follow)))
               (if inbox-follow-link
                 [:li.follow
                   {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
