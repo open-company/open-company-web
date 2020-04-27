@@ -49,46 +49,45 @@ div.empty-board {
         &.contributions {
           background-image: none;
           @include user-profile(56);
-
         }
 
-        &.inbox {
-          background-image: cdnUrl("/img/ML/empty_state_inbox_section.svg");
-          background-size: 24px 21px;
+        &.all-posts {
+          background-image: cdnUrl("/img/ML/nav_all.svg");
+          background-size: 24px 24px;
         }
 
         &.drafts {
-          background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-          background-size: 18px 22px;
+          background-image: cdnUrl("/img/ML/nav_drafts.svg");
+          background-size: 24px 24px;
         }
 
-        &.bookmarks {
-          background-image: cdnUrl("/img/ML/empty_state_bookmarks_section.svg");
-          background-size: 18px 24px;
+        &.saved {
+          background-image: cdnUrl("/img/ML/nav_saved.svg");
+          background-size: 24px 24px;
         }
 
-        &.following {
-          background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
-          background-size: 24px 21px;
+        &.home {
+          background-image: cdnUrl("/img/ML/nav_home.svg");
+          background-size: 24px 24px;
         }
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
 
-          &.inbox {
-            background-image: cdnUrl("/img/ML/empty_state_inbox_section@dark.svg");
+          &.all {
+            background-image: cdnUrl("/img/ML/nav_all@dark.svg");
           }
 
           &.drafts {
-            background-image: cdnUrl("/img/ML/empty_state_drafts@dark.svg");
+            background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
           }
 
-          &.bookmarks {
-            background-image: cdnUrl("/img/ML/empty_state_bookmarks_section@dark.svg");
+          &.saved {
+            background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
           }
 
-          &.following {
-            background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
+          &.home {
+            background-image: cdnUrl("/img/ML/nav_home@dark.svg");
           }
         }
       }

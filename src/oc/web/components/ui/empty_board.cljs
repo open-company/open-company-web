@@ -15,10 +15,9 @@
                          (drv/drv :contributions-user-data)
                          section-mixins/container-nav-in
   [s]
-  (let [is-inbox? (= (router/current-board-slug) "inbox")
-        is-all-posts? (= (router/current-board-slug) "all-posts")
-        is-bookmarks? (= (router/current-board-slug) "bookmarks")
-        is-following? (= (router/current-board-slug) "following")
+  (let [is-all? (= (router/current-board-slug) "all-posts")
+        is-saved? (= (router/current-board-slug) "bookmarks")
+        is-home? (= (router/current-board-slug) "following")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
         current-user-data (drv/react s :current-user-data)
@@ -31,28 +30,26 @@
           {:class (when is-contributions? "contrib")}
           [:div.empty-board-illustration
             {:class (utils/class-set {:contributions is-contributions?
-                                      :inbox is-inbox?
-                                      :all-posts is-all-posts?
+                                      :all-posts is-all?
                                       :drafts is-drafts-board?
-                                      :bookmarks is-bookmarks?
-                                      :following is-following?})}
+                                      :saved is-saved?
+                                      :home is-home?})}
             (when is-contributions?
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
           (cond
            current-user-contrib? "You haven't published any posts yet"
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
-           is-inbox? "You’re all caught up!"
-           is-all-posts? "Recent is a stream of what’s new in Carrot"
+           is-all? "All is a stream of what’s new in Wut"
            is-drafts-board? "Nothing in drafts"
-           is-bookmarks? "You don't have any bookmarks"
-           is-following?
+           is-saved? "You don't have any saved update"
+           is-home?
            [:div.empty-follow
-             "Add teammates and teams you'd like to follow"
+             "Your home feed will only show you the posts from the people and teams you're following."
              [:button.mlb-reset.follow-users-bt
                {:on-click #(nav-actions/show-follow-user-picker)}
-               "Follow teammates"]
+               "Follow someone"]
              [:button.mlb-reset.follow-boards-bt
                {:on-click #(nav-actions/show-follow-board-picker)}
-               "Follow teams"]]
+               "Follow a team"]]
            :else "This team has no updates")]]]))

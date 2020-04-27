@@ -77,7 +77,7 @@
         [:div.follow-user-picker-header
           [:button.mlb-reset.invite-user-bt
             {:on-click #(nav-actions/show-section-add)}
-            "Invite teammates"]
+            "Invite people"]
           [:h3.follow-user-picker-title
             "People"]]
         [:div.follow-user-picker-body
@@ -111,7 +111,7 @@
                       [:span.user-name
                         (:name u)]
                       [:span.user-role
-                        (:role u)]
+                        (:title u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count
@@ -135,7 +135,7 @@
                       [:span.user-name
                         (:name u)]
                       [:span.user-role
-                        (:role u)]
+                        (:title u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
                         (when (pos? followers-count)
                           [:span.followers-count

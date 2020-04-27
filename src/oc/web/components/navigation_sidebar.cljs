@@ -185,12 +185,12 @@
             (orgs-dropdown)])
         ;; All posts
         (when show-following
-          [:a.all-posts.hover-item.group
+          [:a.home.hover-item.group
             {:class (utils/class-set {:item-selected is-following})
              :href (oc-urls/following)
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
-            [:div.all-posts-icon]
-            [:div.all-posts-label
+            [:div.home-icon]
+            [:div.home-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
             ; (when (pos? (count all-unread-items))
@@ -205,7 +205,7 @@
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
-              "All updates"]
+              "All"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
@@ -347,7 +347,7 @@
                 (when (= (:access board) "private")
                   [:div.private])])])]
       (when show-invite-people?
-        [:div.left-navigation-sidebar-footer
+        [:div.left-navigation-sidebar-footer.top-border
           [:button.mlb-reset.invite-people-bt
             {:on-click #(nav-actions/show-org-settings :invite-picker)}
             "Invite people"]])]))

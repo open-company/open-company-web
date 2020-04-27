@@ -67,12 +67,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -106,7 +106,7 @@
     border-radius: 0;
   }
 
-  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+  .internal, div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
     // color: $wut_purple;
     @include OC_Body_Book();
     font-size: 14px;
@@ -137,7 +137,7 @@
     color: $deep_navy;
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+  div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -197,7 +197,7 @@
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
     color: var(--color);
     text-decoration: none;
 
@@ -271,7 +271,6 @@ div.left-navigation-sidebar {
     width: #{$left_navigation_sidebar_width}px;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-bottom: 10px;
 
     @include mobile() {
       position: relative;
@@ -326,7 +325,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions, a.following {
+  a.home, a.all-posts, a.bookmarks, a.drafts, a.contributions, a.following {
     display: block;
     background-color: transparent;
     border: none;
@@ -367,12 +366,12 @@ div.left-navigation-sidebar {
 
     &.item-selected {
 
-      div.inbox-icon {
-        background-image: cdnUrl("/img/ML/nav_threads@dark.svg");
+      div.home-icon {
+        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
       }
 
       div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
       }
 
       div.bookmarks-icon {
@@ -384,7 +383,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -406,8 +405,8 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.inbox-icon {
-      background-image: cdnUrl("/img/ML/nav_threads.svg");
+    div.home-icon {
+      background-image: cdnUrl("/img/ML/nav_home.svg");
       background-size: 14px 14px;
       background-repeat: no-repeat;
       background-position: center;
@@ -422,7 +421,7 @@ div.left-navigation-sidebar {
     }
 
     div.all-posts-icon {
-      background-image: cdnUrl("/img/ML/nav_home.svg");
+      background-image: cdnUrl("/img/ML/nav_all.svg");
       background-size: 14px 14px;
       background-repeat: no-repeat;
       background-position: center;
@@ -795,6 +794,12 @@ div.left-navigation-sidebar {
     overflow: visible;
     padding: 16px 0;
 
+    &.top-border {
+      margin-top: 16px;
+      border-top: 1px solid var(--divider-line);
+      padding-top: 16px;
+    }
+
     @include mobile() {
       display: none;
     }
@@ -833,13 +838,13 @@ div.left-navigation-sidebar {
       }
     }
 
-    a.inbox, a.all-posts, a.bookmarks, a.drafts, a.following {
-      div.inbox-icon {
-        background-image: cdnUrl("/img/ML/nav_threads@dark.svg");
+    a.home, a.all-posts, a.bookmarks, a.drafts, a.following {
+      div.home-icon {
+        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
       }
 
       div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+        background-image: cdnUrl("/img/ML/nav_al@dark.svg");
       }
 
       div.bookmarks-icon {

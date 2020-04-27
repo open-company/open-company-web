@@ -265,19 +265,23 @@
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board))
-                                                  :public (= (:access current-board-data) "public")})
+                                                  :public (= (:access current-board-data) "public")
+                                                  :home-icon is-following
+                                                  :all-icon is-all-posts
+                                                  :saved-icon is-bookmarks
+                                                  :drafts-icon is-drafts-board})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"
 
                                                    is-all-posts
-                                                   "All updates"
+                                                   "All"
 
                                                    is-bookmarks
                                                    "Saved"
 
                                                    is-following
-                                                   "Following"
+                                                   "Home"
 
                                                    :default
                                                    ;; Fallback to the org board data

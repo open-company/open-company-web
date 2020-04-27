@@ -65,12 +65,12 @@ $header_top_margin: 24;
 @mixin bookmark-tag() {
   div.bookmark-tag {
     @include image-2x("/img/ML/bookmark_tag");
-    background-size: 75px 10px;
+    background-size: 48px 14px;
     background-position: center;
     background-repeat: no-repeat;
     background-color: rgba($sea_blue, 0.2);
     height: 18px;
-    width: 86px;
+    width: 59px;
     margin-right: 8px;
     position: relative;
     vertical-align: top;

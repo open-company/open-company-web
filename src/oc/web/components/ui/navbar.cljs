@@ -85,11 +85,11 @@
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
-                       "All updates"
+                       "All"
                        (= (router/current-board-slug) "bookmarks")
                        "Saved"
                        (= (router/current-board-slug) "following")
-                       "Following"
+                       "Home"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else
