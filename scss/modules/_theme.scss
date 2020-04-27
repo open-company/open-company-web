@@ -39,7 +39,7 @@ $dark_mode: "dark";
   --reaction-bt-background: #{rgba($deep_navy, 0.1)};
 
   // Stream-item
-  --foc-background-color: #{rgba($deep_navy, 0.05)};
+  --foc-background-color: white;; // #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: #{rgba($deep_navy, 0.05)};
   --foc-hover-color: #F1F0F0; // rgb(241, 240, 240)
   --foc-hover-border-color: #{rgba($deep_navy, 0.24)};
@@ -148,7 +148,7 @@ $dark_mode: "dark";
   --reaction-bt-background: #{rgba(white, 0.12)};
 
   // Stream-item
-  --foc-background-color: #{rgba(black, 0.16)};
+  --foc-background-color: #{rgba(45, 49, 59, 1)}; // #{rgba(black, 0.16)};
   --mobile-foc-background-color: #1B202A;
   --foc-hover-color: #{rgba(36, 41, 50, 1)};
   --foc-hover-border-color: #{rgba(white, 0.22)};

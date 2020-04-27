@@ -99,7 +99,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :change-data)
+                                ; (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
@@ -155,9 +155,9 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
-        change-data (drv/react s :change-data)
-        filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
-                                                    (not= % (:uuid org-data))) change-data))
+        ; change-data (drv/react s :change-data)
+        ; filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
+        ;                                             (not= % (:uuid org-data))) change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
@@ -186,7 +186,7 @@
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
-        all-unread-items (mapcat :unread (vals filtered-change-data))
+        ; all-unread-items (mapcat :unread (vals filtered-change-data))
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
@@ -230,7 +230,7 @@
              :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq all-unread-items)})}
+              ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "All"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
@@ -272,11 +272,12 @@
               [:button.mlb-reset.left-navigation-sidebar-title-arrow
                 {:class (utils/class-set {:collapsed @(::users-list-collapsed s)})
                  :on-click #(toggle-collapse-users s)}]
-              (let [user-ids (map :user-id follow-publishers-list)
-                    publisher-boards-change-data (map (partial get change-data) user-ids)]
+              (let [; user-ids (map :user-id follow-publishers-list)
+                    ; publisher-boards-change-data (map (partial get change-data) user-ids)
+                    ]
                 [:button.mlb-reset.left-navigation-sidebar-title
-                  {:class (utils/class-set {:new (and @(::users-list-collapsed s)
-                                                      (seq (mapcat :unread publisher-boards-change-data)))})
+                  {; :class (utils/class-set {:new (and @(::users-list-collapsed s)
+                   ;                                    (seq (mapcat :unread publisher-boards-change-data)))})
                    :on-click #(toggle-collapse-users s)}
                   [:span.boards "People"]])
               [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
@@ -292,11 +293,12 @@
                   :let [user-url (oc-urls/contributions org-slug (:user-id user))
                         is-current-user (and (router/current-contributions-id)
                                              (= (:user-id user) (router/current-contributions-id)))
-                        board (some #(when (and (:publisher-board %)
-                                                (= (-> % :author :user-id) (:user-id user)))
-                                       %)
-                               all-boards)
-                        board-change-data (when board (get change-data (:uuid board)))]
+                        ; board (some #(when (and (:publisher-board %)
+                        ;                         (= (-> % :author :user-id) (:user-id user)))
+                        ;                %)
+                        ;        all-boards)
+                        ; board-change-data (when board (get change-data (:uuid board)))
+                        ]
                   :when (or (not @(::users-list-collapsed s))
                             is-current-user)]
               [:a.left-navigation-sidebar-item.hover-item.contributions
@@ -308,7 +310,7 @@
                 [:div.board-name.group
                   (user-avatar-image user)
                   [:div.internal
-                    {:class (when (seq (:unread board-change-data)) "new")}
+                    ; {:class (when (seq (:unread board-change-data)) "new")}
                     (:short-name user)]]])])
         ;; Boards list
         (when show-boards
@@ -318,11 +320,12 @@
               [:button.mlb-reset.left-navigation-sidebar-title-arrow
                 {:class (utils/class-set {:collapsed @(::boards-list-collapsed s)})
                  :on-click #(toggle-collapse-boards s)}]
-              (let [follow-board-uuids (map :uuid follow-boards-list)
-                    boards-change-data (map (partial get change-data) follow-board-uuids)]
+              (let [; follow-board-uuids (map :uuid follow-boards-list)
+                    ; boards-change-data (map (partial get change-data) follow-board-uuids)
+                    ]
                 [:button.mlb-reset.left-navigation-sidebar-title
-                  {:class (utils/class-set {:new (and @(::boards-list-collapsed s)
-                                                      (seq (mapcat :unread boards-change-data)))})
+                  {; :class (utils/class-set {:new (and @(::boards-list-collapsed s)
+                   ;                                    (seq (mapcat :unread boards-change-data)))})
                    :on-click #(toggle-collapse-boards s)}
                   [:span.boards "Teams"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
@@ -347,7 +350,8 @@
                                               (not is-home)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
-                        board-change-data (get change-data (:uuid board))]
+                        ; board-change-data (get change-data (:uuid board))
+                        ]
                   :when (or (not @(::boards-list-collapsed s))
                             is-current-board)]
               [:a.left-navigation-sidebar-item.hover-item
@@ -362,7 +366,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (seq (:unread board-change-data))
+                    {:class (utils/class-set {; :new (seq (:unread board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]

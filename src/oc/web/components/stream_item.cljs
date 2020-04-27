@@ -200,15 +200,14 @@
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
-        white-bg? (or (pos? (:new-comments-count activity-data))
-                      (:unread activity-data))]
+        caught-up? (and (not (pos? (:new-comments-count activity-data)))
+                        (not (:unread activity-data)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
                                 :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
-                                :unread-item white-bg?
                                 :muted-item (utils/link-for (:links activity-data) "follow")
                                 :expandable is-published?
                                 :show-mobile-more-bt true
@@ -366,7 +365,7 @@
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :reads-data read-data})]
-                  (when-not white-bg?
+                  (when caught-up?
                     [:div.stream-item-caught-up
                       "Caught up"]))
                 (when (seq activity-attachments)
