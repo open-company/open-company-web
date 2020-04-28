@@ -48,7 +48,7 @@ div.wrt-count-container {
     padding: 8px 8px 8px 29px;
     background-image: cdnUrl("/img/ML/wrt_foc_icon.svg");
     background-size: 13px 13px;
-    background-position: 8px 8px;
+    background-position: 8px center;
     background-repeat: no-repeat;
     background-color: var(--opac-background-color-15);
     border-radius: 4px;
@@ -67,7 +67,8 @@ div.wrt-count-container {
       border-radius: 0;
       opacity: 0.5;
       height: 32px;
-      padding: 4px 0 4px 21px;
+      line-height: 16px;
+      padding: 8px 0 8px 21px;
     }
   }
 }

@@ -92,7 +92,7 @@ div.expanded-post {
       float: right;
       position: relative;
       margin-top: 0;
-      padding: 4px 16px 4px 0;
+      padding: 0 16px 0 0;
 
       &:after {
         content: "";
@@ -104,23 +104,20 @@ div.expanded-post {
         background-color: var(--opac-background-color-2);
       }
 
-      @include mobile() {
-        margin-top: 0;
-        padding: 0 16px 0 0;
-      }
-
       div.wrt-count-container {
-        height: 24px;
+        height: 32px;
 
         div.wrt-count {
-          line-height: 24px;
+          line-height: 16px;
           color: var(--color);
+          background-color: transparent;
+          background-position: 0 center;
+          padding: 8px 0 8px 21px;
           opacity: 1;
         }
 
         @include mobile() {
           opacity: 0.5;
-          height: 32px;
         }
       }
     }
