@@ -194,7 +194,7 @@
          (more-menu-comp))
        [:button.mlb-reset.mobile-more-bt
          {:on-click #(swap! (::force-show-menu s) not)}]
-       (when user-is-part-of-the-team
+       (when is-publisher?
          [:div.expanded-post-wrt-container
            (wrt-count {:activity-data activity-data
                        :reads-data reads-data})])]
