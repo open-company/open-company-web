@@ -50,14 +50,11 @@
   (rum/local nil ::send-bt-cta)
   (rum/local 0 ::sending)
   (rum/local 0 ::initial-sending)
-  {:init (fn [s] (js/console.log "DBG invite-email/init") s)
-   :will-mount (fn [s]
-    (js/console.log "DBG invite-email/will-mount")
+  {:will-mount (fn [s]
     (setup-initial-rows s)
     (reset! (::send-bt-cta s) (save-button-cta s))
     s)
    :will-update (fn [s]
-    (js/console.log "DBG invite-email/will-update")
     (let [sending (::sending s)
           initial-sending (::initial-sending s)]
       (when (pos? @sending)
@@ -88,7 +85,6 @@
                   (reset! (::send-bt-cta s) (save-button-cta s)))))))))
     s)
     :will-unmount (fn [s]
-     (js/console.log "DBG invite-email/will-unmount")
      (dis/dispatch! [:input [:invite-users] nil])
      s)}
 
@@ -96,7 +92,6 @@
   (let [invite-users (drv/react s :invite-users)
         org-data (drv/react s :org-data)
         is-admin? (jwt/is-admin? (:team-id org-data))]
-    (js/console.log "DBG invite-email/render")
     [:div.invite-email-container
       [:div.invite-email
         {:key "org-settings-invite-table"}

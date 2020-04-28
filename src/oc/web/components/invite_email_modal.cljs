@@ -45,9 +45,7 @@
   (drv/drv :invite-data)
   ;; Locals
   (rum/local false ::creating-invite-link)
-  {:init (fn [s] (js/console.log "DBG invite-email-modal/init") s)
-   :will-mount (fn [s]
-    (js/console.log "DBG invite-email-modal/will-mount")
+  {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data true)
       (team-actions/teams-get))
@@ -59,11 +57,10 @@
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         is-admin? (jwt/is-admin? (:team-id org-data))]
-    (js/console.log "DBG invite-email-modal/render")
     [:div.invite-email-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]
-      [:div.invite-email
+      [:div.invite-email-modal-inner
         [:div.invite-email-header
           [:div.invite-email-header-title
             "Invite via email"]
