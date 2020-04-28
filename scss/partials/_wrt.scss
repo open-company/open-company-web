@@ -64,6 +64,8 @@ div.wrt-count-container {
     @include mobile() {
       padding-left: 0;
       line-height: 20px;
+      padding: 0;
+      background: none;
     }
   }
 }

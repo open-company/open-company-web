@@ -10,6 +10,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.invite-email :refer (invite-email)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- sort-users [user-id users]
@@ -54,7 +55,6 @@
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)
    s)}
-
   [s]
   (let [org-data (drv/react s :org-data)
         follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
@@ -76,20 +76,35 @@
           {:on-click #(nav-actions/close-all-panels)}]
         [:div.follow-user-picker-header
           [:button.mlb-reset.invite-user-bt
-            {:on-click #(nav-actions/show-section-add)}
+            {:on-click #(nav-actions/show-org-settings :invite-picker)}
             "Invite people"]
           [:h3.follow-user-picker-title
             "People"]]
         [:div.follow-user-picker-body
-          (if (zero? (count all-authors))
+          (if-not (zero? (count all-authors))
             [:div.follow-user-picker-empty-users
-              [:div.follow-user-picker-empty-icon]
-              [:div.follow-user-picker-empty-copy
-                "There are no active team members yet. "
-                [:button.mlb-reset.follow-user-picker-empty-invite-bt
-                  {:on-click #(nav-actions/show-org-settings :invite-picker)}
-                  "Invite your team"]
-                " to get started."]]
+              ; [:div.follow-user-picker-empty-icon]
+              ; [:div.follow-user-picker-empty-copy
+              ;   "There are no active team members yet. "
+              ;   [:button.mlb-reset.follow-user-picker-empty-invite-bt
+              ;     {:on-click #(nav-actions/show-org-settings :invite-picker)}
+              ;     "Invite your team"]
+              ;   " to get started."]
+              [:div.invite-users-box
+                [:div.invite-users-box-inner.group
+                  [:div.invite-users-title
+                    (str "Who else works at " (:name org-data) "?")]
+                  (invite-email {:rows-num 3
+                                 :hide-user-role true
+                                 :save-title "Send invites"
+                                 :saving-title "Sending invites"
+                                 :saved-title "Invites sent!"})
+                  [:div.invite-users-footer
+                    [:span.invite-user-or
+                      "Or, "]
+                    [:button.mlb-reset.invite-link-bt
+                      {:on-click #(nav-actions/show-org-settings :invite-email)}
+                      "generate an invite link to share"]]]]]
             [:div.follow-user-picker-body-inner.group
               [:input.follow-user-picker-search-field-input.oc-input
                 {:value @(::query s)
