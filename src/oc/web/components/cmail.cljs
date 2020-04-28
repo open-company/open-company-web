@@ -38,7 +38,7 @@
             [clojure.contrib.humanize :refer (filesize)])
   (:import [goog.async Debouncer]))
 
-(def self-board-name "#None")
+(def self-board-name "All")
 (def board-tooltip "Select a team")
 
 ;; Attachments handling
