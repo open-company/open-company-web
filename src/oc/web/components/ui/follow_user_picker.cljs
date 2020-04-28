@@ -37,6 +37,38 @@
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
 
+(rum/defc empty-user-component < rum/static
+  [{:keys [org-data current-user-data]}]
+  [:div.follow-user-picker-empty-users
+    [:div.invite-users-box
+      [:div.invite-users-box-inner.group
+        [:div.invite-users-title
+          (str "Who else works at " (:name org-data) "?")]
+        (invite-email {:rows-num 3
+                       :hide-user-role true
+                       :save-title "Send invites"
+                       :saving-title "Sending invites"
+                       :saved-title "Invites sent!"})
+        [:div.invite-users-footer
+          [:span.invite-user-or
+            "Or, "]
+          [:button.mlb-reset.invite-link-bt
+            {:on-click #(nav-actions/show-org-settings :invite-email)}
+            "generate an invite link to share"]]]]
+    [:div.follow-user-picker-empty-header
+      "People (1)"]
+    [:div.follow-user-picker-empty-self-user
+      (user-avatar-image current-user-data)
+      [:span.user-name
+        (str (:name current-user-data) " (you)")]
+      [:span.user-role
+        (:title current-user-data)]
+      [:span.followers-count
+        "No followers"]
+      [:button.mlb-reset.follow-bt
+        {:on-click #(nav-actions/show-user-settings :profile)}
+        "Edit profile"]]])
+
 (rum/defcs follow-user-picker < rum/reactive
 
  (drv/drv :org-data)
@@ -81,30 +113,8 @@
           [:h3.follow-user-picker-title
             "People"]]
         [:div.follow-user-picker-body
-          (if-not (zero? (count all-authors))
-            [:div.follow-user-picker-empty-users
-              ; [:div.follow-user-picker-empty-icon]
-              ; [:div.follow-user-picker-empty-copy
-              ;   "There are no active team members yet. "
-              ;   [:button.mlb-reset.follow-user-picker-empty-invite-bt
-              ;     {:on-click #(nav-actions/show-org-settings :invite-picker)}
-              ;     "Invite your team"]
-              ;   " to get started."]
-              [:div.invite-users-box
-                [:div.invite-users-box-inner.group
-                  [:div.invite-users-title
-                    (str "Who else works at " (:name org-data) "?")]
-                  (invite-email {:rows-num 3
-                                 :hide-user-role true
-                                 :save-title "Send invites"
-                                 :saving-title "Sending invites"
-                                 :saved-title "Invites sent!"})
-                  [:div.invite-users-footer
-                    [:span.invite-user-or
-                      "Or, "]
-                    [:button.mlb-reset.invite-link-bt
-                      {:on-click #(nav-actions/show-org-settings :invite-email)}
-                      "generate an invite link to share"]]]]]
+          (if (zero? (count all-authors))
+            (empty-user-component {:org-data org-data :current-user-data current-user-data})
             [:div.follow-user-picker-body-inner.group
               [:input.follow-user-picker-search-field-input.oc-input
                 {:value @(::query s)
@@ -128,9 +138,10 @@
                       [:span.user-role
                         (:title u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
-                        (when (pos? followers-count)
-                          [:span.followers-count
-                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
+                        [:span.followers-count
+                          (if (pos? followers-count)
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))
+                            "No followers")])
                       [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-publisher (:user-id u))
                          :data-toggle (when-not is-mobile? "tooltip")
@@ -152,9 +163,10 @@
                       [:span.user-role
                         (:title u)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
-                        (when (pos? followers-count)
-                          [:span.followers-count
-                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
+                        [:span.followers-count
+                          (if (pos? followers-count)
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))
+                            "No followers")])
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-publisher (:user-id u))}
                         "Follow"]]))]])]]]))

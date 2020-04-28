@@ -98,9 +98,10 @@
                       [:div.follow-board-picker-board
                         (:name b)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
-                        (when (pos? followers-count)
-                          [:span.followers-count
-                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
+                        [:span.followers-count
+                          (if (pos? followers-count)
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))
+                            "No followers")])
                       [:button.mlb-reset.follow-bt.unfollow
                         {:on-click #(user-actions/toggle-board (:uuid b))
                          :data-toggle (when-not is-mobile? "tooltip")
@@ -119,9 +120,10 @@
                       [:div.follow-board-picker-board
                         (:name b)]
                       (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
-                        (when (pos? followers-count)
-                          [:span.followers-count
-                            (str followers-count " follower" (when (not= followers-count 1) "s"))]))
+                        [:span.followers-count
+                          (if (pos? followers-count)
+                            (str followers-count " follower" (when (not= followers-count 1) "s"))
+                            "No followers")])
                       [:button.mlb-reset.follow-bt
                         {:on-click #(user-actions/toggle-board (:uuid b))}
                         "Follow"]]))]])]]]))

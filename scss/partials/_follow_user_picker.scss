@@ -160,37 +160,6 @@ div.follow-user-picker {
       }
 
       div.follow-user-picker-empty-users {
-        opacity: 0.7;
-
-        // div.follow-user-picker-empty-icon {
-        //   margin: 32px auto 0;
-        //   width: 40px;
-        //   height: 40px;
-        //   background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-        //   background-size: 40px 40px;
-        //   background-position: center;
-        //   background-repeat: no-repeat;
-
-        //   @include dark_mode() {
-        //     background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
-        //   }
-        // }
-
-        // div.follow-user-picker-empty-copy {
-        //   margin: 8px 0 0;
-        //   @include OC_Body_Book();
-        //   font-size: 16px;
-        //   color: var(--color);
-        //   text-align: center;
-
-        //   button.follow-user-picker-empty-invite-bt {
-        //     display: inline;
-        //     margin: 0;
-        //     padding: 0;
-        //     color: $wut_purple;
-        //     text-decoration: underline;
-        //   }
-        // }
 
         div.invite-users-box {
           width: 640px;
@@ -227,7 +196,9 @@ div.follow-user-picker {
                 @include OC_Body_Book();
                 font-size: 12px;
                 line-height: 15px;
+                color: var(--light-color);
                 text-decoration: underline;
+                float: unset;
 
                 div.add-button-plus {
                   display: none;
@@ -238,6 +209,7 @@ div.follow-user-picker {
                 width: 100%;
                 height: 40px;
                 margin-top: 0;
+                float: unset;
               }
             }
 
@@ -258,6 +230,99 @@ div.follow-user-picker {
                 line-height: 18px;
                 text-decoration: underline;
                 display: inline-block;
+              }
+            }
+          }
+        }
+
+        div.follow-user-picker-empty-header {
+          margin-top: 16px;
+          height: 32px;
+          padding: 8px 0;
+          @include OC_Body_Bold();
+          text-transform: uppercase;
+          font-size: 12px;
+          line-height: 15px;
+          color: var(--light-color);
+        }
+
+        div.follow-user-picker-empty-self-user {
+          height: 48px;
+          padding: 8px 0;
+          border: none;
+          outline: none;
+          width: 100%;
+          display: block;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+
+          @include user-profile(32) {
+            margin-right: 8px;
+            flex: 0 0 32px;
+            align-self: center;
+          }
+
+          span.user-name {
+            @include OC_Body_Book();
+            font-size: 16px;
+            line-height: 18px;
+            color: var(--color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 6px;
+            align-self: center;
+            flex: 0 1 auto;
+          }
+
+          span.user-role {
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 20px;
+            color: var(--light-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 16px;
+            align-self: center;
+            flex: 0 2 auto;
+          }
+
+          span.followers-count {
+            flex: 1 0 auto;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 20px;
+            color: var(--light-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            align-self: center;
+            margin-left: auto;
+            margin-right: 16px;
+            text-align: right;
+          }
+
+          button.follow-bt {
+            margin-left: auto;
+            align-self: center;
+            background-color: var(--opac-background-color-05);
+            color: var(--light-color);
+            height: 32px;
+            border-radius: 4px;
+            width: 92px;
+            padding: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            flex: 0 0 92px;
+
+            @include big_web(){
+              &:hover {
+                opacity: 1;
+                background-color: var(--opac-background-color-2);
+                color: var(--color);
               }
             }
           }
@@ -342,8 +407,8 @@ div.follow-user-picker {
           }
 
           div.follow-user-picker-user-row {
-            height: 40px;
-            padding: 4px 24px;
+            height: 48px;
+            padding: 8px 24px;
             border: none;
             outline: none;
             width: 100%;
@@ -360,8 +425,8 @@ div.follow-user-picker {
 
             span.user-name {
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 20px;
+              font-size: 16px;
+              line-height: 18px;
               color: var(--color);
               overflow: hidden;
               text-overflow: ellipsis;
@@ -373,8 +438,8 @@ div.follow-user-picker {
 
             span.user-role {
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 20px;
+              font-size: 16px;
+              line-height: 18px;
               color: var(--light-color);
               overflow: hidden;
               text-overflow: ellipsis;
@@ -387,15 +452,15 @@ div.follow-user-picker {
             span.followers-count {
               flex: 1 0 auto;
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 20px;
+              font-size: 16px;
+              line-height: 18px;
               color: var(--light-color);
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
               align-self: center;
               margin-left: auto;
-              margin-right: 8px;
+              margin-right: 16px;
               text-align: right;
             }
 

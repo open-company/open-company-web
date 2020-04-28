@@ -1,5 +1,6 @@
 (ns oc.web.stores.user
   (:require [taoensso.timbre :as timbre]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
@@ -57,21 +58,23 @@
 (defn parse-user-data [user-data]
   (-> user-data
     (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
-    (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))))
+    (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))
+    (assoc :name (user-lib/name-for user-data))
+    (assoc :short-name (user-lib/short-name-for user-data))))
 
 (defn- fix-user-values [user-data]
-    (cond-> user-data
-     true (assoc :has-changes false)
-     (empty? (:first-name user-data)) (merge {:first-name ""})
-     (empty? (:last-name user-data)) (merge {:last-name ""})
-     (empty? (:current-password user-data)) (merge {:current-password ""})
-     (empty? (:password user-data)) (merge {:password ""})
-     (empty? (:email user-data)) (merge {:email ""})
-     (empty? (:timezone user-data)) (merge {:timezone (or (.. js/moment -tz guess) "")})
-     (empty? (:blurb user-data)) (merge {:blurb ""})
-     (empty? (:location user-data)) (merge {:location ""})
-     (empty? (:title user-data)) (merge {:title ""})
-     (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
+  (cond-> user-data
+   true (assoc :has-changes false)
+   (empty? (:first-name user-data)) (merge {:first-name ""})
+   (empty? (:last-name user-data)) (merge {:last-name ""})
+   (empty? (:current-password user-data)) (merge {:current-password ""})
+   (empty? (:password user-data)) (merge {:password ""})
+   (empty? (:email user-data)) (merge {:email ""})
+   (empty? (:timezone user-data)) (merge {:timezone (or (.. js/moment -tz guess) "")})
+   (empty? (:blurb user-data)) (merge {:blurb ""})
+   (empty? (:location user-data)) (merge {:location ""})
+   (empty? (:title user-data)) (merge {:title ""})
+   (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
 
 (defn update-user-data [db user-data]
   (let [fixed-user-data (parse-user-data user-data)
