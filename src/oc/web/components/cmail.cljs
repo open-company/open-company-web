@@ -477,8 +477,8 @@
                     (cmail-actions/cmail-hide)))
         unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
-                            "Save update"
-                            "Share update")
+                            "Save"
+                            "Update")
         did-pick-section (fn [board-data note dismiss-action]
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
