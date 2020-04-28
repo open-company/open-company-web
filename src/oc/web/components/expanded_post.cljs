@@ -168,7 +168,8 @@
                                     :external-bookmark (not is-mobile?)
                                     :show-edit? is-publisher?
                                     :show-delete? is-publisher?
-                                    :show-move? (not is-mobile?)
+                                    :show-move? (and (not is-mobile?)
+                                                     is-publisher?)
                                     :tooltip-position "bottom"
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?

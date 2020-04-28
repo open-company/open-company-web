@@ -192,7 +192,8 @@
                            :external-bookmark (not is-mobile?)
                            :show-edit? publisher?
                            :show-delete? publisher?
-                           :show-move? (not is-mobile?)
+                           :show-move? (and (not is-mobile?)
+                                            publisher?)
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
