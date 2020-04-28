@@ -215,7 +215,7 @@ div.cmail-outer {
 
       &.long-tooltip {
         .tooltip {
-          width: 88px;
+          width: 96px;
         }
       }
     }
@@ -484,10 +484,10 @@ div.cmail-outer {
         margin-top: 0;
 
         div.medium-editor-media-picker {
-          margin-top: 1px;
-          top: 0;
+          top: unset;
           left: unset;
-          right: 0;
+          bottom: -60px;
+          right: 68px;
         }
 
         div.rich-body-editor {
@@ -503,11 +503,11 @@ div.cmail-outer {
             @include activity-body(16, 20, var(--color), 16);
             font-size: 16px;
             line-height: 20px;
-            min-height: 20px;
+            min-height: 76px;
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 20px;
+            min-height: 76px;
           }
 
           @include mobile() {
@@ -655,10 +655,10 @@ div.cmail-outer {
           background-repeat: no-repeat;
           border-radius: 0;
           padding: 0;
-          opacity: 1;
+          opacity: 0.5;
 
           &:not(.disabled):hover {
-            opacity: 0.9;
+            opacity: 1;
           }
         }
       }
@@ -677,17 +677,17 @@ div.cmail-outer {
           width: 32px;
           height: 32px;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 14px 16px;
+          background-size: 12px 14px;
           background-repeat: no-repeat;
           background-position: center;
-          opacity: 1;
+          opacity: 0.5;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
           }
 
           &:not(.disabled):hover {
-            opacity: 0.9;
+            opacity: 1;
           }
         }
 
@@ -700,17 +700,17 @@ div.cmail-outer {
             width: 32px;
             height: 32px;
             background-position: center;
-            background-size: 16px 16px;
+            background-size: 14px 14px;
             padding: 0px;
             position: absolute;
             top: 0px;
             left: 0px;
             cursor: pointer;
-            opacity: 1;
+            opacity: 0.5;
             border-radius: 0;
 
             &:not(.disabled):hover {
-              opacity: 0.9;
+              opacity: 1;
             }
           }
 

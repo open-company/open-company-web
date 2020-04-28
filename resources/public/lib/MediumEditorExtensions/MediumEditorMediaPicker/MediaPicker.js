@@ -49,6 +49,7 @@ function PlaceCaretAtEnd(el) {
     pickerButtons: [],
     /* Use inline plus button */
     inlinePlusButtonOptions: {inlineButtons: true,
+                              staticPositioning: false,
                               alwaysExpanded: false,
                               initiallyVisible: false,
                               disableButtons: false},
@@ -97,7 +98,8 @@ function PlaceCaretAtEnd(el) {
       // Initialize tooltips
       $('[data-toggle=\"tooltip\"]').tooltip();
 
-      if (this.inlinePlusButtonOptions.initiallyVisible) {
+      if (this.inlinePlusButtonOptions.initiallyVisible ||
+          this.inlinePlusButtonOptions.staticPositioning) {
         // Force show the media picker buttons
         this.togglePicker();
       }
@@ -205,18 +207,25 @@ function PlaceCaretAtEnd(el) {
     },
 
     onFocus: function(event, editable){
-      setTimeout(this.togglePicker.bind(this), 100);
+      if (!this.inlinePlusButtonOptions.staticPositioning) {
+        setTimeout(this.togglePicker.bind(this), 100);
+      }
     },
 
     createPicker: function(){
       var picker = this.document.createElement('div');
       picker.id = 'medium-editor-media-picker-' + this.getEditorId();
       picker.className = 'medium-editor-media-picker';
-      picker.style.display = "none";
       this.mediaButtonsContainer = this.createPickerMediaButtons();
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton = this.createPickerMainButton();
         picker.appendChild(this.mainButton);
+      }
+      if (this.inlinePlusButtonOptions.staticPositioning) {
+        picker.classList.add(this.expandedClass, 'medium-editor-media-picker-static');
+        this.mediaButtonsContainer.classList.add(this.expandedClass);
+      } else {
+        picker.style.display = "none";
       }
       picker.appendChild(this.mediaButtonsContainer);
       return picker;
@@ -885,21 +894,23 @@ function PlaceCaretAtEnd(el) {
     },
 
     collapse: function(){
-      if (this._waitingCB) {
-        return;
-      }
-      this.delegate("willCollapse");
-      if (this.mediaButtonsContainer) {
-        this.mediaButtonsContainer.classList.remove(this.expandedClass);
-      }
-      if (!this.inlinePlusButtonOptions.alwaysExpanded) {
-        this.mainButton.classList.remove(this.expandedClass);
+      if (!this.inlinePlusButtonOptions.staticPositioning) {
+        if (this._waitingCB) {
+          return;
+        }
+        this.delegate("willCollapse");
+        if (this.mediaButtonsContainer) {
+          this.mediaButtonsContainer.classList.remove(this.expandedClass);
+        }
+        if (!this.inlinePlusButtonOptions.alwaysExpanded) {
+          this.mainButton.classList.remove(this.expandedClass);
 
-        this.mainButton.setAttribute("title", "Insert media");
-        $(this.mainButton).tooltip("fixTitle");
-        $(this.mainButton).tooltip("hide");
+          this.mainButton.setAttribute("title", "Insert media");
+          $(this.mainButton).tooltip("fixTitle");
+          $(this.mainButton).tooltip("hide");
+        }
+        this.delegate("didCollapse");
       }
-      this.delegate("didCollapse");
     },
 
     toggleExpand: function(event){
@@ -940,16 +951,18 @@ function PlaceCaretAtEnd(el) {
       if (this._waitingCB) {
         return;
       }
-      if(this.inlinePlusButtonOptions.alwaysExpanded) {
+      if (!this.inlinePlusButtonOptions.staticPositioning) {
+        if(this.inlinePlusButtonOptions.alwaysExpanded) {
+          this.collapse();
+        }
+        this.delegate("willHide");
         this.collapse();
+        this._lastParagraphElement = undefined;
+        if (this.pickerElement) {
+          this.pickerElement.style.display = 'none';
+        }
+        this.delegate("didHide");
       }
-      this.delegate("willHide");
-      this.collapse();
-      this._lastParagraphElement = undefined;
-      if (this.pickerElement) {
-        this.pickerElement.style.display = 'none';
-      }
-      this.delegate("didHide");
     },
 
     isRangySelectionBoundary: function(el) {
@@ -986,7 +999,8 @@ function PlaceCaretAtEnd(el) {
     },
 
     repositionMediaPicker: function(){
-      if (this.pickerElement) {
+      if (this.pickerElement &&
+          !this.inlinePlusButtonOptions.staticPositioning) {
         if (this._lastParagraphElement) {
           var top = ($(this._lastParagraphElement).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
           this.pickerElement.style.top = top + "px";

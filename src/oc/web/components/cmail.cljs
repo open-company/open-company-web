@@ -579,6 +579,7 @@
              #(activity-actions/remove-attachment :cmail-data %))
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
+                               :static-positioned-media-picker true
                                :media-picker-initially-visible false
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
