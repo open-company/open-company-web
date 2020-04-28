@@ -386,6 +386,11 @@ div.cmail-outer {
       div.cmail-content-headline-container {
         display: block;
 
+        @include user-profile(24) {
+          float: left;
+          margin: 2px 8px 0 0;
+        }
+
         div.cmail-content-headline {
           border: none;
           outline: none;
@@ -397,9 +402,11 @@ div.cmail-outer {
           min-height: 28px;
           line-height: 28px;
           border: none;
-          margin: 8px 0 0;
+          margin: 0;
           padding: 0;
           display: block;
+          float: left;
+          width: calc(100% - 32px);
 
           @include mobile() {
             @include activity-title(16px, 22px);

@@ -619,7 +619,7 @@
     (str team-name " team update")
     "Team update"))
 
-(def default-body-placeholder "Wut's new?")
+(def default-body-placeholder "Wut's happening?")
 
 (def default-abstract "Quick summary (optional)")
 

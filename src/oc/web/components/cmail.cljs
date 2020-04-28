@@ -552,6 +552,7 @@
                                       :current-user-data current-user-data})])])
             ; Headline element
             [:div.cmail-content-headline-container.group
+              (user-avatar-image current-user-data)
               [:div.cmail-content-headline.emoji-autocomplete.emojiable
                 {:class utils/hide-class
                  :content-editable true
