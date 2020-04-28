@@ -50,10 +50,6 @@ div.paginated-stream {
       overflow: visible !important;
       padding-bottom: 24px;
 
-      @include mobile() {
-        margin-top: 8px;
-      }
-
       .ReactVirtualized__Grid.ReactVirtualized__List,
       .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;

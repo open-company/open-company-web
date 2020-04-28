@@ -568,6 +568,10 @@ div.stream-item {
       margin-top: 8px;
       padding-bottom: 16px;
 
+      @include mobile() {
+        padding-bottom: 8px;
+      }
+
       &.has-thumbnail, &.has-video {
         float: left;
         width: 478px;
@@ -615,6 +619,8 @@ div.stream-item {
 
         @include mobile() {
           @include activity-body-preview(16, 22, var(--color), 3);
+          margin-top: 0;
+          height: 44px;
         }
       }
     }

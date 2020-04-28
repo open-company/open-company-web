@@ -129,7 +129,7 @@
                                                    :long-press long-press-handler
                                                    :disabled #(not (au/is-published? (-> % :rum/args first :activity-data)))}))
                          (when-not ua/edge?
-                           (am/truncate-element-mixin "div.stream-item-body" (* 22 3)))
+                           (am/truncate-element-mixin "div.stream-item-body" (* 22 (if (responsive/is-mobile-size?) 2 3))))
                          ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)

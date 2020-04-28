@@ -106,6 +106,7 @@ div.expanded-post {
 
       @include mobile() {
         margin-top: 0;
+        padding: 0 16px 0 0;
       }
 
       div.wrt-count-container {
@@ -115,6 +116,11 @@ div.expanded-post {
           line-height: 24px;
           color: var(--color);
           opacity: 1;
+        }
+
+        @include mobile() {
+          opacity: 0.5;
+          height: 32px;
         }
       }
     }
