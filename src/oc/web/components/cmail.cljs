@@ -308,6 +308,7 @@
                    (drv/drv :show-edit-tooltip)
                    (drv/drv :current-user-data)
                    (drv/drv :payments)
+                   (drv/drv :follow-boards-list)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -415,13 +416,15 @@
                             (real-close)
                             (utils/after
                              180
-                             #(router/nav! (cond
-                                             (= (router/current-board-slug) "all-posts")
-                                             (oc-urls/all-posts)
-                                             (:publisher-board cmail-data)
-                                             (oc-urls/contributions (:user-id @(drv/get-ref s :current-user-data)))
-                                             :else
-                                             (oc-urls/board (:board-slug cmail-data)))))))))
+                             #(let [following-board-uuids (map :uuid @(drv/get-ref s :follow-boards-list))]
+                                (router/nav! (cond
+                                               (or (= (router/current-board-slug) "all-posts")
+                                                   (not (following-board-uuids (:board-uuid cmail-data))))
+                                               (oc-urls/all-posts)
+                                               (:publisher-board cmail-data)
+                                               (oc-urls/contributions (:user-id @(drv/get-ref s :current-user-data)))
+                                               :else
+                                               (oc-urls/board (:board-slug cmail-data))))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
