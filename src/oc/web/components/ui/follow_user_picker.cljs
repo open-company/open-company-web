@@ -43,7 +43,7 @@
     [:div.invite-users-box
       [:div.invite-users-box-inner.group
         [:div.invite-users-title
-          (str "Who else works at " (:name org-data) "?")]
+          "Invite your team to join you!"]
         (invite-email {:rows-num 3
                        :hide-user-role true
                        :save-title "Send invites"
