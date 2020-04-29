@@ -11,9 +11,9 @@
     [:div.empty-org.group
       (if (:read-only org-data)
         [:div.empty-org-headline
-          (str "There aren't sections in " (:name org-data) " yet. ")]
+          (str "There aren't teams in " (:name org-data) " yet. ")]
         [:div.empty-org-headline
-          (str "You don’t have any sections yet. ")
+          (str "You don’t have any teams yet. ")
           [:button.mlb-reset
             {:on-click #(nav-actions/show-section-add)}
             "Add one?"]])

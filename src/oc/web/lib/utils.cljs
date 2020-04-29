@@ -653,7 +653,7 @@
     (s/trim value)
     value))
 
-(def section-name-exists-error "Section name already exists or isn't allowed")
+(def section-name-exists-error "Team name already exists or isn't allowed")
 
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))

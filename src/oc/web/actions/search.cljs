@@ -76,7 +76,7 @@
                                           :action "search-result-load-failed"
                                           :title (if is-404? "Post moved or deleted" "An error occurred")
                                           :message (if is-404?
-                                                     "The selected post was moved to another section or deleted."
+                                                     "The selected update was moved to another team or deleted."
                                                      "An error occurred while loading the selected post. Please try again.")
                                           :solid-button-style :red
                                           :solid-button-title "Ok"

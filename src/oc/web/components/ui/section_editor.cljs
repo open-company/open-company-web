@@ -204,8 +204,8 @@
             {:dangerouslySetInnerHTML
               (utils/emojify
                (if @(::editing-existing-section s)
-                 "Section settings"
-                 "Create section"))}]
+                 "Team settings"
+                 "Create team"))}]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
@@ -229,10 +229,10 @@
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
-            [:span.section-name "Section name"]]
+            [:span.section-name "Team name"]]
           [:input.section-editor-add-name.oc-input
             {:value @(::section-name s)
-             :placeholder "Section name"
+             :placeholder "Team name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
@@ -252,7 +252,7 @@
               (str (or (:section-name-error section-editing)
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
-            "Section security"]
+            "Team security"]
           [:div.section-editor-add-access.oc-input
             {:class (when @(::show-access-list s) "active")
              :on-click #(do
@@ -327,17 +327,17 @@
                        (pos? (count slack-users))
                        (pos? (count slack-orgs)))
               [:div.section-editor-enable-slack-bot.group
-                "Automatically share posts to Slack? "
+                "Automatically share updates to Slack? "
                 [:button.mlb-reset.enable-slack-bot-bt
                   {:on-click (fn [_]
                                (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
-                  "Add Carrot bot"]]))
+                  "Add Wut bot"]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
-              "Public sections are visible to the world, including search engines."])
+              "Public teams are visible to the world, including search engines."])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label.top-separator
-              "Add members to this private section"])
+              "Add members to this private team"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
                   available-users (uu/filter-active-users all-users-data)
@@ -375,18 +375,18 @@
                         [:div.section-editor-private-users-result.no-more-invites
                           [:div.name
                             (str
-                             "Looks like you'll need to invite more people to your team before you can add them. "
+                             "Looks like you'll need to invite more people before you can add them. "
                              "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              "Carrot team settings"]
+                              "Wut team settings"]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))
             [:div.section-editor-add-label.group
               [:span.main-label
-                "Section members"]
+                "Team members"]
               [:span.role-header
                 "Access"]])
           (when (and (= (:access section-editing) "private")
@@ -461,14 +461,14 @@
                                 (alert-modal/show-alert
                                  {:icon "/img/ML/error_icon.png"
                                   :action "remove-self-user-from-private-section"
-                                  :message "Are you sure you want to leave this section?"
+                                  :message "Are you sure you want to leave this team?"
                                   :link-button-title "No"
                                   :link-button-cb #(alert-modal/hide-alert)
                                   :solid-button-title "Yes"
                                   :solid-button-cb (fn []
                                    (section-actions/private-section-kick-out-self self-data)
                                    (alert-modal/hide-alert))})))}
-                            "Leave section"]
+                            "Leave team"]
                           [:div.user-type.no-dropdown
                             "Edit"])
                         [:div.user-type
@@ -505,9 +505,9 @@
                                            [:span "Are you sure?"]
                                            (when (-> section-data :entry-count pos?)
                                              [:span
-                                               " This will delete the section and "
+                                               " This will delete the team and "
                                                [:strong "all"]
-                                               " its posts, too."])]
+                                               " its updates, too."])]
                                 :link-button-title "No"
                                 :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-style :red
@@ -516,7 +516,7 @@
                                                    (section-actions/section-delete
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
-                                                      {:title "Section deleted"
+                                                      {:title "Team deleted"
                                                        :dismiss true
                                                        :expire 3
                                                        :id :section-deleted}))
@@ -526,7 +526,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title (if last-section-standing
-                         "You cannot delete the last remaining section."
-                         "Delete this section and all its posts.")
+                         "You cannot delete the last remaining team."
+                         "Delete this team and all its updates.")
                  :class (when last-section-standing "disabled")}
-                "Delete section"])]]]]))
+                "Delete team"])]]]]))

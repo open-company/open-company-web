@@ -122,7 +122,7 @@
   ;; Board name exists or too short
   (dispatcher/dispatch! [:update [:section-editing]
    #(-> %
-     (assoc :section-name-error (when (= status 409) "Section name already exists or isn't allowed"))
+     (assoc :section-name-error (when (= status 409) "Team name already exists or isn't allowed"))
      (assoc :section-error (when-not (= status 409) "An error occurred, please retry."))
      (dissoc :loading))]))
 

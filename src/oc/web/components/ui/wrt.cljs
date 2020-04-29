@@ -227,7 +227,7 @@
                            (dis/board-data (router/current-org-slug) (:board-slug activity-data)))
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
-                    "Manage section members?"])
+                    "Manage team members?"])
                 (when (and (> (count remind-all-users) 1)
                            @(::show-remind-all-bt s))
                   [:button.mlb-reset.send-to-all-bt

@@ -221,7 +221,7 @@
                 ; [:div.checkbox-label
                 ;   {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
                 ;    :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
-                ;   "Do not allow public sections"]
+                ;   "Do not allow public teams"]
                 ]
               [:div.org-settings-advanced-row.public-share.group
                 (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
