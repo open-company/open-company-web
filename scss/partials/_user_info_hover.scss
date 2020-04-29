@@ -5,6 +5,7 @@ div.user-info-hover {
   position: absolute;
   display: none;
   left: 0;
+  z-index: 3;
 
   &.above {
     bottom: 100%;
