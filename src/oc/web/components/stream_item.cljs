@@ -292,12 +292,12 @@
                 (utils/foc-date-time t)]])
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
-        [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?
                    mobile-more-menu-el)
             (rum/portal (more-menu-comp) mobile-more-menu-el)
-            (more-menu-comp)))]
+            (more-menu-comp)))
+        [:div.activity-share-container]]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video
