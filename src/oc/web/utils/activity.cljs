@@ -17,6 +17,8 @@
 
 (def empty-headline (char 8203)) ; U+200B a Unicode zero width space, used to mark comment messages originating with OC
 
+(def empty-body-html "<p><br/></p>")
+
 ;; Posts separators
 
 (defn show-separators?
@@ -285,12 +287,13 @@
   (seq (:attachments data)))
 
 (defn has-headline? [data]
-  (let [trimmed-headline (clojure.string/trim (:headline data))]
-    (or (clojure.string/blank? trimmed-headline)
+  (let [trimmed-headline (s/trim (:headline data))]
+    (or (s/blank? trimmed-headline)
         (not= trimmed-headline empty-headline))))
 
 (defn has-body? [data]
-  (not (clojure.string/blank? (:body data))))
+  (and (not (s/blank? (:body data)))
+       (not= (:body data) empty-body-html)))
 
 (defn has-text? [data]
   (or (has-headline? data)

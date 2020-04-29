@@ -344,7 +344,7 @@
                           cmail-state @(drv/get-ref s :cmail-state)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
-                                         dom-utils/empty-body-html)
+                                         au/empty-body-html)
                           initial-headline (utils/emojify
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
@@ -376,7 +376,7 @@
                                 cmail-state @(drv/get-ref s :cmail-state)
                                 initial-body (if (seq (:body cmail-data))
                                                (:body cmail-data)
-                                               dom-utils/empty-body-html)
+                                               au/empty-body-html)
                                 initial-headline (utils/emojify
                                                    (if (seq (:headline cmail-data))
                                                      (:headline cmail-data)
@@ -464,6 +464,7 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
+                      (not (au/has-body? cmail-data))
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
