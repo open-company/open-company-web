@@ -315,12 +315,15 @@
 (defn fix-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {} (dis/active-users)))
+   (fix-board board-data {} (dis/active-users) (dis/follow-boards-list)))
 
   ([board-data change-data]
-   (fix-board board-data change-data (dis/active-users)))
+   (fix-board board-data change-data (dis/active-users) (dis/follow-boards-list)))
 
-  ([board-data change-data active-users & [direction]]
+  ([board-data change-data active-users]
+   (fix-board board-data change-data active-users (dis/follow-boards-list)))
+
+  ([board-data change-data active-users follow-boards-list & [direction]]
     (let [links (:links board-data)
           with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
@@ -366,21 +369,26 @@
                              with-posts-list)
           with-posts-separators (if (show-separators? (:slug board-data))
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
-      with-posts-separators)))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
+          follow-board-uuids (set (map :uuid follow-boards-list))
+          with-following (assoc with-posts-separators :following (boolean (follow-board-uuids (:uuid board-data))))]
+      with-following)))
 
 (defn fix-contributions
   "Parse data coming from the API for a certain user's posts."
   ([contributions-data]
-   (fix-contributions contributions-data {} (dis/org-data) (dis/active-users)))
+   (fix-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
 
   ([contributions-data change-data]
-   (fix-contributions contributions-data change-data (dis/org-data) (dis/active-users)))
+   (fix-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
 
   ([contributions-data change-data org-data]
-   (fix-contributions contributions-data change-data org-data (dis/active-users)))
+   (fix-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list)))
 
-  ([contributions-data change-data org-data active-users & [direction]]
+  ([contributions-data change-data org-data active-users]
+   (fix-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list)))
+
+  ([contributions-data change-data org-data active-users follow-publishers-list & [direction]]
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
@@ -423,8 +431,10 @@
                              with-posts-list)
           with-posts-separators (if (show-separators? (:href contributions-data))
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
-      with-posts-separators)))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
+          follow-publishers-ids (set (map :user-id follow-publishers-list))
+          with-following (assoc with-posts-separators :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))]
+      with-following)))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."

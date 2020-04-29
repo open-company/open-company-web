@@ -25,6 +25,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -313,7 +314,13 @@
                          :data-placement "top"
                          :data-container "body"
                          :title (str (:name current-board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
+                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])
+                  (when (contains? board-container-data :following)
+                    (let [resource-type (if (seq current-contributions-id) :user :board)]
+                      (follow-button {:following (:following board-container-data)
+                                      :resource-type resource-type
+                                      :resource-uuid (or current-contributions-id current-board-slug)
+                                      :tooltip-position "right"})))]
                 [:div.board-name-right
                   (when (and dismiss-all-link
                              (pos? (count posts-data)))

@@ -11,6 +11,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (rum/defc user-info-view < rum/static
@@ -57,16 +58,7 @@
             [:button.mlb-reset.profile-bt
               {:on-click #(nav-actions/show-user-info (:user-id user-data))}
               "My profile"]
-            [:button.mlb-reset.follow-bt
-              {:class (when following "unfollow")
-               :data-toggle (when following "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title (when following "Unfollow")
-               :on-click #(user-actions/toggle-publisher (:user-id user-data))}
-              (if following
-                "Following"
-                "Follow")])])]))
+            (follow-button {:following following :resource-type :user :resource-uuid (:user-id user-data)}))])]))
 
 (rum/defc user-info-otf < rum/static
   [{:keys [portal-el] :as props}]

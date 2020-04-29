@@ -9,7 +9,7 @@
 (defmethod dispatcher/action :contributions-get/finish
   [db [_ org-slug author-uuid contrib-data]]
   (let [org-data (dispatcher/org-data db org-slug)
-        fixed-contrib-data (au/fix-contributions (:collection contrib-data) (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db))
+        fixed-contrib-data (au/fix-contributions (:collection contrib-data) (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) (dispatcher/follow-publishers-list org-slug db))
         contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid)
         posts-key (dispatcher/posts-data-key org-slug)
         merged-items (merge (get-in db posts-key)
@@ -35,7 +35,7 @@
           prepare-contrib-data (merge next-contrib-data {:posts-list (:posts-list contrib-data)
                                                          :old-links (:links contrib-data)})
           org-data (dispatcher/org-data db org-slug)
-          fixed-contrib-data (au/fix-contributions prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) direction)
+          fixed-contrib-data (au/fix-contributions prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) (dispatcher/follow-publishers-list org-slug db) direction)
           new-items-map (merge old-posts (:fixed-items fixed-contrib-data))
           new-contrib-data (-> fixed-contrib-data
                             (assoc :direction direction)

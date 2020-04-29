@@ -15,7 +15,7 @@
                      db)
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db) (dispatcher/active-users))
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
         old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
@@ -63,7 +63,7 @@
         section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
         ;; Parse the new section data
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db) (dispatcher/active-users))
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
         old-board-data (get-in db board-key)
         ;; Replace the old section data
         ;; w/o overriding the posts and links to avoid breaking pagination
@@ -226,7 +226,7 @@
           old-posts (get-in db posts-data-key)
           prepare-board-data (merge next-board-data {:posts-list (:posts-list container-data)
                                                      :old-links (:links container-data)})
-          fixed-posts-data (au/fix-board prepare-board-data (dispatcher/change-data db) (dispatcher/active-users) direction)
+          fixed-posts-data (au/fix-board prepare-board-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list) direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)

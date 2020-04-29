@@ -1,0 +1,29 @@
+button.follow-button {
+  background-color: $wut_purple;
+  height: 32px;
+  border-radius: 4px;
+  width: auto;
+  padding: 8px;
+  @include OC_Body_Book();
+  font-size: 14px;
+  line-height: 18px;
+  color: white;
+
+  @include big_web(){
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.unfollow {
+    background-color: var(--opac-background-color-05);
+    color: var(--light-color);
+
+    @include big_web(){
+      &:hover {
+        background-color: var(--opac-background-color-2);
+        color: var(--color);
+      }
+    }
+  }
+}

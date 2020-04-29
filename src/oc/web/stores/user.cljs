@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.utils.notification :as notif-utils]
             [cljsjs.moment-timezone]))
 
@@ -309,6 +310,25 @@
        vec))
     boards-list))
 
+(defn- update-contributions-and-boards [db org-slug follow-boards-list follow-publishers-list]
+  (let [change-data (dispatcher/change-data db)
+        org-data (dispatcher/org-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        contributions-list-key (dispatcher/contributions-list-key org-slug)
+        next-db (reduce (fn [tdb contrib-key]
+                         (let [contrib-data-key (concat contributions-list-key [contrib-key dispatcher/recently-posted-sort])
+                               old-contributions-data (get-in tdb contrib-data-key)]
+                           (assoc-in tdb contrib-data-key (au/fix-contributions old-contributions-data change-data org-data active-users follow-publishers-list))))
+                  db
+                  (keys (get-in db contributions-list-key)))
+        boards-key (dispatcher/boards-key org-slug)]
+      (reduce (fn [tdb board-key]
+               (let [board-data-key (concat boards-key [board-key dispatcher/recently-posted-sort :board-data])
+                     old-board-data (get-in tdb board-data-key)]
+                 (assoc-in tdb board-data-key (au/fix-board old-board-data change-data active-users follow-boards-list))))
+       next-db
+       (keys (get-in db boards-key)))))
+
 (defmethod dispatcher/action :follow/loaded
   [db [_ org-slug {:keys [publisher-uuids board-uuids user-id] :as resp}]]
   (if (= org-slug (:org-slug resp))
@@ -319,6 +339,7 @@
           next-follow-boards-data (enrich-boards-list board-uuids (:boards org-data))
           next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
       (-> db
+       (update-contributions-and-boards org-slug next-follow-boards-data next-follow-publishers-data)
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)))
       db))
@@ -347,7 +368,8 @@
                                     (= (:resource-uuid %) publisher-uuid))
                              (count-fn %)
                              %)
-          next-db* (update-in db followers-count-key #(mapv record-check-fn %))
+          next-db** (update-contributions-and-boards db org-slug (dispatcher/follow-boards-list org-slug db) next-follow-publishers-data)
+          next-db* (update-in next-db** followers-count-key #(mapv record-check-fn %))
           next-db (if @found?
                     next-db*
                     (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid publisher-uuid :resource-type :user :count (if follow? 1 0)}))]
@@ -369,7 +391,8 @@
                                     (= (:resource-uuid %) board-uuid))
                              (count-fn %)
                              %)
-          next-db* (update-in db followers-count-key #(mapv record-check-fn %))
+          next-db** (update-contributions-and-boards db org-slug next-boards (dispatcher/follow-publishers-list org-slug db))
+          next-db* (update-in next-db** followers-count-key #(mapv record-check-fn %))
           next-db (if @found?
                     next-db*
                     (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid board-uuid :resource-type :board :count (if follow? 1 0)}))]

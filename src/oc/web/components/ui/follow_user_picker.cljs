@@ -11,6 +11,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.invite-email :refer (invite-email)]
+            [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- sort-users [user-id users]
@@ -65,7 +66,7 @@
         (:title current-user-data)]
       [:span.followers-count
         "No followers"]
-      [:button.mlb-reset.follow-bt
+      [:button.mlb-reset.edit-profile-bt
         {:on-click #(nav-actions/show-user-settings :profile)}
         "Edit profile"]]])
 
@@ -142,12 +143,7 @@
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))
                             "No followers")])
-                      [:button.mlb-reset.follow-bt.unfollow
-                        {:on-click #(user-actions/toggle-publisher (:user-id u))
-                         :data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :title "Unfollow"}
-                        "Following"]]))
+                      (follow-button {:following true :resource-type :user :resource-uuid (:user-id u)})]))
                 ;; Unfollowing
                 (when (seq unfollowing-users)
                   [:div.follow-user-picker-row-header
@@ -167,6 +163,4 @@
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))
                             "No followers")])
-                      [:button.mlb-reset.follow-bt
-                        {:on-click #(user-actions/toggle-publisher (:user-id u))}
-                        "Follow"]]))]])]]]))
+                      (follow-button {:following false :resource-type :user :resource-uuid (:user-id u)})]))]])]]]))

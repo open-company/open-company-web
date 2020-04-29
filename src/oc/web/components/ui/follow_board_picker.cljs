@@ -9,6 +9,7 @@
             [oc.web.mixins.ui :refer (strict-refresh-tooltips-mixin)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defn- sort-boards [boards]
@@ -102,12 +103,7 @@
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))
                             "No followers")])
-                      [:button.mlb-reset.follow-bt.unfollow
-                        {:on-click #(user-actions/toggle-board (:uuid b))
-                         :data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :title "Unfollow"}
-                        "Following"]]))
+                      (follow-button {:following true :resource-type :board :resource-uuid (:uuid b)})]))
                 ;; Unfollowing
                 (when (seq unfollowing-boards)
                   [:div.follow-board-picker-row-header
@@ -124,6 +120,4 @@
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))
                             "No followers")])
-                      [:button.mlb-reset.follow-bt
-                        {:on-click #(user-actions/toggle-board (:uuid b))}
-                        "Follow"]]))]])]]]))
+                      (follow-button {:following false :resource-type :board :resource-uuid (:uuid b)})]))]])]]]))
