@@ -122,4 +122,5 @@
                   :show-delete? true
                   :show-unread (not (:unread activity-data))
                   :show-move? (not is-mobile?)
-                  :show-inbox? is-inbox?})]))
+                  :show-inbox? is-inbox?})
+      [:div.activity-share-container]]))
