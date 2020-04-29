@@ -218,7 +218,7 @@
             [:div.home-icon]
             [:div.home-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Home"]
+              "Following"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])

@@ -281,7 +281,7 @@
                                                    "Saved"
 
                                                    is-following
-                                                   "Home"
+                                                   "Following"
 
                                                    :default
                                                    ;; Fallback to the org board data
