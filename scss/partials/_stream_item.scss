@@ -672,8 +672,11 @@ div.stream-item {
       }
 
       div.stream-item-comments-summary {
-        margin-right: 16px;
         float: left;
+
+        div.is-comments div.is-comments-summary:not(:empty) {
+          margin-right: 16px;
+        }
 
         @include mobile() {
           margin-top: 1px;
