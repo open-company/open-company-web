@@ -614,7 +614,7 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-body-placeholder "Wut's happening?")
+(def default-body-placeholder "Wut's happening")
 
 (def default-abstract "Quick summary (optional)")
 

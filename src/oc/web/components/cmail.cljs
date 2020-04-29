@@ -580,7 +580,7 @@
                  :dangerouslySetInnerHTML @(::initial-headline s)}]]
             (when-not is-mobile?
               [:div.cmail-content-collapsed-placeholder
-                utils/default-body-placeholder])
+                (str utils/default-body-placeholder "...")])
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))
@@ -594,7 +594,7 @@
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
-                               :placeholder (str "•  " utils/default-body-placeholder)
+                               :placeholder (str "•  " utils/default-body-placeholder "...")
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
