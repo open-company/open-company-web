@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.mixins.section :as section-mixins]
@@ -27,6 +28,7 @@
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
+(def carrot-close-height 60)
 (def foc-height 226)
 (def mobile-foc-height 166)
 (def foc-separators-height 58)
@@ -136,7 +138,8 @@
 (rum/defc carrot-close < rum/static
   [{:keys [style]}]
   [:div.carrot-close
-    {:style style}])
+    {:style style}
+    "🤠 You've reached the end, partner"])
 
 (rum/defc separator-item < rum/static
   [{:keys [style foc-layout] :as row-props} {:keys [label] :as props}]
@@ -180,7 +183,8 @@
              activities-read
              foc-layout
              show-loading-more
-             show-carrot-close]
+             show-carrot-close
+             is-mobile?]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -189,7 +193,6 @@
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         _force-list-update (drv/react s :force-list-update)
-        is-mobile? (responsive/is-mobile-size?)
         key-prefix (if is-mobile? "mobile" foc-layout)
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
@@ -202,7 +205,7 @@
                         "loading-more"
                         (if is-mobile? 44 60)
                         "carrot-close"
-                        72
+                        carrot-close-height
                         ; else
                         (calc-card-height is-mobile? foc-layout))))
         row-renderer (fn [row-props]
@@ -317,7 +320,11 @@
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
-        foc-layout (drv/react s :foc-layout)]
+        foc-layout (drv/react s :foc-layout)
+        viewport-height (dom-utils/viewport-height)
+        is-mobile? (responsive/is-mobile-size?)
+        card-height (calc-card-height is-mobile? foc-layout)
+        show-carrot-close (> (* (count items) card-height) viewport-height)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -332,4 +339,4 @@
                                        :show-loading-more @(::bottom-loading s)
                                        :show-carrot-close (and (not @(::bottom-loading s))
                                                                (not @(::has-next s))
-                                                               (> (count items) 10))}))]]]))
+                                                               (> (count items) 3))}))]]]))
