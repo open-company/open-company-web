@@ -278,7 +278,10 @@
                 [:button.mlb-reset.left-navigation-sidebar-title
                   {; :class (utils/class-set {:new (and @(::users-list-collapsed s)
                    ;                                    (seq (mapcat :unread publisher-boards-change-data)))})
-                   :on-click #(toggle-collapse-users s)}
+                   :on-click #(toggle-collapse-users s)
+                   :title "People you follow"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")}
                   [:span.boards "People"]])
               [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
@@ -326,7 +329,10 @@
                 [:button.mlb-reset.left-navigation-sidebar-title
                   {; :class (utils/class-set {:new (and @(::boards-list-collapsed s)
                    ;                                    (seq (mapcat :unread boards-change-data)))})
-                   :on-click #(toggle-collapse-boards s)}
+                   :on-click #(toggle-collapse-boards s)
+                   :title "Teams you follow"
+                   :data-placement "top"
+                   :data-toggle (when-not is-mobile? "tooltip")}
                   [:span.boards "Teams"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-section-add)
