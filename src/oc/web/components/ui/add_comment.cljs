@@ -28,7 +28,7 @@
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
-          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))]
+          next-add-bt-disabled (and (not= comment-text dom-utils/empty-body-html) (not (seq comment-text)))]
       (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
