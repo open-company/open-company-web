@@ -412,7 +412,7 @@
                             (real-close)
                             (utils/after
                              180
-                             #(let [following-board-uuids (map :uuid @(drv/get-ref s :follow-boards-list))]
+                             #(let [following-board-uuids (set (map :uuid @(drv/get-ref s :follow-boards-list)))]
                                 (router/nav! (cond
                                                ;; If user is in following and he is following the board
                                                ;; can stay here
