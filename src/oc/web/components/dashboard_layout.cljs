@@ -149,7 +149,10 @@
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         search-active? (drv/react s search/search-active?)
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-follow-button? (and (contains? board-container-data :following)
+                                 (seq (:user-id current-user-data))
+                                 (not= (:author-uuid board-container-data) (:user-id current-user-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -315,7 +318,7 @@
                          :data-container "body"
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])
-                  (when (contains? board-container-data :following)
+                  (when show-follow-button?
                     (let [resource-type (if (seq current-contributions-id) :user :board)]
                       (follow-button {:following (:following board-container-data)
                                       :resource-type resource-type
