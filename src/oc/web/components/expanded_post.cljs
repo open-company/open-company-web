@@ -287,7 +287,8 @@
           (comments-summary {:entry-data activity-data
                              :comments-data comments-drv
                              :new-comments-count 0
-                             :hide-face-pile? true})]]
+                             :hide-face-pile? true
+                             :publisher? is-publisher?})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data

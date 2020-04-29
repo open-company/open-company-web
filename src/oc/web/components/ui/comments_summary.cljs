@@ -37,7 +37,8 @@
            comments-data
            hide-label?
            hide-face-pile?
-           new-comments-count]}]
+           new-comments-count
+           publisher?]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -83,7 +84,6 @@
                 (user-avatar-image user-data {:tooltip? (not (responsive/is-tablet-or-mobile?))})])])
         (when-not (and hide-label?
                        (zero? comments-count))
-
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
@@ -101,6 +101,7 @@
                      (str " new comment" (when (not= new-comments-count 1) "s")))
                    (when-not hide-label?
                      (str " comment" (when (not= comments-count 1) "s")))))]
-              (when-not hide-label?
+              (when (and (not publisher?)
+                         (not hide-label?))
                 [:span.add-a-comment
                   "Add a comment"]))])])))

@@ -337,7 +337,8 @@
                   (comments-summary {:entry-data activity-data
                                      :comments-data comments-data
                                      :new-comments-count (:new-comments-count activity-data)
-                                     :hide-label? is-mobile?})]
+                                     :hide-label? is-mobile?
+                                     :publisher? publisher?})]
                 (if show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
