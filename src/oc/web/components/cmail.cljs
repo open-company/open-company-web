@@ -407,18 +407,26 @@
                         (reset! (::publishing s) false)
                         (reset! (::disable-post s) false)
                         (when-not (:error cmail-data)
-                          (when-let [redirect? (seq (:board-slug cmail-data))]
+                          (when (seq (:board-slug cmail-data))
                             ;; Redirect to the publishing board if the slug is available
                             (real-close)
                             (utils/after
                              180
                              #(let [following-board-uuids (map :uuid @(drv/get-ref s :follow-boards-list))]
                                 (router/nav! (cond
-                                               (or (= (router/current-board-slug) "all-posts")
-                                                   (not (following-board-uuids (:board-uuid cmail-data))))
-                                               (oc-urls/all-posts)
+                                               ;; If user is in following and he is following the board
+                                               ;; can stay here
+                                               (and (= (router/current-board-slug) "following")
+                                                    (following-board-uuids (:board-uuid cmail-data)))
+                                               (oc-urls/following)
+                                               ;; If user is publishing to its own publisher board
+                                               ;; redirect him there
                                                (:publisher-board cmail-data)
                                                (oc-urls/contributions (:user-id @(drv/get-ref s :current-user-data)))
+                                               ;; If he's on AP can stay on AP
+                                               (= (router/current-board-slug) "all-posts")
+                                               (oc-urls/all-posts)
+                                               ;; Redirect to the posting board in every other case
                                                :else
                                                (oc-urls/board (:board-slug cmail-data))))))))))
                     s)
