@@ -612,13 +612,27 @@ div.stream-item {
         }
       }
 
+      &.no-headline {
+        div.stream-item-body {
+          @include activity-body-preview(16, 22, var(--color), 4);
+          margin-top: 8px;
+          height: 88px;
+
+          @include mobile() {
+            @include activity-body-preview(16, 22, var(--color), 3);
+            margin-top: 4px;
+            height: 66px;
+          }
+        }
+      }
+
       div.stream-item-body {
         @include activity-body-preview(16, 22, var(--color), 3);
         margin-top: 4px;
         height: 66px;
 
         @include mobile() {
-          @include activity-body-preview(16, 22, var(--color), 3);
+          @include activity-body-preview(16, 22, var(--color), 2);
           margin-top: 0;
           height: 44px;
         }

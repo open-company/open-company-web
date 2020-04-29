@@ -35,6 +35,7 @@
        :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
     [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
+       :ref :item-body
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
@@ -129,7 +130,18 @@
                                                    :long-press long-press-handler
                                                    :disabled #(not (au/is-published? (-> % :rum/args first :activity-data)))}))
                          (when-not ua/edge?
-                           (am/truncate-element-mixin "div.stream-item-body" (* 22 (if (responsive/is-mobile-size?) 2 3))))
+                           (am/foc-truncate-element-mixin :item-body
+                            (fn [s]
+                              (let [has-headline? (-> s :rum/args first :activity-data :has-headline)
+                                    is-mobile? (responsive/is-mobile-size?)
+                                    lines (cond (and has-headline?
+                                                     is-mobile?)
+                                                2
+                                                (or is-mobile? has-headline?)
+                                                3
+                                                :else
+                                                4)]
+                                (* 22 lines)))))
                          ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
@@ -310,12 +322,14 @@
                             (img/optimize-image-url (* 102 3)))}]]))
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
+                                      :no-headline (not (:has-headline activity-data))
                                       :has-video (:fixed-video-id activity-data)
                                       utils/hide-class true})}
-            [:div.stream-item-headline.ap-seen-item-headline
-              {:ref "activity-headline"
-               :data-itemuuid (:uuid activity-data)
-               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            (when (:has-headline activity-data)
+              [:div.stream-item-headline.ap-seen-item-headline
+                {:ref "activity-headline"
+                 :data-itemuuid (:uuid activity-data)
+                 :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}])
             (stream-item-summary activity-data)]]
           (if-not is-published?
             [:div.stream-item-footer.group

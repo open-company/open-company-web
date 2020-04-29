@@ -21,6 +21,23 @@
         (truncate-fn s))
       s)}))
 
+(defn foc-truncate-element-mixin [element-ref calc-height-fn]
+  (letfn [(truncate-fn [s]
+            ; Truncate body text with dotdotdot
+            (when-let [dom-node (rum/ref-node s element-ref)]
+              (.dotdotdot (js/$ dom-node)
+               #js {:height (calc-height-fn s)
+                    :wrap "word"
+                    :watch false
+                    :ellipsis "..."})))]
+    {:did-mount (fn [s]
+      (truncate-fn s)
+      s)
+     :did-remount (fn [o s]
+      (when-not (= (rum/dom-node o) (rum/dom-node s))
+        (truncate-fn s))
+      s)}))
+
 (def truncate-comments-mixin
   {:init (fn [s]
     (assoc s :comments-truncated (atom false)))

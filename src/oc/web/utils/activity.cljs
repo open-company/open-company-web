@@ -13,6 +13,10 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.comment :as comment-utils]))
 
+(def headline-placeholder "Add a title")
+
+(def empty-headline (char 8203)) ; U+200B a Unicode zero width space, used to mark comment messages originating with OC
+
 ;; Posts separators
 
 (defn show-separators?
@@ -277,6 +281,26 @@
       [has-images cleaned-body])
     [false inner-html]))
 
+(defn has-attachments? [data]
+  (seq (:attachments data)))
+
+(defn has-headline? [data]
+  (let [trimmed-headline (clojure.string/trim (:headline data))]
+    (or (clojure.string/blank? trimmed-headline)
+        (not= trimmed-headline empty-headline))))
+
+(defn has-body? [data]
+  (not (clojure.string/blank? (:body data))))
+
+(defn has-text? [data]
+  (or (has-headline? data)
+      (has-body? data)))
+
+(defn has-content? [data]
+  (or (some? (:video-id data))
+      (has-attachments? data)
+      (has-text? data)))
+
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
   ([entry-data board-data changes]
@@ -310,6 +334,7 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
+      (assoc :has-headline (has-headline? entry-data))
       (assoc :comments (comment-utils/sort-comments (:comments entry-data)))))))
 
 (defn fix-board
@@ -539,24 +564,6 @@
     (if section-slug
       (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))
       (cook/remove-cookie! last-board-cookie))))
-
-(defn has-attachments? [data]
-  (seq (:attachments data)))
-
-(defn has-headline? [data]
-  (not (clojure.string/blank? (:headline data))))
-
-(defn has-body? [data]
-  (not (clojure.string/blank? (:body data))))
-
-(defn has-text? [data]
-  (or (has-headline? data)
-      (has-body? data)))
-
-(defn has-content? [data]
-  (or (some? (:video-id data))
-      (has-attachments? data)
-      (has-text? data)))
 
 (def iso-format (time-format/formatters :date-time))
 

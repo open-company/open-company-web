@@ -203,13 +203,9 @@
 
 (defn- fix-headline [cmail-data]
   (let [headline (utils/trim (:headline cmail-data))]
-    (cond
-      (seq headline)
+    (if (seq headline)
       headline
-      (seq (:board-name cmail-data))
-      (utils/default-headline (:board-name cmail-data))
-      :else
-      nil)))
+      au/empty-headline)))
 
 (defn- is-publishable? [s cmail-data]
   (seq (:board-slug cmail-data)))
@@ -460,8 +456,6 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
-                      (and (not (:uuid cmail-data))
-                           (:has-changes cmail-data))
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -560,7 +554,7 @@
                 {:class utils/hide-class
                  :content-editable true
                  :key (str "cmail-headline-" (:key cmail-state))
-                 :placeholder (utils/default-headline (:board-name cmail-data))
+                 :placeholder au/headline-placeholder
                  :ref "headline"
                  :on-paste    #(headline-on-paste s %)
                  :on-key-down (fn [e]

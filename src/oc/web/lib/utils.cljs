@@ -614,11 +614,6 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(defn default-headline [team-name]
-  (if (seq team-name)
-    (str team-name " team update")
-    "Team update"))
-
 (def default-body-placeholder "Wut's happening?")
 
 (def default-abstract "Quick summary (optional)")
@@ -630,7 +625,6 @@
 (def default-drafts-board-slug "drafts")
 
 (def default-draft-status "draft")
-
 
 (def default-drafts-board
   {:uuid "0000-0000-0000"
