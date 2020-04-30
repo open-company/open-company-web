@@ -31,7 +31,7 @@
         {:on-click #(do
                       (utils/event-stop %)
                       (nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
-        "Wuts"]
+        "Posts"]
       (follow-button {:following following
                       :resource-type :board
                       :resource-uuid (:board-uuid activity-data)})]])
@@ -75,8 +75,8 @@
           [:button.mlb-reset.posts-bt
             {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
             (if my-profile?
-              "My wuts"
-              "Wuts")]
+              "My posts"
+              "Posts")]
           (if my-profile?
             [:button.mlb-reset.profile-bt
               {:on-click #(nav-actions/show-user-info (:user-id user-data))}

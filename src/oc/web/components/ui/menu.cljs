@@ -165,7 +165,7 @@
              :on-click (partial my-posts-click s (:user-id current-user-data))}
             [:div.oc-menu-item.my-posts.group
               [:span.oc-menu-item-label
-                "My wuts"]
+                "My posts"]
               [:span.count
                 (:contributions-count org-data)]]])
         ;; Notifications
