@@ -109,7 +109,6 @@
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
-   (js/console.log "DBG wrapped-stream-item/render style" style "is-mobile" is-mobile)
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item open-item
