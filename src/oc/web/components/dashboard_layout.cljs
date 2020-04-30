@@ -68,6 +68,7 @@
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
+                              (drv/drv :followers-boards-count)
                               (drv/drv search/search-active?)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
@@ -153,7 +154,8 @@
         show-follow-button? (and (contains? board-container-data :following)
                                  (seq (:user-id current-user-data))
                                  (not is-drafts-board)
-                                 (not= (:author-uuid board-container-data) (:user-id current-user-data)))]
+                                 (not= (:author-uuid board-container-data) (:user-id current-user-data)))
+        followers-boards-count (drv/react s :followers-boards-count)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -309,7 +311,13 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])
+                       :title "Visible to the world, including search engines"}])]
+                [:div.board-name-right
+                  (when show-follow-button?
+                    (let [resource-type (if (seq current-contributions-id) :user :board)]
+                      (follow-button {:following (:following board-container-data)
+                                      :resource-type resource-type
+                                      :resource-uuid (or current-contributions-id current-board-slug)})))
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button
@@ -319,13 +327,19 @@
                          :data-container "body"
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])
-                  (when show-follow-button?
-                    (let [resource-type (if (seq current-contributions-id) :user :board)]
-                      (follow-button {:following (:following board-container-data)
-                                      :resource-type resource-type
-                                      :resource-uuid (or current-contributions-id current-board-slug)
-                                      :tooltip-position "right"})))]
-                [:div.board-name-right
+                  (when (and show-follow-button?
+                             (not is-all-posts)
+                             (not is-following)
+                             (not is-bookmarks)
+                             (not is-drafts-board)
+                             (not is-contributions))
+                    (let [followers-count (some #(when (= (:resource-uuid %) (:uuid current-board-data))
+                                                   (:count %))
+                                           followers-boards-count)]
+                      [:div.followers-count
+                        (if (pos? followers-count)
+                          (str followers-count " follower" (when (not= followers-count 1) "s"))
+                          "No followers")]))
                   (when (and dismiss-all-link
                              (pos? (count posts-data)))
                     [:button.mlb-reset.complete-all-bt

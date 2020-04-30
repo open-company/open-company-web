@@ -448,25 +448,43 @@ div.dashboard-layout {
               color: var(--color);
               line-height: 32px;
               position: relative;
+              padding-left: 24px;
 
-              &.home-icon, &.all-icon, &.drafts-icon, &.saved-icon {
-                padding-left: 24px;
+              &:before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 24px;
+                height: 32px;
+                background-repeat: no-repeat;
+                background-position: 0 7px;
+                background-size: 16px 16px;
+                background-image: cdnUrl("/img/ML/number_sign.svg");
+                opacity: 0.24;
 
-                &:before {
-                  content: "";
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  width: 24px;
-                  height: 32px;
-                  background-repeat: no-repeat;
-                  background-position: 0 7px;
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/number_sign@dark.svg");
                 }
               }
+
+              // &.home-icon, &.all-icon, &.drafts-icon, &.saved-icon {
+              //   &:before {
+              //     content: "";
+              //     position: absolute;
+              //     left: 0;
+              //     top: 0;
+              //     width: 24px;
+              //     height: 32px;
+              //     background-repeat: no-repeat;
+              //     background-position: 0 7px;
+              //   }
+              // }
 
               &.home-icon:before {
                 background-image: cdnUrl("/img/ML/nav_home.svg");
                 background-size: 16px 16px;
+                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_home@dark.svg");
@@ -476,6 +494,7 @@ div.dashboard-layout {
               &.all-icon:before {
                 background-image: cdnUrl("/img/ML/nav_all.svg");
                 background-size: 16px 16px;
+                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_all@dark.svg");
@@ -485,6 +504,7 @@ div.dashboard-layout {
               &.saved-icon:before {
                 background-image: cdnUrl("/img/ML/nav_saved.svg");
                 background-size: 16px 16px;
+                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
@@ -494,6 +514,7 @@ div.dashboard-layout {
               &.drafts-icon:before {
                 background-image: cdnUrl("/img/ML/nav_drafts.svg");
                 background-size: 16px 16px;
+                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
@@ -575,69 +596,6 @@ div.dashboard-layout {
             }
           }
 
-          div.board-settings-container {
-            float: left;
-            position: relative;
-            height: 32px;
-
-            button.board-settings-bt {
-              background-image: cdnUrl("/img/ML/section_settings_gear.svg");
-              background-size: 13px 14px;
-              background-repeat: no-repeat;
-              background-position: center;
-              background-color: transparent;
-              width: 48px;
-              height: 25px;
-              padding: 0 0 0 16px;
-              margin: 3px 0 0 16px;
-              position: relative;
-              border-left: 1px solid var(--divider-line);
-              opacity: 0.5;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
-              }
-
-              @include big_web() {
-                &:hover {
-                  opacity: 1;
-                  border-left: 1px solid var(--divider-line);
-                }
-              }
-
-              // &:before {
-              //   content: "";
-              //   position: absolute;
-              //   left: 0;
-              //   top: 12px;
-              //   width: 1px;
-              //   height: 16px;
-              //   background-color: $light_ui_grey;
-
-              //   @include mobile(){
-              //     display: none;
-              //   }
-              // }
-
-              @include mobile(){
-                margin-right: -30px;
-                margin-left: 8px;
-                padding: 0px;
-                float: unset;
-                width: 20px;
-                height: 20px;
-
-                // Remove to show settings button on mobile
-                display: none;
-              }
-            }
-          }
-
-          button.follow-button {
-            float: left;
-            margin-left: 16px;
-          }
-
           div.private-board {
             position: relative;
             width: 12px;
@@ -702,6 +660,54 @@ div.dashboard-layout {
             z-index: 1;
             float: unset;
             height: #{$mobile_search_header_height}px;
+          }
+
+          div.followers-count {
+            float: right;
+            @include OC_Body_Book();
+            height: 32px;
+            line-height: 32px;
+            font-size: 16px;
+            color: var(--light-color);
+            margin-right: 3px;
+          }
+
+          div.board-settings-container {
+            float: right;
+            position: relative;
+            height: 32px;
+
+            button.board-settings-bt {
+              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+              background-size: 3px 14px;
+              background-repeat: no-repeat;
+              background-position: center;
+              background-color: transparent;
+              width: 32px;
+              height: 32px;
+              padding: 0;
+              position: relative;
+              opacity: 0.5;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+              }
+
+              @include big_web() {
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              @include mobile(){
+                display: none;
+              }
+            }
+          }
+
+          button.follow-button {
+            float: right;
+            margin-left: 3px;
           }
 
           button.complete-all-bt {

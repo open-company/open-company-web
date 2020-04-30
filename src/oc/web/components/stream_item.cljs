@@ -269,6 +269,8 @@
                             :user-avatar? true
                             :user-hover? true
                             :board-hover? true
+                            :activity-board? (and (not (:publisher-board activity-data))
+                                                  (not= (:board-slug activity-data) (router/current-board-slug)))
                             :current-user-id current-user-id})
           [:div.separator-dot]
           (let [t (or (:published-at activity-data) (:created-at activity-data))]

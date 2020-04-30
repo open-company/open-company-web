@@ -5,7 +5,7 @@ div.cmail-outer {
   background-color: var(--cmail-background-color);
   box-shadow: var(--cmail-active-box-shadow);
   border: var(--cmail-active-border);
-  border-radius: 4px;
+  border-radius: 6px;
 
   @include mobile() {
     position: fixed;
@@ -527,7 +527,7 @@ div.cmail-outer {
           top: unset;
           left: unset;
           bottom: -60px;
-          right: 68px;
+          right: 66px;
         }
 
         div.rich-body-editor {
@@ -654,6 +654,15 @@ div.cmail-outer {
             }
           }
 
+          span.prefix {
+            @include OC_Body_Book();
+            color: var(--light-color);
+            font-size: 16px;
+            line-height: 32px;
+            @include OC_Body_Book_Italic();
+            margin-right: 4px;
+          }
+
           &:after {
             content: "";
             width: 16px;
@@ -686,7 +695,7 @@ div.cmail-outer {
           position: relative;
           float: right;
           padding: 0;
-          width: 32px;
+          width: 24px;
           height: 32px;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
           background-size: 14px 16px;
@@ -705,11 +714,11 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: left;
-          width: 32px;
+          width: 24px;
           height: 32px;
 
           button.emoji-button {
-            width: 32px;
+            width: 24px;
             height: 32px;
             background-position: center;
             background-size: 16px 16px;

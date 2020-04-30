@@ -538,7 +538,7 @@
           [:button.mlb-reset.dismiss-inline-cmail
             {:on-click close-cb
              :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "left"
+             :data-placement "right"
              :title (if unpublished?
                       "Save & Close"
                       "Close")}]]
@@ -631,7 +631,8 @@
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            (str "#" (:board-name cmail-data))]
+            [:span.prefix "#"]
+            (:board-name cmail-data)]
           (when @(::show-sections-picker s)
             [:div.sections-picker-container
               {:ref :sections-picker-container}
