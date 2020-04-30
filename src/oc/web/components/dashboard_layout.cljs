@@ -151,10 +151,11 @@
                            (utils/link-for (:links container-data) "dismiss-all"))
         search-active? (drv/react s search/search-active?)
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
         show-follow-button? (and (contains? board-container-data :following)
                                  (seq (:user-id current-user-data))
                                  (not is-drafts-board)
-                                 (not= (:author-uuid board-container-data) (:user-id current-user-data)))
+                                 (not is-own-contributions))
         followers-boards-count (drv/react s :followers-boards-count)]
       ;; Entries list
       [:div.dashboard-layout.group
@@ -262,7 +263,7 @@
                     [:div.board-name-with-icon.contributions
                       (user-avatar-image contributions-user-data)
                       [:div.board-name-with-icon-internal
-                        (if (= (:user-id contributions-user-data) (:user-id current-user-data))
+                        (if is-own-contributions
                           "My posts"
                           (lib-user/name-for contributions-user-data))
                         ; (when (pos? (:total-count contributions-data))
@@ -318,6 +319,15 @@
                       (follow-button {:following (:following board-container-data)
                                       :resource-type resource-type
                                       :resource-uuid (or current-contributions-id current-board-slug)})))
+                  (when is-own-contributions
+                    [:div.board-settings-container
+                      ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :title "Edit proile"
+                         :on-click #(nav-actions/show-user-settings :profile)}]])
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button

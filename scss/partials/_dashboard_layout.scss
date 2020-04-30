@@ -414,6 +414,13 @@ div.dashboard-layout {
                 float: left;
                 margin: 4px 8px 0 0;
               }
+
+              div.board-name-with-icon-internal {
+                padding-left: 0;
+                &:before {
+                  display: none;
+                }
+              }
             }
 
             &:before {
