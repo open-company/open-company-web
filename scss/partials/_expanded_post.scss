@@ -226,7 +226,7 @@ div.expanded-post {
         height: 3px;
         border-radius: 50%;
         background-color: var(--opac-background-color-2);
-        margin: 0 6px 3px;
+        margin: 0 6px 2px;
         display: inline-block;
 
         &.muted-dot {
@@ -242,30 +242,72 @@ div.expanded-post {
         color: var(--light-color);
         line-height: 18px;
         opacity: 1;
-        display: inline-block;
         position: relative;
+        max-width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        align-items: center;
 
-        span.hover-info-popup-container {
+        div.post-authorship {
+          max-width: 100%;
+          flex: 0 0 auto;
+          // display: inline-block;
           position: relative;
+          flex-flow: row wrap;
 
-          span.name {
-            margin-right: 4px;
-            min-height: 18px;
+          div.user-hover-container {
+            flex: 0 0 auto;
+            max-width: 100%;
+
+            a.publisher-name {
+              max-width: 100%;
+              flex: 0 0 auto;
+              min-height: 18px;
+              line-height: 18px;
+              white-space: pre-wrap;
+            }
+          }
+
+          span.in {
             line-height: 18px;
-            text-decoration: underline;
+            white-space: pre-wrap;
+          }
+
+          div.board-info-hover {
+            max-width: 100%;
+            flex: 0 0 auto;
+            white-space: pre-wrap;
+
+            a.board-name {
+              white-space: pre-wrap;
+              min-height: 18px;
+              line-height: 18px;
+            }
           }
         }
 
-        span.section {
-          min-height: 18px;
-          line-height: 18px;
-          text-decoration: underline;
-        }
+        // span.hover-info-popup-container {
+        //   position: relative;
+
+        //   a.publisher-name {
+        //     margin-right: 4px;
+        //     min-height: 18px;
+        //     line-height: 18px;
+        //     text-decoration: underline;
+        //   }
+        // }
+
+        // span.section {
+        //   min-height: 18px;
+        //   line-height: 18px;
+        //   text-decoration: underline;
+        // }
 
         time {
           min-height: 18px;
           line-height: 18px;
-          display: inline-block;
+          flex: 0 0 auto;
         }
 
         @include mobile() {
@@ -278,7 +320,7 @@ div.expanded-post {
       @include muted-activity();
 
       div.muted-activity {
-        display: inline-block;
+        flex: 0 0 auto;
         margin-top: 2px;
         opacity: 0.5;
         margin-right: 0;
@@ -289,7 +331,7 @@ div.expanded-post {
       }
 
       div.must-see-tag {
-        display: inline-block;
+        flex: 0 0 auto;
 
         @include mobile() {
           display: inline-block;
@@ -307,7 +349,7 @@ div.expanded-post {
       @include bookmark-tag();
 
       div.bookmark-tag {
-        display: inline-block;
+        flex: 0 0 auto;
 
         @include mobile() {
           display: inline-block;

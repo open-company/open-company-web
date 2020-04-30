@@ -11,7 +11,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
 
 (defn- prefixed-html
   "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.

@@ -23,8 +23,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [cljsjs.hammer]))
 
@@ -266,20 +265,12 @@
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           {:class (when is-inbox? "has-inbox")}
-          [:div.hover-container
-            (user-info-hover {:user-data publisher :current-user-id current-user-id})
-            (user-avatar-image publisher)
-            [:span.name
-              {:class utils/hide-class}
-              (:name publisher)]]
-          (when-not (:publisher-board activity-data)
-            [:span.in "in "])
-          (when-not (:publisher-board activity-data)
-            [:span.section
-              {:class utils/hide-class}
-              (str (:board-name activity-data)
-                   (when (= (:board-access activity-data) "private")
-                     " (private)"))])
+          (post-authorship {:activity-data activity-data
+                            :user-avatar? true
+                            :user-hover? true
+                            :board-hover? true
+                            :current-user-id current-user-id})
+          [:div.separator-dot]
           (let [t (or (:published-at activity-data) (:created-at activity-data))]
             [:span.time-since
               {:data-toggle (when-not is-mobile? "tooltip")

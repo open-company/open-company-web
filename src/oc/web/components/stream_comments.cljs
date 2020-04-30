@@ -25,7 +25,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))

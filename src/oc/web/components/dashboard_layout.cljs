@@ -152,6 +152,7 @@
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
         show-follow-button? (and (contains? board-container-data :following)
                                  (seq (:user-id current-user-data))
+                                 (not is-drafts-board)
                                  (not= (:author-uuid board-container-data) (:user-id current-user-data)))]
       ;; Entries list
       [:div.dashboard-layout.group

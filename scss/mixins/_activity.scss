@@ -4,30 +4,7 @@
 $bottom_margin: 16;
 $header_top_margin: 24;
 
-@mixin activity-author($avatar_size: 32){
-
-  @include user-profile($avatar_size) {
-    float: left;
-    margin-right: 13px;
-  }
-
-  div.name, span.name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    @include OC_Body_Book();
-    color: var(--light-color);
-    font-size: 12px;
-    line-height: 20px;
-    white-space: nowrap;
-    text-decoration: underline;
-
-    @include big_web() {
-      &:hover {
-        color: var(--color);
-      }
-    }
-  }
-
+@mixin time-since() {
   div.time-since, span.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -44,9 +21,38 @@ $header_top_margin: 24;
       }
     }
   }
+}
+
+@mixin activity-author($avatar_size: 32){
+
+  @include user-profile($avatar_size) {
+    float: left;
+    margin-right: 13px;
+  }
+
+  .publisher-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    @include OC_Body_Book();
+    color: var(--light-color);
+    font-size: 12px;
+    line-height: 20px;
+    white-space: nowrap;
+    text-decoration: underline;
+
+    @include big_web() {
+      &:hover {
+        color: var(--color);
+      }
+    }
+  }
+
+  @include time-since();
 
   @content
 }
+
+
 
 @mixin must-see-tag() {
   div.must-see-tag {

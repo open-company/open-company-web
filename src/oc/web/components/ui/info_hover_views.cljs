@@ -1,4 +1,4 @@
-(ns oc.web.components.ui.user-info-hover
+(ns oc.web.components.ui.info-hover-views
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [goog.events :as events]
@@ -13,6 +13,26 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+
+(rum/defc board-info-view < rum/static
+  [{:keys [activity-data above? following followers-count]}]
+  [:div.board-info-view
+    {:class (utils/class-set {:above above?})}
+    [:div.board-info-header
+      [:div.board-info-right
+        [:div.board-info-name
+          (:board-name activity-data)]
+        [:div.board-info-subline
+          (if (pos? followers-count)
+            (str followers-count " follower" (when (not= followers-count 1) "s"))
+            "No followers")]]]
+    [:div.board-info-buttons.group
+      [:button.mlb-reset.posts-bt
+        {:on-click #(nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:boad-slug activity-data)))}
+        "Wuts"]
+      (follow-button {:following following
+                      :resource-type :board
+                      :resource-uuid (:board-uuid activity-data)})]])
 
 (rum/defc user-info-view < rum/static
   [{:keys [user-data user-id my-profile? hide-buttons otf above? inline? following followers-count]}]
@@ -39,9 +59,10 @@
             (seq (:email user-data))
             [:div.user-info-subline
               (:email user-data)])
-          (when (pos? followers-count)
-            [:div.user-info-subline
-              (str followers-count " follower" (when (not= followers-count 1) "s"))])
+          [:div.user-info-subline
+            (if (pos? followers-count)
+              (str followers-count " follower" (when (not= followers-count 1) "s"))
+              "No followers")]
           (when (and (not hide-buttons)
                      (not my-profile?))
             [:button.mlb-reset.profile-bt
@@ -52,8 +73,8 @@
           [:button.mlb-reset.posts-bt
             {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
             (if my-profile?
-              "My posts"
-              "Posts")]
+              "My wuts"
+              "Wuts")]
           (if my-profile?
             [:button.mlb-reset.profile-bt
               {:on-click #(nav-actions/show-user-info (:user-id user-data))}
@@ -163,16 +184,19 @@
   [s {:keys [disabled user-data current-user-id leave-delay?]}]
   ;; Return an empty DOM for mobile since we don't show the hover popup
   (if (responsive/is-mobile-size?)
-    [:div.user-info-hover]
+    [:div.info-hover-view]
     (let [my-profile? (= (:user-id user-data) current-user-id)
           pos @(::positioning s)
           users-info (drv/react s :users-info-hover)
           active-user-data (get users-info (:user-id user-data))
           complete-user-data (merge user-data active-user-data)
-          follow-publishers-list (mapv :user-id (drv/react s :follow-publishers-list))
-          following? (utils/in? follow-publishers-list (:user-id user-data))
-          followers-publishers-count (drv/react s :followers-publishers-count)]
-      [:div.user-info-hover
+          follow-publishers-list (set (map :user-id (drv/react s :follow-publishers-list)))
+          following? (follow-publishers-list (:user-id user-data))
+          followers-publishers-count (drv/react s :followers-publishers-count)
+          followers-count (some #(when (= (:resource-uuid %) (:user-id user-data))
+                                   (:count %))
+                           followers-publishers-count)]
+      [:div.info-hover-view
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true})
          :on-click #(when-not (utils/button-clicked? %)
@@ -183,4 +207,61 @@
                          :hide-buttons (not active-user-data)
                          :my-profile? my-profile?
                          :following following?
-                         :followers-count (some #(when (= (:resource-uuid %) (:user-id user-data)) (:count %)) followers-publishers-count)})])))
+                         :followers-count followers-count})])))
+
+(rum/defcs board-info-hover <
+  rum/static
+  rum/reactive
+  (drv/drv :org-data)
+  (drv/drv :follow-boards-list)
+  (drv/drv :followers-boards-count)
+  (rum/local nil ::mouse-enter)
+  (rum/local nil ::mouse-leave)
+  (rum/local nil ::click)
+  (rum/local default-positioning ::positioning)
+  (rum/local false ::hovering)
+  (rum/local nil ::enter-timeout)
+  (rum/local nil ::leave-timeout)
+  {:did-mount (fn [s]
+   (when-let* [el (rum/dom-node s)
+               parent-el (.-parentElement el)]
+    (if (responsive/is-mobile-size?)
+      (reset! (::click s) (events/listen parent-el EventType/CLICK
+       (partial click s)))
+      (do
+        (reset! (::mouse-enter s) (events/listen parent-el EventType/MOUSEENTER
+         #(enter-ev s parent-el)))
+        (reset! (::mouse-leave s) (events/listen parent-el EventType/MOUSELEAVE
+         #(leave-ev s))))))
+   s)
+   :will-unmount (fn [s]
+    (when @(::mouse-enter s)
+      (events/unlistenByKey @(::mouse-enter s))
+      (reset! (::mouse-enter s) nil))
+    (when @(::mouse-leave s)
+      (events/unlistenByKey @(::mouse-leave s))
+      (reset! (::mouse-leave s) nil))
+    (when @(::click s)
+      (events/unlistenByKey @(::click s))
+      (reset! (::click s) nil))
+    s)}
+  [s {:keys [disabled activity-data leave-delay?]}]
+  ;; Return an empty DOM for mobile since we don't show the hover popup
+  (if (responsive/is-mobile-size?)
+    [:div.info-hover-view]
+    (let [pos @(::positioning s)
+          follow-boards-list (set (map :uuid (drv/react s :follow-boards-list)))
+          following? (follow-boards-list (:board-uuid activity-data))
+          followers-boards-count (drv/react s :followers-boards-count)
+          followers-count (some #(when (= (:resource-uuid %) (:board-uuid activity-data))
+                                   (:count %))
+                           followers-boards-count)]
+      [:div.info-hover-view
+        {:class (utils/class-set {:show @(::hovering s)
+                                  (:vertical-position pos) true})
+         :on-click #(when-not (utils/button-clicked? %)
+                      (utils/event-stop %))
+         :style {:margin-left (str (:horizontal-offset pos) "px")}}
+        (board-info-view {:activity-data activity-data
+                          :following following?
+                          :followers-count followers-count})])))

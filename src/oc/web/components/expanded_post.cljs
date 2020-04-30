@@ -24,9 +24,9 @@
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
-            [oc.web.components.ui.user-info-hover :refer (user-info-hover)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn close-expanded-post [e]
   (nav-actions/dismiss-post-modal e))
@@ -216,20 +216,10 @@
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
           [:div.expanded-post-author-inner-label
-            [:span.hover-info-popup-container
-              (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
-              [:span.name
-                (:name publisher)]]
-            (when-not (:publisher-board activity-data)
-              [:span.in
-                "in "])
-            (when-not (:publisher-board activity-data)
-              [:span.section
-                (str (:board-name activity-data)
-                     (when (= (:board-access activity-data) "private")
-                       " (private)")
-                     (when (= (:board-access activity-data) "public")
-                       " (public)"))])
+            (post-authorship {:activity-data activity-data
+                              :user-hover? true
+                              :board-hover? true
+                              :current-user-id current-user-id})
             [:div.expanded-post-author-dot]
             [:time
               {:date-time (:published-at activity-data)

@@ -1,7 +1,7 @@
 $user_info_width: 200;
 $user_info_vertical_spacing: 8;
 
-div.user-info-hover {
+div.info-hover-view {
   position: absolute;
   display: none;
   left: 0;
@@ -206,6 +206,111 @@ div.user-info-view {
     margin-top: 8px;
 
     button.follow-button, button.profile-bt {
+      float: left;
+      width: calc(50% - 4px);
+      padding: 6px 0;
+      background-color: var(--opac-background-color-08);
+      @include OC_Body_Bold();
+      color: var(--opac-background-color-72);
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
+
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+    }
+
+    button.posts-bt {
+      float: right;
+      width: calc(50% - 4px);
+      padding: 6px 0;
+      background-color: var(--opac-background-color-08);
+      @include OC_Body_Bold();
+      color: var(--opac-background-color-72);
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
+
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+div.board-info-view {
+  position: relative;
+  width: #{$user_info_width}px;
+  height: auto;
+  z-index: #{$navbar_zindex - 1};
+  text-align: center;
+  border: 1px solid var(--divider-line);
+  background-color: var(--background-color);
+  border-radius: 4px;
+  padding: 16px;
+  box-shadow: var(--user-info-view-shadow);
+  cursor: default;
+
+  div.board-info-header {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    justify-items: center;
+    align-content: center;
+    align-items: center;
+
+    div.board-info-right {
+      flex: 0 1 auto;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: center;
+      justify-items: center;
+      align-content: center;
+      align-items: center;
+      max-width: 100%;
+
+      div.board-info-name {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        line-height: 18px;
+        min-height: 18px;
+        color: var(--color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: text;
+        max-width: 100%;
+      }
+
+      div.board-info-subline {
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        min-height: 18px;
+        color: var(--color);
+        opacity: 0.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: text;
+        max-width: 100%;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  div.board-info-buttons {
+    height: 30px;
+    margin-top: 8px;
+
+    button.follow-button {
       float: left;
       width: calc(50% - 4px);
       padding: 6px 0;

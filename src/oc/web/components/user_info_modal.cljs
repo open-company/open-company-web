@@ -56,8 +56,8 @@
                             (nav-actions/close-all-panels)
                             (nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data))))}
               (if my-profile?
-                "View my posts"
-                "View posts")])
+                "View my wuts"
+                "View wuts")])
           (when (some seq (vals (-> user-data (select-keys [:location :timezone :email :profiles :slack-users]))))
             [:div.user-info-about
               (when (:blurb user-data)

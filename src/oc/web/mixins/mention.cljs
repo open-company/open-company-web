@@ -5,7 +5,7 @@
             [oops.core :refer (oget oset!)]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.user-info-hover :refer (user-info-otf)]
+            [oc.web.components.ui.info-hover-views :refer (user-info-otf)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
