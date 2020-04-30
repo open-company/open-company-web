@@ -205,8 +205,9 @@ div.cmail-outer {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.5;
+        opacity: 0.3;
         border-radius: 0;
+        display: block;
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -243,7 +244,8 @@ div.cmail-outer {
         background-repeat: no-repeat;
         border-radius: 0;
         padding: 0;
-        opacity: 0.5;
+        opacity: 0.3;
+        display: block;
 
         &:not(.disabled):hover {
           opacity: 1;
@@ -687,10 +689,10 @@ div.cmail-outer {
           width: 32px;
           height: 32px;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 12px 14px;
+          background-size: 14px 16px;
           background-repeat: no-repeat;
           background-position: center;
-          opacity: 0.5;
+          opacity: 0.3;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
@@ -710,13 +712,13 @@ div.cmail-outer {
             width: 32px;
             height: 32px;
             background-position: center;
-            background-size: 14px 14px;
+            background-size: 16px 16px;
             padding: 0px;
             position: absolute;
             top: 0px;
             left: 0px;
             cursor: pointer;
-            opacity: 0.5;
+            opacity: 0.3;
             border-radius: 0;
 
             &:not(.disabled):hover {

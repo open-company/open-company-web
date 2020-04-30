@@ -193,7 +193,7 @@ div.medium-editor-media-picker div.media-picker-container button.media-code i.fa
 
 div.medium-editor-media-picker div.media-picker-container button.media-code {
   background-image: url("/img/ML/media_code.svg");
-  background-size: 20px 18px;
+  background-size: 20px 12px;
 }
 
 html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-code {
@@ -240,5 +240,5 @@ div.medium-editor-media-picker div.media-picker-container button.media-divider:h
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded button.media {
-  opacity: 0.5;
+  opacity: 0.3;
 }

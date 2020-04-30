@@ -157,9 +157,8 @@
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true])
   (debounced-autosave! state)
-  (let [last-body-count @(::last-body-count state)]
-    (when-let [body-el (body-element)]
-      (reset! (::last-body-count state) (count (.-innerText body-el))))))
+  (when-let [body-el (body-element)]
+    (reset! (::last-body state) (.-innerHTML body-el))))
 
 (defn- headline-on-change [state]
   (when-let [headline (rum/ref-node state "headline")]
@@ -322,7 +321,7 @@
                    (rum/local nil ::latest-key)
                    (rum/local false ::show-post-tooltip)
                    (rum/local false ::show-sections-picker)
-                   (rum/local 0 ::last-body-count)
+                   (rum/local nil ::last-body)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -352,6 +351,7 @@
                           body-text (.text (.html (js/$ "<div/>") initial-body))]
                       (when-not (seq (:uuid cmail-data))
                         (nux-actions/dismiss-add-post-tooltip))
+                      (reset! (::last-body s) initial-body)
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
@@ -384,6 +384,7 @@
                                 body-text (.text (.html (js/$ "<div/>") initial-body))]
                             (when-not (seq (:uuid cmail-data))
                               (nux-actions/dismiss-add-post-tooltip))
+                            (reset! (::last-body s) initial-body)
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
@@ -464,7 +465,7 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
-                      (not (au/has-body? cmail-data))
+                      (au/empty-body? @(::last-body s))
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -484,7 +485,7 @@
         unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
-                            "Wut!")
+                            "Share update")
         did-pick-section (fn [board-data note dismiss-action]
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])

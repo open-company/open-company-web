@@ -291,9 +291,12 @@
     (or (s/blank? trimmed-headline)
         (not= trimmed-headline empty-headline))))
 
+(defn empty-body? [body]
+  (or (s/blank? body)
+      (= body empty-body-html)))
+
 (defn has-body? [data]
-  (and (not (s/blank? (:body data)))
-       (not= (:body data) empty-body-html)))
+  (not (empty-body? (:body data))))
 
 (defn has-text? [data]
   (or (has-headline? data)
