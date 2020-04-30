@@ -145,8 +145,7 @@
                       ;       "No followers")])
                       (when (:location u)
                         [:span.followers-count
-                          (:location u)
-                          "Asd"])
+                          (:location u)])
                       (follow-button {:following true :resource-type :user :resource-uuid (:user-id u)})]))
                 ;; Unfollowing
                 (when (seq unfollowing-users)
