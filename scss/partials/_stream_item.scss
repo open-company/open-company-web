@@ -111,7 +111,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
-  border-top: none;
+  border-top: 1px solid transparent;
   border-right: 1px solid var(--foc-divider-line-color);
   border-bottom: 1px solid var(--foc-divider-line-color);
   border-left: 1px solid var(--foc-divider-line-color);
