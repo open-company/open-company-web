@@ -68,6 +68,10 @@ div.cmail-outer {
         display: none;
       }
 
+      div.delete-bt-container {
+        display: none;
+      }
+
       div.cmail-content-outer {
         padding: 18px 24px;
 
@@ -216,6 +220,33 @@ div.cmail-outer {
       &.long-tooltip {
         .tooltip {
           width: 96px;
+        }
+      }
+    }
+
+    div.delete-bt-container {
+      position: absolute;
+      right: -34px;
+      top: 32px;
+
+      @include mobile() {
+        display: none;
+      }
+
+      button.delete-bt {
+        position: relative;
+        height: 32px;
+        width: 32px;
+        background-image: cdnUrl("/img/ML/cmail_delete.svg");
+        background-size: 16px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 0;
+        padding: 0;
+        opacity: 0.5;
+
+        &:not(.disabled):hover {
+          opacity: 1;
         }
       }
     }
@@ -638,34 +669,6 @@ div.cmail-outer {
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
             }
-          }
-        }
-      }
-
-      div.delete-bt-container {
-        float: left;
-        height: 16px;
-        margin-top: 8px;
-
-        @include mobile() {
-          display: none;
-        }
-
-        button.delete-bt {
-          position: relative;
-          top: -8px;
-          height: 32px;
-          width: 32px;
-          background-image: cdnUrl("/img/ML/cmail_delete.svg");
-          background-size: 16px 14px;
-          background-position: center;
-          background-repeat: no-repeat;
-          border-radius: 0;
-          padding: 0;
-          opacity: 0.5;
-
-          &:not(.disabled):hover {
-            opacity: 1;
           }
         }
       }

@@ -484,7 +484,7 @@
         unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
-                            "Update")
+                            "Wut!")
         did-pick-section (fn [board-data note dismiss-action]
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
@@ -541,6 +541,13 @@
              :title (if unpublished?
                       "Save & Close"
                       "Close")}]]
+        (when (:uuid cmail-data)
+          [:div.delete-bt-container
+            [:button.mlb-reset.delete-bt
+              {:on-click #(delete-clicked s % cmail-data)
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "right"
+               :title "Delete"}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
