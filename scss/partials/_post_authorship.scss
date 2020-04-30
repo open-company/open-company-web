@@ -24,6 +24,12 @@ div.post-authorship {
         overflow: hidden;
         line-height: 24px;
         margin-right: 4px;
+
+        @include big_web() {
+          &:hover {
+            color: var(--color);
+          }
+        }
       }
     }
   }
@@ -55,6 +61,12 @@ div.post-authorship {
       white-space: nowrap;
       text-decoration: underline;
       flex: 0 1 auto;
+
+      @include big_web() {
+        &:hover {
+          color: var(--color);
+        }
+      }
     }
   }
 }
