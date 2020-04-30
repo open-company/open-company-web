@@ -1,8 +1,8 @@
 (ns oc.web.components.ui.post-authorship
   (:require [rum.core :as rum]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
@@ -21,7 +21,7 @@
          :href (oc-urls/contributions (:user-id publisher))
          :on-click #(do
                       (utils/event-stop %)
-                      (router/nav! (oc-urls/contributions (:user-id publisher))))}
+                      (nav-actions/nav-to-author! % (:user-id publisher) (oc-urls/contributions (:user-id publisher))))}
         (:name publisher)]]
     (when-not publisher-board
       [:span.in "in "])
@@ -34,7 +34,7 @@
            :href (oc-urls/board board-slug)
            :on-click #(do
                         (utils/event-stop %)
-                        (router/nav! (oc-urls/board board-slug)))}
+                        (nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
           (str board-name
                (when (= board-access "private")
                  " (private)")

@@ -28,7 +28,9 @@
             "No followers")]]]
     [:div.board-info-buttons.group
       [:button.mlb-reset.posts-bt
-        {:on-click #(nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:boad-slug activity-data)))}
+        {:on-click #(do
+                      (utils/event-stop %)
+                      (nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
         "Wuts"]
       (follow-button {:following following
                       :resource-type :board
