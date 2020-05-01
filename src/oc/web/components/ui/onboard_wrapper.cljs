@@ -263,29 +263,27 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.group
-            [:div.field-label.left-half-field-label.name-fields
+          [:div.form-title
+            "Sign up"]
+          [:div.field-label.name-fields
               "First name"]
-            [:div.field-label.right-half-field-label.name-fields.big-web-tablet-only
-              "Last name"]]
-          [:div.group
-            [:input.field.left-half-field.oc-input
-              {:class utils/hide-class
-               :type "text"
-               :ref "first-name"
-               :placeholder "First name..."
-               :max-length user-utils/user-name-max-lenth
-               :value (or (:first-name user-data) "")
-               :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-            [:div.field-label.right-half-field-label.name-fields.mobile-only
-              "Last name"]
-            [:input.field.right-half-field.oc-input
-              {:class utils/hide-class
-               :type "text"
-               :placeholder "Last name..."
-               :value (or (:last-name user-data) "")
-               :max-length user-utils/user-name-max-lenth
-               :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]]
+          [:input.field.oc-input
+            {:class utils/hide-class
+             :type "text"
+             :ref "first-name"
+             :placeholder "First name..."
+             :max-length user-utils/user-name-max-lenth
+             :value (or (:first-name user-data) "")
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+          [:div.field-label
+            "Last name"]
+          [:input.field.oc-input
+            {:class utils/hide-class
+             :type "text"
+             :placeholder "Last name..."
+             :value (or (:last-name user-data) "")
+             :max-length user-utils/user-name-max-lenth
+             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
           (when-not has-org?
             [:div.field-label.company-name
               "Company name"])

@@ -39,52 +39,59 @@
         (loading)]
       [:div.login-wall-container
         (login-overlays-handler)
+        [:header.login-wall-header
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :class (when ua/mobile-app? "mobile-app")
+             :on-click #(if ua/mobile-app?
+                          (router/redirect! oc-urls/home)
+                          (do
+                            (.preventDefault %)
+                            (router/redirect! oc-urls/home)))
+             :aria-label "Back"}
+            "Back"]
+          [:div.title
+            (or title default-title)]
+          [:button.mlb-reset.top-continue
+            {:class (when-not login-enabled "disabled")
+             :on-click login-action}
+            "Log in"]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
-            (when-not ua/desktop-app?
-              [:a.login-wall-back-arrow
-                {:href oc-urls/home
-                 :on-click #(do
-                             (.preventDefault %)
-                             (router/redirect! oc-urls/home))}])
+            
             [:div.login-wall-content
               [:div.login-overlay-cta.group
-                (when ua/mobile-app?
-                  [:button.mlb-reset.top-back-button
-                    {:on-touch-start identity
-                     :on-click #(router/redirect! oc-urls/home)
-                     :aria-label "Back"}])
-                [:div.login-title (or title default-title)]]
+                
+                [:div.login-title "Log in"]]
               (when (seq (or desc default-desc))
                 [:div.login-description (or desc default-desc)])
-              [:button.mlb-reset.signup-with-slack
-                {:on-touch-start identity
-                 :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                   {:auth-source "slack"})]
-                               (user-actions/maybe-save-login-redirect)
-                               (user-actions/login-with-slack auth-link
-                                                              (when ua/mobile-app?
-                                                                {:redirect-origin deep-link-origin}))))}
-                [:div.signup-with-slack-content
+              [:div.login-buttons.group
+                [:button.mlb-reset.signup-with-slack
+                  {:on-touch-start identity
+                   :on-click #(do
+                               (.preventDefault %)
+                               (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                     {:auth-source "slack"})]
+                                 (user-actions/maybe-save-login-redirect)
+                                 (user-actions/login-with-slack auth-link
+                                                                (when ua/mobile-app?
+                                                                  {:redirect-origin deep-link-origin}))))}
                   [:div.slack-icon
                     {:aria-label "slack"}]
-                  "Continue with Slack"]]
-              [:button.mlb-reset.signup-with-google
-                {:on-touch-start identity
-                 :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                                  {:auth-source "google"})]
-                               (user-actions/maybe-save-login-redirect)
-                               (user-actions/login-with-google auth-link
-                                                               (when ua/mobile-app?
-                                                                 {:redirect-origin deep-link-origin}))))}
-               [:div.signup-with-google-content
+                  [:div.slack-text "Slack"]]
+                [:button.mlb-reset.signup-with-google
+                  {:on-touch-start identity
+                   :on-click #(do
+                               (.preventDefault %)
+                               (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                    {:auth-source "google"})]
+                                 (user-actions/maybe-save-login-redirect)
+                                 (user-actions/login-with-google auth-link
+                                                                 (when ua/mobile-app?
+                                                                   {:redirect-origin deep-link-origin}))))}
                  [:div.google-icon
                   {:aria-label "google"}]
-                  "Continue with Google "]]
+                 [:div.google-text "Google"]]]
               [:div.or-login
                 [:div.or-login-copy "Or, login with email"]]
               ;; Email fields
@@ -137,16 +144,13 @@
                     {:aria-label "Login"
                      :disabled (not login-enabled)
                      :on-click login-action}
-                    "Log in"]
-                  [:div.footer-link
-                    "Don't have an account yet?"
-                    [:div.footer-link-inner
-                      [:a
-                        {:href oc-urls/sign-up
-                         :on-click (fn [e]
-                                     (utils/event-stop e)
-                                     (router/nav! oc-urls/sign-up))}
-                        "Sign up here"]]]]
-               ]]]
-            [:div.bottom-gradient.big-web-only
-              [:div.login-box]]]])))
+                    "Log in"]]]]]
+          [:div.footer-link
+            "Don't have an account yet?"
+            [:div.footer-link-inner
+              [:a
+                {:href oc-urls/sign-up
+                 :on-click (fn [e]
+                             (utils/event-stop e)
+                             (router/nav! oc-urls/sign-up))}
+                "Sign up here"]]]]])))
