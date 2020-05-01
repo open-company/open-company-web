@@ -544,8 +544,8 @@
 (defn hide-mobile-user-notifications []
   (dis/dispatch! [:input [:mobile-user-notifications] false]))
 
-(defn- identify-general-board []
-  (when-let [org-data (dis/org-data)]
+(defn- identify-general-board [org-slug]
+  (when-let [org-data (dis/org-data @dis/app-state org-slug)]
     (let [named-general (some #(when (and (#{(s/lower (:name %)) (:slug %)} "general")
                                           (= (:access %) "team"))
                                  %)
@@ -653,17 +653,18 @@
           :expire 5}))))
   (ws-cc/subscribe :follow/list
     (fn [{:keys [data]}]
+      (dis/dispatch! [:follow/loaded (router/current-org-slug) data])
       ;; In case :board-uuids is nil it means the user has not following record yet
       ;; so we have to default him to follow the general board
-      (let [follow-general-by-default? (nil? (:board-uuids data))
-            general-board (when follow-general-by-default?
-                            (identify-general-board))
-            fixed-data (update data :board-uuids #(if general-board
-                                                   [(:uuid general-board)]
-                                                   %))]
-        (when follow-general-by-default?
-          (utils/after 0 #(follow-boards [(:uuid general-board)])))
-        (dis/dispatch! [:follow/loaded (router/current-org-slug) fixed-data]))))
+      (when (nil? (:board-uuids data))
+        (utils/after 100 (fn []
+         (let [general-board (identify-general-board (:org-slug data))
+               fixed-data (update data :board-uuids #(if general-board
+                                                       [(:uuid general-board)]
+                                                       %))]
+           (when general-board
+             (utils/after 0 #(follow-boards [(:uuid general-board)]))
+             (dis/dispatch! [:follow/loaded (router/current-org-slug) fixed-data]))))))))
   (ws-cc/subscribe :followers/count
     (fn [{:keys [data]}]
       (dis/dispatch! [:followers-count/finish (router/current-org-slug) data]))))
