@@ -38,6 +38,11 @@
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
 
+(def ^:private follow-bt-copy {:active-on "Favorited"
+                               :active-off "Favorite"
+                               :hover-on "Unfavorite"
+                               :hover-off "Favorite"})
+
 (rum/defc empty-user-component < rum/static
   [{:keys [org-data current-user-data]}]
   [:div.follow-user-picker-empty-users
@@ -146,7 +151,10 @@
                       (when (:location u)
                         [:span.followers-count
                           (:location u)])
-                      (follow-button {:following true :resource-type :user :resource-uuid (:user-id u)})]))
+                      (follow-button {:following true
+                                      :resource-type :user
+                                      :resource-uuid (:user-id u)
+                                      :button-copy follow-bt-copy})]))
                 ;; Unfollowing
                 (when (seq unfollowing-users)
                   [:div.follow-user-picker-row-header
@@ -169,4 +177,4 @@
                       (when (:location u)
                         [:span.user-followers-count
                           (:location u)])
-                      (follow-button {:following false :resource-type :user :resource-uuid (:user-id u)})]))]])]]]))
+                      (follow-button {:following false :resource-type :user :resource-uuid (:user-id u) :button-copy follow-bt-copy})]))]])]]]))

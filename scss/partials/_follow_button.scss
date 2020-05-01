@@ -4,10 +4,6 @@ button.follow-button {
   border-radius: 4px;
   width: auto;
   padding: 8px;
-  @include OC_Body_Book();
-  font-size: 14px;
-  line-height: 18px;
-  color: white;
 
   @include big_web(){
     &:hover {
@@ -15,8 +11,37 @@ button.follow-button {
     }
   }
 
+  span.main-title, span.hover-title {
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    color: white;
+    width: 100%;
+    text-align: center;
+  }
+
+  span.main-title {
+    display: block;
+  }
+
+  span.hover-title {
+    display: none;
+  }
+
+  @include big_web() {
+    &:hover {
+      span.hover-title {
+        display: block;
+      }
+
+      span.main-title {
+        display: none;
+      }
+    }
+  }
+
   &.unfollow {
-    background-color: var(--opac-background-color-05);
+    background-color: var(--opac-background-color-1);
     color: var(--light-color);
 
     @include big_web(){

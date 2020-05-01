@@ -53,11 +53,11 @@
 
 (def private-access
   [:div.access-item.private-access
-    "Team members you invite"])
+    "Feed members you invite"])
 
 (def team-access
   [:div.access-item.team-access
-    "Anyone on the team"])
+    "Anyone on the feed"])
 
 (def public-access
   [:div.access-item.public-access
@@ -204,8 +204,8 @@
             {:dangerouslySetInnerHTML
               (utils/emojify
                (if @(::editing-existing-section s)
-                 "Team settings"
-                 "Create team"))}]
+                 "Feed settings"
+                 "Create feed"))}]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
@@ -229,10 +229,10 @@
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
-            [:span.section-name "Team name"]]
+            [:span.section-name "Feed name"]]
           [:input.section-editor-add-name.oc-input
             {:value @(::section-name s)
-             :placeholder "Team name"
+             :placeholder "Feed name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
@@ -252,7 +252,7 @@
               (str (or (:section-name-error section-editing)
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
-            "Team security"]
+            "Feed security"]
           [:div.section-editor-add-access.oc-input
             {:class (when @(::show-access-list s) "active")
              :on-click #(do
@@ -334,10 +334,10 @@
                   "Add Wut bot"]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
-              "Public teams are visible to the world, including search engines."])
+              "Public feeds are visible to the world, including search engines."])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label.top-separator
-              "Add members to this private team"])
+              "Add members to this private feed"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
                   available-users (uu/filter-active-users all-users-data)
@@ -379,14 +379,14 @@
                              "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              "Wut team settings"]
+                              "Wut feed settings"]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))
             [:div.section-editor-add-label.group
               [:span.main-label
-                "Team members"]
+                "Feed members"]
               [:span.role-header
                 "Access"]])
           (when (and (= (:access section-editing) "private")
@@ -461,14 +461,14 @@
                                 (alert-modal/show-alert
                                  {:icon "/img/ML/error_icon.png"
                                   :action "remove-self-user-from-private-section"
-                                  :message "Are you sure you want to leave this team?"
+                                  :message "Are you sure you want to leave this feed?"
                                   :link-button-title "No"
                                   :link-button-cb #(alert-modal/hide-alert)
                                   :solid-button-title "Yes"
                                   :solid-button-cb (fn []
                                    (section-actions/private-section-kick-out-self self-data)
                                    (alert-modal/hide-alert))})))}
-                            "Leave team"]
+                            "Leave feed"]
                           [:div.user-type.no-dropdown
                             "Edit"])
                         [:div.user-type
@@ -505,7 +505,7 @@
                                            [:span "Are you sure?"]
                                            (when (-> section-data :entry-count pos?)
                                              [:span
-                                               " This will delete the team and "
+                                               " This will delete the feed and "
                                                [:strong "all"]
                                                " its updates, too."])]
                                 :link-button-title "No"
@@ -516,7 +516,7 @@
                                                    (section-actions/section-delete
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
-                                                      {:title "Team deleted"
+                                                      {:title "Feed deleted"
                                                        :dismiss true
                                                        :expire 3
                                                        :id :section-deleted}))
@@ -526,7 +526,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title (if last-section-standing
-                         "You cannot delete the last remaining team."
-                         "Delete this team and all its updates.")
+                         "You cannot delete the last remaining feed."
+                         "Delete this feed and all its updates.")
                  :class (when last-section-standing "disabled")}
-                "Delete team"])]]]]))
+                "Delete feed"])]]]]))

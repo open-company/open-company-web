@@ -66,25 +66,25 @@
         [:div.follow-board-picker-header
           [:button.mlb-reset.create-board-bt
             {:on-click #(nav-actions/show-section-add)}
-            "Create a new team"]
+            "Create a new feed"]
           [:h3.follow-board-picker-title
-            "Teams"]]
+            "Feeds"]]
         [:div.follow-board-picker-body
           (if (zero? (count all-boards))
             [:div.follow-board-picker-empty-boards
               [:div.follow-board-picker-empty-icon]
               [:div.follow-board-picker-empty-copy
-                "There are no teams to follow yet. "
+                "There are no feeds to follow yet. "
                 (when (utils/link-for (:links org-data) "create")
                   [:button.mlb-reset.follow-board-picker-empty-invite-bt
                     {:on-click #(nav-actions/show-org-settings :invite-picker)}
-                    "Add a team to get started."])]]
+                    "Add a feed to get started."])]]
             [:div.follow-board-picker-body-inner.group
               [:input.follow-board-picker-search-field-input.oc-input
                 {:value @(::query s)
                  :type "text"
                  :ref :query
-                 :placeholder "Find a team..."
+                 :placeholder "Find a feed..."
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-board-picker-boards-list.group
                 ;; Following
@@ -107,7 +107,7 @@
                 ;; Unfollowing
                 (when (seq unfollowing-boards)
                   [:div.follow-board-picker-row-header
-                    (str "Other teams (" (count unfollowing-boards) ")")])
+                    (str "Other feeds (" (count unfollowing-boards) ")")])
                 (when (seq unfollowing-boards)
                   (for [b unfollowing-boards]
                     [:div.follow-board-picker-board-row.group

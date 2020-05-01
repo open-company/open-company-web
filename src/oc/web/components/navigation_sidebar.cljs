@@ -192,7 +192,9 @@
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
         follow-publishers-list (drv/react s :follow-publishers-list)
-        show-users-list? false ;user-is-part-of-the-team?
+        show-users-list? (and user-is-part-of-the-team?
+                              follow-publishers-list
+                              (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
