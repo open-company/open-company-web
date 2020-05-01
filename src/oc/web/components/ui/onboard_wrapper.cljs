@@ -33,11 +33,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(def why-carrot-label "Why you are giving Carrot a try?")
-
-(defn- why-carrot-value [v]
-  (str why-carrot-label "\n&zwnj;\n" v))
-
 (defn- clean-org-name [org-name]
   (string/trim org-name))
 
@@ -212,8 +207,6 @@
                             (drv/drv :org-editing)
                             (drv/drv :orgs)
                             (rum/local false ::saving)
-                            (rum/local "" ::why-carrot)
-                            (ui-mixins/autoresize-textarea "why-carrot")
                             {:will-mount (fn [s]
                               (dis/dispatch! [:input [:org-editing :name] ""])
                               (user-actions/user-profile-reset)
@@ -242,13 +235,10 @@
                               (and (empty? (:first-name user-data))
                                    (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (-> org-editing :name clean-org-name count (<= 1)))
-                              (and (not has-org?)
-                                   (-> @(::why-carrot s) utils/trim seq not)))
+                                   (-> org-editing :name clean-org-name count (<= 1))))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
-                       (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
                        (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:header.main-cta
@@ -306,18 +296,6 @@
                                                                                        :rand (rand 1000)})]))}])
           (when (:error org-editing)
             [:div.error "Must be between 3 and 50 characters"])
-          (when-not has-org?
-            [:div.field-label.why-carrot
-              why-carrot-label])
-          (when-not has-org?
-            [:textarea.field.oc-input
-              {:ref "why-carrot"
-               :placeholder "Why you're trying it..."
-               :class utils/hide-class
-               :max-length 1024
-               :value @(::why-carrot s)
-               :rows "1"
-               :on-change #(reset! (::why-carrot s) (.. % -target -value))}])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -365,7 +343,6 @@
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
-                         (rum/local "" ::why-carrot)
                          {:will-mount (fn [s]
                            (dis/dispatch! [:input [:org-editing :name] ""])
                            s)
@@ -380,12 +357,10 @@
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        continue-disabled (or (-> org-editing :name clean-org-name count (< 3))
-                              (-> @(::why-carrot s) utils/trim seq not))
+        continue-disabled (-> org-editing :name clean-org-name count (< 3))
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
-                         (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
                          (if (and (seq org-name)
                                   (>= (count org-name) 2))
                            ;; Create org and show setup screen
@@ -446,16 +421,6 @@
                (merge org-editing {:error nil :name (.. % -target -value)})])}]
           (when (:error org-editing)
             [:div.error "Must be between 3 and 50 characters"])
-          [:div.field-label.why-carrot
-            why-carrot-label]
-          [:textarea.field.oc-input
-            {:ref "why-carrot"
-             :placeholder "Help us with..."
-             :class utils/hide-class
-             :max-length 1024
-             :value @(::why-carrot s)
-             :rows "1"
-             :on-change #(reset! (::why-carrot s) (.. % -target -value))}]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
