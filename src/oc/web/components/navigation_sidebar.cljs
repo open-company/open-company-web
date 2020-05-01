@@ -284,7 +284,7 @@
                    :title "People you follow"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")}
-                  [:span.boards "People"]])
+                  [:span.boards "Favorites"]])
               [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
                 {:on-click #(nav-actions/show-follow-user-picker)
                  :title "People directory"
