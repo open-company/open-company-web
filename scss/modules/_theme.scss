@@ -77,8 +77,8 @@ $dark_mode: "dark";
   --cmail-background-color: white;
   --cmail-border: 1px solid #{rgba($deep_navy, 0.24)};
   --cmail-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
-  --cmail-active-border: 1px solid #{rgba($deep_navy, 0.08)};
-  --cmail-active-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+  --cmail-active-border: 1px solid #DCDDE1;
+  --cmail-active-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);

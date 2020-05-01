@@ -28,15 +28,6 @@ div.cmail-outer {
   }
 
   &.quick-post-collapsed {
-    box-shadow: var(--cmail-box-shadow);
-    border: var(--cmail-border);
-
-    @include big_web() {
-      &:hover {
-        box-shadow: var(--cmail-active-box-shadow);
-        border: var(--cmail-active-border);
-      }
-    }
 
     @include mobile() {
       display: none;
