@@ -122,7 +122,7 @@
                                 {:will-mount (fn [s]
                                   (save-window-size s)
                                   (save-content-height s)
-                                  (reset! (::boards-list-collapsed s) (= (cook/get-cookie (router/collapse-boards-list-cookie)) "true"))
+                                  (reset! (::boards-list-collapsed s) (not= (cook/get-cookie (router/collapse-boards-list-cookie)) "false"))
                                   (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
@@ -333,7 +333,7 @@
                    :title "Teams you follow"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")}
-                  [:span.boards "Teams"]])
+                  [:span.boards "Feeds"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-section-add)
                  :title "New team"
