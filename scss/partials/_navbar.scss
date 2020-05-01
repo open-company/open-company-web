@@ -215,6 +215,16 @@ nav.oc-navbar {
           left: calc(100vw - 112px - 16px);
         }
 
+        &.invite-people {
+          min-width: 197px; // 72 + 109 + 16
+          left: calc(100vw - 197px - 16px); 
+        }
+
+        &.create-post.invite-people {
+          min-width: 237px; // 72 + 109 + 16 + 32 + 8
+          left: calc(100vw - 237px - 16px); 
+        }
+
         @include mobile() {
           min-width: unset;
           position: absolute;
@@ -223,6 +233,23 @@ nav.oc-navbar {
           right: 16px;
           width: 32px;
           height: 32px;
+        }
+
+        button.invite-people-bt {
+          float: left;
+          margin-right: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 32px;
+          color: var(--purple-primary-color);
+          padding: 0;
+          text-align: right;
+          width: 109px;
+          height: 32px;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         button.navbar-create-bt {
