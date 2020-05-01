@@ -87,9 +87,9 @@
                        (= (router/current-board-slug) "all-posts")
                        "All"
                        (= (router/current-board-slug) "bookmarks")
-                       "Saved"
+                       "Bookmarks"
                        (= (router/current-board-slug) "following")
-                       "Following"
+                       "Wut"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else

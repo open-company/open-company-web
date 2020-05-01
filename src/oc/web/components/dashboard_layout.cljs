@@ -183,7 +183,7 @@
                                    (= current-board-slug "following"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Home"]]
+                [:span.tab-label "Wut"]]
               [:button.mlb-reset.tab-button.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -286,10 +286,10 @@
                                                    "All"
 
                                                    is-bookmarks
-                                                   "Saved"
+                                                   "Bookmarks"
 
                                                    is-following
-                                                   "Following"
+                                                   "Wut"
 
                                                    :default
                                                    ;; Fallback to the org board data
