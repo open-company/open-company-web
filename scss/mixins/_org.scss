@@ -1,11 +1,12 @@
 @mixin carrot-fallback($max_logo_height, $show_border) {
 
   &:before {
-    content: "";
-    background-repeat: no-repeat;
-    background-image: cdnUrl("/img/ML/carrot_logo.svg");
-    background-position: center;
-    background-color: white;
+    background-color: $wut_purple;
+    content: attr(data-first-letter);
+    text-align: center;
+    color: white;
+    line-height: #{$max_logo_height}px;
+    font-size: #{$max_logo_height * .7}px;
     position: absolute;
     width: #{$max_logo_height}px;
     height: #{$max_logo_height}px;
@@ -17,7 +18,7 @@
       $logo_height: $max_logo_height - ($logo_padding * 2);
       $logo_width: $logo_height * (66 / 119);
 
-      border: 1px solid var(--divider-line);
+      border: 1px solid white;// var(--divider-line);
       background-size: #{$logo_width}px #{$logo_height}px;
       border-radius: 4px;
     } @else {

@@ -10,7 +10,8 @@
 (defn internal-org-avatar
   [s org-data show-org-avatar? show-org-name?]
   [:div.org-avatar-container.group
-    {:class (utils/class-set {:no-avatar (not show-org-avatar?)})}
+    {:class (utils/class-set {:no-avatar (not show-org-avatar?)})
+     :data-first-letter (first (:name org-data))}
     (when show-org-avatar?
       [:img.org-avatar-img
        {:src (-> org-data :logo-url (img/optimize-org-avatar-url default-max-logo-height))
