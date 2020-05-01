@@ -3,6 +3,7 @@ div.onboard-wrapper-container {
   box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
   width: 100%;
   margin: 0 auto;
+  min-height: 100vh;
 
   @include mobile() {
     background-color: $grey_num_2;
@@ -275,6 +276,19 @@ div.onboard-lander {
       text-align: center;
     }
 
+    button.user-profile-avatar {
+      margin: 24px auto 0;
+      cursor: pointer;
+      width: 80px;
+      height: 80px;
+
+      @include user-profile(80) {
+        img.user-avatar-img {
+          cursor: pointer;
+        }
+      }
+    }
+
     div.subtitle {
       @include OC_Body_Book();
       font-size: 18px;
@@ -537,33 +551,6 @@ div.onboard-lander {
         margin-left: 16px;
         color: $carrot_orange;
       }
-
-      &.left-half-field-label, &.right-half-field-label {
-        width: calc(50% - 4px);
-
-        @include mobile() {
-          width: 100%;
-        }
-      }
-
-      &.left-half-field-label {
-        float: left;
-
-        @include mobile() {
-          float: unset;
-        }
-      }
-
-      &.right-half-field-label {
-        float: right;
-
-        @include mobile() {
-          &.field-label.name-fields {
-            float: unset;
-            margin-top: 16px;
-          }
-        }
-      }
     }
 
     div.field-description {
@@ -609,30 +596,6 @@ div.onboard-lander {
 
       &.valid {
         border: 1px solid rgba($wut_purple, 0.5);
-      }
-
-      &.right-half-field, &.left-half-field {
-        width: calc(50% - 4px);
-
-        @include mobile() {
-          width: 100%;
-        }
-      }
-
-      &.left-half-field {
-        float: left;
-
-        @include mobile() {
-          float: unset;
-        }
-      }
-
-      &.right-half-field {
-        float: right;
-
-        @include mobile() {
-          float: unset;
-        }
       }
     }
 

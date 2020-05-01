@@ -66,6 +66,7 @@
 (defn- fix-user-values [user-data]
   (cond-> user-data
    true (assoc :has-changes false)
+   true (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
    (empty? (:first-name user-data)) (merge {:first-name ""})
    (empty? (:last-name user-data)) (merge {:last-name ""})
    (empty? (:current-password user-data)) (merge {:current-password ""})

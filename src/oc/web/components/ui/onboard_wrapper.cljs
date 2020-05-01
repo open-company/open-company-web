@@ -23,7 +23,9 @@
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -200,6 +202,40 @@
             (gdom/append (.-body js/document) img)
             (set! (.-src img) (:logo-url first-team))))))))
 
+(defn- update-tooltip [s]
+  (utils/after 100
+   #(let [header-avatar (rum/ref-node s "user-profile-avatar")
+          $header-avatar (js/$ header-avatar)
+          edit-user-profile-avatar (-> s (drv/get-ref :edit-user-profile) deref :user-data :avatar-url)
+          title (if (string/includes? edit-user-profile-avatar "/img/ML/happy_face_")
+                  "Add a photo"
+                  "Change photo")]
+      (.tooltip $header-avatar #js {:title title
+                                    :trigger "hover focus"
+                                    :position "top"
+                                    :container "body"}))))
+
+(defn error-cb [s res error]
+  (notification-actions/show-notification
+    {:title "Image upload error"
+     :description "An error occurred while processing your image. Please retry."
+     :expire 3
+     :dismiss true})
+  (update-tooltip s))
+
+(defn success-cb
+  [s res]
+  (let [url (gobj/get res "url")]
+    (if-not url
+      (error-cb s nil nil)
+      (dis/dispatch! [:input [:edit-user-profile :user-data :avatar-url] url]))
+    (update-tooltip s)))
+
+(defn progress-cb [res progress])
+
+(defn upload-user-profile-picture-clicked [s]
+  (iu/upload! user-utils/user-avatar-filestack-config (partial success-cb s) progress-cb (partial error-cb s)))
+
 (rum/defcs lander-profile < rum/reactive
                             (drv/drv :edit-user-profile)
                             (drv/drv :current-user-data)
@@ -214,7 +250,11 @@
                              :did-mount (fn [s]
                               (profile-setup-team-data s)
                               (delay-focus-field-with-ref s "first-name")
+                              (update-tooltip s)
                              s)
+                             :did-remount (fn [o s]
+                              (update-tooltip s)
+                              s)
                              :will-update (fn [s]
                               (profile-setup-team-data s)
                               (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
@@ -236,6 +276,7 @@
                                    (empty? (:last-name user-data)))
                               (and (not has-org?)
                                    (-> org-editing :name clean-org-name count (<= 1))))
+        is-mobile? (responsive/is-tablet-or-mobile?)
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
@@ -255,6 +296,11 @@
                         (.preventDefault e))}
           [:div.form-title
             "Sign up"]
+          [:button.mlb-reset.user-profile-avatar
+            {:on-click #(upload-user-profile-picture-clicked s)
+             :ref "user-profile-avatar"
+             :data-toggle (when-not is-mobile? "")}
+            (user-avatar-image user-data)]
           [:div.field-label.name-fields
               "First name"]
           [:input.field.oc-input
