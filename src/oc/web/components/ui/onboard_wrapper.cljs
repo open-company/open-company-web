@@ -63,42 +63,56 @@
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)
         auth-settings (drv/react s :auth-settings)
-        deep-link-origin (drv/react s :expo-deep-link-origin)]
-    [:div.onboard-lander.lander
-      [:div.main-cta
-        [:div.onboard-lander-header
-          (when-not ua/mobile-app?
-            [:button.mlb-reset.top-back-button
-              {:on-touch-start identity
-               :on-click #(router/history-back!)
-               :aria-label "Back"}])]
-        [:div.title.main-lander
-          "Let’s get started!"]]
-      [:div.onboard-form
-        [:button.mlb-reset.signup-with-slack
+        deep-link-origin (drv/react s :expo-deep-link-origin)
+        continue-disabled? (or (not (utils/valid-email? @(::email s)))
+                               (<= (count @(::pswd s)) 7))
+        continue-fn (if continue-disabled?
+                      (fn [_]
+                        (when-not (utils/valid-email? @(::email s))
+                          (reset! (::email-error s) true))
+                        (when (<= (count @(::pswd s)) 7)
+                          (reset! (::password-error s) true)))
+                      #(user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))]
+    [:div.onboard-lander.lander.group
+      [:header.main-cta
+        [:button.mlb-reset.top-back-button
           {:on-touch-start identity
-           :on-click #(do
-                       (.preventDefault %)
-                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                             {:auth-source "slack"})]
-                         (user-actions/login-with-slack auth-link
-                                                        (when ua/mobile-app?
-                                                          {:redirect-origin deep-link-origin}))))}
-          "Continue with Slack"
-          [:div.slack-icon
-            {:aria-label "slack"}]]
-       [:button.mlb-reset.signup-with-google
-         {:on-touch-start identity
-          :on-click #(do
-                       (.preventDefault %)
-                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                            {:auth-source "google"})]
-                         (user-actions/login-with-google auth-link
-                                                         (when ua/mobile-app?
-                                                           {:redirect-origin deep-link-origin}))))}
-          "Continue with Google"
-          [:div.google-icon
-            {:aria-label "google"}]]
+           :on-click #(router/history-back!)}
+          "Back"]
+        [:div.title.main-lander
+          "Let’s get started!"]
+        [:button.mlb-reset.top-continue
+          {:class (when continue-disabled? "disabled")
+           :on-click continue-fn}
+          "Continue"]]
+      [:div.onboard-form
+        [:div.form-title
+          "Sign up"]
+        [:div.signup-buttons.group
+          [:button.mlb-reset.signup-with-slack
+            {:on-touch-start identity
+             :on-click #(do
+                         (.preventDefault %)
+                         (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                               {:auth-source "slack"})]
+                           (user-actions/login-with-slack auth-link
+                                                          (when ua/mobile-app?
+                                                            {:redirect-origin deep-link-origin}))))}
+            [:div.slack-icon
+              {:aria-label "slack"}]
+            [:div.slack-text "Slack"]]
+         [:button.mlb-reset.signup-with-google
+           {:on-touch-start identity
+            :on-click #(do
+                         (.preventDefault %)
+                         (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                              {:auth-source "google"})]
+                           (user-actions/login-with-google auth-link
+                                                           (when ua/mobile-app?
+                                                             {:redirect-origin deep-link-origin}))))}
+            [:div.google-icon
+              {:aria-label "google"}]
+            [:div.google-text "Google"]]]
         [:div.or-with-email
           [:div.or-with-email-copy
             "Or, sign up with email"]]
@@ -136,8 +150,13 @@
                            (reset! (::password-error s) false)
                            (reset! (::email-error s) false)
                            (reset! (::pswd s) v))}]
+          [:button.continue
+            {:class (when continue-disabled? "disabled")
+             :on-touch-start identity
+             :on-click continue-fn}
+            "Continue"]
           [:div.field-description
-            "By signing up you are agreeing to our "
+            "By clicking continue, you agree to our "
             [:a
               {:href oc-urls/terms}
               "terms of service"]
@@ -145,21 +164,7 @@
             [:a
               {:href oc-urls/privacy}
               "privacy policy"]
-            "."]
-          [:button.continue
-            {:class (when (or (not (utils/valid-email? @(::email s)))
-                              (<= (count @(::pswd s)) 7))
-                      "disabled")
-             :on-touch-start identity
-             :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                                (<= (count @(::pswd s)) 7))
-                          (do
-                            (when-not (utils/valid-email? @(::email s))
-                              (reset! (::email-error s) true))
-                            (when (<= (count @(::pswd s)) 7)
-                              (reset! (::password-error s) true)))
-                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
-            "Continue"]]
+            "."]]]
         [:div.footer-link
           "Already have an account?"
           [:div
@@ -171,7 +176,7 @@
                              (router/nav! (if ua/pseudo-native?
                               oc-urls/native-login
                               oc-urls/login)))}
-             "Sign in here"]]]]]))
+             "Sign in here"]]]]))
 
 (defn- profile-setup-team-data
   ""
@@ -246,14 +251,7 @@
                        (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
                        (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
-      [:div.main-cta
-        [:div.onboard-lander-header
-          [:button.mlb-reset.top-continue
-           {:class (when continue-disabled "disabled")
-            :on-touch-start identity
-            :on-click continue-fn
-            :aria-label "Continue"}
-            "Continue"]]
+      [:header.main-cta
         [:div.title.about-yourself
           (if has-org?
            "Tell us about you"
@@ -326,12 +324,12 @@
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
              :on-click continue-fn}
-            "Create team"]
-          [:div.logout-cancel
-            "Need to start over? "
-            [:button.mlb-reset.logout-cancel
-              {:on-click #(jwt-actions/logout oc-urls/sign-up)}
-              "Click here"]]]]]))
+            "Create team"]]]
+        [:div.logout-cancel
+          "Need to start over? "
+          [:button.mlb-reset.logout-cancel
+            {:on-click #(jwt-actions/logout oc-urls/sign-up)}
+            "Click here"]]]))
 
 (defn- setup-team-data
   ""
@@ -396,7 +394,7 @@
                            (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
-      [:div.main-cta
+      [:header.main-cta
         [:div.title.company-setup
           "Set up your company"]]
       [:div.onboard-form
@@ -534,13 +532,11 @@
                            (team-actions/invite-users not-empty-invites "")))))
         continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
-      [:div.main-cta
+      [:header.main-cta
         [:div.title
           "Invite your team"]
         [:div.subtitle
-          "Invite some colleagues to explore Carrot with you."]
-        [:div.steps
-          "Step 3 of 3"]]
+          "Invite some colleagues to explore Carrot with you."]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -617,13 +613,12 @@
       (if auth-settings
         (if (:team auth-settings)
           [:div
-            [:div.main-cta
-              [:div.onboard-lander-header
-                (when-not ua/mobile-app?
-                  [:button.mlb-reset.top-back-button
-                    {:on-touch-start identity
-                     :on-click #(router/history-back!)
-                     :aria-label "Back"}])]
+            [:header.main-cta
+              (when-not ua/mobile-app?
+                [:button.mlb-reset.top-back-button
+                  {:on-touch-start identity
+                   :on-click #(router/history-back!)
+                   :aria-label "Back"}])
               [:div.title-container
                 (when (seq (:logo-url team-data))
                   [:div.team-logo-container
@@ -689,7 +684,7 @@
                                     (reset! (::password-error s) true)))
                                 (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
                   (str "Join " (:name team-data))]]]]
-          [:div.main-cta
+          [:header.main-cta
             [:div.invite-token-container.token-error
               [:div.title
                 "Oh oh..."]
@@ -697,7 +692,7 @@
                 (str "The invite link you’re trying to access "
                      "has been deactivated by your account admin "
                      "and is no longer valid.")]]])
-        [:div.main-cta
+        [:header.main-cta
           [:div.invite-token-container
             [:div.title
               "Please wait"]
@@ -728,7 +723,7 @@
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
-      [:div.main-cta
+      [:header.main-cta
         [:div.invite-container
           [:div.title
             "Join your team on Carrot"]
@@ -751,7 +746,7 @@
         collect-pswd-error (:collect-pswd-error collect-password)
         invitation-confirmed (:invitation-confirmed collect-password)]
     [:div.onboard-lander.invitee-lander-password
-      [:div.main-cta
+      [:header.main-cta
         [:div.title
           "Set a password"]
         [:div.subtitle
@@ -821,7 +816,7 @@
         current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)]
     [:div.onboard-lander.invitee-lander-profile
-      [:div.main-cta
+      [:header.main-cta
         [:div.title.about-yourself
           "Tell us about you"]
         (when (:error edit-user-profile)
@@ -989,11 +984,9 @@
                      (and (jwt/jwt)
                           (not user-data)))]
     [:div.onboard-wrapper-container
+      {:class (when loading? "loading")}
       (if loading?
         (loading {:loading true})
-        [:div
-          [:div.onboard-wrapper
-            {:class (str "onboard-" (name component))}
-            (get-component component)]
-          [:div.bottom-gradient.big-web-only
-            [:div.onboard-box]]])]))
+        [:div.onboard-wrapper
+          {:class (str "onboard-" (name component))}
+          (get-component component)])]))
