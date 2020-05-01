@@ -81,7 +81,6 @@
  (drv/drv :active-users)
  (drv/drv :follow-publishers-list)
  (drv/drv :current-user-data)
- ; (drv/drv :followers-publishers-count)
  (rum/local "" ::query)
  (rum/local false ::saving)
  strict-refresh-tooltips-mixin
@@ -96,7 +95,6 @@
   [s]
   (let [org-data (drv/react s :org-data)
         follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
-        ; followers-publishers-count (drv/react s :followers-publishers-count)
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
         authors-uuids (->> org-data :authors (map :user-id) set)
@@ -143,11 +141,6 @@
                         (:name u)]
                       [:span.user-role
                         (:title u)]
-                      ; (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
-                      ;   [:span.followers-count
-                      ;     (if (pos? followers-count)
-                      ;       (str followers-count " follower" (when (not= followers-count 1) "s"))
-                      ;       "No followers")])
                       (when (:location u)
                         [:span.followers-count
                           (:location u)])
@@ -169,12 +162,7 @@
                         (:name u)]
                       [:span.user-role
                         (:title u)]
-                      ; (let [followers-count (:count (some #(when (= (:resource-uuid %) (:user-id u)) %) followers-publishers-count))]
-                      ;   [:span.followers-count
-                      ;     (if (pos? followers-count)
-                      ;       (str followers-count " follower" (when (not= followers-count 1) "s"))
-                      ;       "No followers")])
                       (when (:location u)
-                        [:span.user-followers-count
+                        [:span.followers-count
                           (:location u)])
                       (follow-button {:following false :resource-type :user :resource-uuid (:user-id u) :button-copy follow-bt-copy})]))]])]]]))

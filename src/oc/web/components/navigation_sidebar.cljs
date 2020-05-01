@@ -187,10 +187,6 @@
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
-        user-role (user-store/user-role org-data current-user-data)
-        is-admin-or-author? (#{:admin :author} user-role)
-        show-invite-people? (and org-slug
-                                 is-admin-or-author?)
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? (and user-is-part-of-the-team?
                               follow-publishers-list
@@ -383,9 +379,4 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]
-      (when show-invite-people?
-        [:div.left-navigation-sidebar-footer.top-border
-          [:button.mlb-reset.invite-people-bt
-            {:on-click #(nav-actions/show-org-settings :invite-picker)}
-            "Invite people"]])]))
+                  [:div.private])])])]]))

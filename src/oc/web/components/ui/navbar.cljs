@@ -11,6 +11,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
             [oc.web.stores.search :as search]
+            [oc.web.stores.user :as user-store]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -98,16 +99,22 @@
          editable-boards (drv/react s :editable-boards)
          can-compose? (pos? (count editable-boards))
          show-plus-button? (and (not is-mobile?)
-                                can-compose?)]
+                                can-compose?)
+         user-role (user-store/user-role org-data current-user-data)
+         is-admin-or-author? (#{:admin :author} user-role)
+         org-slug (router/current-org-slug)
+         show-invite-people? (and org-slug
+                                  is-admin-or-author?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
-                                :has-prior-updates (and (router/current-org-slug)
+                                :has-prior-updates (and org-slug
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
                                 :showing-orgs-dropdown orgs-dropdown-visible
-                                :can-edit-board (and (router/current-org-slug)
+
+                                :can-edit-board (and org-slug
                                                      (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
@@ -137,7 +144,12 @@
                 (search-box)])
             (if (jwt/jwt)
               [:div.navbar-right.group
-                {:class (when show-plus-button? "create-post")}
+                {:class (utils/class-set {:create-post show-plus-button?
+                                          :invite-people show-invite-people?})}
+                (when show-invite-people?
+                  [:button.mlb-reset.invite-people-bt
+                    {:on-click #(nav-actions/show-org-settings :invite-picker)}
+                    "Invite teammates"])
                 (when show-plus-button?
                   [:button.mlb-reset.navbar-create-bt
                     {:class (utils/class-set {:scrolled @(::scrolled s)})

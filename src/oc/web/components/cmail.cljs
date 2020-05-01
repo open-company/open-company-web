@@ -619,26 +619,18 @@
                               :dispatch-key :cmail-data
                               :activity-data cmail-data}))]]
       [:div.cmail-footer
-        [:div.post-button-container.group
-          (post-to-button {:on-submit #(post-clicked s)
-                           :disabled disabled?
-                           :title post-button-title
-                           :force-show-tooltip @(::show-post-tooltip s)
-                           :show-on-hover true})]
-        [:div.section-picker-bt-container
-          [:button.mlb-reset.section-picker-bt
-            {:on-click #(swap! (::show-sections-picker s) not)
-             :data-placement "top"
-             :data-toggle "tooltip"
-             :title board-tooltip}
-            [:span.prefix "#"]
-            (:board-name cmail-data)]
-          (when @(::show-sections-picker s)
-            [:div.sections-picker-container
-              {:ref :sections-picker-container}
-              (sections-picker {:active-slug (:board-slug cmail-data)
-                                :on-change did-pick-section
-                                :current-user-data current-user-data})])]
+        (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                         :width 32
+                         :height 32
+                         :position "bottom"
+                         :default-field-selector "div.cmail-content div.rich-body-editor"
+                         :container-selector "div.cmail-content"})
+        [:button.mlb-reset.attachment-button
+          {:on-click #(add-attachment s)
+           :data-toggle "tooltip"
+           :data-placement "top"
+           :data-container "body"
+           :title "Add attachment"}]
         ; (when (:uuid cmail-data)
         ;     [:div.delete-bt-container
         ;       [:button.mlb-reset.delete-bt
@@ -654,15 +646,23 @@
         ;     (when (false? (:auto-saving cmail-data))
         ;       [:div.saving-saved "Saved"])))
         [:div.cmail-footer-right
-          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                         :width 32
-                         :height 32
-                         :position "bottom"
-                         :default-field-selector "div.cmail-content div.rich-body-editor"
-                         :container-selector "div.cmail-content"})
-          [:button.mlb-reset.attachment-button
-              {:on-click #(add-attachment s)
-               :data-toggle "tooltip"
+          [:div.post-button-container.group
+            (post-to-button {:on-submit #(post-clicked s)
+                             :disabled disabled?
+                             :title post-button-title
+                             :force-show-tooltip @(::show-post-tooltip s)
+                             :show-on-hover true})]
+          [:div.section-picker-bt-container
+            [:button.mlb-reset.section-picker-bt
+              {:on-click #(swap! (::show-sections-picker s) not)
                :data-placement "top"
-               :data-container "body"
-               :title "Add attachment"}]]]]]))
+               :data-toggle "tooltip"
+               :title board-tooltip}
+              [:span.prefix "#"]
+              (:board-name cmail-data)]
+            (when @(::show-sections-picker s)
+              [:div.sections-picker-container
+                {:ref :sections-picker-container}
+                (sections-picker {:active-slug (:board-slug cmail-data)
+                                  :on-change did-pick-section
+                                  :current-user-data current-user-data})])]]]]]))

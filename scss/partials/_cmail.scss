@@ -154,8 +154,8 @@ div.cmail-outer {
 
         div.cmail-mobile-header-right {
           position: absolute;
-          top: 11px;
-          right: 16px;
+          top: 32px;
+          right: -16px;
 
           button.mobile-attachment-button {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
@@ -165,7 +165,6 @@ div.cmail-outer {
             width: 32px;
             height: 32px;
             padding: 0;
-            float: left;
             opacity: 1;
             background-color: var(--opac-background-color-1);
             border-radius: 4px;
@@ -180,8 +179,8 @@ div.cmail-outer {
 
     div.dismiss-inline-cmail-container {
       position: absolute;
-      right: -34px;
-      top: 0;
+      top: -16px;
+      right: -16px;
       display: block;
 
       @include mobile() {
@@ -192,16 +191,18 @@ div.cmail-outer {
         width: 32px;
         height: 32px;
         padding: 0;
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
         background-size: 12px 12px;
+        background-color: var(--color);
+        border-radius: 50%;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.3;
-        border-radius: 0;
+        opacity: 1;
         display: block;
+        border: none;
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
         }
 
         &:not(.disabled):hover {
@@ -218,7 +219,7 @@ div.cmail-outer {
 
     div.delete-bt-container {
       position: absolute;
-      right: -34px;
+      right: -16px;
       top: 32px;
 
       @include mobile() {
@@ -229,17 +230,22 @@ div.cmail-outer {
         position: relative;
         height: 32px;
         width: 32px;
-        background-image: cdnUrl("/img/ML/cmail_delete.svg");
+        background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
         background-size: 16px 14px;
         background-position: center;
         background-repeat: no-repeat;
-        border-radius: 0;
         padding: 0;
-        opacity: 0.3;
+        opacity: 1;
         display: block;
+        background-color: var(--color);
+        border-radius: 50%;
 
         &:not(.disabled):hover {
           opacity: 1;
+        }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/cmail_delete.svg");
         }
       }
     }
@@ -518,7 +524,7 @@ div.cmail-outer {
           top: unset;
           left: unset;
           bottom: -60px;
-          right: 66px;
+          left: 66px;
         }
 
         div.rich-body-editor {
@@ -591,87 +597,60 @@ div.cmail-outer {
         float: left;
       }
 
-      div.post-button-container {
+      button.attachment-button {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        position: relative;
         float: left;
+        padding: 0;
+        width: 24px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+        background-size: 14px 16px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.3;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+        }
+
+        &:not(.disabled):hover {
+          opacity: 1;
+        }
+      }
+
+      div.emoji-picker {
+        float: left;
+        width: 24px;
+        height: 32px;
+
+        button.emoji-button {
+          width: 24px;
+          height: 32px;
+          background-position: center;
+          background-size: 16px 16px;
+          padding: 0px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          cursor: pointer;
+          opacity: 0.3;
+          border-radius: 0;
+
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+        }
 
         @include mobile() {
           display: none;
         }
-      }
 
-      div.section-picker-bt-container {
-        margin: 0 0 0 16px;
-        position: relative;
-        display: block;
-        float: left;
-        height: 32px;
-
-        .tooltip {
-          width: 95px;
-        }
-
-        div.sections-picker {
-          position: absolute;
-          top: 32px;
-          left: 0;
-          z-index: #{$navbar_zindex - 1};
-
-          @include mobile (){
-            top: 30px;
-          }
-        }
-
-        button.section-picker-bt {
-          height: 32px;
-          padding: 0 22px 0 0;
-          color: white;
-          @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 32px;
-          color: var(--light-color);
-          position: relative;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 200px;
-          vertical-align: super;
-          white-space: nowrap;
-
-          @include mobile() {
-            height: 28px;
-            font-size: 16px;
-
-            &:after {
-              top: 9px;
-            }
-          }
-
-          span.prefix {
-            @include OC_Body_Book();
-            color: var(--light-color);
-            font-size: 16px;
-            line-height: 32px;
-            @include OC_Body_Book_Italic();
-            margin-right: 4px;
-          }
-
-          &:after {
-            content: "";
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            background-color: var(--opac-background-color-08);
-            position: absolute;
-            top: 8px;
-            right: 0;
-            background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
-            }
-          }
+        div.picker-container {
+          right: -16px;
+          left: unset;
         }
       }
 
@@ -679,60 +658,87 @@ div.cmail-outer {
         float: right;
         position: relative;
 
-        button.attachment-button {
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          position: relative;
+        div.post-button-container {
           float: right;
-          padding: 0;
-          width: 24px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 14px 16px;
-          background-repeat: no-repeat;
-          background-position: center;
-          opacity: 0.3;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
-
-          &:not(.disabled):hover {
-            opacity: 1;
-          }
-        }
-
-        div.emoji-picker {
-          float: left;
-          width: 24px;
-          height: 32px;
-
-          button.emoji-button {
-            width: 24px;
-            height: 32px;
-            background-position: center;
-            background-size: 16px 16px;
-            padding: 0px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            cursor: pointer;
-            opacity: 0.3;
-            border-radius: 0;
-
-            &:not(.disabled):hover {
-              opacity: 1;
-            }
-          }
 
           @include mobile() {
             display: none;
           }
+        }
 
-          div.picker-container {
-            right: -16px;
-            left: unset;
+        div.section-picker-bt-container {
+          margin: 0 16px 0;
+          position: relative;
+          display: block;
+          float: right;
+          height: 32px;
+
+          .tooltip {
+            width: 95px;
+          }
+
+          div.sections-picker {
+            position: absolute;
+            top: 32px;
+            left: 0;
+            z-index: #{$navbar_zindex - 1};
+
+            @include mobile (){
+              top: 30px;
+            }
+          }
+
+          button.section-picker-bt {
+            height: 32px;
+            padding: 0 22px 0 0;
+            color: white;
+            @include OC_Body_Book();
+            font-size: 16px;
+            line-height: 32px;
+            color: var(--light-color);
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+            vertical-align: super;
+            white-space: nowrap;
+
+            @include mobile() {
+              height: 28px;
+              font-size: 16px;
+
+              &:after {
+                top: 9px;
+              }
+            }
+
+            span.prefix {
+              @include OC_Body_Book();
+              color: var(--light-color);
+              font-size: 16px;
+              line-height: 32px;
+              @include OC_Body_Book_Italic();
+              margin-right: 4px;
+            }
+
+            &:after {
+              content: "";
+              width: 16px;
+              height: 16px;
+              border-radius: 4px;
+              background-color: var(--opac-background-color-08);
+              position: absolute;
+              top: 8px;
+              right: 0;
+              background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
+              background-size: 8px 4px;
+              background-repeat: no-repeat;
+              background-position: center;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
+              }
+            }
           }
         }
       }
