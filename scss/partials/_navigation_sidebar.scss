@@ -312,6 +312,10 @@ div.left-navigation-sidebar {
           background-repeat: no-repeat;
           background-color: var(--ultralight-color);
           border-radius: 4px;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
         }
 
         div.orgs-dropdown  {
@@ -418,6 +422,10 @@ div.left-navigation-sidebar {
         opacity: 1;
         height: 24px;
       }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+      }
     }
 
     div.all-posts-icon {
@@ -432,6 +440,10 @@ div.left-navigation-sidebar {
       @include mobile() {
         opacity: 1;
         height: 24px;
+      }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
       }
     }
 
@@ -450,6 +462,10 @@ div.left-navigation-sidebar {
         background-position: center 5px;
         opacity: 1;
       }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+      }
     }
 
     div.drafts-icon {
@@ -465,6 +481,10 @@ div.left-navigation-sidebar {
         background-position: center;
         opacity: 1;
         height: 24px;
+      }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
       }
     }
   }
@@ -525,6 +545,10 @@ div.left-navigation-sidebar {
 
         &.collapsed {
           transform: rotate(-90deg);
+        }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
         }
 
         @include mobile() {
@@ -612,6 +636,10 @@ div.left-navigation-sidebar {
         &:hover, &:active, &.active {
           opacity: 1;
         }
+      }
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
       }
 
       @include mobile() {
@@ -707,6 +735,10 @@ div.left-navigation-sidebar {
           margin-top: 2px;
           opacity: 1;
         }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/board_public_white.svg");
+        }
       }
 
       div.private {
@@ -724,6 +756,10 @@ div.left-navigation-sidebar {
           margin-top: 2px;
           opacity: 1;
         }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/board_private_white.svg");
+        }
       }
 
       div.team {
@@ -740,6 +776,10 @@ div.left-navigation-sidebar {
           margin-left: 0;
           margin-top: 2px;
           opacity: 1;
+        }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/number_sign@dark.svg");
         }
       }
 
@@ -824,68 +864,8 @@ div.left-navigation-sidebar {
           background-color: var(--navigation-sidebar-hover-bg);
         }
       }
-    }
-  }
-}
 
-@include dark_mode() {
-  div.left-navigation-sidebar {
-    div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
-      @include mobile() {
-        button.mobile-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-    }
-
-    a.home, a.all-posts, a.bookmarks, a.drafts, a.following {
-      div.home-icon {
-        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
-      }
-
-      div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-      }
-
-      div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
-      }
-
-      div.drafts-icon {
-        background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-top {
-      button.left-navigation-sidebar-title-arrow {
-        background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
-      }
-
-      button.left-navigation-sidebar-top-title-button {
-        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-      }
-
-      button.left-navigation-sidebar-top-ellipsis-bt {
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-items a.left-navigation-sidebar-item {
-      div.public {
-        background-image: cdnUrl("/img/ML/board_public_white.svg");
-      }
-
-      div.private {
-        background-image: cdnUrl("/img/ML/board_private_white.svg");
-      }
-
-      div.team {
-        background-image: cdnUrl("/img/ML/number_sign@dark.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-footer {
-      button.invite-people-bt {
+      @include dark_mode() {
         background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
       }
     }
