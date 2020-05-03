@@ -216,9 +216,20 @@ div.user-info-view {
       line-height: 18px;
       border-radius: 4px;
 
+      span.main-title, span.hover-title {
+        @include OC_Body_Bold();
+        color: var(--opac-background-color-72);
+        line-height: 18px;
+        font-size: 14px;
+      }
+
       @include big_web() {
         &:hover {
           opacity: 0.9;
+
+          span.main-title, span.hover-title {
+            color: var(--opac-background-color-72);
+          }
         }
       }
     }

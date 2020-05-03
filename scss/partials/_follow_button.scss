@@ -30,24 +30,30 @@ button.follow-button {
 
   @include big_web() {
     &:hover {
-      span.hover-title {
-        display: block;
-      }
-
       span.main-title {
         display: none;
+      }
+
+      span.hover-title {
+        display: block;
       }
     }
   }
 
   &.unfollow {
     background-color: var(--opac-background-color-1);
-    color: var(--light-color);
+
+    span.main-title, span.hover-title {
+      color: var(--light-color);
+    }
 
     @include big_web(){
       &:hover {
         background-color: var(--opac-background-color-2);
-        color: var(--color);
+        
+        span.main-title, span.hover-title {
+          color: var(--color);
+        }
       }
     }
   }
