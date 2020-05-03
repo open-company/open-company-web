@@ -3,7 +3,6 @@
 // --foc-hover-color: rgba($deep_navy, 0.10);
 // --foc-new-color: white;
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
-$foc_hover_extra_padding: 4;
 
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
@@ -26,18 +25,10 @@ div.virtualized-list-row:not(.collapsed-item) {
 
     &:hover {
       z-index: 2;
-      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
-      // height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
-      // margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
 
       div.stream-item {
         background-color: var(--foc-hover-color);
         z-index: 2;
-        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-        border-radius: 8px;
-        // padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
-        // width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        // height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
         border-top: 1px solid var(--foc-hover-border-color);
         border-right: 1px solid var(--foc-hover-border-color);
         border-bottom: 1px solid var(--foc-hover-border-color);
@@ -78,15 +69,10 @@ div.virtualized-list-row:not(.collapsed-item) {
         &.unread-item {
           background-color: var(--foc-new-color);
           z-index: 2;
-          box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-          border-radius: 4px;
           border-top: 1px solid var(--foc-new-border-color);
           border-right: 1px solid var(--foc-new-border-color);
           border-bottom: 1px solid var(--foc-new-border-color);
           border-left: 1px solid var(--foc-new-border-color);
-          // padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
-          // width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-          // height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
 
           div.stream-item-header {
             div.more-menu {
