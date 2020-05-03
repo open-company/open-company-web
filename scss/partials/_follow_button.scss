@@ -18,6 +18,8 @@ button.follow-button {
     color: white;
     width: 100%;
     text-align: center;
+
+    @include no-user-select();
   }
 
   span.main-title {
@@ -40,7 +42,7 @@ button.follow-button {
     }
   }
 
-  &.unfollow {
+  &.on {
     background-color: var(--opac-background-color-1);
 
     span.main-title, span.hover-title {

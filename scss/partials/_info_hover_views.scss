@@ -209,29 +209,27 @@ div.user-info-view {
       float: left;
       width: calc(50% - 4px);
       padding: 6px 0;
-      background-color: var(--opac-background-color-08);
       @include OC_Body_Bold();
-      color: var(--opac-background-color-72);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;
 
       span.main-title, span.hover-title {
         @include OC_Body_Bold();
-        color: var(--opac-background-color-72);
-        line-height: 18px;
         font-size: 14px;
+        line-height: 18px;
       }
 
       @include big_web() {
         &:hover {
           opacity: 0.9;
-
-          span.main-title, span.hover-title {
-            color: var(--opac-background-color-72);
-          }
         }
       }
+    }
+
+    button.profile-bt {
+      background-color: var(--opac-background-color-08);
+      color: var(--opac-background-color-72);
     }
 
     button.posts-bt {
@@ -325,12 +323,16 @@ div.board-info-view {
       float: left;
       width: calc(50% - 4px);
       padding: 6px 0;
-      background-color: var(--opac-background-color-08);
       @include OC_Body_Bold();
-      color: var(--opac-background-color-72);
       font-size: 14px;
       line-height: 18px;
       border-radius: 4px;
+
+      span.main-title, span.hover-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+      }
 
       @include big_web() {
         &:hover {
