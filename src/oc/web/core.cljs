@@ -568,6 +568,14 @@
       (timbre/info "Routing following-slash-route" (str (urls/following ":org") "/"))
       (org-handler "dashboard" target org-dashboard (assoc params :board "following")))
 
+    (defroute unfollowing-route (urls/unfollowing ":org") {:as params}
+      (timbre/info "Routing unfollowing-route" (urls/unfollowing ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "unfollowing")))
+
+    (defroute unfollowing-slash-route (str (urls/unfollowing ":org") "/") {:as params}
+      (timbre/info "Routing unfollowing-slash-route" (str (urls/unfollowing ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "unfollowing")))
+
     (defroute first-ever-landing-route (urls/first-ever-landing ":org") {:as params}
       (timbre/info "Routing first-ever-landing-route" (urls/first-ever-landing ":org"))
       (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))

@@ -114,7 +114,7 @@
   ([]
     (unfollowing (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/unfollowing")))
+    (str (org org-slug) "/explore")))
 
 (defn follow-ups
   "Org follow-ups url"
