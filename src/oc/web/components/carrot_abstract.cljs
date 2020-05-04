@@ -96,6 +96,10 @@
                              (mention-mixins/oc-mentions-hover)
                              ;; Derivatives
                              (drv/drv :team-roster)
+                             (drv/drv :users-info-hover)
+                             (drv/drv :current-user-data)
+                             (drv/drv :follow-publishers-list)
+                             (drv/drv :followers-publishers-count)
                              {:did-mount (fn [s]
                               (setup-editor s)
                               s)
@@ -115,7 +119,11 @@
                                 (.destroy @(::editor s)))
                               s)}
   [s {:keys [initial-value value on-change-cb post-clicked abstract-length exceeds-limit cmail-key]}]
-  (let [_team-roster (drv/react s :team-roster)]
+  (let [_team-roster (drv/react s :team-roster)
+        _users-info-hover (drv/react s :users-info-hover)
+        _current-user-data (drv/react s :current-user-data)
+        _follow-publishers-list (drv/react s :follow-publishers-list)
+        _followers-publishers-count (drv/react s :followers-publishers-count)]
     [:div.cmail-content-abstract-container
       {:key (str "carrot-abstract-" cmail-key)}
       [:div.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover.editing
