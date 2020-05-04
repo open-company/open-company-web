@@ -299,9 +299,11 @@
        vec))
     publishers-list))
 
-(defn- filter-org-boards [board-uuids]
+(defn- filter-org-boards [boards-data]
   ;; Filter out drafts board
-  (filter #(not= % (:uuid utils/default-drafts-board)) board-uuids))
+  (filter #(and (not (:publisher-board %))
+                (not= (:uuid %) (:uuid utils/default-drafts-board)))
+   boards-data))
 
 (defn enrich-boards-list [boards-list org-boards]
   (if (and (seq boards-list) (seq org-boards))
@@ -315,7 +317,9 @@
        vec))
     boards-list))
 
-(defn- update-contributions-and-boards [db org-slug follow-boards-list follow-publishers-list]
+(defn- update-contributions-and-boards
+  "Given the new list of board and publisher followers, update the following flag in each board and contributions data we have."
+  [db org-slug follow-boards-list follow-publishers-list]
   (let [change-data (dispatcher/change-data db)
         org-data (dispatcher/org-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
@@ -341,7 +345,7 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          all-boards-uuids (->> org-data :boards (map :uuid) filter-org-boards set)
+          all-boards-uuids (->> org-data :boards filter-org-boards (map :uuid) set)
           follow-board-uuids (clojure.set/difference (set all-boards-uuids) (set unfollow-board-uuids))
           next-follow-boards-data (enrich-boards-list follow-board-uuids (:boards org-data))
           next-follow-publishers-data (enrich-publishers-list follow-publisher-uuids active-users)]
@@ -357,7 +361,7 @@
         unfollow-boards (filter #(= (:resource-type %) :board) data)
         unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
         active-users-count (count (dispatcher/active-users org-slug db))
-        all-board-uuids (->> (dispatcher/org-data db org-slug) :boards (map :uuid) filter-org-boards)
+        all-board-uuids (->> (dispatcher/org-data db org-slug) :boards filter-org-boards (map :uuid))
         all-boards-count (map #(hash-map :resource-uuid %
                                          :resource-type :board
                                          :count (if-let [unfollow-board (get unfollow-boards-map %)]
