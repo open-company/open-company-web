@@ -358,65 +358,63 @@
 (defmethod dispatcher/action :followers-count/finish
   [db [_ org-slug data]]
   (let [publisher-uuids (filter #(= (:resource-type %) :user) data)
+        publishers-map (zipmap (map :resource-uuid publisher-uuids) publisher-uuids)
+
         unfollow-boards (filter #(= (:resource-type %) :board) data)
         unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
         active-users-count (count (dispatcher/active-users org-slug db))
         all-board-uuids (->> (dispatcher/org-data db org-slug) :boards filter-org-boards (map :uuid))
-        all-boards-count (map #(hash-map :resource-uuid %
-                                         :resource-type :board
-                                         :count (if-let [unfollow-board (get unfollow-boards-map %)]
-                                                 (- active-users-count (:count unfollow-board))
-                                                 active-users-count))
-                          all-board-uuids)]
+        all-boards-count (apply merge
+                          (map #(hash-map % {:resource-uuid %
+                                             :resource-type :board
+                                             :count (if-let [unfollow-board (get unfollow-boards-map %)]
+                                                      (- active-users-count (:count unfollow-board))
+                                                      active-users-count)})
+                           all-board-uuids))]
     (-> db
      (assoc-in (dispatcher/followers-publishers-count-key org-slug) publisher-uuids)
      (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))
 
-(defmethod dispatcher/action :publishers/follow
+(defmethod dispatcher/action :publisher/follow
   [db [_ org-slug {:keys [publisher-uuids follow? publisher-uuid] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
           next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)
           followers-count-key (dispatcher/followers-publishers-count-key org-slug)
-          found? (atom false)
-          count-fn (fn [fr]
-                    (reset! found? true)
-                    (let [cf (cond (true? follow?) inc (false? follow?) dec :else identity)]
-                      (update fr :count #(max (cf %) 0))))
-          record-check-fn #(if (and (= (:resource-type %) :user)
-                                    (= (:resource-uuid %) publisher-uuid))
-                             (count-fn %)
-                             %)
-          next-db** (update-contributions-and-boards db org-slug (dispatcher/follow-boards-list org-slug db) next-follow-publishers-data)
-          next-db* (update-in next-db** followers-count-key #(mapv record-check-fn %))
-          next-db (if @found?
-                    next-db*
-                    (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid publisher-uuid :resource-type :user :count (if follow? 1 0)}))]
-      (assoc-in next-db follow-publishers-list-key next-follow-publishers-data))
+          publisher-count-key (conj followers-count-key publisher-uuid)
+          fn (cond (true? follow?) inc (false? follow?) dec :else identity)
+          follow-boards-data (dispatcher/follow-boards-list org-slug db)]
+      (-> db
+       (update-contributions-and-boards org-slug follow-boards-data next-follow-publishers-data)
+       (assoc-in follow-publishers-list-key next-follow-publishers-data)
+       (update-in publisher-count-key #(if %
+                                         (update % :count fn)
+                                         {:org-slug org-slug
+                                          :resource-uuid publisher-uuid
+                                          :resource-type :user
+                                          :count (if follow? 1 0)}))))
     db))
 
-(defmethod dispatcher/action :boards/follow
+(defmethod dispatcher/action :board/follow
   [db [_ org-slug {:keys [board-uuids follow? board-uuid] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [org-data (dispatcher/org-data db)
-          next-boards (enrich-boards-list board-uuids (:boards org-data))
+    (let [follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
+          org-boards (:boards (dispatcher/org-data db org-slug))
+          next-follow-boards-data (enrich-boards-list board-uuids org-boards)
           followers-count-key (dispatcher/followers-boards-count-key org-slug)
-          found? (atom false)
-          count-fn (fn [br]
-                    (reset! found? true)
-                    (let [cf (cond (true? follow?) inc (false? follow?) dec :else identity)]
-                      (update br :count #(max (cf %) 0))))
-          record-check-fn #(if (and (= (:resource-type %) :board)
-                                    (= (:resource-uuid %) board-uuid))
-                             (count-fn %)
-                             %)
-          next-db** (update-contributions-and-boards db org-slug next-boards (dispatcher/follow-publishers-list org-slug db))
-          next-db* (update-in next-db** followers-count-key #(mapv record-check-fn %))
-          next-db (if @found?
-                    next-db*
-                    (update-in next-db* followers-count-key conj {:org-slug org-slug :resource-uuid board-uuid :resource-type :board :count (if follow? 1 0)}))]
-      (assoc-in next-db (dispatcher/follow-boards-list-key org-slug) next-boards))
+          board-count-key (conj followers-count-key board-uuid)
+          fn (cond (true? follow?) inc (false? follow?) dec :else identity)
+          follow-publishers-data (dispatcher/follow-publishers-list org-slug db)]
+      (-> db
+       (update-contributions-and-boards org-slug next-follow-boards-data follow-publishers-data)
+       (assoc-in follow-boards-list-key next-follow-boards-data)
+       (update-in board-count-key #(if %
+                                     (update % :count fn)
+                                     {:org-slug org-slug
+                                      :resource-uuid board-uuid
+                                      :resource-type :board
+                                      :count (if follow? 1 0)}))))
     db))
 
 (defmethod dispatcher/action :follow-list-last-added

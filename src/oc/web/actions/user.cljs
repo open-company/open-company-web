@@ -563,14 +563,6 @@
     (utils/maybe-after inbox-delay #(activity-actions/inbox-get (dis/org-data)))
     (utils/maybe-after following-delay #(activity-actions/following-get (dis/org-data)))))
 
-(defn follow-publishers [publisher-uuids]
-  (dis/dispatch! [:publishers/follow (router/current-org-slug)
-                                     {:org-slug (router/current-org-slug)
-                                      :publisher-uuids publisher-uuids}])
-  (ws-cc/publishers-follow publisher-uuids)
-  (refresh-follow-containers)
-  (load-followers-count))
-
 (defn toggle-publisher [publisher-uuid]
   (let [org-slug (router/current-org-slug)
         current-publishers (map :user-id (dis/follow-publishers-list org-slug))
@@ -589,16 +581,6 @@
     (if follow?
       (ws-cc/publisher-follow publisher-uuid)
       (ws-cc/publisher-unfollow publisher-uuid))))
-
-(defn follow-boards [follow-board-uuids]
-  (let [all-board-uuids (->> (dis/org-data) :boards (map :uuid) set)
-        unfollow-board-uuids (clojure.set/difference all-board-uuids follow-board-uuids)]
-    (dis/dispatch! [:boards/follow (router/current-org-slug)
-                                   {:org-slug (router/current-org-slug)
-                                    :board-uuids follow-board-uuids}])
-    (ws-cc/boards-unfollow unfollow-board-uuids)
-    (refresh-follow-containers)
-    (load-followers-count)))
 
 (defn toggle-board [board-uuid]
   (let [org-slug (router/current-org-slug)

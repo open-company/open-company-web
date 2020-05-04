@@ -35,6 +35,10 @@
                                ;; Derivatives
                                (drv/drv :media-input)
                                (drv/drv :mention-users)
+                               (drv/drv :users-info-hover)
+                               (drv/drv :current-user-data)
+                               (drv/drv :follow-publishers-list)
+                               (drv/drv :followers-publishers-count)
                                ;; Mixins
                                (mention-mixins/oc-mentions-hover)
                                (on-window-click-mixin (fn [s e]
@@ -92,6 +96,10 @@
              paywall?]}]
   (let [_mention-users (drv/react s :mention-users)
         _media-input (drv/react s :media-input)
+        _users-info-hover (drv/react s :users-info-hover)
+        _current-user-data (drv/react s :current-user-data)
+        _follow-publishers-list (drv/react s :follow-publishers-list)
+        _followers-publishers-count (drv/react s :followers-publishers-count)
         hide-placeholder? (or (not show-placeholder) @(::did-change s))]
     [:div.rich-body-editor-outer-container
       {:key (str "rich-body-editor-" cmail-key)
