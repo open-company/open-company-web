@@ -19,6 +19,7 @@
   (let [is-all? (= (router/current-board-slug) "all-posts")
         is-saved? (= (router/current-board-slug) "bookmarks")
         is-home? (= (router/current-board-slug) "following")
+        is-unfollowing? (= (router/current-board-slug) "unfollowing")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
         org-data (drv/react s :org-data)
@@ -35,7 +36,8 @@
                                       :all-posts is-all?
                                       :drafts is-drafts-board?
                                       :saved is-saved?
-                                      :home is-home?})}
+                                      :home is-home?
+                                      :explore is-unfollowing?})}
             (when is-contributions?
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
@@ -48,6 +50,15 @@
            is-home?
            [:div.empty-follow
              "Home is where you'll find updates from the people and teams you're following."
+             [:button.mlb-reset.follow-users-bt
+               {:on-click #(nav-actions/show-follow-user-picker)}
+               "Follow someone"]
+             [:button.mlb-reset.follow-boards-bt
+               {:on-click #(nav-actions/show-follow-board-picker)}
+               "Follow a team"]]
+           is-unfollowing?
+           [:div.empty-follow
+             "Explore is where you'll find updates that you decided to not follow."
              [:button.mlb-reset.follow-users-bt
                {:on-click #(nav-actions/show-follow-user-picker)}
                "Follow someone"]

@@ -413,20 +413,24 @@
                             (real-close)
                             (utils/after
                              180
-                             #(let [following-board-uuids (set (map :uuid @(drv/get-ref s :follow-boards-list)))]
+                             #(let [following-board-uuids (set (map :uuid @(drv/get-ref s :follow-boards-list)))
+                                    following-cmail-board? (following-board-uuids (:board-uuid cmail-data))
+                                    is-in-cmail-board? (= (router/current-board-slug) (:board-slug cmail-data))]
                                 (router/nav! (cond
+                                               is-in-cmail-board?
+                                               (oc-urls/board (:board-slug cmail-data))
                                                ;; If user is in following and he is following the board
                                                ;; can stay here
-                                               (and (= (router/current-board-slug) "following")
-                                                    (following-board-uuids (:board-uuid cmail-data)))
+                                               following-cmail-board?
                                                (oc-urls/following)
+                                               ;; If user is in unfollowing and he is not following the board
+                                               ;; can stay here
+                                               (not following-cmail-board?)
+                                               (oc-urls/unfollowing)
                                                ;; If user is publishing to its own publisher board
                                                ;; redirect him there
                                                (:publisher-board cmail-data)
                                                (oc-urls/contributions (:user-id @(drv/get-ref s :current-user-data)))
-                                               ;; If he's on AP can stay on AP
-                                               (= (router/current-board-slug) "all-posts")
-                                               (oc-urls/all-posts)
                                                ;; Redirect to the posting board in every other case
                                                :else
                                                (oc-urls/board (:board-slug cmail-data))))))))))

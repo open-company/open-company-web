@@ -115,6 +115,14 @@
              (= (router/current-sort-type) dis/recent-activity-sort))
         (activity-actions/recent-following-get org-data)
 
+        (and (= board-slug "unfollowing")
+             (= (router/current-sort-type) dis/recently-posted-sort))
+        (activity-actions/unfollowing-get org-data)
+
+        (and (= board-slug "unfollowing")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (activity-actions/recent-unfollowing-get org-data)
+
         :default
         (let [fixed-board-data (or board-data
                                    (some #(when (= (:slug %) board-slug) %) (:boards org-data)))

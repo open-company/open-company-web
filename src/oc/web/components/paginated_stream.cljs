@@ -79,6 +79,8 @@
         (activity-actions/bookmarks-more @(::has-next s) :down)
         (= (router/current-board-slug) "following")
         (activity-actions/following-more @(::has-next s) :down)
+        (= (router/current-board-slug) "unfollowing")
+        (activity-actions/unfollowing-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value

@@ -1,14 +1,13 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [clojure.string :as s]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.lib.jwt :as jwt]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
@@ -16,14 +15,11 @@
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.follow-user-picker :refer (follow-user-picker)]
-            [oc.web.components.ui.follow-board-picker :refer (follow-board-picker)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -31,13 +27,12 @@
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
-            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
-            [oc.web.components.user-notifications :refer (user-notifications)]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.login-wall :refer (login-wall)]
-            [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.invite-email-modal :refer (invite-email-modal)]
             [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
+            [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.ui.follow-user-picker :refer (follow-user-picker)]
+            [oc.web.components.ui.follow-board-picker :refer (follow-board-picker)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
@@ -112,11 +107,7 @@
         section-not-found (and (not org-not-found)
                                org-data
                                (not (router/current-contributions-id))
-                               (not= (router/current-board-slug) "inbox")
-                               (not= (router/current-board-slug) "all-posts")
-                               (not= (router/current-board-slug) "must-see")
-                               (not= (router/current-board-slug) "bookmarks")
-                               (not= (router/current-board-slug) "following")
+                               (not (dis/is-container? (router/current-board-slug)))
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         current-activity-data (when (router/current-activity-id)
                                 (get posts-data (router/current-activity-id)))
