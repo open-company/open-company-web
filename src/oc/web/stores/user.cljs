@@ -299,6 +299,10 @@
        vec))
     publishers-list))
 
+(defn- filter-org-boards [board-uuids]
+  ;; Filter out drafts board
+  (filter #(not= % (:uuid utils/default-drafts-board)) board-uuids))
+
 (defn enrich-boards-list [boards-list org-boards]
   (if (and (seq boards-list) (seq org-boards))
     (let [board-uuids (remove nil? (if (every? map? boards-list)
@@ -331,14 +335,16 @@
        (keys (get-in db boards-key)))))
 
 (defmethod dispatcher/action :follow/loaded
-  [db [_ org-slug {:keys [publisher-uuids board-uuids user-id] :as resp}]]
+  [db [_ org-slug {:keys [follow-publisher-uuids unfollow-board-uuids user-id] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [org-data (dispatcher/org-data db)
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          next-follow-boards-data (enrich-boards-list board-uuids (:boards org-data))
-          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)]
+          all-boards-uuids (->> org-data :boards (map :uuid) filter-org-boards set)
+          follow-board-uuids (clojure.set/difference (set all-boards-uuids) (set unfollow-board-uuids))
+          next-follow-boards-data (enrich-boards-list follow-board-uuids (:boards org-data))
+          next-follow-publishers-data (enrich-publishers-list follow-publisher-uuids active-users)]
       (-> db
        (update-contributions-and-boards org-slug next-follow-boards-data next-follow-publishers-data)
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
@@ -348,10 +354,19 @@
 (defmethod dispatcher/action :followers-count/finish
   [db [_ org-slug data]]
   (let [publisher-uuids (filter #(= (:resource-type %) :user) data)
-        board-uuids (filter #(= (:resource-type %) :board) data)]
+        unfollow-boards (filter #(= (:resource-type %) :board) data)
+        unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
+        active-users-count (count (dispatcher/active-users org-slug db))
+        all-board-uuids (->> (dispatcher/org-data db org-slug) :boards (map :uuid) filter-org-boards)
+        all-boards-count (map #(hash-map :resource-uuid %
+                                         :resource-type :board
+                                         :count (if-let [unfollow-board (get unfollow-boards-map %)]
+                                                 (- active-users-count (:count unfollow-board))
+                                                 active-users-count))
+                          all-board-uuids)]
     (-> db
      (assoc-in (dispatcher/followers-publishers-count-key org-slug) publisher-uuids)
-     (assoc-in (dispatcher/followers-boards-count-key org-slug) board-uuids))))
+     (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))
 
 (defmethod dispatcher/action :publishers/follow
   [db [_ org-slug {:keys [publisher-uuids follow? publisher-uuid] :as resp}]]

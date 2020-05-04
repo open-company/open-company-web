@@ -122,12 +122,12 @@
 
 ;; Boards follow
 
-(defn boards-follow [board-uuids]
-  (timbre/debug "Sending boards/follow for user-id:" @current-uid
+(defn boards-unfollow [board-uuids]
+  (timbre/debug "Sending boards/unfollow for user-id:" @current-uid
    "org-slug:" @current-org "with uuids:" board-uuids)
-  (send! chsk-send! [:boards/follow {:user-id @current-uid
-                                     :org-slug @current-org
-                                     :board-uuids (vec board-uuids)}]))
+  (send! chsk-send! [:boards/unfollow {:user-id @current-uid
+                                       :org-slug @current-org
+                                       :board-uuids (vec board-uuids)}]))
 
 (defn board-follow [board-uuid]
   (timbre/debug "Sending board/follow for user-id:" @current-uid

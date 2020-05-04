@@ -544,20 +544,6 @@
 (defn hide-mobile-user-notifications []
   (dis/dispatch! [:input [:mobile-user-notifications] false]))
 
-(defn- identify-general-board [org-slug]
-  (when-let [org-data (dis/org-data @dis/app-state org-slug)]
-    (let [named-general (some #(when (and (#{(s/lower (:name %)) (:slug %)} "general")
-                                          (= (:access %) "team"))
-                                 %)
-                         (:boards org-data))]
-      (if named-general
-        named-general
-        (->> org-data
-             :boards
-             (filter #(= (:access %) "team"))
-             (sort-by :created-at)
-             first)))))
-
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
 
@@ -604,13 +590,15 @@
       (ws-cc/publisher-follow publisher-uuid)
       (ws-cc/publisher-unfollow publisher-uuid))))
 
-(defn follow-boards [board-uuids]
-  (dis/dispatch! [:boards/follow (router/current-org-slug)
-                                 {:org-slug (router/current-org-slug)
-                                  :board-uuids board-uuids}])
-  (ws-cc/boards-follow board-uuids)
-  (refresh-follow-containers)
-  (load-followers-count))
+(defn follow-boards [follow-board-uuids]
+  (let [all-board-uuids (->> (dis/org-data) :boards (map :uuid) set)
+        unfollow-board-uuids (clojure.set/difference all-board-uuids follow-board-uuids)]
+    (dis/dispatch! [:boards/follow (router/current-org-slug)
+                                   {:org-slug (router/current-org-slug)
+                                    :board-uuids follow-board-uuids}])
+    (ws-cc/boards-unfollow unfollow-board-uuids)
+    (refresh-follow-containers)
+    (load-followers-count)))
 
 (defn toggle-board [board-uuid]
   (let [org-slug (router/current-org-slug)
@@ -653,18 +641,7 @@
           :expire 5}))))
   (ws-cc/subscribe :follow/list
     (fn [{:keys [data]}]
-      (dis/dispatch! [:follow/loaded (router/current-org-slug) data])
-      ;; In case :board-uuids is nil it means the user has not following record yet
-      ;; so we have to default him to follow the general board
-      (when (nil? (:board-uuids data))
-        (utils/after 100 (fn []
-         (let [general-board (identify-general-board (:org-slug data))
-               fixed-data (update data :board-uuids #(if general-board
-                                                       [(:uuid general-board)]
-                                                       %))]
-           (when general-board
-             (utils/after 0 #(follow-boards [(:uuid general-board)]))
-             (dis/dispatch! [:follow/loaded (router/current-org-slug) fixed-data]))))))))
+      (dis/dispatch! [:follow/loaded (router/current-org-slug) data])))
   (ws-cc/subscribe :followers/count
     (fn [{:keys [data]}]
       (dis/dispatch! [:followers-count/finish (router/current-org-slug) data]))))
