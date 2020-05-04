@@ -39,13 +39,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(defn- switch-home [e slug]
-  (let [url (if (= slug :following)
-              (oc-urls/following)
-              (oc-urls/all-posts))]
-    (activity-actions/switch-home slug)
-    (nav-actions/nav-to-url! e (name slug) url)))
-
 (rum/defcs dashboard-layout < rum/static
                               rum/reactive
                               ;; Derivative
@@ -106,6 +99,7 @@
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
         is-following (= current-board-slug "following")
+        is-unfollowing (= current-board-slug "unfollowing")
         is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -184,18 +178,15 @@
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Wut"]]
-              [:button.mlb-reset.tab-button.inbox-tab
+              [:button.mlb-reset.tab-button.explore-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "inbox" (oc-urls/inbox)))
+                              (nav-actions/nav-to-url! % "unfollow" (oc-urls/unfollowing)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "inbox"))
+                                   (= current-board-slug "unfollow"))
                           "active")}
-                [:span.tab-icon
-                  (when (-> org-data :following-inbox-count pos?)
-                    [:span.count-badge
-                      (:following-inbox-count org-data)])]
-                [:span.tab-label "Unread"]]
+                [:span.tab-icon]
+                [:span.tab-label "Explore"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -205,7 +196,7 @@
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
                     [:span.unread-dot])]
-                [:span.tab-label "Alerts"]]
+                [:span.tab-label "Activity"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -276,6 +267,7 @@
                                                   :public (= (:access current-board-data) "public")
                                                   :home-icon is-following
                                                   :all-icon is-all-posts
+                                                  :explore-icon is-unfollowing
                                                   :saved-icon is-bookmarks
                                                   :drafts-icon is-drafts-board})
                          :dangerouslySetInnerHTML (utils/emojify (cond
@@ -284,6 +276,9 @@
 
                                                    is-all-posts
                                                    "All"
+
+                                                   is-unfollowing
+                                                   "<div class=\"explore-icon-in\"></div> Explore"
 
                                                    is-bookmarks
                                                    "Bookmarks"
@@ -340,6 +335,7 @@
                   (when (and show-follow-button?
                              (not is-all-posts)
                              (not is-following)
+                             (not is-unfollowing)
                              (not is-bookmarks)
                              (not is-drafts-board)
                              (not is-contributions))
@@ -373,5 +369,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" is-following "FL" :else (:slug current-board-data))))
+               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" is-following "FL" is-unfollowing "UF" :else (:slug current-board-data))))
               )]]]))

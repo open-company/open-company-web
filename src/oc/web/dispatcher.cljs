@@ -204,11 +204,11 @@
 
 (defn is-container? [container-slug]
   ;; Rest of containers
-  (#{"inbox" "all-posts" "bookmarks" "following"} container-slug))
+  (#{"inbox" "all-posts" "bookmarks" "following" "unfollowing"} container-slug))
 
 (defn is-container-with-sort? [container-slug]
   ;; Rest of containers
-  (#{"all-posts" "following"} container-slug))
+  (#{"all-posts" "following" "unfollowing"} container-slug))
 
 (defn- get-container-posts [base route posts-data org-slug container-slug sort-type posts-key]
   (let [cnt-key (cond
@@ -316,6 +316,9 @@
    :following-data     [[:base :org-slug]
                           (fn [base org-slug]
                             (get-in base (container-key org-slug :following)))]
+   :unfollowing-data   [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (container-key org-slug :unfollowing)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

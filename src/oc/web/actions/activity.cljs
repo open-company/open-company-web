@@ -189,6 +189,43 @@
   (api/load-more-items more-link direction (partial following-more-finish (router/current-org-slug) (router/current-sort-type) direction))
   (dis/dispatch! [:following-more (router/current-org-slug) (router/current-sort-type)]))
 
+;; Unfollowing stream
+
+(defn- unfollowing-get-finish [org-slug sort-type {:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          posts-data-key (dis/posts-data-key org-slug)
+          unfollowing-data (when success (json->cljs body))]
+      (when (= (router/current-board-slug) "unfollowing")
+        (cook/set-cookie! (router/last-board-cookie org-slug) "unfollowing" (* 60 60 24 365))
+        (request-reads-count (->> unfollowing-data :collection :items (map :uuid)))
+        (watch-boards (:items (:collection unfollowing-data))))
+      (dis/dispatch! [:unfollowing-get/finish org-slug sort-type unfollowing-data]))))
+
+(defn- unfollowing-real-get [unfollowing-link org-slug sort-type finish-cb]
+  (api/get-all-posts unfollowing-link
+   (fn [resp]
+     (unfollowing-get-finish org-slug sort-type resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
+(defn unfollowing-get [org-data & [finish-cb]]
+  (when-let [unfollowing-link (utils/link-for (:links org-data) "unfollowing")]
+    (unfollowing-real-get unfollowing-link (:slug org-data) dis/recently-posted-sort finish-cb)))
+
+(defn recent-unfollowing-get [org-data & [finish-cb]]
+  (when-let [recent-unfollowing-link (utils/link-for (:links org-data) "recent-unfollowing")]
+    (unfollowing-real-get recent-unfollowing-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+
+(defn- unfollowing-more-finish [org-slug sort-type direction {:keys [success body]}]
+  (when success
+    (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
+  (dis/dispatch! [:unfollowing-more/finish org-slug sort-type direction (when success (json->cljs body))]))
+
+(defn unfollowing-more [more-link direction]
+  (api/load-more-items more-link direction (partial unfollowing-more-finish (router/current-org-slug) (router/current-sort-type) direction))
+  (dis/dispatch! [:unfollowing-more (router/current-org-slug) (router/current-sort-type)]))
+
 ;; Referesh org when needed
 (defn- refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
@@ -196,6 +233,7 @@
         is-bookmarks (= (router/current-board-slug) "bookmarks")
         is-inbox (= (router/current-board-slug) "inbox")
         is-following (= (router/current-board-slug) "following")
+        is-unfollowing (= (router/current-board-slug) "unfollowing")
         is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
@@ -213,6 +251,9 @@
 
       is-following
       (following-get org-data)
+
+      is-unfollowing
+      (unfollowing-get org-data)
 
       (seq board-link)
       (sa/section-get board-link))))
@@ -667,6 +708,8 @@
           (bookmarks-get (dis/org-data)))
         (when (= (router/current-board-slug) "following")
           (following-get (dis/org-data)))
+        (when (= (router/current-board-slug) "unfollowing")
+          (unfollowing-get (dis/org-data)))
         (when (= (router/current-board-slug) "inbox")
           (inbox-get (dis/org-data))))))
   (ws-cc/subscribe :entry/inbox-action
@@ -739,6 +782,8 @@
             (bookmarks-get org-data dispatch-unread)
             (= (router/current-board-slug) "following")
             (following-get org-data dispatch-unread)
+            (= (router/current-board-slug) "unfollowing")
+            (unfollowing-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -884,16 +929,6 @@
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
 
-;; Home switching
-
-(defn saved-home []
-  (if-let [last-home (cook/get-cookie (router/last-home-cookie (router/current-org-slug)))]
-    (keyword last-home)
-    :all-posts))
-
-(defn switch-home [slug]
-  (cook/set-cookie! (router/last-home-cookie (router/current-org-slug)) (name slug) cook/default-cookie-expire))
-
 ;; Refresh data
 
 (defn refresh-board-data [to-slug]
@@ -932,6 +967,14 @@
         (and (= to-slug "following")
              (= (router/current-sort-type) dis/recent-activity-sort))
         (recent-following-get org-data)
+
+        (and (= to-slug "unfollowing")
+             (= (router/current-sort-type) dis/recently-posted-sort))
+        (unfollowing-get org-data)
+
+        (and (= to-slug "unfollowing")
+             (= (router/current-sort-type) dis/recent-activity-sort))
+        (recent-unfollowing-get org-data)
 
         (and (not board-data)
              is-contributions?)

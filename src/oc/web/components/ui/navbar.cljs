@@ -91,6 +91,8 @@
                        "Bookmarks"
                        (= (router/current-board-slug) "following")
                        "Wut"
+                       (= (router/current-board-slug) "unfollowing")
+                       "Explore"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else

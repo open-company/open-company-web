@@ -103,11 +103,18 @@
     (str (org org-slug) "/all-posts")))
 
 (defn following
-  "Org all posts url"
+  "Org following url"
   ([]
     (following (router/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/following")))
+
+(defn unfollowing
+  "Org unfollowing url"
+  ([]
+    (unfollowing (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/unfollowing")))
 
 (defn follow-ups
   "Org follow-ups url"

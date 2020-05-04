@@ -375,7 +375,8 @@ div.left-navigation-sidebar {
       }
 
       div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+        // background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+        color: white;
       }
 
       div.bookmarks-icon {
@@ -429,13 +430,24 @@ div.left-navigation-sidebar {
     }
 
     div.all-posts-icon {
-      background-image: cdnUrl("/img/ML/nav_all.svg");
-      background-size: 14px 14px;
-      background-repeat: no-repeat;
-      background-position: center;
+      // background-image: cdnUrl("/img/ML/nav_all.svg");
+      // background-size: 14px 14px;
+      // background-repeat: no-repeat;
+      // background-position: center;
       width: 16px;
       height: 23px;
       float: left;
+
+      text-align: center;
+      font-size: 16px;
+      line-height: 23px;
+      vertical-align: bottom;
+      color: var(--color);
+      font-family: "Material Design Icons";
+
+      &:before {
+        content: "\F18B";
+      }
 
       @include mobile() {
         opacity: 1;
@@ -443,7 +455,7 @@ div.left-navigation-sidebar {
       }
 
       @include dark_mode() {
-        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+        // background-image: cdnUrl("/img/ML/nav_all@dark.svg");
       }
     }
 

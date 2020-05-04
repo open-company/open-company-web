@@ -32,9 +32,9 @@
         (not (responsive/is-mobile-size?))
         ;; on All posts and Following only on NOT recent activity sort
         (or (and (not= sort-type dis/recent-activity-sort)
-                 (#{"all-posts" "following"} (name container-slug-or-href)))
+                 (#{"all-posts" "following" "unfollowing"} (name container-slug-or-href)))
             (and (string? container-slug-or-href)
-                 (not (.match container-slug-or-href #"(?i)/(entries|following)/?\?.*sort=activity"))))
+                 (not (.match container-slug-or-href #"(?i)/(entries|following|unfollowing)/?\?.*sort=activity"))))
         ;; Never on inbox and bookmarks
         (not (or (#{"inbox" "bookmarks" utils/default-drafts-board-slug} (name container-slug-or-href))
                  (and (string? container-slug-or-href)

@@ -100,6 +100,9 @@
       (and (= last-board-slug "following")
            (utils/link-for (:links org-data) "following"))
       {:slug "following"}
+      (and (= last-board-slug "unfollowing")
+           (utils/link-for (:links org-data) "unfollowing"))
+      {:slug "unfollowing"}
       :else
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
@@ -146,6 +149,7 @@
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         following-link (utils/link-for (:links org-data) "following")
+        unfollowing-link (utils/link-for (:links org-data) "unfollowing")
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
@@ -153,6 +157,7 @@
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-following? (= (router/current-board-slug) "following")
+        is-unfollowing? (= (router/current-board-slug) "unfollowing")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         sort-type (router/current-sort-type)
         is-contributions? (seq (router/current-contributions-id))
@@ -161,6 +166,7 @@
         all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
+        unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
         active-users-link (utils/link-for (:links org-data) "active-users")]
@@ -192,6 +198,9 @@
           ;; Preload following data with recently posted sort
           (when following-link
             (utils/maybe-after following-delay #(aa/following-get org-data)))
+          ;; Preload unfollowing data with recently posted sort
+          (when unfollowing-link
+            (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
           ;; Drafts
           (when drafts-link
             (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
@@ -209,7 +218,9 @@
                 (and is-bookmarks?
                      (not bookmarks-link))
                 (and is-following?
-                     (not following-link)))
+                     (not following-link))
+                (and is-unfollowing?
+                     (not unfollowing-link)))
         (check-org-404))
 
       ; If there is a board slug let's load the board data

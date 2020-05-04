@@ -101,43 +101,47 @@
       (assoc-in db bm-key next-bm-data))
     db))
 
-(defn add-remove-item-from-following
+(defn add-remove-item-from-follow
   "Given an activity map adds or remove it from the bookmarks list of posts."
-  [db org-slug activity-data]
+  [db org-slug activity-data following-container?]
   (if (:uuid activity-data)
     (let [;; Add/remove item from MS
           follow-list (dispatcher/follow-list org-slug db)
           publisher-id (-> activity-data :publisher :user-id)
-          is-following? (and (not= (:status activity-data) "draft")
-                             (or ((set (:publisher-uuids follow-list)) publisher-id)
-                                 ((set (:board-uuids follow-list)) (:board-uuid activity-data))
-                                 (= publisher-id (j/user-id))))
-          fl-rp-key (dispatcher/container-key org-slug :following dispatcher/recently-posted-sort)
-          fl-ra-key (dispatcher/container-key org-slug :following dispatcher/recent-activity-sort)
+          include-activity? (and (not= (:status activity-data) "draft")
+                                 (or (and following-container?
+                                          (or ((set (:publisher-uuids follow-list)) publisher-id)
+                                              ((set (:board-uuids follow-list)) (:board-uuid activity-data))
+                                              (= publisher-id (j/user-id))))
+                                     (and (not following-container?)
+                                          (not ((set (:publisher-uuids follow-list)) publisher-id))
+                                          (not ((set (:board-uuids follow-list)) (:board-uuids activity-data)))
+                                          (not= publisher-id (j/user-id)))))
+          container-slug (if following-container? :following :unfollowing)
+          fl-rp-key (dispatcher/container-key org-slug container-slug dispatcher/recently-posted-sort)
+          fl-ra-key (dispatcher/container-key org-slug container-slug dispatcher/recent-activity-sort)
           old-fl-rp-data (get-in db fl-rp-key)
           old-fl-ra-data (get-in db fl-ra-key)
           old-fl-rp-data-posts (get old-fl-rp-data :posts-list)
           old-fl-ra-data-posts (get old-fl-ra-data :posts-list)
           fl-rp-without-uuid (utils/vec-dissoc old-fl-rp-data-posts (:uuid activity-data))
           fl-ra-without-uuid (utils/vec-dissoc old-fl-ra-data-posts (:uuid activity-data))
-          new-fl-rp-uuids (vec
-                           (if is-following?
-                             (conj fl-rp-without-uuid (:uuid activity-data))
-                             fl-rp-without-uuid))
-          new-fl-ra-uuids (vec
-                           (if is-following?
-                             (conj fl-ra-without-uuid (:uuid activity-data))
-                             fl-ra-without-uuid))
+          new-fl-rp-uuids (vec (if (= following-container? include-activity?)
+                                 (conj fl-rp-without-uuid (:uuid activity-data))
+                                 fl-rp-without-uuid))
+          new-fl-ra-uuids (vec (if (= following-container? include-activity?)
+                                 (conj fl-ra-without-uuid (:uuid activity-data))
+                                 fl-ra-without-uuid))
           new-fl-rp-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-fl-rp-uuids)
           new-fl-ra-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-fl-ra-uuids)
           sorted-new-fl-rp-posts (reverse (sort-by :published-at new-fl-rp-data-posts))
           sorted-new-fl-ra-posts (reverse (sort-by (juxt :new-at :published-at) new-fl-ra-data-posts))
           sorted-new-fl-rp-uuids (mapv :uuid sorted-new-fl-rp-posts)
           sorted-new-fl-ra-uuids (mapv :uuid sorted-new-fl-ra-posts)
-          grouped-fl-rp-uuids (if (au/show-separators? :following dispatcher/recently-posted-sort)
+          grouped-fl-rp-uuids (if (au/show-separators? container-slug dispatcher/recently-posted-sort)
                                 (au/grouped-posts (assoc old-fl-rp-data :posts-list sorted-new-fl-rp-uuids))
                                 sorted-new-fl-rp-uuids)
-          grouped-fl-ra-uuids (if (au/show-separators? :following dispatcher/recent-activity-sort)
+          grouped-fl-ra-uuids (if (au/show-separators? container-slug dispatcher/recent-activity-sort)
                                 (au/grouped-posts (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids))
                                 sorted-new-fl-ra-uuids)
           next-fl-rp-data (merge old-fl-rp-data {:posts-list sorted-new-fl-rp-uuids
@@ -241,7 +245,8 @@
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
       (add-remove-item-from-all-posts org-slug with-published-at)
       (add-remove-item-from-bookmarks org-slug with-published-at)
-      (add-remove-item-from-following org-slug with-published-at)
+      (add-remove-item-from-follow org-slug with-published-at true)
+      (add-remove-item-from-follow org-slug with-published-at false)
       (add-remove-item-from-board org-slug with-published-at)
       (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
@@ -813,6 +818,53 @@
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
         (assoc-in (conj org-data-key :following-count) (:total-count fixed-posts-data))))
+    db))
+
+;; Unfollowing
+
+(defmethod dispatcher/action :unfollowing-get/finish
+  [db [_ org-slug sort-type unfollowing-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-unfollowing-data (au/fix-container (:collection unfollowing-data) change-data org-data active-users sort-type)
+        posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge old-posts (:fixed-items fixed-unfollowing-data))
+        container-key (dispatcher/container-key org-slug :unfollowing sort-type)]
+    (-> db
+      (assoc-in container-key fixed-unfollowing-data)
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-data-key :unfollowing-count) (:total-count fixed-unfollowing-data)))))
+
+(defmethod dispatcher/action :unfollowing-more
+  [db [_ org-slug sort-type]]
+  (let [container-key (dispatcher/container-key org-slug :unfollowing sort-type)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
+
+(defmethod dispatcher/action :unfollowing-more/finish
+  [db [_ org sort-type direction posts-data]]
+  (if posts-data
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
+          container-key (dispatcher/container-key org :unfollowing sort-type)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-data-key :unfollowing-count) (:total-count fixed-posts-data))))
     db))
 
 (defmethod dispatcher/action :force-list-update
