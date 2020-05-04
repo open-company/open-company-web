@@ -195,9 +195,7 @@
           follow-publishers-list (set (map :user-id (drv/react s :follow-publishers-list)))
           following? (follow-publishers-list (:user-id user-data))
           followers-publishers-count (drv/react s :followers-publishers-count)
-          followers-count (some #(when (= (:resource-uuid %) (:user-id user-data))
-                                   (:count %))
-                           followers-publishers-count)]
+          followers-count (get followers-publishers-count (:user-id user-data))]
       [:div.info-hover-view
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true})
@@ -255,9 +253,7 @@
           follow-boards-list (set (map :uuid (drv/react s :follow-boards-list)))
           following? (follow-boards-list (:board-uuid activity-data))
           followers-boards-count (drv/react s :followers-boards-count)
-          followers-count (some #(when (= (:resource-uuid %) (:board-uuid activity-data))
-                                   (:count %))
-                           followers-boards-count)]
+          followers-count (get followers-boards-count (:board-uuid activity-data))]
       [:div.info-hover-view
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true})

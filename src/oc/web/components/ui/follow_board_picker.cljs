@@ -98,7 +98,7 @@
                        :class (when (:follow b) "selected")}
                       [:div.follow-board-picker-board
                         (:name b)]
-                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
+                      (let [followers-count (:count (get followers-boards-count (:uuid b)))]
                         [:span.followers-count
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))
@@ -115,7 +115,7 @@
                        :class (when (:follow b) "selected")}
                       [:div.follow-board-picker-board
                         (:name b)]
-                      (let [followers-count (:count (some #(when (= (:resource-uuid %) (:uuid b)) %) followers-boards-count))]
+                      (let [followers-count (:count (get followers-boards-count (:uuid b)))]
                         [:span.followers-count
                           (if (pos? followers-count)
                             (str followers-count " follower" (when (not= followers-count 1) "s"))

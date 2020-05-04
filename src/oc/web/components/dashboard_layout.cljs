@@ -343,9 +343,7 @@
                              (not is-bookmarks)
                              (not is-drafts-board)
                              (not is-contributions))
-                    (let [followers-count (some #(when (= (:resource-uuid %) (:uuid current-board-data))
-                                                   (:count %))
-                                           followers-boards-count)]
+                    (let [followers-count (get followers-boards-count (:uuid current-board-data))]
                       [:div.followers-count
                         (if (pos? followers-count)
                           (str followers-count " follower" (when (not= followers-count 1) "s"))

@@ -35,8 +35,7 @@
                                                 :portal-el this
                                                 :my-profile (= (:user-id current-user-data) user-id)
                                                 :following (utils/in? (mapv :user-id @(drv/get-ref s :follow-publishers-list)) user-id)
-                                                :followers-count (some #(when (= (:resource-uuid %) (:user-id user-data)) (:count %))
-                                                                  @(drv/get-ref s :followers-publishers-count))})
+                                                :followers-count (get @(drv/get-ref s :followers-publishers-count) user-id)})
                                 mount-el)
                                (let [user-data {:first-name (oget this "dataset" "?firstName")
                                                 :last-name (oget this "dataset" "?lastName")
@@ -80,7 +79,8 @@
    - rum/reactive
    - (drv/drv :current-user-data)
    - (drv/drv :users-info-hover)
-   - (drv/drv :follow-publishers-list)"
+   - (drv/drv :follow-publishers-list)
+   - (drv/drv :followers-publishers-count)"
   [& [{:keys [click?]}]]
   (let [events-list (atom [])]
     {:did-mount (fn [s]
