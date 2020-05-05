@@ -7,7 +7,6 @@ div.follow-board-picker {
   height: 100vh;
   position: fixed;
   overflow: visible;
-  padding: 24px;
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
@@ -18,10 +17,12 @@ div.follow-board-picker {
 
   @include mobile() {
     height: 100vh;
+    padding: 24px;
   }
 
   div.follow-board-picker-modal {
     width: #{$modal_width}px;
+    height: calc(100vh - 40px - 32px);
     background-color: var(--overlay-background-color);
     margin: 40px auto 32px;
     padding: 0;
@@ -152,6 +153,17 @@ div.follow-board-picker {
     
     div.follow-board-picker-body {
       padding: 16px 120px 66px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: calc(100% - #{$navbar_height}px);
+      min-height: 200px;
+
+      @include mobile() {
+        overflow-x: initial;
+        overflow-y: initial;
+        max-height: initial;
+        min-height: initial;
+      }
 
       div.follow-board-tabs {
         width: 100%;
