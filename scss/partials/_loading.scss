@@ -1,3 +1,6 @@
+$startPosX: 120%;
+$startPosY: -800%;
+
 div.oc-loading {
   position: absolute;
   top: 0px;
@@ -5,11 +8,12 @@ div.oc-loading {
   width: 100%;
   height: 100%;
   display: none;
-  background-color: var(--background-color);
+  background-color: white;
   z-index: #{$navbar_zindex + 3001};
+  filter: url(#goo);
 
-  @include mobile() {
-    background-color: var(--mobile-background-color);
+  @include dark_mode() {
+    background-color: $wut_purple;
   }
 
   &.active {
@@ -22,97 +26,126 @@ div.oc-loading {
 
   div.oc-loading-inner {
     position: relative;
-    width: 52px;
-    height: 96px;
-    top: 50%;
-    left: 50%;
-    margin-left: -26px;
-    margin-top: -48px;
+    width: 100vw;
+    height: 50vh;
+    font-size: 40vh;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 25vh;
+    line-height: 50vh;
+    color: $wut_purple;
+    @include OC_Title();
 
-    div.oc-loading-body {
-      background-image: cdnUrl("/img/ML/carrot_loading_body.svg");
-      background-position: 52px 74px;
-      width: 52px;
-      height: 74px;
-      position: absolute;
-      top: 22px;
-      left: 0px;
-    }
+    @include no-user-select();
 
-    div.oc-loading-heart {
-      background-image: cdnUrl("/img/ML/carrot_loading_heart.svg");
-      background-position: 23px 23px;
-      width: 23px;
-      height: 23px;
-      position: absolute;
-      top: 0px;
-      left: 0px;
+    @include dark_mode() {
+      color: white;
     }
   }
 
-  &.active div.oc-loading-inner {
-    -webkit-animation: -webkit-loading-frames 3.2s linear 1.0s;
-    -webkit-animation-iteration-count: infinite;
-    animation: loading-frames 3.2s linear 1.0s;
+  div.loading-drop {
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+    background-color: $wut_purple;
+    position: absolute;
+    top: -1000px;
+
+    @include dark_mode() {
+      background-color: white;
+    }
+
+    @for $i from 1 through 100 {
+      &.drop-#{$i} {
+        left: #{percentage($i/100)};
+      }
+    }
+
+  }
+
+  &.active div.loading-drop {
+    transform: translate(#{$startPosX}, #{$startPosY}) scaleX(0.5);
+    animation-duration: 6s;
     animation-iteration-count: infinite;
+    top: 50%;
+
+    &:nth-of-type(2) {
+      animation-delay: 0s;
+      animation-name: move-one;
+      animation-timing-function: cubic-bezier(1,.04,.74,.2);
+    }
+
+    &:nth-of-type(3) {
+      animation-delay: 0.5s;
+      animation-name: move-two;
+      animation-timing-function: cubic-bezier(1,.04,.74,.2);
+    }
+
+    &:nth-of-type(4) {
+      animation-delay: 0.9s;
+      animation-name: move-three;
+      animation-timing-function: cubic-bezier(1,.04,.74,.2);
+    }
   }
 }
 
-@-webkit-keyframes -webkit-loading-frames {
-  10% {
-    -webkit-transform:scale(1);
-  }
-  15%{
-    -webkit-transform:scale(1.2);
-  }
-  20%{
-    -webkit-transform:scale(1.2) rotate(30deg);
-  }
-  25%{
-    -webkit-transform:scale(1.2) rotate(0deg);
+svg#gooFilterSvg {
+  position: absolute;
+}
 
+@keyframes move-one{
+  0%{
+    transform: translate($startPosX,$startPosY) scaleX(0.2);
+    height: 60px;
   }
   30%{
-    -webkit-transform:scale(1.2) rotate(30deg);
-
+    transform: translate($startPosX,-200%);
+    height: 30px;
   }
-  35%{
-    -webkit-transform:scale(1.2) rotate(0deg);
+  70%{
+    transform: translate($startPosX,100%);
+    height: 30px;
   }
-  40%{
-    -webkit-transform:scale(1) rotate(0deg);
+  100%{
+    transform: translate($startPosX,800%) scaleX(0.2);
+    height: 60px;
   }
 }
 
-@keyframes loading-frames {
-  10% {
-    transform:scale(1);
-  }
-  15%{
-    transform:scale(1.2);
-  }
-  20%{
-    transform:scale(1.2) rotate(30deg);
-  }
-  25%{
-    transform:scale(1.2) rotate(0deg);
-
+@keyframes move-two{
+  0%{
+    transform: translate($startPosX,$startPosY) scaleX(0.2);
+    height: 60px;
   }
   30%{
-    transform:scale(1.2) rotate(30deg);
-
+    transform: translate($startPosX,-650%);
+    height: 30px;
   }
-  35%{
-    transform:scale(1.2) rotate(0deg);
+  70%{
+    transform: translate($startPosX,0%);
+    height: 30px;
   }
-  40%{
-    transform:scale(1) rotate(0deg);
+  100%{
+    transform: translate($startPosX,600%) scaleX(0.2);
+    height: 60px;
   }
 }
 
-@include dark_mode() {
-  div.oc-loading div.oc-loading-inner div.oc-loading-body,
-  div.oc-loading div.oc-loading-inner div.oc-loading-heart {
-    opacity: 0.4;
+@keyframes move-three{
+  0%{
+    transform: translate($startPosX,$startPosY) scaleX(0.2);
+    height: 60px;
+  }
+  30%{
+    transform: translate($startPosX,0%);
+    height: 30px;
+  }
+  70%{
+    transform: translate($startPosX,400%);
+    height: 30px;
+  }
+  100%{
+    transform: translate($startPosX,900%) scaleX(0.2);
+    height: 60px;
   }
 }

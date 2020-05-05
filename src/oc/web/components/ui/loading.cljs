@@ -7,5 +7,10 @@
   [:div.oc-loading
     {:class (utils/class-set {:active (:loading data)})}
     [:div.oc-loading-inner
-      [:div.oc-loading-heart]
-      [:div.oc-loading-body]]])
+      "WUT!"]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]])

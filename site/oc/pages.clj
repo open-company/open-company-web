@@ -10,6 +10,33 @@
             [oc.pages.about :as about]
             [oc.pages.press-kit :as press-kit]))
 
+(defn oc-loading []
+  [:div.oc-loading.active
+    [:div.oc-loading-inner
+      "WUT!"]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]
+    [:div.loading-drop
+      {:class (str "drop-" (int (rand 100)))}]])
+
+(def goo-filter
+  [:svg {:id "gooFilterSvg"}
+    [:defs
+      [:filter {:id "goo"}
+        [:feGaussianBlur {:in "SourceGraphic"
+                          :stdDeviation "10"
+                          :result "name"}]
+        [:feColorMatric {:in "name"
+                         :mode "matrix"
+                         :values "1 0 0 0 0
+                                  0 1 0 0 0
+                                  0 0 1 0 0
+                                  0 0 0 15 -10"
+                         :result "b"}]
+        [:feBlend {:in "SourceGraphic" :in2 "b"}]]]])
+
 (def tag-manager-head
   [:script"
     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -213,11 +240,9 @@
           stripe-js]
    :body [:body
           tag-manager-body
+          goo-filter
           [:div#app
-            [:div.oc-loading.active
-              [:div.oc-loading-inner
-                [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+            (oc-loading)]
           [:div#oc-notifications-container]
           [:div#oc-loading]
           [:div.preload-interstitial]
@@ -325,11 +350,9 @@
           stripe-js]
    :body [:body
           tag-manager-body
+          goo-filter
           [:div#app
-            [:div.oc-loading.active
-              [:div.oc-loading-inner
-                [:div.oc-loading-heart]
-                [:div.oc-loading-body]]]]
+            (oc-loading)]
           [:div#oc-notifications-container]
           [:div#oc-loading]
           [:div.preload-interstitial]
