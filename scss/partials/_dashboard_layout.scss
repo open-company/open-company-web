@@ -173,11 +173,13 @@ div.dashboard-layout {
               background-size: 18px 16px;
 
               text-align: center;
-              font-size: 18px;
+              font-size: 19px;
               line-height: 16px;
               vertical-align: bottom;
               color: var(--color);
               font-family: "Material Design Icons";
+              display: block;
+
               &:before {
                 content: "\F18B";
               }

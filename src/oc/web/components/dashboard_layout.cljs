@@ -178,7 +178,7 @@
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
-              [:button.mlb-reset.tab-button.explore-tab
+              [:button.mlb-reset.tab-button.unfollowing-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "unfollow" (oc-urls/unfollowing)))
