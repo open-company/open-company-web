@@ -98,7 +98,7 @@
 
 (def google-fonts
   ;; Google fonts Muli
-  [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&display=swap" :rel "stylesheet"}])
+  [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&family=Anton:wght@700&display=swap" :rel "stylesheet"}])
 
 (def stripe-js
   [:script {:src "https://js.stripe.com/v3/"}])

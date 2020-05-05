@@ -34,7 +34,7 @@ div.oc-loading {
     margin-top: 25vh;
     line-height: 50vh;
     color: $wut_purple;
-    @include OC_Title();
+    font-family: Anton;
 
     @include no-user-select();
 
