@@ -33,7 +33,11 @@
 (defn- filter-user [s user q]
   (or (not (seq q))
       (search-user user q)
-      (some (partial search-user user) (string/split q #"\s"))))
+      (some (partial search-user user) (string/split q #"\s"))
+      (and (= q "follow")
+           (:follow user))
+      (and (= q "unfollow")
+           (not (:follow user)))))
 
 (defn- filter-sort-users [s current-user-id users q]
   (sort-users current-user-id (filterv #(filter-user s % (string/lower q)) users)))
@@ -99,8 +103,8 @@
         with-follow (map #(assoc % :follow (utils/in? follow-publishers-list (:user-id %))) all-authors)
         sorted-users (filter-sort-users s (:user-id current-user-data) with-follow @(::query s))
         is-mobile? (responsive/is-mobile-size?)
-        following-users (filter #(->> % :user-id (utils/in? follow-publishers-list)) sorted-users)
-        unfollowing-users (filter #(->> % :user-id (utils/in? follow-publishers-list) not) sorted-users)]
+        following-users (filter :follow sorted-users)
+        unfollowing-users (filter (comp not :follow) sorted-users)]
     [:div.follow-user-picker
       [:div.follow-user-picker-modal
         [:button.mlb-reset.modal-close-bt

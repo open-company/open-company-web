@@ -27,7 +27,11 @@
        (not (:publisher-board board))
        (or (not (seq q))
            (search-board board q)
-           (some (partial search-board board) (string/split q #"\s")))))
+           (some (partial search-board board) (string/split q #"\s"))
+           (and (= q "follow")
+                (:follow board))
+           (and (= q "unfollow")
+                (not (:follow board))))))
 
 (defn- filter-sort-boards [s boards q]
   (sort-boards (filterv #(filter-board s % (string/lower q)) boards)))
@@ -57,8 +61,8 @@
         with-follow (map #(assoc % :follow (utils/in? follow-boards-list (:uuid %))) all-boards)
         sorted-boards (filter-sort-boards s with-follow @(::query s))
         is-mobile? (responsive/is-mobile-size?)
-        following-boards (filter #(->> % :uuid (utils/in? follow-boards-list)) sorted-boards)
-        unfollowing-boards (filter #(->> % :uuid (utils/in? follow-boards-list) not) sorted-boards)]
+        following-boards (filter :follow sorted-boards)
+        unfollowing-boards (filter (comp not :follow) sorted-boards)]
     [:div.follow-board-picker
       [:div.follow-board-picker-modal
         [:button.mlb-reset.modal-close-bt
