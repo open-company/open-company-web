@@ -36,6 +36,10 @@ div.oc-loading {
     color: $wut_purple;
     font-family: Anton;
 
+    @include mobile() {
+      font-size: 25vw;
+    }
+
     @include no-user-select();
 
     @include dark_mode() {

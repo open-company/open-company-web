@@ -28,7 +28,7 @@
         [:feGaussianBlur {:in "SourceGraphic"
                           :stdDeviation "10"
                           :result "name"}]
-        [:feColorMatric {:in "name"
+        [:feColorMatrix {:in "name"
                          :mode "matrix"
                          :values "1 0 0 0 0
                                   0 1 0 0 0
