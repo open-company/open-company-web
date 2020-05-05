@@ -177,7 +177,7 @@
                                    (= current-board-slug "following"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Wut"]]
+                [:span.tab-label "Home"]]
               [:button.mlb-reset.tab-button.explore-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -284,7 +284,7 @@
                                                    "Bookmarks"
 
                                                    is-following
-                                                   "Wut"
+                                                   "Home"
 
                                                    :default
                                                    ;; Fallback to the org board data
@@ -352,6 +352,14 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
+                  (when (and is-following
+                             member?)
+                    [:button.mlb-reset.curate-feed-bt
+                      {:on-click #(nav-actions/show-follow-board-picker)
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Curate your Home feed"}])
                   (when (and (not is-drafts-board)
                              is-mobile?)
                     (search-box))]])

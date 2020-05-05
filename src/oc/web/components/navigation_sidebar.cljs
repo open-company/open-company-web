@@ -219,10 +219,16 @@
             [:div.home-icon]
             [:div.home-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Wut"]
+              "Home"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
-            ])
+            (when user-is-part-of-the-team?
+              [:button.mlb-reset.home-ellipsis-bt
+                {:title "Curate your Home feed"
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-toggle (when-not is-mobile? "tooltip")}
+                ])])
         (when show-unfollowing
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-unfollowing})

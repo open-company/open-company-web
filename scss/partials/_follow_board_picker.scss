@@ -129,7 +129,7 @@ div.follow-board-picker {
         color: var(--color);
         margin: 0;
         padding: 0;
-        width: 100px;
+        width: 30vw;
         position: absolute;
         left: 50%;
         top: 12px;
@@ -151,7 +151,49 @@ div.follow-board-picker {
     }
     
     div.follow-board-picker-body {
-      padding: 40px 120px 66px;
+      padding: 16px 120px 66px;
+
+      div.follow-board-tabs {
+        width: 100%;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
+        margin-bottom: 16px;
+
+        button.follow-board-tab {
+          width: 120px;
+          text-align: center;
+          height: 40px;
+          font-size: 18px;
+          @include OC_Body_Bold();
+          line-height: 40px;
+          border-radius: 4px;
+
+          background-color: var(--overlay-background-color);
+          color: $wut_purple;
+          border: 1px solid $wut_purple;
+          opacity: 1;
+
+          &:nth-child(1) {
+            margin-left: auto;
+            margin-right: 8px;
+          }
+
+          &:nth-child(2) {
+            margin-right: auto;
+            margin-left: 8px;
+          }
+
+          &.active {
+            background-color: $wut_purple;
+            color: white;
+            border: 1px solid $wut_purple;
+            text-decoration: underline;
+          }
+        }
+      }
 
       div.follow-board-picker-subtitle {
         @include OC_Body_Book();

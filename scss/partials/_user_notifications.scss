@@ -50,10 +50,15 @@ div.user-notifications {
     }
 
     &:hover, &.active {
-      background-color: var(--opac-background-color-2);
+      background-color: $wut_purple;
 
       span.bell-icon {
         opacity: 1;
+        background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
+        }
       }
     }
 

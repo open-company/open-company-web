@@ -110,8 +110,14 @@
             {:on-click #(nav-actions/show-org-settings :invite-picker)}
             "Invite people"]
           [:h3.follow-user-picker-title
-            "People"]]
+            "Curate your Home feed"]]
         [:div.follow-user-picker-body
+          [:div.follow-user-tabs
+            [:button.mlb-reset.follow-user-tab
+              {:on-click #(nav-actions/show-follow-board-picker)}
+              "Topics"]
+            [:button.mlb-reset.follow-user-tab.active
+              "People"]]
           (if (zero? (count all-authors))
             (empty-user-component {:org-data org-data :current-user-data current-user-data})
             [:div.follow-user-picker-body-inner.group
@@ -119,13 +125,13 @@
                 {:value @(::query s)
                  :type "text"
                  :ref :query
-                 :placeholder "Find a person"
+                 :placeholder "Find someone"
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-user-picker-users-list.group
                 ;; Following
-                (when (seq following-users)
-                  [:div.follow-user-picker-row-header
-                    (str "Following (" (count following-users) ")")])
+                ; (when (seq following-users)
+                ;   [:div.follow-user-picker-row-header
+                ;     (str "Following (" (count following-users) ")")])
                 (when (seq following-users)
                   (for [u following-users]
                     [:div.follow-user-picker-user-row.group
@@ -141,9 +147,9 @@
                           (:location u)])
                       (follow-button {:following true :resource-type :user :resource-uuid (:user-id u)})]))
                 ;; Unfollowing
-                (when (seq unfollowing-users)
-                  [:div.follow-user-picker-row-header
-                    (str "Other people (" (count unfollowing-users) ")")])
+                ; (when (seq unfollowing-users)
+                ;   [:div.follow-user-picker-row-header
+                ;     (str "Other people (" (count unfollowing-users) ")")])
                 (when (seq unfollowing-users)
                   (for [u unfollowing-users]
                     [:div.follow-user-picker-user-row.group

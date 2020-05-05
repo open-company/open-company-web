@@ -760,6 +760,26 @@ div.dashboard-layout {
             margin-left: 3px;
           }
 
+          button.curate-feed-bt {
+            float: right;
+            margin-left: 8px;
+            width: 16px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+            background-size: 5px 21px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+            }
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
           button.complete-all-bt {
             float: left;
             height: 32px;
