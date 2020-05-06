@@ -573,11 +573,11 @@
         next-publishers (if follow?
                           (vec (conj (set current-publishers) publisher-uuid))
                           (vec (disj (set current-publishers) publisher-uuid)))]
-    (dis/dispatch! [:publishers/follow (router/current-org-slug)
-                                       {:org-slug org-slug
-                                        :publisher-uuids next-publishers
-                                        :follow? follow?
-                                        :publisher-uuid publisher-uuid}])
+    (dis/dispatch! [:publisher/follow (router/current-org-slug)
+                                      {:org-slug org-slug
+                                       :publisher-uuids next-publishers
+                                       :follow? follow?
+                                       :publisher-uuid publisher-uuid}])
     (when follow?
       (dis/dispatch! [:follow-list-last-added org-slug {:last-added-uuid publisher-uuid
                                                         :resource-type :user}]))
@@ -592,11 +592,11 @@
         next-boards (if follow?
                       (vec (conj (set current-boards) board-uuid))
                       (vec (disj (set current-boards) board-uuid)))]
-    (dis/dispatch! [:boards/follow (router/current-org-slug)
-                                   {:org-slug org-slug
-                                    :board-uuids next-boards
-                                    :follow? follow?
-                                    :board-uuid board-uuid}])
+    (dis/dispatch! [:board/follow (router/current-org-slug)
+                                  {:org-slug org-slug
+                                   :board-uuids next-boards
+                                   :follow? follow?
+                                   :board-uuid board-uuid}])
     (when follow?
       (dis/dispatch! [:follow-list-last-added org-slug {:last-added-uuid board-uuid
                                                         :resource-type :board}]))
