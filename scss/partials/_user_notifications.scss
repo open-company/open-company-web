@@ -204,15 +204,9 @@ div.user-notifications-tray {
   }
 
   div.user-notifications-tray-list {
-    max-height: calc(90vh - 100px);
-    overflow-y: auto;
-    overflow-x: hidden;
 
     @include mobile() {
       min-height: 100%;
-      max-height: initial;
-      overflow-y: hidden;
-      overflow-x: hidden;
     }
 
     div.user-notifications-tray-empty {
