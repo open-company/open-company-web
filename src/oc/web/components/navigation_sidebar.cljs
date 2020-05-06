@@ -241,19 +241,6 @@
                  :data-container "body"
                  :data-toggle (when-not is-mobile? "tooltip")
                  :on-click #(nav-actions/show-follow-board-picker)}])])
-        (when show-unfollowing
-          [:a.nav-link.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-unfollowing})
-             :href (oc-urls/unfollowing)
-             :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
-            ; [:div.explore-icon]
-            [:div.nav-link-icon]
-            [:div.nav-link-label
-              ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Explore"]
-            ; (when (pos? (count all-unread-items))
-            ;   [:span.count (count all-unread-items)])
-            ])
         (when user-is-part-of-the-team?
           [:a.nav-link.activity-view.hover-item.group
             {:class (utils/class-set {:item-selected activity-view
@@ -313,6 +300,19 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
+        (when show-unfollowing
+          [:a.nav-link.all-posts.hover-item.group
+            {:class (utils/class-set {:item-selected is-unfollowing})
+             :href (oc-urls/unfollowing)
+             :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
+            ; [:div.explore-icon]
+            [:div.nav-link-icon]
+            [:div.nav-link-label
+              ; {:class (utils/class-set {:new (seq all-unread-items)})}
+              "Explore"]
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
+            ])
         (when show-users-list?
           [:div.left-navigation-sidebar-top.top-border.group
             ;; Boards header
