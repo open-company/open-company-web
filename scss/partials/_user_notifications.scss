@@ -79,227 +79,257 @@ div.user-notifications {
     position: absolute;
     top: 31px;
     right: 0px;
+    width: 375px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
+    border: 1px solid var(--notifications-border);
     background-color: var(--overlay-background-color);
     border-radius: 4px;
-    border: 1px solid var(--notifications-border);
-    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
-    width: 375px;
-
-    &.hidden-tray {
-      top: -99999px;
-      right: -99999px;
-    }
 
     @include mobile() {
       position: relative;
       top: unset;
       right: unset;
-      width: 100%;
       box-shadow: none;
       border: none;
       background-color: var(--mobile-background-color);
+    }
+  }
+}
 
-      &.hidden-tray {
-        top: unset;
-        right: unset;
+div.user-notifications-tray {
+  width: 100%;
+
+  &.hidden-tray {
+    position: absolute;
+    top: -99999px;
+    right: -99999px;
+  }
+
+  @include mobile() {
+    width: 100%;
+
+    &.hidden-tray {
+      top: unset;
+      right: unset;
+    }
+  }
+
+  div.user-notifications-tray-header {
+    height: 40px;
+    padding: 0 0 8px;
+    position: relative;
+
+    @include mobile(){
+      display: none;
+    }
+
+    div.title {
+      @include OC_Body_Bold();
+      color: var(--color);
+      font-size: 18px;
+      line-height: 32px;
+      text-align: left;
+      width: auto;
+      float: left;
+      padding-left: 22px;
+      position: relative;
+
+      &:before {
+        content: "";
+        width: 24px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/notification_bell.svg");
+        background-size: 14px 18px;
+        background-position: top 7px left 0;
+        background-repeat: no-repeat;
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
+        }
       }
     }
 
-    div.user-notifications-tray-header {
-      padding: 16px;
-      position: relative;
+    button.user-notifications-tray-mobile-close {
+      display: none;
 
-      @include mobile(){
-        display: none;
-      }
-
-      button.user-notifications-tray-mobile-close {
-        display: none;
-
-        @include mobile() {
-          display: block;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: 14px 14px;
-          position: absolute;
-          top: 12px;
-          right: 11px;
-        }
-      }
-
-      button.notification-settings-bt {
-        position:absolute;
-        top: 12px;
-        right: 12px;
+      @include mobile() {
+        display: block;
         width: 24px;
         height: 24px;
-        background-image: cdnUrl("/img/ML/notification_settings_bt.svg");
+        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
         background-position: center;
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        position: absolute;
+        top: 12px;
+        right: 11px;
+      }
+    }
+
+    div.notification-settings-bt-container {
+
+      button.notification-settings-bt {
+        float: left;
+        margin: 4px 0 0 16px;
+        padding: 0 0 0 16px;
+        border-left: 1px solid var(--divider-line);
+        width: 32px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/notification_settings_bt.svg");
+        background-position: top 4px right 0;
         background-repeat: no-repeat;
         background-size: 15px 16px;
       }
 
-      div.title {
-        @include OC_Body_Book();
-        color: var(--color);
-        font-size: 14px;
-        text-align: center;
-        width: 100px;
-        margin: 0 auto;
-        line-height: 20px;
-        height: 18px;
-        line-height: 18px;
-
-        @include mobile() {
-          font-size: 16px;
-        }
-      }
-
-      button.all-read-bt {
-        position:absolute;
-        top: 12px;
-        left: 12px;
-        height: 24px;
-        width: 24px;
-        padding: 0px;
-        margin: 0px;
-        background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
-        background-size: 14px 14px;
-        background-position: center;
-        background-repeat: no-repeat;
+      .tooltip {
+        margin-left: 8px;
       }
     }
 
-    div.user-notifications-tray-list {
-      max-height: calc(90vh - 100px);
-      overflow-y: auto;
+    button.all-read-bt {
+      float: right;
+      height: 32px;
+      width: 24px;
+      padding: 0px;
+      margin: 0px;
+      background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
+      background-size: 14px 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-left: 8px;
+    }
+  }
+
+  div.user-notifications-tray-list {
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    @include mobile() {
+      min-height: 100%;
+      max-height: initial;
+      overflow-y: hidden;
       overflow-x: hidden;
+    }
+
+    div.user-notifications-tray-empty {
+      margin-top: 100px;
+      @include mobile() {
+        div.all-caught-up {
+          display: block !important;
+          margin-top: 100px;
+        }
+      }
+    }
+
+    div.user-notification {
+      border-top: 1px solid var(--divider-line);
+      padding: 16px 16px 13px;
+      cursor: pointer;
+      text-align: left;
+      opacity: 0.9;
+      position: relative;
+      background-color: var(--background-color);
 
       @include mobile() {
-        min-height: 100%;
-        max-height: initial;
-        overflow-y: hidden;
-        overflow-x: hidden;
-      }
-
-      div.user-notifications-tray-empty {
-        @include mobile() {
-          div.all-caught-up {
-            display: block !important;
-            margin-top: 100px;
-          }
-        }
-      }
-
-      div.user-notification {
+        background-color: var(--mobile-background-color);
         border-top: 1px solid var(--divider-line);
-        padding: 16px 16px 13px;
-        cursor: pointer;
-        text-align: left;
-        opacity: 0.9;
-        position: relative;
-        background-color: var(--background-color);
+
+        &:first-child {
+          border-top: none;
+        }
+      }
+
+      &:hover {
+        button.read-bt {
+          display: block;
+        }
+      }
+
+      &:last-child {
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+
+      &.unread {
+        background-color: var(--overlay-background-color);
 
         @include mobile() {
-          background-color: var(--mobile-background-color);
-          border-top: 1px solid var(--divider-line);
+          background-color: var(--background-color);
+        }
+      }
 
-          &:first-child {
-            border-top: none;
-          }
+      @include user-profile(24);
+
+      div.user-avatar-img-container {
+        float: left;
+      }
+
+      div.user-notification-title {
+        margin-left: 16px;
+        float: left;
+        width: calc(100% - 24px - 16px - 42px);
+        padding-right: 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 16px;
+        color: var(--color);
+        float: left;
+      }
+
+      div.user-notification-time-since {
+        float: right;
+        text-align: right;
+        width: 42px;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--light-color);
+        height: 12px;
+        line-height: 12px;
+      }
+
+      div.user-notification-body {
+        margin-left: 16px;
+        margin-top: 4px;
+        width: calc(100% - 40px);
+        padding-right: 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+        float: right;
+        overflow-wrap: break-word;
+
+        p {
+          margin: 0px;
+          padding: 0px;
         }
 
-        &:hover {
-          button.read-bt {
-            display: block;
-          }
+        a {
+          color: $wut_purple;
         }
 
-        &:last-child {
-          border-bottom-left-radius: 6px;
-          border-bottom-right-radius: 6px;
-        }
-
-        &.unread {
-          background-color: var(--overlay-background-color);
-
-          @include mobile() {
-            background-color: var(--background-color);
-          }
-        }
-
-        @include user-profile(24);
-
-        div.user-avatar-img-container {
-          float: left;
-        }
-
-        div.user-notification-title {
-          margin-left: 16px;
-          float: left;
-          width: calc(100% - 24px - 16px - 42px);
-          padding-right: 8px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--color);
-          float: left;
-        }
-
-        div.user-notification-time-since {
-          float: right;
-          text-align: right;
-          width: 42px;
-          @include OC_Body_Book();
-          font-size: 12px;
-          color: var(--light-color);
-          height: 12px;
-          line-height: 12px;
-        }
-
-        div.user-notification-body {
-          margin-left: 16px;
-          margin-top: 4px;
-          width: calc(100% - 40px);
-          padding-right: 8px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 18px;
-          color: var(--color);
-          float: right;
-          overflow-wrap: break-word;
-
-          p {
-            margin: 0px;
-            padding: 0px;
-          }
-
-          a {
-            color: $wut_purple;
-          }
-
-          img {
-            display: none;
-          }
-        }
-
-        button.read-bt {
-          position: absolute;
-          right: 4px;
-          top: 50%;
-          float: right;
-          margin-top: -12px;
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/notification_read_bt.svg");
-          background-size: 8px 8px;
-          background-position: center;
-          background-repeat: no-repeat;
+        img {
           display: none;
         }
+      }
+
+      button.read-bt {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        float: right;
+        margin-top: -12px;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/notification_read_bt.svg");
+        background-size: 8px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: none;
       }
     }
   }
