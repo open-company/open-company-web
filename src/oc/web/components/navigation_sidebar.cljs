@@ -19,6 +19,7 @@
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -100,6 +101,8 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 ; (drv/drv :change-data)
+                                (drv/drv :activity-view)
+                                (drv/drv :unread-notifications-count)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
@@ -163,11 +166,17 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
-        is-following (= selected-slug "following")
-        is-unfollowing (= selected-slug "unfollowing")
-        is-home (= selected-slug "all-posts")
-        is-bookmarks (= selected-slug "bookmarks")
-        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
+        activity-view (drv/react s :activity-view)
+        is-following (and (not activity-view)
+                          (= selected-slug "following"))
+        is-unfollowing (and (not activity-view)
+                            (= selected-slug "unfollowing"))
+        is-home (and (not activity-view)
+                     (= selected-slug "all-posts"))
+        is-bookmarks (and (not activity-view)
+                          (= selected-slug "bookmarks"))
+        is-drafts-board (and (not activity-view)
+                             (= selected-slug utils/default-drafts-board-slug))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
@@ -194,7 +203,8 @@
         show-users-list? (and user-is-part-of-the-team?
                               follow-publishers-list
                               (pos? (count follow-publishers-list)))
-        follow-boards-list (drv/react s :follow-boards-list)]
+        follow-boards-list (drv/react s :follow-boards-list)
+        unread-notifications-count (drv/react s :unread-notifications-count)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -212,12 +222,12 @@
             (orgs-dropdown)])
         ;; All posts
         (when show-following
-          [:a.home.hover-item.group
+          [:a.nav-link.home.hover-item.group
             {:class (utils/class-set {:item-selected is-following})
              :href (oc-urls/following)
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
-            [:div.home-icon]
-            [:div.home-label
+            [:div.nav-link-icon]
+            [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
             ; (when (pos? (count all-unread-items))
@@ -227,29 +237,45 @@
                 {:title "Curate your Home feed"
                  :data-placement "top"
                  :data-container "body"
-                 :data-toggle (when-not is-mobile? "tooltip")}
-                ])])
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :on-click #(nav-actions/show-follow-board-picker)}])])
         (when show-unfollowing
-          [:a.all-posts.hover-item.group
+          [:a.nav-link.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-unfollowing})
              :href (oc-urls/unfollowing)
              :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
             ; [:div.explore-icon]
-            [:div.all-posts-icon]
-            [:div.all-posts-label
+            [:div.nav-link-icon]
+            [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Explore"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
+        (when user-is-part-of-the-team?
+          [:a.nav-link.activity-view.hover-item.group
+            {:class (utils/class-set {:item-selected activity-view
+                                      :new (pos? unread-notifications-count)})
+             :href "."
+             :on-click (fn [e]
+                         (utils/event-stop e)
+                         (user-actions/show-activity-view))}
+            ; [:div.explore-icon]
+            [:div.nav-link-icon]
+            [:div.nav-link-label
+              ; {:class (utils/class-set {:new (seq all-unread-items)})}
+              "Activity"]
+            (when (pos? unread-notifications-count)
+              [:span.count unread-notifications-count])
+            ])
         ; ;; All posts
         ; (when show-all-posts
-        ;   [:a.all-posts.hover-item.group
+        ;   [:a.nav-link.all-posts.hover-item.group
         ;     {:class (utils/class-set {:item-selected is-home})
         ;      :href (oc-urls/all-posts)
         ;      :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
-        ;     [:div.all-posts-icon]
-        ;     [:div.all-posts-label
+        ;     [:div.nav-link-icon]
+        ;     [:div.nav-link-label
         ;       ; {:class (utils/class-set {:new (seq all-unread-items)})}
         ;       "All"]
         ;     ; (when (pos? (count all-unread-items))
@@ -257,12 +283,12 @@
         ;     ])
         ;; Bookmarks
         (when show-bookmarks
-          [:a.bookmarks.hover-item.group
+          [:a.nav-link.bookmarks.hover-item.group
             {:class (utils/class-set {:item-selected is-bookmarks})
              :href (oc-urls/bookmarks)
              :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
-            [:div.bookmarks-icon]
-            [:div.bookmarks-label
+            [:div.nav-link-icon]
+            [:div.nav-link-label
               "Bookmarks"]
             (when (pos? (:bookmarks-count org-data))
               [:span.count (:bookmarks-count org-data)])])
@@ -270,7 +296,7 @@
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
-            [:a.drafts.hover-item.group
+            [:a.nav-link.drafts.hover-item.group
               {:class (when (and (not is-following)
                                  (not is-unfollowing)
                                  (not is-home)
@@ -281,8 +307,8 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
-              [:div.drafts-icon]
-              [:div.drafts-label.group
+              [:div.nav-link-icon]
+              [:div.nav-link-label.group
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))

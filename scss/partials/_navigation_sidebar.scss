@@ -7,10 +7,6 @@
     height: 40px;
     margin: 2px 0;
     padding: 7px 16px;
-
-    &.all-posts {
-      margin-top: 16px;
-    }
   }
 
   .internal {
@@ -52,7 +48,7 @@
     }
   }
 
-  div.drafts-label {
+  &.drafts div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -67,12 +63,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.nav-link-label {
       text-decoration: none;
     }
   }
 
-  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -106,7 +102,7 @@
     border-radius: 0;
   }
 
-  .internal, div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+  .internal, div.nav-link-label {
     // color: $wut_purple;
     @include OC_Body_Book();
     font-size: 14px;
@@ -137,7 +133,7 @@
     color: $deep_navy;
   }
 
-  div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+  div.nav-link-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +146,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.nav-link-label {
       text-decoration: none;
     }
   }
 
-  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.nav-link-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -197,7 +193,7 @@
     }
   }
 
-  div.home-label, div.all-posts-label, div.bookmarks-label, div.contributions-label, div.following-label {
+  div.nav-link-label {
     color: var(--color);
     text-decoration: none;
 
@@ -329,7 +325,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.home, a.all-posts, a.bookmarks, a.drafts, a.contributions, a.following {
+  a.nav-link {
     display: block;
     background-color: transparent;
     border: none;
@@ -368,7 +364,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.home-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label, div.following-label {
+    div.nav-link-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -389,197 +385,185 @@ div.left-navigation-sidebar {
         max-width: initial;
       }
     }
-  }
 
-  a.home {
-    div.home-icon {
-      background-image: cdnUrl("/img/ML/nav_home.svg");
-      background-size: 14px 14px;
+    div.nav-link-icon {
       background-repeat: no-repeat;
       background-position: center;
       width: 16px;
       height: 23px;
       float: left;
+      font-size: 16px;
+      line-height: 23px;
+      vertical-align: bottom;
+      text-align: center;
+      color: var(--color);
+      font-family: "Material Design Icons";
 
       @include mobile() {
         opacity: 1;
         height: 24px;
       }
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-      }
     }
 
-    &.item-selected {
-      div.home-icon {
-        background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+    &.home {
+      div.nav-link-icon {
+        background-image: cdnUrl("/img/ML/nav_home.svg");
+        background-size: 14px 14px;
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+          background-image: cdnUrl("/img/ML/nav_all@dark.svg");
         }
       }
-    }
 
-    &.item-selected {
-      button.home-ellispsis-bt {
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+      &.item-selected {
+        div.nav-link-icon {
+          background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+          }
+        }
+      }
+
+      &.item-selected {
+        button.home-ellispsis-bt {
+          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+        }
+
+        @include big_web() {
+          &:hover, &:active, &:focus {
+            button.home-ellipsis-bt {
+              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+            }
+          }
+        }
       }
 
       @include big_web() {
-        &:hover, &:active, &:focus {
+        &:hover {
           button.home-ellipsis-bt {
-            background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+            display: inline-block;
+          }
+        }
+      }
+
+      button.home-ellipsis-bt {
+        width: 24px;
+        height: 32px;
+        margin-right: 0;
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+        background-size: 3px 14px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.5;
+        display: none;
+        float: right;
+        margin-top: -4px;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+        }
+
+        @include big_web() {
+          &:hover, &:active, &:focus {
+            opacity: 1;
           }
         }
       }
     }
 
-    @include big_web() {
-      &:hover {
-        button.home-ellipsis-bt {
-          display: inline-block;
+    &.all-posts {
+      div.nav-link-icon {
+        &:before {
+          content: "\F18B";
+        }
+      }
+
+      &.item-selected {
+        div.nav-link-icon {
+          color: white;
         }
       }
     }
 
-    button.home-ellipsis-bt {
-      width: 24px;
-      height: 32px;
-      margin-right: 0;
-      background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
-      background-size: 3px 14px;
-      background-repeat: no-repeat;
-      background-position: center;
-      opacity: 0.5;
-      display: none;
-      float: right;
-      margin-top: -4px;
+    &.activity-view {
+      div.nav-link-icon {
+        background-size: 12px 14px;
+        background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+        }
       }
 
-      @include big_web() {
-        &:hover, &:active, &:focus {
-          opacity: 1;
+      &.item-selected {
+        div.nav-link-icon {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
         }
       }
     }
-  }
 
-  a.all-posts {
-    div.all-posts-icon {
-      // background-image: cdnUrl("/img/ML/nav_all.svg");
-      // background-size: 14px 14px;
-      // background-repeat: no-repeat;
-      // background-position: center;
-      width: 16px;
-      height: 23px;
-      float: left;
+    &.bookmarks {
+      div.nav-link-icon {
+        background-image: cdnUrl("/img/ML/nav_saved.svg");
+        background-size: 12px 14px;
 
-      text-align: center;
-      font-size: 16px;
-      line-height: 23px;
-      vertical-align: bottom;
-      color: var(--color);
-      font-family: "Material Design Icons";
-
-      &:before {
-        content: "\F18B";
-      }
-
-      @include mobile() {
-        opacity: 1;
-        height: 24px;
-      }
-
-      @include dark_mode() {
-        // background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-      }
-    }
-
-    &.item-selected {
-      div.all-posts-icon {
-        // background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-        color: white;
-      }
-    }
-  }
-
-  a.bookmarks {
-    div.bookmarks-icon {
-      background-image: cdnUrl("/img/ML/nav_saved.svg");
-      background-size: 12px 14px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 16px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 5px;
-        opacity: 1;
-      }
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
-      }
-    }
-
-    &.item-selected {
-      div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+        @include mobile() {
+          margin-left: 0px;
+          margin-top: 0px;
+          background-position: center 5px;
+        }
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
         }
       }
+
+      &.item-selected {
+        div.nav-link-icon {
+          background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+          }
+        }
+      }
     }
-  }
 
-  a.drafts {
-
-    div.drafts-icon {
-      background-image: cdnUrl("/img/ML/nav_drafts.svg");
-      background-size: 14px 14px;
-      background-repeat: no-repeat;
-      background-position: center 3px;
-      width: 16px;
-      height: 23px;
-      float: left;
-
+    &.drafts {
       @include mobile() {
-        background-position: center;
-        opacity: 1;
-        height: 24px;
+        margin-bottom: 0px;
       }
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
-      }
-    }
+      div.nav-link-icon {
+        background-image: cdnUrl("/img/ML/nav_drafts.svg");
+        background-size: 14px 14px;
+        background-position: center 3px;
 
-    @include mobile() {
-      margin-bottom: 0px;
-    }
-
-    &.item-selected {
-      div.drafts-icon {
-        background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
+        @include mobile() {
+          background-position: center;
+        }
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
         }
       }
-    }
 
-    &.hover-item {
-      @include mobile() {
-        &:after {
-          display: none;
+      &.item-selected {
+        div.nav-link-icon {
+          background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
+          }
+        }
+      }
+
+      &.hover-item {
+        @include mobile() {
+          &:after {
+            display: none;
+          }
         }
       }
     }
@@ -796,7 +780,7 @@ div.left-navigation-sidebar {
 
           div.team {
             background-image: cdnUrl("/img/ML/number_sign@dark.svg");
-            opacity: 1; 
+            opacity: 1;
           }
         }
       }
