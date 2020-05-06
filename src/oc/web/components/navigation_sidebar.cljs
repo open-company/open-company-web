@@ -178,7 +178,8 @@
         is-drafts-board (and (not activity-view)
                              (= selected-slug utils/default-drafts-board-slug))
         create-link (utils/link-for (:links org-data) "create")
-        show-boards (or create-link (pos? (count boards)))
+        show-boards false ;; Hide following boards list for now
+                    ;; (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -200,7 +201,8 @@
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
         follow-publishers-list (drv/react s :follow-publishers-list)
-        show-users-list? (and user-is-part-of-the-team?
+        show-users-list? (and false ;; Remove users list from sidebar or now
+                              user-is-part-of-the-team?
                               follow-publishers-list
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
@@ -265,9 +267,8 @@
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Activity"]
-            (when (pos? unread-notifications-count)
-              [:span.count unread-notifications-count])
-            ])
+              (when (pos? unread-notifications-count)
+                [:span.count unread-notifications-count])])
         ; ;; All posts
         ; (when show-all-posts
         ;   [:a.nav-link.all-posts.hover-item.group
@@ -395,7 +396,8 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
                  :data-container "body"}]]])
-        (when (seq follow-boards-list)
+        (when (and show-boards
+                   (seq follow-boards-list))
           [:div.left-navigation-sidebar-items.group
             (for [board follow-boards-list
                   :let [board-url (oc-urls/board org-slug (:slug board))
