@@ -141,7 +141,6 @@ div.dashboard-layout {
               color: $wut_purple;
             }
           }
-          
 
           &.all-posts-tab {
             span.tab-icon {
@@ -410,7 +409,7 @@ div.dashboard-layout {
             height: 0;
           }
         }
-          
+
         div.board-name {
           float: left;
           position: relative;
@@ -436,6 +435,13 @@ div.dashboard-layout {
             width: auto;
             display: inline-block;
             position: relative;
+
+            &.activity-view div.board-name-with-icon-internal {
+              padding-left: 0;
+              &:before {
+                display: none;
+              }
+            }
 
             &.contributions {
               @include user-profile(24) {

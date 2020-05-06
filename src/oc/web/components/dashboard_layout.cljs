@@ -57,7 +57,7 @@
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
                               (drv/drv :user-notifications)
-                              (drv/drv :mobile-user-notifications)
+                              (drv/drv :activity-view)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -133,7 +133,7 @@
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
-        showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
+        showing-activity-view (drv/react s :activity-view)
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -173,7 +173,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "following" (oc-urls/following)))
-                 :class (when (and (not showing-mobile-user-notifications)
+                 :class (when (and (not showing-activity-view)
                                    (= current-board-slug "following"))
                           "active")}
                 [:span.tab-icon]
@@ -182,7 +182,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "unfollow" (oc-urls/unfollowing)))
-                 :class (when (and (not showing-mobile-user-notifications)
+                 :class (when (and (not showing-activity-view)
                                    (= current-board-slug "unfollow"))
                           "active")}
                 [:span.tab-icon]
@@ -190,8 +190,8 @@
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (user-actions/show-mobile-user-notifications))
-                 :class (when showing-mobile-user-notifications
+                              (user-actions/show-activity-view))
+                 :class (when showing-activity-view
                           "active")}
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
@@ -202,13 +202,9 @@
                   {:on-click #(do
                                 (.stopPropagation %)
                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                                (user-actions/hide-mobile-user-notifications))}
+                                (user-actions/hide-activity-view))}
                   [:span.tab-icon]
                   [:span.tab-label "Add"]])])
-          ;; Mobile notifications
-          (when (and is-mobile?
-                     showing-mobile-user-notifications)
-            (user-notifications/user-notifications))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
@@ -244,13 +240,22 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when-not show-expanded-post
-            ;; Board name row: board name, settings button and say something button
+            (when (and (not showing-activity-view)
+                       (not show-expanded-post))
+              ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (if current-contributions-id
+                  (cond
+                    showing-activity-view
+                    [:div.board-name-with-icon.activity-view
+                      [:div.board-name-with-icon-internal
+                        "Activity"
+                        ; (when (pos? (:total-count contributions-data))
+                        ;   [:span.count (:total-count contributions-data)])
+                        ]]
+                    current-contributions-id
                     [:div.board-name-with-icon.contributions
                       (user-avatar-image contributions-user-data)
                       [:div.board-name-with-icon-internal
@@ -260,6 +265,7 @@
                         ; (when (pos? (:total-count contributions-data))
                         ;   [:span.count (:total-count contributions-data)])
                         ]]
+                    :else
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
@@ -363,9 +369,12 @@
                   (when (and (not is-drafts-board)
                              is-mobile?)
                     (search-box))]])
-
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
+              ;; user notifications
+              showing-activity-view
+              (user-notifications/user-notifications {:tray-open true
+                                                      :close-tray-fn #(user-actions/hide-activity-view)})
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)
