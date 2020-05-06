@@ -9,9 +9,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.components.ui.menu :as menu]
             [oc.web.stores.search :as search]
             [oc.web.stores.user :as user-store]
+            [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -19,12 +19,11 @@
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.navigation-sidebar :as navigation-sidebar]
+            [oc.web.components.ui.user-avatar :refer (user-avatar)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.user-notifications :refer (user-notifications)]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar)])
+            [oc.web.components.navigation-sidebar :as navigation-sidebar]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)])
   (:import [goog.async Throttle]))
 
 (defn- mobile-nav! [e board-slug]
@@ -45,7 +44,7 @@
                     (drv/drv :cmail-state)
                     (drv/drv :editable-boards)
                     (drv/drv :show-add-post-tooltip)
-                    (drv/drv :mobile-user-notifications)
+                    (drv/drv :activity-view)
                     (ui-mixins/render-on-resize nil)
                     (rum/local nil ::throttled-scroll-check)
                     (rum/local false ::scrolled)
@@ -71,17 +70,17 @@
                 show-login-overlay
                 orgs-dropdown-visible
                 search-active
-                mobile-user-notifications
+                activity-view
                 show-whats-new-green-dot
                 panel-stack]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
+         showing-activity-view (drv/react s :activity-view)
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
-                       showing-mobile-user-notifications
+                       showing-activity-view
                        "Notifications"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
@@ -165,8 +164,6 @@
                                   (cmail-actions/cmail-toggle-fullscreen))}
                     [:span.plus-icon]
                     [:span.plus-icon-active]])
-                (when-not is-mobile?
-                  (user-notifications))
                 [:div.user-menu
                   [:div.user-menu-button
                     {:ref "user-menu"

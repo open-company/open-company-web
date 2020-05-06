@@ -211,18 +211,18 @@ nav.oc-navbar {
         }
 
         &.create-post {
-          min-width: 112px; // 72 + 32 + 8
+          min-width: 72px; // 32 + 32 + 8
           left: calc(100vw - 112px - 16px);
         }
 
         &.invite-people {
-          min-width: 197px; // 72 + 109 + 16
-          left: calc(100vw - 197px - 16px); 
+          min-width: 157px; // 32 + 108 + 16
+          left: calc(100vw - 197px - 16px);
         }
 
         &.create-post.invite-people {
-          min-width: 237px; // 72 + 109 + 16 + 32 + 8
-          left: calc(100vw - 237px - 16px); 
+          min-width: 197px; // 32 + 109 + 16 + 32 + 8
+          left: calc(100vw - 197px - 16px);
         }
 
         @include mobile() {

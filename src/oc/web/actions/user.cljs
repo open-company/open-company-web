@@ -538,11 +538,11 @@
 (defn read-notifications []
   (dis/dispatch! [:user-notifications/read (router/current-org-slug)]))
 
-(defn show-mobile-user-notifications []
-  (dis/dispatch! [:input [:mobile-user-notifications] true]))
+(defn show-activity-view []
+  (dis/dispatch! [:input [:activity-view] true]))
 
-(defn hide-mobile-user-notifications []
-  (dis/dispatch! [:input [:mobile-user-notifications] false]))
+(defn hide-activity-view []
+  (dis/dispatch! [:input [:activity-view] false]))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
