@@ -244,7 +244,6 @@
              :on-click (fn [e]
                          (utils/event-stop e)
                          (user-actions/show-activity-view))}
-            ; [:div.explore-icon]
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -300,7 +299,6 @@
             {:class (utils/class-set {:item-selected is-unfollowing})
              :href (oc-urls/unfollowing)
              :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
-            ; [:div.explore-icon]
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
