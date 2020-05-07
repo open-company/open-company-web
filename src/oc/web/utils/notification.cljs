@@ -100,7 +100,8 @@
         entry-uuid (:entry-id notification)
         interaction-uuid (:interaction-id notification)
         activity-data (dis/activity-data entry-uuid)]
-    (when (seq title)
+    (when (and (seq title)
+               board-data)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
        :board-name (:name board-data)
