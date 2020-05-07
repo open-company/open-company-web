@@ -103,7 +103,7 @@
         with-follow (map #(assoc % :follow (utils/in? follow-publishers-list (:user-id %))) all-authors)
         sorted-users (filter-sort-users s (:user-id current-user-data) with-follow @(::query s))
         is-mobile? (responsive/is-mobile-size?)
-        following-users (filter :follow sorted-users)
+        following-users (cons current-user-data (filter :follow sorted-users))
         unfollowing-users (filter (comp not :follow) sorted-users)]
     [:div.follow-user-picker
       [:div.follow-user-picker-modal
@@ -133,27 +133,33 @@
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-user-picker-users-list.group
                 ;; Following
-                ; (when (seq following-users)
-                ;   [:div.follow-user-picker-row-header
-                ;     (str "Following (" (count following-users) ")")])
+                [:div.follow-user-picker-row-header
+                  (str "Following (" (count following-users) ")")]
                 (when (seq following-users)
-                  (for [u following-users]
+                  (for [u following-users
+                        :let [self-user? (= (:user-id u) (:user-id current-user-data))]]
                     [:div.follow-user-picker-user-row.group
                       {:key (str "follow-user-picker-" (:user-id u))
                        :class (when (:follow u) "selected")}
                       (user-avatar-image u)
                       [:span.user-name
                         (:name u)]
+                      (when self-user?
+                        [:span.self-user
+                          "(you)"])
                       [:span.user-role
                         (:title u)]
                       (when (:location u)
                         [:span.followers-count
                           (:location u)])
-                      (follow-button {:following true :resource-type :user :resource-uuid (:user-id u)})]))
+                      (follow-button {:following true
+                                      :resource-type :user
+                                      :resource-uuid (:user-id u)
+                                      :disabled self-user?})]))
                 ;; Unfollowing
-                ; (when (seq unfollowing-users)
-                ;   [:div.follow-user-picker-row-header
-                ;     (str "Other people (" (count unfollowing-users) ")")])
+                (when (seq unfollowing-users)
+                  [:div.follow-user-picker-row-header
+                    (str "Other people (" (count unfollowing-users) ")")])
                 (when (seq unfollowing-users)
                   (for [u unfollowing-users]
                     [:div.follow-user-picker-user-row.group

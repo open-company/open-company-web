@@ -98,9 +98,9 @@
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-board-picker-boards-list.group
                 ;; Following
-                ; (when (seq following-boards)
-                ;   [:div.follow-board-picker-row-header
-                ;     (str "Following (" (count following-boards) ")")])
+                (when (seq following-boards)
+                  [:div.follow-board-picker-row-header
+                    (str "Following (" (count following-boards) ")")])
                 (when (seq following-boards)
                   (for [b following-boards]
                     [:div.follow-board-picker-board-row.group
@@ -115,9 +115,9 @@
                             "No followers")])
                       (follow-button {:following true :resource-type :board :resource-uuid (:uuid b)})]))
                 ;; Unfollowing
-                ; (when (seq unfollowing-boards)
-                ;   [:div.follow-board-picker-row-header
-                ;     (str "Other topics (" (count unfollowing-boards) ")")])
+                (when (seq unfollowing-boards)
+                  [:div.follow-board-picker-row-header
+                    (str "Other topics (" (count unfollowing-boards) ")")])
                 (when (seq unfollowing-boards)
                   (for [b unfollowing-boards]
                     [:div.follow-board-picker-board-row.group

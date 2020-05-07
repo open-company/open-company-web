@@ -494,6 +494,19 @@ div.follow-user-picker {
               flex: 0 1 auto;
             }
 
+            span.self-user {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: var(--light-color);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              margin-right: 6px;
+              align-self: center;
+              flex: 0 1 auto;
+            }
+
             span.user-role {
               @include OC_Body_Book();
               font-size: 16px;
