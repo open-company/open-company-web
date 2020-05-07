@@ -233,6 +233,11 @@ nav.oc-navbar {
           right: 16px;
           width: 32px;
           height: 32px;
+
+          &.create-post, &.invite-people, &.create-post.invite-people {
+            min-width: unset;
+            left: unset;
+          }
         }
 
         button.invite-people-bt {
