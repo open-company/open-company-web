@@ -345,11 +345,12 @@
                              (not is-bookmarks)
                              (not is-drafts-board)
                              (not is-contributions))
-                    (let [followers-count (get followers-boards-count (:uuid current-board-data))]
-                      [:div.followers-count
-                        (if (pos? followers-count)
-                          (str followers-count " follower" (when (not= followers-count 1) "s"))
-                          "No followers")]))
+                    ; (let [followers-count (get followers-boards-count (:uuid current-board-data))]
+                    ;   [:div.followers-count
+                    ;     (if (pos? followers-count)
+                    ;       (str followers-count " follower" (when (not= followers-count 1) "s"))
+                    ;       "No followers")])
+                    )
                   (when (and dismiss-all-link
                              (pos? (count posts-data)))
                     [:button.mlb-reset.complete-all-bt
