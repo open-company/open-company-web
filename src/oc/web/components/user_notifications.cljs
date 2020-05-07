@@ -1,6 +1,7 @@
 (ns oc.web.components.user-notifications
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
@@ -11,37 +12,55 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
 (rum/defc user-notification-item < rum/static
   [{entry-uuid        :uuid
     board-slug        :board-slug
+    board-name        :board-name
+    publisher-board   :publisher-board
     reminder?         :reminder?
     reminder          :reminder
     notification-type :notification-type
     created-at        :created-at
+    activity-data     :activity-data
+    title             :title
+    body              :body
     :as n}]
-  [:div.user-notification.group
-    {:class    (utils/class-set {:unread (:unread n)})
-     :on-click (fn [e]
-                 (when (fn? (:click n))
-                   ((:click n)))
-                 (user-actions/hide-activity-view))}
-    (user-avatar-image (:author n))
-    [:div.user-notification-title
-      (:title n)]
-    [:div.user-notification-time-since
-      [:time
-        {:date-time      (:created-at n)
-         :data-toggle    "tooltip"
-         :data-placement "top"
-         :data-delay     "{\"show\":\"1000\", \"hide\":\"0\"}"
-         :data-container "body"
-         :data-title     (utils/tooltip-date (:created-at n))}
-        (utils/time-since (:created-at n) [:short])]]
-    [:div.user-notification-body.oc-mentions.oc-mentions-hover
-      {:dangerouslySetInnerHTML (utils/emojify (:body n))}]])
+  (let [is-mobile? (responsive/is-mobile-size?)
+        authorship-map (or activity-data {:publisher (:author n)
+                                          :board-slug board-slug
+                                          :board-name board-name})]
+    [:div.user-notification.group
+      {:class    (utils/class-set {:unread (:unread n)})
+       :on-click (fn [e]
+                   (when (fn? (:click n))
+                     ((:click n)))
+                   (user-actions/hide-activity-view))}
+      [:div.user-notification-header
+        (post-authorship {:activity-data authorship-map
+                          :user-avatar? true
+                          :user-hover? true
+                          :board-hover? true
+                          :activity-board? (and (not publisher-board)
+                                                (not= board-slug (router/current-board-slug)))
+                          :current-user-id (jwt/user-id)})
+          [:div.separator-dot]
+          [:span.time-since
+            {:data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}
+            [:time
+              {:date-time created-at}
+              (utils/foc-date-time created-at)]]]
+      [:div.user-notification-title
+        title]
+      [:div.user-notification-body.oc-mentions.oc-mentions-hover
+        {:dangerouslySetInnerHTML (utils/emojify body)}]]))
 
 (defn has-new-content? [notifications-data]
   (some :unread notifications-data))

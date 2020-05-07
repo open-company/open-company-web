@@ -220,13 +220,29 @@ div.user-notifications-tray {
     }
 
     div.user-notification {
-      border-top: 1px solid var(--divider-line);
-      padding: 16px 16px 13px;
+      margin: 0;
+      border-top: 1px solid transparent;
+      border-right: 1px solid var(--foc-divider-line-color);
+      border-bottom: 1px solid var(--foc-divider-line-color);
+      border-left: 1px solid var(--foc-divider-line-color);
+      padding: 24px 32px;
+      background-color: var(--foc-background-color);
+      overflow: visible;
+      border-radius: 4px;
       cursor: pointer;
-      text-align: left;
-      opacity: 0.9;
-      position: relative;
-      background-color: var(--background-color);
+
+      &:hover, &.unread {
+        background-color: var(--foc-hover-color);
+        z-index: 2;
+        border-top: 1px solid var(--foc-hover-border-color);
+        border-right: 1px solid var(--foc-hover-border-color);
+        border-bottom: 1px solid var(--foc-hover-border-color);
+        border-left: 1px solid var(--foc-hover-border-color);
+      }
+
+      &:first-child {
+        border-top: 1px solid var(--foc-divider-line-color);
+      }
 
       @include mobile() {
         background-color: var(--mobile-background-color);
@@ -243,11 +259,6 @@ div.user-notifications-tray {
         }
       }
 
-      &:last-child {
-        border-bottom-left-radius: 6px;
-        border-bottom-right-radius: 6px;
-      }
-
       &.unread {
         background-color: var(--overlay-background-color);
 
@@ -256,59 +267,59 @@ div.user-notifications-tray {
         }
       }
 
-      @include user-profile(24);
+      div.user-notification-header {
+        position: relative;
+        display: flex;
+        flex-flow: row no-wrap;
+        justify-content: flex-start;
+        align-items: center;
 
-      div.user-avatar-img-container {
-        float: left;
+        div.post-authorship {
+          display: contents;
+          flex: 0 1 auto;
+          z-index: 2;
+          max-width: 100%;
+        }
+
+        div.separator-dot {
+          width: 3px;
+          height: 3px;
+          background-color: var(--divider-line);
+          border-radius: 50%;
+          margin: 1px 5px 0 5px;
+          flex: 0 0 auto;
+        }
+
+        span.time-since {
+          display: block;
+          height: 24px;
+          line-height: 24px;
+          text-align: left;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: var(--light-color);
+          position: relative;
+          white-space: nowrap;
+          flex: 0 0 auto;
+          overflow: hidden;
+        }
       }
 
       div.user-notification-title {
-        margin-left: 16px;
-        float: left;
-        width: calc(100% - 24px - 16px - 42px);
-        padding-right: 8px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 16px;
+        @include activity-title(20px, 28px);
+        height: 28px;
         color: var(--color);
-        float: left;
-      }
-
-      div.user-notification-time-since {
-        float: right;
-        text-align: right;
-        width: 42px;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: var(--light-color);
-        height: 12px;
-        line-height: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow-wrap: break-word;
       }
 
       div.user-notification-body {
-        margin-left: 16px;
+        @include activity-body-preview(16, 22, var(--color), 3);
         margin-top: 4px;
-        width: calc(100% - 40px);
-        padding-right: 8px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--color);
-        float: right;
-        overflow-wrap: break-word;
-
-        p {
-          margin: 0px;
-          padding: 0px;
-        }
-
-        a {
-          color: $wut_purple;
-        }
-
-        img {
-          display: none;
-        }
+        max-height: #{22 * 3}px;
       }
 
       button.read-bt {

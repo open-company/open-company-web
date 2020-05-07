@@ -98,10 +98,13 @@
         reminder-data (:reminder notification)
         reminder? (:reminder? notification)
         entry-uuid (:entry-id notification)
-        interaction-uuid (:interaction-id notification)]
+        interaction-uuid (:interaction-id notification)
+        activity-data (dis/activity-data entry-uuid)]
     (when (seq title)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
+       :board-name (:name board-data)
+       :publisher-board (:publisher-board board-data)
        :interaction-id interaction-uuid
        :is-interaction is-interaction
        :unread unread
@@ -112,6 +115,7 @@
        :body (notification-content notification)
        :title title
        :author (:author notification)
+       :activity-data activity-data
        :click (if reminder?
                 (when-not (responsive/is-mobile-size?)
                   (if (and reminder-data

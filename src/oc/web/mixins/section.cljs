@@ -11,7 +11,6 @@
    s)})
 
 (defn focus-reload []
-  (js/console.log "DBG reload!")
   (when-let [slug (or (router/current-board-slug)
                       (router/current-contributions-id))]
     (timbre/info "Reloading data for:" slug)
@@ -19,7 +18,7 @@
 
 (def window-focus-auto-loader
   (let [throttled-refresh (Throttle. focus-reload 5000)
-        fire! (fn [] (js/console.log "DBG try") (.fire throttled-refresh))]
+        fire! #(.fire throttled-refresh)]
     {:did-mount
      (fn [s]
        (.addEventListener js/window "focus" fire!)
