@@ -5,6 +5,14 @@ button.follow-button {
   width: auto;
   padding: 8px;
 
+  &.default-copy {
+    width: 82px;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
   @include big_web(){
     &:hover {
       opacity: 1;
@@ -31,7 +39,7 @@ button.follow-button {
   }
 
   @include big_web() {
-    &:hover {
+    &:not(.disabled):hover {
       span.main-title {
         display: none;
       }
@@ -50,7 +58,7 @@ button.follow-button {
     }
 
     @include big_web(){
-      &:hover {
+      &:not(.disabled):hover {
         background-color: var(--opac-background-color-2);
         
         span.main-title, span.hover-title {
