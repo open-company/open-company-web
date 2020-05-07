@@ -186,7 +186,8 @@
         show-following (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "following"))
         show-unfollowing (and user-is-part-of-the-team?
-                              (utils/link-for (:links org-data) "unfollowing"))
+                              (utils/link-for (:links org-data) "unfollowing")
+                              (integer? (:unfollowing-count org-data)))
         show-all-posts false ;(and user-is-part-of-the-team?
                              ;     (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
@@ -234,13 +235,7 @@
               "Home"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
-            (when user-is-part-of-the-team?
-              [:button.mlb-reset.home-ellipsis-bt
-                {:title "Curate your Home feed"
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :on-click #(nav-actions/show-follow-board-picker)}])])
+            ])
         (when user-is-part-of-the-team?
           [:a.nav-link.activity-view.hover-item.group
             {:class (utils/class-set {:item-selected activity-view

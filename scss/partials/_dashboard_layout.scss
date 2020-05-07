@@ -773,14 +773,14 @@ div.dashboard-layout {
             margin-left: 8px;
             width: 16px;
             height: 32px;
-            background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
-            background-size: 5px 21px;
+            background-image: cdnUrl("/img/ML/curate_filter_icon.svg");
+            background-size: 16px 17px;
             background-repeat: no-repeat;
             background-position: center;
             opacity: 0.5;
 
             @include dark_mode() {
-              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+              background-image: cdnUrl("/img/ML/curate_filter_icon@dark.svg");
             }
 
             &:hover {

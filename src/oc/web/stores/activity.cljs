@@ -836,7 +836,7 @@
     (-> db
       (assoc-in container-key fixed-unfollowing-data)
       (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :unfollowing-count) (:total-count fixed-unfollowing-data)))))
+      (update-in (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data))))))
 
 (defmethod dispatcher/action :unfollowing-more
   [db [_ org-slug sort-type]]
@@ -864,7 +864,7 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-data-key :unfollowing-count) (:total-count fixed-posts-data))))
+        (update-in (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))))
     db))
 
 (defmethod dispatcher/action :force-list-update

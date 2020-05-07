@@ -425,20 +425,6 @@ div.left-navigation-sidebar {
         }
       }
 
-      &.item-selected {
-        button.home-ellispsis-bt {
-          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
-        }
-
-        @include big_web() {
-          &:hover, &:active, &:focus {
-            button.home-ellipsis-bt {
-              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
-            }
-          }
-        }
-      }
-
       @include big_web() {
         &:hover {
           button.home-ellipsis-bt {
