@@ -372,7 +372,7 @@
                                                       active-users-count)})
                            all-board-uuids))]
     (-> db
-     (assoc-in (dispatcher/followers-publishers-count-key org-slug) publisher-uuids)
+     (assoc-in (dispatcher/followers-publishers-count-key org-slug) publishers-map)
      (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))
 
 (defmethod dispatcher/action :publisher/follow
