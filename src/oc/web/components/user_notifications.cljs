@@ -4,6 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.activity :as am]
             [oc.web.utils.dom :as dom-utils]
@@ -50,32 +51,34 @@
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/event-inside? e (.querySelector user-notification-el "div.add-comment-box-container"))))
                        ((:click n)))))}
+      [:div.user-notification-title-container
+        (when (:headline activity-data)
+          [:div.user-notification-title
+            (:headline activity-data)])
+        [:span.time-since
+          {:data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}
+          [:time
+            {:date-time created-at}
+            (utils/foc-date-time created-at)]]]
       [:div.user-notification-header
         (post-authorship {:activity-data authorship-map
-                          :copy stream-attribution
                           :user-avatar? true
                           :user-hover? true
+                          :hide-last-name? true
                           :activity-board? false
                           :current-user-id (jwt/user-id)})
-          [:div.separator-dot]
-          [:span.time-since
-            {:data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}
-            [:time
-              {:date-time created-at}
-              (utils/foc-date-time created-at)]]
-          (when unread
-            [:div.separator-dot])
-          (when unread
-            [:div.new-tag
-              "NEW"])]
-      (when (:headline activity-data)
-        [:div.user-notification-title
-          (:headline activity-data)])
-      [:div.user-notification-body.oc-mentions.oc-mentions-hover
-        {:dangerouslySetInnerHTML (utils/emojify body)}]
+        (when unread
+          [:div.separator-dot])
+        (when unread
+          [:div.new-tag
+            "NEW"])]
+      [:div.user-notification-body-container
+        {:class (utils/class-set {:comment (seq interaction-id)})}
+        [:div.user-notification-body.oc-mentions.oc-mentions-hover
+          {:dangerouslySetInnerHTML (utils/emojify body)}]]
       (when activity-data
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when interaction-id interaction-id)
@@ -85,15 +88,26 @@
 (defn has-new-content? [notifications-data]
   (some :unread notifications-data))
 
+(defn- fix-notification [n]
+  (if (and (not (map? (:activity-data n)))
+           (not (:reminder? n)))
+    (assoc n :activity-data (dis/activity-data (:uuid n)))
+    n))
+
 (rum/defcs user-notifications < rum/static
                                 rum/reactive
                                 (drv/drv :user-notifications)
+                                (drv/drv :posts-data)
                                 ui-mixins/refresh-tooltips-mixin
                                 (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
   [s {:keys [tray-open]}]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        fix-activity? (some #(and (not (:activity-data %)) (not (:reminder? %))) user-notifications-data)
+        fixed-user-notifications-data (if fix-activity?
+                                        (map fix-notification user-notifications-data)
+                                        user-notifications-data)]
     [:div.user-notifications-tray
       {:class (utils/class-set {:hidden-tray (not tray-open)})}
       [:div.user-notifications-tray-header.group
@@ -107,7 +121,7 @@
                :data-placement "top"
                :data-container "body"
                :title "Notification settings"}]])
-        (when true ;has-new-content
+        (when has-new-content
           [:button.mlb-reset.all-read-bt
             {:on-click #(user-actions/read-notifications)
              :data-toggle (when-not is-mobile? "tooltip")
@@ -115,10 +129,10 @@
              :data-container "body"
              :title "Mark all as read"}])]
       [:div.user-notifications-tray-list
-        (if (empty? user-notifications-data)
+        (if (empty? fixed-user-notifications-data)
           [:div.user-notifications-tray-empty
             (all-caught-up)]
-          (for [n user-notifications-data
+          (for [n fixed-user-notifications-data
                 :let [entry-uuid (:uuid n)
                       board-slug (:board-slug n)
                       reminder? (:reminder? n)

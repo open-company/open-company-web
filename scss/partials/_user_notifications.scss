@@ -287,9 +287,10 @@ div.user-notifications-tray {
       div.user-notification-header {
         position: relative;
         display: flex;
-        flex-flow: row no-wrap;
+        flex-flow: row nowrap;
         justify-content: flex-start;
         align-items: center;
+        margin-top: 4px;
 
         div.post-authorship {
           display: contents;
@@ -315,41 +316,69 @@ div.user-notifications-tray {
           height: 16px;
           width: 32px;
           border-radius: 4px;
-          background-color: rgba($wut_purple, 0.4);
-          color: $wut_purple;
+          background-color: $feint_emerald;
+          color: $carrot_green;
           text-align: center;
+        }
+      }
+
+      div.user-notification-title-container {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        max-width: 100%;
+
+        div.user-notification-title {
+          @include activity-title(20px, 28px);
+          height: 28px;
+          color: var(--color);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow-wrap: break-word;
+          flex: 0 1 auto;
+          margin-right: 6px;
         }
 
         span.time-since {
           display: block;
-          height: 24px;
-          line-height: 24px;
+          height: 28px;
+          line-height: 28px;
           text-align: left;
           @include OC_Body_Book();
-          font-size: 12px;
+          font-size: 18px;
           color: var(--light-color);
           position: relative;
           white-space: nowrap;
+          margin-left: auto;
           flex: 0 0 auto;
           overflow: hidden;
         }
       }
 
-      div.user-notification-title {
-        @include activity-title(20px, 28px);
-        height: 28px;
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-        overflow-wrap: break-word;
-      }
-
-      div.user-notification-body {
-        @include activity-body-preview(16, 22, var(--color), 3);
+      div.user-notification-body-container {
         margin-top: 4px;
-        max-height: #{22 * 3}px;
+
+        &.comment div.user-notification-body {
+          margin-left: 12px;
+          padding-left: 20px;
+          padding-top: 2px;
+          margin-top: -6px;
+          border-left: 1px solid var(--divider-line);
+        }
+
+        div.user-notification-body {
+          @include activity-body-preview(16, 22, var(--color), 3);
+          margin-top: 4px;
+          max-height: #{22 * 3}px;
+          p {
+            min-height: 0;  
+            p > br:only-child {
+              display: none;
+            }
+          }
+        }
       }
 
       div.add-comment-box-container {

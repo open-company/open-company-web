@@ -87,6 +87,7 @@
    :comment-parent-uuid parent-uuid
    :placeholder (if parent-uuid "Reply…" "Add a comment…")
    :use-inline-media-picker true
+   :static-positioned-media-picker true
    :media-picker-initially-visible false})
 
 (defn add-comment-did-change [s]
@@ -277,22 +278,8 @@
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
-            [:button.mlb-reset.close-reply-bt
-              {:on-click #(close-reply-clicked s)
-               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title (if edit-comment-data "Cancel edit" "Close")}]
-            [:button.mlb-reset.send-btn
-              {:on-click #(when-not @(::add-button-disabled s)
-                            (send-clicked % s))
-               :disabled @(::add-button-disabled s)
-               :class (when uploading? "separator-line")}
-              (if edit-comment-data
-                "Save"
-                "Reply")]
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
-                           :width 32
+                           :width 24
                            :height 32
                            :position "top"
                            :default-field-selector (str "div." add-comment-class)
@@ -301,7 +288,21 @@
               [:div.upload-progress
                 (small-loading)
                 [:span.attachment-uploading
-                  (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])]]
+                  (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])
+            [:button.mlb-reset.send-btn
+              {:on-click #(when-not @(::add-button-disabled s)
+                            (send-clicked % s))
+               :disabled @(::add-button-disabled s)
+               :class (when uploading? "separator-line")}
+              (if edit-comment-data
+                "Save"
+                "Reply")]
+            [:button.mlb-reset.close-reply-bt
+              {:on-click #(close-reply-clicked s)
+               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title (if edit-comment-data "Cancel edit" "Cancel")}]]]
         (when @(:me/showing-media-video-modal s)
           [:div.video-container
             {:ref :video-container}
