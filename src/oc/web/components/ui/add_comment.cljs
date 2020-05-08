@@ -29,7 +29,7 @@
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
-          next-add-bt-disabled (not (au/has-body? {:body comment-text}))]
+          next-add-bt-disabled (au/empty-body? comment-text)]
       (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
@@ -95,8 +95,7 @@
   (enable-add-comment? s))
 
 (defn- should-focus-field? [s & [mounting]]
-  (let [{:keys [activity-data parent-comment-uuid
-         parent-comment-uuid edit-comment-data]} (first (:rum/args s))
+  (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
         add-comment-focus @(drv/get-ref s :add-comment-focus)]
     (or (and mounting
              edit-comment-data)
@@ -225,7 +224,7 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb]}]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb collapsed?]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _mention-users (drv/react s :mention-users)
@@ -237,12 +236,12 @@
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
         is-focused? (should-focus-field? s)
-        should-hide-post-button (and ;; Hide post button only for the last add comment field, not
-                                     ;; for the reply to comments
-                                     (not parent-comment-uuid)
+        should-hide-post-button (and ;; Hide post button for replies, not for root comment
+                                     (or (not parent-comment-uuid)
+                                         collapsed?)
                                      (not @(::show-post-button s))
                                      (not is-focused?)
-                                     (au/has-body? {:body @(::initial-add-comment s)}))
+                                     (au/empty-body? @(::initial-add-comment s)))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading

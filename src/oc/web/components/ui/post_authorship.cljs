@@ -9,7 +9,7 @@
 (rum/defc post-authorship < rum/static
   [{{:keys [publisher board-name board-slug board-access] :as activity-data} :activity-data
     user-avatar? :user-avatar? user-hover? :user-hover? board-hover? :board-hover?
-    activity-board? :activity-board? current-user-id :current-user-id}]
+    activity-board? :activity-board? current-user-id :current-user-id copy :copy}]
   [:div.post-authorship
     [:div.user-hover-container
       (when user-hover?
@@ -23,6 +23,8 @@
                       (utils/event-stop %)
                       (nav-actions/nav-to-author! % (:user-id publisher) (oc-urls/contributions (:user-id publisher))))}
         (:name publisher)]]
+    (when copy
+      [:span.in copy])
     (when activity-board?
       [:span.in "in "])
     (when activity-board?

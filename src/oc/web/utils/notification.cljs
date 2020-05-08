@@ -33,17 +33,8 @@
       ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
       (str first-name " mentioned you")
-      ;; A comment was added to a post the current is involved in
-      (and ;; if is a commnet
-           (:interaction-id notification)
-           ;; And the recipient of the notification is different than the
-           ;; author fo the post it means we are just following this post
-           ;; because we commented too
-           (not= (:user-id entry-publisher) user-id))
-      (str first-name " replied to a thread")
-      ;; A comment was added to a post the current user published
       (:interaction-id notification)
-      (str first-name " commented on your post")
+      (str first-name " added a comment")
       :else
       nil)))
 

@@ -52,7 +52,6 @@
     (.preventDefault e))
   (when ua/mobile?
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-  (dis/dispatch! [:input [:activity-view] false])
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (router/current-org-slug)
@@ -75,8 +74,7 @@
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
-           (utils/after 0 #(refresh-contributions-data author-uuid))))))
-   (user-actions/hide-activity-view)))))
+           (utils/after 0 #(refresh-contributions-data author-uuid))))))))))
 
 (defn- container-data [back-to]
   (cond
@@ -141,7 +139,6 @@
     (.preventDefault e))
   (when ua/mobile?
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-  (dis/dispatch! [:input [:activity-view] false])
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (router/current-org-slug)
@@ -177,8 +174,7 @@
                                                    :publisher-board (:publisher-board nav-to-board-data)}])
              (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)])))
          (when refresh?
-           (utils/after 0 #(refresh-board-data board-slug))))))
-   (user-actions/hide-activity-view)))))
+           (utils/after 0 #(refresh-board-data board-slug))))))))))
 
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)

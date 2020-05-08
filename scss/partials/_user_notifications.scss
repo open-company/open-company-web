@@ -170,18 +170,27 @@ div.user-notifications-tray {
     }
 
     div.notification-settings-bt-container {
+      float: right;
+      width: 24px;
+      height: 32px;
 
       button.notification-settings-bt {
-        float: left;
-        margin: 4px 0 0 16px;
-        padding: 0 0 0 16px;
-        border-left: 1px solid var(--divider-line);
-        width: 32px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/notification_settings_bt.svg");
-        background-position: top 4px right 0;
+        width: 24px;
+        height: 32px;
+        padding: 0;
+        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
+        background-position: right 4px top 9px;
         background-repeat: no-repeat;
-        background-size: 15px 16px;
+        background-size: 3px 14px;
+        opacity: 0.5;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+        }
+
+        &:hover {
+          opacity: 1;
+        }
       }
 
       .tooltip {
@@ -194,12 +203,20 @@ div.user-notifications-tray {
       height: 32px;
       width: 24px;
       padding: 0px;
-      margin: 0px;
+      margin: 0 3px 0 0;
       background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
       background-size: 14px 14px;
       background-position: center;
       background-repeat: no-repeat;
-      margin-left: 8px;
+      opacity: 0.5;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/notifications_mark_all_read@dark.svg");
+      }
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 
@@ -290,6 +307,19 @@ div.user-notifications-tray {
           flex: 0 0 auto;
         }
 
+        div.new-tag {
+          flex: 0 0 auto;
+          @include OC_Body_Bold();
+          font-size: 11px;
+          line-height: 16px;
+          height: 16px;
+          width: 32px;
+          border-radius: 4px;
+          background-color: rgba($wut_purple, 0.4);
+          color: $wut_purple;
+          text-align: center;
+        }
+
         span.time-since {
           display: block;
           height: 24px;
@@ -320,6 +350,10 @@ div.user-notifications-tray {
         @include activity-body-preview(16, 22, var(--color), 3);
         margin-top: 4px;
         max-height: #{22 * 3}px;
+      }
+
+      div.add-comment-box-container {
+        margin-top: 8px;
       }
 
       button.read-bt {

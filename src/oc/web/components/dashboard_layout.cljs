@@ -57,7 +57,6 @@
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
                               (drv/drv :user-notifications)
-                              (drv/drv :activity-view)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -133,7 +132,7 @@
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
-        showing-activity-view (drv/react s :activity-view)
+        showing-activity-view (= (router/current-board-slug) "activity")
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -173,8 +172,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "following" (oc-urls/following)))
-                 :class (when (and (not showing-activity-view)
-                                   (= current-board-slug "following"))
+                 :class (when (= current-board-slug "following")
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
@@ -182,15 +180,14 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "unfollow" (oc-urls/unfollowing)))
-                 :class (when (and (not showing-activity-view)
-                                   (= current-board-slug "unfollow"))
+                 :class (when (= current-board-slug "unfollow")
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Explore"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (user-actions/show-activity-view))
+                              (nav-actions/nav-to-url! % "activity" (oc-urls/activity)))
                  :class (when showing-activity-view
                           "active")}
                 [:span.tab-icon
@@ -201,8 +198,7 @@
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
                                 (.stopPropagation %)
-                                (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                                (user-actions/hide-activity-view))}
+                                (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                   [:span.tab-icon]
                   [:span.tab-label "Add"]])])
           ;; Show the board always on desktop except when there is an expanded post and
@@ -375,8 +371,7 @@
             (cond
               ;; user notifications
               showing-activity-view
-              (user-notifications/user-notifications {:tray-open true
-                                                      :close-tray-fn #(user-actions/hide-activity-view)})
+              (user-notifications/user-notifications {:tray-open true})
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)

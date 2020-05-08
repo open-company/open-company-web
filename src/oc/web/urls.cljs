@@ -137,6 +137,13 @@
   ([org-slug]
     (str (org org-slug) "/must-see")))
 
+(defn activity
+  "Org activity url"
+  ([]
+    (activity (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/activity")))
+
 ;; Boards
 
 (defn board

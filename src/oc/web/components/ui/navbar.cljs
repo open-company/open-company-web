@@ -44,7 +44,6 @@
                     (drv/drv :cmail-state)
                     (drv/drv :editable-boards)
                     (drv/drv :show-add-post-tooltip)
-                    (drv/drv :activity-view)
                     (ui-mixins/render-on-resize nil)
                     (rum/local nil ::throttled-scroll-check)
                     (rum/local false ::scrolled)
@@ -77,11 +76,11 @@
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         showing-activity-view (drv/react s :activity-view)
+         showing-activity-view (= (router/current-board-slug) "activity")
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        showing-activity-view
-                       "Notifications"
+                       "Activity"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")

@@ -608,6 +608,14 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
 
+    (defroute activity-route (urls/activity ":org") {:as params}
+      (timbre/info "Routing activity-route" (urls/activity ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "activity")))
+
+    (defroute activity-slash-route (str (urls/activity ":org") "/") {:as params}
+      (timbre/info "Routing activity-slash-route" (str (urls/activity ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "activity")))
+
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
       (secure-activity-handler secure-activity "secure-activity" target params true))

@@ -101,7 +101,6 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 ; (drv/drv :change-data)
-                                (drv/drv :activity-view)
                                 (drv/drv :unread-notifications-count)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
@@ -166,17 +165,12 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
-        activity-view (drv/react s :activity-view)
-        is-following (and (not activity-view)
-                          (= selected-slug "following"))
-        is-unfollowing (and (not activity-view)
-                            (= selected-slug "unfollowing"))
-        is-home (and (not activity-view)
-                     (= selected-slug "all-posts"))
-        is-bookmarks (and (not activity-view)
-                          (= selected-slug "bookmarks"))
-        is-drafts-board (and (not activity-view)
-                             (= selected-slug utils/default-drafts-board-slug))
+        is-activity (= selected-slug "activity")
+        is-following (= selected-slug "following")
+        is-unfollowing (= selected-slug "unfollowing")
+        is-home (= selected-slug "all-posts")
+        is-bookmarks (= selected-slug "bookmarks")
+        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards false ;; Hide following boards list for now
                     ;; (or create-link (pos? (count boards)))
@@ -238,12 +232,12 @@
             ])
         (when user-is-part-of-the-team?
           [:a.nav-link.activity-view.hover-item.group
-            {:class (utils/class-set {:item-selected activity-view
+            {:class (utils/class-set {:item-selected is-activity
                                       :new (pos? unread-notifications-count)})
              :href "."
              :on-click (fn [e]
                          (utils/event-stop e)
-                         (user-actions/show-activity-view))}
+                         (nav-actions/nav-to-url! e "activity" (oc-urls/activity)))}
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}

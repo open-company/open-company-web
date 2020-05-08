@@ -15,6 +15,7 @@
             [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
 (rum/defc user-notification-item < rum/static
@@ -24,29 +25,37 @@
     publisher-board   :publisher-board
     reminder?         :reminder?
     reminder          :reminder
+    mention?          :mention?
+    mention           :mention
     notification-type :notification-type
+    interaction-id    :interaction-id
     created-at        :created-at
     activity-data     :activity-data
     title             :title
     body              :body
+    author            :author
+    unread            :unread
     :as n}]
   (let [is-mobile? (responsive/is-mobile-size?)
-        authorship-map (or activity-data {:publisher (:author n)
-                                          :board-slug board-slug
-                                          :board-name board-name})]
+        authorship-map {:publisher author
+                        :board-slug board-slug
+                        :board-name board-name}]
     [:div.user-notification.group
       {:class    (utils/class-set {:unread (:unread n)})
        :on-click (fn [e]
-                   (when (fn? (:click n))
-                     ((:click n)))
-                   (user-actions/hide-activity-view))}
+                   (this-as user-notification-el
+                     (when (and (fn? (:click n))
+                                (not (utils/button-clicked? e))
+                                (not (utils/input-clicked? e))
+                                (not (utils/anchor-clicked? e))
+                                (not (utils/event-inside? e (.querySelector user-notification-el "div.add-comment-box-container"))))
+                       ((:click n)))))}
       [:div.user-notification-header
         (post-authorship {:activity-data authorship-map
+                          :copy title
                           :user-avatar? true
                           :user-hover? true
-                          :board-hover? true
-                          :activity-board? (and (not publisher-board)
-                                                (not= board-slug (router/current-board-slug)))
+                          :activity-board? false
                           :current-user-id (jwt/user-id)})
           [:div.separator-dot]
           [:span.time-since
@@ -56,11 +65,22 @@
              :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}
             [:time
               {:date-time created-at}
-              (utils/foc-date-time created-at)]]]
-      [:div.user-notification-title
-        title]
+              (utils/foc-date-time created-at)]]
+          (when true ;unread
+            [:div.separator-dot])
+          (when true ;unread
+            [:div.new-tag
+              "NEW"])]
+      (when (:headline activity-data)
+        [:div.user-notification-title
+          (:headline activity-data)])
       [:div.user-notification-body.oc-mentions.oc-mentions-hover
-        {:dangerouslySetInnerHTML (utils/emojify body)}]]))
+        {:dangerouslySetInnerHTML (utils/emojify body)}]
+      (when activity-data
+        (rum/with-key (add-comment {:activity-data activity-data
+                                    :parent-comment-uuid (when interaction-id interaction-id)
+                                    :collapsed? true})
+         (str "activity-add-comment-" (:created-at n))))]))
 
 (defn has-new-content? [notifications-data]
   (some :unread notifications-data))
@@ -70,7 +90,7 @@
                                 (drv/drv :user-notifications)
                                 ui-mixins/refresh-tooltips-mixin
                                 (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
-  [s {:keys [tray-open close-tray-fn]}]
+  [s {:keys [tray-open]}]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)
         is-mobile? (responsive/is-mobile-size?)]
@@ -78,24 +98,22 @@
       {:class (utils/class-set {:hidden-tray (not tray-open)})}
       [:div.user-notifications-tray-header.group
         [:div.title "Activity"]
-        (when-not has-new-content
+        (when-not is-mobile?
+          [:div.notification-settings-bt-container
+            [:button.mlb-reset.notification-settings-bt
+              {:on-click #(do
+                            (nav-actions/show-user-settings :notifications))
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title "Notification settings"}]])
+        (when true ;has-new-content
           [:button.mlb-reset.all-read-bt
             {:on-click #(user-actions/read-notifications)
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :data-container "body"
-             :title "Mark all as read"}])
-        (if is-mobile?
-          [:button.mlb-reset.user-notifications-tray-mobile-close
-            {:on-click #(user-actions/hide-activity-view)}]
-          [:div.notification-settings-bt-container
-            [:button.mlb-reset.notification-settings-bt
-              {:on-click #(do
-                            (close-tray-fn)
-                            (nav-actions/show-user-settings :notifications))
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :title "Notification settings"}]])]
+             :title "Mark all as read"}])]
       [:div.user-notifications-tray-list
         (if (empty? user-notifications-data)
           [:div.user-notifications-tray-empty
@@ -160,6 +178,5 @@
                       (reset! (::tray-open s) true))}
         [:span.bell-icon]]
       (rum/with-ref
-       (user-notifications {:tray-open @(::tray-open s)
-                            :close-tray-fn #(close-tray s)})
+       (user-notifications {:tray-open @(::tray-open s)})
        "user-notifications-list")]))
