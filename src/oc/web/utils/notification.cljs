@@ -8,7 +8,7 @@
             [oc.web.utils.activity :as activity-utils]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
-(defn- notification-title [notification]
+(defn- notification-title [notification & [no-first-name?]]
   (let [mention? (:mention? notification)
         reminder? (:reminder? notification)
         author (:author notification)
@@ -25,16 +25,16 @@
       ;; A reminder was created for current user
       (and reminder
            (= notification-type "reminder-notification"))
-      (str first-name " created a new reminder for you")
+      (str (when-not no-first-name? (str first-name " ")) "created a new reminder for you")
       ;; A reminder has been triggered for the current user
       (and reminder
            (= notification-type "reminder-alert"))
       (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
       ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
-      (str first-name " mentioned you")
+      (str (when-not no-first-name? (str first-name " ")) "mentioned you")
       (:interaction-id notification)
-      (str first-name " added a comment")
+      (str (when-not no-first-name? (str first-name " ")) "added a comment")
       :else
       nil)))
 
@@ -106,6 +106,7 @@
        :created-at (:notify-at notification)
        :body (notification-content notification)
        :title title
+       :stream-attribution (notification-title notification true)
        :author (:author notification)
        :activity-data activity-data
        :click (if reminder?

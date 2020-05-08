@@ -19,22 +19,22 @@
             [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
 (rum/defc user-notification-item < rum/static
-  [{entry-uuid        :uuid
-    board-slug        :board-slug
-    board-name        :board-name
-    publisher-board   :publisher-board
-    reminder?         :reminder?
-    reminder          :reminder
-    mention?          :mention?
-    mention           :mention
-    notification-type :notification-type
-    interaction-id    :interaction-id
-    created-at        :created-at
-    activity-data     :activity-data
-    title             :title
-    body              :body
-    author            :author
-    unread            :unread
+  [{entry-uuid         :uuid
+    board-slug         :board-slug
+    board-name         :board-name
+    publisher-board    :publisher-board
+    reminder?          :reminder?
+    reminder           :reminder
+    mention?           :mention?
+    mention            :mention
+    notification-type  :notification-type
+    interaction-id     :interaction-id
+    created-at         :created-at
+    activity-data      :activity-data
+    stream-attribution :stream-attribution
+    body               :body
+    author             :author
+    unread             :unread
     :as n}]
   (let [is-mobile? (responsive/is-mobile-size?)
         authorship-map {:publisher author
@@ -52,7 +52,7 @@
                        ((:click n)))))}
       [:div.user-notification-header
         (post-authorship {:activity-data authorship-map
-                          :copy title
+                          :copy stream-attribution
                           :user-avatar? true
                           :user-hover? true
                           :activity-board? false
@@ -66,9 +66,9 @@
             [:time
               {:date-time created-at}
               (utils/foc-date-time created-at)]]
-          (when true ;unread
+          (when unread
             [:div.separator-dot])
-          (when true ;unread
+          (when unread
             [:div.new-tag
               "NEW"])]
       (when (:headline activity-data)
