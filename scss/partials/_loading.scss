@@ -10,7 +10,6 @@ div.oc-loading {
   display: none;
   background-color: white;
   z-index: #{$navbar_zindex + 3001};
-  filter: url(#goo);
 
   @include dark_mode() {
     background-color: $wut_purple;
@@ -28,128 +27,18 @@ div.oc-loading {
     position: relative;
     width: 100vw;
     height: 50vh;
-    font-size: 40vh;
+    font-size: 120px;
     text-align: center;
     vertical-align: middle;
     margin-top: 25vh;
     line-height: 50vh;
     color: $wut_purple;
-    font-family: Anton;
-
-    @include mobile() {
-      font-size: 25vw;
-    }
+    @include OC_Body_Bold();
 
     @include no-user-select();
 
     @include dark_mode() {
       color: white;
     }
-  }
-
-  div.loading-drop {
-    height: 30px;
-    width: 30px;
-    border-radius: 15px;
-    background-color: $wut_purple;
-    position: absolute;
-    top: -1000px;
-
-    @include dark_mode() {
-      background-color: white;
-    }
-
-    @for $i from 1 through 100 {
-      &.drop-#{$i} {
-        left: #{percentage($i/100)};
-      }
-    }
-
-  }
-
-  &.active div.loading-drop {
-    transform: translate(#{$startPosX}, #{$startPosY}) scaleX(0.5);
-    animation-duration: 6s;
-    animation-iteration-count: infinite;
-    top: 50%;
-
-    &:nth-of-type(2) {
-      animation-delay: 0s;
-      animation-name: move-one;
-      animation-timing-function: cubic-bezier(1,.04,.74,.2);
-    }
-
-    &:nth-of-type(3) {
-      animation-delay: 0.5s;
-      animation-name: move-two;
-      animation-timing-function: cubic-bezier(1,.04,.74,.2);
-    }
-
-    &:nth-of-type(4) {
-      animation-delay: 0.9s;
-      animation-name: move-three;
-      animation-timing-function: cubic-bezier(1,.04,.74,.2);
-    }
-  }
-}
-
-svg#gooFilterSvg {
-  position: absolute;
-}
-
-@keyframes move-one{
-  0%{
-    transform: translate($startPosX,$startPosY) scaleX(0.2);
-    height: 60px;
-  }
-  30%{
-    transform: translate($startPosX,-200%);
-    height: 30px;
-  }
-  70%{
-    transform: translate($startPosX,100%);
-    height: 30px;
-  }
-  100%{
-    transform: translate($startPosX,800%) scaleX(0.2);
-    height: 60px;
-  }
-}
-
-@keyframes move-two{
-  0%{
-    transform: translate($startPosX,$startPosY) scaleX(0.2);
-    height: 60px;
-  }
-  30%{
-    transform: translate($startPosX,-650%);
-    height: 30px;
-  }
-  70%{
-    transform: translate($startPosX,0%);
-    height: 30px;
-  }
-  100%{
-    transform: translate($startPosX,600%) scaleX(0.2);
-    height: 60px;
-  }
-}
-
-@keyframes move-three{
-  0%{
-    transform: translate($startPosX,$startPosY) scaleX(0.2);
-    height: 60px;
-  }
-  30%{
-    transform: translate($startPosX,0%);
-    height: 30px;
-  }
-  70%{
-    transform: translate($startPosX,400%);
-    height: 30px;
-  }
-  100%{
-    transform: translate($startPosX,900%) scaleX(0.2);
-    height: 60px;
   }
 }

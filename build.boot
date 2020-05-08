@@ -217,7 +217,7 @@
                :port 3559)
         (from-jars)
         (watch)
-        (sass {:data "$is_wut: true;"})
+        (sass)
         (build-prod-site)
         (cljs :ids #{"public/oc"}
               :optimizations :advanced

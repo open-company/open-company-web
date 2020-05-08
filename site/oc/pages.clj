@@ -13,29 +13,7 @@
 (defn oc-loading []
   [:div.oc-loading.active
     [:div.oc-loading-inner
-      "WUT!"]
-    [:div.loading-drop
-      {:class (str "drop-" (int (rand 100)))}]
-    [:div.loading-drop
-      {:class (str "drop-" (int (rand 100)))}]
-    [:div.loading-drop
-      {:class (str "drop-" (int (rand 100)))}]])
-
-(def goo-filter
-  [:svg {:id "gooFilterSvg"}
-    [:defs
-      [:filter {:id "goo"}
-        [:feGaussianBlur {:in "SourceGraphic"
-                          :stdDeviation "10"
-                          :result "name"}]
-        [:feColorMatrix {:in "name"
-                         :mode "matrix"
-                         :values "1 0 0 0 0
-                                  0 1 0 0 0
-                                  0 0 1 0 0
-                                  0 0 0 15 -10"
-                         :result "b"}]
-        [:feBlend {:in "SourceGraphic" :in2 "b"}]]]])
+      "Wut!"]])
 
 (def tag-manager-head
   [:script"
@@ -98,7 +76,7 @@
 
 (def google-fonts
   ;; Google fonts Muli
-  [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&family=Anton&display=swap" :rel "stylesheet"}])
+  [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&display=swap" :rel "stylesheet"}])
 
 (def stripe-js
   [:script {:src "https://js.stripe.com/v3/"}])
@@ -240,7 +218,6 @@
           stripe-js]
    :body [:body
           tag-manager-body
-          goo-filter
           [:div#app
             (oc-loading)]
           [:div#oc-notifications-container]
@@ -350,7 +327,6 @@
           stripe-js]
    :body [:body
           tag-manager-body
-          goo-filter
           [:div#app
             (oc-loading)]
           [:div#oc-notifications-container]
