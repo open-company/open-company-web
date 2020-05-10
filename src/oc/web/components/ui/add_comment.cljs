@@ -126,7 +126,7 @@
     (if @(::did-change s)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "cancel-comment-edit"
-                        :message "Are you sure you want to cancel? All your changes to this comment will be lost."
+                        :message "Are you sure you want to cancel? Your comment will be lost."
                         :link-button-title "Keep"
                         :link-button-cb #(alert-modal/hide-alert)
                         :solid-button-style :red
@@ -237,10 +237,12 @@
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
         is-focused? (should-focus-field? s)
-        should-hide-post-button (and ;; Hide post button for replies, not for root comment
+        should-hide-post-button (and ;; Show initially collapsed box for:
+                                     ;; - first add comment (always visible in post page)
+                                     ;; - Activity view (expand on click or focus)
                                      (or (not parent-comment-uuid)
-                                         collapsed?)
-                                     (not @(::show-post-button s))
+                                         (and collapsed?
+                                              (not @(::show-post-button s))))
                                      (not is-focused?)
                                      (au/empty-body? @(::initial-add-comment s)))
         is-mobile? (responsive/is-mobile-size?)
@@ -250,7 +252,8 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
-                                :collapsed-box should-hide-post-button})}
+                                :collapsed-box should-hide-post-button})
+       :on-click #(reset! (::show-post-button s) true)}
       [:div.add-comment-box
         [:div.add-comment-internal
           {:class (when-not should-hide-post-button "active")}
