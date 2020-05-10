@@ -474,7 +474,7 @@ div.left-navigation-sidebar {
 
     &.activity-view {
       div.nav-link-icon {
-        background-size: 12px 14px;
+        background-size: 14px 14px;
         background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
 
         @include dark_mode() {
