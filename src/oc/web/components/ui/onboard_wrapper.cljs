@@ -619,25 +619,32 @@
         team-data (:team auth-settings)
         signup-with-email (drv/react s user-store/signup-with-email)]
     [:div.onboard-lander.invitee-team-lander
-      (if auth-settings
-        (if (:team auth-settings)
-          [:div
-            [:header.main-cta
-              (when-not ua/mobile-app?
-                [:button.mlb-reset.top-back-button
-                  {:on-touch-start identity
-                   :on-click #(router/history-back!)
-                   :aria-label "Back"}])
-              [:div.title-container
-                (when (seq (:logo-url team-data))
-                  [:div.team-logo-container
-                    (org-avatar team-data false :never)])
-                [:div.title.main-lander
-                  "Join " (:name team-data) " on Carrot"]]]
+      [:header.main-cta
+        (when-not ua/mobile-app?
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+             :on-click #(router/history-back!)
+             :aria-label "Back"}])
+        (if auth-settings
+          (if (:team auth-settings)
+            [:div.title
+              "Join Carrot"]
+            [:div.title
+              "Oh oh..."])
+          [:div.title
+            "Please wait"])]
+        (if auth-settings
+          (if (:team auth-settings)
             [:div.onboard-form
               [:form
                 {:on-submit (fn [e]
                               (.preventDefault e))}
+                [:div.title-container
+                  (when (seq (:logo-url team-data))
+                    [:div.team-logo-container
+                      (org-avatar team-data false :never)])
+                  [:div.title.main-lander
+                    "Join " (:name team-data) " on Carrot"]]
                 [:div.field-label.email-field
                   "Work email"
                   (cond
@@ -692,21 +699,15 @@
                                   (when (<= (count @(::pswd s)) 7)
                                     (reset! (::password-error s) true)))
                                 (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
-                  (str "Join " (:name team-data))]]]]
-          [:header.main-cta
+                  (str "Join " (:name team-data))]]]
             [:div.invite-token-container.token-error
               [:div.title
-                "Oh oh..."]
-              [:div.subtitle
                 (str "The invite link you’re trying to access "
                      "has been deactivated by your account admin "
-                     "and is no longer valid.")]]])
-        [:header.main-cta
+                     "and is no longer valid.")]])
           [:div.invite-token-container
-            [:div.title
-              "Please wait"]
             [:div.subtitle.checking-invitation
-              "Checking invitation link" [:span.dots {:ref :dots} "."]]]])]))
+              "Checking invitation link" [:span.dots {:ref :dots} "."]]])]))
 
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]

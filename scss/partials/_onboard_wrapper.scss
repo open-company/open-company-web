@@ -769,53 +769,44 @@ div.onboard-lander {
   }
 
   &.invitee-team-lander {
-    header.main-cta {
+    div.invite-token-container {
+      position: absolute;
+      left: 50%;
+      top: calc(50% - 32px);
+      transform: translate(-50%, -50%);
 
-      div.title-container {
+      div.title {
+        font-size: 32px;
+      }
 
-        div.team-logo-container {
-          width: 100%;
-          display: block;
-          margin: 0 0 24px;
-          padding-top: 64px;
+      div.subtitle {
+        width: 379px;
+        margin: 16px auto 0;
+        font-size: 18px;
 
-          @include org-avatar(72);
-
-          div.org-avatar {
-            float: none;
-
-            div.org-avatar-container:before {
-              left: 50%;
-              transform: translateX(-50%);
-            }
-          }
+        &.checking-invitation {
+          width: 264px;
+          text-align: left;
         }
+      }
+    }
 
-        div.title {
-          padding-top: 0;
+    div.title-container {
+      div.team-logo-container {
+        width: 100%;
+        display: block;
+
+        @include org-avatar(72);
+
+        div.org-avatar {
+          width: 72px;
+          float: unset;
+          margin: 0 auto;
         }
       }
 
-      div.invite-token-container {
-        position: absolute;
-        left: 50%;
-        top: calc(50% - 32px);
-        transform: translate(-50%, -50%);
-
-        div.title {
-          font-size: 32px;
-        }
-
-        div.subtitle {
-          width: 379px;
-          margin: 16px auto 0;
-          font-size: 18px;
-
-          &.checking-invitation {
-            width: 264px;
-            text-align: left;
-          }
-        }
+      div.title.main-lander {
+        margin-top: 24px;
       }
     }
   }
