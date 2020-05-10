@@ -355,8 +355,7 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
-                  (when (and (or is-following
-                                 is-unfollowing)
+                  (when (and is-following
                              member?)
                     [:button.mlb-reset.curate-feed-bt
                       {:on-click #(nav-actions/show-follow-board-picker)
