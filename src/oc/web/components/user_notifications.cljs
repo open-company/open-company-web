@@ -12,7 +12,6 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -111,15 +110,6 @@
       {:class (utils/class-set {:hidden-tray (not tray-open)})}
       [:div.user-notifications-tray-header.group
         [:div.title "Activity"]
-        (when-not is-mobile?
-          [:div.notification-settings-bt-container
-            [:button.mlb-reset.notification-settings-bt
-              {:on-click #(do
-                            (nav-actions/show-user-settings :notifications))
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title "Notification settings"}]])
         (when has-new-content
           [:button.mlb-reset.all-read-bt
             {:on-click #(user-actions/read-notifications)
