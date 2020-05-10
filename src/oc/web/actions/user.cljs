@@ -603,7 +603,7 @@
 (defn subscribe []
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [data]}]
-      (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
+      (let [fixed-notifications (notif-utils/fix-notifications @dis/app-state (:notifications data))]
         (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]

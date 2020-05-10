@@ -19,32 +19,31 @@
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
-(rum/defc user-notification-item < rum/static
-  [{entry-uuid         :uuid
-    board-slug         :board-slug
-    board-name         :board-name
-    publisher-board    :publisher-board
-    reminder?          :reminder?
-    reminder           :reminder
-    mention?           :mention?
-    mention            :mention
-    notification-type  :notification-type
-    interaction-id     :interaction-id
-    created-at         :created-at
-    activity-data      :activity-data
-    stream-attribution :stream-attribution
-    body               :body
-    author             :author
-    unread             :unread
+(rum/defcs user-notification-item < rum/static
+  [s
+   {entry-uuid            :entry-id
+    reminder?             :reminder?
+    reminder              :reminder
+    mention?              :mention?
+    mention               :mention
+    notification-type     :notification-type
+    interaction-id        :interaction-id
+    parent-interaction-id :parent-interaction-id
+    created-at            :created-at
+    activity-data         :activity-data
+    body                  :body
+    author                :author
+    unread                :unread
     :as n}]
   (let [is-mobile? (responsive/is-mobile-size?)
         authorship-map {:publisher author
-                        :board-slug board-slug
-                        :board-name board-name}]
+                        :board-slug (:board-slug activity-data)
+                        :board-name (:board-name activity-data)}]
     [:div.user-notification.group
       {:class    (utils/class-set {:unread (:unread n)})
+       :ref :user-notification
        :on-click (fn [e]
-                   (this-as user-notification-el
+                   (let [user-notification-el (rum/ref-node s :user-notification)]
                      (when (and (fn? (:click n))
                                 (not (utils/button-clicked? e))
                                 (not (utils/input-clicked? e))

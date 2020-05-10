@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.lib.time :as oc-time]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.notification :as notif-util]
             [oc.web.utils.org :as ou]
             [oc.web.utils.activity :as au]))
 
@@ -34,7 +35,10 @@
                                  (dissoc with-current-edit :fixed-items))
      (update-in org-drafts-count-key #(if is-drafts-board?
                                         (ou/disappearing-count-value % (:total-count section-data))
-                                        %)))))
+                                        %))
+     (as-> ndb
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %))))))
 
 (defn fix-org-section-data
   [db org-data changes]
@@ -70,8 +74,11 @@
         next-board-data (merge fixed-section-data
                          (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
-        (assoc-in board-key next-board-data)
-        (dissoc :section-editing))))
+     (assoc-in board-key next-board-data)
+     (dissoc :section-editing)
+     (as-> ndb
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %))))))
 
 (defmethod dispatcher/action :section-edit/dismiss
   [db [_]]
@@ -233,7 +240,10 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)))
+        (assoc-in posts-data-key new-items-map)
+        (as-> ndb
+         (update-in ndb (dispatcher/user-notifications-key org)
+          #(notif-util/fix-notifications ndb %)))))
     db))
 
 (defmethod dispatcher/action :setup-section-editing

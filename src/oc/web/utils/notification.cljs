@@ -57,13 +57,13 @@
       :else
       (:content notification))))
 
-(defn- load-item-if-needed [board-slug entry-uuid interaction-uuid]
+(defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
   (when (and board-slug
              entry-uuid)
     (let [url (if interaction-uuid
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
                 (oc-urls/entry board-slug entry-uuid))]
-      #(if (seq (dis/activity-data entry-uuid))
+      #(if (seq (dis/activity-data (router/current-org-slug) entry-uuid db))
         (router/nav! url)
         (cmail-actions/get-entry-with-uuid board-slug entry-uuid
          (fn [success status]
@@ -80,48 +80,34 @@
                               :solid-button-cb alert-modal/hide-alert}]
               (alert-modal/show-alert alert-data)))))))))
 
-(defn fix-notification [notification & [unread]]
+(defn fix-notification [db notification & [unread]]
   (let [board-id (:board-id notification)
         board-data (activity-utils/board-by-uuid board-id)
-        is-interaction (seq (:interaction-id notification))
-        created-at (:notify-at notification)
         title (notification-title notification)
+        body (notification-content notification)
         reminder-data (:reminder notification)
-        reminder? (:reminder? notification)
         entry-uuid (:entry-id notification)
         interaction-uuid (:interaction-id notification)
         activity-data (dis/activity-data entry-uuid)]
-    (when (and (seq title)
-               board-data)
-      {:uuid entry-uuid
-       :board-slug (:slug board-data)
-       :board-name (:name board-data)
-       :publisher-board (:publisher-board board-data)
-       :interaction-id interaction-uuid
-       :is-interaction is-interaction
-       :unread unread
-       :mention? (:mention? notification)
-       :reminder? reminder?
-       :reminder reminder-data
-       :created-at (:notify-at notification)
-       :body (notification-content notification)
-       :title title
-       :stream-attribution (notification-title notification true)
-       :author (:author notification)
-       :activity-data activity-data
-       :click (if reminder?
-                (when-not (responsive/is-mobile-size?)
-                  (if (and reminder-data
-                           (= (:notification-type reminder-data) "reminder-notification"))
-                    #(oc.web.actions.nav-sidebar/show-reminders)
-                    #(ui-compose)))
-                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid))})))
+    (merge notification
+     {:activity-data activity-data
+      :title title
+      :body body
+      :unread unread
+      :click (if (:reminder? notification)
+               (when-not (responsive/is-mobile-size?)
+                 (if (and reminder-data
+                          (= (:notification-type reminder-data) "reminder-notification"))
+                   #(oc.web.actions.nav-sidebar/show-reminders)
+                   #(ui-compose)))
+               (load-item-if-needed db (or (:slug board-data) board-id) entry-uuid
+                (:interaction-id notification)))})))
 
 (defn sorted-notifications [notifications]
-  (vec (reverse (sort-by :created-at notifications))))
+  (vec (reverse (sort-by :notify-at notifications))))
 
-(defn fix-notifications [notifications]
+(defn fix-notifications [db notifications]
   (sorted-notifications
    (remove nil?
-    (map fix-notification
+    (map (partial fix-notification db)
      notifications))))
