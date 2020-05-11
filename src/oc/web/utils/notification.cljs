@@ -150,7 +150,7 @@
 
 (defun fix-notifications
   ([db notifications :guard map?]
-   (fix-notifications (:sorted notifications)))
+   (fix-notifications db (:sorted notifications)))
 
   ([db notifications :guard sequential?]
    (let [fixed-notifications (map (partial fix-notification db) notifications)]

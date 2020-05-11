@@ -440,12 +440,11 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-all-posts-data))
         container-key (dispatcher/container-key org-slug :all-posts sort-type)]
-    (-> db
-     (assoc-in container-key fixed-all-posts-data)
-     (assoc-in posts-key merged-items)
-     (as-> ndb
-      (update-in ndb (dispatcher/user-notifications-key org-slug)
-       #(notif-util/fix-notifications ndb %))))))
+    (as-> db ndb
+     (assoc-in ndb container-key fixed-all-posts-data)
+     (assoc-in ndb posts-key merged-items)
+     (update-in ndb (dispatcher/user-notifications-key org-slug)
+      #(notif-util/fix-notifications ndb %)))))
 
 (defmethod dispatcher/action :all-posts-more
   [db [_ org-slug sort-type]]
@@ -469,12 +468,11 @@
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
-      (-> db
-       (assoc-in container-key new-container-data)
-       (assoc-in posts-data-key new-items-map)
-       (as-> ndb
-        (update-in ndb (dispatcher/user-notifications-key org)
-         #(notif-util/fix-notifications ndb %)))))
+      (as-> db ndb
+       (assoc-in ndb container-key new-container-data)
+       (assoc-in ndb posts-data-key new-items-map)
+       (update-in ndb (dispatcher/user-notifications-key org)
+        #(notif-util/fix-notifications ndb %))))
     db))
 
 ;; Bookmarks
@@ -490,13 +488,12 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-bookmarks-data))
         container-key (dispatcher/container-key org-slug :bookmarks)]
-    (-> db
-      (assoc-in container-key fixed-bookmarks-data)
-      (assoc-in posts-key merged-items)
-      (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data)))
-      (as-> ndb
-       (update-in ndb (dispatcher/user-notifications-key org-slug)
-        #(notif-util/fix-notifications ndb %))))))
+    (as-> db ndb
+      (assoc-in ndb container-key fixed-bookmarks-data)
+      (assoc-in ndb posts-key merged-items)
+      (update-in ndb (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data)))
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %)))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug sort-type]]
@@ -524,13 +521,12 @@
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
-      (-> db
-        (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+      (as-> db ndb
+        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb posts-data-key new-items-map)
+        (update-in ndb (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))
+        (update-in ndb (dispatcher/user-notifications-key org)
+         #(notif-util/fix-notifications ndb %))))
     db))
 
 (defmethod dispatcher/action :remove-bookmark
@@ -699,13 +695,12 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-inbox-data))
         container-key (dispatcher/container-key org-slug :inbox sort-type)]
-    (-> db
-      (assoc-in container-key fixed-inbox-data)
-      (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data))
-      (as-> ndb
-       (update-in ndb (dispatcher/user-notifications-key org-slug)
-        #(notif-util/fix-notifications ndb %))))))
+    (as-> db ndb
+      (assoc-in ndb container-key fixed-inbox-data)
+      (assoc-in ndb posts-key merged-items)
+      (assoc-in ndb (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data))
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %)))))
 
 (defmethod dispatcher/action :inbox-more
   [db [_ org-slug sort-type]]
@@ -730,13 +725,12 @@
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
-      (-> db
-        (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-data-key :following-inbox-count) (:total-count fixed-posts-data))
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+      (as-> db ndb
+        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb posts-data-key new-items-map)
+        (assoc-in ndb (conj org-data-key :following-inbox-count) (:total-count fixed-posts-data))
+        (update-in ndb (dispatcher/user-notifications-key org)
+         #(notif-util/fix-notifications ndb %))))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss
@@ -808,13 +802,12 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-following-data))
         container-key (dispatcher/container-key org-slug :following sort-type)]
-    (-> db
-      (assoc-in container-key fixed-following-data)
-      (assoc-in posts-key merged-items)
-      (assoc-in (conj org-data-key :following-count) (:total-count fixed-following-data))
-      (as-> ndb
-       (update-in ndb (dispatcher/user-notifications-key org-slug)
-        #(notif-util/fix-notifications ndb %))))))
+    (as-> db ndb
+      (assoc-in ndb container-key fixed-following-data)
+      (assoc-in ndb posts-key merged-items)
+      (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %)))))
 
 (defmethod dispatcher/action :following-more
   [db [_ org-slug sort-type]]
@@ -839,13 +832,12 @@
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
-      (-> db
-        (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-data-key :following-count) (:total-count fixed-posts-data))
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+      (as-> db ndb
+        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb posts-data-key new-items-map)
+        (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-posts-data))
+        (update-in ndb (dispatcher/user-notifications-key org)
+         #(notif-util/fix-notifications ndb %))))
     db))
 
 ;; Unfollowing
@@ -861,13 +853,12 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-unfollowing-data))
         container-key (dispatcher/container-key org-slug :unfollowing sort-type)]
-    (-> db
-      (assoc-in container-key fixed-unfollowing-data)
-      (assoc-in posts-key merged-items)
-      (update-in (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data)))
-      (as-> ndb
-       (update-in ndb (dispatcher/user-notifications-key org-slug)
-        #(notif-util/fix-notifications ndb %))))))
+    (as-> db ndb
+      (assoc-in ndb container-key fixed-unfollowing-data)
+      (assoc-in ndb posts-key merged-items)
+      (update-in ndb (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data)))
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %)))))
 
 (defmethod dispatcher/action :unfollowing-more
   [db [_ org-slug sort-type]]
@@ -892,13 +883,12 @@
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
                               (dissoc :loading-more))]
-      (-> db
-        (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (update-in (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+      (as-> db ndb
+        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb posts-data-key new-items-map)
+        (update-in ndb (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-posts-data)))
+        (update-in ndb (dispatcher/user-notifications-key org)
+         #(notif-util/fix-notifications ndb %))))
     db))
 
 (defmethod dispatcher/action :force-list-update
