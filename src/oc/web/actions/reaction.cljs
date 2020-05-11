@@ -28,8 +28,14 @@
   [activity-data reaction-data reacting?]
   (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
         link-method (if reacting? "PUT" "DELETE")
-        reaction-link (utils/link-for (:links reaction-data) "react" link-method)]
-    (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
+        reaction-link (utils/link-for (:links reaction-data) "react" link-method)
+        fixed-count (if reacting?
+                      (inc (or (:count reaction-data) 0))
+                      (dec (or (:count reaction-data) 0)))
+        fixed-reaction-data (-> reaction-data
+                             (assoc :count fixed-count)
+                             (assoc :reacted reacting?))]
+    (dis/dispatch! [:handle-reaction-to-entry activity-data fixed-reaction-data activity-key])
     (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
         ;; Refresh the full entry to make sure it's up to date

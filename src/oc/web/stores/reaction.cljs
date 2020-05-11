@@ -39,11 +39,9 @@
             next-reaction-data (assoc (get reaction-data reaction) :reaction (name reaction))
             reactions-data (or (:reactions activity-data) [])
             reaction-idx (utils/index-of reactions-data #(= (:reaction %) (name reaction)))
-            next-reactions-data (if (pos? (:count next-reaction-data))
-                                  (if (or (neg? reaction-idx) (nil? reaction-idx))
-                                    (assoc reactions-data (count reactions-data) next-reaction-data)
-                                    (assoc reactions-data reaction-idx next-reaction-data))
-                                  (vec (remove #(= (:reaction %) (name reaction)) reactions-data)))
+            next-reactions-data (if (or (neg? reaction-idx) (nil? reaction-idx))
+                                  (assoc reactions-data (count reactions-data) next-reaction-data)
+                                  (assoc reactions-data reaction-idx next-reaction-data))
             updated-activity-data (-> activity-data
                                    (assoc :reactions-loading next-reactions-loading)
                                    (assoc :reactions next-reactions-data))]
