@@ -130,7 +130,7 @@
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when (-> notifications count (= 1)) (-> notifications first :interaction-id))
                                     :collapsed? true})
-         (str "adc-" "-" entry-id (:notify-at n))))]))
+         (str "adc-" "-" entry-id latest-notify-at)))]))
 
 (defn has-new-content? [notifications-data]
   (some :unread notifications-data))

@@ -115,7 +115,8 @@
   (->> ns
    (filter #(and (-> % :interaction-id empty? not)
                  (-> % :parent-interaction-id (= comment-uuid))))
-   (sort-by :notify-at)))
+   (sort-by :notify-at)
+   reverse))
 
 (defn- comment-notifications [ns]
   (->> ns
@@ -145,17 +146,20 @@
                                         (mapcat #(map :notify-at (:replies %)) all-comments)))
         excluded-ns (filter #(-> % :notify-at included-notify-at not) ns)
         all-ns (remove nil? (concat all-roots all-comments excluded-ns))
-        with-notify-at (map #(assoc % :latest-notify-at (latest-notify-at %)) all-ns)]
+        with-notify-at (map #(assoc % :latest-notify-at (latest-notify-at %)) all-ns)
+        activity-data (dis/activity-data (router/current-org-slug) entry-id db)
+        board-id (or (:board-slug activity-data) (:board-id (first ns)))]
     {:entry-id  entry-id
-     :notifications (sort-by :latest-notify-at with-notify-at)
+     :notifications (reverse (sort-by :latest-notify-at with-notify-at))
      :activity-data (dis/activity-data (router/current-org-slug) entry-id db)
      :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
-     :latest-notify-at (latest-notify-at with-notify-at)}))
+     :latest-notify-at (latest-notify-at with-notify-at)
+     :click (load-item-if-needed db board-id entry-id nil)}))
 
 (defn- group-notifications [db ns]
   (let [grouped-ns (group-by :entry-id ns)
         three-ns (map (fn [[k v]] (entry-notifications db k v)) grouped-ns)]
-    (sort-by :latest-notify-at three-ns)))
+    (reverse (sort-by :latest-notify-at three-ns))))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :notify-at notifications))))
