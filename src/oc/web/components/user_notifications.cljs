@@ -18,21 +18,61 @@
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
+(rum/defc user-notification-timestamp
+  [{:keys [timestamp is-mobile?]}]
+  [:span.time-since
+    {:data-toggle (when-not is-mobile? "tooltip")
+     :data-placement "top"
+     :data-container "body"
+     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+     :data-title (utils/activity-date-tooltip timestamp)}
+    [:time
+      {:date-time timestamp}
+      (utils/foc-date-time timestamp)]])
+
+(rum/defc user-notification-attribution
+  [{:keys [authorship-map current-user-id unread timestamp is-mobile?] :as props}]
+  [:div.user-notification-header
+    (post-authorship {:activity-data authorship-map
+                      :user-avatar? true
+                      :user-hover? true
+                      :hide-last-name? true
+                      :activity-board? false
+                      :current-user-id current-user-id})
+    (when timestamp
+      [:div.separator-dot])
+    (when timestamp
+      (user-notification-timestamp props))
+    (when unread
+      [:div.separator-dot])
+    (when unread
+      [:div.new-tag
+        "NEW"])])
+
+(rum/defc user-notification-body
+  [{:keys [parent-interaction-id interaction-id body]}]
+  [:div.user-notification-body-container
+    {:class (utils/class-set {:comment (seq interaction-id)
+                              :reply (seq parent-interaction-id)})}
+    [:div.user-notification-body.oc-mentions.oc-mentions-hover
+      {:dangerouslySetInnerHTML (utils/emojify body)}]])
+
 (rum/defcs user-notification-item < rum/static
   [s
-   {entry-uuid            :entry-id
-    reminder?             :reminder?
-    reminder              :reminder
+   {current-user-id       :current-user-id
+    entry-uuid            :entry-id
     mention?              :mention?
     mention               :mention
-    notification-type     :notification-type
     interaction-id        :interaction-id
     parent-interaction-id :parent-interaction-id
+    notify-at             :notify-at
     created-at            :created-at
     activity-data         :activity-data
     body                  :body
     author                :author
     unread                :unread
+    comments              :comments
+    replies               :replies
     :as n}]
   (let [is-mobile? (responsive/is-mobile-size?)
         authorship-map {:publisher author
@@ -49,34 +89,61 @@
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/event-inside? e (.querySelector user-notification-el "div.add-comment-box-container"))))
                        ((:click n)))))}
-      [:div.user-notification-title-container
-        (when (:headline activity-data)
-          [:div.user-notification-title
-            (:headline activity-data)])
-        [:span.time-since
-          {:data-toggle (when-not is-mobile? "tooltip")
-           :data-placement "top"
-           :data-container "body"
-           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"}
-          [:time
-            {:date-time created-at}
-            (utils/foc-date-time created-at)]]]
-      [:div.user-notification-header
-        (post-authorship {:activity-data authorship-map
-                          :user-avatar? true
-                          :user-hover? true
-                          :hide-last-name? true
-                          :activity-board? false
-                          :current-user-id (jwt/user-id)})
-        (when unread
-          [:div.separator-dot])
-        (when unread
-          [:div.new-tag
-            "NEW"])]
-      [:div.user-notification-body-container
-        {:class (utils/class-set {:comment (seq interaction-id)})}
-        [:div.user-notification-body.oc-mentions.oc-mentions-hover
-          {:dangerouslySetInnerHTML (utils/emojify body)}]]
+      (when (:headline activity-data)
+        [:div.user-notification-title
+          (:headline activity-data)])
+
+      [:div.user-notification-block.group
+        {:class (utils/class-set {:vertical-line (seq interaction-id)})}
+        (user-notification-attribution {:authorship-map authorship-map
+                                        :current-user-id current-user-id
+                                        :unread unread
+                                        :is-mobile? is-mobile?
+                                        :timestamp (or created-at notify-at)})
+
+        (user-notification-body (select-keys n [:interaction-id :parent-interaction-id :body]))
+
+        (for [c comments
+              :let [comment-authorship-map {:publisher (:author c)
+                                            :board-slug (:board-slug activity-data)
+                                            :board-name (:board-name activity-data)
+                                            :is-mobile? is-mobile?}]]
+          [:div.user-notification-block.group.vertical-line
+            (user-notification-attribution {:authorship-map comment-authorship-map
+                                            :current-user-id current-user-id
+                                            :unread (:unread c)
+                                            :is-mobile? is-mobile?
+                                            :timestamp (or (:created-at c) (:notify-at c))})
+            (user-notification-body (select-keys c [:interaction-id :parent-interaction-id :body]))
+
+            (for [r (:replies c)
+                  :let [reply-authorship-map {:publisher (:author r)
+                                              :board-slug (:board-slug activity-data)
+                                              :board-name (:board-name activity-data)
+                                              :is-mobile? is-mobile?}]]
+              [:div.user-notification-block.horizontal-line.group
+                (user-notification-attribution {:authorship-map reply-authorship-map
+                                                :current-user-id current-user-id
+                                                :unread (:unread r)
+                                                :is-mobile? is-mobile?
+                                                :timestamp (or (:created-at r) (:notify-at r))})
+                (user-notification-body (select-keys r [:interaction-id :parent-interaction-id :body]))])])
+
+        (for [r replies
+              :let [reply-authorship-map {:publisher (:author r)
+                                          :board-slug (:board-slug activity-data)
+                                          :board-name (:board-name activity-data)
+                                          :is-mobile? is-mobile?}]]
+          [:div.user-notification-block.group
+            {:class (utils/class-set {:horizontal-line (= (:parent-interaction-id r) interaction-id)
+                                      :vertical-line (not= (:parent-interaction-id r) interaction-id)})}
+            (user-notification-attribution {:authorship-map reply-authorship-map
+                                            :current-user-id current-user-id
+                                            :unread (:unread r)
+                                            :is-mobile? is-mobile?
+                                            :timestamp (or (:created-at r) (:notify-at r))})
+            (user-notification-body (select-keys r [:interaction-id :parent-interaction-id :body]))])]
+
       (when activity-data
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when interaction-id interaction-id)
@@ -99,17 +166,13 @@
                                 ui-mixins/refresh-tooltips-mixin
                                 (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
   [s {:keys [tray-open]}]
-  (let [user-notifications-data (drv/react s :user-notifications)
-        has-new-content (has-new-content? user-notifications-data)
-        is-mobile? (responsive/is-mobile-size?)
-        fix-activity? (some #(and (not (:activity-data %)) (not (:reminder? %))) user-notifications-data)
-        fixed-user-notifications-data (if fix-activity?
-                                        (map fix-notification user-notifications-data)
-                                        user-notifications-data)]
+  (let [{user-notifications-data :grouped all-notifications :sorted :as x} (drv/react s :user-notifications)
+        has-new-content (has-new-content? all-notifications)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.user-notifications-tray
       {:class (utils/class-set {:hidden-tray (not tray-open)})}
       [:div.user-notifications-tray-header.group
-        [:div.title "Activity"]
+        [:div.title "Threads"]
         (when has-new-content
           [:button.mlb-reset.all-read-bt
             {:on-click #(user-actions/read-notifications)
@@ -118,28 +181,28 @@
              :data-container "body"
              :title "Mark all as read"}])]
       [:div.user-notifications-tray-list
-        (if (empty? fixed-user-notifications-data)
+        (if (empty? user-notifications-data)
           [:div.user-notifications-tray-empty
             (all-caught-up)]
-          (for [n fixed-user-notifications-data
-                :let [entry-uuid (:uuid n)
+          (for [n user-notifications-data
+                :let [entry-id (:entry-id n)
+                      interaction-id (:interaction-id n)
+                      parent-interaction-id (:parent-interaction-id n)
                       board-slug (:board-slug n)
-                      reminder? (:reminder? n)
-                      reminder (when reminder?
-                                 (:reminder n))
-                      notification-type (when reminder?
-                                          (:notification-type reminder))
                       ;; Base string for the key of the React child
-                      children-key-base (str "user-notification-" (:created-at n) "-")
+                      children-key-base (str "user-notification-" (:notify-at n) "-")
                       ;; add a unique part to the key to make sure the children are rendered
                       children-key (str children-key-base
-                                    (if (seq entry-uuid)
-                                      entry-uuid
-                                      (if (and reminder?
-                                               (seq (:uuid reminder)))
-                                        (:uuid reminder)
-                                        (rand 1000))))]]
-            (rum/with-key (user-notification-item n) (str "user-notification-" (:created-at n)))))]]))
+                                    (cond
+                                      (seq parent-interaction-id)
+                                      (str "-" parent-interaction-id)
+                                      (seq interaction-id)
+                                      (str "-" interaction-id)
+                                      (seq entry-id)
+                                      (str "-" entry-id)
+                                      (:reminder? n)
+                                      (str "-" (:uuid (:reminder n)))))]]
+            (rum/with-key (user-notification-item n) children-key)))]]))
 
 (defn- close-tray [s]
   (reset! (::tray-open s) false)

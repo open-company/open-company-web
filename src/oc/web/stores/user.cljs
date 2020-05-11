@@ -259,9 +259,9 @@
 ;; User notifications
 (defmethod dispatcher/action :user-notification
   [db [_ org-slug notification]]
-  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+  (let [user-notifications-key (dispatcher/sorted-user-notifications-key org-slug)
         old-notifications (get-in db user-notifications-key)
-        new-notifications (notif-utils/sorted-notifications (concat [notification] old-notifications))]
+        new-notifications (notif-utils/fix-notifications (cons notification old-notifications))]
     (assoc-in db user-notifications-key new-notifications)))
 
 (defmethod dispatcher/action :user-notifications/read

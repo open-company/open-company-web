@@ -78,6 +78,8 @@
 
 (defn- container-data [back-to]
   (cond
+   (contains? back-to :activity)
+   nil
    (contains? back-to :contributions)
    (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
    (dis/is-container? (:board back-to))
@@ -180,9 +182,14 @@
   (let [org-data (dis/org-data)
         ;; Go back to
         back-to (utils/back-to org-data)
+        is-activity? (contains? back-to :activity)
         is-contributions? (contains? back-to :contributions)
-        to-url (if is-contributions?
+        to-url (cond
+                 is-activity?
+                 (oc-urls/activity)
+                 is-contributions?
                  (oc-urls/contributions (:contributions back-to))
+                 :else
                  (oc-urls/board (:board back-to)))
         cont-data (container-data back-to)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
@@ -195,8 +202,12 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
-    (if is-contributions?
+    (cond
+      is-contributions?
       (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
+      is-activity?
+      (nav-to-url! e "activity" to-url back-y should-refresh-data?)
+      :else
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal [activity-data dont-scroll]
@@ -205,6 +216,9 @@
         board (:board-slug activity-data)
         sort-type (activity-actions/saved-sort-type org board)
         back-to (cond
+                  (and (seq (router/current-board-slug))
+                       (not= (router/current-board-slug) "activity"))
+                  {:activity true}
                   (and (seq (router/current-board-slug))
                        (not= (router/current-board-slug) utils/default-drafts-board-slug))
                   {:board (router/current-board-slug)}

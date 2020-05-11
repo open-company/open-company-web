@@ -56,7 +56,7 @@
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
-                              (drv/drv :user-notifications)
+                              (drv/drv :sorted-user-notifications)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -131,7 +131,7 @@
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        user-notifications-data (drv/react s :user-notifications)
+        user-notifications-data (drv/react s :sorted-user-notifications)
         showing-activity-view (= (router/current-board-slug) "activity")
         show-expanded-post (and current-activity-id
                                 activity-data

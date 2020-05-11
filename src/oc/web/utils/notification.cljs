@@ -1,5 +1,6 @@
 (ns oc.web.utils.notification
-  (:require [oc.web.urls :as oc-urls]
+  (:require [defun.core :refer (defun defun-)]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -60,11 +61,17 @@
 (defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
   (when (and board-slug
              entry-uuid)
-    (let [url (if interaction-uuid
+    #(let [url (if interaction-uuid
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
-                (oc-urls/entry board-slug entry-uuid))]
-      #(if (seq (dis/activity-data (router/current-org-slug) entry-uuid db))
+                (oc-urls/entry board-slug entry-uuid))
+           activity-data (dis/activity-data (router/current-org-slug) entry-uuid db)]
+      (cond
+        (and (= (router/current-board-slug) "activity")
+             (seq activity-data))
+        (oc.web.actions.nav-sidebar/open-post-modal activity-data false)
+        (seq activity-data)
         (router/nav! url)
+        :else
         (cmail-actions/get-entry-with-uuid board-slug entry-uuid
          (fn [success status]
           (if success
@@ -94,6 +101,7 @@
       :title title
       :body body
       :unread unread
+      :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
       :click (if (:reminder? notification)
                (when-not (responsive/is-mobile-size?)
                  (if (and reminder-data
@@ -103,11 +111,51 @@
                (load-item-if-needed db (or (:slug board-data) board-id) entry-uuid
                 (:interaction-id notification)))})))
 
+(defn- reply-notifications [comment-uuid ns]
+  (->> ns
+   (filter #(and (-> % :interaction-id empty? not)
+                 (-> % :parent-interaction-id (= comment-uuid))))
+   (sort-by :notify-at)))
+
+(defn- comment-notifications [ns]
+  (->> ns
+   (filter #(and (-> % :interaction-id empty? not)
+                 (-> % :parent-interaction-id empty?)))
+   (map #(assoc % :replies (reply-notifications (:interaction-id %) ns)))))
+
+(defun- latest-notify-at
+
+  ([ns :guard sequential?]
+  (apply max (map :notify-at ns)))
+
+  ([n :guard map?]
+  (if (contains? n :replies)
+    (max (:notify-at n) (latest-notify-at (:replies n)))
+    (:notify-at n))))
+
+(defn- entry-notifications [ns]
+  (let [all-roots (filter #(and (-> % :interaction-id empty?)
+                                (-> % :parent-interaction-id empty?)) ns)
+        all-comments (comment-notifications ns)
+        included-notify-at (set (concat (map :notify-at all-roots)
+                                        (map :notify-at all-comments)
+                                        (mapcat #(map :notify-at (:replies %)) all-comments)))
+        excluded-ns (filter #(-> % :notify-at included-notify-at not) ns)
+        all-ns (concat all-roots all-comments excluded-ns)
+        with-notify-at (map #(assoc % :latest-notify-at (latest-notify-at %)) all-ns)]
+    (sort-by :latest-notify-at with-notify-at)))
+
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :notify-at notifications))))
 
-(defn fix-notifications [db notifications]
-  (sorted-notifications
-   (remove nil?
-    (map (partial fix-notification db)
-     notifications))))
+(defun fix-notifications
+  ([db notifications :guard map?]
+   (fix-notifications (:sorted notifications)))
+
+  ([db notifications :guard sequential?]
+   (let [fixed-notifications (map (partial fix-notification db) notifications)]
+     {:sorted (sorted-notifications (remove nil? fixed-notifications))
+      :grouped (entry-notifications fixed-notifications)}))
+
+  ([_db _notifications :guard nil?]
+   []))

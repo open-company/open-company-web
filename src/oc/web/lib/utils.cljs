@@ -511,7 +511,8 @@
                                      (* 1000 60 60 24)))
         created-str (tooltip-date created-at)
         updated-str (tooltip-date updated-at)
-        label-prefix (if (= (:status entry-data) "published")
+        label-prefix (if (or (= (:status entry-data) "published")
+                             (not= (:content-type entry-data) "entry"))
                        "Posted on "
                        "Created on ")]
     (if-not should-show-updated-at?
