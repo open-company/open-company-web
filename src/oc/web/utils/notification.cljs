@@ -128,12 +128,15 @@
   ([ns :guard sequential?]
   (apply max (map :notify-at ns)))
 
+  ([n :guard #(contains? % :notify-at)]
+   (:notify-at n))
+
   ([n :guard map?]
   (if (contains? n :replies)
     (max (:notify-at n) (latest-notify-at (:replies n)))
     (:notify-at n))))
 
-(defn- entry-notifications [ns]
+(defn- entry-notifications [db entry-id ns]
   (let [all-roots (filter #(and (-> % :interaction-id empty?)
                                 (-> % :parent-interaction-id empty?)) ns)
         all-comments (comment-notifications ns)
@@ -141,9 +144,18 @@
                                         (map :notify-at all-comments)
                                         (mapcat #(map :notify-at (:replies %)) all-comments)))
         excluded-ns (filter #(-> % :notify-at included-notify-at not) ns)
-        all-ns (concat all-roots all-comments excluded-ns)
+        all-ns (remove nil? (concat all-roots all-comments excluded-ns))
         with-notify-at (map #(assoc % :latest-notify-at (latest-notify-at %)) all-ns)]
-    (sort-by :latest-notify-at with-notify-at)))
+    {:entry-id  entry-id
+     :notifications (sort-by :latest-notify-at with-notify-at)
+     :activity-data (dis/activity-data (router/current-org-slug) entry-id db)
+     :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
+     :latest-notify-at (latest-notify-at with-notify-at)}))
+
+(defn- group-notifications [db ns]
+  (let [grouped-ns (group-by :entry-id ns)
+        three-ns (map (fn [[k v]] (entry-notifications db k v)) grouped-ns)]
+    (sort-by :latest-notify-at three-ns)))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :notify-at notifications))))
@@ -155,7 +167,7 @@
   ([db notifications :guard sequential?]
    (let [fixed-notifications (map (partial fix-notification db) notifications)]
      {:sorted (sorted-notifications (remove nil? fixed-notifications))
-      :grouped (entry-notifications fixed-notifications)}))
+      :grouped (group-notifications db fixed-notifications)}))
 
   ([_db _notifications :guard nil?]
    []))

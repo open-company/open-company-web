@@ -60,24 +60,13 @@
 (rum/defcs user-notification-item < rum/static
   [s
    {current-user-id       :current-user-id
-    entry-uuid            :entry-id
-    mention?              :mention?
-    mention               :mention
-    interaction-id        :interaction-id
-    parent-interaction-id :parent-interaction-id
-    notify-at             :notify-at
-    created-at            :created-at
+    entry-id              :entry-id
+    latest-notify-at      :latest-notify-at
     activity-data         :activity-data
-    body                  :body
-    author                :author
-    unread                :unread
-    comments              :comments
+    notifications         :notifications
     replies               :replies
     :as n}]
-  (let [is-mobile? (responsive/is-mobile-size?)
-        authorship-map {:publisher author
-                        :board-slug (:board-slug activity-data)
-                        :board-name (:board-name activity-data)}]
+  (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.user-notification.group
       {:class    (utils/class-set {:unread (:unread n)})
        :ref :user-notification
@@ -93,27 +82,20 @@
         [:div.user-notification-title
           (:headline activity-data)])
 
-      [:div.user-notification-block.group
-        {:class (utils/class-set {:vertical-line (seq interaction-id)})}
-        (user-notification-attribution {:authorship-map authorship-map
-                                        :current-user-id current-user-id
-                                        :unread unread
-                                        :is-mobile? is-mobile?
-                                        :timestamp (or created-at notify-at)})
+      [:div.user-notification-blocks.group
 
-        (user-notification-body (select-keys n [:interaction-id :parent-interaction-id :body]))
-
-        (for [c comments
-              :let [comment-authorship-map {:publisher (:author c)
-                                            :board-slug (:board-slug activity-data)
-                                            :board-name (:board-name activity-data)
-                                            :is-mobile? is-mobile?}]]
+        (for [c notifications
+              :let [notification-authorship-map {:publisher (:author c)
+                                                 :board-slug (:board-slug activity-data)
+                                                 :board-name (:board-name activity-data)
+                                                 :is-mobile? is-mobile?}]]
           [:div.user-notification-block.group.vertical-line
-            (user-notification-attribution {:authorship-map comment-authorship-map
+            {:key (str "unic-" (:notify-at c) "-" (:interaction-id c))}
+            (user-notification-attribution {:authorship-map notification-authorship-map
                                             :current-user-id current-user-id
                                             :unread (:unread c)
                                             :is-mobile? is-mobile?
-                                            :timestamp (or (:created-at c) (:notify-at c))})
+                                            :timestamp (:notify-at c)})
             (user-notification-body (select-keys c [:interaction-id :parent-interaction-id :body]))
 
             (for [r (:replies c)
@@ -122,11 +104,12 @@
                                               :board-name (:board-name activity-data)
                                               :is-mobile? is-mobile?}]]
               [:div.user-notification-block.horizontal-line.group
+                {:key (str "unicr-" (:notify-at r) "-" (:interaction-id r))}
                 (user-notification-attribution {:authorship-map reply-authorship-map
                                                 :current-user-id current-user-id
                                                 :unread (:unread r)
                                                 :is-mobile? is-mobile?
-                                                :timestamp (or (:created-at r) (:notify-at r))})
+                                                :timestamp (:notify-at r)})
                 (user-notification-body (select-keys r [:interaction-id :parent-interaction-id :body]))])])
 
         (for [r replies
@@ -134,21 +117,20 @@
                                           :board-slug (:board-slug activity-data)
                                           :board-name (:board-name activity-data)
                                           :is-mobile? is-mobile?}]]
-          [:div.user-notification-block.group
-            {:class (utils/class-set {:horizontal-line (= (:parent-interaction-id r) interaction-id)
-                                      :vertical-line (not= (:parent-interaction-id r) interaction-id)})}
+          [:div.user-notification-block.vertical-line.group
+            {:key (str "unir-" (:notify-at r) "-" (:interaction-id r))}
             (user-notification-attribution {:authorship-map reply-authorship-map
                                             :current-user-id current-user-id
                                             :unread (:unread r)
                                             :is-mobile? is-mobile?
-                                            :timestamp (or (:created-at r) (:notify-at r))})
+                                            :timestamp (:notify-at r)})
             (user-notification-body (select-keys r [:interaction-id :parent-interaction-id :body]))])]
 
       (when activity-data
         (rum/with-key (add-comment {:activity-data activity-data
-                                    :parent-comment-uuid (when interaction-id interaction-id)
+                                    :parent-comment-uuid (when (-> notifications count (= 1)) (-> notifications first :interaction-id))
                                     :collapsed? true})
-         (str "activity-add-comment-" (:created-at n))))]))
+         (str "adc-" "-" entry-id (:notify-at n))))]))
 
 (defn has-new-content? [notifications-data]
   (some :unread notifications-data))
@@ -189,10 +171,7 @@
                       interaction-id (:interaction-id n)
                       parent-interaction-id (:parent-interaction-id n)
                       board-slug (:board-slug n)
-                      ;; Base string for the key of the React child
-                      children-key-base (str "user-notification-" (:notify-at n) "-")
-                      ;; add a unique part to the key to make sure the children are rendered
-                      children-key (str children-key-base
+                      children-key (str "uni-" (:notify-at n)
                                     (cond
                                       (seq parent-interaction-id)
                                       (str "-" parent-interaction-id)

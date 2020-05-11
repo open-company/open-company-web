@@ -301,126 +301,129 @@ div.user-notifications-tray {
         max-width: 100%;
       }
 
-      div.user-notification-block {
-        margin-top: 8px;
-        position: relative;
-        height: 100%;
+      div.user-notification-blocks {
 
-        &.horizontal-line, &.vertical-line {
-          div.user-notification-body-container {
-            div.user-notification-body {
-              margin-left: 12px;
-              padding-left: 20px;
-              padding-top: 2px;
-              margin-top: -6px;
-            }
-          }
-        }
-
-        &.horizontal-line {
-          margin-left: 32px;
-          width: calc(100% - 32px);
-
-          &:last-child:before {
-            width: 2px;
-            height: calc(100% - 16px);
-            content: "";
-            background-color: var(--foc-background-color);
-            position: absolute;
-            left: -21px;
-            top: 10px;
-          }
-
-          &:after {
-            height: 2px;
-            width: 10px;
-            background-color: var(--divider-line);
-            content: "";
-            position: absolute;
-            top: 8px;
-            left: -19px;
-          }
-        }
-
-        &.vertical-line {
-          &:before {
-            width: 2px;
-            height: calc(100% - 40px);
-            background-color: var(--divider-line);
-            content: "";
-            position: absolute;
-            top: 32px;
-            left: 11px;
-          }
-        }
-
-        div.user-notification-header {
+        div.user-notification-block {
+          margin-top: 8px;
           position: relative;
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: flex-start;
-          align-items: center;
-          margin-top: 4px;
+          height: 100%;
 
-          div.post-authorship {
-            display: contents;
-            flex: 0 1 auto;
-            z-index: 2;
-            max-width: 100%;
-
-            div.user-hover-container a.publisher-name {
-              margin-right: 0;
+          &.horizontal-line, &.vertical-line {
+            div.user-notification-body-container {
+              div.user-notification-body {
+                margin-left: 12px;
+                padding-left: 20px;
+                padding-top: 2px;
+                margin-top: -6px;
+              }
             }
           }
 
-          div.separator-dot {
-            width: 3px;
-            height: 3px;
-            background-color: var(--divider-line);
-            border-radius: 50%;
-            margin: 1px 5px 0 5px;
-            flex: 0 0 auto;
+          &.horizontal-line {
+            margin-left: 32px;
+            width: calc(100% - 32px);
+
+            &:last-child:before {
+              width: 2px;
+              height: calc(100% - 14px);
+              content: "";
+              background-color: var(--foc-background-color);
+              position: absolute;
+              left: -21px;
+              top: 14px;
+            }
+
+            &:after {
+              height: 2px;
+              width: 10px;
+              background-color: var(--divider-line);
+              content: "";
+              position: absolute;
+              top: 12px;
+              left: -19px;
+            }
           }
 
-          span.time-since {
-            display: block;
-            height: 24px;
-            line-height: 24px;
-            text-align: left;
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: var(--light-color);
+          &.vertical-line {
+            &:before {
+              width: 2px;
+              height: calc(100% - 32px);
+              background-color: var(--divider-line);
+              content: "";
+              position: absolute;
+              top: 32px;
+              left: 11px;
+            }
+          }
+
+          div.user-notification-header {
             position: relative;
-            white-space: nowrap;
-            flex: 0 0 auto;
-            overflow: hidden;
-          }
-
-          div.new-tag {
-            flex: 0 0 auto;
-            @include OC_Body_Bold();
-            font-size: 11px;
-            line-height: 16px;
-            height: 16px;
-            width: 32px;
-            border-radius: 4px;
-            background-color: $feint_emerald;
-            color: $carrot_green;
-            text-align: center;
-          }
-        }
-
-        div.user-notification-body-container {
-          margin-top: 4px;
-
-          div.user-notification-body {
-            @include activity-body-preview(16, 22, var(--color), 3);
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-items: center;
             margin-top: 4px;
-            max-height: #{22 * 3}px;
-            p {
-              min-height: 0;
-              p > br:only-child {
-                display: none;
+
+            div.post-authorship {
+              display: contents;
+              flex: 0 1 auto;
+              z-index: 2;
+              max-width: 100%;
+
+              div.user-hover-container a.publisher-name {
+                margin-right: 0;
+              }
+            }
+
+            div.separator-dot {
+              width: 3px;
+              height: 3px;
+              background-color: var(--divider-line);
+              border-radius: 50%;
+              margin: 1px 5px 0 5px;
+              flex: 0 0 auto;
+            }
+
+            span.time-since {
+              display: block;
+              height: 24px;
+              line-height: 24px;
+              text-align: left;
+              @include OC_Body_Book();
+              font-size: 12px;
+              color: var(--light-color);
+              position: relative;
+              white-space: nowrap;
+              flex: 0 0 auto;
+              overflow: hidden;
+            }
+
+            div.new-tag {
+              flex: 0 0 auto;
+              @include OC_Body_Bold();
+              font-size: 11px;
+              line-height: 16px;
+              height: 16px;
+              width: 32px;
+              border-radius: 4px;
+              background-color: $feint_emerald;
+              color: $carrot_green;
+              text-align: center;
+            }
+          }
+
+          div.user-notification-body-container {
+            margin-top: 4px;
+
+            div.user-notification-body {
+              @include activity-body-preview(16, 22, var(--color), 3);
+              margin-top: 4px;
+              max-height: #{22 * 3}px;
+              p {
+                min-height: 0;
+                p > br:only-child {
+                  display: none;
+                }
               }
             }
           }
