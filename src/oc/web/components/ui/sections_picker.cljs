@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
@@ -56,7 +57,7 @@
         filtered-boards (filter (comp not :publisher-board) editable-boards)
         sorted-boards (sort-by :name filtered-boards)
         fixed-publisher-board (or user-publisher-board (self-board current-user-data))
-        all-sections (if author?
+        all-sections (if (and author? ls/publisher-board-enabled?)
                        (cons fixed-publisher-board sorted-boards)
                        sorted-boards)
         container-style (if @(::container-max-height s)

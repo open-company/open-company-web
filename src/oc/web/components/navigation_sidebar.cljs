@@ -241,7 +241,7 @@
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Activity"]
+              "Threads"]
               (when (pos? unread-notifications-count)
                 [:span.count unread-notifications-count])])
         ; ;; All posts

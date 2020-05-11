@@ -54,7 +54,12 @@
         board-from-cookie (when cookie-value
                             (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
                              editable-boards))
-        filtered-boards (filterv #(not (:draft %)) editable-boards)
+        filtered-boards (filterv #(and (not (:draft %))
+                                       ;; Pick publisher board only if they are enabled
+                                       (or (and (:publisher-board %)
+                                                ls/publisher-board-enabled?)
+                                           (not (:publisher-board %))))
+                         editable-boards)
         board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
     (when board-data
       {:board-name (:name board-data)

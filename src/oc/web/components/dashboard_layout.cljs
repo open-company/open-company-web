@@ -193,7 +193,7 @@
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
                     [:span.unread-dot])]
-                [:span.tab-label "Activity"]]
+                [:span.tab-label "Threads"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -247,7 +247,7 @@
                     showing-activity-view
                     [:div.board-name-with-icon.activity-view
                       [:div.board-name-with-icon-internal
-                        "Activity"
+                        "Threads"
                         ; (when (pos? (:total-count contributions-data))
                         ;   [:span.count (:total-count contributions-data)])
                         ]]

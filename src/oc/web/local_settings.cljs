@@ -99,3 +99,6 @@
 
 ;; Wut
 (def wut? true)
+
+;; Publisher boards feature-flag
+(def publisher-board-enabled? false)

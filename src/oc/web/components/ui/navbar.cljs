@@ -80,7 +80,7 @@
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        showing-activity-view
-                       "Activity"
+                       "Threads"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
