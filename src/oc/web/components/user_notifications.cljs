@@ -85,12 +85,14 @@
       [:div.user-notification-blocks.group
 
         (for [c notifications
-              :let [notification-authorship-map {:publisher (:author c)
+              :let [is-comment? (seq (:interaction-id c))
+                    notification-authorship-map {:publisher (:author c)
                                                  :board-slug (:board-slug activity-data)
                                                  :board-name (:board-name activity-data)
                                                  :is-mobile? is-mobile?}]]
-          [:div.user-notification-block.group.vertical-line
-            {:key (str "unic-" (:notify-at c) "-" (:interaction-id c))}
+          [:div.user-notification-block.group
+            {:key (str "uni" (when is-comment? "c") "-" (:notify-at c) (when is-comment? (str "-" (:interaction-id c))))
+             :class (when is-comment? "vertical-line")}
             (user-notification-attribution {:authorship-map notification-authorship-map
                                             :current-user-id current-user-id
                                             :unread (:unread c)
