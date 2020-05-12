@@ -32,7 +32,6 @@
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.poll :refer (poll-portal)]
@@ -253,7 +252,6 @@
                         ]]
                     current-contributions-id
                     [:div.board-name-with-icon.contributions
-                      (user-avatar-image contributions-user-data)
                       [:div.board-name-with-icon-internal
                         (if is-own-contributions
                           "My posts"

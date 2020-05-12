@@ -332,16 +332,6 @@ div.left-navigation-sidebar {
     outline: none;
     padding-left: 16px;
 
-    &.top-border {
-      margin-top: 16px;
-      border-top: 1px solid var(--opac-background-color-08);
-      padding-top: 16px;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
-    }
-
     @include mobile() {
       padding-left: 0px;
     }
@@ -458,7 +448,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    &.all-posts {
+    &.explore {
       div.nav-link-icon {
         &:before {
           content: "\F18B";
@@ -485,6 +475,23 @@ div.left-navigation-sidebar {
       &.item-selected {
         div.nav-link-icon {
           background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+        }
+      }
+    }
+
+    &.my-posts {
+      div.nav-link-icon {
+        background-size: 14px 14px;
+        background-image: cdnUrl("/img/ML/nav_my_posts.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/nav_my_posts@dark.svg");
+        }
+      }
+
+      &.item-selected {
+        div.nav-link-icon {
+          background-image: cdnUrl("/img/ML/nav_my_posts@dark.svg");
         }
       }
     }

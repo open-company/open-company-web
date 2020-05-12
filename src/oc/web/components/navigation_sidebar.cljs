@@ -165,16 +165,17 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
+        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         is-activity (= selected-slug "activity")
         is-following (= selected-slug "following")
         is-unfollowing (= selected-slug "unfollowing")
-        is-home (= selected-slug "all-posts")
+        is-my-posts (and user-is-part-of-the-team?
+                         (= (router/current-contributions-id) (:user-id current-user-data)))
         is-bookmarks (= selected-slug "bookmarks")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards false ;; Hide following boards list for now
                     ;; (or create-link (pos? (count boards)))
-        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
@@ -182,8 +183,6 @@
         show-unfollowing (and user-is-part-of-the-team?
                               (utils/link-for (:links org-data) "unfollowing")
                               (integer? (:unfollowing-count org-data)))
-        show-all-posts false ;(and user-is-part-of-the-team?
-                             ;     (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks")
                             (integer? (:bookmarks-count org-data)))
@@ -244,30 +243,22 @@
               "Threads"]
               (when (pos? unread-notifications-count)
                 [:span.count unread-notifications-count])])
-        ; ;; All posts
-        ; (when show-all-posts
-        ;   [:a.nav-link.all-posts.hover-item.group
-        ;     {:class (utils/class-set {:item-selected is-home})
-        ;      :href (oc-urls/all-posts)
-        ;      :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
-        ;     [:div.nav-link-icon]
-        ;     [:div.nav-link-label
-        ;       ; {:class (utils/class-set {:new (seq all-unread-items)})}
-        ;       "All"]
-        ;     ; (when (pos? (count all-unread-items))
-        ;     ;   [:span.count (count all-unread-items)])
-        ;     ])
-        ;; Bookmarks
-        (when show-bookmarks
-          [:a.nav-link.bookmarks.hover-item.group
-            {:class (utils/class-set {:item-selected is-bookmarks})
-             :href (oc-urls/bookmarks)
-             :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
-            [:div.nav-link-icon]
-            [:div.nav-link-label
-              "Bookmarks"]
-            (when (pos? (:bookmarks-count org-data))
-              [:span.count (:bookmarks-count org-data)])])
+        ;; My posts
+        (when user-is-part-of-the-team?
+          [:div.left-navigation-sidebar-top.top-border
+            [:a.nav-link.my-posts.hover-item.group
+              {:class (utils/class-set {:item-selected is-my-posts})
+               :href (oc-urls/contributions (:user-id current-user-data))
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                ; {:class (utils/class-set {:new (seq all-unread-items)})}
+                "My posts"]
+                ; (when (pos? (:contributions-count org-data))
+                ;   [:span.count (:contributions-count org-data)])
+                ]])
         ;; Drafts
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))
@@ -275,7 +266,6 @@
             [:a.nav-link.drafts.hover-item.group
               {:class (when (and (not is-following)
                                  (not is-unfollowing)
-                                 (not is-home)
                                  (not is-bookmarks)
                                  (= (router/current-board-slug) (:slug drafts-board)))
                         "item-selected")
@@ -288,18 +278,30 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
-        (when show-unfollowing
-          [:a.nav-link.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-unfollowing})
-             :href (oc-urls/unfollowing)
-             :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
+        ;; Bookmarks
+        (when show-bookmarks
+          [:a.nav-link.bookmarks.hover-item.group
+            {:class (utils/class-set {:item-selected is-bookmarks})
+             :href (oc-urls/bookmarks)
+             :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
             [:div.nav-link-icon]
             [:div.nav-link-label
-              ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Explore"]
-            ; (when (pos? (count all-unread-items))
-            ;   [:span.count (count all-unread-items)])
-            ])
+              "Bookmarks"]
+            (when (pos? (:bookmarks-count org-data))
+              [:span.count (:bookmarks-count org-data)])])
+        (when show-unfollowing
+          [:div.left-navigation-sidebar-top.top-border
+            [:a.nav-link.explore.hover-item.group
+              {:class (utils/class-set {:item-selected is-unfollowing})
+               :href (oc-urls/unfollowing)
+               :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                ; {:class (utils/class-set {:new (seq all-unread-items)})}
+                "Explore"]
+              ; (when (pos? (count all-unread-items))
+              ;   [:span.count (count all-unread-items)])
+              ]])
         (when show-users-list?
           [:div.left-navigation-sidebar-top.top-border.group
             ;; Boards header
@@ -390,7 +392,6 @@
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (and (not is-following)
                                               (not is-unfollowing)
-                                              (not is-home)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
                         ; board-change-data (get change-data (:uuid board))
