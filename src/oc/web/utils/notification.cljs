@@ -58,36 +58,45 @@
       :else
       (:content notification))))
 
+(defn- notification-click [activity-data interaction-uuid status]
+  (let [url (when activity-data
+              (if (seq interaction-uuid)
+                (oc-urls/comment-url (:board-slug activity-data) (:uuid activity-data) interaction-uuid)
+                (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))))]
+    (cond
+      (and (= (router/current-board-slug) "activity")
+           (seq activity-data))
+      #(oc.web.actions.nav-sidebar/open-post-modal activity-data false interaction-uuid)
+      (seq activity-data)
+      #(router/nav! url)
+      :else
+      #(let [alert-data {:icon "/img/ML/trash.svg"
+                         :action "notification-click-item-load"
+                         :title (if (= status 404) "Post not found" "An error occurred")
+                         :message (if (= status 404)
+                                    "The post you're trying to access may have been moved or deleted."
+                                    "Please try again")
+                         :solid-button-title "Ok"
+                         :solid-button-style :red
+                         :solid-button-cb alert-modal/hide-alert}]
+         (alert-modal/show-alert alert-data)))))
+
+(defn- load-item [db org-slug board-slug entry-uuid interaction-uuid]
+  (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+   (fn [success status]
+    (when (= 404 status)
+      (dis/dispatch! [:user-notification-remove-by-entry org-slug board-slug entry-uuid]))))
+  nil)
+
 (defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
   (when (and board-slug
              entry-uuid)
-    #(let [url (if interaction-uuid
-                (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
-                (oc-urls/entry board-slug entry-uuid))
-           activity-data (dis/activity-data (router/current-org-slug) entry-uuid db)]
-      (cond
-        (and (= (router/current-board-slug) "activity")
-             (seq activity-data))
-        (oc.web.actions.nav-sidebar/open-post-modal activity-data false)
-        (seq activity-data)
-        (router/nav! url)
-        :else
-        (cmail-actions/get-entry-with-uuid board-slug entry-uuid
-         (fn [success status]
-          (if success
-            (router/nav! url)
-            (let [alert-data {:icon "/img/ML/trash.svg"
-                              :action "notification-click-item-load"
-                              :title (if (= status 404) "Post not found" "An error occurred")
-                              :message (if (= status 404)
-                                         "The post you're trying to access may have been moved or deleted."
-                                         "Please try again")
-                              :solid-button-title "Ok"
-                              :solid-button-style :red
-                              :solid-button-cb alert-modal/hide-alert}]
-              (alert-modal/show-alert alert-data)))))))))
+    (let [activity-data (dis/activity-data (router/current-org-slug) entry-uuid db)]
+      (if (map? activity-data)
+        (notification-click activity-data interaction-uuid nil)
+        (load-item db (router/current-org-slug) board-slug entry-uuid interaction-uuid)))))
 
-(defn fix-notification [db notification & [unread]]
+(defn fix-notification [db notification]
   (let [board-id (:board-id notification)
         board-data (activity-utils/board-by-uuid board-id)
         title (notification-title notification)
@@ -100,7 +109,7 @@
      {:activity-data activity-data
       :title title
       :body body
-      :unread unread
+      :unread (or (:unread notification) (> (:notify-at notification) (:last-read-at activity-data)))
       :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
       :click (if (:reminder? notification)
                (when-not (responsive/is-mobile-size?)

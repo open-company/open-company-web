@@ -607,8 +607,8 @@
         (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
-      (when-let [fixed-notification (notif-utils/fix-notification @dis/app-state data true)]
-        (dis/dispatch! [:user-notification (router/current-org-slug) fixed-notification])
+      (when-let [fixed-notification (notif-utils/fix-notification @dis/app-state (assoc data :unread true))]
+        (dis/dispatch! [:user-notification (router/current-org-slug) data])
         (notification-actions/show-notification
          {:title (:title fixed-notification)
           :mention true

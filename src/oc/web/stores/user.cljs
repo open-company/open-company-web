@@ -259,24 +259,33 @@
 ;; User notifications
 (defmethod dispatcher/action :user-notification
   [db [_ org-slug notification]]
-  (let [user-notifications-key (dispatcher/sorted-user-notifications-key org-slug)
-        old-notifications (get-in db user-notifications-key)
-        new-notifications (notif-utils/fix-notifications (cons notification old-notifications))]
-    (assoc-in db user-notifications-key new-notifications)))
+  (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
+        old-notifications (get-in db (dispatcher/sorted-user-notifications-key org-slug))
+        new-notifications (cons notification old-notifications)]
+    (assoc-in db user-notifications-key (notif-utils/fix-notifications db new-notifications))))
 
 (defmethod dispatcher/action :user-notifications/read
   [db [_ org-slug]]
   (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
-        old-notifications (get-in db user-notifications-key)
+        old-notifications (get-in db (dispatcher/sorted-user-notifications-key org-slug))
         read-notifications (map #(assoc % :unread false) old-notifications)]
-    (assoc-in db user-notifications-key read-notifications)))
+    (assoc-in db user-notifications-key (notif-utils/fix-notifications db read-notifications))))
 
 (defmethod dispatcher/action :user-notification/read
   [db [_ org-slug notification]]
   (let [user-notifications-key (dispatcher/user-notifications-key org-slug)
-        old-notifications (get-in db user-notifications-key)
-        read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
-    (assoc-in db user-notifications-key read-notifications)))
+        old-notifications (get-in db (dispatcher/sorted-user-notifications-key org-slug))
+        read-notifications (map #(if (= (:notify-at %) (:notify-at notification)) (assoc % :unread false) %) old-notifications)]
+    (assoc-in db user-notifications-key (notif-utils/fix-notifications db read-notifications))))
+
+(defmethod dispatcher/action :user-notification-remove-by-entry
+  [db [_ org-slug board-id entry-id]]
+  (let [notifications (get-in db (dispatcher/sorted-user-notifications-key org-slug))
+        filtered-notifications (filter #(or (not= board-id (:board-id %))
+                                            (not= entry-id (:entry-id %)))
+                                notifications)]
+    (assoc-in db (dispatcher/user-notifications-key org-slug)
+     (notif-utils/fix-notifications db filtered-notifications))))
 
 ;; Expo push tokens
 

@@ -210,7 +210,10 @@
       :else
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
-(defn open-post-modal [activity-data dont-scroll]
+(defn open-post-modal
+  ([activity-data dont-scroll] (open-post-modal activity-data dont-scroll nil))
+
+  ([activity-data dont-scroll comment-uuid]
   (let [org (router/current-org-slug)
         previous-slug (or (router/current-board-slug) (router/current-contributions-id))
         board (:board-slug activity-data)
@@ -227,23 +230,29 @@
                   :else
                   {:board board})
         activity (:uuid activity-data)
-        post-url (oc-urls/entry board activity)
+        post-url (if comment-uuid
+                   (oc-urls/comment-url board activity)
+                   (oc-urls/entry board activity))
         query-params (router/query-params)
         route [org board sort-type activity "activity"]
-        scroll-y-position (.. js/document -scrollingElement -scrollTop)]
-    (router/set-route! route {:org org
-                              :board board
-                              :sort-type sort-type
-                              :activity activity
-                              :query-params query-params
-                              :back-to back-to
-                              :back-y scroll-y-position})
+        scroll-y-position (.. js/document -scrollingElement -scrollTop)
+        route-path* {:org org
+                     :board board
+                     :sort-type sort-type
+                     :activity activity
+                     :query-params query-params
+                     :back-to back-to
+                     :back-y scroll-y-position}
+        route-path (if comment-uuid
+                     (assoc route-path* :comment comment-uuid)
+                     route-path*)]
+    (router/set-route! route route-path)
     (cmail-actions/cmail-hide)
     (when-not dont-scroll
       (if ua/mobile?
         (utils/after 10 #(utils/scroll-to-y 0 0))
         (utils/scroll-to-y 0 0)))
-    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
+    (.pushState (.-history js/window) #js {} (.-title js/document) post-url))))
 
 ;; Push panel
 
