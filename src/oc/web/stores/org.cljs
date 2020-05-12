@@ -70,13 +70,14 @@
                     (update :cmail-data merge editing-board))
                   db)
         active-users (dispatcher/active-users (:slug org-data) db)
-        follow-boards-list-key (dispatcher/follow-boards-list-key (:slug org-data))]
+        follow-boards-list-key (dispatcher/follow-boards-list-key (:slug org-data))
+        unfollow-board-uuids (get-in db (dispatcher/unfollow-board-uuids-key (:slug fixed-org-data)))]
     (-> next-db
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing next-org-editing)
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
       (assoc-in boards-key next-boards)
-      (update-in follow-boards-list-key #(user-store/enrich-boards-list % (:boards fixed-org-data))))))
+      (update-in follow-boards-list-key #(user-store/enrich-boards-list unfollow-board-uuids (:boards fixed-org-data))))))
 
 (defmethod dispatcher/action :org-avatar-update/failed
   [db [_]]

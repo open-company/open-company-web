@@ -305,17 +305,15 @@
                 (not= (:uuid %) (:uuid utils/default-drafts-board)))
    boards-data))
 
-(defn enrich-boards-list [boards-list org-boards]
-  (if (and (seq boards-list) (seq org-boards))
-    (let [board-uuids (remove nil? (if (every? map? boards-list)
-                       (map :uuid boards-list)
-                       boards-list))
+(defn enrich-boards-list [unfollow-board-uuids org-boards]
+  (when (seq org-boards)
+    (let [all-board-uuids (->> org-boards filter-org-boards (map :uuid) set)
+          follow-board-uuids (clojure.set/difference all-board-uuids (set unfollow-board-uuids))
           boards-map (zipmap (map :uuid org-boards) org-boards)]
-      (->> board-uuids
-       (map boards-map)
-       (sort-by :name)
-       vec))
-    boards-list))
+       (->> follow-board-uuids
+            (map boards-map)
+            (sort-by :name)
+            vec))))
 
 (defn- update-contributions-and-boards
   "Given the new list of board and publisher followers, update the following flag in each board and contributions data we have."
@@ -345,14 +343,13 @@
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           active-users (dispatcher/active-users org-slug db)
-          all-boards-uuids (->> org-data :boards filter-org-boards (map :uuid) set)
-          follow-board-uuids (clojure.set/difference (set all-boards-uuids) (set unfollow-board-uuids))
-          next-follow-boards-data (enrich-boards-list follow-board-uuids (:boards org-data))
+          next-follow-boards-data (enrich-boards-list unfollow-board-uuids (:boards org-data))
           next-follow-publishers-data (enrich-publishers-list follow-publisher-uuids active-users)]
       (-> db
        (update-contributions-and-boards org-slug next-follow-boards-data next-follow-publishers-data)
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
-       (assoc-in follow-boards-list-key next-follow-boards-data)))
+       (assoc-in follow-boards-list-key next-follow-boards-data)
+       (assoc-in (dispatcher/unfollow-board-uuids-key org-slug) unfollow-board-uuids)))
       db))
 
 (defmethod dispatcher/action :followers-count/finish
@@ -401,7 +398,10 @@
   (if (= org-slug (:org-slug resp))
     (let [follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
           org-boards (:boards (dispatcher/org-data db org-slug))
-          next-follow-boards-data (enrich-boards-list board-uuids org-boards)
+          unfollow-board-uuids-key (dispatcher/unfollow-board-uuids-key org-slug)
+          all-board-uuids (set (map :uuid org-boards))
+          next-unfollow-uuids (clojure.set/difference all-board-uuids (set board-uuids))
+          next-follow-boards-data (enrich-boards-list next-unfollow-uuids org-boards)
           followers-count-key (dispatcher/followers-boards-count-key org-slug)
           board-count-key (conj followers-count-key board-uuid)
           fn (cond (true? follow?) inc (false? follow?) dec :else identity)
@@ -409,6 +409,7 @@
       (-> db
        (update-contributions-and-boards org-slug next-follow-boards-data follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)
+       (assoc-in unfollow-board-uuids-key next-unfollow-uuids)
        (update-in board-count-key #(if %
                                      (update % :count fn)
                                      {:org-slug org-slug

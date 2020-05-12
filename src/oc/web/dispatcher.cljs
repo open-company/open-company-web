@@ -140,6 +140,9 @@
 (defn follow-boards-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :board-uuids)))
 
+(defn unfollow-board-uuids-key [org-slug]
+  (vec (conj (follow-list-key org-slug) :unfollow-board-uuids)))
+
 (defn followers-count-key [org-slug]
   (vec (conj (org-key org-slug) :followers-count)))
 
