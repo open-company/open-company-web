@@ -34,15 +34,16 @@ function OCStaticGetCookie(name) {
 }
 
 function OCStaticCookieName(name){
-  var h = window.location.hostname.split(".")[0];
-  var prefix = "";
+  var domainParts = window.location.hostname.split("."),
+      h = domainParts[0],
+      prefix = "";
   switch(h) {
     case "192":
     case "localhost":
       prefix = "localhost-";
       break;
     case "staging":
-      if (domainParts[1] === "wuts.io") {
+      if (domainParts[1] === "wuts") {
         prefix = "staging-wut-";
       }else{
         prefix = "staging-";
