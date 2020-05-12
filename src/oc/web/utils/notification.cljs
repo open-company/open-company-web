@@ -115,8 +115,7 @@
   (->> ns
    (filter #(and (-> % :interaction-id seq)
                  (-> % :parent-interaction-id (= comment-uuid))))
-   (sort-by :notify-at)
-   reverse))
+   (sort-by :notify-at)))
 
 (defn- comment-notifications [ns]
   (->> ns
@@ -150,7 +149,7 @@
         activity-data (dis/activity-data (router/current-org-slug) entry-id db)
         board-id (or (:board-slug activity-data) (:board-id (first ns)))]
     {:entry-id  entry-id
-     :notifications (reverse (sort-by :latest-notify-at with-notify-at))
+     :notifications (sort-by :latest-notify-at with-notify-at)
      :activity-data (dis/activity-data (router/current-org-slug) entry-id db)
      :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
      :latest-notify-at (latest-notify-at with-notify-at)
