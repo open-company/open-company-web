@@ -42,7 +42,11 @@ function OCStaticCookieName(name){
       prefix = "localhost-";
       break;
     case "staging":
-      prefix = "staging-";
+      if (domainParts[1] === "wuts.io") {
+        prefix = "staging-wut-";
+      }else{
+        prefix = "staging-";
+      }
       break;
   }
   return prefix + name;
