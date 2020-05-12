@@ -356,7 +356,7 @@
                   (when (and is-following
                              member?)
                     [:button.mlb-reset.curate-feed-bt
-                      {:on-click #(nav-actions/show-follow-board-picker)
+                      {:on-click #(nav-actions/show-follow-picker)
                        :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
                        :data-container "body"

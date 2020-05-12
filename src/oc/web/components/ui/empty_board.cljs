@@ -49,20 +49,14 @@
            is-saved? "You don't have any saved update"
            is-home?
            [:div.empty-follow
-             "Home is where you'll find updates from the people and teams you're following."
-             [:button.mlb-reset.follow-users-bt
-               {:on-click #(nav-actions/show-follow-user-picker)}
-               "Follow someone"]
-             [:button.mlb-reset.follow-boards-bt
-               {:on-click #(nav-actions/show-follow-board-picker)}
-               "Follow a team"]]
+             "Home is where you'll find updates from the people and topics you're following."
+             [:button.mlb-reset.follow-picker-bt
+               {:on-click #(nav-actions/show-follow-picker)}
+               "Curate your Home feed"]]
            is-unfollowing?
            [:div.empty-follow
              "Explore is where you'll find updates that you decided to not follow."
-             [:button.mlb-reset.follow-users-bt
-               {:on-click #(nav-actions/show-follow-user-picker)}
-               "Follow someone"]
-             [:button.mlb-reset.follow-boards-bt
-               {:on-click #(nav-actions/show-follow-board-picker)}
-               "Follow a team"]]
+             [:button.mlb-reset.follow-picker-bt
+               {:on-click #(nav-actions/show-follow-picker)}
+               "Curate your feed"]]
            :else "This team has no updates")]]]))

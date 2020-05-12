@@ -35,8 +35,7 @@
 ;; :wrt-{uuid}
 ;; :theme
 ;; :user-info-{uuid}
-;; :follow-user-picker
-;; :follow-board-picker
+;; :follow-picker
 
 (defn- refresh-contributions-data [author-uuid]
   (when author-uuid
@@ -394,15 +393,8 @@
 
 ;; Follow picker
 
-(defn show-follow-user-picker []
-  (push-panel :follow-user-picker))
+(defn show-follow-picker []
+  (push-panel :follow-picker))
 
-(defn show-follow-board-picker []
-  (push-panel :follow-board-picker))
-
-
-(defn hide-follow-user-picker []
-  (pop-panel))
-
-(defn hide-follow-board-picker []
+(defn hide-follow-picker []
   (pop-panel))

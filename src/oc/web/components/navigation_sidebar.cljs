@@ -321,7 +321,7 @@
                    :data-toggle (when-not is-mobile? "tooltip")}
                   [:span.boards "Favorites"]])
               [:button.left-navigation-sidebar-top-ellipsis-bt.btn-reset
-                {:on-click #(nav-actions/show-follow-user-picker)
+                {:on-click #(nav-actions/show-follow-picker)
                  :title "People directory"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")
@@ -379,7 +379,7 @@
                  :data-delay "{\"show\":\"800\", \"hide\":\"0\"}"
                  :data-container "body"}]
               [:button.left-navigation-sidebar-top-ellipsis-bt.people-ellipsis-bt.btn-reset
-                {:on-click #(nav-actions/show-follow-board-picker)
+                {:on-click #(nav-actions/show-follow-picker)
                  :title "Team directory"
                  :data-placement "top"
                  :data-toggle (when-not is-mobile? "tooltip")

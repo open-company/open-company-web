@@ -20,6 +20,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -31,8 +32,6 @@
             [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
             [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.follow-user-picker :refer (follow-user-picker)]
-            [oc.web.components.ui.follow-board-picker :refer (follow-board-picker)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
@@ -157,8 +156,7 @@
         show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
-        show-follow-user-picker (= open-panel :follow-user-picker)
-        show-follow-board-picker (= open-panel :follow-board-picker)]
+        show-follow-picker (= open-panel :follow-picker)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -236,11 +234,8 @@
           show-user-info?
           (user-info-modal {:user-data user-info-data :org-data org-data})
           ;; Follow user picker
-          show-follow-user-picker
-          (follow-user-picker)
-          ;; Follow section picker
-          show-follow-board-picker
-          (follow-board-picker))
+          show-follow-picker
+          (follow-picker))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
