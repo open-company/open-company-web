@@ -113,14 +113,14 @@
 
 (defn- reply-notifications [comment-uuid ns]
   (->> ns
-   (filter #(and (-> % :interaction-id empty? not)
+   (filter #(and (-> % :interaction-id seq)
                  (-> % :parent-interaction-id (= comment-uuid))))
    (sort-by :notify-at)
    reverse))
 
 (defn- comment-notifications [ns]
   (->> ns
-   (filter #(and (-> % :interaction-id empty? not)
+   (filter #(and (-> % :interaction-id seq)
                  (-> % :parent-interaction-id empty?)))
    (map #(assoc % :replies (reply-notifications (:interaction-id %) ns)))))
 
