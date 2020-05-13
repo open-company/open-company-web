@@ -9,7 +9,7 @@
 (defn- ^:private cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
 
-(defn set-cookie!
+(defn ^:export set-cookie!
   ([c-name c-value]
     (set-cookie! c-name c-value -1))
   ([c-name c-value expiry]
@@ -19,7 +19,7 @@
   ([c-name c-value expiry c-path c-domain c-secure]
     (.set cookies-static-obj (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
-(defn get-cookie
+(defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
   (.get cookies-static-obj (cookie-name c-name)))
