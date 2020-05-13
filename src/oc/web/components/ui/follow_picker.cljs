@@ -143,8 +143,8 @@
         is-mobile? (responsive/is-mobile-size?)
         following-items (filter :follow sorted-items)
         unfollowing-items (filter (comp not :follow) sorted-items)
-        show-following? (and (= (count all-authors) 1)
-                             (= (count all-boards) 1))]
+        show-following? (or (not= (count all-authors) 1)
+                            (not= (count all-boards) 1))]
     [:div.follow-picker
       [:div.follow-picker-modal
         [:button.mlb-reset.modal-close-bt
