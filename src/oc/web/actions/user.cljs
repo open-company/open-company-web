@@ -625,6 +625,19 @@
     (fn [{:keys [data]}]
       (dis/dispatch! [:followers-count/finish (router/current-org-slug) data]))))
 
+;; Reply from activity view
+
+(defn activity-reply-inline [notification-thread reply]
+  (let [notification-from-reply {:notify-at (:created-at reply)
+                                 :content (:body reply)
+                                 :unread false
+                                 :interaction-id (:uuid reply)
+                                 :parent-interaction-id (:parent-uuid reply)
+                                 :entry-id (:resource-uuid reply)
+                                 :author (:author reply)
+                                 :activity-data (:activity-data notification-thread)}]
+    (dis/dispatch! [:user-notification (router/current-org-slug) notification-from-reply])))
+
 ;; Debug
 
 (defn force-jwt-refresh []

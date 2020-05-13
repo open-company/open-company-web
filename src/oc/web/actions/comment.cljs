@@ -86,7 +86,8 @@
           ;; Remove the newly added comment if still in the list
           (dis/dispatch! [:comment-add/failed activity-data new-comment-map comments-key])
           ;; Move the comment back in the body field
-          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))))
+          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))
+    new-comment-map))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))
@@ -160,7 +161,8 @@
           ;; Remove the newly added comment if still in the list
           (dis/dispatch! [:comment-save/failed activity-data comment-data comments-key])
           ;; Move the comment back in the body field
-          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) (:parent-uuid comment-data) (:uuid comment-data) new-body true]))))))
+          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) (:parent-uuid comment-data) (:uuid comment-data) new-body true]))))
+    updated-comment-map))
 
 (defn ws-comment-update
   [interaction-data]

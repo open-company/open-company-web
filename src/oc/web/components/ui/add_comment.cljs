@@ -65,22 +65,22 @@
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
     (reset! (::add-button-disabled s) true)
     (set! (.-innerHTML add-comment-div) au/empty-body-html)
-    (if edit-comment-data
-      (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
-      (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
-    (reset! (::show-post-button s) false)
-    (when (and (not (responsive/is-mobile-size?))
-               (not edit-comment-data)
-               (not dismiss-reply-cb)
-               scroll-after-posting?
-               (not (dom-utils/is-element-top-in-viewport? (sel1 [:div.stream-comments]) -40)))
-      (when-let [vertical-offset (-> s (rum/dom-node) (.-offsetTop) (- 72))]
-        (utils/after 10
-         #(.scrollTo js/window 0 vertical-offset))))
-    (when (fn? dismiss-reply-cb)
-      (dismiss-reply-cb false))
-    (when (fn? add-comment-cb)
-      (add-comment-cb))))
+    (let [updated-comment (if edit-comment-data
+                            (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
+                            (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))]
+      (reset! (::show-post-button s) false)
+      (when (and (not (responsive/is-mobile-size?))
+                 (not edit-comment-data)
+                 (not dismiss-reply-cb)
+                 scroll-after-posting?
+                 (not (dom-utils/is-element-top-in-viewport? (sel1 [:div.stream-comments]) -40)))
+        (when-let [vertical-offset (-> s (rum/dom-node) (.-offsetTop) (- 72))]
+          (utils/after 10
+           #(.scrollTo js/window 0 vertical-offset))))
+      (when (fn? dismiss-reply-cb)
+        (dismiss-reply-cb false))
+      (when (fn? add-comment-cb)
+        (add-comment-cb updated-comment)))))
 
 (defn me-options [parent-uuid]
   {:media-config ["code" "gif" "photo" "video"]
@@ -225,7 +225,8 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb collapsed?]}]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb
+             edit-comment-data scroll-after-posting? add-comment-cb collapsed?]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _mention-users (drv/react s :mention-users)

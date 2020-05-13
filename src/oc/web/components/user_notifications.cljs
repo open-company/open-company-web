@@ -148,7 +148,8 @@
       (when activity-data
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when (-> notifications count (= 1)) (-> notifications first :interaction-id))
-                                    :collapsed? true})
+                                    :collapsed? true
+                                    :add-comment-cb (partial user-actions/activity-reply-inline n)})
          (str "adc-" "-" entry-id latest-notify-at)))]))
 
 (defn has-new-content? [notifications-data]

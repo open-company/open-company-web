@@ -104,12 +104,15 @@
         reminder-data (:reminder notification)
         entry-uuid (:entry-id notification)
         interaction-uuid (:interaction-id notification)
-        activity-data (dis/activity-data entry-uuid)]
+        activity-data (dis/activity-data entry-uuid)
+        current-user-data (:current-user-data db)]
     (merge notification
      {:activity-data activity-data
       :title title
       :body body
-      :unread (or (:unread notification) (> (:notify-at notification) (:last-read-at activity-data)))
+      :unread (and (not= (:user-id current-user-data) (-> notification :author :user-id))
+                   (or (:unread notification)
+                       (> (:notify-at notification) (:last-read-at activity-data))))
       :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
       :click (if (:reminder? notification)
                (when-not (responsive/is-mobile-size?)
