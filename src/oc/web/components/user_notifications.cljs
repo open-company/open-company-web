@@ -13,10 +13,11 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.post-authorship :refer (post-authorship)]))
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]
+            [oc.web.components.ui.info-hover-views :refer (board-info-hover)]))
 
 (rum/defc user-notification-timestamp
   [{:keys [timestamp is-mobile?]}]
@@ -30,9 +31,22 @@
       {:date-time timestamp}
       (utils/foc-date-time timestamp)]])
 
+(rum/defc user-notification-header
+  [{latest-notify-at :latest-notify-at {:keys [board-name] :as activity-data} :activity-data}]
+  [:div.user-notification-header
+    [:div.user-notification-board-name-container
+      (board-info-hover {:activity-data activity-data})
+      [:span.board-name
+        board-name]]
+    [:div.separator-dot]
+    [:span.time-since
+      [:time
+        {:date-time latest-notify-at}
+        (utils/tooltip-date latest-notify-at)]]])
+
 (rum/defc user-notification-attribution
   [{:keys [authorship-map current-user-id unread timestamp is-mobile?] :as props}]
-  [:div.user-notification-header
+  [:div.user-notification-attribution
     (post-authorship {:activity-data authorship-map
                       :user-avatar? true
                       :user-hover? true
@@ -78,6 +92,9 @@
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/event-inside? e (.querySelector user-notification-el "div.add-comment-box-container"))))
                        ((:click n)))))}
+      (when (and activity-data
+                 latest-notify-at)
+        (user-notification-header (select-keys n [:activity-data :latest-notify-at])))
       (when (:headline activity-data)
         [:div.user-notification-title
           (:headline activity-data)])

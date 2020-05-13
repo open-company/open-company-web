@@ -290,6 +290,50 @@ div.user-notifications-tray {
         }
       }
 
+      div.user-notification-header {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        height: 18px;
+        margin-bottom: 8px;
+        text-align: left;
+
+        div.user-notification-board-name-container {
+          position: relative;
+
+          span.board-name {
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 18px;
+            flex: 0 1 auto;
+            color: var(--color);
+            text-decoration: underline;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        div.separator-dot {
+          width: 3px;
+          height: 3px;
+          background-color: var(--divider-line);
+          border-radius: 50%;
+          margin: 1px 5px 0 5px;
+          flex: 0 0 auto;
+        }
+
+        span.time-since {
+          @include OC_Body_Book();
+          font-size: 12px;
+          line-height: 18px;
+          flex: 0 0 auto;
+          color: var(--color);
+        }
+      }
+
       div.user-notification-title {
         @include activity-title(20px, 28px);
         height: 28px;
@@ -356,7 +400,7 @@ div.user-notifications-tray {
             }
           }
 
-          div.user-notification-header {
+          div.user-notification-attribution {
             position: relative;
             display: flex;
             flex-flow: row nowrap;
