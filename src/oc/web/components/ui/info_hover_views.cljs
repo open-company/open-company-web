@@ -210,7 +210,7 @@
                          :hide-buttons (not active-user-data)
                          :my-profile? my-profile?
                          :following following?
-                         :followers-count followers-count})])))
+                         :followers-count (:count followers-count)})])))
 
 (rum/defcs board-info-hover <
   rum/static
@@ -265,4 +265,4 @@
          :style {:margin-left (str (:horizontal-offset pos) "px")}}
         (board-info-view {:activity-data activity-data
                           :following following?
-                          :followers-count followers-count})])))
+                          :followers-count (:count followers-count)})])))
