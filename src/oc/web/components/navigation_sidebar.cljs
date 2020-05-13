@@ -184,11 +184,9 @@
                               (utils/link-for (:links org-data) "unfollowing")
                               (integer? (:unfollowing-count org-data)))
         show-bookmarks (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "bookmarks")
-                            (integer? (:bookmarks-count org-data)))
+                            (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?
-                         drafts-link
-                         (integer? (:drafts-count org-data)))
+                         drafts-link)
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
