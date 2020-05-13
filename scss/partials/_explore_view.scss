@@ -1,0 +1,91 @@
+div.explore-view {
+  width: #{$board_container_width}px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @include mobile() {
+    width: 100%;
+  }
+
+  div.explore-view-header {
+    height: 24px;
+    padding-left: 24px;
+    background-image: cdnUrl("/img/ML/nav_explore.svg");
+    background-size: 16px 16px;
+    background-position: left 0px top 4px;
+    background-repeat: no-repeat;
+    @include OC_Body_Bold();
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--color);
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/nav_explore@dark.svg");
+    }
+  }
+
+  div.explore-view-blocks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    div.explore-view-block {
+      background-color: var(--overlay-background-color);
+      padding: 24px;
+      border: 1px solid var(--opac-background-color-2);
+      margin-top: 4px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      height: 166px;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: flex-start;
+      // justify-content: flex-start;
+
+      &:nth-child(2n + 1) {
+        margin-right: 4px;
+      }
+
+      &:nth-child(2n) {
+        margin-left: 4px;
+      }
+
+      div.explore-view-block-title {
+        @include OC_Body_Bold();
+        font-size: 18px;
+        line-height: 24px;
+        color: var(--color);
+        flex: 0 1 auto;
+      }
+
+      div.explore-view-block-description {
+        margin-top: 8px;
+        @include OC_Body_Bold();
+        font-size: 16px;
+        line-height: 20px;
+        max-height: 40px;
+        overflow: hidden;
+        color: var(--color);
+        flex: 0 1 auto;
+      }
+
+      div.explore-view-block-footer {
+        height: 32px;
+        margin-top: auto;
+        flex: 0 0 auto;
+
+        button.follow-button {
+          float: left;
+        }
+
+        span.followers-count {
+          float: left;
+          margin-left: 16px;
+          line-height: 32px;
+          font-size: 14px;
+          @include OC_Body_Book();
+          color: var(--light-color);
+        }
+      }
+    }
+  }
+}

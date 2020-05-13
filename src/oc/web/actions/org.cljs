@@ -158,6 +158,7 @@
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-following? (= (router/current-board-slug) "following")
         is-unfollowing? (= (router/current-board-slug) "unfollowing")
+        is-explore? (= (router/current-board-slug) "explore")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         sort-type (router/current-sort-type)
         is-contributions? (seq (router/current-contributions-id))
@@ -209,6 +210,8 @@
                      (router/current-contributions-id))
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id)))))))
     (cond
+      is-explore?
+      true
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
       (when (or ; (and is-inbox?
@@ -249,6 +252,7 @@
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation"))
            (not (utils/in? (:route @router/path) "secure-activity"))
+           (not (utils/in? (:route @router/path) "explore"))
            (not (router/current-contributions-id)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]

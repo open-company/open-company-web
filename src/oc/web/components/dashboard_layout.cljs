@@ -25,6 +25,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
@@ -98,6 +99,7 @@
         is-bookmarks (= current-board-slug "bookmarks")
         is-following (= current-board-slug "following")
         is-unfollowing (= current-board-slug "unfollowing")
+        is-explore (= current-board-slug "explore")
         is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -236,6 +238,7 @@
                        can-compose?)
                (cmail))
             (when (and (not showing-activity-view)
+                       (not is-explore)
                        (not show-expanded-post))
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -369,12 +372,16 @@
               ;; user notifications
               showing-activity-view
               (user-notifications/user-notifications {:tray-open true})
+              ;; Explore view
+              is-explore
+              (explore-view)
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; Empty board
               empty-board?
               (empty-board)
+              ;; Expanded post view
               show-expanded-post
               (expanded-post)
               ;; Paginated board/container

@@ -182,10 +182,13 @@
         ;; Go back to
         back-to (utils/back-to org-data)
         is-activity? (contains? back-to :activity)
+        is-explore? (contains? back-to :explore)
         is-contributions? (contains? back-to :contributions)
         to-url (cond
                  is-activity?
                  (oc-urls/activity)
+                 is-explore?
+                 (oc-urls/explore)
                  is-contributions?
                  (oc-urls/contributions (:contributions back-to))
                  :else
@@ -206,6 +209,8 @@
       (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
       is-activity?
       (nav-to-url! e "activity" to-url back-y should-refresh-data?)
+      is-explore?
+      (nav-to-url! e "explore" to-url back-y should-refresh-data?)
       :else
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
@@ -221,6 +226,9 @@
                   (and (seq (router/current-board-slug))
                        (not= (router/current-board-slug) "activity"))
                   {:activity true}
+                  (and (seq (router/current-board-slug))
+                       (not= (router/current-board-slug) "explore"))
+                  {:explore true}
                   (and (seq (router/current-board-slug))
                        (not= (router/current-board-slug) utils/default-drafts-board-slug))
                   {:board (router/current-board-slug)}

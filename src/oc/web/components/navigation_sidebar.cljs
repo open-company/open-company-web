@@ -168,7 +168,7 @@
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         is-activity (= selected-slug "activity")
         is-following (= selected-slug "following")
-        is-unfollowing (= selected-slug "unfollowing")
+        is-explore (= selected-slug "explore")
         is-my-posts (and user-is-part-of-the-team?
                          (= (router/current-contributions-id) (:user-id current-user-data)))
         is-bookmarks (= selected-slug "bookmarks")
@@ -180,9 +180,7 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "following"))
-        show-unfollowing (and user-is-part-of-the-team?
-                              (utils/link-for (:links org-data) "unfollowing")
-                              (integer? (:unfollowing-count org-data)))
+        show-explore user-is-part-of-the-team?
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?
@@ -263,7 +261,7 @@
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.nav-link.drafts.hover-item.group
               {:class (when (and (not is-following)
-                                 (not is-unfollowing)
+                                 (not is-explore)
                                  (not is-bookmarks)
                                  (= (router/current-board-slug) (:slug drafts-board)))
                         "item-selected")
@@ -287,12 +285,12 @@
               "Bookmarks"]
             (when (pos? (:bookmarks-count org-data))
               [:span.count (:bookmarks-count org-data)])])
-        (when show-unfollowing
+        (when show-explore
           [:div.left-navigation-sidebar-top.top-border
             [:a.nav-link.explore.hover-item.group
-              {:class (utils/class-set {:item-selected is-unfollowing})
+              {:class (utils/class-set {:item-selected is-explore})
                :href (oc-urls/unfollowing)
-               :on-click #(nav-actions/nav-to-url! % "unfollowing" (oc-urls/unfollowing))}
+               :on-click #(nav-actions/nav-to-url! % "explore" (oc-urls/explore))}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -389,7 +387,7 @@
             (for [board follow-boards-list
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (and (not is-following)
-                                              (not is-unfollowing)
+                                              (not is-explore)
                                               (not is-bookmarks)
                                               (= selected-slug (:slug board)))
                         ; board-change-data (get change-data (:uuid board))
