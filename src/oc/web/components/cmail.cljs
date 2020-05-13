@@ -28,7 +28,6 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
@@ -572,7 +571,6 @@
                                       :current-user-data current-user-data})])])
             ; Headline element
             [:div.cmail-content-headline-container.group
-              (user-avatar-image current-user-data)
               [:div.cmail-content-headline.emoji-autocomplete.emojiable
                 {:class utils/hide-class
                  :content-editable true
