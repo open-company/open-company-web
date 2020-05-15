@@ -1,8 +1,16 @@
+$expanded_post_header_height: 72;
+
 div.expanded-post {
   width: #{$board_container_width}px;
   margin: 0 auto;
   padding: 0 0 24px;
   position: relative;
+  padding-top: #{$expanded_post_header_height}px;
+  position: relative;
+
+  @include mobile() {
+    padding-top: 0;
+  }
 
   @include mobile() {
     width: 100%;
@@ -28,15 +36,22 @@ div.expanded-post {
     }
   }
 
+  &.no-headline {
+    div.expanded-post-author {
+      margin-top: 16px;
+    }
+  }
+
   div.expanded-post-header {
     position: fixed;
     // Add 32 pixels to the width to account for the overflwoing comment menu
     width: #{$board_container_width + 40}px;
     margin-left: -8px;
-    height: 72px;
+    height: #{$expanded_post_header_height}px;
     padding: 24px 32px 16px 8px;
     background-color: var(--background-color);
     z-index: 102;
+    top: #{$navbar_height}px;
 
     &:before {
       content: "";
@@ -203,16 +218,14 @@ div.expanded-post {
 
   div.expanded-post-headline {
     @include activity-title(26px, 33px);
-    padding-top: #{72 + 40}px;
+    margin: 16px 0 8px;
 
     @include mobile() {
       @include activity-title(22px, 28px);
-      padding-top: 0;
     }
   }
 
   div.expanded-post-author {
-    margin-top: 8px;
     min-height: 18px;
 
     div.expanded-post-author-inner {
@@ -389,9 +402,17 @@ div.expanded-post {
     @include activity-body(17, 22, var(--color), 16);
     margin-top: 16px;
 
+    &.no-headline {
+      @include activity-body-with-headline(26, 33);
+    }
+
     @include mobile() {
       margin-top: 8px;
       @include activity-body(18, 24, var(--color), 16);
+
+      &.no-headline {
+        @include activity-body-with-headline(22, 28);
+      }
     }
 
     .interactive-image {

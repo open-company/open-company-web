@@ -356,16 +356,10 @@ div.stream-item {
   }
 
   div.stream-item-body-ext {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     padding: 0;
     border-radius: 6px;
 
     @include mobile() {
-      display: block;
-      flex-direction: unset;
-      justify-content: unset;
       border-radius: 0;
     }
 
@@ -401,24 +395,24 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 80px;
+      height: 76px;
       position: relative;
       cursor: pointer;
 
       @include mobile() {
-        min-height: 71px;
+        height: 71px;
       }
 
       div.ziggeo-player {
-        width: 106px;
-        height: 80px;
+        width: 101px;
+        height: 76px;
         position: absolute;
         right: 0;
         top: 50%;
         transform: translateY(-50%);
 
         video {
-          max-height: 80px;
+          max-height: 76px;
         }
 
         @include tablet(){
@@ -443,8 +437,8 @@ div.stream-item {
       }
 
       div.body-thumbnail-wrapper {
-        width: 106px;
-        max-height: 80px;
+        width: 101px;
+        max-height: 76px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -456,8 +450,8 @@ div.stream-item {
         img.body-thumbnail {
           border-radius: 4px;
           object-fit: contain;
-          max-width: 106px;
-          max-height: 80px;
+          max-width: 101px;
+          max-height: 76px;
         }
 
         @include mobile() {
@@ -497,8 +491,6 @@ div.stream-item {
 
     div.stream-body-left {
       position: relative;
-      margin-top: 8px;
-      padding-bottom: 16px;
 
       @include mobile() {
         padding-bottom: 8px;
@@ -507,7 +499,7 @@ div.stream-item {
       &.has-thumbnail, &.has-video {
         float: left;
         width: 478px;
-        min-height: 80px;
+        height: 76px;
 
         @include mobile() {
           width: 100%;
@@ -536,6 +528,7 @@ div.stream-item {
         max-width: 100%;
         white-space: nowrap;
         overflow-wrap: break-word;
+        margin-top: 8px;
 
         @include mobile() {
           margin-top: 2px;
@@ -544,35 +537,40 @@ div.stream-item {
         }
       }
 
-      &.no-headline {
-        div.stream-item-body {
-          @include activity-body-preview(16, 22, var(--color), 4);
-          margin-top: 8px;
-          height: 88px;
+      div.stream-item-body {
+
+        &:not(.no-headline) {
+          @include activity-body-preview(16, 20, var(--color), 2);
 
           @include mobile() {
-            @include activity-body-preview(16, 22, var(--color), 3);
-            margin-top: 4px;
-            height: 66px;
+            @include activity-body-preview(16, 20, var(--color), 2);            
           }
         }
-      }
 
-      div.stream-item-body {
-        @include activity-body-preview(16, 22, var(--color), 3);
-        margin-top: 4px;
-        height: 66px;
+        &.no-headline {
+          @include activity-body-preview(16, 20, var(--color), 3);
 
-        @include mobile() {
-          @include activity-body-preview(16, 22, var(--color), 2);
-          margin-top: 0;
-          height: 44px;
+          @include activity-body-with-headline(20, 28);
+
+          margin-top: 8px;
+          height: #{(20 * 2) + 28 + 8}px;
+          padding-bottom: 8px;
+          
+          @include mobile() {
+            @include activity-body-preview(16, 20, var(--color), 3);
+
+            @include activity-body-with-headline(18, 23);
+
+            height: #{(20 * 2) + 23}px;
+            padding-bottom: 0;
+            margin-top: 0;
+          }
         }
       }
     }
 
     div.stream-item-footer {
-      min-height: 30px;
+      min-height: 26px;
 
       @include mobile() {
         height: auto;
@@ -690,7 +688,7 @@ div.stream-item {
       div.stream-item-attachments {
         float: left;
         margin-right: 16px;
-        height: 30px;
+        height: 26px;
         position: relative;
 
         @include mobile() {
@@ -713,7 +711,7 @@ div.stream-item {
           font-size: 14px;
           color: var(--color);
           opacity: 0.5;
-          line-height: 30px;
+          line-height: 26px;
 
           @include mobile() {
             margin-top: 0;
@@ -724,7 +722,7 @@ div.stream-item {
 
         div.stream-item-attachments-list {
           position: absolute;
-          top: 30px;
+          top: 26px;
           left: calc(50% - 120px);
           width: 240px;
           max-height: 200px;

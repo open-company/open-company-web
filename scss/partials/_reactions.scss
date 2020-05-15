@@ -1,5 +1,5 @@
 div.reactions {
-  height: 30px;
+  height: 26px;
   float: left;
 
   @include mobile() {
@@ -13,9 +13,9 @@ div.reactions {
       float: left;
       outline: none;
       position: relative;
-      height: 30px;
+      height: 26px;
       cursor: default;
-      padding: 4px 3px;
+      padding: 2px 3px;
       @include OC_Body_Bold();
       box-shadow: none;
       font-size: 11px;
@@ -48,7 +48,7 @@ div.reactions {
 
       div.count {
         float: right;
-        margin-top: 2px;
+        margin-top: 3px;
         min-width: 14px;
         height: 15px;
         text-align: center;

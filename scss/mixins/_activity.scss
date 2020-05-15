@@ -624,6 +624,14 @@ $header_top_margin: 24;
   }
 }
 
+@mixin activity-body-with-headline($font_size: 20, $line_height: 28) {
+  &:first-line, & + *:first-child:first-line {
+    @include activity-title(#{$font_size}px, #{$line_height}px);
+
+    @content
+  }
+}
+
 @mixin activity-body($font_size: 16, $line_height: ($bottom_margin + 6), $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
@@ -1201,6 +1209,10 @@ $header_top_margin: 24;
   }
 
   @include code-blocks(int($font-size) - 3, int($line-height) - 3, $paragraph_spacing);
+
+  &.no-headline {
+    @include activity-body-with-headline($font-size + 4, $line-height + 4);
+  }
 }
 
 @mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
@@ -1213,7 +1225,7 @@ $header_top_margin: 24;
   line-height: #{$line_height}px;
   font-size: #{$font_size}px;
 
-  max-height: #{$line_height * $preview_lines}px;
+  height: #{$line_height * $preview_lines}px;
 
   h1, h2, mark, mark.highlight {
     color: var(--color);
@@ -1267,9 +1279,5 @@ $header_top_margin: 24;
         background-image: cdnUrl("/img/ML/media_poll@dark.svg");
       }
     }
-  }
-
-  &.no-headline:first-line, &.no-headline + *:first-child:first-line {
-    @include activity-title(20px, 28px);
   }
 }
