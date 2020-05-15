@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
+            [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn- is-currently-shown? [author-uuid]
@@ -64,3 +65,20 @@
   (let [author-uuid (router/current-contributions-id)]
     (api/load-more-items more-link direction (partial contributions-more-finish author-uuid direction))
     (dis/dispatch! [:contributions-more (router/current-org-slug) author-uuid])))
+
+;; Change service actions
+
+(defn subscribe []
+  (ws-cc/subscribe :item/change
+    (fn [data]
+      (when (router/current-contributions-id)
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              activity-data (dis/activity-data (router/current-org-slug) activity-uuid)]
+          ;; On update or delete of a post from the currently shown user
+          (when (or (= change-type :add)
+                    (and (#{:update :delete} change-type)
+                         (= (router/current-contributions-id)
+                            (-> activity-data :publisher :user-id))))
+            (contributions-get (router/current-contributions-id))))))))
