@@ -41,8 +41,7 @@
 
 (defn focus-add-comment [s]
   (enable-add-comment? s)
-  (let [{:keys [activity-data parent-comment-uuid]} (first (:rum/args s))]
-    (comment-actions/add-comment-focus (focus-value s))))
+  (comment-actions/add-comment-focus (focus-value s)))
 
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
