@@ -420,14 +420,6 @@
                                 (router/nav! (cond
                                                is-in-cmail-board?
                                                (oc-urls/board (:board-slug cmail-data))
-                                               ;; If user is in following and he is following the board
-                                               ;; can stay here
-                                               following-cmail-board?
-                                               (oc-urls/following)
-                                               ;; If user is in unfollowing and he is not following the board
-                                               ;; can stay here
-                                               (not following-cmail-board?)
-                                               (oc-urls/unfollowing)
                                                ;; If user is publishing to its own publisher board
                                                ;; redirect him there
                                                (:publisher-board cmail-data)

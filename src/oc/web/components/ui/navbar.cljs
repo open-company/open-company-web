@@ -76,10 +76,9 @@
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         showing-threads-view (= (router/current-board-slug) "threads")
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
-                       showing-threads-view
+                       (= (router/current-board-slug) "threads")
                        "Threads"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
@@ -88,7 +87,7 @@
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
                        (= (router/current-board-slug) "following")
-                       "Wut"
+                       "Home"
                        (= (router/current-board-slug) "unfollowing")
                        "Explore"
                        (and (router/current-contributions-id) (seq contributions-user-data))

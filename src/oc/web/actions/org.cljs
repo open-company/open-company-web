@@ -99,7 +99,7 @@
       {:slug "all-posts"}
       (and (= last-board-slug "following")
            (utils/link-for (:links org-data) "following"))
-      {:slug "following"}
+      {:slug "home"}
       (and (= last-board-slug "unfollowing")
            (utils/link-for (:links org-data) "unfollowing"))
       {:slug "unfollowing"}
@@ -213,6 +213,7 @@
     (cond
       (or is-explore?
           is-threads?)
+      ;; No-op
       true
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)

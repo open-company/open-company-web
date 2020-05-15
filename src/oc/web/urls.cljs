@@ -107,7 +107,7 @@
   ([]
     (following (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/following")))
+    (str (org org-slug) "/home")))
 
 (defn unfollowing
   "Org unfollowing url"
