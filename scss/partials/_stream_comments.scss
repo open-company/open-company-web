@@ -635,14 +635,14 @@ div.stream-comments {
 
         &.indented-comment div.stream-comment {
           div.add-comment-box-container {
-            margin-left: 48px;
+            margin-left: 40px;
 
             @include mobile() {
               margin-left: 0;
             }
 
             div.add-comment-box {
-              width: calc(100% - 48px);
+              width: calc(100% - 32px);
 
               @include mobile() {
                 width: 100%;
