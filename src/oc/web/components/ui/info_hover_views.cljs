@@ -23,9 +23,8 @@
         [:div.board-info-name
           (:board-name activity-data)]
         [:div.board-info-subline
-          (if (pos? followers-count)
-            (str followers-count " follower" (when (not= followers-count 1) "s"))
-            "No followers")]]]
+          (when (pos? followers-count)
+            (str followers-count " follower" (when (not= followers-count 1) "s")))]]]
     [:div.board-info-buttons.group
       [:button.mlb-reset.posts-bt
         {:on-click #(do
@@ -65,9 +64,8 @@
             [:div.user-info-subline
               (:email user-data)])
           [:div.user-info-subline
-            (if (pos? followers-count)
-              (str followers-count " follower" (when (not= followers-count 1) "s"))
-              "No followers")]
+            (when (pos? followers-count)
+              (str followers-count " follower" (when (not= followers-count 1) "s")))]
           (when (and (not hide-buttons)
                      (not my-profile?))
             [:button.mlb-reset.profile-bt

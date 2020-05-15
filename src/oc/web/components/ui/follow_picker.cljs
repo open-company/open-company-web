@@ -83,7 +83,8 @@
       [:span.user-role
         (:title current-user-data)]
       [:span.followers-count
-        "No followers"]
+        ; "No followers"
+        ]
       [:button.mlb-reset.edit-profile-bt
         {:on-click #(nav-actions/show-user-settings :profile)}
         "Edit profile"]]])
@@ -210,9 +211,8 @@
                                       (get followers-publishers-count (:user-id i)))
                           followers-count (:count followers)]
                       [:span.followers-count
-                        (if (pos? followers-count)
-                          (str followers-count " follower" (when (not= followers-count 1) "s"))
-                          "No followers")])
+                        (when (pos? followers-count)
+                          (str followers-count " follower" (when (not= followers-count 1) "s")))])
                     (follow-button {:following true
                                     :resource-type (:resource-type i)
                                     :resource-uuid (if (is-user? i) (:user-id i) (:uuid i))})])
@@ -240,9 +240,8 @@
                                         (get followers-publishers-count (:user-id i)))
                             followers-count (:count followers)]
                         [:span.followers-count
-                          (if (pos? followers-count)
-                            (str followers-count " follower" (when (not= followers-count 1) "s"))
-                            "No followers")])
+                          (when (pos? followers-count)
+                            (str followers-count " follower" (when (not= followers-count 1) "s")))])
                       (follow-button {:following false
                                       :resource-type (:resource-type i)
                                       :resource-uuid (if (is-user? i) (:user-id i) (:uuid i))})]))]])]]]))

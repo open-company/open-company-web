@@ -80,6 +80,5 @@
                               :resource-uuid (if (is-user? item) (:user-id item) (:uuid item))
                             :resource-type (:resource-type item)})
               [:span.followers-count
-                (if (pos? followers-count)
-                  (str followers-count " follower" (when (not= followers-count 1) "s"))
-                  "No followers")]]])]]))
+                (when (pos? followers-count)
+                  (str followers-count " follower" (when (not= followers-count 1) "s")))]]])]]))
