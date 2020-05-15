@@ -169,3 +169,13 @@
        (assoc :new-count (count (filter :new enriched-children)))
        (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children))))))
    comments))
+
+(defn add-comment-focus-value
+  ([prefix entry-uuid]
+   (add-comment-focus-value prefix entry-uuid nil nil))
+
+  ([prefix entry-uuid parent-comment-uuid]
+   (add-comment-focus-value prefix entry-uuid parent-comment-uuid nil))
+
+  ([prefix entry-uuid parent-comment-uuid edit-comment-uuid]
+   (str prefix "-" (dis/add-comment-string-key entry-uuid parent-comment-uuid edit-comment-uuid))))

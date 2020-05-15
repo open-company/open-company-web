@@ -345,7 +345,8 @@
                                      :comments-data comments-data
                                      :new-comments-count (:new-comments-count activity-data)
                                      :hide-label? is-mobile?
-                                     :publisher? publisher?})]
+                                     :publisher? publisher?
+                                     :add-comment-focus-prefix "main-comment"})]
                 (if show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

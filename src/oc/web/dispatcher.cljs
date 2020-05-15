@@ -93,12 +93,15 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
-(defn add-comment-string-key [activity-uuid & [parent-comment-uuid comment-uuid]]
-  (str activity-uuid
-    (when parent-comment-uuid
-      (str "-" parent-comment-uuid))
-    (when comment-uuid
-      (str "-" comment-uuid))))
+(defn add-comment-string-key
+  ([activity-uuid] (add-comment-string-key activity-uuid nil nil))
+  ([activity-uuid parent-comment-uuid] (add-comment-string-key activity-uuid parent-comment-uuid nil))
+  ([activity-uuid parent-comment-uuid comment-uuid]
+   (str activity-uuid
+     (when parent-comment-uuid
+       (str "-" parent-comment-uuid))
+     (when comment-uuid
+       (str "-" comment-uuid)))))
 
 (def add-comment-force-update-root-key :add-comment-force-update)
 

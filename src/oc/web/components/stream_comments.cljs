@@ -153,7 +153,8 @@
        (add-comment {:activity-data activity-data
                      :parent-comment-uuid (:reply-parent comment-data)
                      :dismiss-reply-cb dismiss-reply-cb
-                     :edit-comment-data comment-data})
+                     :edit-comment-data comment-data
+                     :add-comment-focus-prefix (if is-indented-comment? "edit-reply" "edit-comment")})
        (str "edit-comment-" edit-comment-key))]])
 
 
@@ -401,7 +402,8 @@
                       showing-picker? (and (seq @(::show-picker s))
                                            (= @(::show-picker s) (:uuid root-comment-data)))]]
             [:div.stream-comment-thread
-              {:class (utils/class-set {:left-border (-> root-comment-data :thread-children count pos?)
+              {:class (utils/class-set {:left-border (or (-> root-comment-data :thread-children count pos?)
+                                                         show-add-comment?)
                                         :has-new (pos? (:new-count root-comment-data))})
                :key (str "stream-comments-thread-" (:uuid root-comment-data))}
               (if is-editing?
@@ -497,6 +499,7 @@
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :parent-comment-uuid (:reply-parent root-comment-data)
                                             :add-comment-cb #(thread-mark-read s (:uuid root-comment-data))
+                                            :add-comment-focus-prefix "new-reply"
                                             :dismiss-reply-cb (fn [_ _]
                                                                (swap! (::replying-to s) #(disj % (:reply-parent root-comment-data))))})
                  (str "add-comment-" edit-comment-key))]])])])]))

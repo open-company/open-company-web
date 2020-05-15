@@ -125,6 +125,7 @@
    :will-unmount (fn [s]
     (mark-read s)
     (reset! (::activity-uuid s) nil)
+    (comment-actions/add-comment-blur)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -285,7 +286,8 @@
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data
-                                      :scroll-after-posting? true})
+                                      :scroll-after-posting? true
+                                      :add-comment-focus-prefix "main-comment"})
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
