@@ -64,7 +64,7 @@
                 (oc-urls/comment-url (:board-slug activity-data) (:uuid activity-data) interaction-uuid)
                 (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))))]
     (cond
-      (and (= (router/current-board-slug) "activity")
+      (and (= (router/current-board-slug) "threads")
            (seq activity-data))
       #(oc.web.actions.nav-sidebar/open-post-modal activity-data false interaction-uuid)
       (seq activity-data)

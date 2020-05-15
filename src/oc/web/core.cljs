@@ -608,13 +608,13 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
 
-    (defroute activity-route (urls/activity ":org") {:as params}
-      (timbre/info "Routing activity-route" (urls/activity ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "activity")))
+    (defroute threads-route (urls/threads ":org") {:as params}
+      (timbre/info "Routing threads-route" (urls/threads ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "threads")))
 
-    (defroute activity-slash-route (str (urls/activity ":org") "/") {:as params}
-      (timbre/info "Routing activity-slash-route" (str (urls/activity ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "activity")))
+    (defroute threads-slash-route (str (urls/threads ":org") "/") {:as params}
+      (timbre/info "Routing threads-slash-route" (str (urls/threads ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "threads")))
 
     (defroute explore-route (urls/explore ":org") {:as params}
       (timbre/info "Routing explore-route" (urls/explore ":org"))

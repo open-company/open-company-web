@@ -69,17 +69,17 @@
                 show-login-overlay
                 orgs-dropdown-visible
                 search-active
-                activity-view
+                threads-view
                 show-whats-new-green-dot
                 panel-stack]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         showing-activity-view (= (router/current-board-slug) "activity")
+         showing-threads-view (= (router/current-board-slug) "threads")
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
-                       showing-activity-view
+                       showing-threads-view
                        "Threads"
                        (= (router/current-board-slug) "inbox")
                        "Unread"

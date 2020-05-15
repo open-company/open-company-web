@@ -287,7 +287,6 @@
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
-   ; :activity-view [[:base] (fn [base] (:activity-view base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]

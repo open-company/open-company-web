@@ -166,11 +166,15 @@
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
-        is-activity (= selected-slug "activity")
-        is-following (= selected-slug "following")
-        is-explore (= selected-slug "explore")
+        is-threads (or (:threads (:back-to @router/path))
+                        (= selected-slug "threads"))
+        is-following (or (:following (:back-to @router/path))
+                         (= selected-slug "following"))
+        is-explore (or (:explore (:back-to @router/path))
+                         (= selected-slug "explore"))
         is-my-posts (and user-is-part-of-the-team?
-                         (= (router/current-contributions-id) (:user-id current-user-data)))
+                         (or (= (:contributions (:back-to @router/path)) (:user-id current-user-data))
+                             (= (router/current-contributions-id) (:user-id current-user-data))))
         is-bookmarks (= selected-slug "bookmarks")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
@@ -226,13 +230,13 @@
             ;   [:span.count (count all-unread-items)])
             ])
         (when user-is-part-of-the-team?
-          [:a.nav-link.activity-view.hover-item.group
-            {:class (utils/class-set {:item-selected is-activity
+          [:a.nav-link.threads-view.hover-item.group
+            {:class (utils/class-set {:item-selected is-threads
                                       :new (pos? unread-notifications-count)})
              :href "."
              :on-click (fn [e]
                          (utils/event-stop e)
-                         (nav-actions/nav-to-url! e "activity" (oc-urls/activity)))}
+                         (nav-actions/nav-to-url! e "threads" (oc-urls/threads)))}
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}

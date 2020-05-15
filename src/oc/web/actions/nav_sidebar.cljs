@@ -77,7 +77,8 @@
 
 (defn- container-data [back-to]
   (cond
-   (contains? back-to :activity)
+   (or (:threads back-to)
+       (:explore back-to))
    nil
    (contains? back-to :contributions)
    (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
@@ -181,12 +182,15 @@
   (let [org-data (dis/org-data)
         ;; Go back to
         back-to (utils/back-to org-data)
-        is-activity? (contains? back-to :activity)
-        is-explore? (contains? back-to :explore)
-        is-contributions? (contains? back-to :contributions)
+        is-threads? (:threads back-to)
+        is-explore? (:explore back-to)
+        is-following? (:following back-to)
+        is-contributions? (:contributions back-to)
         to-url (cond
-                 is-activity?
-                 (oc-urls/activity)
+                 is-following?
+                 (oc-urls/following)
+                 is-threads?
+                 (oc-urls/threads)
                  is-explore?
                  (oc-urls/explore)
                  is-contributions?
@@ -207,10 +211,12 @@
     (cond
       is-contributions?
       (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
-      is-activity?
-      (nav-to-url! e "activity" to-url back-y should-refresh-data?)
+      is-threads?
+      (nav-to-url! e "threads" to-url back-y should-refresh-data?)
       is-explore?
       (nav-to-url! e "explore" to-url back-y should-refresh-data?)
+      is-following?
+      (nav-to-url! e "following" to-url back-y should-refresh-data?)
       :else
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
@@ -223,17 +229,15 @@
         board (:board-slug activity-data)
         sort-type (activity-actions/saved-sort-type org board)
         back-to (cond
-                  (and (seq (router/current-board-slug))
-                       (not= (router/current-board-slug) "activity"))
-                  {:activity true}
-                  (and (seq (router/current-board-slug))
-                       (not= (router/current-board-slug) "explore"))
-                  {:explore true}
-                  (and (seq (router/current-board-slug))
-                       (not= (router/current-board-slug) utils/default-drafts-board-slug))
-                  {:board (router/current-board-slug)}
-                  (seq (router/current-contributions-id))
+                  (and (seq (router/current-contributions-id))
+                       (not (seq (router/current-board-slug))))
                   {:contributions (router/current-contributions-id)}
+                  (= (router/current-board-slug) "threads")
+                  {:threads true}
+                  (= (router/current-board-slug) "explore")
+                  {:explore true}
+                  (= (router/current-board-slug) "following")
+                  {:following true}
                   :else
                   {:board board})
         activity (:uuid activity-data)

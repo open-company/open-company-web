@@ -133,7 +133,7 @@
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :sorted-user-notifications)
-        showing-activity-view (= (router/current-board-slug) "activity")
+        showing-threads-view (= (router/current-board-slug) "threads")
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -188,8 +188,8 @@
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "activity" (oc-urls/activity)))
-                 :class (when showing-activity-view
+                              (nav-actions/nav-to-url! % "threads" (oc-urls/threads)))
+                 :class (when showing-threads-view
                           "active")}
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
@@ -237,7 +237,7 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when (and (not showing-activity-view)
+            (when (and (not showing-threads-view)
                        (not is-explore)
                        (not show-expanded-post))
               ;; Board name row: board name, settings button and say something button
@@ -246,8 +246,8 @@
                 ;; Board name and settings button
                 [:div.board-name
                   (cond
-                    showing-activity-view
-                    [:div.board-name-with-icon.activity-view
+                    showing-threads-view
+                    [:div.board-name-with-icon.threads-view
                       [:div.board-name-with-icon-internal
                         "Threads"
                         ; (when (pos? (:total-count contributions-data))
@@ -370,7 +370,7 @@
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; user notifications
-              showing-activity-view
+              showing-threads-view
               (user-notifications/user-notifications {:tray-open true})
               ;; Explore view
               is-explore
