@@ -34,6 +34,7 @@
             [oc.web.actions.comment :as ca]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
+            [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.nux :as na]
             [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
@@ -689,6 +690,7 @@
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
+  (contrib-actions/subscribe)
   (oa/subscribe)
   (ra/subscribe)
   (ca/subscribe)

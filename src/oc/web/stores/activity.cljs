@@ -149,6 +149,31 @@
        (assoc-in fl-ra-key next-fl-ra-data)))
     db))
 
+(defn add-remove-item-from-contributions
+  "Given an activity map adds or remove it from it's contributions' list of posts depending on the activity status"
+  [db org-slug activity-data]
+  (let [data-key (dispatcher/contributions-data-key org-slug (-> activity-data :publisher :user-id))]
+    (if (and (:uuid activity-data)
+             (= (:status activity-data) "published")
+             (contains? (get db (butlast data-key)) (last data-key)))
+      (let [;; Add/remove item from AP
+            publisher (:publisher activity-data)
+            data-key (dispatcher/contributions-data-key org-slug (:user-id publisher))
+            old-data (get-in db data-key)
+            old-data-posts (get old-data :posts-list)
+            without-uuid (utils/vec-dissoc old-data-posts (:uuid activity-data))
+            new-uuids (vec (conj without-uuid (:uuid activity-data)))
+            new-data-posts (map #(dispatcher/activity-data org-slug % db) new-uuids)
+            sorted-new-posts (reverse (sort-by :published-at new-data-posts))
+            sorted-new-uuids (mapv :uuid sorted-new-posts)
+            grouped-uuids (if (au/show-separators? (:board-slug activity-data))
+                            (au/grouped-posts (assoc old-data :posts-list sorted-new-uuids))
+                            sorted-new-uuids)
+            next-data (merge old-data {:posts-list sorted-new-uuids
+                                       :items-to-render grouped-uuids})]
+        (assoc-in db data-key next-data))
+      db)))
+
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
   (-> db
@@ -243,6 +268,7 @@
       (add-remove-item-from-bookmarks org-slug with-published-at)
       (add-remove-item-from-following org-slug with-published-at)
       (add-remove-item-from-board org-slug with-published-at)
+      (add-remove-item-from-contributions org-slug with-published-at)
       (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
@@ -286,6 +312,21 @@
                                         (get-in next-ndb (conj container-ra-key :posts-list)))))))
                                db
                                (keys (get-in db containers-key)))
+        ;; Remove the post from contributors lists
+        contributions-list-key (dispatcher/contributions-list-key org-slug)
+        with-fixed-contribs (reduce
+                             (fn [ndb ckey]
+                               (let [base-contributions-key (dispatcher/contributions-key org-slug ckey)
+                                     next-ndb (update-in ndb (conj base-contributions-key :posts-list)
+                                               (fn [posts-list]
+                                                 (filterv #(not= % (:uuid activity-data)) posts-list)))
+                                     items-to-render-key (conj base-contributions-key :items-to-render)]
+                                  (assoc-in next-ndb items-to-render-key
+                                   (if (au/show-separators? ckey)
+                                     (au/grouped-posts (get-in next-ndb base-contributions-key))
+                                     (get-in next-ndb (conj base-contributions-key :posts-list))))))
+                             db
+                             (keys (get-in with-fixed-containers contributions-list-key)))
         ;; Remove the post from all the boards posts list too
         boards-key (dispatcher/boards-key org-slug)
         with-fixed-boards (reduce
@@ -299,7 +340,7 @@
                                  (if (au/show-separators? ckey)
                                    (au/grouped-posts (get-in next-ndb base-board-key))
                                    (get-in next-ndb (conj base-board-key :posts-list))))))
-                           with-fixed-containers
+                           with-fixed-contribs
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
     (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
