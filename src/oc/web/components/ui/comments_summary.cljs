@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.comment :as cu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -38,7 +39,8 @@
            hide-label?
            hide-face-pile?
            new-comments-count
-           publisher?]}]
+           publisher?
+           add-comment-focus-prefix]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -70,7 +72,7 @@
                        (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
                          (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
                        (nav-actions/open-post-modal entry-data true))
-                     (comment-actions/add-comment-focus (:uuid entry-data)))}
+                     (comment-actions/add-comment-focus (cu/add-comment-focus-value add-comment-focus-prefix (:uuid entry-data))))}
         ; Comments authors heads
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)

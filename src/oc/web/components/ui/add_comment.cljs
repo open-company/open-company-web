@@ -24,6 +24,11 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
+(defn- focus-value [s]
+  (let [{:keys [activity-data parent-comment-uuid
+         add-comment-focus-prefix edit-comment-data]} (-> s :rum/args first)]
+    (cu/add-comment-focus-value add-comment-focus-prefix (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))))
+
 ;; Add commnet handling
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
@@ -37,9 +42,7 @@
 (defn focus-add-comment [s]
   (enable-add-comment? s)
   (let [{:keys [activity-data parent-comment-uuid]} (first (:rum/args s))]
-    (if parent-comment-uuid
-      (comment-actions/add-comment-focus parent-comment-uuid)
-      (comment-actions/add-comment-focus (:uuid activity-data)))))
+    (comment-actions/add-comment-focus (focus-value s))))
 
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
@@ -96,15 +99,16 @@
   (enable-add-comment? s))
 
 (defn- should-focus-field? [s & [mounting]]
-  (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
-        add-comment-focus @(drv/get-ref s :add-comment-focus)]
+  (let [{:keys [activity-data parent-comment-uuid
+         parent-comment-uuid edit-comment-data]} (first (:rum/args s))
+        add-comment-focus @(drv/get-ref s :add-comment-focus)
+        component-focus-id (focus-value s)]
     (or (and mounting
              edit-comment-data)
-        (and (= (:uuid activity-data) add-comment-focus)
-             (not parent-comment-uuid))
-        (and mounting
-             (seq parent-comment-uuid)
-             (= parent-comment-uuid add-comment-focus)))))
+        (and (= add-comment-focus component-focus-id)
+             (or (not parent-comment-uuid)
+                 (and (seq parent-comment-uuid)
+                      mounting))))))
 
 (defn- maybe-focus-field [s & [mounting]]
   (when (should-focus-field? s mounting)
@@ -120,6 +124,7 @@
                     (disable-add-comment-if-needed s)
                     (reset! (::did-change s) false)
                     (reset! (::show-post-button s) false)
+                    (comment-actions/add-comment-blur)
                     (comment-actions/add-comment-reset (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                     (when (fn? dismiss-reply-cb)
                       (dismiss-reply-cb true)))]
@@ -225,7 +230,8 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb
+
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix
              edit-comment-data scroll-after-posting? add-comment-cb collapsed?]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
@@ -234,7 +240,7 @@
         _current-user-data (drv/react s :current-user-data)
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
-        add-comment-focus (drv/react s :add-comment-focus)
+        add-comment-focus (str add-comment-focus-prefix (drv/react s :add-comment-focus))
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
         is-focused? (should-focus-field? s)
