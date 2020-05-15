@@ -64,6 +64,10 @@ div.virtualized-list-row.collapsed-item {
           }
         }
 
+        div.activity-share-container {
+          display: block;
+        }
+
         &.expandable {
           div.more-menu {
             display: initial;
@@ -357,6 +361,18 @@ div.stream-collapsed-item {
 
     ul.more-menu-list {
       z-index: 102;
+    }
+  }
+
+  div.activity-share-container {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+
+    div.activity-share-modal-container {
+      margin-top: 0;
+      right: 0;
     }
   }
 }
