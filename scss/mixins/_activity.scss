@@ -1268,4 +1268,8 @@ $header_top_margin: 24;
       }
     }
   }
+
+  &.no-headline:first-line, &.no-headline + *:first-child:first-line {
+    @include activity-title(20px, 28px);
+  }
 }

@@ -31,10 +31,12 @@
   (if (seq (:abstract activity-data))
     [:div.stream-item-body.oc-mentions
       {:data-itemuuid (:uuid activity-data)
+       :class (when-not (:has-headline activity-data) "no-headline")
        :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
     [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :ref :item-body
+       :class (when-not (:has-headline activity-data) "no-headline")
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
