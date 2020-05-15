@@ -155,7 +155,7 @@
             {:on-click #(nav-actions/show-section-add)}
             "New topic"]
           [:h3.follow-picker-title
-            "Content filter"]]
+            "Personalize your Home feed"]]
         [:div.follow-picker-body
           (if-not show-following?
             [:div.follow-picker-empty-items
