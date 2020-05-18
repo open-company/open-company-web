@@ -236,6 +236,45 @@ div.user-notifications-tray {
       }
     }
 
+    div.user-notification-caught-up {
+      height: 55px;
+      width: 100%;
+      position: relative;
+      margin: 16px 0;
+
+      &:before {
+        position: absolute;
+        top: 24px;
+        height: 2px;
+        left: 0;
+        width: 30%;
+        background-color: rgba($wut_purple, 0.6);
+        content: "";
+      }
+
+      div.all-caught-up {
+        // width: 40%;
+        margin: 0 auto;
+        height: 55px;
+
+        div.all-caught-up-inner {
+          div.message {
+            color: rgba($wut_purple, 0.6);
+          }
+        }
+      }
+
+      &:after {
+        position: absolute;
+        top: 24px;
+        height: 2px;
+        right: 0;
+        width: 30%;
+        background-color: rgba($wut_purple, 0.6);
+        content: "";
+      }
+    }
+
     div.user-notification {
       margin: 0;
       border-top: 1px solid transparent;
@@ -256,13 +295,13 @@ div.user-notifications-tray {
         border-left: 1px solid var(--foc-hover-border-color);
       }
 
-      &:first-child {
+      &.open-item {
         border-top: 1px solid var(--foc-divider-line-color);
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
       }
 
-      &:last-child {
+      &.close-item {
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
       }
