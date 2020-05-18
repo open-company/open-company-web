@@ -182,7 +182,7 @@
                 ;; Following
                 [:div.follow-picker-row-header.group
                   [:div.follow-picker-row-header-left
-                    "Subsctiptions"]
+                    "Subscriptions"]
                   (comment ;; Hide filter for now
                     [:div.follow-picker-row-header-right
                       [:button.mlb-reset.follow-filter-bt
