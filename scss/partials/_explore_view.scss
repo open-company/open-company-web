@@ -28,7 +28,7 @@ div.explore-view {
     display: grid;
     grid-template-columns: 1fr 1fr;
 
-    div.explore-view-block {
+    a.explore-view-block {
       background-color: var(--overlay-background-color);
       padding: 24px;
       border: 1px solid var(--opac-background-color-2);

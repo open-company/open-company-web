@@ -2,8 +2,10 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.follow-button :refer (follow-button)]))
 
 (defn- is-user? [item]
@@ -65,11 +67,19 @@
         "Explore"]
       [:div.explore-view-blocks
         (for [item sorted-items
-              :let [followers-count-data (if (is-user? item)
+              :let [user? (is-user? item)
+                    followers-count-data (if user?
                                            (get followers-publishers-count (:user-id item))
                                            (get followers-boards-count (:uuid item)))
                     followers-count (:count followers-count-data)]]
-          [:div.explore-view-block
+          [:a.explore-view-block
+            {:href (if user? (oc-urls/contributions (:user-id item)) (oc-urls/board (:slug item)))
+             :on-click (fn [e]
+                         (utils/event-stop e)
+                         (when-not (utils/button-clicked? e)
+                           (if user?
+                             (nav-actions/nav-to-author! e (:user-id item) (oc-urls/contributions (:user-id item)))
+                             (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item))))))}
             [:div.explore-view-block-title
               (:name item)]
             (when (is-user? item)
