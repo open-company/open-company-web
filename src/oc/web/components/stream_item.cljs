@@ -135,7 +135,6 @@
                             (fn [s]
                               (let [has-headline? (-> s :rum/args first :activity-data :has-headline)
                                     height (+ (* 2 22) (if has-headline? 0 28))]
-                                (js/console.log "DBG height " height "has-headline?" has-headline?)
                                 height))))
                          ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
