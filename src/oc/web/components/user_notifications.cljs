@@ -153,6 +153,7 @@
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when (-> notifications count (= 1)) (-> notifications first :interaction-id))
                                     :collapsed? true
+                                    :add-comment-placeholder "Reply..."
                                     :add-comment-cb (partial user-actions/activity-reply-inline n)
                                     :add-comment-focus-prefix "thread-comment"})
          (str "adc-" "-" entry-id latest-notify-at)))]))
@@ -196,7 +197,7 @@
             (if caught-up?
               [:div.user-notification-caught-up
                 {:key (str "uni-caught-up-" (:latest-notify-at n))}
-                (all-caught-up)]
+                (all-caught-up "You are all caught up!")]
               (let [entry-id (:entry-id n)
                     interaction-id (:interaction-id n)
                     parent-interaction-id (:parent-interaction-id n)

@@ -2,8 +2,8 @@
   (:require [rum.core :as rum]))
 
 (rum/defc all-caught-up
-  []
+  [message]
   [:div.all-caught-up
     [:div.all-caught-up-inner
       [:div.message
-        "That’s all for now!"]]])
+        (or message "That’s all for now!")]]])

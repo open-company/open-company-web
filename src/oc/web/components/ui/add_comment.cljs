@@ -30,7 +30,7 @@
     (cu/add-comment-focus-value add-comment-focus-prefix (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))))
 
 ;; Add commnet handling
-(defn enable-add-comment? [s]
+(defn- enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
@@ -39,11 +39,11 @@
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
-(defn focus-add-comment [s]
+(defn- focus-add-comment [s]
   (enable-add-comment? s)
   (comment-actions/add-comment-focus (focus-value s)))
 
-(defn disable-add-comment-if-needed [s]
+(defn- disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
     (enable-add-comment? s)
     (when-not (seq (.-innerHTML add-comment-node))
@@ -84,15 +84,15 @@
       (when (fn? add-comment-cb)
         (add-comment-cb updated-comment)))))
 
-(defn me-options [parent-uuid]
+(defn- me-options [parent-uuid placeholder]
   {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
-   :placeholder (if parent-uuid "Reply…" "Add a comment…")
+   :placeholder (or placeholder (if parent-uuid "Reply…" "Add a comment…"))
    :use-inline-media-picker true
    :static-positioned-media-picker true
    :media-picker-initially-visible false})
 
-(defn add-comment-did-change [s]
+(defn- add-comment-did-change [s]
   (reset! (::did-change s) true)
   (reset! (::show-post-button s) true)
   (enable-add-comment? s))
@@ -199,7 +199,8 @@
                               (reset! (::did-change s) true)))
                           s)
                           :did-mount (fn [s]
-                           (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
+                           (let [props (first (:rum/args s))]
+                             (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid props) (:add-comment-placeholder props))))
                            (maybe-focus-field s true)
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
@@ -210,7 +211,8 @@
                                (reset! (::last-add-comment-focus s) add-comment-focus)))
                            s)
                           :will-update (fn [s]
-                           (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
+                           (let [props (first (:rum/args s))]
+                             (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid props) (:add-comment-placeholder props))))
                            (let [data @(drv/get-ref s :media-input)
                                  video-data (:media-video data)]
                               (when (and @(:me/media-video s)
