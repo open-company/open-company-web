@@ -3,6 +3,7 @@
             [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -134,7 +135,7 @@
         [:div.plan-summary-details
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(payments-actions/add-payment-method payments-data)}
-            "Subscribe to Carrot"]])
+            "Subscribe to Wut"]])
       (when (or (is-trial? subscription-data)
                 (is-trial-expired? subscription-data))
         [:div.plan-summary-details.bottom-margin
@@ -172,7 +173,7 @@
           "Have a team of 250+"
           [:a.chat-with-us
             {:class "intercom-chat-link"
-             :href "mailto:hello@carrot.io"}
+             :href oc-urls/contact-mail-to}
             "Chat with us"]])]))
 
 (defn- show-error-alert [s]
@@ -334,9 +335,9 @@
                         current-plan-data))))}
         (if has-payment-info?
           (if (:cancel-at-period-end? subscription-data)
-            "Subscribe to Carrot"
+            "Subscribe to Wut"
             "Change plan")
-          "Subscribe to Carrot")]
+          "Subscribe to Wut")]
       (when @(::saving-plan s)
         (small-loading))
      [:div.plan-change-separator]
@@ -345,13 +346,13 @@
        [:br]
        [:a.chat-with-us
          {:class "intercom-chat-link"
-          :href "mailto:hello@carrot.io"}
+          :href oc-urls/contact-mail-to}
          "Chat with us"]]
      [:div.plan-change-details
        "Team of 250+? "
        [:a.chat-with-us
          {:class "intercom-chat-link"
-          :href "mailto:hello@carrot.io"}
+          :href oc-urls/contact-mail-to}
          "Contact us"]
        " about an enterprise plan."]]))
 

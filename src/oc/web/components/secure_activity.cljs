@@ -101,7 +101,7 @@
                 {:on-click #(router/redirect! oc-urls/home)}
                 (str "learn more"
                  (when-not is-mobile?
-                   " about Carrot"))]
+                   " about Wut"))]
               [:span.or " or "]
               [:button.mlb-reset.login-bt
                 {:on-click #(user-actions/show-login :login-with-email)}
@@ -164,7 +164,7 @@
           [:a.sent-via-carrot
             {:href oc-urls/home}
             [:div.sent-via-carrot-copy
-              "Sent by Carrot"]])]
+              "Sent with Wut"]])]
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))

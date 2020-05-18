@@ -487,7 +487,7 @@
 
 (def default-invite-note
   (str
-    "Hey there, let's explore Carrot together. It's a place to make sure important "
+    "Hey there, let's explore Wut together. It's a place to make sure important "
     "announcements, updates, and decisions don't get lost in the noise."))
 
 (rum/defcs lander-invite < rum/reactive
@@ -545,7 +545,7 @@
         [:div.title
           "Invite your team"]
         [:div.subtitle
-          "Invite some colleagues to explore Carrot with you."]]
+          "Invite some colleagues to explore Wut with you."]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -628,7 +628,7 @@
         (if auth-settings
           (if (:team auth-settings)
             [:div.title
-              "Join Carrot"]
+              "Join Wut"]
             [:div.title
               "Oh oh..."])
           [:div.title
@@ -644,7 +644,7 @@
                     [:div.team-logo-container
                       (org-avatar team-data false :never)])
                   [:div.title.main-lander
-                    "Join " (:name team-data) " on Carrot"]]
+                    "Join " (:name team-data) " on Wut"]]
                 [:div.field-label.email-field
                   "Work email"
                   (cond
@@ -736,7 +736,7 @@
       [:header.main-cta
         [:div.invite-container
           [:div.title
-            "Join your team on Carrot"]
+            "Join your team on Wut"]
           (if (:invitation-error confirm-invitation)
             [:div.subtitle
               "An error occurred while confirming your invitation, please try again."]
@@ -862,7 +862,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/onboard-profile-save current-user-data edit-user-profile))}
-            "Start using Carrot"]]]]))
+            "Start using Wut"]]]]))
 
 (rum/defcs email-wall < rum/reactive
                         (drv/drv :query-params)

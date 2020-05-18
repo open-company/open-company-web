@@ -12,7 +12,7 @@
             [oc.shared.useragent :as ua]
             [oc.web.expo :as expo]))
 
-(def default-title "Login to Carrot")
+(def default-title "Login to Wut")
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive

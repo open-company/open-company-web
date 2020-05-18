@@ -21,7 +21,7 @@
 
 (defn- check-for-updates
   []
-  (timbre/info "Checking for Carrot desktop updates")
+  (timbre/info "Checking for desktop updates")
   (.checkForUpdatesAndNotify auto-updater))
 
 (defonce auto-updater-interval (interval/make-interval {:fn check-for-updates

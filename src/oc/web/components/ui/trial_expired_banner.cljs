@@ -1,8 +1,9 @@
 (ns oc.web.components.ui.trial-expired-banner
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
@@ -18,16 +19,16 @@
           [:button.mlb-reset.open-payments-bt
             {:on-click #(nav-actions/show-org-settings :payments)}
             "select a plan"]
-          " to continue using Carrot."]
+          " to continue using Wut."]
         [:div.trial-expired-banner
           "📣 Your 14-day free trial has ended. Please "
           [:button.mlb-reset.open-payments-bt
             {:on-click #(nav-actions/show-org-settings :payments)}
             "select a plan"]
-          " to continue using Carrot. Need more time? "
+          " to continue using Wut. Need more time? "
           [:a.chat-with-us
             {:class "intercom-chat-link"
-             :href "mailto:hello@carrot.io"}
+             :href oc-urls/contact-mail-to}
             "Chat with us"]
           "."]]
       [:div
@@ -35,10 +36,10 @@
           "📣 Your 14-day free trial has ended. Please ask your team admin to choose a new plan."]
         [:div.trial-expired-banner
           "📣 Your team's 14-day free trial has ended. Please ask your team admin "
-          "to subscribe to Carrot. Need more time? "
+          "to subscribe to Wut. Need more time? "
           [:a.chat-with-us
             {:class "intercom-chat-link"
-             :href "mailto:hello@carrot.io"}
+             :href oc-urls/contact-mail-to}
             "Chat with us"]
           "."]])])
 
@@ -64,7 +65,7 @@
           [:div.trial-expired-alert-description
             (str
              "Hi, it looks like your free trial has ended. Please ask your "
-             "team admin to subscribe to Carrot to continue adding new posts.")])
+             "team admin to subscribe to Wut to continue adding new posts.")])
         (when is-admin?
           [:button.mlb-reset.trial-expired-alert-bt
             {:on-click #(do

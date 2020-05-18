@@ -23,7 +23,7 @@
 (defn- real-web-app-update-check
   "Check for app updates, show the notification if necessary, set a new timeout else."
   []
-  (timbre/info "Checking for Carrot web app updates")
+  (timbre/info "Checking for web app updates")
   (interval/stop-interval! web-app-update-interval)
   (api/web-app-version-check
    (fn [{:keys [success body status]}]
@@ -35,7 +35,7 @@
                          (when e
                            (utils/event-stop e))
                          (.. js/window -location reload))]
-           (notification-actions/show-notification {:title "New version of Carrot available!"
+           (notification-actions/show-notification {:title "New version of Wut available!"
                                                     :web-app-update true
                                                     :id :web-app-update-error
                                                     :dismiss on-notification-dismissed

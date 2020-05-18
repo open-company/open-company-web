@@ -207,7 +207,7 @@
                   "Do not allow secure links to open posts from email or Slack"
                   [:i.mdi.mdi-information-outline
                     {:title (str
-                             "When team members receive Carrot posts via an email or Slack morning digest, secure "
+                             "When team members receive Wut posts via an email or Slack morning digest, secure "
                              "links allow them to read the post without first logging in. A login is still required "
                              "to access additional posts. If you turn off secure links, your team will always need to "
                              "be logged in to view posts.")

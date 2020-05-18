@@ -16,19 +16,21 @@
 
 (def slack "/slack")
 
-(def blog "https://blog.carrot.io")
+(def domain "wuts.io")
+
+(def blog (str "https://blog." domain))
 
 (def contact "/contact")
 
 (def press-kit "/press-kit")
 
-(def help "http://help.carrot.io/")
+(def help (str "http://help." domain "/"))
 
-(def what-s-new "https://carrot.news/")
+(def what-s-new "https://wuts.news/")
 
 (def home-try-it-focus (str home "?tif"))
 
-(def contact-email "hello@carrot.io")
+(def contact-email (str "hello@" domain))
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")

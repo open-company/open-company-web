@@ -155,7 +155,7 @@
             [:div.invite-token-title
               "Share this link in Slack " [:i.mdi.mdi-slack]]
             [:div.invite-token-description
-              "Anyone on your Slack team can use this link to join Carrot as a "
+              "Anyone on your Slack team can use this link to join Wut as a "
               [:strong "contributor"]
               "."]
             [:div.invite-token-description
@@ -258,4 +258,4 @@
                   "Invite someone with a specific permission level"]
                 [:button.mlb-reset.enable-carrot-bot-bt
                   {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=invite-slack"))}
-                  "Enable the Carrot bot for Slack"]]))]]]))
+                  "Enable the Wut bot for Slack"]]))]]]))

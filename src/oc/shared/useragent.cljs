@@ -64,12 +64,12 @@ Not supported for Linux, where an empty string is returned."}
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Carrot-specific detection
 
-(def ^{:doc "Whether we're running in the Carrot desktop application"}
+(def ^{:doc "Whether we're running in the desktop application"}
   desktop-app?
   ;; injected by the Electron shell
   (some? js/window.OCCarrotDesktop))
 
-(def ^{:doc "Whether we're running in the Carrot mobile application"}
+(def ^{:doc "Whether we're running in the mobile application"}
   mobile-app?
   ;; injected by the Expo shell
   (some? js/window.ReactNativeWebView))

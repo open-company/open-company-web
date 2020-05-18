@@ -15,7 +15,7 @@
     [:div.carrot-icon
      [:div.notification-bubble "3"]]
     [:p.modal-body-text
-     "Get notified when your team shares on Carrot"]
+     "Get notified when your team shares on Wut"]
     [:button.mlb-reset.enable-notifications-bt
      {:on-click #(expo/bridge-request-push-notification-permission!)}
      "Enable notifications"]

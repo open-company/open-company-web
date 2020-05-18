@@ -251,7 +251,7 @@
         ;; What's new
         [:a.whats-new-link
           (if ua/mobile?
-            {:href "https://carrot.news/"
+            {:href oc-urls/what-s-new
              :target "_blank"}
             {:on-click (partial whats-new-click s)})
           [:div.oc-menu-item.whats-new
@@ -259,7 +259,7 @@
         ;; Support
         [:a
           {:class "intercom-chat-link"
-           :href "mailto:hello@carrot.io"}
+           :href oc-urls/contact-mail-to}
           [:div.oc-menu-item.support
             "Get support"]]
         ;; Mobile billing

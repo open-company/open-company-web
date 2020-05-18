@@ -132,7 +132,7 @@
                                                        (if pending?
                                                         "Are you sure you want to cancel this invitation?"
                                                         [:span
-                                                          "This user will no longer be able to access your team on Carrot."
+                                                          "This user will no longer be able to access your team on Wut."
                                                           [:br][:br]
                                                           "Are you sure you want to remove this user?"])
                                                       :link-button-title (if pending?

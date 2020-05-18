@@ -219,12 +219,12 @@
             ;         {:class (when is-second-user "second-user")}
             ;         [:div.add-post-tooltip-box-mobile]
             ;         [:div.add-post-tooltip-title
-            ;           "Welcome to Carrot!"]
+            ;           "Welcome to Wut!"]
             ;           [:div.add-post-tooltip
             ;             (if is-admin-or-author
             ;               (if is-second-user
             ;                 non-admin-tooltip
-            ;                 "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
+            ;                 "Create your first post now to see how Wut works. Don't worry, you can delete it anytime.")
             ;               non-admin-tooltip)]
             ;           (when (and is-admin-or-author
             ;                      (not is-second-user))

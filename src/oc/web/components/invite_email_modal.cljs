@@ -74,7 +74,7 @@
                 [:div.invite-token-title
                   "Share an invite link"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Carrot team as a "
+                  "Anyone can use this link to join your Wut team as a "
                   [:strong "contributor"]
                   "."]
                 [:div.invite-token-description
@@ -124,7 +124,7 @@
                 [:div.invite-token-title
                   "Share an invite link"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Carrot team as a "
+                  "Anyone can use this link to join your Wut team as a "
                   [:strong "contributor"]
                   "."]
                 [:button.mlb-reset.generate-link-bt

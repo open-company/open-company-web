@@ -351,7 +351,7 @@
                     ;     [:div.post-added-tooltip-title
                     ;       "Post analytics"]
                     ;     [:div.post-added-tooltip
-                    ;       (str "Invite your team to Carrot so you can know who read your "
+                    ;       (str "Invite your team to Wut so you can know who read your "
                     ;        "post and when. Click here to access your post analytics anytime.")]
                     ;     [:button.mlb-reset.post-added-tooltip-bt
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
