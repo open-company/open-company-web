@@ -113,7 +113,7 @@
           ;          :disabled (not slack-enabled?)}
           ;         "Via Slack"])]
           ;   [:div.field-description
-          ;     "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
+          ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Comments and mentions."]
             [:select.field-value.oc-input

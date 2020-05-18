@@ -69,5 +69,5 @@
                 "Set up recurring updates"]
               [:div.recurring-updates-empty-list-desc
                 (str
-                 "Carrot reminds you when it's time to update your team. "
+                 "Wut reminds you when it's time to update your team. "
                  "You can create reminders for yourself and others.")]])]]))

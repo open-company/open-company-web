@@ -29,7 +29,7 @@
 
 (defn- on-update-available
   [data]
-  (timbre/info "Carrot desktop update available" data)
+  (timbre/info "Wut desktop update available" data)
   (interval/restart-interval! auto-updater-interval extended-rate-ms))
 
 (defn start-update-cycle!

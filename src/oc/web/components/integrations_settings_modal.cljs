@@ -105,14 +105,14 @@
                             "Viewer"]]])
                     (if has-bot?
                       [:div.bot-line
-                        "Carrot bot is currently " [:strong "on"] "."]
+                        "Wut bot is currently " [:strong "on"] "."]
                       [:div.bot-line
-                        "Carrot bot is currently " [:strong "off"] ". "
+                        "Wut bot is currently " [:strong "off"] ". "
                         [:button.mlb-reset.turn-on-bot-bt
                           {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
                           "Turn it on?"]
                         [:i.mdi.mdi-information-outline
-                          {:title "The Carrot bot integrates Carrot with Slack to allow invites, shares, digests and notifications to use Slack rather than email."
+                          {:title "The Wut bot integrates Wut with Slack to allow invites, shares, digests and notifications to use Slack rather than email."
                            :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                            :data-placement "top"
                            :data-container "body"

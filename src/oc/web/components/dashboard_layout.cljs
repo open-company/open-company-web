@@ -206,7 +206,7 @@
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
             ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-            ;       non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+            ;       non-admin-tooltip (str "Wut is where you'll find key announcements, updates, and "
             ;                              "decisions to keep you and your team pulling in the same direction.")
             ;       is-second-user (= add-post-tooltip :is-second-user)]
             ;   (when (and (not is-drafts-board)

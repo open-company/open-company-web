@@ -58,7 +58,7 @@
                         {:medium "slack"
                          :channel {:slack-org-id (:slack-org-id slack-user)
                                    :channel-id (:id slack-user)
-                                   :channel-name "Carrot"
+                                   :channel-name "Wut"
                                    :type "user"}}
                         {:medium "email"
                          :to [(:email u)]}))}))]

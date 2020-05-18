@@ -378,7 +378,7 @@
     (.stopPropagation e))
   (if (responsive/is-mobile-size?)
     (let [alert-data {:action "mobile-integrations-link"
-                      :message "Carrot integrations need to be configured in a desktop browser."
+                      :message "Wut integrations need to be configured in a desktop browser."
                       :solid-button-style :green
                       :solid-button-title "OK, got it"
                       :solid-button-cb #(alert-modal/hide-alert)}]

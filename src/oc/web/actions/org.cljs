@@ -51,7 +51,7 @@
   (when-let* [org-data (dis/org-data)
               bot-access (dis/bot-access)]
     (when (= bot-access "bot")
-      (notification-actions/show-notification {:title "Carrot Bot enabled"
+      (notification-actions/show-notification {:title "Wut Bot enabled"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
                                                       :expire 5
@@ -287,7 +287,7 @@
   (payments-actions/maybe-load-payments-data org-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
-  (set! (.-title js/document) (str "Carrot | " (:name org-data))))
+  (set! (.-title js/document) (str "Wut | " (:name org-data))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
