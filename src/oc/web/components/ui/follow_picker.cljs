@@ -100,7 +100,7 @@
  (drv/drv :followers-publishers-count)
  (rum/local "" ::query)
  (rum/local false ::saving)
- (rum/local :all ::filter)
+ (rum/local :boards ::filter)
  (rum/local false ::filter-open)
  ui-mixins/strict-refresh-tooltips-mixin
  (ui-mixins/on-window-click-mixin (fn [s e]
@@ -172,27 +172,32 @@
                 {:value @(::query s)
                  :type "text"
                  :ref :query
-                 :placeholder "Find a topic or person"
+                 :class (name @(::filter s))
+                 :placeholder (case @(::filter s)
+                               :all    "Find a topic or person"
+                               :users  "Find a person"
+                               :boards "Find a topic")
                  :on-change #(reset! (::query s) (.. % -target -value))}]
               [:div.follow-picker-items-list.group
                 ;; Following
                 [:div.follow-picker-row-header.group
                   [:div.follow-picker-row-header-left
                     "Subsctiptions"]
-                  [:div.follow-picker-row-header-right
-                    [:button.mlb-reset.follow-filter-bt
-                      {:ref :follow-filter-bt
-                       :on-click #(swap! (::filter-open s) not)}
-                      (case @(::filter s)
-                       :users "Only people"
-                       :boards "Only topics"
-                       "All topics & people")]
-                    (when @(::filter-open s)
-                      (dropdown-list {:items [{:value :all :label "All topics & people"}
-                                              {:value :users :label "Only people"}
-                                              {:value :boards :label "Only topics"}]
-                                      :value @(::filter s)
-                                      :on-change #(reset! (::filter s) (:value %))}))]]
+                  (comment ;; Hide filter for now
+                    [:div.follow-picker-row-header-right
+                      [:button.mlb-reset.follow-filter-bt
+                        {:ref :follow-filter-bt
+                         :on-click #(swap! (::filter-open s) not)}
+                        (case @(::filter s)
+                         :users "Only people"
+                         :boards "Only topics"
+                         "All topics & people")]
+                      (when @(::filter-open s)
+                        (dropdown-list {:items [{:value :all :label "All topics & people"}
+                                                {:value :users :label "Only people"}
+                                                {:value :boards :label "Only topics"}]
+                                        :value @(::filter s)
+                                        :on-change #(reset! (::filter s) (:value %))}))])]
                 (for [i following-items]
                   [:div.follow-picker-item-row.group
                     {:key (str "follow-picker-" (if (is-user? i) (:user-id i) (:uuid i)))

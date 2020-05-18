@@ -404,6 +404,24 @@ div.follow-picker {
             outline: none;
           }
 
+          &.all {
+            @include placeholder() {
+              background-position: left calc(50% - 85px) top 4px;
+            }
+          }
+
+          &.users {
+            @include placeholder() {
+              background-position: left calc(50% - 54px) top 4px;
+            }
+          }
+
+          &.boards {
+            @include placeholder() {
+              background-position: left calc(50% - 48px) top 4px;
+            }
+          }
+
           @include placeholder() {
             @include OC_Body_Book();
             color: var(--color);
