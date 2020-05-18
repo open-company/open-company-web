@@ -107,6 +107,7 @@
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-publishers-list)
                                 (drv/drv :follow-boards-list)
+                                (drv/drv :unfollow-board-uuids)
                                 (drv/drv :follow-list-last-added)
                                 ;; Locals
                                 (rum/local false ::content-height)
@@ -184,7 +185,9 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "following"))
-        show-explore user-is-part-of-the-team?
+        unfollow-board-uuids (drv/react s :unfollow-board-uuids)
+        show-explore (and user-is-part-of-the-team?
+                          (pos? (count unfollow-board-uuids)))
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?

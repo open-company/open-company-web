@@ -593,6 +593,7 @@
    :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
+   :unfollow-board-uuids   [[:base :org-slug] (fn [base org-slug] (get-in base (unfollow-board-uuids-key org-slug)))]
    })
 
 ;; Action Loop =================================================================
