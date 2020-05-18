@@ -3,6 +3,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
@@ -167,10 +168,36 @@
      :latest-notify-at (latest-notify-at with-notify-at)
      :click (load-item-if-needed db board-id entry-id nil)}))
 
+(defn- caught-up-map
+  ([] (caught-up-map nil))
+  ([n]
+   (let [t (if (:latest-notify-at n)
+             (-> n :latest-notify-at utils/js-date .getTime inc utils/js-date .toISOString)
+             (utils/as-of-now))]
+     {:resource-type :caught-up :latest-notify-at t})))
+
+(defn- insert-open-close-items [ns]
+  (when (seq ns)
+    (-> ns
+     vec
+     (update 0 #(assoc % :open-item true))
+     (update (dec (count ns)) #(assoc % :close-item true)))))
+
+(defn- insert-caught-up [ns]
+  (let [first-read-index (utils/index-of ns (comp not :unread))
+        insert? (and first-read-index
+                     (> first-read-index -1))
+        [ns-before ns-after] (when insert?
+                               (split-at first-read-index ns))]
+    (if insert?
+      (vec (concat (insert-open-close-items ns-before) [(caught-up-map (last ns-before))] (insert-open-close-items ns-after)))
+      (vec (cons (caught-up-map) (insert-open-close-items ns))))))
+
 (defn- group-notifications [db ns]
   (let [grouped-ns (group-by :entry-id ns)
-        three-ns (map (fn [[k v]] (entry-notifications db k v)) grouped-ns)]
-    (reverse (sort-by :latest-notify-at three-ns))))
+        three-ns (map (fn [[k v]] (entry-notifications db k v)) grouped-ns)
+        sorted-ns (reverse (sort-by :latest-notify-at three-ns))]
+    (insert-caught-up sorted-ns)))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :notify-at notifications))))
