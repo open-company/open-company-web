@@ -107,8 +107,8 @@
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-publishers-list)
                                 (drv/drv :follow-boards-list)
-                                (drv/drv :unfollow-board-uuids)
                                 (drv/drv :follow-list-last-added)
+                                (drv/drv :show-explore-view)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
@@ -185,9 +185,6 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "following"))
-        unfollow-board-uuids (drv/react s :unfollow-board-uuids)
-        show-explore (and user-is-part-of-the-team?
-                          (pos? (count unfollow-board-uuids)))
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?
@@ -203,7 +200,8 @@
                               follow-publishers-list
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
-        unread-notifications-count (drv/react s :unread-notifications-count)]
+        unread-notifications-count (drv/react s :unread-notifications-count)
+        show-explore-view (drv/react s :show-explore-view)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -292,7 +290,7 @@
               "Bookmarks"]
             (when (pos? (:bookmarks-count org-data))
               [:span.count (:bookmarks-count org-data)])])
-        (when show-explore
+        (when show-explore-view
           [:div.left-navigation-sidebar-top.top-border
             [:a.nav-link.explore.hover-item.group
               {:class (utils/class-set {:item-selected is-explore})
