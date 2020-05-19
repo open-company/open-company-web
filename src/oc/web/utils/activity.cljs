@@ -15,8 +15,6 @@
 
 (def headline-placeholder "Add a title")
 
-(def empty-headline (char 8203)) ; U+200B a Unicode zero width space, used to mark comment messages originating with OC
-
 (def empty-body-html "<p><br/></p>")
 
 ;; Posts separators
@@ -287,9 +285,7 @@
   (seq (:attachments data)))
 
 (defn has-headline? [data]
-  (let [trimmed-headline (s/trim (:headline data))]
-    (or (s/blank? trimmed-headline)
-        (not= trimmed-headline empty-headline))))
+  (-> data :headline s/trim s/blank?))
 
 (defn empty-body? [body]
   (boolean

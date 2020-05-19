@@ -182,8 +182,7 @@
         muted-post? (seq (utils/link-for (:links activity-data) "follow"))]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
-                                :android ua/android?
-                                :no-headline (not (:has-headline activity-data))})
+                                :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
        :data-new-at (:new-at activity-data)
@@ -214,10 +213,9 @@
                           :lazy (not video-player-show)
                           :video-image (:video-image activity-data)
                           :video-processed (:video-processed activity-data)})])
-      (when (:has-headline activity-data)
-        [:div.expanded-post-headline
-          {:class utils/hide-class}
-          (:headline activity-data)])
+      [:div.expanded-post-headline
+        {:class utils/hide-class}
+        (:headline activity-data)]
       [:div.expanded-post-author.group
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
@@ -259,8 +257,7 @@
          :on-click (when @(::collapse-post s)
                      #(reset! (::collapse-post s) false))
          :class (utils/class-set {utils/hide-class true
-                                  :collapsed @(::collapse-post s)
-                                  :no-headline (not (:has-headline activity-data))})
+                                  :collapsed @(::collapse-post s)})
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (when @(::collapse-post s)
         [:button.mlb-reset.expand-button

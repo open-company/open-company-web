@@ -538,33 +538,10 @@ div.stream-item {
       }
 
       div.stream-item-body {
+        @include activity-body-preview(16, 20, var(--color), 2);
 
-        &:not(.no-headline) {
+        @include mobile() {
           @include activity-body-preview(16, 20, var(--color), 2);
-
-          @include mobile() {
-            @include activity-body-preview(16, 20, var(--color), 2);            
-          }
-        }
-
-        &.no-headline {
-          @include activity-body-preview(16, 20, var(--color), 3);
-
-          @include activity-body-with-headline(20, 28);
-
-          margin-top: 8px;
-          height: #{(20 * 2) + 28 + 8}px;
-          padding-bottom: 8px;
-          
-          @include mobile() {
-            @include activity-body-preview(16, 20, var(--color), 3);
-
-            @include activity-body-with-headline(18, 23);
-
-            height: #{(20 * 2) + 23}px;
-            padding-bottom: 0;
-            margin-top: 0;
-          }
         }
       }
     }

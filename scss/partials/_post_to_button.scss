@@ -51,7 +51,7 @@ div.post-to-button {
     // }
 
     &.tt-title div.post-bt-tooltip {
-      width: 142px;
+      width: 192px;
     }
 
     &.tt-abstract div.post-bt-tooltip {
@@ -74,11 +74,12 @@ div.post-to-button {
       border: 1px solid var(--divider-line);
       position: absolute;
       top: 34px;
-      right: 0;
+      left: 0;
       z-index: #{$navbar_zindex + 157};
       display: none;
 
       @include mobile() {
+        left: unset;
         right: -8px;
         top: 36px;
       }

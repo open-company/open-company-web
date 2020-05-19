@@ -21,12 +21,17 @@
         (truncate-fn s))
       s)}))
 
-(defn foc-truncate-element-mixin [element-ref calc-height-fn]
+(defn foc-truncate-element-mixin [element-ref height-or-calc-fn]
+  {:pre [(or (string? element-ref) (keyword? element-ref))
+         (or (integer? height-or-calc-fn) (fn? height-or-calc-fn))]}
   (letfn [(truncate-fn [s]
             ; Truncate body text with dotdotdot
             (when-let [dom-node (rum/ref-node s element-ref)]
               (.dotdotdot (js/$ dom-node)
-               #js {:height (calc-height-fn s)
+               #js {:height (cond (number? height-or-calc-fn)
+                                  height-or-calc-fn
+                                  (fn? height-or-calc-fn)
+                                  (height-or-calc-fn s))
                     :wrap "word"
                     :watch false
                     :ellipsis "..."})))]

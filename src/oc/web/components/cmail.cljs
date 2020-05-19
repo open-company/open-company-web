@@ -106,6 +106,13 @@
 (defn real-close []
   (cmail-actions/cmail-hide))
 
+(defn- fix-headline [headline]
+  (utils/trim (str/replace (or headline "") #"\n" "")))
+
+(defn- clean-body [s]
+  (when (body-element)
+    (dis/dispatch! [:input [:cmail-data :body] (cleaned-body)])))
+
 ;; Local cache for outstanding edits
 
 (defn autosave [s]
@@ -162,9 +169,11 @@
 
 (defn- headline-on-change [state]
   (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline (.-innerText headline)]
-      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
+    (let [clean-headline (fix-headline (.-innerText headline))
+          post-button-title (when-not (seq clean-headline) :title)]
+      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline clean-headline
                                                        :has-changes true})])
+      (reset! (::post-tt-kw state) post-button-title)
       (debounced-autosave! state))))
 
 ;; Headline setup and paste handler
@@ -196,24 +205,15 @@
      (headline-on-change s)
      (body-on-change s))))
 
-(defn- clean-body [s]
-  (when-let [body-el (body-element)]
-    (dis/dispatch! [:input [:cmail-data :body] (utils/clean-body-html (.-innerHTML body-el))])))
-
-(defn- fix-headline [cmail-data]
-  (let [headline (utils/trim (:headline cmail-data))]
-    (if (seq headline)
-      headline
-      au/empty-headline)))
-
-(defn- is-publishable? [s cmail-data]
-  (seq (:board-slug cmail-data)))
+(defn- is-publishable? [cmail-data]
+  (and (seq (fix-headline (:headline cmail-data)))
+       (seq (:board-slug cmail-data))))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-        fixed-headline (fix-headline cmail-data)
+        fixed-headline (fix-headline (:headline cmail-data))
         published? (= (:status cmail-data) "published")]
-      (if (is-publishable? s cmail-data)
+      (if (is-publishable? cmail-data)
         (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
@@ -323,6 +323,7 @@
                    (rum/local false ::show-post-tooltip)
                    (rum/local false ::show-sections-picker)
                    (rum/local nil ::last-body)
+                   (rum/local nil ::post-tt-kw)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -359,7 +360,8 @@
                       (reset! (::saving s) (:loading cmail-data))
                       (reset! (::publishing s) (:publishing cmail-data))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
-                      (reset! (::latest-key s) (:key cmail-state)))
+                      (reset! (::latest-key s) (:key cmail-state))
+                      (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title)))
                     (when (responsive/is-mobile-size?)
                       (dom-utils/lock-page-scroll))
                     s)
@@ -389,7 +391,8 @@
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+                            (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
@@ -459,10 +462,13 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        show-post-bt-tooltip? (not (is-publishable? s cmail-data))
+        publishable? (is-publishable? cmail-data)
+        show-post-bt-tooltip? (not publishable?)
+        post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
                       (au/empty-body? @(::last-body s))
+                      (not publishable?)
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -535,6 +541,7 @@
               (post-to-button {:on-submit #(post-clicked s)
                                :disabled disabled?
                                :title post-button-title
+                               :post-tt-kw post-tt-kw
                                :force-show-tooltip @(::show-post-tooltip s)})]]]
         [:div.dismiss-inline-cmail-container
           {:class (when unpublished? "long-tooltip")}
@@ -619,6 +626,7 @@
           (post-to-button {:on-submit #(post-clicked s)
                            :disabled disabled?
                            :title post-button-title
+                           :post-tt-kw post-tt-kw
                            :force-show-tooltip @(::show-post-tooltip s)
                            :show-on-hover true})]
         [:div.section-picker-bt-container
