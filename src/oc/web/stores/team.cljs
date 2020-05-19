@@ -9,11 +9,15 @@
             [oc.web.utils.user :as uu]
             [oc.web.stores.user :as user-store]))
 
-(defn- parse-users [users-list]
-  (map (fn [u] (-> u
-                (update :name #(or % (user-lib/name-for u)))
-                (update :short-name #(or % (user-lib/short-name-for u)))))
-   users-list))
+(defn- parse-users [users-list follow-publishers-list]
+  (let [follow-publishers-set (if (every? map? follow-publishers-list)
+                                (set (map :user-id follow-publishers-list))
+                                (set follow-publishers-list))]
+    (map (fn [u] (-> u
+                  (update :name #(or % (user-lib/name-for u)))
+                  (update :short-name #(or % (user-lib/short-name-for u)))
+                  (update :following (comp follow-publishers-set :user-id))))
+     users-list)))
 
 (defn- deep-merge-users [new-users old-users]
   (let [filtered-new-users (filter
@@ -26,12 +30,12 @@
 (defmethod dispatcher/action :active-users
   [db [_ org-slug active-users-data]]
   (if-let [users (-> active-users-data :collection :items)]
-    (let [fixed-users (parse-users users)
-          users-map (zipmap (map :user-id users) fixed-users)
+    (let [follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
+          fixed-users (parse-users users follow-publishers-list)
           change-data (dispatcher/change-data db)
           org-data (dispatcher/org-data db org-slug)
-          follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
           contributions-list-key (dispatcher/contributions-list-key org-slug)
+          users-map (zipmap (map :user-id users) fixed-users)
           next-db*** (reduce (fn [tdb contrib-key]
                              (let [contrib-data-key (concat contributions-list-key [contrib-key dispatcher/recently-posted-sort])
                                    old-contributions-data (get-in tdb contrib-data-key)]
@@ -96,10 +100,10 @@
 (defmethod dispatcher/action :team-roster-loaded
   [db [_ org-slug roster-data]]
   (if roster-data
-    (let [parsed-roster-data (update roster-data :users parse-users)
-          merged-users-data (deep-merge-users (:users parsed-roster-data) (dispatcher/active-users org-slug db))
-          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+    (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           old-follow-publishers-list (get-in db follow-publishers-list-key)
+          parsed-roster-data (update roster-data :users #(parse-users % old-follow-publishers-list))
+          merged-users-data (deep-merge-users (:users parsed-roster-data) (dispatcher/active-users org-slug db))
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list merged-users-data)]
       (-> db
        (assoc-in (dispatcher/team-roster-key (:team-id roster-data)) parsed-roster-data)
@@ -109,7 +113,7 @@
        (assoc-in follow-publishers-list-key next-follow-publishers-list)))
     db))
 
-(defn parse-team-data [team-data]
+(defn parse-team-data [team-data follow-publishers-list]
   (let [team-has-bot? (j/team-has-bot? (:team-id team-data))
         slack-orgs (:slack-orgs team-data)
         slack-users (j/get-key :slack-users)
@@ -117,17 +121,16 @@
     (-> team-data
      (assoc :can-slack-invite team-has-bot?)
      (assoc :can-add-bot (and (not team-has-bot?) can-add-bot?))
-     (update :users parse-users))))
+     (update :users #(parse-users % follow-publishers-list)))))
 
 (defmethod dispatcher/action :team-loaded
   [db [_ org-slug team-data]]
   (if team-data
     ;; if team is the current org team, load the slack chennels
-    (let [parsed-team-data (parse-team-data team-data)
-          merged-users-data (deep-merge-users (:users parsed-team-data) (dispatcher/active-users org-slug db))
-
-          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
+    (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           old-follow-publishers-list (get-in db follow-publishers-list-key)
+          parsed-team-data (parse-team-data team-data old-follow-publishers-list)
+          merged-users-data (deep-merge-users (:users parsed-team-data) (dispatcher/active-users org-slug db))
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list merged-users-data)]
       (-> db
        (assoc-in (dispatcher/team-data-key (:team-id team-data)) parsed-team-data)

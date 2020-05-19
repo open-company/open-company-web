@@ -407,10 +407,10 @@
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
-   :contributions-user-data [[:base :team-roster :contributions-id]
-                           (fn [base team-roster contributions-id]
-                            (when (and team-roster contributions-id)
-                              (some #(when (= (:user-id %) contributions-id) %) (:users team-roster))))]
+   :contributions-user-data [[:base :active-users :contributions-id]
+                             (fn [base active-users contributions-id]
+                              (when (and active-users contributions-id)
+                                (get active-users contributions-id)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
