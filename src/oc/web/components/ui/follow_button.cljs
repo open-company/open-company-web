@@ -4,7 +4,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]))
 
-(rum/defc follow-button < rum/static
+(rum/defc follow-button ;< rum/static
   [{following :following
     resource-type :resource-type
     resource-uuid :resource-uuid

@@ -555,16 +555,9 @@ div.follow-picker {
             flex-direction: row;
             flex-wrap: nowrap;
 
-            @include big_web() {
-              &:hover button.board-settings-bt {
-                opacity: 0.5;
-              }
-            }
-
             div.follow-picker-board-item {
               display: block;
               white-space: nowrap;
-              // max-width: calc(100% - 90px);
               @include OC_Body_Book();
               font-size: 16px;
               line-height: 32px;
@@ -593,6 +586,36 @@ div.follow-picker {
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/number_sign@dark.svg");
                 }
+              }
+            }
+
+            button.board-settings-bt {
+              flex: 0 0 auto;
+              margin-right: 12px;
+              margin-left: -8px;
+              opacity: 0.5;
+              background-image: cdnUrl("/img/ML/section_settings_gear.svg");
+              background-size: 13px 14px;
+              background-repeat: no-repeat;
+              background-position: center;
+              background-color: transparent;
+              width: 16px;
+              height: 32px;
+              padding: 0;
+              position: relative;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
+              }
+
+              @include big_web() {
+                &:hover {
+                  opacity: 1;
+                }
+              }
+
+              @include mobile(){
+                display: none;
               }
             }
 
@@ -656,37 +679,8 @@ div.follow-picker {
               flex: 1 0 auto;
               align-self: center;
               margin-left: auto;
-              margin-right: 24px;
+              margin-right: 16px;
               text-align: right;
-            }
-
-            button.board-settings-bt {
-              flex: 0 0 auto;
-              margin-left: -24px;
-              opacity: 0;
-              background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
-              background-size: 3px 14px;
-              background-repeat: no-repeat;
-              background-position: center;
-              background-color: transparent;
-              width: 24px;
-              height: 32px;
-              padding: 0;
-              position: relative;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
-              }
-
-              @include big_web() {
-                &:hover {
-                  opacity: 1;
-                }
-              }
-
-              @include mobile(){
-                display: none;
-              }
             }
 
             button.follow-button {

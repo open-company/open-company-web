@@ -89,6 +89,43 @@
         {:on-click #(nav-actions/show-user-settings :profile)}
         "Edit profile"]]])
 
+(defn- follow-picker-items [state items prefix]
+  (let [followers-boards-count (drv/react state :followers-boards-count)
+        followers-publishers-count (drv/react state :followers-publishers-count)
+        is-mobile? (responsive/is-mobile-size?)]
+    (for [i items
+          :let [board? (is-board? i)]]
+      [:div.follow-picker-item-row.group
+        {:key (str prefix "-picker-" (if board? (:uuid i) (:user-id i)))
+         :class (when (:follow i) "selected")}
+        (if board?
+          [:div.follow-picker-board-item
+            (:name i)]
+          [:div.follow-picker-user-item
+            (user-avatar-image i)
+            [:span.user-name
+              (:name i)]
+            [:span.user-role
+              (:title i)]])
+        (when (and board?
+                   (not (:read-only i)))
+          [:button.mlb-reset.board-settings-bt
+            {:data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :title (str (:name i) " settings")
+             :on-click #(nav-actions/show-section-editor (:slug i))}])
+        (let [followers (if board?
+                          (get followers-boards-count (:uuid i))
+                          (get followers-publishers-count (:user-id i)))
+              followers-count (:count followers)]
+          [:span.followers-count
+            (when (pos? followers-count)
+              (str followers-count " follower" (when (not= followers-count 1) "s")))])
+        (follow-button {:following (:follow i)
+                        :resource-type (:resource-type i)
+                        :resource-uuid (if board? (:uuid i) (:user-id i))})])))
+
 (rum/defcs follow-picker < rum/reactive
 
  (drv/drv :org-data)
@@ -121,9 +158,7 @@
         current-user-data (drv/react s :current-user-data)
         all-active-users (drv/react s :active-users)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))
-        followers-boards-count (drv/react s :followers-boards-count)
         follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
-        followers-publishers-count (drv/react s :followers-publishers-count)
         all-boards (map #(assoc % :resource-type :board) (:boards org-data))
         authors-uuids (->> org-data :authors (map :user-id) set)
         all-authors (->> all-active-users
@@ -141,7 +176,6 @@
                                                     (utils/in? follow-boards-list (:uuid %)))))
                       all-items)
         sorted-items (filter-sort-items s (:user-id current-user-data) with-follow @(::query s))
-        is-mobile? (responsive/is-mobile-size?)
         following-items (filter :follow sorted-items)
         unfollowing-items (filter (comp not :follow) sorted-items)
         show-following? (or (not= (count all-authors) 1)
@@ -181,8 +215,9 @@
               [:div.follow-picker-items-list.group
                 ;; Following
                 [:div.follow-picker-row-header.group
-                  [:div.follow-picker-row-header-left
-                    "Subscriptions"]
+                  (when (seq following-items)
+                    [:div.follow-picker-row-header-left
+                      "Subscriptions"])
                   (comment ;; Hide filter for now
                     [:div.follow-picker-row-header-right
                       [:button.mlb-reset.follow-filter-bt
@@ -198,73 +233,11 @@
                                                 {:value :boards :label "Only topics"}]
                                         :value @(::filter s)
                                         :on-change #(reset! (::filter s) (:value %))}))])]
-                (for [i following-items
-                      :let [board? (is-board? i)]]
-                  [:div.follow-picker-item-row.group
-                    {:key (str "follow-picker-" (if board? (:uuid i) (:user-id i)))
-                     :class (when (:follow i) "selected")}
-                    (if board?
-                      [:div.follow-picker-board-item
-                        (:name i)]
-                      [:div.follow-picker-user-item
-                        (user-avatar-image i)
-                        [:span.user-name
-                          (:name i)]
-                        [:span.user-role
-                          (:title i)]])
-                    (let [followers (if board?
-                                      (get followers-boards-count (:uuid i))
-                                      (get followers-publishers-count (:user-id i)))
-                          followers-count (:count followers)]
-                      [:span.followers-count
-                        (when (pos? followers-count)
-                          (str followers-count " follower" (when (not= followers-count 1) "s")))])
-                    (when (and board?
-                               (not (:read-only i)))
-                        [:button.mlb-reset.board-settings-bt
-                          {:data-toggle (when-not is-mobile? "tooltip")
-                           :data-placement "top"
-                           :data-container "body"
-                           :title (str (:name i) " settings")
-                           :on-click #(nav-actions/show-section-editor (:slug i))}])
-                    (follow-button {:following true
-                                    :resource-type (:resource-type i)
-                                    :resource-uuid (if board? (:uuid i) (:user-id i))})])
+                (follow-picker-items s following-items "follow")
                 ;; Unfollowing
                 (when (seq unfollowing-items)
                   [:div.follow-picker-row-header
                     [:div.follow-picker-row-header-left.unfollow
                       "Suggestions"]])
                 (when (seq unfollowing-items)
-                  (for [i unfollowing-items
-                        :let [board? (is-board? i)]]
-                    [:div.follow-picker-item-row.group
-                      {:key (str "unfollow-picker-" (if board? (:uuid i) (:user-id i)))
-                       :class (when (:follow i) "selected")}
-                      (if board?
-                        [:div.follow-picker-board-item
-                          (:name i)]
-                        [:div.follow-picker-user-item
-                          (user-avatar-image i)
-                          [:span.user-name
-                            (:name i)]
-                          [:span.user-role
-                            (:title i)]])
-                      (let [followers (if board?
-                                        (get followers-boards-count (:uuid i))
-                                        (get followers-publishers-count (:user-id i)))
-                            followers-count (:count followers)]
-                        [:span.followers-count
-                          (when (pos? followers-count)
-                            (str followers-count " follower" (when (not= followers-count 1) "s")))])
-                      (when (and board?
-                                 (not (:read-only i)))
-                        [:button.mlb-reset.board-settings-bt
-                          {:data-toggle (when-not is-mobile? "tooltip")
-                           :data-placement "top"
-                           :data-container "body"
-                           :title (str (:name i) " settings")
-                           :on-click #(nav-actions/show-section-editor (:slug i))}])
-                      (follow-button {:following false
-                                      :resource-type (:resource-type i)
-                                      :resource-uuid (if board? (:uuid i) (:user-id i))})]))]])]]]))
+                  (follow-picker-items s unfollowing-items "unfollow"))]])]]]))
