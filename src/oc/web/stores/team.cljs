@@ -16,7 +16,7 @@
     (map (fn [u] (-> u
                   (update :name #(or % (user-lib/name-for u)))
                   (update :short-name #(or % (user-lib/short-name-for u)))
-                  (update :following (comp follow-publishers-set :user-id))))
+                  (update :follow (comp follow-publishers-set :user-id))))
      users-list)))
 
 (defn- deep-merge-users [new-users old-users]

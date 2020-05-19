@@ -316,7 +316,7 @@
                           resource-data (if is-contributions
                                           contributions-user-data
                                           board-container-data)]
-                      (follow-button {:following (:following resource-data)
+                      (follow-button {:following (:follow resource-data)
                                       :resource-type resource-type
                                       :resource-uuid (if is-contributions
                                                        (:author-uuid board-container-data)
