@@ -106,6 +106,9 @@
 (defn real-close []
   (cmail-actions/cmail-hide))
 
+(defn headline-element [s]
+  (rum/ref-node s "headline"))
+
 (defn- fix-headline [headline]
   (utils/trim (str/replace (or headline "") #"\n" "")))
 
@@ -168,7 +171,7 @@
     (reset! (::last-body state) (.-innerHTML body-el))))
 
 (defn- headline-on-change [state]
-  (when-let [headline (rum/ref-node state "headline")]
+  (when-let [headline (headline-element state)]
     (let [clean-headline (fix-headline (.-innerText headline))
           post-button-title (when-not (seq clean-headline) :title)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline clean-headline
@@ -179,7 +182,7 @@
 ;; Headline setup and paste handler
 
 (defn- setup-headline [state]
-  (when-let [headline-el  (rum/ref-node state "headline")]
+  (when-let [headline-el  (headline-element state)]
     (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state))))
   (js/emojiAutocomplete))
 
@@ -195,7 +198,7 @@
     ; call the headline-on-change to check for content length
     (headline-on-change state)
     (when (= (.-activeElement js/document) (.-body js/document))
-      (when-let [headline-el (rum/ref-node state "headline")]
+      (when-let [headline-el (headline-element state)]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
 
@@ -293,7 +296,7 @@
                   (:uuid cmail-data)
                   showing-section-picker?)
       (real-close)
-      (.blur (rum/ref-node s "headline")))))
+      (.blur (headline-element s)))))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -525,8 +528,8 @@
                       (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
                       (utils/after 280
-                       #(when-let [body-el (body-element)]
-                          (.focus body-el)))))}
+                       #(when-let [el (headline-element s)]
+                          (.focus el)))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state))
         (trial-expired-alert {:top "48px" :left "50%"}))
