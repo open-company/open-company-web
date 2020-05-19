@@ -228,7 +228,7 @@
   (let [url (gobj/get res "url")]
     (if-not url
       (error-cb s nil nil)
-      (dis/dispatch! [:input [:edit-user-profile :user-data :avatar-url] url]))
+      (dis/dispatch! [:input [:edit-user-profile :avatar-url] url]))
     (update-tooltip s)))
 
 (defn progress-cb [res progress])
@@ -299,7 +299,9 @@
           [:button.mlb-reset.user-profile-avatar
             {:on-click #(upload-user-profile-picture-clicked s)
              :ref "user-profile-avatar"
-             :data-toggle (when-not is-mobile? "")}
+             :data-toggle (when-not is-mobile? "tooltip")
+             :title "Change avatar"
+             :data-placement "top"}
             (user-avatar-image user-data)]
           [:div.field-label.name-fields
               "First name"]
@@ -824,7 +826,8 @@
   [s]
   (let [edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
-        user-data (:user-data edit-user-profile)]
+        user-data (:user-data edit-user-profile)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.onboard-lander.invitee-lander-profile
       [:header.main-cta
         [:div.title.about-yourself
@@ -836,6 +839,15 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
+          [:div.form-title
+            "Sign up"]
+          [:button.mlb-reset.user-profile-avatar
+            {:on-click #(upload-user-profile-picture-clicked s)
+             :ref "user-profile-avatar"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :title "Change avatar"
+             :data-placement "top"}
+            (user-avatar-image user-data)]
           [:div.field-label
             "First name"]
           [:input.field.oc-input
