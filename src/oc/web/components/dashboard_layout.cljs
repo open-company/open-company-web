@@ -105,13 +105,12 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
-        board-container-data (cond
-                              (seq current-contributions-id)
-                              contributions-data
-                              (dis/is-container? current-board-slug)
-                              container-data
-                              :else
-                              board-data)
+        board-container-data (cond (seq current-contributions-id)
+                                   contributions-data
+                                   (dis/is-container? current-board-slug)
+                                   container-data
+                                   :else
+                                   board-data)
         empty-board? (or (and (not is-contributions)
                               (map? board-container-data)
                               (zero? (count (:posts-list board-container-data))))
@@ -313,10 +312,15 @@
                        :title "Visible to the world, including search engines"}])]
                 [:div.board-name-right
                   (when show-follow-button?
-                    (let [resource-type (if (seq current-contributions-id) :user :board)]
-                      (follow-button {:following (:following board-container-data)
+                    (let [resource-type (if is-contributions :user :board)
+                          resource-data (if is-contributions
+                                          contributions-user-data
+                                          board-container-data)]
+                      (follow-button {:following (:following resource-data)
                                       :resource-type resource-type
-                                      :resource-uuid (or current-contributions-id current-board-slug)})))
+                                      :resource-uuid (if is-contributions
+                                                       (:author-uuid board-container-data)
+                                                       (:uuid board-container-data))})))
                   (when is-own-contributions
                     [:div.board-settings-container
                       ;; Settings button
