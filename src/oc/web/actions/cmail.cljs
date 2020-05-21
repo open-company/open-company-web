@@ -84,7 +84,7 @@
 ;; Entry
 
 (defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
-  (dis/dispatch! [:activity-get {:org-slug (router/current-org-slug) :board-uuid board-uuid :activity-uuid activity-uuid}])
+  (dis/dispatch! [:activity-get {:org-slug (router/current-org-slug) :board-slug board-slug :activity-uuid activity-uuid}])
   (api/get-entry-with-uuid (router/current-org-slug) board-slug activity-uuid
    (fn [{:keys [status success body]}]
     (if (= status 404)
