@@ -404,10 +404,13 @@
   (let [activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
                        (dispatcher/activity-key org-slug activity-uuid))]
-    (update-in db activity-key merge {:loading true
-                                      :uuid activity-uuid
-                                      :board-slug board-slug
-                                      :board-uuid board-uuid})))
+    (update-in db activity-key #(let [updated-activity-data {:loading true
+                                                             :uuid activity-uuid
+                                                             :board-slug board-slug
+                                                             :board-uuid board-uuid}]
+                                  (if (map? %)
+                                    (merge % updated-activity-data)
+                                    updated-activity-data)))))
 
 (defmethod dispatcher/action :activity-get/not-found
   [db [_ org-slug activity-uuid secure-uuid]]
