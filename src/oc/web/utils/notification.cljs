@@ -82,25 +82,23 @@
                          :solid-button-cb alert-modal/hide-alert}]
          (alert-modal/show-alert alert-data)))))
 
-(def loading-items (atom #{}))
-
 (defn- load-item [db org-slug board-slug entry-uuid interaction-uuid]
-  (let [item-key (str org-slug "-" board-slug "-" entry-uuid)]
-    (when-not (loading-items item-key)
-      (swap! loading-items conj item-key)
-      (cmail-actions/get-entry-with-uuid board-slug entry-uuid
-       (fn [success status]
-        (when (= 404 status)
-          (dis/dispatch! [:user-notification-remove-by-entry org-slug board-slug entry-uuid]))))))
+  (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+   (fn [success status]
+    (when (= 404 status)
+      (dis/dispatch! [:user-notification-remove-by-entry org-slug board-slug entry-uuid]))))
   nil)
 
 (defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
   (when (and board-slug
              entry-uuid)
     (let [activity-data (dis/activity-data (router/current-org-slug) entry-uuid db)]
-      (if (map? activity-data)
-        (notification-click activity-data interaction-uuid nil)
-        (load-item db (router/current-org-slug) board-slug entry-uuid interaction-uuid)))))
+      (when-not (map? activity-data)
+        (load-item db (router/current-org-slug) board-slug entry-uuid interaction-uuid))
+      (when (and (map? activity-data)
+                 (:uuid activity-data)
+                 (:board-slug activity-data))
+        (notification-click activity-data interaction-uuid nil)))))
 
 (defn fix-notification [db notification]
   (let [board-id (:board-id notification)
@@ -213,8 +211,6 @@
    (fix-notifications db (:sorted notifications)))
 
   ([db notifications :guard sequential?]
-   ;; Reset the already loaded items
-   (reset! loading-items #{})
    (let [fixed-notifications (map (partial fix-notification db) notifications)]
      {:sorted (sorted-notifications (remove nil? fixed-notifications))
       :grouped (group-notifications db fixed-notifications)}))
