@@ -416,6 +416,17 @@
                        (dispatcher/activity-key org-slug activity-uuid))]
     (assoc-in db activity-key :404)))
 
+(defmethod dispatcher/action :activity-get/failed
+  [db [_ org-slug activity-uuid secure-uuid]]
+  (let [activity-key (if secure-uuid
+                       (dispatcher/secure-activity-key org-slug secure-uuid)
+                       (dispatcher/activity-key org-slug activity-uuid))
+        old-activity-data (get-in db activity-key)
+        failed-activity-data (if (map? old-activity-data)
+                               (dissoc old-activity-data :loading)
+                               old-activity-data)]
+    (assoc-in db activity-key failed-activity-data)))
+
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
   (let [activity-uuid (:uuid activity-data)

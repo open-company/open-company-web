@@ -213,6 +213,8 @@
    (fix-notifications db (:sorted notifications)))
 
   ([db notifications :guard sequential?]
+   ;; Reset the already loaded items
+   (reset! loading-items #{})
    (let [fixed-notifications (map (partial fix-notification db) notifications)]
      {:sorted (sorted-notifications (remove nil? fixed-notifications))
       :grouped (group-notifications db fixed-notifications)}))
