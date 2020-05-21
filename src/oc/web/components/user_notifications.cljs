@@ -67,6 +67,7 @@
   [{:keys [parent-interaction-id interaction-id body]}]
   [:div.user-notification-body-container
     {:class (utils/class-set {:comment (seq interaction-id)
+                              :entry (not (seq interaction-id))
                               :reply (seq parent-interaction-id)})}
     [:div.user-notification-body.oc-mentions.oc-mentions-hover
       {:dangerouslySetInnerHTML (utils/emojify body)}]])

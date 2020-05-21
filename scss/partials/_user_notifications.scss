@@ -499,15 +499,24 @@ div.user-notifications-tray {
             margin-top: 4px;
 
             div.user-notification-body {
-              @include activity-body-preview(16, 22, var(--color), 3);
               margin-top: 4px;
-              max-height: #{22 * 3}px;
               p {
                 min-height: 0;
                 p > br:only-child {
                   display: none;
                 }
               }
+            }
+
+            &.entry div.user-notification-body {
+              @include activity-body-preview(16, 22, var(--color), 3);
+              max-height: unset;
+              heigth: unset;
+            }
+
+            &.comment div.user-notification-body {
+              @include activity-comment(15, 18, 12);
+              min-height: 22px;
             }
           }
         }
