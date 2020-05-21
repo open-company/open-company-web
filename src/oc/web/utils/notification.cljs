@@ -82,11 +82,16 @@
                          :solid-button-cb alert-modal/hide-alert}]
          (alert-modal/show-alert alert-data)))))
 
+(def loading-items #{})
+
 (defn- load-item [db org-slug board-slug entry-uuid interaction-uuid]
-  (cmail-actions/get-entry-with-uuid board-slug entry-uuid
-   (fn [success status]
-    (when (= 404 status)
-      (dis/dispatch! [:user-notification-remove-by-entry org-slug board-slug entry-uuid]))))
+  (let [item-key (str org-slug "-" board-slug "-" entry-uuid)]
+    (when-not (loading-items item-key)
+      (swap! loading-items conj item-key)
+      (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+       (fn [success status]
+        (when (= 404 status)
+          (dis/dispatch! [:user-notification-remove-by-entry org-slug board-slug entry-uuid]))))))
   nil)
 
 (defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
@@ -184,20 +189,21 @@
      (update (dec (count ns)) #(assoc % :close-item true)))))
 
 (defn- insert-caught-up [ns]
-  (let [first-read-index (utils/index-of ns (comp not :unread))
-        insert? (and first-read-index
-                     (> first-read-index -1))
-        [ns-before ns-after] (when insert?
-                               (split-at first-read-index ns))]
-    (if insert?
-      (vec (concat (insert-open-close-items ns-before) [(caught-up-map (last ns-before))] (insert-open-close-items ns-after)))
-      (vec (cons (caught-up-map) (insert-open-close-items ns))))))
+  (when (seq ns)
+    (let [first-read-index (utils/index-of ns (comp not :unread))
+          insert? (and first-read-index
+                       (> first-read-index -1))
+          [ns-before ns-after] (when insert?
+                                 (split-at first-read-index ns))]
+      (if insert?
+        (vec (concat (insert-open-close-items ns-before) [(caught-up-map (last ns-before))] (insert-open-close-items ns-after)))
+        (vec (cons (caught-up-map) (insert-open-close-items ns)))))))
 
 (defn- group-notifications [db ns]
   (let [grouped-ns (group-by :entry-id ns)
         three-ns (map (fn [[k v]] (entry-notifications db k v)) grouped-ns)
         sorted-ns (reverse (sort-by :latest-notify-at three-ns))]
-    (insert-caught-up sorted-ns)))
+    (or (insert-caught-up sorted-ns) [])))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :notify-at notifications))))
