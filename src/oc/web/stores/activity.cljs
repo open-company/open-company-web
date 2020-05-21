@@ -901,6 +901,57 @@
          #(notif-util/fix-notifications ndb %))))
     db))
 
+;; Threads
+
+(defmethod dispatcher/action :threads-get/finish
+  [db [_ org-slug sort-type threads-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
+        org-data (get-in db org-data-key)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)
+        fixed-threads-data (au/fix-threads (:collection threads-data) change-data org-data active-users sort-type)
+        posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge old-posts (:fixed-items fixed-threads-data))
+        container-key (dispatcher/container-key org-slug :threads sort-type)]
+    (as-> db ndb
+      (assoc-in ndb container-key fixed-threads-data)
+      (assoc-in ndb posts-key merged-items)
+      (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-threads-data))
+      (update-in ndb (dispatcher/user-notifications-key org-slug)
+       #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :threads-more
+  [db [_ org-slug sort-type]]
+  (let [container-key (dispatcher/container-key org-slug :threads sort-type)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
+
+(defmethod dispatcher/action :threads-more/finish
+  [db [_ org sort-type direction posts-data]]
+  (if posts-data
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
+          container-key (dispatcher/container-key org :threads sort-type)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-threads prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (as-> db ndb
+        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb posts-data-key new-items-map)
+        (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-posts-data))
+        (update-in ndb (dispatcher/user-notifications-key org)
+         #(notif-util/fix-notifications ndb %))))
+    db))
+
 ;; Unfollowing
 
 (defmethod dispatcher/action :unfollowing-get/finish

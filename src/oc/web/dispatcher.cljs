@@ -218,7 +218,7 @@
 
 (defn is-container? [container-slug]
   ;; Rest of containers
-  (#{"inbox" "all-posts" "bookmarks" "following" "unfollowing" "activity"} container-slug))
+  (#{"inbox" "all-posts" "bookmarks" "following" "unfollowing" "activity" "threads"} container-slug))
 
 (defn is-container-with-sort? [container-slug]
   ;; Rest of containers

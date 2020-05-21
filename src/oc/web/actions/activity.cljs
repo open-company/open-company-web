@@ -189,6 +189,36 @@
   (api/load-more-items more-link direction (partial following-more-finish (router/current-org-slug) (router/current-sort-type) direction))
   (dis/dispatch! [:following-more (router/current-org-slug) (router/current-sort-type)]))
 
+;; Threads stream
+
+(defn- threads-get-finish [org-slug sort-type {:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          posts-data-key (dis/posts-data-key org-slug)
+          threads-data (when success (json->cljs body))]
+      (when (= (router/current-board-slug) "threads")
+        (cook/set-cookie! (router/last-board-cookie org-slug) "threads" (* 60 60 24 365))
+        (request-reads-count (->> threads-data :collection :entries (map :uuid)))
+        (watch-boards (:entries (:collection threads-data))))
+      (dis/dispatch! [:threads-get/finish org-slug sort-type threads-data]))))
+
+(defn- threads-get [org-data & [finish-cb]]
+  (when-let [threads-link (utils/link-for (:links org-data) "threads")]
+    (api/get-all-posts threads-link
+     (fn [resp]
+       (threads-get-finish (:slug org-data) dis/recent-activity-sort resp)
+       (when (fn? finish-cb)
+         (finish-cb resp))))))
+
+(defn- threads-more-finish [org-slug sort-type direction {:keys [success body]}]
+  (when success
+    (request-reads-count (->> body json->cljs :collection :entries (map :uuid))))
+  (dis/dispatch! [:threads-more/finish org-slug sort-type direction (when success (json->cljs body))]))
+
+(defn threads-more [more-link direction]
+  (api/load-more-items more-link direction (partial threads-more-finish (router/current-org-slug) (router/current-sort-type) direction))
+  (dis/dispatch! [:threads-more (router/current-org-slug) (router/current-sort-type)]))
+
 ;; Unfollowing stream
 
 (defn- unfollowing-get-finish [org-slug sort-type {:keys [body success]}]

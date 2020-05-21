@@ -523,6 +523,12 @@
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
+(defn fix-threads
+  ([threads-data change-data org-data active-users sort-type]
+   (fix-threads threads-data change-data org-data active-users sort-type nil))
+  ([threads-data change-data org-data active-users sort-type direction]
+    threads-data))
+
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
           (get (:uuid activity-data))

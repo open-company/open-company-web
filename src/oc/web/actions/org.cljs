@@ -94,10 +94,10 @@
     ; Replace default-board with the following to go back to the last visited board
     ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (cond
-      (and (= last-board-slug "all-posts")
-           (utils/link-for (:links org-data) "entries"))
-      {:slug "all-posts"}
-      (and (= last-board-slug "following")
+      ; (and (= last-board-slug "all-posts")
+      ;      (utils/link-for (:links org-data) "entries"))
+      ; {:slug "all-posts"}
+      (and (or (= last-board-slug "all-posts") (= last-board-slug "following"))
            (utils/link-for (:links org-data) "following"))
       {:slug "home"}
       (and (= last-board-slug "unfollowing")
@@ -140,7 +140,7 @@
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
-    (redirect-to-ap? org-data)
+    ; (redirect-to-ap? org-data)
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [boards (:boards org-data)
@@ -153,25 +153,27 @@
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
+        threads-link (utils/link-for (:links org-data) "threads")
+        active-users-link (utils/link-for (:links org-data) "active-users")
         ; is-inbox? (= current-board-slug "inbox")
-        is-all-posts? (= current-board-slug "all-posts")
-        is-bookmarks? (= (router/current-board-slug) "bookmarks")
+        ; is-all-posts? (= current-board-slug "all-posts")
         is-following? (= (router/current-board-slug) "following")
-        is-unfollowing? (= (router/current-board-slug) "unfollowing")
-        is-explore? (= (router/current-board-slug) "explore")
         is-threads? (= (router/current-board-slug) "threads")
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
-        sort-type (router/current-sort-type)
+        is-explore? (= (router/current-board-slug) "explore")
         is-contributions? (seq (router/current-contributions-id))
+        ; is-unfollowing? (= (router/current-board-slug) "unfollowing")
+        sort-type (router/current-sort-type)
         delay-count (atom 0)
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
-        all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
+        ; all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
+        threads-delay (if is-threads? 0 (* other-resources-delay (swap! delay-count inc)))
+        bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
-        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
-        active-users-link (utils/link-for (:links org-data) "active-users")]
+        ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))]
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
     (when is-drafts?
@@ -192,41 +194,49 @@
           ;            inbox-link)
           ;   (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data with recently posted sort
-          (when all-posts-link
-            (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
-          ;; Preload bookmarks data
-          (when bookmarks-link
-            (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
+          ; (when all-posts-link
+          ;   (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
           ;; Preload following data with recently posted sort
           (when following-link
             (utils/maybe-after following-delay #(aa/following-get org-data)))
-          ;; Preload unfollowing data with recently posted sort
-          (when unfollowing-link
-            (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
+          ;; Preload threads data
+          (when threads-link
+            (utils/maybe-after threads-delay #(aa/threads-get org-data)))
+          ;; Preload bookmarks data
+          (when bookmarks-link
+            (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           ;; Drafts
           (when drafts-link
             (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
           ;; contributions data
           (when (and contrib-link
                      (router/current-contributions-id))
-            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id)))))))
+            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id))))
+          ;; Preload unfollowing data with recently posted sort
+          ; (when unfollowing-link
+          ;   (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
+          )))
     (cond
-      (or is-explore?
-          is-threads?)
+      is-explore?
       ;; No-op
       true
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
       (when (or ; (and is-inbox?
                 ;     (not inbox-link))
-                (and is-all-posts?
-                     (not all-posts-link))
+                ; (and is-all-posts?
+                ;      (not all-posts-link))
+                (and is-threads?
+                     (not threads-link))
                 (and is-bookmarks?
                      (not bookmarks-link))
                 (and is-following?
                      (not following-link))
-                (and is-unfollowing?
-                     (not unfollowing-link)))
+                (and is-drafts?
+                     (not drafts-link))
+                ; (and is-unfollowing?
+                ;      (not unfollowing-link))
+                )
         (check-org-404))
 
       ; If there is a board slug let's load the board data
