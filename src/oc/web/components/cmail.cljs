@@ -422,10 +422,17 @@
                              180
                              #(let [following-board-uuids (set (map :uuid @(drv/get-ref s :follow-boards-list)))
                                     following-cmail-board? (following-board-uuids (:board-uuid cmail-data))
-                                    is-in-cmail-board? (= (router/current-board-slug) (:board-slug cmail-data))]
+                                    is-in-cmail-board? (= (router/current-board-slug) (:board-slug cmail-data))
+                                    is-home? (= (router/current-board-slug) "following")]
                                 (router/nav! (cond
+                                               ;; If user posted from that board let's leave him there
                                                is-in-cmail-board?
                                                (oc-urls/board (:board-slug cmail-data))
+                                               ;; If use is following the board they posted to
+                                               ;; and they are in home
+                                               (and following-cmail-board?
+                                                    is-home?)
+                                               (oc-urls/following)
                                                ;; If user is publishing to its own publisher board
                                                ;; redirect him there
                                                (:publisher-board cmail-data)
