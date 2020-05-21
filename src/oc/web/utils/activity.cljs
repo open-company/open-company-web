@@ -264,6 +264,19 @@
         board-unread (:unread board-change-data)]
     (utils/in? board-unread (:uuid entry))))
 
+(defn comment-unread?
+  "An entry is new if its uuid is contained in container's unread."
+  [comment-data last-read-at]
+  (letfn [(get-time [t] (.getTime (utils/js-date (or t 0))))]
+    (< (get-time last-read-at)
+       (get-time (:created-at comment-data)))))
+
+(defn thread-unread?
+  "An entry is new if its uuid is contained in container's unread."
+  [thread-data last-read-at]
+  (or (comment-unread? thread-data last-read-at)
+      (some #(comment-unread? % last-read-at) (:replies thread-data))))
+
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
     (let [$container (.html (js/$ "<div/>") inner-html)
@@ -355,7 +368,6 @@
 
   ([board-data change-data active-users follow-boards-list & [direction]]
     (let [links (:links board-data)
-          with-read-only (assoc board-data :read-only (readonly-board? links))
           with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
@@ -363,7 +375,7 @@
                                                          :publisher-board (:publisher-board %2)}
                                            change-data
                                            active-users))
-                                 with-read-only
+                                 board-data
                                  (:entries board-data))
           next-links (when direction
                       (vec
@@ -379,30 +391,27 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              links)
-          with-links (-> with-fixed-activities
-                       (dissoc :old-links)
-                       (assoc :links fixed-next-links))
           items-list (if (contains? board-data :entries)
                        ;; In case we are parsing a fresh response from server
                        (map :uuid (:entries board-data))
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
                        (:posts-list board-data))
-          without-items (dissoc with-links :entries)
-          with-posts-list (assoc without-items :posts-list (vec
-                                                             (case direction
-                                                              :up (concat items-list (:posts-list board-data))
-                                                              :down (concat (:posts-list board-data) items-list)
-                                                              items-list)))
-          with-saved-items (if direction
-                             (assoc with-posts-list :saved-items (count (:posts-list board-data)))
-                             with-posts-list)
-          with-posts-separators (if (show-separators? (:slug board-data))
-                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
-          follow-board-uuids (set (map :uuid follow-boards-list))
-          with-following (assoc with-posts-separators :following (boolean (follow-board-uuids (:uuid board-data))))]
-      with-following)))
+          follow-board-uuids (set (map :uuid follow-boards-list))]
+      (as-> with-fixed-activities b
+        (assoc b :read-only (readonly-board? links))
+        (dissoc b :old-links :items)
+        (assoc b :posts-list (vec (case direction
+                                   :up (concat items-list (:posts-list board-data))
+                                   :down (concat (:posts-list board-data) items-list)
+                                   items-list)))
+        (if direction
+          (assoc b :saved-items (count (:posts-list board-data)))
+          b)
+        (if (show-separators? (:slug board-data))
+          (update b :items-to-render grouped-posts)
+          (assoc b :items-to-render (:posts-list b)))
+        (assoc b :following (boolean (follow-board-uuids (:uuid board-data))))))))
 
 (defn fix-contributions
   "Parse data coming from the API for a certain user's posts."
@@ -441,30 +450,27 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links contributions-data))
-          with-links (-> with-fixed-activities
-                       (dissoc :old-links)
-                       (assoc :links fixed-next-links))
           items-list (if (contains? contributions-data :items)
                        ;; In case we are parsing a fresh response from server
                        (map :uuid (:items contributions-data))
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
                        (:posts-list contributions-data))
-          without-items (dissoc with-links :items)
-          with-posts-list (assoc without-items :posts-list (vec
-                                                             (case direction
-                                                              :up (concat items-list (:posts-list contributions-data))
-                                                              :down (concat (:posts-list contributions-data) items-list)
-                                                              items-list)))
-          with-saved-items (if direction
-                             (assoc with-posts-list :saved-items (count (:posts-list contributions-data)))
-                             with-posts-list)
-          with-posts-separators (if (show-separators? (:href contributions-data))
-                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))
-          follow-publishers-ids (set (map :user-id follow-publishers-list))
-          with-following (assoc with-posts-separators :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))]
-      with-following)))
+          follow-publishers-ids (set (map :user-id follow-publishers-list))]
+      (as-> with-fixed-activities c
+        (dissoc :old-links :items)
+        (assoc c :links fixed-next-links)
+        (assoc c :posts-list (vec (case direction
+                                   :up (concat items-list (:posts-list contributions-data))
+                                   :down (concat (:posts-list contributions-data) items-list)
+                                   items-list)))
+        (if direction
+          (assoc c :saved-items (count (:posts-list contributions-data)))
+          c)
+        (if (show-separators? (:href contributions-data))
+          (assoc c :items-to-render (grouped-posts c))
+          (assoc c :items-to-render (:posts-list c)))
+        (assoc c :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
@@ -500,34 +506,101 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links container-data))
-          with-links (-> with-fixed-activities
-                       (dissoc :old-links)
-                       (assoc :links fixed-next-links))
           items-list (if (contains? container-data :items)
                        ;; In case we are parsing a fresh response from server
                        (map :uuid (:items container-data))
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
-                       (:posts-list container-data))
-          without-items (dissoc with-links :items)
-          with-posts-list (assoc without-items :posts-list (vec
-                                                             (case direction
-                                                              :up (concat items-list (:posts-list container-data))
-                                                              :down (concat (:posts-list container-data) items-list)
-                                                              items-list)))
-          with-saved-items (if direction
-                             (assoc with-posts-list :saved-items (count (:posts-list container-data)))
-                             with-posts-list)
-          with-posts-separators (if (show-separators? (:href container-data) sort-type)
-                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
-                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
-      with-posts-separators)))
+                       (:posts-list container-data))]
+      (as-> with-fixed-activities c
+       (dissoc c :old-links :items)
+       (assoc c :links fixed-next-links)
+       (assoc c :posts-list (vec (case direction
+                                  :up (concat items-list (:posts-list container-data))
+                                  :down (concat (:posts-list container-data) items-list)
+                                  items-list)))
+       (if direction
+         (assoc c :saved-items (count (:posts-list container-data)))
+         c)
+       (if (show-separators? (:href container-data) sort-type)
+         (assoc c :items-to-render (grouped-posts c))
+         (assoc c :items-to-render (:posts-list c)))))))
+
+(defn fix-thread [thread entry-data active-users]
+  (let [fixed-author (get active-users (-> thread :author :user-id))
+        comment-unread (comment-unread? (:created-at thread) (:last-read-at entry-data))
+        thread-unread (thread-unread? thread (:last-read-at entry-data))]
+    (-> thread
+      (assoc :content-type "comment")
+      (assoc :entry entry-data)
+      (update :author merge fixed-author)
+      (assoc :unread comment-unread)
+      (assoc :thread-unread thread-unread))))
 
 (defn fix-threads
+  "
+  Threads data looks like this:
+  {:total-count 100
+   :entries [...List of entry maps...]
+   :items [{...Comment map...
+            :replies [...List of children...]
+            :reply-count 1
+            :resource-uuid uuid
+            :last-activity-at most-recent-created-at}]
+   :links []}
+  "
   ([threads-data change-data org-data active-users sort-type]
    (fix-threads threads-data change-data org-data active-users sort-type nil))
   ([threads-data change-data org-data active-users sort-type direction]
-    threads-data))
+    (let [all-boards (:boards org-data)
+          with-fixed-entries (reduce (fn [ret item]
+                                       (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
+                                                         all-boards)]
+                                         (assoc-in ret [:fixed-entries (:uuid item)]
+                                          (fix-entry item board-data change-data active-users))))
+                              threads-data
+                              (:entries threads-data))
+          with-fixed-items (reduce (fn [ret item]
+                                     (if-let [entry-data (get-in with-fixed-entries [:fixed-entries (:resource-uuid item)])]
+                                       (assoc-in ret [:fixed-items (:uuid item)]
+                                        (fix-thread item entry-data active-users))
+                                       ret))
+                            with-fixed-entries
+                            (:items with-fixed-entries))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        (:links threads-data))))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links threads-data) "previous")
+                           (utils/link-for (:old-links threads-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             (:links threads-data))
+          items-list (if (contains? threads-data :items)
+                       ;; In case we are parsing a fresh response from server
+                       (map :uuid (:items threads-data))
+                       ;; If we are re-parsing existing data for updated related data
+                       ;; ie: change, org or active-users
+                       (:threads-list threads-data))
+          threads-list (vec (case direction
+                             :up (concat items-list (:threads-list threads-data))
+                             :down (concat (:threads-list threads-data) items-list)
+                             items-list))]
+      (as-> with-fixed-items t
+       (dissoc t :old-links :entries :items)
+       (assoc t :links fixed-next-links)
+       (assoc t :threads-list threads-list)
+       (assoc t :no-virtualized-steam true)
+       (update t :entries-list #(map :uuid (vals (:fixed-entries t))))
+       (if (seq direction)
+         (assoc t :saved-items (count threads-list))
+         t)
+       (assoc t :items-to-render threads-list)))))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

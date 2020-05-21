@@ -489,7 +489,7 @@
         posts-key (dispatcher/posts-data-key org-slug)]
   (-> db
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
-    (assoc-in posts-key (merge (get-in db posts-key) (get fixed-board-data :fixed-items)))
+    (update-in posts-key merge (get fixed-board-data :fixed-items))
     (dissoc :section-editing)
     (dissoc :entry-toggle-save-on-exit))))
 
@@ -505,7 +505,7 @@
         merged-items (merge old-posts (:fixed-items fixed-all-posts-data))
         container-key (dispatcher/container-key org-slug :all-posts sort-type)]
     (as-> db ndb
-     (assoc-in ndb container-key fixed-all-posts-data)
+     (assoc-in ndb container-key (dissoc fixed-all-posts-data :fixed-items))
      (assoc-in ndb posts-key merged-items)
      (update-in ndb (dispatcher/user-notifications-key org-slug)
       #(notif-util/fix-notifications ndb %)))))
@@ -531,7 +531,7 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items))]
       (as-> db ndb
        (assoc-in ndb container-key new-container-data)
        (assoc-in ndb posts-data-key new-items-map)
@@ -553,7 +553,7 @@
         merged-items (merge old-posts (:fixed-items fixed-bookmarks-data))
         container-key (dispatcher/container-key org-slug :bookmarks)]
     (as-> db ndb
-      (assoc-in ndb container-key fixed-bookmarks-data)
+      (assoc-in ndb container-key (dissoc fixed-bookmarks-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (update-in ndb (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data)))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -584,7 +584,7 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
@@ -760,7 +760,7 @@
         merged-items (merge old-posts (:fixed-items fixed-inbox-data))
         container-key (dispatcher/container-key org-slug :inbox sort-type)]
     (as-> db ndb
-      (assoc-in ndb container-key fixed-inbox-data)
+      (assoc-in ndb container-key (dissoc fixed-inbox-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -788,7 +788,7 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
@@ -867,7 +867,7 @@
         merged-items (merge old-posts (:fixed-items fixed-following-data))
         container-key (dispatcher/container-key org-slug :following sort-type)]
     (as-> db ndb
-      (assoc-in ndb container-key fixed-following-data)
+      (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -895,7 +895,7 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
@@ -912,14 +912,26 @@
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
+        posts-data-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-data-key)
+        threads-data-key (dispatcher/threads-data-key org-slug)
+        old-threads (get-in db threads-data-key)
         fixed-threads-data (au/fix-threads (:collection threads-data) change-data org-data active-users sort-type)
-        posts-key (dispatcher/posts-data-key org-slug)
-        old-posts (get-in db posts-key)
-        merged-items (merge old-posts (:fixed-items fixed-threads-data))
+        merged-items (merge old-threads (:fixed-items fixed-threads-data))
+        merged-posts (merge old-posts (:fixed-entries fixed-threads-data))
         container-key (dispatcher/container-key org-slug :threads sort-type)]
+    (js/console.log "DBG :threads-get/finish" threads-data)
+    (js/console.log "DBG   fixed-threads-data"  fixed-threads-data)
+    (js/console.log "DBG   old-threads" old-threads)
+    (js/console.log "DBG   merged-items" merged-items)
+    (js/console.log "DBG   old-posts" old-posts)
+    (js/console.log "DBG   merged-posts" merged-posts)
+    (js/console.log "DBG   container-key" container-key)
+
     (as-> db ndb
-      (assoc-in ndb container-key fixed-threads-data)
-      (assoc-in ndb posts-key merged-items)
+      (assoc-in ndb container-key (dissoc fixed-threads-data :fixed-items :fixed-entries))
+      (assoc-in ndb threads-data-key merged-items)
+      (assoc-in ndb posts-data-key merged-posts)
       (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-threads-data))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
@@ -928,29 +940,33 @@
   [db [_ org-slug sort-type]]
   (let [container-key (dispatcher/container-key org-slug :threads sort-type)
         container-data (get-in db container-key)
-        next-posts-data (assoc container-data :loading-more true)]
-    (assoc-in db container-key next-posts-data)))
+        next-threads-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-threads-data)))
 
 (defmethod dispatcher/action :threads-more/finish
-  [db [_ org sort-type direction posts-data]]
-  (if posts-data
+  [db [_ org sort-type direction threads-data]]
+  (if threads-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
           container-key (dispatcher/container-key org :threads sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
-          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
-                                                              :old-links (:links container-data)})
-          fixed-posts-data (au/fix-threads prepare-posts-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
-          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
-          new-container-data (-> fixed-posts-data
+          threads-data-key (dispatcher/threads-data-key org)
+          old-threads (get-in db threads-data-key)
+          prepare-threads-data (merge (:collection threads-data) {:threads-list (:threads-list container-data)
+                                                                  :old-links (:links container-data)})
+          fixed-threads-data (au/fix-threads prepare-threads-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
+          new-threads-map (merge old-threads (:fixed-items fixed-threads-data))
+          new-posts-map (merge old-posts (:fixed-entries fixed-threads-data))
+          new-container-data (-> fixed-threads-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items :fixed-entries))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
-        (assoc-in ndb posts-data-key new-items-map)
-        (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-posts-data))
+        (assoc-in ndb threads-data-key new-threads-map)
+        (assoc-in ndb posts-data-key new-posts-map)
+        (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-threads-data))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
@@ -969,7 +985,7 @@
         merged-items (merge old-posts (:fixed-items fixed-unfollowing-data))
         container-key (dispatcher/container-key org-slug :unfollowing sort-type)]
     (as-> db ndb
-      (assoc-in ndb container-key fixed-unfollowing-data)
+      (assoc-in ndb container-key (dissoc fixed-unfollowing-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (update-in ndb (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data)))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -997,7 +1013,7 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more))]
+                              (dissoc :loading-more :fixed-items))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
