@@ -391,6 +391,9 @@
   (if (router/current-secure-activity-id)
     (secure-activity-get)
     (let [entry-link (utils/link-for (:links entry-data) "self")]
+      (dis/dispatch! [:activity-get {:org-slug (router/current-org-slug)
+                                     :board-slug (:board-slug entry-data)
+                                     :activity-uuid (:uuid entry-data)}])
       (api/get-entry entry-link
         (fn [{:keys [status success body]}]
           (if (and (= status 404)

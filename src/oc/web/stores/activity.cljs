@@ -399,6 +399,16 @@
   ;; do nothing for now
   db)
 
+(defmethod dispatcher/action :activity-get
+  [db [_ {:keys [org-slug board-slug board-uuid activity-uuid secure-uuid]}]]
+  (let [activity-key (if secure-uuid
+                       (dispatcher/secure-activity-key org-slug secure-uuid)
+                       (dispatcher/activity-key org-slug activity-uuid))]
+    (update-in db activity-key merge {:loading true
+                                      :uuid activity-uuid
+                                      :board-slug board-slug
+                                      :board-uuid board-uuid})))
+
 (defmethod dispatcher/action :activity-get/not-found
   [db [_ org-slug activity-uuid secure-uuid]]
   (let [activity-key (if secure-uuid
@@ -413,10 +423,9 @@
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
                        (dispatcher/activity-key org-slug activity-uuid))
-        fixed-activity-data (au/fix-entry
-                             activity-data
-                             board-data
-                             (dispatcher/change-data db))
+        fixed-activity-data (-> activity-data
+                             (au/fix-entry board-data (dispatcher/change-data db))
+                             (dissoc :loading))
         update-cmail? (and (= (get-in db [:cmail-data :uuid]) activity-uuid)
                            (pos? (compare (:updated-at fixed-activity-data)
                                           (get-in db [:cmail-data :updated-at]))))]

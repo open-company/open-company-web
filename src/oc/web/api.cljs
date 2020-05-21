@@ -849,7 +849,7 @@
      callback)
     (handle-missing-link "get-secure-entry" secure-link callback)))
 
-(defn get-current-entry [org-slug board-slug activity-uuid callback]
+(defn get-entry-with-uuid [org-slug board-slug activity-uuid callback]
   (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
                          :method "GET"
                          :rel ""
