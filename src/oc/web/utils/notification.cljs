@@ -82,7 +82,7 @@
                          :solid-button-cb alert-modal/hide-alert}]
          (alert-modal/show-alert alert-data)))))
 
-(def loading-items #{})
+(def loading-items (atom #{}))
 
 (defn- load-item [db org-slug board-slug entry-uuid interaction-uuid]
   (let [item-key (str org-slug "-" board-slug "-" entry-uuid)]
