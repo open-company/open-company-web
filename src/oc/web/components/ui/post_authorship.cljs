@@ -21,7 +21,6 @@
                       :else
                       {:name "Anonymous"})
         show-board? (and activity-board? board-slug)]
-    (js/console.log "DBG post-authorship author-data" author-data "board" board-name board-slug board-access board-uuid)
     [:div.post-authorship
       [:div.user-hover-container
         (when user-hover?

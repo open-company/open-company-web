@@ -920,14 +920,6 @@
         merged-items (merge old-threads (:fixed-items fixed-threads-data))
         merged-posts (merge old-posts (:fixed-entries fixed-threads-data))
         container-key (dispatcher/container-key org-slug :threads sort-type)]
-    (js/console.log "DBG :threads-get/finish" threads-data)
-    (js/console.log "DBG   fixed-threads-data"  fixed-threads-data)
-    (js/console.log "DBG   old-threads" old-threads)
-    (js/console.log "DBG   merged-items" merged-items)
-    (js/console.log "DBG   old-posts" old-posts)
-    (js/console.log "DBG   merged-posts" merged-posts)
-    (js/console.log "DBG   container-key" container-key)
-
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-threads-data :fixed-items :fixed-entries))
       (assoc-in ndb threads-data-key merged-items)
