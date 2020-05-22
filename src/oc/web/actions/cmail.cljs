@@ -113,15 +113,9 @@
   (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug entry-data) "/" (:uuid entry-data)) true) (* 60 60 24 365)))
 
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:fullscreen false}
-        cleaned-cmail-state (dissoc cmail-state :auto)
-        fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
-    (when (:fullscreen fixed-cmail-state)
-      (utils/scroll-to-y 0 0))
-    (if (:fullscreen fixed-cmail-state)
-      (dom-utils/lock-page-scroll)
-      (when-not (:collapsed cmail-state)
-        (cook/remove-cookie! (cmail-fullscreen-cookie))))
+  (let [fixed-cmail-state (dissoc cmail-state :auto)]
+    (when-not (:collapsed cmail-state)
+      (cook/remove-cookie! (cmail-fullscreen-cookie)))
     (when (and (not (:auto cmail-state))
                (not (:collapsed cmail-state)))
       (save-edit-open-cookie initial-entry-data))
