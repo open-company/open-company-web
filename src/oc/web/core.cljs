@@ -183,7 +183,9 @@
   ;            (= last-sort-type dis/recently-posted-sort))
   ;     dis/recent-activity-sort
   ;     dis/recently-posted-sort))
-  dis/recently-posted-sort)
+  (if (= (:board params) "threads")
+    dis/recent-activity-sort
+    dis/recently-posted-sort))
 
 ;; Company list
 (defn org-handler [route target component params]

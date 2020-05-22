@@ -25,6 +25,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.components.threads-list :refer (threads-list)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.expanded-post :refer (expanded-post)]
@@ -98,6 +99,7 @@
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
         is-following (= current-board-slug "following")
+        is-threads (= current-board-slug "threads")
         is-unfollowing (= current-board-slug "unfollowing")
         is-explore (= current-board-slug "explore")
         is-contributions (seq current-contributions-id)
@@ -111,12 +113,13 @@
                                    container-data
                                    :else
                                    board-data)
-        empty-board? (or (and (not is-contributions)
-                              (map? board-container-data)
-                              (zero? (count (:posts-list board-container-data))))
-                         (and is-contributions
-                              (map? contributions-data)
-                              (zero? (count (:posts-list contributions-data)))))
+        empty-board? (and (not is-threads)
+                          (or (and (not is-contributions)
+                                   (map? board-container-data)
+                                   (zero? (count (:posts-list board-container-data))))
+                              (and is-contributions
+                                   (map? contributions-data)
+                                   (zero? (count (:posts-list contributions-data))))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
@@ -132,7 +135,6 @@
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :sorted-user-notifications)
-        showing-threads-view (= (router/current-board-slug) "threads")
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -188,7 +190,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "threads" (oc-urls/threads)))
-                 :class (when showing-threads-view
+                 :class (when is-threads
                           "active")}
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
@@ -236,8 +238,7 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when (and (not showing-threads-view)
-                       (not is-explore)
+            (when (and (not is-explore)
                        (not show-expanded-post))
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -245,13 +246,6 @@
                 ;; Board name and settings button
                 [:div.board-name
                   (cond
-                    showing-threads-view
-                    [:div.board-name-with-icon.threads-view
-                      [:div.board-name-with-icon-internal
-                        "Threads"
-                        ; (when (pos? (:total-count contributions-data))
-                        ;   [:span.count (:total-count contributions-data)])
-                        ]]
                     current-contributions-id
                     [:div.board-name-with-icon.contributions
                       [:div.board-name-with-icon-internal
@@ -271,7 +265,8 @@
                                                   :all-icon is-all-posts
                                                   :explore-icon is-unfollowing
                                                   :saved-icon is-bookmarks
-                                                  :drafts-icon is-drafts-board})
+                                                  :drafts-icon is-drafts-board
+                                                  :threads-icon is-threads})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"
@@ -287,6 +282,9 @@
 
                                                    is-following
                                                    "Home"
+
+                                                   is-threads
+                                                   "Threads"
 
                                                    :default
                                                    ;; Fallback to the org board data
@@ -373,9 +371,6 @@
                     (search-box))]])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
-              ;; user notifications
-              showing-threads-view
-              (user-notifications/user-notifications {:tray-open true})
               ;; Explore view
               is-explore
               (explore-view)
@@ -388,8 +383,16 @@
               ;; Expanded post view
               show-expanded-post
               (expanded-post)
+              ;; Threads list view
+              is-threads
+              (threads-list)
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" is-following "FL" is-unfollowing "UF" :else (:slug current-board-data))))
-              )]]]))
+               (str "paginated-posts-component-" (
+                cond is-inbox       "IN"
+                     is-all-posts   "AP"
+                     is-bookmarks   "BM"
+                     is-following   "FL"
+                     is-unfollowing "UF"
+                     :else          (:slug current-board-data)))))]]]))

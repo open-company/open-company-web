@@ -101,7 +101,7 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 ; (drv/drv :change-data)
-                                (drv/drv :unread-notifications-count)
+                                (drv/drv :unread-threads)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
@@ -189,6 +189,8 @@
                             (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?
                          drafts-link)
+        show-threads (and user-is-part-of-the-team?
+                          (utils/link-for (:links org-data) "threads"))
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
@@ -200,7 +202,7 @@
                               follow-publishers-list
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
-        unread-notifications-count (drv/react s :unread-notifications-count)
+        unread-threads (drv/react s :unread-threads)
         show-explore-view (drv/react s :show-explore-view)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
@@ -230,10 +232,10 @@
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
-        (when user-is-part-of-the-team?
+        (when show-threads
           [:a.nav-link.threads-view.hover-item.group
             {:class (utils/class-set {:item-selected is-threads
-                                      :new (pos? unread-notifications-count)})
+                                      :new unread-threads})
              :href "."
              :on-click (fn [e]
                          (utils/event-stop e)
@@ -242,8 +244,8 @@
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Threads"]
-              (when (pos? unread-notifications-count)
-                [:span.count unread-notifications-count])])
+              (when (pos? unread-threads)
+                [:span.unread-dot])])
         ;; My posts
         (when user-is-part-of-the-team?
           [:div.left-navigation-sidebar-top.top-border

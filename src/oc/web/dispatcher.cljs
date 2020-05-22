@@ -58,6 +58,9 @@
 (defn threads-data-key [org-slug]
   (vec (conj (org-key org-slug) :threads)))
 
+(defn unread-threads-key [org-slug]
+  (vec (conj (org-key org-slug) :unread-threads)))
+
 (defn board-key [org-slug board-slug]
   (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort])))
 
@@ -269,11 +272,39 @@
                                   (get threads-data %)
                                   :else
                                   nil)
-                           threads-list)))]
-    (mapv #(if-let [entry-data (get posts-data (:resource-uuid %))]
-             (assoc % :entry entry-data)
-             %)
-     container-items*)))
+                           threads-list)))
+        enriched-items (mapv #(if-let [activity-data (get posts-data (:resource-uuid %))]
+                                (assoc % :activity-data activity-data)
+                                %)
+                        container-items*)
+        x (loop [items enriched-items
+                 ret-items []
+                 last-item nil]
+            (let [item (first items)
+                  not-eq (not= (:resource-uuid last-item) (:resource-uuid item))
+                  open? (and item
+                             (:activity-data item)
+                             (or not-eq
+                                 (not last-item)))
+                  close? (and last-item
+                              (:activity-data last-item)
+                              (or not-eq
+                                  (not item)))
+                  next-ret-items (as-> ret-items n
+                                  (if close?
+                                    (vec (conj (butlast n) (assoc (last n) :close-item true)))
+                                    n)
+                                  (if open?
+                                    (vec (conj n (assoc item :open-item true)))
+                                    (if item
+                                      (vec (conj n item))
+                                      n)))]
+              (if (seq items)
+                (recur (rest items)
+                       next-ret-items
+                       item)
+                next-ret-items)))]
+    x))
 
 (defn- get-container-items [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (if (is-threads? container-slug)
@@ -553,6 +584,9 @@
                                     (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
+   :unread-threads        [[:base :org-slug]
+                           (fn [base org-slug]
+                             (get-in base (unread-threads-key org-slug)))]
    :user-responded-to-push-permission? [[:base] (fn [base]
                                                   (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
@@ -726,6 +760,15 @@
     (posts-data data (router/current-org-slug)))
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
+
+(defn threads-data
+  "Get all the threads of the given org."
+  ([]
+    (threads-data @app-state))
+  ([data]
+    (threads-data data (router/current-org-slug)))
+  ([data org-slug]
+    (get-in data (threads-data-key org-slug))))
 
 (defun board-data
   "Get board data."

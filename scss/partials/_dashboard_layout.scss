@@ -582,6 +582,16 @@ div.dashboard-layout {
                 }
               }
 
+              &.threads-icon:before {
+                background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+                background-size: 16px 16px;
+                opacity: 1;
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+                }
+              }
+
               span.count {
                 @include OC_Body_Book();
                 font-size: 14px;

@@ -132,10 +132,9 @@
                           (if (empty? posts)
                             separators
                             (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
-                                   (rest posts))))
-        unwrapped-items (vec (rest ;; Always remove the first label
-                         (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)))]
-        unwrapped-items))
+                                   (rest posts))))]
+        (vec (rest ;; Always remove the first label
+         (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)))))
 
 ;; 
 
@@ -270,12 +269,6 @@
   (letfn [(get-time [t] (.getTime (utils/js-date (or t 0))))]
     (< (get-time last-read-at)
        (get-time (:created-at comment-data)))))
-
-(defn thread-unread?
-  "An entry is new if its uuid is contained in container's unread."
-  [thread-data last-read-at]
-  (or (comment-unread? thread-data last-read-at)
-      (some #(comment-unread? % last-read-at) (:replies thread-data))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
@@ -532,13 +525,23 @@
 (defn fix-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
         comment-unread (comment-unread? (:created-at thread) (:last-read-at entry-data))
-        thread-unread (thread-unread? thread (:last-read-at entry-data))]
+        unread-replies (map #(assoc % :unread (comment-unread? (:created-at %) (:last-read-at entry-data)))
+                        (:replies thread))]
     (-> thread
       (assoc :content-type "comment")
       (assoc :entry entry-data)
       (update :author merge fixed-author)
       (assoc :unread comment-unread)
-      (assoc :thread-unread thread-unread))))
+      (assoc :unread-thread (or comment-unread (some :unread unread-replies)))
+      (assoc :replies unread-replies))))
+
+(defn- caught-up-map
+  ([] (caught-up-map nil))
+  ([n]
+   (let [t (if (:last-activity-at n)
+             (-> n :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
+             (utils/as-of-now))]
+     {:content-type :caught-up :last-activity-at t})))
 
 (defn fix-threads
   "
@@ -586,24 +589,32 @@
                              (:links threads-data))
           items-list (if (contains? threads-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map :uuid (:items threads-data))
+                       (remove nil? (map :uuid (:items threads-data)))
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
-                       (:threads-list threads-data))
+                       (filter string? (:threads-list threads-data)))
           threads-list (vec (case direction
                              :up (concat items-list (:threads-list threads-data))
                              :down (concat (:threads-list threads-data) items-list)
-                             items-list))]
+                             items-list))
+          threads-with-separators (when (seq threads-list)
+                                    (loop [to-items []
+                                           from-items threads-list]
+                                      (if (or (->> from-items first (get (:fixed-items with-fixed-items)) :unread-thread not)
+                                              (not (seq from-items)))
+                                        (concat to-items [(caught-up-map (last to-items))] from-items)
+                                        (recur (conj to-items (first from-items))
+                                               (rest from-items)))))]
       (as-> with-fixed-items t
        (dissoc t :old-links :entries :items)
        (assoc t :links fixed-next-links)
        (assoc t :threads-list threads-list)
        (assoc t :no-virtualized-steam true)
-       (update t :entries-list #(map :uuid (vals (:fixed-entries t))))
+       (update t :entries-list #(remove nil? (map :uuid (vals (:fixed-entries t)))))
        (if (seq direction)
          (assoc t :saved-items (count threads-list))
          t)
-       (assoc t :items-to-render threads-list)))))
+       (assoc t :items-to-render threads-with-separators)))))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

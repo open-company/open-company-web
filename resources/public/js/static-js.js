@@ -79,7 +79,7 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
       if ( user_id ) {
         org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
-          board_slug = "following";
+          board_slug = "home";
           // Replace all-posts above withe the following to go back to the last visited board
           // OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
