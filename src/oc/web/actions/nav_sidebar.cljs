@@ -97,6 +97,9 @@
         (= board-slug "inbox")
         (activity-actions/inbox-get org-data)
 
+        (= board-slug "threads")
+        (activity-actions/threads-get org-data)
+
         (and (= board-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
         (activity-actions/all-posts-get org-data)

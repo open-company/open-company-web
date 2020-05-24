@@ -202,7 +202,7 @@
         (watch-boards (:entries (:collection threads-data))))
       (dis/dispatch! [:threads-get/finish org-slug sort-type threads-data]))))
 
-(defn- threads-get [org-data & [finish-cb]]
+(defn threads-get [org-data & [finish-cb]]
   (when-let [threads-link (utils/link-for (:links org-data) "threads")]
     (api/get-all-posts threads-link
      (fn [resp]
@@ -956,7 +956,9 @@
     (if (and (dis/is-container-with-sort? board-slug)
              (string? sort-type-cookie))
       (keyword sort-type-cookie)
-      dis/recently-posted-sort)))
+      (if (dis/is-threads? board-slug)
+        dis/recent-activity-sort
+        dis/recently-posted-sort))))
 
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
@@ -981,6 +983,9 @@
 
         (= to-slug "inbox")
         (inbox-get org-data)
+
+        (= to-slug "threads")
+        (threads-get org-data)
 
         (and (= to-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
