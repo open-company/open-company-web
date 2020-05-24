@@ -603,7 +603,7 @@
                                       (if (or (->> from-items first (get (:fixed-items with-fixed-items)) :unread-thread not)
                                               (not (seq from-items)))
                                         (concat to-items [(caught-up-map (last to-items))] from-items)
-                                        (recur (conj to-items (first from-items))
+                                        (recur (vec (conj to-items (first from-items)))
                                                (rest from-items)))))]
       (as-> with-fixed-items t
        (dissoc t :old-links :entries :items)

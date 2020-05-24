@@ -263,48 +263,45 @@
 (defn- get-container-threads [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (let [cnt-key (container-key org-slug container-slug sort-type)
         container-data (get-in base cnt-key)
-        threads-list (get container-data items-key)
-        container-items* (vec (remove nil?
-                          (mapv #(cond
+        container-items (vec (remove nil?
+                          (map #(cond
                                   (map? %)
                                   %
                                   (and (string? %) (contains? threads-data %))
-                                  (get threads-data %)
+                                  (let [thread (get threads-data %)]
+                                    (assoc thread :activity-data (get posts-data (:resource-uuid thread))))
                                   :else
                                   nil)
-                           threads-list)))
-        enriched-items (mapv #(if-let [activity-data (get posts-data (:resource-uuid %))]
-                                (assoc % :activity-data activity-data)
-                                %)
-                        container-items*)
-        x (loop [items enriched-items
-                 ret-items []
-                 last-item nil]
-            (let [item (first items)
-                  not-eq (not= (:resource-uuid last-item) (:resource-uuid item))
-                  open? (and item
-                             (:activity-data item)
-                             (or not-eq
-                                 (not last-item)))
-                  close? (and last-item
-                              (:activity-data last-item)
-                              (or not-eq
-                                  (not item)))
-                  next-ret-items (as-> ret-items n
-                                  (if close?
-                                    (vec (conj (butlast n) (assoc (last n) :close-item true)))
-                                    n)
-                                  (if open?
-                                    (vec (conj n (assoc item :open-item true)))
-                                    (if item
-                                      (vec (conj n item))
-                                      n)))]
-              (if (seq items)
-                (recur (rest items)
-                       next-ret-items
-                       item)
-                next-ret-items)))]
-    x))
+                           (get container-data items-key))))]
+    (loop [items container-items
+           ret-items []
+           last-item nil]
+      (let [item (first items)
+            not-eq (not= (:resource-uuid last-item) (:resource-uuid item))
+            open? (and item
+                       (:activity-data item)
+                       (or not-eq
+                           (not last-item)))
+            close? (and last-item
+                        (:activity-data last-item)
+                        (or not-eq
+                            (not item)))
+            next-ret-items (as-> ret-items n
+                            (if close?
+                              (vec (conj (vec (butlast n)) (assoc (last n) :close-item true)))
+                              n)
+                            (if open?
+                              (vec (conj n (assoc item :open-item true)))
+                              n)
+                            (if (and (not open?)
+                                     item)
+                              (vec (conj n item))
+                              n))]
+        (if (seq items)
+          (recur (rest items)
+                 next-ret-items
+                 item)
+          next-ret-items)))))
 
 (defn- get-container-items [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (if (is-threads? container-slug)
@@ -428,7 +425,8 @@
                              (get-in base (posts-data-key org-slug))))]
    :filtered-posts      [[:base :org-data :posts-data :threads-data :route]
                          (fn [base org-data posts-data threads-data route]
-                           (when (and base org-data posts-data threads-data route (:board route))
+                           (when (and base org-data posts-data threads-data route (:board route)
+                                      (not (is-threads? (:board base))))
                              (let [org-slug (:slug org-data)
                                    container-slug (or (:contributions route) (:board route))]
                               (get-container-items base route posts-data threads-data org-slug container-slug (:sort-type route) :posts-list))))]
@@ -446,9 +444,7 @@
                                                  posts-data))
                                         (or (:contributions route)
                                             (:board route)))
-                               (let [org-slug (:slug org-data)
-                                     container-slug (or (:contributions route) (:board route))]
-                                (get-container-items base route posts-data threads-data org-slug container-slug (:sort-type route) :items-to-render)))))]
+                               (get-container-items base route posts-data threads-data (:slug org-data) (:board route) (:sort-type route) :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
