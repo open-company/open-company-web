@@ -98,7 +98,8 @@
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
                        ((:click n)))))}
-      (thread-header n)
+      (when open-item
+        (thread-header n))
       (when open-item
         [:div.thread-item-title
           (:headline activity-data)])
@@ -149,7 +150,7 @@
           (if caught-up?
             [:div.threads-list-caught-up
               {:key (str "threads-caught-up-" (:last-activity-at item))}
-              (all-caught-up "You are all caught up!")]
+              (all-caught-up "You’re all caught up")]
             (rum/with-key
              (thread-item item)
              (str "thread-" (:resource-uuid item) "-" (:uuid item))))))]))
