@@ -142,6 +142,15 @@ div.threads-list {
         @include mobile() {
           background-color: var(--background-color);
         }
+
+        div.thread-item-blocks div.thread-item-block button.expand-thead-bt {
+          background-color: var(--foc-background-color);
+
+          @include mobile() {
+            background-color: var(--foc-background-color);
+          }
+        }
+
       }
 
       div.thread-item-header {
