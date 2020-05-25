@@ -190,6 +190,38 @@ div.threads-list {
         position: relative;
         height: 100%;
 
+        button.expand-thead-bt {
+          width: 100%;
+          height: 16px;
+          padding: 0 0 0 48px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          text-align: left;
+          position: relative;
+          background-color: var(--foc-background-color);
+
+          &:before {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--light-color);
+            background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            left: 4px;
+            top: 0;
+
+            @include dark_mode(){
+              background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+            }
+          }
+        }
+
         div.thread-item-block {
           margin-top: 8px;
         }

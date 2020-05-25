@@ -15,7 +15,9 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.react-utils :as react-utils]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -23,7 +25,6 @@
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
 (defn- reply-to [s add-comment-focus-key]
@@ -181,12 +182,14 @@
                          (rum/local nil ::show-picker)
                          (rum/local false ::replying)
                          ui-mixins/refresh-tooltips-mixin
+                         (mention-mixins/oc-mentions-hover {:click? true})
                          (ui-mixins/interactive-images-mixin "div.thread-comment-body")
                          (ui-mixins/on-window-click-mixin (fn [s e]
                           (when (and @(::show-picker s)
                                      (not (utils/event-inside? e
                                       (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                             (reset! (::show-picker s) nil))))
+                           (rum/local false ::expanded)
   [s
    {current-user-id  :current-user-id
     resource-uuid    :resource-uuid
@@ -204,7 +207,14 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) comment-uuid))
-        add-comment-focus-prefix "thread-comment"]
+        add-comment-focus-prefix "thread-comment"
+        replies-count (count replies)
+        read-count (count (filter (comp not :unread) replies))
+        collapsed-count (when-not @(::expanded s)
+                          ;; Count the read comments and remove one since last is always rendered
+                          (if (= read-count replies-count)
+                            (dec read-count)
+                            read-count))]
     [:div.thread-item.group
       {:class    (utils/class-set {:unread unread
                                    :close-item close-item
@@ -212,12 +222,11 @@
        :ref :thread
        :on-click (fn [e]
                    (let [thread-el (rum/ref-node s :thread)]
-                     (when (and (fn? (:click n))
-                                (not (utils/button-clicked? e))
+                     (when (and (not (utils/button-clicked? e))
                                 (not (utils/input-clicked? e))
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
-                       ((:click n)))))}
+                       (nav-actions/open-post-modal activity-data false comment-uuid))))}
       (when open-item
         (thread-header n))
       (when open-item
@@ -235,15 +244,20 @@
                            :showing-picker? showing-picker?
                            :new-thread? unread
                            :member? member?
+                           :replies-count replies-count
                            :current-user-id current-user-id})
+          (when (and (not @(::expanded s))
+                     (pos? collapsed-count))
+            [:button.mlb-reset.expand-thead-bt
+              {:on-click #(reset! (::expanded s) true)}
+              (str "View " collapsed-count " older repl" (if (not= collapsed-count 1) "ies" "y"))])
           (for [idx (range (count replies))
                 :let [r (get replies idx)
-                      reply-authorship-map {:author (:author r)
-                                            :board-slug (:board-slug activity-data)
-                                            :board-name (:board-name activity-data)
-                                            :is-mobile? is-mobile?}
                       ind-showing-picker? (and (seq @(::show-picker s))
-                                               (= @(::show-picker s) (:uuid r)))]]
+                                               (= @(::show-picker s) (:uuid r)))]
+                :when (or (< collapsed-count 1)
+                          (:unread r)
+                          (= (dec (count replies)) idx))]
             [:div.thread-item-block.horizontal-line.group
               {:key (str "unir-" (:created-at r) "-" (:uuid r))}
               (thread-comment {:activity-data activity-data
@@ -268,6 +282,16 @@
                                   :add-comment-focus-prefix add-comment-focus-prefix
                                   :dismiss-reply-cb #(reset! (::replying s) false)})
        (str "adc-" resource-uuid  last-activity-at))]))
+
+(defn- expand-thread [s comment-data]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) (:uuid comment-data)))]
+    (swap! (::threads s) (fn [thread]
+                           (-> thread
+                             (assoc-in [idx :collapsed-count] 0)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :expanded true) children))))))))
 
 (rum/defcs threads-list-inner <
   ui-mixins/refresh-tooltips-mixin
