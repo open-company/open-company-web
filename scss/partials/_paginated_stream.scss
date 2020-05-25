@@ -10,12 +10,6 @@ div.paginated-stream {
   }
 
   div.paginated-stream-cards {
-    float: left;
-
-    @include mobile() {
-      width: 100%;
-      float: unset;
-    }
 
     div.loading-updates {
       text-align: center;
