@@ -123,7 +123,20 @@
   (vec (conj (org-key org-slug) :comments)))
 
 (defn activity-comments-key [org-slug activity-uuid]
-  (vec (conj (comments-key org-slug) activity-uuid :sorted-comments)))
+  (vec (conj (comments-key org-slug) activity-uuid)))
+
+(def sorted-comments-key :sorted-comments)
+
+(defn activity-sorted-comments-key [org-slug activity-uuid]
+  (vec (concat (comments-key org-slug) [activity-uuid sorted-comments-key])))
+
+(def threads-map-key :threads-map)
+
+(defn activity-threads-map-key [org-slug activity-uuid]
+  (vec (concat (comments-key org-slug) [activity-uuid threads-map-key])))
+
+(defn thread-data-key [org-slug activity-uuid thread-uuid]
+  (vec (concat (comments-key org-slug) [activity-uuid threads-map-key thread-uuid])))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -272,8 +285,13 @@
                                     (assoc thread :activity-data (get posts-data (:resource-uuid thread))))
                                   :else
                                   nil)
-                           (get container-data items-key))))]
-    (loop [items container-items
+                           (get container-data items-key))))
+        with-thread-data (map (fn [thread-data]
+                                (let [thread-key (thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
+                                      thread-comments (get-in base thread-key)]
+                                  (merge thread-data thread-comments)))
+                          container-items)]
+    (loop [items with-thread-data
            ret-items []
            last-item nil]
       (let [item (first items)

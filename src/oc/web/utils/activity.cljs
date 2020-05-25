@@ -525,15 +525,13 @@
 (defn fix-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
         comment-unread (comment-unread? (:created-at thread) (:last-read-at entry-data))
-        unread-replies (map #(assoc % :unread (comment-unread? (:created-at %) (:last-read-at entry-data)))
-                        (:replies thread))]
+        thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
     (-> thread
       (assoc :content-type "comment")
       (assoc :entry entry-data)
       (update :author merge fixed-author)
       (assoc :unread comment-unread)
-      (assoc :unread-thread (or comment-unread (some :unread unread-replies)))
-      (assoc :replies unread-replies))))
+      (assoc :unread-thread thread-unread))))
 
 (defn- caught-up-map
   ([] (caught-up-map nil))
@@ -549,7 +547,6 @@
   {:total-count 100
    :entries [...List of entry maps...]
    :items [{...Comment map...
-            :replies [...List of children...]
             :reply-count 1
             :resource-uuid uuid
             :last-activity-at most-recent-created-at}]
@@ -559,11 +556,13 @@
    (fix-threads threads-data change-data org-data active-users sort-type nil))
   ([threads-data change-data org-data active-users sort-type direction]
     (let [all-boards (:boards org-data)
+          entries (atom [])
           with-fixed-entries (reduce (fn [ret item]
                                        (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
-                                                         all-boards)]
-                                         (assoc-in ret [:fixed-entries (:uuid item)]
-                                          (fix-entry item board-data change-data active-users))))
+                                                         all-boards)
+                                             fixed-entry (fix-entry item board-data change-data active-users)]
+                                         (swap! entries conj fixed-entry)
+                                         (assoc-in ret [:fixed-entries (:uuid item)] fixed-entry)))
                               threads-data
                               (:entries threads-data))
           with-fixed-items (reduce (fn [ret item]
@@ -605,6 +604,7 @@
                                         (concat to-items [(caught-up-map (last to-items))] from-items)
                                         (recur (vec (conj to-items (first from-items)))
                                                (rest from-items)))))]
+      (doseq [e @entries] (utils/after 0 #(comment-utils/get-comments e)))
       (as-> with-fixed-items t
        (dissoc t :old-links :entries :items)
        (assoc t :links fixed-next-links)

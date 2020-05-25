@@ -131,6 +131,10 @@
       (vec (reverse sorted-comments))
       (vec sorted-comments)))))
 
+(defn threads-map [sorted-comments]
+  (apply merge
+   (map #(hash-map (:uuid %) %) sorted-comments)))
+
 (defn new? [user-id last-read-at comment-data]
   (if (contains? comment-data :new)
     (:new comment-data)
