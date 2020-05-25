@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -133,11 +134,20 @@
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
         current-user-data (drv/react s :current-user-data)
-        read-data (drv/react s :wrt-read-data)
-        unread-data (filter #(not= (:user-id %) (:user-id current-user-data)) (:unread read-data))
+        is-author? (au/is-publisher? (:user-id current-user-data) activity-data)
+        read-data* (drv/react s :wrt-read-data)
+        read-data (as-> read-data* rd
+                   (update rd :unreads (fn [unreads]
+                                         (if is-author?
+                                           (filter #(not= (:user-id %) (:user-id current-user-data)) unreads)
+                                           unreads)))
+                   (update rd :reads (fn [reads]
+                                       (if is-author?
+                                         (filter #(not= (:user-id %) (:user-id current-user-data)) reads)
+                                         reads))))
         item-id (:uuid activity-data)
-        seen-users (vec (sort-by user-lib/name-for unread-data))
-        seen-ids (disj (set (map :user-id seen-users)) (:user-id current-user-data))
+        seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
+        seen-ids (set (map :user-id seen-users))
         unseen-users (vec (sort-by user-lib/name-for (:unreads read-data)))
         all-users (sort-by user-lib/name-for (concat seen-users unseen-users))
         read-count (:count read-data)
@@ -314,7 +324,10 @@
 (rum/defc wrt-count < rum/static
   [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
-        reads-count (:count reads-data)]
+        is-author? (au/is-publisher? activity-data)
+        reads-count (if (and is-author? (:last-read-at reads-data))
+                      (dec (:count reads-data))
+                      (:count reads-data))]
     [:div.wrt-count-container
       [:div.wrt-count
         {:ref :wrt-count
