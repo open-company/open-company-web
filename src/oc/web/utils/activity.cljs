@@ -263,12 +263,14 @@
         board-unread (:unread board-change-data)]
     (utils/in? board-unread (:uuid entry))))
 
-(defn comment-unread?
+(defun comment-unread?
   "An entry is new if its uuid is contained in container's unread."
-  [comment-data last-read-at]
-  (letfn [(get-time [t] (.getTime (utils/js-date (or t 0))))]
-    (< (get-time last-read-at)
-       (get-time (:created-at comment-data)))))
+  ([comment-data :guard map? last-read-at]
+   (comment-unread? (:created-at comment-data)))
+  ([iso-date last-read-at]
+   (letfn [(get-time [t] (.getTime (utils/js-date t)))]
+     (< (get-time last-read-at)
+        (get-time iso-date)))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
