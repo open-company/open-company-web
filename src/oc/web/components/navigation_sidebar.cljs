@@ -268,34 +268,37 @@
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
-            [:a.nav-link.drafts.hover-item.group
-              {:class (utils/class-set {:item-selected (and (not is-following)
-                                                            (not is-explore)
-                                                            (not is-bookmarks)
-                                                            (= (router/current-board-slug) (:slug drafts-board)))
-                                        :top-border (not show-you)})
-               :data-board (name (:slug drafts-board))
-               :key (str "board-list-" (name (:slug drafts-board)))
-               :href board-url
-               :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
-              [:div.nav-link-icon]
-              [:div.nav-link-label.group
-                "Drafts "]
-              (when (pos? draft-count)
-                [:span.count draft-count])]))
+            [:div.left-navigation-sidebar-top
+              {:class (when-not show-you "top-border")}
+              [:a.nav-link.drafts.hover-item.group
+                {:class (utils/class-set {:item-selected (and (not is-following)
+                                                              (not is-explore)
+                                                              (not is-bookmarks)
+                                                              (= (router/current-board-slug) (:slug drafts-board)))})
+                 :data-board (name (:slug drafts-board))
+                 :key (str "board-list-" (name (:slug drafts-board)))
+                 :href board-url
+                 :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
+                [:div.nav-link-icon]
+                [:div.nav-link-label.group
+                  "Drafts "]
+                (when (pos? draft-count)
+                  [:span.count draft-count])]]))
         ;; Bookmarks
         (when show-bookmarks
-          [:a.nav-link.bookmarks.hover-item.group
-            {:class (utils/class-set {:item-selected is-bookmarks
-                                      :top-border (and (not show-drafts)
-                                                       (not show-you))})
-             :href (oc-urls/bookmarks)
-             :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
-            [:div.nav-link-icon]
-            [:div.nav-link-label
-              "Bookmarks"]
-            (when (pos? (:bookmarks-count org-data))
-              [:span.count (:bookmarks-count org-data)])])
+          [:div.left-navigation-sidebar-top
+            {:class (when (and (not show-drafts)
+                               (not show-you))
+                      "top-border")}
+            [:a.nav-link.bookmarks.hover-item.group
+              {:class (utils/class-set {:item-selected is-bookmarks})
+               :href (oc-urls/bookmarks)
+               :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                "Bookmarks"]
+              (when (pos? (:bookmarks-count org-data))
+                [:span.count (:bookmarks-count org-data)])]])
         (when show-explore-view
           [:div.left-navigation-sidebar-top.top-border
             [:a.nav-link.explore.hover-item.group
