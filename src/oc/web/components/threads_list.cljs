@@ -1,35 +1,168 @@
 (ns oc.web.components.threads-list
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [goog.object :as gobj]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.comment :as cu]
             [oc.web.mixins.activity :as am]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.reaction :as reaction-utils]
+            [oc.web.actions.comment :as comment-actions]
+            [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.info-hover-views :refer (board-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
-(rum/defc thread-timestamp
-  [{:keys [timestamp is-mobile?]}]
-  [:span.time-since
-    {:data-toggle (when-not is-mobile? "tooltip")
-     :data-placement "top"
-     :data-container "body"
-     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-     :data-title (utils/activity-date-tooltip timestamp)}
-    [:time
-      {:date-time timestamp}
-      (utils/foc-date-time timestamp)]])
+(defn- reply-to [s add-comment-focus-key]
+  (reset! (::replying s) true)
+  (comment-actions/add-comment-focus add-comment-focus-key))
+
+(defn- copy-comment-url [comment-url]
+  (let [input-field (.createElement js/document "input")]
+    (set! (.-style input-field) "position:absolute;top:-999999px;left:-999999px;")
+    (set! (.-value input-field) comment-url)
+    (.appendChild (.-body js/document) input-field)
+    (.select input-field)
+    (utils/copy-to-clipboard input-field)
+    (.removeChild (.-body js/document) input-field)))
+
+(rum/defc emoji-picker < (when (responsive/is-mobile-size?)
+                           ui-mixins/no-scroll-mixin)
+  [{:keys [add-emoji-cb dismiss-cb]}]
+  [:div.emoji-picker-container
+    [:button.mlb-reset.close-bt
+      {:on-click dismiss-cb}
+      "Cancel"]
+    (react-utils/build (.-Picker js/EmojiMart)
+      {:native true
+       :autoFocus true
+       :onClick (fn [emoji _]
+                  (add-emoji-cb emoji))})])
+
+(defn- emoji-picker-container [s activity-data comment-data]
+  (let [showing-picker? (and (seq @(::show-picker s))
+                             (= @(::show-picker s) (:uuid comment-data)))]
+    (when showing-picker?
+      (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
+                     :add-emoji-cb (fn [emoji]
+                                     (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                       (comment-actions/react-from-picker activity-data comment-data
+                                        (gobj/get emoji "native")))
+                                     (reset! (::show-picker s) nil))}))))
+
+(rum/defc thread-comment < rum/static
+  [{:keys [activity-data comment-data closing-thread
+           is-indented-comment? mouse-leave-cb
+           react-cb reply-cb emoji-picker
+           is-mobile? member?
+           showing-picker? did-react-cb new-thread?
+           current-user-id replies-count]}]
+  [:div.thread-comment-outer
+    {:key (str "thread-comment-" (:created-at comment-data))
+     :data-comment-uuid (:uuid comment-data)
+     :class (utils/class-set {:open-thread (not is-indented-comment?)
+                              :closing-thread closing-thread
+                              :new-comment (:unread comment-data)
+                              :indented-comment is-indented-comment?
+                              :showing-picker showing-picker?
+                              :no-replies (zero? replies-count)})}
+    [:div.thread-comment
+      {:ref (str "thread-comment-" (:uuid comment-data))
+       :on-mouse-leave mouse-leave-cb}
+      [:div.thread-comment-inner
+        (when is-mobile?
+          [:div.thread-comment-mobile-menu
+            (more-menu {:entity-data comment-data
+                        :external-share false
+                        :entity-type "comment"
+                        :can-react? true
+                        :react-cb react-cb
+                        :can-reply? true
+                        :reply-cb reply-cb})
+            emoji-picker])
+        [:div.thread-comment-right
+          [:div.thread-comment-header.group
+            {:class utils/hide-class}
+            [:div.thread-comment-author-right
+              [:div.thread-comment-author-right-group
+                {:class (when (:unread comment-data) "new-comment")}
+                [:div.thread-comment-author-name-container
+                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
+                  [:div.thread-comment-author-avatar
+                    (user-avatar-image (:author comment-data))]
+                  [:div.thread-comment-author-name
+                    {:class (when (:user-id (:author comment-data)) "clickable-name")}
+                    (:name (:author comment-data))]]
+                [:div.thread-comment-author-timestamp
+                  [:time
+                    {:date-time (:created-at comment-data)
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip comment-data)}
+                    (utils/foc-date-time (:created-at comment-data))]]]
+              (when (and (:unread comment-data)
+                         (or (and is-indented-comment?
+                                  (not new-thread?))
+                             (not is-indented-comment?)))
+                [:div.new-comment-tag])
+              (if (responsive/is-mobile-size?)
+                [:div.thread-comment-mobile-menu
+                  (more-menu comment-data nil {:external-share false
+                                               :entity-type "comment"
+                                               :can-react? true
+                                               :react-cb react-cb
+                                               :can-reply? true
+                                               :reply-cb reply-cb})
+                  emoji-picker]
+                [:div.thread-comment-floating-buttons
+                  ;; Reply to comment
+                  (when (:reply-parent comment-data)
+                    [:button.mlb-reset.floating-bt.reply-bt.separator-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click reply-cb
+                       :title "Reply"}
+                      "Reply"])
+                  ;; React container
+                  [:div.react-bt-container.separator-bt
+                    [:button.mlb-reset.floating-bt.react-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Add reaction"
+                       :on-click react-cb}
+                      "React"]
+                    emoji-picker]])]]
+          [:div.thread-comment-content
+            [:div.thread-comment-body.oc-mentions.oc-mentions-hover
+              {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+               :ref (str "comment-body-" (:uuid comment-data))
+               :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                        utils/hide-class true})}]]
+          (when (seq (:reactions comment-data))
+            [:div.thread-comment-reactions-footer.group
+              (reactions {:entity-data comment-data
+                          :hide-picker (zero? (count (:reactions comment-data)))
+                          :did-react-cb did-react-cb
+                          :optional-activity-data activity-data})])
+          (when closing-thread
+            [:button.mlb-reset.thread-reply-bt
+              {:on-click reply-cb}
+              "Reply"])]]]])
 
 (rum/defc thread-header
   [{last-activity-at :last-activity-at {:keys [board-name published-at] :as activity-data} :activity-data}]
@@ -44,47 +177,34 @@
         {:date-time published-at}
         (utils/tooltip-date published-at)]]])
 
-(rum/defc thread-attribution
-  [{:keys [authorship-map current-user-id unread timestamp is-mobile?] :as props}]
-  [:div.thread-item-attribution
-    (post-authorship {:activity-data authorship-map
-                      :user-avatar? true
-                      :user-hover? true
-                      :hide-last-name? true
-                      :activity-board? false
-                      :current-user-id current-user-id})
-    (when timestamp
-      [:div.separator-dot])
-    (when timestamp
-      (thread-timestamp props))
-    (when unread
-      [:div.separator-dot])
-    (when unread
-      [:div.new-tag
-        "NEW"])])
-
-(rum/defc thread-body
-  [{:keys [parent-uuid uuid body]}]
-  [:div.thread-body-container.comment
-    {:class (utils/class-set {:reply (seq parent-uuid)})}
-    [:div.thread-body.oc-mentions.oc-mentions-hover
-      {:dangerouslySetInnerHTML (utils/emojify body)}]])
-
 (rum/defcs thread-item < rum/static
+                         (rum/local nil ::show-picker)
+                         (rum/local false ::replying)
+                         ui-mixins/refresh-tooltips-mixin
+                         (ui-mixins/interactive-images-mixin "div.thread-comment-body")
+                         (ui-mixins/on-window-click-mixin (fn [s e]
+                          (when (and @(::show-picker s)
+                                     (not (utils/event-inside? e
+                                      (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
+                            (reset! (::show-picker s) nil))))
   [s
    {current-user-id  :current-user-id
     resource-uuid    :resource-uuid
     comment-uuid     :uuid
     last-activity-at :last-activity-at
     activity-data    :activity-data
-    replies          :replies
+    replies          :thread-children
     author           :author
     unread           :unread
     created-at       :created-at
     open-item        :open-item
     close-item       :close-item
+    member?          :member?
     :as n}]
-  (let [is-mobile? (responsive/is-mobile-size?)]
+  (let [is-mobile? (responsive/is-mobile-size?)
+        showing-picker? (and (seq @(::show-picker s))
+                             (= @(::show-picker s) comment-uuid))
+        add-comment-focus-prefix "thread-comment"]
     [:div.thread-item.group
       {:class    (utils/class-set {:unread unread
                                    :close-item close-item
@@ -105,40 +225,53 @@
           (:headline activity-data)])
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
-          (thread-attribution {:authorship-map {:author author
-                                                :board-slug (:board-slug activity-data)
-                                                :board-name (:board-name activity-data)
-                                                :is-mobile? is-mobile?}
-                               :current-user-id current-user-id
-                               :unread unread
-                               :is-mobile? is-mobile?
-                               :timestamp created-at})
-          (thread-body n)
-          (for [r replies
-                :let [reply-authorship-map {:author (:author r)
+          (thread-comment {:activity-data activity-data
+                           :comment-data n
+                           :is-mobile? is-mobile?
+                           :react-cb #(reset! (::show-picker s) comment-uuid)
+                           :reply-cb #(reply-to s (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid))
+                           :emoji-picker (when showing-picker?
+                                           (emoji-picker-container s activity-data n))
+                           :showing-picker? showing-picker?
+                           :new-thread? unread
+                           :member? member?
+                           :current-user-id current-user-id})
+          (for [idx (range (count replies))
+                :let [r (get replies idx)
+                      reply-authorship-map {:author (:author r)
                                             :board-slug (:board-slug activity-data)
                                             :board-name (:board-name activity-data)
-                                            :is-mobile? is-mobile?}]]
+                                            :is-mobile? is-mobile?}
+                      ind-showing-picker? (and (seq @(::show-picker s))
+                                               (= @(::show-picker s) (:uuid r)))]]
             [:div.thread-item-block.horizontal-line.group
               {:key (str "unir-" (:created-at r) "-" (:uuid r))}
-              (thread-attribution {:authorship-map reply-authorship-map
-                                   :current-user-id current-user-id
-                                   :unread (:unread r)
-                                   :is-mobile? is-mobile?
-                                   :timestamp (:created-at r)})
-              (thread-body r)])]]
+              (thread-comment {:activity-data activity-data
+                               :comment-data r
+                               :closing-thread (= (dec (count replies)) idx)
+                               :is-indented-comment? true
+                               :is-mobile? is-mobile?
+                               :react-cb #(reset! (::show-picker s) (:uuid r))
+                               :reply-cb #(reply-to s (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid))
+                               :emoji-picker (when ind-showing-picker?
+                                               (emoji-picker-container s activity-data r))
+                               :showing-picker? ind-showing-picker?
+                               :new-thread? (:unread r)
+                               :member? member?
+                               :current-user-id current-user-id})])]]
 
       (rum/with-key (add-comment {:activity-data activity-data
-                                  :parent-comment-uuid resource-uuid
+                                  :parent-comment-uuid comment-uuid
                                   :collapsed? true
                                   :add-comment-placeholder "Reply..."
                                   :add-comment-cb (partial user-actions/activity-reply-inline n)
-                                  :add-comment-focus-prefix "thread-comment"})
-       (str "adc-" "-" resource-uuid last-activity-at))]))
+                                  :add-comment-focus-prefix add-comment-focus-prefix
+                                  :dismiss-reply-cb #(reset! (::replying s) false)})
+       (str "adc-" resource-uuid  last-activity-at))]))
 
 (rum/defcs threads-list-inner <
   ui-mixins/refresh-tooltips-mixin
-  [s {:keys [items-to-render current-user-data]}]
+  [s {:keys [items-to-render current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.threads-list
       (if (empty? items-to-render)
@@ -146,7 +279,7 @@
           (all-caught-up)]
         (for [item* items-to-render
               :let [caught-up? (= (:content-type item*) :caught-up)
-                    item (assoc item* :current-user-data current-user-data)]]
+                    item (assoc item* :current-user-data current-user-data :member? member?)]]
           (if caught-up?
             [:div.threads-list-caught-up
               {:key (str "threads-caught-up-" (:last-activity-at item))}
@@ -159,7 +292,10 @@
   rum/reactive
   (drv/drv :items-to-render)
   (drv/drv :current-user-data)
+  (drv/drv :org-data)
   [s]
-  (let [items-to-render (drv/react s :items-to-render)]
+  (let [org-data (drv/react s :org-data)
+        items-to-render (drv/react s :items-to-render)]
     (threads-list-inner {:items-to-render items-to-render
-                         :current-user-data (drv/react s :current-user-data)})))
+                         :current-user-data (drv/react s :current-user-data)
+                         :member? (jwt/user-is-part-of-the-team (:team-id org-data))})))

@@ -70,7 +70,6 @@
     (let [updated-comment (if edit-comment-data
                             (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
                             (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))]
-      (reset! (::show-post-button s) false)
       (when (and (not (responsive/is-mobile-size?))
                  (not edit-comment-data)
                  (not dismiss-reply-cb)
@@ -94,7 +93,6 @@
 
 (defn- add-comment-did-change [s]
   (reset! (::did-change s) true)
-  (reset! (::show-post-button s) true)
   (enable-add-comment? s))
 
 (defn- should-focus-field? [s & [mounting]]
@@ -104,10 +102,7 @@
         component-focus-id (focus-value s)]
     (or (and mounting
              edit-comment-data)
-        (and (= add-comment-focus component-focus-id)
-             (or (not parent-comment-uuid)
-                 (and (seq parent-comment-uuid)
-                      mounting))))))
+        (= add-comment-focus component-focus-id))))
 
 (defn- maybe-focus-field [s & [mounting]]
   (when (should-focus-field? s mounting)
@@ -122,7 +117,6 @@
                     (set! (.-innerHTML (rum/ref-node s "editor-node")) @(::initial-add-comment s))
                     (disable-add-comment-if-needed s)
                     (reset! (::did-change s) false)
-                    (reset! (::show-post-button s) false)
                     (comment-actions/add-comment-blur)
                     (comment-actions/add-comment-reset (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                     (when (fn? dismiss-reply-cb)
@@ -170,7 +164,6 @@
                          (rum/local true ::add-button-disabled)
                          (rum/local au/empty-body-html ::initial-add-comment)
                          (rum/local false ::did-change)
-                         (rum/local false ::show-post-button)
                          (rum/local false ::last-add-comment-focus)
                          ;; Mixins
                          ui-mixins/first-render-mixin
@@ -194,7 +187,6 @@
                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                                 activity-add-comment-data (get add-comment-data add-comment-key)]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data au/empty-body-html))
-                            (reset! (::show-post-button s) (or (seq activity-add-comment-data) (should-focus-field? s)))
                             (when (seq activity-add-comment-data)
                               (reset! (::did-change s) true)))
                           s)
@@ -245,14 +237,6 @@
         current-user-data (drv/react s :current-user-data)
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
         is-focused? (should-focus-field? s)
-        should-hide-post-button (and ;; Show initially collapsed box for:
-                                     ;; - first add comment (always visible in post page)
-                                     ;; - Activity view (expand on click or focus)
-                                     (or (not parent-comment-uuid)
-                                         (and collapsed?
-                                              (not @(::show-post-button s))))
-                                     (not is-focused?)
-                                     (au/empty-body? @(::initial-add-comment s)))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
@@ -260,11 +244,10 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
-                                :collapsed-box should-hide-post-button})
-       :on-click #(reset! (::show-post-button s) true)}
+                                :collapsed-box (not is-focused?)})}
       [:div.add-comment-box
         [:div.add-comment-internal
-          {:class (when-not should-hide-post-button "active")}
+          {:class (when is-focused? "active")}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
