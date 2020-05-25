@@ -203,7 +203,9 @@
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
         unread-threads (drv/react s :unread-threads)
-        show-explore-view (drv/react s :show-explore-view)]
+        show-explore-view (drv/react s :show-explore-view)
+        show-you (and user-is-part-of-the-team?
+                      (pos? (:contributions-count org-data)))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -246,8 +248,8 @@
               "Threads"]
               (when (pos? unread-threads)
                 [:span.unread-dot])])
-        ;; My posts
-        (when user-is-part-of-the-team?
+        ;; You
+        (when show-you
           [:div.left-navigation-sidebar-top.top-border
             [:a.nav-link.my-posts.hover-item.group
               {:class (utils/class-set {:item-selected is-my-posts})
@@ -258,7 +260,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "My posts"]
+                "You"]
                 ; (when (pos? (:contributions-count org-data))
                 ;   [:span.count (:contributions-count org-data)])
                 ]])
@@ -267,11 +269,11 @@
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.nav-link.drafts.hover-item.group
-              {:class (when (and (not is-following)
-                                 (not is-explore)
-                                 (not is-bookmarks)
-                                 (= (router/current-board-slug) (:slug drafts-board)))
-                        "item-selected")
+              {:class (utils/class-set {:item-selected (and (not is-following)
+                                                            (not is-explore)
+                                                            (not is-bookmarks)
+                                                            (= (router/current-board-slug) (:slug drafts-board)))
+                                        :top-border (not show-you)})
                :data-board (name (:slug drafts-board))
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
@@ -284,7 +286,9 @@
         ;; Bookmarks
         (when show-bookmarks
           [:a.nav-link.bookmarks.hover-item.group
-            {:class (utils/class-set {:item-selected is-bookmarks})
+            {:class (utils/class-set {:item-selected is-bookmarks
+                                      :top-border (and (not show-drafts)
+                                                       (not show-you))})
              :href (oc-urls/bookmarks)
              :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
             [:div.nav-link-icon]

@@ -652,10 +652,10 @@
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
     (-> db
      (assoc-in (conj dispatcher/activities-read-key item-id) {:count read-data-count
-                                                                :reads fixed-read-data
-                                                                :item-id item-id
-                                                                :unreads unseen-users
-                                                                :private-access? private-access?})
+                                                              :reads fixed-read-data
+                                                              :item-id item-id
+                                                              :unreads unseen-users
+                                                              :private-access? private-access?})
      (assoc-in (dispatcher/activity-last-read-at-key org-slug item-id) last-read-at))))
 
 (defmethod dispatcher/action :uploading-video

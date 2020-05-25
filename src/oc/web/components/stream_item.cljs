@@ -152,7 +152,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher?]}]
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher? boards-count]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -259,7 +259,8 @@
                             :user-hover? true
                             :board-hover? true
                             :activity-board? (and (not (:publisher-board activity-data))
-                                                  (not= (:board-slug activity-data) (router/current-board-slug)))
+                                                  (not= (:board-slug activity-data) (router/current-board-slug))
+                                                  (> boards-count 1))
                             :current-user-id current-user-id})
           [:div.separator-dot]
           (let [t (or (:published-at activity-data) (:created-at activity-data))]

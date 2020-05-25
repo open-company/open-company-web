@@ -132,10 +132,12 @@
                    s)}
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
+        current-user-data (drv/react s :current-user-data)
         read-data (drv/react s :wrt-read-data)
+        unread-data (filter #(not= (:user-id %) (:user-id current-user-data)) (:unread read-data))
         item-id (:uuid activity-data)
-        seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
-        seen-ids (set (map :user-id seen-users))
+        seen-users (vec (sort-by user-lib/name-for unread-data))
+        seen-ids (disj (set (map :user-id seen-users)) (:user-id current-user-data))
         unseen-users (vec (sort-by user-lib/name-for (:unreads read-data)))
         all-users (sort-by user-lib/name-for (concat seen-users unseen-users))
         read-count (:count read-data)
@@ -146,7 +148,6 @@
                          :all (filterv #(filter-by-query % (string/lower (or @query ""))) all-users)
                          :seen seen-users
                          :unseen unseen-users)
-        current-user-data (drv/react s :current-user-data)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
@@ -319,6 +320,10 @@
         {:ref :wrt-count
          :on-click #(nav-actions/show-wrt item-id)
          :class (when (pos? (count (:reads reads-data))) "has-read-list")}
-        (if (pos? reads-count)
-          (str reads-count " person viewed")
+        (cond
+          (= reads-count 1)
+          "1 person viewed"
+          (pos? reads-count)
+          (str reads-count " people viewed")
+          :else
           "Viewers")]]))

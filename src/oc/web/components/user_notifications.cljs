@@ -12,7 +12,6 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]

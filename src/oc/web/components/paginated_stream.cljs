@@ -130,7 +130,8 @@
                      :show-wrt? show-wrt?
                      :member? member?
                      :publisher? publisher?
-                     :editable-boards editable-boards}))]))
+                     :editable-boards editable-boards
+                     :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
