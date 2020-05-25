@@ -614,7 +614,7 @@
        (assoc t :threads-list threads-list)
        (assoc t :no-virtualized-steam true)
        (update t :entries-list #(remove nil? (map :uuid (vals (:fixed-entries t)))))
-       (if (seq direction)
+       (if direction
          (assoc t :saved-items (count threads-list))
          t)
        (assoc t :items-to-render threads-with-separators)))))
