@@ -270,7 +270,7 @@
                                :emoji-picker (when ind-showing-picker?
                                                (emoji-picker-container s activity-data r))
                                :showing-picker? ind-showing-picker?
-                               :new-thread? (:unread r)
+                               :new-thread? unread
                                :member? member?
                                :current-user-id current-user-id})])]]
 
