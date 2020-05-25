@@ -25,6 +25,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
@@ -66,7 +67,7 @@
                                      (reset! (::show-picker s) nil))}))))
 
 (rum/defc thread-comment < rum/static
-  [{:keys [activity-data comment-data closing-thread
+  [{:keys [activity-data comment-data
            is-indented-comment? mouse-leave-cb
            react-cb reply-cb emoji-picker
            is-mobile? member?
@@ -76,7 +77,6 @@
     {:key (str "thread-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
      :class (utils/class-set {:open-thread (not is-indented-comment?)
-                              :closing-thread closing-thread
                               :new-comment (:unread comment-data)
                               :indented-comment is-indented-comment?
                               :showing-picker showing-picker?
@@ -160,11 +160,7 @@
               (reactions {:entity-data comment-data
                           :hide-picker (zero? (count (:reactions comment-data)))
                           :did-react-cb did-react-cb
-                          :optional-activity-data activity-data})])
-          (when closing-thread
-            [:button.mlb-reset.thread-reply-bt
-              {:on-click reply-cb}
-              "Reply"])]]]])
+                          :optional-activity-data activity-data})])]]]])
 
 (rum/defc thread-header
   [{last-activity-at :last-activity-at {:keys [board-name published-at] :as activity-data} :activity-data}]
@@ -248,6 +244,10 @@
                            :member? member?
                            :replies-count replies-count
                            :current-user-id current-user-id})
+          (when-not (contains? n :thread-children)
+            [:div.thread-item-loading
+              (small-loading)
+              "Loading thread..."])
           (when (and (not @(::expanded s))
                      (pos? collapsed-count))
             [:button.mlb-reset.expand-thead-bt
@@ -265,8 +265,7 @@
             [:div.thread-item-block.horizontal-line.group
               {:key (str "unir-" (:created-at r) "-" (:uuid r))}
               (thread-comment {:activity-data activity-data
-                               :comment-data r
-                               :closing-thread (= (dec (count replies)) idx)
+                               :comment-data reply-data
                                :is-indented-comment? true
                                :is-mobile? is-mobile?
                                :react-cb #(reset! (::show-picker s) (:uuid r))
@@ -297,33 +296,25 @@
                               (fn [children]
                                 (map #(assoc % :expanded true) children))))))))
 
-(rum/defcs threads-list-inner <
+(rum/defcs threads-list <
   ui-mixins/refresh-tooltips-mixin
-  [s {:keys [items-to-render current-user-data member?]}]
+  [s {:keys [items-to-render current-user-data member? loading-more]}]
   (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.threads-list
       (if (empty? items-to-render)
         [:div.threads-list-empty
           (all-caught-up)]
-        (for [item* items-to-render
-              :let [caught-up? (= (:content-type item*) :caught-up)
-                    item (assoc item* :current-user-data current-user-data :member? member?)]]
-          (if caught-up?
-            [:div.threads-list-caught-up
-              {:key (str "threads-caught-up-" (:last-activity-at item))}
-              (all-caught-up "You’re all caught up")]
-            (rum/with-key
-             (thread-item item)
-             (str "thread-" (:resource-uuid item) "-" (:uuid item))))))]))
-
-(rum/defcs threads-list <
-  rum/reactive
-  (drv/drv :items-to-render)
-  (drv/drv :current-user-data)
-  (drv/drv :org-data)
-  [s]
-  (let [org-data (drv/react s :org-data)
-        items-to-render (drv/react s :items-to-render)]
-    (threads-list-inner {:items-to-render items-to-render
-                         :current-user-data (drv/react s :current-user-data)
-                         :member? (jwt/user-is-part-of-the-team (:team-id org-data))})))
+        [:div.threads-list-container
+          (for [item* items-to-render
+                :let [caught-up? (= (:content-type item*) :caught-up)
+                      item (assoc item* :current-user-data current-user-data :member? member?)]]
+            (if caught-up?
+              [:div.threads-list-caught-up
+                {:key (str "threads-caught-up-" (:last-activity-at item))}
+                (all-caught-up "You’re all caught up")]
+              (rum/with-key
+               (thread-item item)
+               (str "thread-" (:resource-uuid item) "-" (:uuid item)))))
+          (when loading-more
+            [:div.loading-updates.bottom-loading
+              "Loading more posts..."])])]))

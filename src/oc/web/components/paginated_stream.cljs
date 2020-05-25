@@ -16,6 +16,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.actions.contributions :as contributions-actions]
+            [oc.web.components.threads-list :refer (threads-list)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -274,6 +275,7 @@
                         (drv/drv :comments-data)
                         (drv/drv :editable-boards)
                         (drv/drv :foc-layout)
+                        (drv/drv :current-user-data)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
@@ -323,23 +325,30 @@
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)
+        current-user-data (drv/react s :current-user-data)
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
-        show-carrot-close (> (* (count items) card-height) viewport-height)]
+        show-carrot-close (> (* (count items) card-height) viewport-height)
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
-         (window-scroller
-          {}
-          (partial virtualized-stream {:org-data org-data
-                                       :comments-data comments-data
-                                       :items items
-                                       :is-mobile? is-mobile?
-                                       :activities-read activities-read
-                                       :editable-boards editable-boards
-                                       :foc-layout foc-layout
-                                       :show-loading-more @(::bottom-loading s)
-                                       :show-carrot-close (and (not @(::bottom-loading s))
-                                                               (not @(::has-next s))
-                                                               (> (count items) 3))}))]]]))
+         (if (:no-virtualized-steam container-data)
+           (threads-list {:items-to-render items
+                          :org-data org-data
+                          :current-user-data current-user-data
+                          :loading-more @(::bottom-loading s)})
+           (window-scroller
+            {}
+            (partial virtualized-stream {:org-data org-data
+                                         :comments-data comments-data
+                                         :items items
+                                         :is-mobile? is-mobile?
+                                         :activities-read activities-read
+                                         :editable-boards editable-boards
+                                         :foc-layout foc-layout
+                                         :show-loading-more @(::bottom-loading s)
+                                         :show-carrot-close (and (not @(::bottom-loading s))
+                                                                 (not @(::has-next s))
+                                                                 (> (count items) 3))})))]]]))

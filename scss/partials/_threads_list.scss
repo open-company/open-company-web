@@ -16,790 +16,797 @@ div.threads-list {
     }
   }
 
-  div.threads-list-caught-up {
-    height: 32px;
-    width: 100%;
-    position: relative;
-    margin: 16px 0;
+  div.threads-list-container {
 
-    &:before {
-      position: absolute;
-      top: 15px;
-      height: 2px;
-      left: 0;
-      width: 100%;
-      z-index: 1;
-      background-color: $wut_green;
-      content: "";
+    div.loading-updates {
+      text-align: center;
+      height: 60px;
+      padding: 24px 0 16px;
+      font-size: 14px;
+      @include OC_Body_Book();
+      color: var(--light-color);
+
+      @include mobile() {
+        height: 44px;
+        padding: 16px 0 8px;
+      }
     }
 
-    div.all-caught-up {
-      width: 160px;
-      margin: 0 auto;
+    div.threads-list-caught-up {
       height: 32px;
-      padding: 4px 16px;
-      background-color: $wut_green;
-      border-radius: 4px;
-      z-index: 2;
+      width: 100%;
       position: relative;
+      margin: 16px 0;
 
-      div.all-caught-up-inner {
-        text-align: center;
-        background-image: unset;
-        width: 128px;
-        height: 24px;
+      &:before {
+        position: absolute;
+        top: 15px;
+        height: 2px;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        background-color: $wut_green;
+        content: "";
+      }
 
-        div.message {
-          color: white;
-          line-height: 24px;
-          font-size: 14px;
-          @include OC_Body_Bold();
-          padding-top: 0;
+      div.all-caught-up {
+        width: 160px;
+        margin: 0 auto;
+        height: 32px;
+        padding: 4px 16px;
+        background-color: $wut_green;
+        border-radius: 4px;
+        z-index: 2;
+        position: relative;
+
+        div.all-caught-up-inner {
+          text-align: center;
+          background-image: unset;
+          width: 128px;
+          height: 24px;
+
+          div.message {
+            color: white;
+            line-height: 24px;
+            font-size: 14px;
+            @include OC_Body_Bold();
+            padding-top: 0;
+          }
         }
       }
     }
-  }
 
-  div.thread-item {
-    margin: 0;
-    border-top: 1px solid transparent;
-    border-right: 1px solid var(--foc-divider-line-color);
-    border-bottom: 1px solid transparent;
-    border-left: 1px solid var(--foc-divider-line-color);
-    padding: 16px 32px;
-    background-color: var(--foc-background-color);
-    overflow: visible;
-    cursor: pointer;
-    position: relative;
+    div.thread-item {
+      margin: 0;
+      border-top: 1px solid transparent;
+      border-right: 1px solid var(--foc-divider-line-color);
+      border-bottom: 1px solid transparent;
+      border-left: 1px solid var(--foc-divider-line-color);
+      padding: 16px 32px;
+      background-color: var(--foc-background-color);
+      overflow: visible;
+      cursor: pointer;
+      position: relative;
 
-    &:hover {
-      background-color: var(--foc-hover-color);
-      border-top: 1px solid var(--foc-hover-border-color);
-      border-right: 1px solid var(--foc-hover-border-color);
-      border-bottom: 1px solid var(--foc-hover-border-color);
-      border-left: 1px solid var(--foc-hover-border-color);
+      &:hover {
+        background-color: var(--foc-hover-color);
+        border-top: 1px solid var(--foc-hover-border-color);
+        border-right: 1px solid var(--foc-hover-border-color);
+        border-bottom: 1px solid var(--foc-hover-border-color);
+        border-left: 1px solid var(--foc-hover-border-color);
+
+        &:not(.open-item):before {
+          background-color: transparent;
+        }
+      }
+
+      &.unread {
+        background-color: var(--foc-hover-color);
+        z-index: 2;
+      }
 
       &:not(.open-item):before {
-        background-color: transparent;
+        content: "";
+        width: calc(100% - 64px);
+        margin-left: 32px;
+        height: 1px;
+        background-color: var(--foc-divider-line-color);
+        position: absolute;
+        top: 0;
+        left: 0;
       }
-    }
 
-    &.unread {
-      background-color: var(--foc-hover-color);
-      z-index: 2;
-    }
-
-    &:not(.open-item):before {
-      content: "";
-      width: calc(100% - 64px);
-      margin-left: 32px;
-      height: 1px;
-      background-color: var(--foc-divider-line-color);
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    &.open-item {
-      border-top: 1px solid var(--foc-divider-line-color);
-      padding-top: 24px;
-    }
-
-    &.close-item {
-      border-bottom: 1px solid var(--foc-divider-line-color);
-      padding-bottom: 24px;
-    }
-
-    @include mobile() {
-      background-color: var(--mobile-background-color);
-      border-top: 1px solid var(--divider-line);
-      border-bottom: 1px solid var(--divider-line);
-
-      &:first-child {
-        border-top: none;
+      &.open-item {
+        border-top: 1px solid var(--foc-divider-line-color);
+        padding-top: 24px;
       }
-    }
 
-    &.unread {
-      background-color: var(--overlay-background-color);
+      &.close-item {
+        border-bottom: 1px solid var(--foc-divider-line-color);
+        padding-bottom: 24px;
+      }
 
       @include mobile() {
-        background-color: var(--background-color);
+        background-color: var(--mobile-background-color);
+        border-top: 1px solid var(--divider-line);
+        border-bottom: 1px solid var(--divider-line);
+
+        &:first-child {
+          border-top: none;
+        }
       }
-    }
 
-    div.thread-item-header {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: flex-start;
-      align-items: center;
-      height: 18px;
-      margin-bottom: 8px;
-      text-align: left;
+      &.unread {
+        background-color: var(--overlay-background-color);
 
-      div.thread-item-board-name-container {
-        position: relative;
+        @include mobile() {
+          background-color: var(--background-color);
+        }
+      }
 
-        span.board-name {
+      div.thread-item-header {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        height: 18px;
+        margin-bottom: 8px;
+        text-align: left;
+
+        div.thread-item-board-name-container {
+          position: relative;
+
+          span.board-name {
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 18px;
+            flex: 0 1 auto;
+            color: var(--color);
+            text-decoration: underline;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        div.separator-dot {
+          width: 3px;
+          height: 3px;
+          background-color: var(--divider-line);
+          border-radius: 50%;
+          margin: 1px 5px 0 5px;
+          flex: 0 0 auto;
+        }
+
+        span.time-since {
           @include OC_Body_Book();
           font-size: 12px;
           line-height: 18px;
-          flex: 0 1 auto;
+          flex: 0 0 auto;
           color: var(--color);
-          text-decoration: underline;
-          display: block;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
         }
       }
 
-      div.separator-dot {
-        width: 3px;
-        height: 3px;
-        background-color: var(--divider-line);
-        border-radius: 50%;
-        margin: 1px 5px 0 5px;
-        flex: 0 0 auto;
-      }
-
-      span.time-since {
-        @include OC_Body_Book();
-        font-size: 12px;
-        line-height: 18px;
-        flex: 0 0 auto;
+      div.thread-item-title {
+        @include activity-title(20px, 28px);
+        height: 28px;
         color: var(--color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow-wrap: break-word;
+        max-width: 100%;
       }
-    }
 
-    div.thread-item-title {
-      @include activity-title(20px, 28px);
-      height: 28px;
-      color: var(--color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow-wrap: break-word;
-      max-width: 100%;
-    }
-
-    div.thread-item-blocks {
-
-      div.thread-item-block {
-        margin-top: 4px;
-        position: relative;
-        height: 100%;
-
-        button.expand-thead-bt {
-          width: 100%;
-          height: 16px;
-          padding: 0 0 0 32px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--color);
-          text-align: left;
-          position: relative;
-          background-color: var(--foc-background-color);
-
-          &:before {
-            content: "";
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: var(--light-color);
-            background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
-            background-position: center;
-            position: absolute;
-            left: 4px;
-            top: 0;
-
-            @include dark_mode(){
-              background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-            }
-          }
-        }
+      div.thread-item-blocks {
 
         div.thread-item-block {
-          margin-top: 8px;
-        }
+          margin-top: 4px;
+          position: relative;
+          height: 100%;
 
-        &.horizontal-line {
-          div.thread-comment-outer {
-            padding-right: 0;
-            padding-top: 2px;
-            margin-top: -8px;
+          button.expand-thead-bt {
+            width: 100%;
+            height: 16px;
+            padding: 0 0 0 32px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 16px;
+            color: var(--color);
+            text-align: left;
+            position: relative;
+            background-color: var(--foc-background-color);
 
-            div.thread-comment div.thread-comment-floating-buttons {
-              right: -16px;
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background-color: var(--light-color);
+              background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+              background-size: 16px 16px;
+              background-repeat: no-repeat;
+              background-position: center;
+              position: absolute;
+              left: 4px;
+              top: 0;
+
+              @include dark_mode(){
+                background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+              }
             }
           }
-        }
 
-        &.horizontal-line {
-          margin-left: 24px;
-
-          &:last-child:before {
-            width: 2px;
-            height: calc(100% - 24px);
-            content: "";
-            background-color: var(--foc-background-color);
-            position: absolute;
-            left: -13px;
-            top: 22px;
+          div.thread-item-block {
+            margin-top: 8px;
           }
 
-          &:after {
-            height: 2px;
-            width: 11px;
+          &.horizontal-line {
+            div.thread-comment-outer {
+              padding-right: 0;
+              padding-top: 2px;
+              margin-top: -8px;
+
+              div.thread-comment div.thread-comment-floating-buttons {
+                right: -16px;
+              }
+            }
+          }
+
+          &.horizontal-line {
+            margin-left: 24px;
+
+            &:last-child:before {
+              width: 2px;
+              height: calc(100% - 24px);
+              content: "";
+              background-color: var(--foc-background-color);
+              position: absolute;
+              left: -13px;
+              top: 22px;
+            }
+
+            &:after {
+              height: 2px;
+              width: 11px;
+              background-color: var(--divider-line);
+              content: "";
+              position: absolute;
+              top: 20px;
+              left: -11px;
+            }
+
+            div.thread-comment-outer div.thread-comment div.thread-comment-inner {
+              padding: 8px;
+            }
+          }
+
+          &.vertical-line:before {
+            width: 2px;
+            height: calc(100% - 48px);
             background-color: var(--divider-line);
             content: "";
             position: absolute;
-            top: 20px;
-            left: -11px;
+            top: 40px;
+            left: 11px;
           }
 
-          div.thread-comment-outer div.thread-comment div.thread-comment-inner {
-            padding: 8px;
+          &.no-replies.vertical-line:before {
+            height: calc(100% - 24px);
           }
-        }
-
-        &.vertical-line:before {
-          width: 2px;
-          height: calc(100% - 48px);
-          background-color: var(--divider-line);
-          content: "";
-          position: absolute;
-          top: 40px;
-          left: 11px;
-        }
-
-        &.no-replies.vertical-line:before {
-          height: calc(100% - 24px);
-        }
-
-        div.thread-comment-outer {
-          padding: 0;
-          position: relative;
-          width: calc(100% + 16px);
-          padding-left: 8px;
-          padding-right: 8px;
-          margin-left: -8px;
 
           @include big_web() {
-
-            &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
-              background-color: var(--comments-floating-bt-background);
-              border-radius: 4px;
-            }
-
-            &:not(.new-comment):not(.open-thread).indented-comment:hover div.thread-comment div.thread-comment-inner,
-            &:not(.new-comment):not(.open-thread).indented-comment.showing-picker div.thread-comment div.thread-comment-inner {
-              background-color: var(--comments-floating-bt-background);
-              border-radius: 4px;
-            }
-          }
-
-          &.indented-comment div.thread-comment div.thread-comment-inner {
-            @include mobile() {
-              display: block;
-
-              div.more-menu {
-                button.more-menu-bt {
-                  background-position: 0px left 4px top;
-                  margin-top: -4px;
-                  background-color: transparent;
-                }
-
-                ul.more-menu-list {
-                  width: 94px;
-                  top: 20px;
-                  right: 13px;
-                  left: unset;
+            & > div.thread-item-block, & > div.thread-item-block > div.threads-item-block {
+              & > div.thread-comment-outer:not(.new-comment) {
+                &:hover, &.showing-picker,
+                &:hover div.thread-comment div.thread-comment-inner,
+                &.showing-picker div.thread-comment div.thread-comment-inner {
+                  background-color: var(--comments-floating-bt-background);
+                  border-radius: 4px;
                 }
               }
             }
           }
 
-          &:hover, &.showing-picker {
-            div.thread-comment div.thread-comment-floating-buttons {
-              display: block;
-            }
-          }
-
-          &.new-comment {
-            background-color: rgba($wut_purple, 0.16);
-            border-radius: 8px;
-            margin-bottom: 1px;
-
-            &.indented-comment {
-              background-color: transparent;
-
-              div.thread-comment div.thread-comment-inner {
-                background-color: rgba($wut_purple, 0.16);
-                border-radius: 8px;
-              }
-            }
-          }
-
-          div.thread-comment {
+          div.thread-comment-outer {
+            padding: 0;
             position: relative;
+            width: calc(100% + 16px);
+            padding-left: 8px;
+            padding-right: 8px;
+            margin-left: -8px;
 
-            div.thread-comment-inner {
-              padding: 8px 0;
-            }
+            @include big_web() {
 
-            &.add-comment-container {
-              padding-bottom: 8px;
-            }
-
-            div.thread-comment-mobile-menu {
-              display: none;
-              float: right;
-
-              div.emoji-picker-container {
-                button.close-bt {
-                  display: none;
+              &:not(.new-comment) {
+                &:hover, &.showing-picker,
+                &:hover div.thread-comment div.thread-comment-inner,
+                &.showing-picker div.thread-comment div.thread-comment-inner {
+                  background-color: var(--comments-floating-bt-background);
+                  border-radius: 4px;
                 }
               }
+            }
 
+            &.indented-comment div.thread-comment div.thread-comment-inner {
               @include mobile() {
                 display: block;
 
-                div.emoji-picker-container {
-                  width: 100vw;
-                  position: fixed;
-                  top: 0;
-                  bottom: 0;
-                  left: 0;
-                  right: 0;
-                  height: 100vh;
-                  background-color: white;
-                  z-index: 104;
-                  padding-top: 29px;
-
-                  button.close-bt {
-                    color: var(--color);
-                    padding: 0;
-                    margin: 0;
-                    @include OC_Body_Bold();
-                    font-size: 16px;
-                    position: absolute;
-                    top: 8px;
-                    right: 8px;
-                    display: block;
-                  }
-
-                  div.emoji-mart {
-                    position: relative;
-                    width: 100% !important;
-                    height: calc(100vh - 29px);
-                    bottom: unset;
-                    box-shadow: none;
-                    border-radius: none;
-                    border: none;
-
-                    div.emoji-mart-scroll {
-                      height: calc(100vh - 29px - 46px - 29px);
-                    }
-
-                    div.emoji-mart-bar:last-child {
-                      display: none;
-                    }
-                  }
-                }
-
                 div.more-menu {
                   button.more-menu-bt {
-                    margin-top: -12px;
-                    margin-left: 7px;
+                    background-position: 0px left 4px top;
+                    margin-top: -4px;
                     background-color: transparent;
                   }
 
                   ul.more-menu-list {
                     width: 94px;
                     top: 20px;
-                    right: 0;
+                    right: 13px;
                     left: unset;
                   }
                 }
               }
             }
 
-            div.thread-comment-floating-buttons {
-              position: absolute;
-              top: -8px;
-              right: -24px;
-              height: 32px;
-              z-index: 2;
-              display: none;
-              border-radius: 4px;
-              box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-              background-color: var(--color);
-
-              @include dark_mode() {
-                box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+            &:hover, &.showing-picker {
+              div.thread-comment div.thread-comment-floating-buttons {
+                display: block;
               }
+            }
 
-              div.more-bt-container {
-                height: 32px;
-                float: left;
-                position: relative;
+            &.new-comment {
+              background-color: rgba($wut_purple, 0.16);
+              border-radius: 8px;
+              margin-bottom: 1px;
 
-                div.comment-more-menu-container {
-                  position: absolute;
-                  top: 34px;
-                  left: 0;
-                  padding: 8px 0;
-                  border-radius: 4px;
-                  width: 78px;
-                  outline: none;
-                  z-index: 110;
-                  background-color: var(--overlay-background-color);
-                  border: 1px solid var(--divider-line);
+              &.indented-comment {
+                background-color: transparent;
 
-                  button {
-                    padding: 0;
-                    margin: 0;
-                    @include OC_Body_Book();
-                    font-size: 14px;
-                    color: var(--color);
-                    line-height: 18px;
-                    cursor: pointer;
-                    padding: 8px 16px;
-                    background-color: var(--overlay-background-color);
-                    position: relative;
-                  }
+                div.thread-comment div.thread-comment-inner {
+                  background-color: rgba($wut_purple, 0.16);
+                  border-radius: 8px;
                 }
               }
+            }
 
-              div.react-bt-container {
-                height: 32px;
-                float: left;
+            div.thread-comment {
+              position: relative;
 
-                div.emoji-mart {
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  bottom: unset;
-                  left: unset;
-                }
+              div.thread-comment-inner {
+                padding: 8px 0;
+              }
+
+              &.add-comment-container {
+                padding-bottom: 8px;
+              }
+
+              div.thread-comment-mobile-menu {
+                display: none;
+                float: right;
 
                 div.emoji-picker-container {
                   button.close-bt {
                     display: none;
                   }
                 }
+
+                @include mobile() {
+                  display: block;
+
+                  div.emoji-picker-container {
+                    width: 100vw;
+                    position: fixed;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 100vh;
+                    background-color: white;
+                    z-index: 104;
+                    padding-top: 29px;
+
+                    button.close-bt {
+                      color: var(--color);
+                      padding: 0;
+                      margin: 0;
+                      @include OC_Body_Bold();
+                      font-size: 16px;
+                      position: absolute;
+                      top: 8px;
+                      right: 8px;
+                      display: block;
+                    }
+
+                    div.emoji-mart {
+                      position: relative;
+                      width: 100% !important;
+                      height: calc(100vh - 29px);
+                      bottom: unset;
+                      box-shadow: none;
+                      border-radius: none;
+                      border: none;
+
+                      div.emoji-mart-scroll {
+                        height: calc(100vh - 29px - 46px - 29px);
+                      }
+
+                      div.emoji-mart-bar:last-child {
+                        display: none;
+                      }
+                    }
+                  }
+
+                  div.more-menu {
+                    button.more-menu-bt {
+                      margin-top: -12px;
+                      margin-left: 7px;
+                      background-color: transparent;
+                    }
+
+                    ul.more-menu-list {
+                      width: 94px;
+                      top: 20px;
+                      right: 0;
+                      left: unset;
+                    }
+                  }
+                }
               }
 
-              div.react-bt-container .tooltip {
-                width: 86px;
-              }
-
-              .separator-bt {
-                border-left: 1px solid rgba(white, 0.1);
-              }
-
-              button.floating-bt {
-                padding: 0;
+              div.thread-comment-floating-buttons {
+                position: absolute;
+                top: -8px;
+                right: -24px;
                 height: 32px;
-                min-width: 20px;
-                background-position: center;
-                background-repeat: no-repeat;
-                padding: 0 8px;
-                float: left;
-                @include OC_Body_Bold();
-                font-size: 12px;
-                line-height: 32px;
-                color: var(--overlay-background-color);
-                text-transform: uppercase;
+                z-index: 2;
+                display: none;
+                border-radius: 4px;
+                box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+                background-color: var(--color);
 
-                @include big_web() {
-                  opacity: 0.5;
-                  &:hover {
-                    opacity: 1;
+                @include dark_mode() {
+                  box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+                }
 
-                    &:before {
-                      opacity: 0.5;
+                div.more-bt-container {
+                  height: 32px;
+                  float: left;
+                  position: relative;
+
+                  div.comment-more-menu-container {
+                    position: absolute;
+                    top: 34px;
+                    left: 0;
+                    padding: 8px 0;
+                    border-radius: 4px;
+                    width: 78px;
+                    outline: none;
+                    z-index: 110;
+                    background-color: var(--overlay-background-color);
+                    border: 1px solid var(--divider-line);
+
+                    button {
+                      padding: 0;
+                      margin: 0;
+                      @include OC_Body_Book();
+                      font-size: 14px;
+                      color: var(--color);
+                      line-height: 18px;
+                      cursor: pointer;
+                      padding: 8px 16px;
+                      background-color: var(--overlay-background-color);
+                      position: relative;
                     }
                   }
                 }
 
-                &.more-bt {
-                  padding-left: 30px;
-                  background-image: cdnUrl("/img/ML/comment_more.svg");
-                  background-size: 18px 4px;
-                  background-position: left 8px top 14px;
-                }
-
-                &.reply-bt {
-                  padding-left: 24px;
-                  background-image: cdnUrl("/img/ML/comment_reply.svg");
-                  background-size: 12px 12px;
-                  background-position: left 8px top 10px;
-                }
-
-                &.react-bt {
-                  padding-left: 26px;
-                  background-image: cdnUrl("/img/ML/comment_react.svg");
-                  background-size: 14px 14px;
-                  background-position: left 8px top 9px;
-                  border-right: none;
+                div.react-bt-container {
+                  height: 32px;
+                  float: left;
 
                   div.emoji-mart {
-                    right: 0;
-                    left: unset;
                     position: absolute;
-                    top: 34px;
+                    top: 0;
+                    right: 0;
+                    bottom: unset;
+                    left: unset;
+                  }
+
+                  div.emoji-picker-container {
+                    button.close-bt {
+                      display: none;
+                    }
                   }
                 }
 
-                @include dark_mode() {
-                  &.more-bt {
-                    background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+                div.react-bt-container .tooltip {
+                  width: 86px;
+                }
+
+                .separator-bt {
+                  border-left: 1px solid rgba(white, 0.1);
+                }
+
+                button.floating-bt {
+                  padding: 0;
+                  height: 32px;
+                  min-width: 20px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  padding: 0 8px;
+                  float: left;
+                  @include OC_Body_Bold();
+                  font-size: 12px;
+                  line-height: 32px;
+                  color: var(--overlay-background-color);
+                  text-transform: uppercase;
+
+                  @include big_web() {
+                    opacity: 0.5;
+                    &:hover {
+                      opacity: 1;
+
+                      &:before {
+                        opacity: 0.5;
+                      }
+                    }
                   }
 
-                  &.share-bt {
-                    background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+                  &.more-bt {
+                    padding-left: 30px;
+                    background-image: cdnUrl("/img/ML/comment_more.svg");
+                    background-size: 18px 4px;
+                    background-position: left 8px top 14px;
                   }
 
                   &.reply-bt {
-                    background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                    padding-left: 24px;
+                    background-image: cdnUrl("/img/ML/comment_reply.svg");
+                    background-size: 12px 12px;
+                    background-position: left 8px top 10px;
                   }
 
                   &.react-bt {
-                    background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                    padding-left: 26px;
+                    background-image: cdnUrl("/img/ML/comment_react.svg");
+                    background-size: 14px 14px;
+                    background-position: left 8px top 9px;
+                    border-right: none;
+
+                    div.emoji-mart {
+                      right: 0;
+                      left: unset;
+                      position: absolute;
+                      top: 34px;
+                    }
                   }
-                }
-              }
-            }
-
-            div.thread-comment-right {
-              margin-left: 32px;
-
-              @include mobile() {
-                margin-left: 32px;
-              }
-
-              @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
-
-              @include dark_mode() {
-                @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
-              }
-            }
-
-            div.thread-comment-header {
-              height: 24px;
-
-              @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
-
-              @include dark_mode() {
-                @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
-              }
-
-              div.thread-comment-author-right {
-                float: left;
-                max-width: 100%;
-                display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                flex-wrap: nowrap;
-                height: 18px;
-
-                @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
-
-                @include dark_mode() {
-                  @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
-                }
-
-                div.thread-comment-author-name {
-                  @include OC_Body_Book();
-                  font-size: 12px;
-                  color: var(--light-color);
-                  line-height: 15px;
-                  float: left;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-
-                  &.clickable-name {
-                    text-decoration: underline;
-                    cursor: pointer;
-                  }
-
-                  @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
 
                   @include dark_mode() {
-                    @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
-                  }
-                }
-
-                @include mobile() {
-                  max-width: 80%;
-                }
-
-                div.thread-comment-author-right-group {
-                  width: auto;
-                  flex: 1 1 auto;
-                  display: flex;
-                  flex-direction: row;
-                  flex-wrap: nowrap;
-                  align-items: flex-start;
-                  max-width: 100%;
-
-                  &.new-comment {
-                    max-width: calc(100% - 35px);
-                  }
-
-                  div.thread-comment-author-name-container {
-                    flex: 1 0 auto;
-                    position: relative;
-
-                    div.user-info-hover {
-                      transform: translateX(-40px);
+                    &.more-bt {
+                      background-image: cdnUrl("/img/ML/comment_more@dark.svg");
                     }
 
-                    div.thread-comment-author-avatar {
-                      position: absolute;
-                      left: -32px;
-                      top: 0;
-                      width: 32px;
-                      height: 24px;
-                      padding-right: 8px;
+                    &.share-bt {
+                      background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+                    }
 
-                      @include user-profile(24);
+                    &.reply-bt {
+                      background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                    }
+
+                    &.react-bt {
+                      background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                    }
+                  }
+                }
+              }
+
+              div.thread-comment-right {
+                margin-left: 32px;
+
+                @include mobile() {
+                  margin-left: 32px;
+                }
+
+                @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
+
+                @include dark_mode() {
+                  @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
+                }
+              }
+
+              div.thread-comment-header {
+                height: 24px;
+
+                @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
+
+                @include dark_mode() {
+                  @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
+                }
+
+                div.thread-comment-author-right {
+                  float: left;
+                  max-width: 100%;
+                  display: flex;
+                  flex-direction: row;
+                  align-items: flex-start;
+                  flex-wrap: nowrap;
+                  height: 18px;
+
+                  @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
+
+                  @include dark_mode() {
+                    @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
+                  }
+
+                  div.thread-comment-author-name {
+                    @include OC_Body_Book();
+                    font-size: 12px;
+                    color: var(--light-color);
+                    line-height: 15px;
+                    float: left;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    &.clickable-name {
+                      text-decoration: underline;
+                      cursor: pointer;
+                    }
+
+                    @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
+
+                    @include dark_mode() {
+                      @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
+                    }
+                  }
+
+                  @include mobile() {
+                    max-width: 80%;
+                  }
+
+                  div.thread-comment-author-right-group {
+                    width: auto;
+                    flex: 1 1 auto;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    align-items: flex-start;
+                    max-width: 100%;
+
+                    &.new-comment {
+                      max-width: calc(100% - 35px);
+                    }
+
+                    div.thread-comment-author-name-container {
+                      flex: 1 0 auto;
+                      position: relative;
+
+                      div.user-info-hover {
+                        transform: translateX(-40px);
+                      }
+
+                      div.thread-comment-author-avatar {
+                        position: absolute;
+                        left: -32px;
+                        top: 0;
+                        width: 32px;
+                        height: 24px;
+                        padding-right: 8px;
+
+                        @include user-profile(24);
+
+                        @include mobile() {
+                          left: -32px;
+                          padding-right: 8px;
+                        }
+                      }
 
                       @include mobile() {
-                        left: -32px;
-                        padding-right: 8px;
+                        flex: 1 1 auto;
                       }
                     }
 
-                    @include mobile() {
-                      flex: 1 1 auto;
+                    div.thread-comment-author-timestamp {
+                      flex: 0 0 auto;
                     }
+                  }
+                  div.thread-comment-author-name {
+                    @include OC_Body_Bold();
+                    font-size: 14px;
+                    color: var(--color);
+                    line-height: 18px;
+                    float: left;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    height: 18px;
                   }
 
                   div.thread-comment-author-timestamp {
-                    flex: 0 0 auto;
-                  }
-                }
-                div.thread-comment-author-name {
-                  @include OC_Body_Bold();
-                  font-size: 14px;
-                  color: var(--color);
-                  line-height: 18px;
-                  float: left;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  height: 18px;
-                }
-
-                div.thread-comment-author-timestamp {
-                  @include OC_Body_Book();
-                  font-size: 14px;
-                  color: var(--light-color);
-                  float: left;
-                  margin-left: 6px;
-                  line-height: 18px;
-                  height: 18px;
-                }
-
-                div.new-comment-tag {
-                  flex: 0 0 37px;
-                  margin-left: 8px;
-                  width: 37px;
-                  height: 18px;
-                  position: relative;
-
-                  &:before {
-                    @include OC_Body_Bold();
-                    font-size: 12px;
+                    @include OC_Body_Book();
+                    font-size: 14px;
+                    color: var(--light-color);
+                    float: left;
+                    margin-left: 6px;
                     line-height: 18px;
-                    content: "(NEW)";
-                    color: $wut_purple;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
+                    height: 18px;
+                  }
+
+                  div.new-comment-tag {
+                    flex: 0 0 37px;
+                    margin-left: 8px;
+                    width: 37px;
+                    height: 18px;
+                    position: relative;
+
+                    &:before {
+                      @include OC_Body_Bold();
+                      font-size: 12px;
+                      line-height: 18px;
+                      content: "(NEW)";
+                      color: $wut_purple;
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                    }
                   }
                 }
               }
-            }
 
-            div.thread-comment-content {
-              text-align: left;
-              position: relative;
+              div.thread-comment-content {
+                text-align: left;
+                position: relative;
 
-              div.thread-comment-body {
-                display: inline;
-                @include activity-comment(15, 18, 12);
+                div.thread-comment-body {
+                  display: inline;
+                  @include activity-comment(15, 18, 12);
+
+                  @include mobile() {
+                    @include activity-comment(18, 24, 16);
+                  }
+
+                  .interactive-image {
+                    cursor: zoom-in;
+
+                    &:hover {
+                      opacity: 0.7;
+                    }
+                  }
+                }
+              }
+
+              div.thread-comment-reactions-footer {
+                height: 26px;
+                margin-top: 8px;
 
                 @include mobile() {
-                  @include activity-comment(18, 24, 16);
-                }
-
-                .interactive-image {
-                  cursor: zoom-in;
-
-                  &:hover {
-                    opacity: 0.7;
-                  }
+                  margin-bottom: 8px;
                 }
               }
-            }
 
-            div.thread-comment-reactions-footer {
-              height: 26px;
-              margin-top: 8px;
+              div.thread-comment-footer {
+                height: 24px;
+                margin-top: 2px;
 
-              @include mobile() {
-                margin-bottom: 8px;
-              }
-            }
-
-            button.thread-reply-bt {
-              display: none;
-              @include mobile() {
-                display: initial;
-                @include OC_Body_Book();
-                font-size: 15px;
-                line-height: 18px;
-                color: var(--light-color);
-                padding: 8px 24px 0 0;
-                text-align: left;
-                opacity: 1;
-
-                @include big_web() {
-                  &:hover {
-                    opacity: 1;
-                    text-decoration: underline;
-                  }
+                @include mobile() {
+                  margin-top: 8px;
                 }
               }
             }
 
-            div.thread-comment-footer {
-              height: 24px;
-              margin-top: 2px;
-
-              @include mobile() {
-                margin-top: 8px;
-              }
+            div.thread-comment div.add-comment-box-container {
+              padding-top: 8px;
             }
-          }
-
-          div.thread-comment div.add-comment-box-container {
-            padding-top: 8px;
           }
         }
       }
-    }
 
-    div.add-comment-box-container {
-      margin-top: 8px;
+      div.add-comment-box-container {
+        margin-top: 8px;
+      }
     }
   }
 }

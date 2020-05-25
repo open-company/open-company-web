@@ -25,7 +25,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.threads-list :refer (threads-list)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.expanded-post :refer (expanded-post)]
@@ -383,14 +382,12 @@
               ;; Expanded post view
               show-expanded-post
               (expanded-post)
-              ;; Threads list view
-              is-threads
-              (threads-list)
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
                (str "paginated-posts-component-" (
                 cond is-inbox       "IN"
+                     is-threads     "TH"
                      is-all-posts   "AP"
                      is-bookmarks   "BM"
                      is-following   "FL"
