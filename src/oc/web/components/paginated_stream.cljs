@@ -74,6 +74,8 @@
         (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
+        (= current-board-slug "threads")
+        (activity-actions/threads-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "bookmarks")
