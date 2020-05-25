@@ -268,7 +268,7 @@
   ([comment-data :guard map? last-read-at]
    (comment-unread? (:created-at comment-data) last-read-at))
   ([iso-date last-read-at]
-   (letfn [(get-time [t] (.getTime (utils/js-date t)))]
+   (letfn [(get-time [t] (.getTime (new js/Date t)))]
      (< (get-time last-read-at)
         (get-time iso-date)))))
 
