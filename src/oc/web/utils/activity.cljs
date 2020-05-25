@@ -570,7 +570,7 @@
           with-fixed-items (reduce (fn [ret item]
                                      (if-let [entry-data (get-in with-fixed-entries [:fixed-entries (:resource-uuid item)])]
                                        (let [fixed-thread (fix-thread item entry-data active-users)]
-                                        (js/console.log "DBG fix-thread created-at" (:created-at item) "last-read-at" (:last-read-at entry-data) "->" (:unread fixed-thread) (:unread-thread fixed-thread))
+                                        (js/console.log "DBG fix-thread act" (:uuid entry-data) (:last-read-at entry-data) "thread" (:uuid item) (:last-read-at item) "Unread root" (:unread fixed-thread) "unread thread" (:unread-thread fixed-thread))
                                        (assoc-in ret [:fixed-items (:uuid item)]
                                         (fix-thread item entry-data active-users)))
                                        ret))

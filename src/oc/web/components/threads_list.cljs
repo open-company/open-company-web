@@ -257,7 +257,8 @@
                 :let [r (get replies idx)
                       ind-showing-picker? (and (seq @(::show-picker s))
                                                (= @(::show-picker s) (:uuid r)))
-                      unread-reply? (au/comment-unread? (:created-at r) (:last-read-at activity-data))]
+                      unread-reply? (au/comment-unread? (:created-at r) (:last-read-at activity-data))
+                      reply-data (assoc r :unread unread-reply?)]
                 :when (or (< collapsed-count 1)
                           unread-reply?
                           (= (dec (count replies)) idx))]
@@ -274,7 +275,6 @@
                                                (emoji-picker-container s activity-data r))
                                :showing-picker? ind-showing-picker?
                                :new-thread? unread
-                               :unread unread-reply?
                                :member? member?
                                :current-user-id current-user-id})])]]
 
