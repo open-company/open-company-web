@@ -266,7 +266,7 @@
 (defun comment-unread?
   "An entry is new if its uuid is contained in container's unread."
   ([comment-data :guard map? last-read-at]
-   (comment-unread? (:created-at comment-data)))
+   (comment-unread? (:created-at comment-data) last-read-at))
   ([iso-date last-read-at]
    (letfn [(get-time [t] (.getTime (utils/js-date t)))]
      (< (get-time last-read-at)
@@ -526,7 +526,7 @@
 
 (defn fix-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
-        comment-unread (comment-unread? (:created-at thread) (:last-read-at entry-data))
+        comment-unread (comment-unread? thread (:last-read-at entry-data))
         thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
     (-> thread
       (assoc :content-type "comment")
@@ -569,8 +569,10 @@
                               (:entries threads-data))
           with-fixed-items (reduce (fn [ret item]
                                      (if-let [entry-data (get-in with-fixed-entries [:fixed-entries (:resource-uuid item)])]
+                                       (let [fixed-thread (fix-thread item entry-data active-users)]
+                                        (js/console.log "DBG fix-thread created-at" (:created-at item) "last-read-at" (:last-read-at entry-data) "->" (:unread fixed-thread) (:unread-thread fixed-thread))
                                        (assoc-in ret [:fixed-items (:uuid item)]
-                                        (fix-thread item entry-data active-users))
+                                        (fix-thread item entry-data active-users)))
                                        ret))
                             with-fixed-entries
                             (:items with-fixed-entries))

@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
+            [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
@@ -243,6 +244,7 @@
                                            (emoji-picker-container s activity-data n))
                            :showing-picker? showing-picker?
                            :new-thread? unread
+                           :unread unread
                            :member? member?
                            :replies-count replies-count
                            :current-user-id current-user-id})
@@ -254,9 +256,10 @@
           (for [idx (range (count replies))
                 :let [r (get replies idx)
                       ind-showing-picker? (and (seq @(::show-picker s))
-                                               (= @(::show-picker s) (:uuid r)))]
+                                               (= @(::show-picker s) (:uuid r)))
+                      unread-reply? (au/comment-unread? (:created-at r) (:last-read-at activity-data))]
                 :when (or (< collapsed-count 1)
-                          (:unread r)
+                          unread-reply?
                           (= (dec (count replies)) idx))]
             [:div.thread-item-block.horizontal-line.group
               {:key (str "unir-" (:created-at r) "-" (:uuid r))}
@@ -271,6 +274,7 @@
                                                (emoji-picker-container s activity-data r))
                                :showing-picker? ind-showing-picker?
                                :new-thread? unread
+                               :unread unread-reply?
                                :member? member?
                                :current-user-id current-user-id})])]]
 
