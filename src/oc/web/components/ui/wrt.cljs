@@ -325,9 +325,10 @@
   [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
         is-author? (au/is-publisher? activity-data)
-        reads-count (if (and is-author? (:last-read-at reads-data))
-                      (dec (:count reads-data))
-                      (:count reads-data))]
+        reads-count (if (and is-author?
+                             (:last-read-at activity-data))
+                     (dec (:count reads-data))
+                     (:count reads-data))]
     [:div.wrt-count-container
       [:div.wrt-count
         {:ref :wrt-count
