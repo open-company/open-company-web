@@ -40,8 +40,8 @@ div.threads-list {
 
       &:before {
         position: absolute;
-        top: 15px;
-        height: 2px;
+        top: 16px;
+        height: 1px;
         left: 0;
         width: 100%;
         z-index: 1;
@@ -210,6 +210,24 @@ div.threads-list {
 
       div.thread-item-blocks {
 
+        @include big_web() {
+
+          & > div.thread-item-block > div.thread-comment-outer:not(.new-comment) {
+            &:hover, &.showing-picker {
+              background-color: var(--comments-floating-bt-background);
+              border-radius: 4px;
+            }
+          }
+
+          & > div.thread-item-block > div.thread-item-block > div.thread-comment-outer:not(.new-comment) {
+            &:hover div.thread-comment div.thread-comment-inner,
+            &.showing-picker div.thread-comment div.thread-comment-inner {
+              background-color: var(--comments-floating-bt-background);
+              border-radius: 4px;
+            }
+          }
+        }
+
         div.thread-item-block {
           margin-top: 4px;
           position: relative;
@@ -258,7 +276,7 @@ div.threads-list {
               margin-top: -8px;
 
               div.thread-comment div.thread-comment-floating-buttons {
-                right: -16px;
+                right: 16px;
               }
             }
           }
@@ -305,19 +323,6 @@ div.threads-list {
             height: calc(100% - 24px);
           }
 
-          @include big_web() {
-            & > div.thread-item-block, & > div.thread-item-block > div.threads-item-block {
-              & > div.thread-comment-outer:not(.new-comment) {
-                &:hover, &.showing-picker,
-                &:hover div.thread-comment div.thread-comment-inner,
-                &.showing-picker div.thread-comment div.thread-comment-inner {
-                  background-color: var(--comments-floating-bt-background);
-                  border-radius: 4px;
-                }
-              }
-            }
-          }
-
           div.thread-comment-outer {
             padding: 0;
             position: relative;
@@ -325,18 +330,6 @@ div.threads-list {
             padding-left: 8px;
             padding-right: 8px;
             margin-left: -8px;
-
-            @include big_web() {
-
-              &:not(.new-comment) {
-                &:hover, &.showing-picker,
-                &:hover div.thread-comment div.thread-comment-inner,
-                &.showing-picker div.thread-comment div.thread-comment-inner {
-                  background-color: var(--comments-floating-bt-background);
-                  border-radius: 4px;
-                }
-              }
-            }
 
             &.indented-comment div.thread-comment div.thread-comment-inner {
               @include mobile() {
@@ -466,8 +459,8 @@ div.threads-list {
 
               div.thread-comment-floating-buttons {
                 position: absolute;
-                top: -8px;
-                right: -24px;
+                top: -16px;
+                right: 16px;
                 height: 32px;
                 z-index: 2;
                 display: none;
@@ -541,7 +534,7 @@ div.threads-list {
                 button.floating-bt {
                   padding: 0;
                   height: 32px;
-                  min-width: 20px;
+                  min-width: 14px;
                   background-position: center;
                   background-repeat: no-repeat;
                   padding: 0 8px;

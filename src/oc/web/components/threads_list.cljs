@@ -133,21 +133,20 @@
                   emoji-picker]
                 [:div.thread-comment-floating-buttons
                   ;; Reply to comment
-                  (when (:reply-parent comment-data)
-                    [:button.mlb-reset.floating-bt.reply-bt.separator-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click reply-cb
-                       :title "Reply"}
-                      "Reply"])
+                  ; (when (:reply-parent comment-data)
+                  ;   [:button.mlb-reset.floating-bt.reply-bt.separator-bt
+                  ;     {:data-toggle "tooltip"
+                  ;      :data-placement "top"
+                  ;      :on-click reply-cb
+                  ;      :title "Reply"}
+                  ;     "Reply"])
                   ;; React container
                   [:div.react-bt-container.separator-bt
                     [:button.mlb-reset.floating-bt.react-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :title "Add reaction"
-                       :on-click react-cb}
-                      "React"]
+                       :on-click react-cb}]
                     emoji-picker]])]]
           [:div.thread-comment-content
             [:div.thread-comment-body.oc-mentions.oc-mentions-hover
