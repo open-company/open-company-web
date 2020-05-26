@@ -207,7 +207,8 @@
         add-comment-focus-prefix "thread-comment"
         replies-count (count replies)
         read-count (count (filter (comp not :unread) replies))
-        collapsed-count (when-not @(::expanded s)
+        collapsed-count (when (and (not @(::expanded s))
+                                   (not (:unread n)))
                           ;; Count the read comments and remove one since last is always rendered
                           (if (= read-count replies-count)
                             (dec read-count)
