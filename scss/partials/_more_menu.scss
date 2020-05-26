@@ -87,7 +87,7 @@ div.more-menu {
   button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: var(--opac-background-color-15);
+    border-right: 1px solid var(--opac-background-color-15);
   }
 
   button.more-menu-remove-bookmark-bt {
