@@ -396,20 +396,18 @@
                        ;; ie: change, org or active-users
                        (:posts-list board-data))
           follow-board-uuids (set (map :uuid follow-boards-list))]
-      (as-> with-fixed-activities b
-        (assoc b :read-only (readonly-board? links))
-        (dissoc b :old-links :items)
-        (assoc b :posts-list (vec (case direction
-                                   :up (concat items-list (:posts-list board-data))
-                                   :down (concat (:posts-list board-data) items-list)
-                                   items-list)))
-        (if direction
-          (assoc b :saved-items (count (:posts-list board-data)))
-          b)
-        (if (show-separators? (:slug board-data))
-          (update b :items-to-render grouped-posts)
-          (assoc b :items-to-render (:posts-list b)))
-        (assoc b :following (boolean (follow-board-uuids (:uuid board-data))))))))
+      (-> with-fixed-activities
+        (assoc :read-only (readonly-board? links))
+        (dissoc :old-links :items)
+        (assoc :posts-list (vec (case direction
+                                  :up (concat items-list (:posts-list board-data))
+                                  :down (concat (:posts-list board-data) items-list)
+                                  items-list)))
+        (as-> b
+         (if (show-separators? (:slug board-data))
+           (update b :items-to-render grouped-posts)
+           (assoc b :items-to-render (:posts-list b))))
+        (assoc :following (boolean (follow-board-uuids (:uuid board-data))))))))
 
 (defn fix-contributions
   "Parse data coming from the API for a certain user's posts."
@@ -455,20 +453,18 @@
                        ;; ie: change, org or active-users
                        (:posts-list contributions-data))
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
-      (as-> with-fixed-activities c
+      (-> with-fixed-activities
         (dissoc :old-links :items)
-        (assoc c :links fixed-next-links)
-        (assoc c :posts-list (vec (case direction
+        (assoc :links fixed-next-links)
+        (assoc :posts-list (vec (case direction
                                    :up (concat items-list (:posts-list contributions-data))
                                    :down (concat (:posts-list contributions-data) items-list)
                                    items-list)))
-        (if direction
-          (assoc c :saved-items (count (:posts-list contributions-data)))
-          c)
-        (if (show-separators? (:href contributions-data))
-          (assoc c :items-to-render (grouped-posts c))
-          (assoc c :items-to-render (:posts-list c)))
-        (assoc c :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
+        (as-> c
+         (if (show-separators? (:href contributions-data))
+           (assoc c :items-to-render (grouped-posts c))
+           (assoc c :items-to-render (:posts-list c))))
+        (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
@@ -510,19 +506,17 @@
                        ;; If we are re-parsing existing data for updated related data
                        ;; ie: change, org or active-users
                        (:posts-list container-data))]
-      (as-> with-fixed-activities c
-       (dissoc c :old-links :items)
-       (assoc c :links fixed-next-links)
-       (assoc c :posts-list (vec (case direction
-                                  :up (concat items-list (:posts-list container-data))
-                                  :down (concat (:posts-list container-data) items-list)
-                                  items-list)))
-       (if direction
-         (assoc c :saved-items (count (:posts-list container-data)))
-         c)
-       (if (show-separators? (:href container-data) sort-type)
-         (assoc c :items-to-render (grouped-posts c))
-         (assoc c :items-to-render (:posts-list c)))))))
+      (-> with-fixed-activities
+       (dissoc :old-links :items)
+       (assoc :links fixed-next-links)
+       (assoc :posts-list (vec (case direction
+                                 :up (concat items-list (:posts-list container-data))
+                                 :down (concat (:posts-list container-data) items-list)
+                                 items-list)))
+       (as-> c
+        (if (show-separators? (:href container-data) sort-type)
+          (assoc c :items-to-render (grouped-posts c))
+          (assoc c :items-to-render (:posts-list c))))))))
 
 (defn fix-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
@@ -608,16 +602,13 @@
                                         (recur (vec (conj to-items (first from-items)))
                                                (rest from-items)))))]
       (doseq [e @entries] (utils/after 0 #(comment-utils/get-comments e)))
-      (as-> with-fixed-items t
-       (dissoc t :old-links :entries :items)
-       (assoc t :links fixed-next-links)
-       (assoc t :threads-list threads-list)
-       (assoc t :no-virtualized-steam true)
-       (update t :entries-list #(remove nil? (map :uuid (vals (:fixed-entries t)))))
-       (if direction
-         (assoc t :saved-items (count threads-list))
-         t)
-       (assoc t :items-to-render threads-with-separators)))))
+      (-> with-fixed-items
+       (dissoc :old-links :entries :items)
+       (assoc :links fixed-next-links)
+       (assoc :threads-list threads-list)
+       (assoc :no-virtualized-steam true)
+       (as-> t (update t :entries-list #(remove nil? (map :uuid (vals (:fixed-entries t))))))
+       (assoc :items-to-render threads-with-separators)))))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data
