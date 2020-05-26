@@ -351,13 +351,13 @@
                         (-> with-authors
                           (assoc :new-at created-at)
                           (assoc :new-comments-count new-comments-count)))
-          all-old-comments-data (comment-utils/ungroup-comments (dispatcher/activity-comments-data org-slug activity-uuid db))]
+          sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
+          all-old-comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)
               ;; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-              sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
               new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
               threads-map-key (dispatcher/activity-threads-map-key org-slug activity-uuid)
               threads-map (comment-utils/threads-map new-sorted-comments-data)]
