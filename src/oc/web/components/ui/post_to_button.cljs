@@ -4,7 +4,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
-(def missing-title-tooltip "Please add a title to post")
+(def missing-title-tooltip "Please add a title before sharing")
 (def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 (rum/defcs post-to-button < rum/reactive

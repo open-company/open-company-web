@@ -552,10 +552,10 @@ div.threads-list {
                 button.floating-bt {
                   padding: 0;
                   height: 32px;
-                  min-width: 14px;
+                  min-width: 32px;
                   background-position: center;
                   background-repeat: no-repeat;
-                  padding: 0 8px;
+                  padding: 0;
                   float: left;
                   @include OC_Body_Bold();
                   font-size: 12px;
