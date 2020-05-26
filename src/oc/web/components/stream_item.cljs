@@ -171,12 +171,6 @@
                         :height @(::mobile-video-height s)}
                        {:width 136
                         :height (utils/calc-video-height 136)}))
-        ;; Add NEW tag besides comment summary
-        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and (:new-at activity-data)
-                               ;; and that's after the user last read
-                               (< (.getTime (utils/js-date (:last-read-at activity-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
@@ -319,8 +313,9 @@
                   ; {:on-click #(expand s true true)}
                   (comments-summary {:entry-data activity-data
                                      :comments-data comments-data
-                                     :new-comments-count (:new-comments-count activity-data)
-                                     :hide-label? is-mobile?
+                                     :hide-face-pile? true
+                                     :show-bubble-icon? true
+                                     :hide-label? true
                                      :publisher? publisher?
                                      :add-comment-focus-prefix "main-comment"})]
                 (if show-wrt?

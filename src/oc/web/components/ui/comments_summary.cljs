@@ -40,7 +40,8 @@
            hide-face-pile?
            new-comments-count
            publisher?
-           add-comment-focus-prefix]}]
+           add-comment-focus-prefix
+           show-bubble-icon?]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -74,6 +75,9 @@
                        (nav-actions/open-post-modal entry-data true))
                      (comment-actions/add-comment-focus (cu/add-comment-focus-value add-comment-focus-prefix (:uuid entry-data))))}
         ; Comments authors heads
+        (when (and show-bubble-icon?
+                   (pos? comments-count))
+          [:div.is-comments-bubble])
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)
                       (not (zero? comments-count))))
