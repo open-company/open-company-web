@@ -179,15 +179,6 @@ div.threads-list {
           }
         }
 
-        div.separator-dot {
-          width: 3px;
-          height: 3px;
-          background-color: var(--divider-line);
-          border-radius: 50%;
-          margin: 1px 5px 0 5px;
-          flex: 0 0 auto;
-        }
-
         span.time-since {
           @include OC_Body_Book();
           font-size: 12px;
@@ -195,6 +186,15 @@ div.threads-list {
           flex: 0 0 auto;
           color: var(--color);
         }
+      }
+
+      div.separator-dot {
+        width: 3px;
+        height: 3px;
+        background-color: var(--light-color);
+        border-radius: 50%;
+        margin: 1px 5px 0 5px;
+        flex: 0 0 auto;
       }
 
       div.thread-item-title {
@@ -646,7 +646,7 @@ div.threads-list {
                   div.thread-comment-author-name {
                     @include OC_Body_Book();
                     font-size: 12px;
-                    color: var(--light-color);
+                    color: var(--color);
                     line-height: 15px;
                     float: left;
                     overflow: hidden;
@@ -654,8 +654,11 @@ div.threads-list {
                     white-space: nowrap;
 
                     &.clickable-name {
-                      text-decoration: underline;
                       cursor: pointer;
+
+                      &:hover {
+                        text-decoration: underline;
+                      }
                     }
 
                     @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
@@ -675,7 +678,8 @@ div.threads-list {
                     display: flex;
                     flex-direction: row;
                     flex-wrap: nowrap;
-                    align-items: flex-start;
+                    align-items: center;
+                    justify-content: flex-start;
                     max-width: 100%;
 
                     &.new-comment {
@@ -715,9 +719,10 @@ div.threads-list {
                       flex: 0 0 auto;
                     }
                   }
+
                   div.thread-comment-author-name {
-                    @include OC_Body_Bold();
-                    font-size: 14px;
+                    @include OC_Body_Book();
+                    font-size: 12px;
                     color: var(--color);
                     line-height: 18px;
                     float: left;
@@ -725,14 +730,18 @@ div.threads-list {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     height: 18px;
+                    cursor: pointer;
+
+                    &:hover {
+                      text-decoration: underline;
+                    }
                   }
 
                   div.thread-comment-author-timestamp {
                     @include OC_Body_Book();
                     font-size: 14px;
-                    color: var(--light-color);
+                    color: var(--color);
                     float: left;
-                    margin-left: 6px;
                     line-height: 18px;
                     height: 18px;
                   }

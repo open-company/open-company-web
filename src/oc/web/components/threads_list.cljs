@@ -108,6 +108,7 @@
                   [:div.thread-comment-author-name
                     {:class (when (:user-id (:author comment-data)) "clickable-name")}
                     (:name (:author comment-data))]]
+                [:div.separator-dot]
                 [:div.thread-comment-author-timestamp
                   [:time
                     {:date-time (:created-at comment-data)
