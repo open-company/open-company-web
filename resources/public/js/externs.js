@@ -50,7 +50,6 @@ $.after = function(){};
 $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
-$.datepicker = function(){};
 $.parseJSON = function(){};
 // WURFL
 var WURFL = {};

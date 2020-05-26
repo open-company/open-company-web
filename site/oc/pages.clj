@@ -168,10 +168,6 @@
           font-awesome
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
-          ;; jQuery UI CSS
-          [:link
-            {:rel "stylesheet"
-             :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Lineto font
@@ -236,10 +232,6 @@
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js" :type "text/javascript"}]
-          ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
-          ;; Resolve jQuery UI and Bootstrap tooltip conflict
-          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           bootstrap-js
           ;; Emoji One Autocomplete
           [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
@@ -297,10 +289,6 @@
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
           font-awesome
-          ;; jQuery UI CSS
-          [:link
-            {:rel "stylesheet"
-             :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (shared/cdn "/main.css")}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -326,10 +314,6 @@
              :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
-          ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
-          ;; Resolve jQuery UI and Bootstrap tooltip conflict
-          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
