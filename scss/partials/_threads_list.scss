@@ -219,7 +219,7 @@ div.threads-list {
             }
           }
 
-          & > div.thread-item-block > div.thread-item-block > div.thread-comment-outer:not(.new-comment) {
+          & > div.thread-item-block div.thread-item-block > div.thread-comment-outer:not(.new-comment) {
             &:hover div.thread-comment div.thread-comment-inner,
             &.showing-picker div.thread-comment div.thread-comment-inner {
               background-color: var(--comments-floating-bt-background);
@@ -232,6 +232,24 @@ div.threads-list {
           margin-top: 4px;
           position: relative;
           height: 100%;
+
+          div.thread-item-loading {
+            height: 30px;
+            margin-left: 8px;
+
+            div.small-loading {
+              margin-top: 6px;
+              margin-right: 6px;
+              float: left;
+            }
+
+            span.thread-item-loading-inner {
+              font-size: 13px;
+              @include OC_Body_Book();
+              line-height: 30px;
+              float: left;
+            }
+          }
 
           button.expand-thead-bt {
             width: 100%;
