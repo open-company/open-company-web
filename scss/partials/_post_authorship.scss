@@ -18,7 +18,7 @@ div.post-authorship {
       a.publisher-name {
         flex: 0 1 auto;
         display: block;
-        color: var(--light-color);
+        color: var(--color);
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -27,7 +27,7 @@ div.post-authorship {
 
         @include big_web() {
           &:hover {
-            color: var(--color);
+            text-decoration: underline;
           }
         }
       }
