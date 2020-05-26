@@ -37,10 +37,6 @@ div.is-comments {
       display: none;
     }
 
-    &:not(:empty){
-      margin-right: 8px;
-    }
-
     &.show-border {
       div.is-comments-author {
         background-color: transparent;

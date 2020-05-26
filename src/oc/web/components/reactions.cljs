@@ -95,7 +95,11 @@
           (when should-show-picker?
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
               {:key (str "reaction-" (:uuid entity-data) "-picker")
-               :on-click #(reset! (::show-picker s) (not @(::show-picker s)))}
+               :on-click #(reset! (::show-picker s) (not @(::show-picker s)))
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title "Pick a reaction"}
               [:span.reaction]])]
        (when @(::show-picker s)
          [:div.reactions-picker-container

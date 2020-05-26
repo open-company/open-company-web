@@ -540,10 +540,7 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         float: left;
-
-        div.is-comments div.is-comments-summary:not(:empty) {
-          margin-right: 16px;
-        }
+        margin-left: 14px;
 
         @include mobile() {
           margin-top: 1px;
@@ -552,7 +549,6 @@ div.stream-item {
 
       div.reactions {
         float: left;
-        margin-right: 14px;
 
         div.reactions-picker-container {
           display: none;
@@ -698,7 +694,7 @@ div.stream-item {
       div.stream-item-wrt {
         float: left;
         position: relative;
-        margin-right: 16px;
+        margin-left: 14px;
 
         @include mobile() {
           display: none;

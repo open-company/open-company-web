@@ -328,16 +328,20 @@
         reads-count (if (and is-author?
                              (:last-read-at activity-data))
                      (dec (:count reads-data))
-                     (:count reads-data))]
-    [:div.wrt-count-container
-      [:div.wrt-count
-        {:ref :wrt-count
-         :on-click #(nav-actions/show-wrt item-id)
-         :class (when (pos? (count (:reads reads-data))) "has-read-list")}
-        (cond
-          (= reads-count 1)
-          "1 person viewed"
-          (pos? reads-count)
-          (str reads-count " people viewed")
-          :else
-          "Viewers")]]))
+                     (:count reads-data))
+        is-mobile? (responsive/is-tablet-or-mobile?)]
+    (when (pos? reads-count)
+      [:div.wrt-count-container
+        {:data-toggle (when-not is-mobile? "tooltip")
+         :data-placement "top"
+         :data-container "body"
+         :title (cond
+                  (= reads-count 1)
+                  "1 person viewed"
+                  (pos? reads-count)
+                  (str reads-count " people viewed"))}
+        [:div.wrt-count
+          {:ref :wrt-count
+           :on-click #(nav-actions/show-wrt item-id)
+           :class (when (pos? (count (:reads reads-data))) "has-read-list")}
+          reads-count]])))

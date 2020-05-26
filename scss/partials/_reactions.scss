@@ -20,9 +20,8 @@ div.reactions {
       box-shadow: none;
       font-size: 12px;
       color: var(--color);
-      min-width: 34px;
       border-radius: 4px;
-      margin-left: 4px;
+      margin-left: 16px;
 
       @include mobile() {
         height: 32px;
@@ -37,8 +36,8 @@ div.reactions {
         position: relative;
         float: left;
         font-size: 15px;
-        margin-left: 2px;
         opacity: 0.9;
+        text-align: center;
 
         @include mobile() {
           font-size: 17px;
@@ -49,11 +48,9 @@ div.reactions {
       div.count {
         float: right;
         margin-top: 1px;
-        min-width: 14px;
         height: 18px;
         line-height: 18px;
-        text-align: center;
-        margin-left: -1px;
+        text-align: right;
         color: var(--light-color);
         font-size: 14px;
         vertical-align: bottom;
@@ -109,7 +106,6 @@ div.reactions {
         }
 
         span.reaction {
-          margin: 0 0 0 4px;
           opacity: 0.5;
           display: inline-block;
           width: 24px;

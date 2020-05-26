@@ -73,7 +73,11 @@
                        (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
                          (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
                        (nav-actions/open-post-modal entry-data true))
-                     (comment-actions/add-comment-focus (cu/add-comment-focus-value add-comment-focus-prefix (:uuid entry-data))))}
+                     (comment-actions/add-comment-focus (cu/add-comment-focus-value add-comment-focus-prefix (:uuid entry-data))))
+         :data-placement "top"
+         :data-toggle (when-not is-mobile? "tooltip")
+         :data-container "body"
+         :title (str comments-count " comment" (when (not= comments-count 1) "s"))}
         ; Comments authors heads
         (when (and show-bubble-icon?
                    (pos? comments-count))
@@ -94,7 +98,8 @@
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
                                       :add-a-comment (not (pos? comments-count))
-                                      :has-new-comments show-new-tag?})}
+                                      :has-new-comments show-new-tag?})
+             :data-toggle (when-not is-mobile? "tooltip")}
             (if (pos? comments-count)
               [:div.is-comments-summary-inner.group
                 (str
