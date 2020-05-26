@@ -1,9 +1,13 @@
 div.stream-comments {
   height: 100%;
   position: relative;
-  padding-bottom: 25vh;
+  padding-bottom: 56px;
   margin-top: 16px;
   padding-top: 16px;
+
+  @include mobile() {
+    padding-bottom: 25vh;
+  }
 
   @include big_web(){
     &.editing {

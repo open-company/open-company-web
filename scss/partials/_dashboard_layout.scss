@@ -21,20 +21,6 @@ div.dashboard-layout {
     }
   }
 
-  &.expanded-post-view {
-    @include mobile() {
-      background-color: var(--mobile-background-color);
-    }
-
-    div.cmail-outer:not(.fullscreen) {
-      display: none;
-    }
-
-    div.dashboard-layout-container div.board-container {
-      padding-top: 0;
-    }
-  }
-
   @include mobile() {
     background-color: var(--opac-background-color-05);
 

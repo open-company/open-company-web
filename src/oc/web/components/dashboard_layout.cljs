@@ -153,13 +153,11 @@
         followers-boards-count (drv/react s :followers-boards-count)]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (utils/class-set {:expanded-post-view show-expanded-post
-                                  :search-active search-active?})}
+        {:class (utils/class-set {:search-active search-active?})}
         [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           (when (and is-mobile?
-                     (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      member?)
@@ -237,8 +235,7 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when (and (not is-explore)
-                       (not show-expanded-post))
+            (when (not is-explore)
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
@@ -379,9 +376,6 @@
               ;; Empty board
               empty-board?
               (empty-board)
-              ;; Expanded post view
-              show-expanded-post
-              (expanded-post)
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)

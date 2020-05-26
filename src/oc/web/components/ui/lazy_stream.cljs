@@ -30,13 +30,11 @@
                                ;; But no container data yet
                               (not container-data))
         board-loaded? (and ;; board specified
-                           (not is-expanded-post?)
                            (not is-container?)
                            (not is-contributions?)
                            ;; But no board data yet
                            (not board-data))
         contributions-loaded? (and ;; Contrib specified
-                                 (not is-expanded-post?)
                                  is-contributions?
                                  ;; But no contributions data data yet
                                  (not contributions-data))

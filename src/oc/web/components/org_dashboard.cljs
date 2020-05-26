@@ -20,6 +20,7 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -274,4 +275,6 @@
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
-               (dashboard-layout)]]])])))
+               (dashboard-layout)]
+              (when (router/current-activity-id)
+                (expanded-post))]])])))

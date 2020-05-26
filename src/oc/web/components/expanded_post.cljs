@@ -23,6 +23,7 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
@@ -174,12 +175,13 @@
                                     :show-delete? is-publisher?
                                     :show-move? (and (not is-mobile?)
                                                      is-publisher?)
-                                    :tooltip-position "bottom"
+                                    :tooltip-position "top"
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))}))
-        muted-post? (seq (utils/link-for (:links activity-data) "follow"))]
+        muted-post? (seq (utils/link-for (:links activity-data) "follow"))
+        comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -190,107 +192,115 @@
        :data-last-read-at (:last-read-at activity-data)
        :data-new-comments-count (:new-comments-count activity-data)}
       (image-modal/image-modal {:src expand-image-src})
-      [:div.expanded-post-header.group
-        [:button.mlb-reset.back-to-board
-          {:on-click close-expanded-post}]
-       [:div.activity-share-container]
-       (if show-mobile-menu?
-         (rum/portal (more-menu-comp) mobile-more-menu-el)
-         (more-menu-comp))
-       [:button.mlb-reset.mobile-more-bt
-         {:on-click #(swap! (::force-show-menu s) not)}]
-       (when is-publisher?
-         [:div.expanded-post-wrt-container
-           (wrt-count {:activity-data activity-data
-                       :reads-data reads-data})])]
-      (when has-video
-        [:div.group
-          {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
-           :ref :ziggeo-player}
-          (ziggeo-player {:video-id (:fixed-video-id activity-data)
-                          :width (:width video-size)
-                          :height (:height video-size)
-                          :lazy (not video-player-show)
-                          :video-image (:video-image activity-data)
-                          :video-processed (:video-processed activity-data)})])
-      [:div.expanded-post-headline
-        {:class utils/hide-class}
-        (:headline activity-data)]
-      [:div.expanded-post-author.group
-        [:div.expanded-post-author-inner
-          {:class utils/hide-class}
-          [:div.expanded-post-author-inner-label
+      [:div.expanded-post-container
+        [:div.activity-share-container]
+        [:div.expanded-post-header.group
+          [:button.mlb-reset.back-to-board
+            {:on-click close-expanded-post
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :title "Close"}]
+          [:div.expanded-post-header-center
             (post-authorship {:activity-data activity-data
+                              :user-avatar? true
                               :user-hover? true
                               :board-hover? true
-                              :current-user-id current-user-id})
-            [:div.expanded-post-author-dot]
-            [:time
-              {:date-time (:published-at activity-data)
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :data-title (utils/activity-date-tooltip activity-data)}
-              (utils/foc-date-time (:published-at activity-data))]]
-          (when muted-post?
-            [:div.expanded-post-author-dot.muted-dot])
-          (when muted-post?
-            [:div.muted-activity
-              {:data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :title "Muted"}])
-          (when (or (:must-see activity-data)
-                    (:bookmarked-at activity-data))
-            [:div.expanded-post-author-dot])
-          (cond
-            (:bookmarked-at activity-data)
-            [:div.bookmark-tag]
-            (:must-see activity-data)
-            [:div.must-see-tag])]]
-      (when (seq (:abstract activity-data))
-        [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
-          {:class utils/hide-class
-           :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
-      [:div.expanded-post-body.oc-mentions.oc-mentions-hover
-        {:ref "post-body"
-         :on-click (when @(::collapse-post s)
-                     #(reset! (::collapse-post s) false))
-         :class (utils/class-set {utils/hide-class true
-                                  :collapsed @(::collapse-post s)})
-         :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
-      (when @(::collapse-post s)
-        [:button.mlb-reset.expand-button
-          {:on-click #(reset! (::collapse-post s) false)}
-          [:div.expand-button-inner
-            "View more"]])
-      (when (seq (:polls activity-data))
-        (polls-wrapper {:polls-data (:polls activity-data)
-                        :editing? false
-                        :current-user-id current-user-id
-                        :container-selector "div.expanded-post"
-                        :activity-data activity-data
-                        :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
-      (stream-attachments (:attachments activity-data))
-      ; (when is-mobile?
-      ;   [:div.expanded-post-mobile-reactions
-      ;     (reactions {:entity-data activity-data})])
-      [:div.expanded-post-footer.group
-        (reactions {:entity-data activity-data})
-        [:div.expanded-post-footer-mobile-group
-          (comments-summary {:entry-data activity-data
-                             :comments-data comments-drv
-                             :new-comments-count 0
-                             :hide-face-pile? true
-                             :publisher? is-publisher?})]]
-      [:div.expanded-post-comments.group
-        (when (:can-comment activity-data)
-          (rum/with-key (add-comment {:activity-data activity-data
-                                      :scroll-after-posting? true
-                                      :add-comment-focus-prefix "main-comment"})
-           (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
-        (stream-comments {:activity-data activity-data
-                          :comments-data comments-data
-                          :member? user-is-part-of-the-team
-                          :last-read-at @(::initial-last-read-at s)
-                          :current-user-id current-user-id})]]))
+                              :current-user-id current-user-id})]
+          (if show-mobile-menu?
+            (rum/portal (more-menu-comp) mobile-more-menu-el)
+            (more-menu-comp))
+          [:button.mlb-reset.mobile-more-bt
+            {:on-click #(swap! (::force-show-menu s) not)}]]
+        (if-not activity-data
+          (small-loading)
+          [:div.expanded-post-container-inner
+            (when has-video
+              [:div.group
+                {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
+                 :ref :ziggeo-player}
+                (ziggeo-player {:video-id (:fixed-video-id activity-data)
+                                :width (:width video-size)
+                                :height (:height video-size)
+                                :lazy (not video-player-show)
+                                :video-image (:video-image activity-data)
+                                :video-processed (:video-processed activity-data)})])
+            [:div.expanded-post-headline
+              {:class utils/hide-class}
+              (:headline activity-data)]
+            [:div.expanded-post-author.group
+              [:div.expanded-post-author-inner
+                {:class utils/hide-class}
+                [:div.expanded-post-author-inner-label
+                  [:time
+                    {:date-time (:published-at activity-data)
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip activity-data)}
+                    (utils/foc-date-time (:published-at activity-data))]]
+                (when muted-post?
+                  [:div.expanded-post-author-dot.muted-dot])
+                (when muted-post?
+                  [:div.muted-activity
+                    {:data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :title "Muted"}])
+                (when (or (:must-see activity-data)
+                          (:bookmarked-at activity-data))
+                  [:div.expanded-post-author-dot])
+                (cond
+                  (:bookmarked-at activity-data)
+                  [:div.bookmark-tag]
+                  (:must-see activity-data)
+                  [:div.must-see-tag])]]
+            (when (seq (:abstract activity-data))
+              [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
+                {:class utils/hide-class
+                 :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
+            [:div.expanded-post-body.oc-mentions.oc-mentions-hover
+              {:ref "post-body"
+               :on-click (when @(::collapse-post s)
+                           #(reset! (::collapse-post s) false))
+               :class (utils/class-set {utils/hide-class true
+                                        :collapsed @(::collapse-post s)})
+               :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+            (when @(::collapse-post s)
+              [:button.mlb-reset.expand-button
+                {:on-click #(reset! (::collapse-post s) false)}
+                [:div.expand-button-inner
+                  "View more"]])
+            (when (seq (:polls activity-data))
+              (polls-wrapper {:polls-data (:polls activity-data)
+                              :editing? false
+                              :current-user-id current-user-id
+                              :container-selector "div.expanded-post"
+                              :activity-data activity-data
+                              :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
+            (stream-attachments (:attachments activity-data))
+            ; (when is-mobile?
+            ;   [:div.expanded-post-mobile-reactions
+            ;     (reactions {:entity-data activity-data})])
+            [:div.expanded-post-footer.group
+              (reactions {:entity-data activity-data})
+              [:div.expanded-post-footer-mobile-group
+                (when (pos? (:count comments-link))
+                  (comments-summary {:entry-data activity-data
+                                     :comments-data comments-drv
+                                     :new-comments-count 0
+                                     :hide-face-pile? true
+                                     :publisher? is-publisher?}))]
+              (when is-publisher?
+                (wrt-count {:activity-data activity-data
+                            :reads-data reads-data}))]
+            [:div.expanded-post-comments.group
+              (when (:can-comment activity-data)
+                (rum/with-key (add-comment {:activity-data activity-data
+                                            :scroll-after-posting? true
+                                            :add-comment-focus-prefix "main-comment"})
+                 (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
+              (stream-comments {:activity-data activity-data
+                                :comments-data comments-data
+                                :member? user-is-part-of-the-team
+                                :last-read-at @(::initial-last-read-at s)
+                                :current-user-id current-user-id})]])]]))
