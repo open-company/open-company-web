@@ -224,11 +224,11 @@
       (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal
-  ([activity-data dont-scroll] (open-post-modal activity-data dont-scroll nil))
+  ([activity-data dont-scroll]
+   (open-post-modal activity-data dont-scroll nil))
 
   ([activity-data dont-scroll comment-uuid]
   (let [org (router/current-org-slug)
-        previous-slug (or (router/current-board-slug) (router/current-contributions-id))
         board (:board-slug activity-data)
         sort-type (activity-actions/saved-sort-type org board)
         back-to (cond
@@ -245,8 +245,8 @@
                   {:board board})
         activity (:uuid activity-data)
         post-url (if comment-uuid
-                   (oc-urls/comment-url board activity)
-                   (oc-urls/entry board activity))
+                   (oc-urls/comment-url org board activity comment-uuid)
+                   (oc-urls/entry org board activity))
         query-params (router/query-params)
         route [org board sort-type activity "activity"]
         scroll-y-position (.. js/document -scrollingElement -scrollTop)
