@@ -136,16 +136,6 @@ div.secure-activity-container {
         min-height: calc(100vh - 210px);
       }
 
-      div.ziggeo-player {
-        margin-top: 16px;
-        video {
-          max-height: 480px;
-        }
-        @include tablet(){
-          margin-left: -24px;
-        }
-      }
-
       div.activity-title {
         @include activity-title(26px, 33px);
         color: var(--color);

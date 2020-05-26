@@ -22,7 +22,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [cljsjs.hammer]))
@@ -283,26 +282,15 @@
         [:div.activity-share-container]]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
-          (if has-video
-            [:div.group
-             {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
-              :ref :ziggeo-player}
-             (ziggeo-player {:video-id (:fixed-video-id activity-data)
-                             :width (:width video-size)
-                             :height (:height video-size)
-                             :lazy (not video-player-show)
-                             :video-image (:video-image activity-data)
-                             :video-processed (:video-processed activity-data)
-                             :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})]
-            (when (:body-thumbnail activity-data)
-              [:div.body-thumbnail-wrapper
-                {:class (:type (:body-thumbnail activity-data))}
-                [:img.body-thumbnail
-                  {:data-image (:thumbnail (:body-thumbnail activity-data))
-                   :src (-> activity-data
-                            :body-thumbnail
-                            :thumbnail
-                            (img/optimize-image-url (* 102 3)))}]]))
+          (when (:body-thumbnail activity-data)
+            [:div.body-thumbnail-wrapper
+              {:class (:type (:body-thumbnail activity-data))}
+              [:img.body-thumbnail
+                {:data-image (:thumbnail (:body-thumbnail activity-data))
+                 :src (-> activity-data
+                          :body-thumbnail
+                          :thumbnail
+                          (img/optimize-image-url (* 102 3)))}]])
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                       :has-video (:fixed-video-id activity-data)

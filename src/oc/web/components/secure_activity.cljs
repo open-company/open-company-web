@@ -15,7 +15,6 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
-            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -41,8 +40,6 @@
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :comments-data)
-                             ;; Locals
-                             (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              ui-mixins/refresh-tooltips-mixin
@@ -60,13 +57,6 @@
   (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        video-size (when (:fixed-video-id activity-data)
-                    (if is-mobile?
-                      {:width (win-width)
-                       :height @(::mobile-video-height s)}
-                      {:width 640
-                       :height (utils/calc-video-height 640)}))
-        video-id (:fixed-video-id activity-data)
         id-token (drv/react s :id-token)
         org-data (-> activity-data
                   (select-keys [:org-slug :org-name :org-logo-url :org-logo-width :org-logo-height])
@@ -127,11 +117,6 @@
                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                     :data-title (utils/activity-date-tooltip activity-data)}
                    (utils/date-string (utils/js-date (:published-at activity-data)) [:year])]]]
-            (when video-id
-              (ziggeo-player {:video-id video-id
-                              :width (:width video-size)
-                              :height (:height video-size)
-                              :video-processed (:video-processed activity-data)}))
             (when (:abstract activity-data)
               [:div.activity-abstract
                 {:class utils/hide-class

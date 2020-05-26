@@ -367,27 +367,6 @@ div.stream-item {
       div.thumbnail-container {
         cursor: default;
 
-        div.ziggeo-player {
-          margin-top: 24px;
-          margin-bottom: 24px;
-          float: unset;
-          width: 654px;
-          height: 478px;
-          position: relative;
-          top: unset;
-          right: unset;
-          transform: translate(0%,0%);
-
-          video {
-            max-height: 478px;
-          }
-
-          @include tablet(){
-            width: 100vw;
-            height: calc(100vw *  0.75);
-          }
-        }
-
         div.body-thumbnail-wrapper {
           display: none;
         }
@@ -401,39 +380,6 @@ div.stream-item {
 
       @include mobile() {
         height: 71px;
-      }
-
-      div.ziggeo-player {
-        width: 101px;
-        height: 76px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-
-        video {
-          max-height: 76px;
-        }
-
-        @include tablet(){
-          margin-top: 16px;
-          float: unset;
-          width: calc(100vw + 32px);
-          height: auto;
-          margin-left: -16px;
-          position: initial;
-          top: unset;
-          right: unset;
-          transform: translateY(0%);
-
-          video {
-            max-height: calc(100vw * 0.75);
-          }
-
-          div.ba-videoplayer-carrot-theme-volumebar, div[data-selector="button-icon-volume"] {
-            display: none !important;
-          }
-        }
       }
 
       div.body-thumbnail-wrapper {

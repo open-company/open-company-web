@@ -192,22 +192,6 @@ div.expanded-post {
     div.expanded-post-container-inner {
       padding: #{$expanded_post_header_height + 51}px 120px 32px;
 
-      div.ziggeo-player {
-        margin-top: 16px;
-        width: 638px;
-        height: 478px;
-        position: relative;
-
-        video {
-          max-height: 478px;
-        }
-
-        @include mobile(){
-          width: 100vw;
-          height: calc(100vw *  0.75);
-        }
-      }
-
       div.expanded-post-headline {
         @include activity-title(26px, 33px);
         min-height: 0;

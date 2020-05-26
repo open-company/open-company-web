@@ -327,32 +327,6 @@ div.cmail-outer {
         }
       }
 
-      div.ziggeo-player, div.ziggeo-recorder {
-        margin: 0px auto 24px;
-
-        @include mobile() {
-          margin-top: -24px;
-          margin-left: -24px;
-        }
-
-        video {
-          max-width: 548px;
-
-          @include mobile() {
-            max-width: 100vw;
-          }
-        }
-
-        div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
-          margin: 0px auto;
-
-          @include mobile() {
-            margin-top: -24px;
-            margin-left: -24px;
-          }
-        }
-      }
-
       div.cmail-content-abstract-bt-container {
         border-bottom: 1px solid var(--divider-line);
         padding: 6px 0 12px;

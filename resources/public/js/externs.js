@@ -168,24 +168,6 @@ FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
-// Ziggeo
-var ZiggeoApi = function(){};
-ZiggeoApi.Events = {};
-ZiggeoApi.Events.on = function(){};
-ZiggeoApi.Events.off = function(){};
-ZiggeoApi.token = {};
-ZiggeoApi.Config = {};
-ZiggeoApi.Config.webrtc = {};
-ZiggeoApi.V2 = {};
-ZiggeoApi.V2.Application = function(){};
-ZiggeoApi.V2.Recorder = function(){};
-ZiggeoApi.V2.Recorder.activate = function(){};
-ZiggeoApi.V2.Recorder.destroy = function(){};
-ZiggeoApi.V2.Recorder.get = function(){};
-ZiggeoApi.V2.Player = function(){};
-ZiggeoApi.V2.Player.activate = function(){};
-ZiggeoApi.V2.Player.destroy = function(){};
-ZiggeoApi.V2.Player.get = function(){};
 // Headway (What's New)
 var Headway = function(){};
 Headway.init = function(){};

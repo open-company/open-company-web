@@ -20,7 +20,6 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -214,16 +213,6 @@
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner
-            (when has-video
-              [:div.group
-                {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
-                 :ref :ziggeo-player}
-                (ziggeo-player {:video-id (:fixed-video-id activity-data)
-                                :width (:width video-size)
-                                :height (:height video-size)
-                                :lazy (not video-player-show)
-                                :video-image (:video-image activity-data)
-                                :video-processed (:video-processed activity-data)})])
             [:div.expanded-post-headline
               {:class utils/hide-class}
               (:headline activity-data)]

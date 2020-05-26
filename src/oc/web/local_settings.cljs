@@ -71,11 +71,6 @@
 ;; AP seen TTL in days
 (def oc-seen-ttl 30)
 
-;; Ziggeo
-(def oc-ziggeo-app "c9b611b2b996ee5a1f318d3bacc36b27")
-(def oc-ziggeo-profiles [])
-(def oc-enable-transcriptions false)
-
 ;; Payments enabled
 (def payments-enabled true)
 (def stripe-api-key "pk_test_srP6wqbAalvBWYxcdAi4NlX0")

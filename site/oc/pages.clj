@@ -66,14 +66,6 @@
     {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
      :crossorigin "anonymous"}])
 
-(def ziggeo-css
-  [:link {:rel "stylesheet" :href "/lib/ziggeo/ziggeo.css"}])
-  ; [:link {:rel "stylesheet" :href "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.css"}])
-
-(def ziggeo-js
-  [:script {:src "/lib/ziggeo/ziggeo.js"}])
-  ; [:script {:src "https://assets-cdn.ziggeo.com/v2-stable/ziggeo.js"}])
-
 (def google-fonts
   ;; Google fonts Muli
   [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&display=swap" :rel "stylesheet"}])
@@ -207,9 +199,6 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
-          ;; Ziggeo
-          ziggeo-css
-          ziggeo-js
           ;; Intercom (Support)
           [:script {:src (shared/cdn "/js/intercom.js")}]
           ;; Headway (What's New)
@@ -320,9 +309,6 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
-          ;; Ziggeo
-          ziggeo-css
-          ziggeo-js
           ;; Stripe
           stripe-js]
    :body [:body
