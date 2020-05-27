@@ -315,15 +315,6 @@
                                       :resource-uuid (if is-contributions
                                                        (:author-uuid board-container-data)
                                                        (:uuid board-container-data))})))
-                  (when is-own-contributions
-                    [:div.board-settings-container
-                      ;; Settings button
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :title "Edit proile"
-                         :on-click #(nav-actions/show-user-settings :profile)}]])
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button

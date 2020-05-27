@@ -293,7 +293,7 @@ div.stream-item {
       div.separator-dot {
         width: 3px;
         height: 3px;
-        background-color: var(--divider-line);
+        background-color: var(--light-color);
         border-radius: 50%;
         margin: 1px 5px 0 5px;
         flex: 0 0 auto;
@@ -306,7 +306,7 @@ div.stream-item {
         text-align: left;
         @include OC_Body_Book();
         font-size: 12px;
-        color: var(--light-color);
+        color: var(--color);
         position: relative;
         white-space: nowrap;
         flex: 0 0 auto;

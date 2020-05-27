@@ -36,7 +36,7 @@ div.post-authorship {
 
   span.in {
     @include OC_Body_Book();
-    color: var(--light-color);
+    color: var(--color);
     font-size: 12px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -55,12 +55,17 @@ div.post-authorship {
       overflow: hidden;
       text-overflow: ellipsis;
       @include OC_Body_Book();
-      color: var(--light-color);
+      color: var(--color);
       font-size: 12px;
       line-height: 24px;
       white-space: nowrap;
-      text-decoration: underline;
       flex: 0 1 auto;
+
+      @include big_web() {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
 
       @include big_web() {
         &:hover {

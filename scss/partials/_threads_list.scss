@@ -171,11 +171,16 @@ div.threads-list {
             line-height: 18px;
             flex: 0 1 auto;
             color: var(--color);
-            text-decoration: underline;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+
+            @include big_web() {
+              &:hover {
+                text-decoration: underline;
+              }
+            }
           }
         }
 
