@@ -1,3 +1,7 @@
+:root {
+  --picker-height: 32px;
+}
+
 div.medium-editor-media-picker {
   background-color: transparent;
   position: absolute;
@@ -8,7 +12,7 @@ div.medium-editor-media-picker {
 
 div.medium-editor-media-picker button.media {
   width: 24px;
-  height: 24px;
+  height: var(--picker-height);
   background-position: 50%;
   background-size: 14px;
   background-repeat: no-repeat;
@@ -33,7 +37,7 @@ div.medium-editor-media-picker button.media.add-media-bt {
   margin-right: 0px;
   border-radius: 22px;
   width: 24px;
-  height: 24px;
+  height: var(--picker-height);
   opacity: 1;
 }
 
@@ -54,7 +58,7 @@ div.medium-editor-media-picker button.media.add-media-bt.expanded {
 
 div.medium-editor-media-picker div.media-picker-container {
     width: 0px;
-    height: 24px;
+    height: var(--picker-height);
     transition: width 0ms;
     float: left;
     position: relative;
@@ -72,7 +76,7 @@ div.medium-editor-media-picker div.media-picker-container button.media {
   margin: 0;
   opacity: 0;
   width: 24px;
-  height: 24px;
+  height: var(--picker-height);
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media:not(:first-child) {
