@@ -435,4 +435,4 @@
           [:div.left-navigation-sidebar-footer.top-border
             [:button.mlb-reset.invite-people-bt
               {:on-click #(nav-actions/show-org-settings :invite-picker)}
-              "Invite teammates"]])]]))
+              "Invite your team"]])]]))
