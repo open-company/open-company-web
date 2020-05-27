@@ -5,7 +5,7 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 
 $thumbnail_width: 128;
-$thumbnail_height: 96;
+$thumbnail_height: 103;
 
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
@@ -393,7 +393,7 @@ div.stream-item {
         background-position: center;
         position: absolute;
         right: 0;
-        top: 0;
+        top: 3px;
         cursor: pointer;
 
         img.body-thumbnail {
