@@ -543,7 +543,7 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         float: left;
-        margin-left: 16px;
+        margin-left: 36px;
 
         @include mobile() {
           margin-top: 1px;
@@ -697,7 +697,7 @@ div.stream-item {
       div.stream-item-wrt {
         float: left;
         position: relative;
-        margin-left: 16px;
+        margin-left: 40px;
 
         @include mobile() {
           display: none;
