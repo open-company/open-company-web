@@ -6,7 +6,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.activity :as am]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -172,7 +171,6 @@
                                 (drv/drv :user-notifications)
                                 (drv/drv :posts-data)
                                 ui-mixins/refresh-tooltips-mixin
-                                (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
   [s {:keys [tray-open]}]
   (let [{user-notifications-data :grouped all-notifications :sorted :as x} (drv/react s :user-notifications)
         has-new-content (has-new-content? all-notifications)

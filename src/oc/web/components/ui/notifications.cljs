@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -46,7 +45,6 @@
                           (rum/local false ::timeout)
 
                           (rum/local 0 ::old-expire)
-                          (am/truncate-element-mixin "div.notification-description" (* 20 3))
                           {:did-mount (fn [s]
                            (setup-timeout s)
                            s)

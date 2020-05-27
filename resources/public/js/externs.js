@@ -40,7 +40,6 @@ $.animate = function(){};
 $.prop = function(){};
 $.dropdown = function(){};
 $.not = function(){};
-$.dotdotdot = function(){};
 $.trigger = function(){};
 $.ajax = function(){};
 $.outerHeight = function(){};

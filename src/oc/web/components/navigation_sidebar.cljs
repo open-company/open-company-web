@@ -108,7 +108,6 @@
                                 (drv/drv :follow-publishers-list)
                                 (drv/drv :follow-boards-list)
                                 (drv/drv :follow-list-last-added)
-                                (drv/drv :show-explore-view)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
@@ -203,9 +202,12 @@
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
         unread-threads (drv/react s :unread-threads)
-        show-explore-view (drv/react s :show-explore-view)
         show-you (and user-is-part-of-the-team?
-                      (pos? (:contributions-count org-data)))]
+                      (pos? (:contributions-count org-data)))
+        user-role (user-store/user-role org-data current-user-data)
+        is-admin-or-author? (#{:admin :author} user-role)
+        show-invite-people? (and org-slug
+                                 is-admin-or-author?)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -299,19 +301,18 @@
                 "Bookmarks"]
               (when (pos? (:bookmarks-count org-data))
                 [:span.count (:bookmarks-count org-data)])]])
-        (when show-explore-view
-          [:div.left-navigation-sidebar-top.top-border
-            [:a.nav-link.explore.hover-item.group
-              {:class (utils/class-set {:item-selected is-explore})
-               :href (oc-urls/unfollowing)
-               :on-click #(nav-actions/nav-to-url! % "explore" (oc-urls/explore))}
-              [:div.nav-link-icon]
-              [:div.nav-link-label
-                ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "Explore"]
-              ; (when (pos? (count all-unread-items))
-              ;   [:span.count (count all-unread-items)])
-              ]])
+        [:div.left-navigation-sidebar-top.top-border
+          [:a.nav-link.explore.hover-item.group
+            {:class (utils/class-set {:item-selected is-explore})
+             :href (oc-urls/unfollowing)
+             :on-click #(nav-actions/nav-to-url! % "explore" (oc-urls/explore))}
+            [:div.nav-link-icon]
+            [:div.nav-link-label
+              ; {:class (utils/class-set {:new (seq all-unread-items)})}
+              "Topics"]
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
+            ]]
         (when show-users-list?
           [:div.left-navigation-sidebar-top.top-border.group
             ;; Boards header
@@ -429,4 +430,9 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]]))
+                  [:div.private])])])
+        (when show-invite-people?
+          [:div.left-navigation-sidebar-footer.top-border
+            [:button.mlb-reset.invite-people-bt
+              {:on-click #(nav-actions/show-org-settings :invite-picker)}
+              "Invite teammates"]])]]))

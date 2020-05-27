@@ -12,7 +12,6 @@
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
             [oc.web.utils.activity :as au]
-            [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
@@ -127,8 +126,6 @@
                                                    :swipe-right swipe-right-handler
                                                    :long-press long-press-handler
                                                    :disabled #(not (au/is-published? (-> % :rum/args first :activity-data)))}))
-                         (when-not ua/edge?
-                           (am/foc-truncate-element-mixin :item-body 40))
                          ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
@@ -286,7 +283,8 @@
                           :thumbnail
                           (img/optimize-image-url (* 102 3)))}]])
           [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
+            {:class (utils/class-set {:has-thumbnail (and (not (:fixed-video-id activity-data))
+                                                          (seq (:body-thumbnail activity-data)))
                                       :has-video (:fixed-video-id activity-data)
                                       utils/hide-class true})}
             [:div.stream-item-headline.ap-seen-item-headline
