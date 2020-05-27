@@ -39,7 +39,7 @@
   (:import [goog.async Debouncer]))
 
 (def self-board-name "All")
-(def board-tooltip "Select a team")
+(def board-tooltip "Select a topic")
 
 ;; Attachments handling
 
@@ -498,7 +498,7 @@
         unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
-                            "Share")
+                            "Share update")
         did-pick-section (fn [board-data note dismiss-action]
                            (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
@@ -646,8 +646,7 @@
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            [:span.prefix "#"]
-            (:board-name cmail-data)]
+            (str "→ " (:board-name cmail-data))]
           (when @(::show-sections-picker s)
             [:div.sections-picker-container
               {:ref :sections-picker-container}

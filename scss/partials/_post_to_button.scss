@@ -43,14 +43,6 @@ div.post-to-button {
       display: block;
     }
 
-    // @include big_web() {
-    //   &:hover {
-    //     div.post-bt-tooltip {
-    //       display: block;
-    //     }
-    //   }
-    // }
-
     &.tt-title div.post-bt-tooltip {
       width: 192px;
     }
@@ -60,7 +52,6 @@ div.post-to-button {
     }
 
     div.post-bt-tooltip {
-      // background-color: var(--tooltip-background-color);
       white-space:pre-wrap;
       max-width: unset;
       position: absolute;

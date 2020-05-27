@@ -534,10 +534,9 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data :current-user-data :contributions-user-data]
-                          (fn [base org-data board-data current-user-data contributions-user-data]
+   :navbar-data         [[:base :org-data :board-data :contributions-user-data]
+                          (fn [base org-data board-data contributions-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
-                                                                 :current-user-data
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
                                                                  :search-active

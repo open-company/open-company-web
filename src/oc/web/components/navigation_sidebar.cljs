@@ -205,7 +205,11 @@
         unread-threads (drv/react s :unread-threads)
         show-explore-view (drv/react s :show-explore-view)
         show-you (and user-is-part-of-the-team?
-                      (pos? (:contributions-count org-data)))]
+                      (pos? (:contributions-count org-data)))
+        user-role (user-store/user-role org-data current-user-data)
+        is-admin-or-author? (#{:admin :author} user-role)
+        show-invite-people? (and org-slug
+                                 is-admin-or-author?)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -429,4 +433,9 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]]))
+                  [:div.private])])])
+        (when show-invite-people?
+          [:div.left-navigation-sidebar-footer.top-border
+            [:button.mlb-reset.invite-people-bt
+              {:on-click #(nav-actions/show-org-settings :invite-picker)}
+              "Invite teammates"]])]]))

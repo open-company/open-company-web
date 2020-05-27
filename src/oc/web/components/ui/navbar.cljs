@@ -10,10 +10,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
-            [oc.web.stores.user :as user-store]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
-            [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
@@ -64,7 +62,6 @@
   [s]
   (let [{:keys [org-data
                 board-data
-                current-user-data
                 contributions-user-data
                 show-login-overlay
                 orgs-dropdown-visible
@@ -99,11 +96,7 @@
          can-compose? (pos? (count editable-boards))
          show-plus-button? (and (not is-mobile?)
                                 can-compose?)
-         user-role (user-store/user-role org-data current-user-data)
-         is-admin-or-author? (#{:admin :author} user-role)
-         org-slug (router/current-org-slug)
-         show-invite-people? (and org-slug
-                                  is-admin-or-author?)]
+         org-slug (router/current-org-slug)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -143,12 +136,7 @@
                 (search-box)])
             (if (jwt/jwt)
               [:div.navbar-right.group
-                {:class (utils/class-set {:create-post show-plus-button?
-                                          :invite-people show-invite-people?})}
-                (when show-invite-people?
-                  [:button.mlb-reset.invite-people-bt
-                    {:on-click #(nav-actions/show-org-settings :invite-picker)}
-                    "Invite teammates"])
+                {:class (utils/class-set {:create-post show-plus-button?})}
                 (when show-plus-button?
                   [:button.mlb-reset.navbar-create-bt
                     {:class (utils/class-set {:scrolled @(::scrolled s)})
