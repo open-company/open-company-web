@@ -385,7 +385,7 @@
                    :title "Teams you follow"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")}
-                  [:span.boards "Feeds"]])
+                  [:span.boards "Topics"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-section-add)
                  :title "New team"

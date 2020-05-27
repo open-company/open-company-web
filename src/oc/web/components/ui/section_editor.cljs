@@ -53,11 +53,11 @@
 
 (def private-access
   [:div.access-item.private-access
-    "Feed members you invite"])
+    "Team members you invite"])
 
 (def team-access
   [:div.access-item.team-access
-    "Anyone on the feed"])
+    "Anyone on the team"])
 
 (def public-access
   [:div.access-item.public-access
@@ -204,8 +204,8 @@
             {:dangerouslySetInnerHTML
               (utils/emojify
                (if @(::editing-existing-section s)
-                 "Feed settings"
-                 "Create feed"))}]
+                 "Team settings"
+                 "Create topic"))}]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
@@ -229,10 +229,10 @@
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
-            [:span.section-name "Feed name"]]
+            [:span.section-name "Topic name"]]
           [:input.section-editor-add-name.oc-input
             {:value @(::section-name s)
-             :placeholder "Feed name"
+             :placeholder "Topic name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
@@ -252,7 +252,7 @@
               (str (or (:section-name-error section-editing)
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
-            "Feed security"]
+            "Topic security"]
           [:div.section-editor-add-access.oc-input
             {:class (when @(::show-access-list s) "active")
              :on-click #(do
@@ -334,10 +334,10 @@
                   "Add Wut bot"]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
-              "Public feeds are visible to the world, including search engines."])
+              "Public topics are visible to the world, including search engines."])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label.top-separator
-              "Add members to this private feed"])
+              "Add members to this private topic"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
                   available-users (uu/filter-active-users all-users-data)
@@ -379,14 +379,14 @@
                              "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              "Wut feed settings"]
+                              "Wut topic settings"]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))
             [:div.section-editor-add-label.group
               [:span.main-label
-                "Feed members"]
+                "Team members"]
               [:span.role-header
                 "Access"]])
           (when (and (= (:access section-editing) "private")
@@ -461,14 +461,14 @@
                                 (alert-modal/show-alert
                                  {:icon "/img/ML/error_icon.png"
                                   :action "remove-self-user-from-private-section"
-                                  :message "Are you sure you want to leave this feed?"
+                                  :message "Are you sure you want to leave this topic?"
                                   :link-button-title "No"
                                   :link-button-cb #(alert-modal/hide-alert)
                                   :solid-button-title "Yes"
                                   :solid-button-cb (fn []
                                    (section-actions/private-section-kick-out-self self-data)
                                    (alert-modal/hide-alert))})))}
-                            "Leave feed"]
+                            "Leave topic"]
                           [:div.user-type.no-dropdown
                             "Edit"])
                         [:div.user-type
@@ -505,7 +505,7 @@
                                            [:span "Are you sure?"]
                                            (when (-> section-data :entry-count pos?)
                                              [:span
-                                               " This will delete the feed and "
+                                               " This will delete the topic and "
                                                [:strong "all"]
                                                " its updates, too."])]
                                 :link-button-title "No"
@@ -516,7 +516,7 @@
                                                    (section-actions/section-delete
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
-                                                      {:title "Feed deleted"
+                                                      {:title "Topic deleted"
                                                        :dismiss true
                                                        :expire 3
                                                        :id :section-deleted}))
@@ -526,7 +526,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title (if last-section-standing
-                         "You cannot delete the last remaining feed."
-                         "Delete this feed and all its updates.")
+                         "You cannot delete the last remaining topic."
+                         "Delete this topic and all its updates.")
                  :class (when last-section-standing "disabled")}
-                "Delete feed"])]]]]))
+                "Delete topic"])]]]]))
