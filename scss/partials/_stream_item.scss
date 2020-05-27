@@ -374,7 +374,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      height: 76px;
+      height: 96px;
       position: relative;
       cursor: pointer;
 
@@ -384,7 +384,7 @@ div.stream-item {
 
       div.body-thumbnail-wrapper {
         width: 101px;
-        max-height: 76px;
+        max-height: 96px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -397,7 +397,7 @@ div.stream-item {
           border-radius: 4px;
           object-fit: contain;
           max-width: 101px;
-          max-height: 76px;
+          max-height: 96px;
         }
 
         @include mobile() {
@@ -445,7 +445,7 @@ div.stream-item {
       &.has-thumbnail, &.has-video {
         float: left;
         width: 478px;
-        height: 76px;
+        height: 96px;
 
         @include mobile() {
           width: 100%;
@@ -484,7 +484,7 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body-preview(16, 20, var(--color), 2);
+        @include activity-body-preview(16, 20, var(--color), 3);
 
         @include mobile() {
           @include activity-body-preview(16, 20, var(--color), 2);

@@ -218,8 +218,6 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
-          ;; Truncate html string
-          [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]

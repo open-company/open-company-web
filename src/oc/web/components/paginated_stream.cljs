@@ -30,7 +30,7 @@
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
 (def carrot-close-height 60)
-(def foc-height 184)
+(def foc-height 204)
 (def mobile-foc-height 166)
 (def foc-separators-height 58)
 

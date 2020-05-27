@@ -1215,6 +1215,13 @@ $header_top_margin: 24;
 
   height: #{$line_height * $preview_lines}px;
 
+  & > * {
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+  }
+
   h1, h2, mark, mark.highlight {
     color: var(--color);
     @include OC_Body_Book();

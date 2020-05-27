@@ -9,7 +9,6 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/autotrack/autotrack.js \
 --js lib/autotrack/google-analytics.js \
 --js lib/fullstory.js \
---js lib/truncate/jquery.dotdotdot.js \
 --js lib/scrollTo/scrollTo.min.js \
 --js js/emojione/autocomplete.js \
 --js lib/js-utils/pasteHtmlAtCaret.js \
