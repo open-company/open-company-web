@@ -79,8 +79,7 @@
          :data-container "body"
          :title (str comments-count " comment" (when (not= comments-count 1) "s"))}
         ; Comments authors heads
-        (when (and show-bubble-icon?
-                   (pos? comments-count))
+        (when show-bubble-icon?
           [:div.is-comments-bubble])
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)
@@ -92,8 +91,9 @@
               [:div.is-comments-author
                 {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
                 (user-avatar-image user-data {:tooltip? (not (responsive/is-tablet-or-mobile?))})])])
-        (when-not (and hide-label?
-                       (zero? comments-count))
+        (when (or show-bubble-icon?
+                  (and (not hide-label?)
+                       (pos? comments-count)))
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
