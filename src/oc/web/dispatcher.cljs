@@ -443,26 +443,26 @@
                              (get-in base (posts-data-key org-slug))))]
    :filtered-posts      [[:base :org-data :posts-data :threads-data :route]
                          (fn [base org-data posts-data threads-data route]
-                           (when (and base org-data posts-data threads-data route (:board route)
-                                      (not (is-threads? (:board base))))
-                             (let [org-slug (:slug org-data)
-                                   container-slug (or (:contributions route) (:board route))]
-                              (get-container-items base route posts-data threads-data org-slug container-slug (:sort-type route) :posts-list))))]
+                           (let [threads? (is-threads? (:board route))
+                                 container-slug (or (:contributions route) (:board route))]
+                             (when (and base org-data posts-data threads-data route (:board route)
+                                        (not threads?))
+                               (get-container-items base route posts-data threads-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
    :threads-data        [[:base :org-slug]
                          (fn [base org-slug]
                            (when (and base org-slug)
                              (get-in base (threads-data-key org-slug))))]
    :items-to-render     [[:base :org-data :posts-data :threads-data :route]
                          (fn [base org-data posts-data threads-data route]
-                           (let [threads? (is-threads? (:board base))]
-                             (when (and base org-data route
+                           (let [threads? (is-threads? (:board route))
+                                 container-slug (or (:contributions route) (:board route))]
+                             (when (and base org-data container-slug
                                         (or (and threads?
-                                                 threads-data)
+                                                 threads-data
+                                                 posts-data)
                                             (and (not threads?)
-                                                 posts-data))
-                                        (or (:contributions route)
-                                            (:board route)))
-                               (get-container-items base route posts-data threads-data (:slug org-data) (:board route) (:sort-type route) :items-to-render))))]
+                                                 posts-data)))
+                               (get-container-items base route posts-data threads-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
