@@ -19,7 +19,7 @@
         {:on-click on-submit}
         title]
       (when post-tt-kw
-        [:div.post-bt-tooltip ;.fade.top.in ;.tooltip
+        [:div.post-bt-tooltip
           [:div.tooltip-arrow]
           [:div.tooltip-inner
             (cond
