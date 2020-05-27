@@ -63,7 +63,7 @@
 
 (def big-web-collapse-min-height 134)
 (def mobile-collapse-min-height 160)
-(def min-body-length-for-truncation 50)
+(def min-body-length-for-truncation 150)
 
 (defn- check-collapse-post [s]
   (when (nil? @(::collapse-post s))
