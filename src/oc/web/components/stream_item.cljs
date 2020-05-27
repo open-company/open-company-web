@@ -283,7 +283,8 @@
                           :thumbnail
                           (img/optimize-image-url (* 102 3)))}]])
           [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
+            {:class (utils/class-set {:has-thumbnail (and (not (:fixed-video-id activity-data))
+                                                          (seq (:body-thumbnail activity-data)))
                                       :has-video (:fixed-video-id activity-data)
                                       utils/hide-class true})}
             [:div.stream-item-headline.ap-seen-item-headline

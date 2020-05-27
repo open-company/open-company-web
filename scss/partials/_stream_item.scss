@@ -4,6 +4,9 @@
 // --foc-new-color: white;
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 
+$thumbnail_width: 128;
+$thumbnail_height: 96;
+
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
 
@@ -374,7 +377,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      height: 96px;
+      height: #{$thumbnail_height}px;
       position: relative;
       cursor: pointer;
 
@@ -383,8 +386,8 @@ div.stream-item {
       }
 
       div.body-thumbnail-wrapper {
-        width: 101px;
-        max-height: 96px;
+        width: #{$thumbnail_width}px;
+        max-height: #{$thumbnail_height}px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -394,10 +397,10 @@ div.stream-item {
         cursor: pointer;
 
         img.body-thumbnail {
-          border-radius: 4px;
+          border-radius: 6px;
           object-fit: contain;
-          max-width: 101px;
-          max-height: 96px;
+          max-width: #{$thumbnail_width}px;
+          max-height: #{$thumbnail_height}px;
         }
 
         @include mobile() {
@@ -444,8 +447,8 @@ div.stream-item {
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 478px;
-        height: 96px;
+        width: calc(100% - #{$thumbnail_width}px - 8px);
+        height: #{$thumbnail_height}px;
 
         @include mobile() {
           width: 100%;

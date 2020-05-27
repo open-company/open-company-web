@@ -4,6 +4,7 @@
             [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
+            [oc.lib.html :as html-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.user :as user-utils]
@@ -271,23 +272,6 @@
      (< (get-time last-read-at)
         (get-time iso-date)))))
 
-(defn body-for-stream-view [inner-html]
-  (if (seq inner-html)
-    (let [$container (.html (js/$ "<div/>") inner-html)
-          _ (.append (js/$ (.-body js/document)) $container)
-          has-images (pos? (.-length (.find $container "img")))
-          _ (.remove (js/$ "img" $container))
-          empty-paragraph-rx (js/RegExp "^(<br\\s*/?>)?$" "i")
-          _ (.each (.find $container "p")
-             #(this-as this
-                (let [$this (js/$ this)]
-                  (when (.match (.html $this) empty-paragraph-rx)
-                    (.remove $this)))))
-          cleaned-body (.html $container)
-          _ (.detach $container)]
-      [has-images cleaned-body])
-    [false inner-html]))
-
 (defn has-attachments? [data]
   (seq (:attachments data)))
 
@@ -327,7 +311,6 @@
                                (or (:board-access entry-data) (:access board-data))
                                "private")
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
-          [has-images stream-view-body] (body-for-stream-view (:body entry-data))
           is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
           fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
@@ -344,10 +327,10 @@
         (assoc :board-access fixed-board-access)
         (assoc :has-comments (boolean comments-link))
         (assoc :can-comment (boolean add-comment-link))
-        (assoc :stream-view-body stream-view-body)
-        (assoc :body-has-images has-images)
         (assoc :fixed-video-id fixed-video-id)
         (assoc :has-headline (has-headline? entry-data))
+        (assoc :body-thumbnail (when (seq (:body entry-data))
+                                 (html-lib/first-body-thumbnail (:body entry-data))))
         (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))))
 
 (defn fix-board

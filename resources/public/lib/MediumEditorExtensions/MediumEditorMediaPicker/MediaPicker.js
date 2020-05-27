@@ -407,6 +407,7 @@ function PlaceCaretAtEnd(el) {
         img.dataset.thumbnail = photoThumbnail;
         img.width = width;
         img.height = height;
+        p.classList.add("carrot-no-preview");
         p.appendChild(img);
 
         var nextP = this.document.createElement("p");
