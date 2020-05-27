@@ -301,7 +301,11 @@
                 "Bookmarks"]
               (when (pos? (:bookmarks-count org-data))
                 [:span.count (:bookmarks-count org-data)])]])
-        [:div.left-navigation-sidebar-top.top-border
+        [:div.left-navigation-sidebar-top
+          {:class (when (and (not show-drafts)
+                               (not show-you)
+                               (not show-bookmarks))
+                      "top-border")}
           [:a.nav-link.explore.hover-item.group
             {:class (utils/class-set {:item-selected is-explore})
              :href (oc-urls/unfollowing)
