@@ -169,7 +169,10 @@
                                 (will-close))
                               (if (fn? edit-cb)
                                 (edit-cb entity-data)
-                                (activity-actions/activity-edit entity-data)))}
+                                (do
+                                  (when (router/current-activity-id)
+                                    (nav-actions/dismiss-post-modal %))
+                                  (activity-actions/activity-edit entity-data))))}
                 "Edit"])
             (when (and delete-link
                        show-delete?)
