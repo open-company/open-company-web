@@ -2,6 +2,7 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [clojure.string :as s]
             [defun.core :refer (defun)]
+            [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -9,7 +10,19 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
+
+(defn- watch-boards [posts-data]
+  (when (jwt/jwt) ; only for logged in users
+    (let [board-slugs (distinct (map :board-slug posts-data))
+          org-data (dis/org-data)
+          org-boards (:boards org-data)
+          org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
+      (ws-ic/board-unwatch (fn [rep]
+        (let [board-uuids (map org-board-map board-slugs)]
+          (timbre/debug "Watching on socket " board-slugs board-uuids)
+          (ws-ic/boards-watch board-uuids)))))))
 
 (defn- is-currently-shown? [author-uuid]
   (= (router/current-contributions-id) author-uuid))
@@ -30,11 +43,12 @@
         member? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))]
     (when is-currently-shown
       (when member?
-        ;; only watch the currently visible board.
-        ; only for logged in users and if the board is currently shown
-        ; (watch-single-section section)
+        ;; only watch the boards of the posts of the contributor
+        (when (= (router/current-contributions-id) (:author-id (:collection contrib-data)))
+          ; (request-reads-count (->> contrib-data :collection :items (map :uuid)))
+          (watch-boards (:items (:collection contrib-data))))
         ;; Retrieve reads count if there are items in the loaded section
-        (request-reads-count author-uuid contrib-data)))
+        (request-reads-count author-uuid (:collection contrib-data))))
     (dis/dispatch! [:contributions-get/finish (router/current-org-slug) author-uuid contrib-data])))
 
 (defn- contributions-get-finish [author-uuid {:keys [status body success]}]
@@ -56,10 +70,15 @@
        (contributions-get-finish author-uuid resp))))))
 
 (defn- contributions-more-finish [author-uuid direction {:keys [success body]}]
-  (when success
-    (request-reads-count author-uuid (json->cljs body)))
-  (dis/dispatch! [:contributions-more/finish (router/current-org-slug) author-uuid
-   direction (when success (:collection (json->cljs body)))]))
+  (let [contrib-data (when success (json->cljs body))]
+    (when success
+      (when (= (router/current-contributions-id) (:author-id (:collection contrib-data)))
+        ;; only watch the boards of the posts of the contributor
+        (watch-boards (:items (:collection contrib-data))))
+      ;; Retrieve reads count if there are items in the loaded section
+      (request-reads-count author-uuid (:collection contrib-data)))
+    (dis/dispatch! [:contributions-more/finish (router/current-org-slug) author-uuid
+     direction (when success (:collection contrib-data))])))
 
 (defn contributions-more [more-link direction]
   (let [author-uuid (router/current-contributions-id)]
