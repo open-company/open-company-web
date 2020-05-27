@@ -402,7 +402,7 @@
                                   items-list)))
         (as-> b
          (if (show-separators? (:slug board-data))
-           (update b :items-to-render grouped-posts)
+           (assoc b :items-to-render (grouped-posts b))
            (assoc b :items-to-render (:posts-list b))))
         (assoc :following (boolean (follow-board-uuids (:uuid board-data))))))))
 

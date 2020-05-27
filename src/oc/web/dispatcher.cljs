@@ -445,8 +445,7 @@
                          (fn [base org-data posts-data threads-data route]
                            (let [threads? (is-threads? (:board route))
                                  container-slug (or (:contributions route) (:board route))]
-                             (when (and base org-data posts-data threads-data route (:board route)
-                                        (not threads?))
+                             (when (and base org-data posts-data route container-slug (not threads?))
                                (get-container-items base route posts-data threads-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
    :threads-data        [[:base :org-slug]
                          (fn [base org-slug]
