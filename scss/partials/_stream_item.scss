@@ -543,7 +543,10 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         float: left;
-        margin-left: 36px;
+
+        div.is-comments:not(:empty) {
+          margin-left: 36px;
+        }
 
         @include mobile() {
           margin-top: 1px;

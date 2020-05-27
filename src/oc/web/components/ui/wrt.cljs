@@ -330,7 +330,7 @@
                      (dec (:count reads-data))
                      (:count reads-data))
         is-mobile? (responsive/is-tablet-or-mobile?)]
-    (when (pos? reads-count)
+    (when is-author?
       [:div.wrt-count-container
         {:data-toggle (when-not is-mobile? "tooltip")
          :data-placement "top"
@@ -342,6 +342,5 @@
                   (str reads-count " people viewed"))}
         [:div.wrt-count
           {:ref :wrt-count
-           :on-click #(nav-actions/show-wrt item-id)
-           :class (when (pos? (count (:reads reads-data))) "has-read-list")}
+           :on-click #(nav-actions/show-wrt item-id)}
           reads-count]])))

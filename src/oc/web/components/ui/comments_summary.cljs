@@ -100,19 +100,14 @@
                                       :add-a-comment (not (pos? comments-count))
                                       :has-new-comments show-new-tag?})
              :data-toggle (when-not is-mobile? "tooltip")}
-            (if (pos? comments-count)
-              [:div.is-comments-summary-inner.group
-                (str
-                 (if show-new-tag?
-                   new-comments-count
-                   comments-count)
-                 (if show-new-tag?
-                   (if hide-label?
-                     " new"
-                     (str " new comment" (when (not= new-comments-count 1) "s")))
-                   (when-not hide-label?
-                     (str " comment" (when (not= comments-count 1) "s")))))]
-              (when (and (not publisher?)
-                         (not hide-label?))
-                [:span.add-a-comment
-                  "Add a comment"]))])])))
+            [:div.is-comments-summary-inner.group
+              (str
+               (if show-new-tag?
+                 new-comments-count
+                 comments-count)
+               (if show-new-tag?
+                 (if hide-label?
+                   " new"
+                   (str " new comment" (when (not= new-comments-count 1) "s")))
+                 (when-not hide-label?
+                   (str " comment" (when (not= comments-count 1) "s")))))]])])))
