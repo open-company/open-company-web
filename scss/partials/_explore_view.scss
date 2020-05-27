@@ -28,7 +28,7 @@ div.explore-view {
     display: grid;
     grid-template-columns: 1fr 1fr;
 
-    a.explore-view-block {
+    .explore-view-block {
       background-color: var(--overlay-background-color);
       padding: 24px;
       border: 1px solid var(--opac-background-color-2);
@@ -36,10 +36,6 @@ div.explore-view {
       margin-bottom: 4px;
       border-radius: 8px;
       height: 166px;
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: flex-start;
-      // justify-content: flex-start;
 
       &:nth-child(2n + 1) {
         margin-right: 4px;
@@ -48,6 +44,39 @@ div.explore-view {
       &:nth-child(2n) {
         margin-left: 4px;
       }
+    }
+
+    button.create-topic-bt {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: center;
+
+      span.plus {
+        width: 11px;
+        height: 11px;
+        background-image: cdnUrl("/img/ML/purple_plus.svg");
+        background-size: 11px 11px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: auto;
+        margin-right: 4px;
+      }
+
+      span.new-topic {
+        @include OC_Body_Bold();
+        font-size: 18px;
+        color: $wut_purple;
+        margin-left: 4px;
+        margin-right: auto;
+      }
+    }
+
+    a.board-link {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: flex-start;
+      // justify-content: flex-start;
 
       div.explore-view-block-title {
         @include OC_Body_Bold();
@@ -77,13 +106,63 @@ div.explore-view {
           float: left;
         }
 
-        span.followers-count {
+        span.posts-count {
           float: left;
           margin-left: 16px;
           line-height: 32px;
           font-size: 14px;
           @include OC_Body_Book();
           color: var(--light-color);
+          padding-left: 22px;
+          position: relative;
+
+          &:before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            background-image: cdnUrl("/img/ML/nav_drafts.svg");
+            background-size: 14px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+            position: absolute;
+            left: 0;
+            top: 9px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
+            }
+          }
+        }
+
+        span.followers-count {
+          float: left;
+          margin-left: 16px;
+          margin-left: 16px;
+          line-height: 32px;
+          font-size: 14px;
+          @include OC_Body_Book();
+          color: var(--light-color);
+          padding-left: 22px;
+          position: relative;
+
+          &:before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            background-image: cdnUrl("/img/ML/invite_people_bt.svg");
+            background-size: 14px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+            position: absolute;
+            left: 0;
+            top: 9px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+            }
+          }
         }
       }
     }

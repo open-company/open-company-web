@@ -36,8 +36,6 @@
 (def notifications-key [:notifications-data])
 (def show-login-overlay-key :show-login-overlay)
 
-(def show-explore-view-key [:show-explore-view])
-
 (def orgs-key :orgs)
 
 (defn org-key [org-slug]
@@ -682,7 +680,6 @@
    :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
-   :show-explore-view     [[:base] (fn [base] (get-in base show-explore-view-key))]
    })
 
 ;; Action Loop =================================================================

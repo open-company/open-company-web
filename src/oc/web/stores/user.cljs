@@ -364,7 +364,6 @@
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)
        (assoc-in (dispatcher/unfollow-board-uuids-key org-slug) unfollow-board-uuids)
-       (update-in dispatcher/show-explore-view-key #(or % (pos? (count unfollow-board-uuids))))
        (update-contributions-and-boards org-slug next-follow-boards-data next-follow-publishers-data)))
       db))
 

@@ -13,10 +13,10 @@
   (let [{:keys [active-on active-off hover-on hover-off]}
          (if (map? button-copy)
            button-copy
-           {:active-on "Following"
-            :active-off "Follow"
-            :hover-on "Unfollow"
-            :hover-off "Follow"})]
+           {:active-on "Subscribed"
+            :active-off "Subscribe"
+            :hover-on "Unsubscribe"
+            :hover-off "Subscribe"})]
     [:button.mlb-reset.follow-button
       {:class (utils/class-set {:on following
                                 :off (not following)

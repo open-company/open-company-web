@@ -8,87 +8,56 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.follow-button :refer (follow-button)]))
 
-(defn- is-user? [item]
-  (= (:resource-type item) :user))
+(defn- filter-item [s item]
+  (not= (:slug item) utils/default-drafts-board-slug))
 
-(defn- is-board? [item]
-  (= (:resource-type item) :board))
-
-(defn- sort-items [items]
-  (sort-by #(if (is-board? %)
-              (:name %)
-              (:short-name %))
-   items))
-
-(defn- filter-item [s current-user-id item]
-  (or (and (is-user? item)
-           (not= current-user-id (:user-id item)))
-      (and (is-board? item)
-           (not= (:slug item) utils/default-drafts-board-slug)
-           (not (:publisher-board item)))))
-
-(defn- filter-sort-items [s current-user-id items]
-  (sort-items (filterv #(filter-item s current-user-id %) items)))
+(defn- filter-sort-items [s items]
+  (->> items
+   (filterv #(filter-item s %))
+   (sort-by :short-name)))
 
 (rum/defcs explore-view <
   rum/reactive
   (drv/drv :org-data)
-  (drv/drv :active-users)
-  (drv/drv :current-user-data)
   (drv/drv :follow-boards-list)
-  (drv/drv :follow-publishers-list)
   (drv/drv :followers-boards-count)
-  (drv/drv :followers-publishers-count)
   [s]
   (let [org-data (drv/react s :org-data)
-        current-user-data (drv/react s :current-user-data)
-        all-active-users (drv/react s :active-users)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))
         followers-boards-count (drv/react s :followers-boards-count)
-        follow-publishers-list (map :user-id (drv/react s :follow-publishers-list))
-        followers-publishers-count (drv/react s :followers-publishers-count)
-        all-boards (map #(assoc % :resource-type :board) (:boards org-data))
-        authors-uuids (->> org-data :authors (map :user-id) set)
-        all-authors (->> all-active-users
-                     vals
-                     (filter #(and (authors-uuids (:user-id %))
-                                   (not= (:user-id current-user-data) (:user-id %))))
-                     (map #(assoc % :resource-type :user)))
-        all-items (concat all-boards all-authors)
-        with-follow (map #(assoc % :follow (or (and (is-user? %)
-                                                    (utils/in? follow-publishers-list (:user-id %)))
-                                               (and (is-board? %)
-                                                    (utils/in? follow-boards-list (:uuid %)))))
-                      all-items)
-        sorted-items (filter-sort-items s (:user-id current-user-data) with-follow)
-        is-mobile? (responsive/is-mobile-size?)]
+        with-follow (map #(assoc % :follow (utils/in? follow-boards-list (:uuid %))) (:boards org-data))
+        sorted-items (filter-sort-items s with-follow)
+        is-mobile? (responsive/is-mobile-size?)
+        can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
       [:div.explore-view-header
         "Explore"]
       [:div.explore-view-blocks
+        (when can-create-topic?
+          [:button.mlb-reset.explore-view-block.create-topic-bt
+            {:on-click #(nav-actions/show-section-add)}
+            [:span.plus]
+            [:span.new-topic "New topic"]])
         (for [item sorted-items
-              :let [user? (is-user? item)
-                    followers-count-data (if user?
-                                           (get followers-publishers-count (:user-id item))
-                                           (get followers-boards-count (:uuid item)))
+              :let [followers-count-data (get followers-boards-count (:uuid item))
                     followers-count (:count followers-count-data)]]
-          [:a.explore-view-block
-            {:href (if user? (oc-urls/contributions (:user-id item)) (oc-urls/board (:slug item)))
+          [:a.explore-view-block.board-link
+            {:href (oc-urls/board (:slug item))
              :on-click (fn [e]
                          (utils/event-stop e)
                          (when-not (utils/button-clicked? e)
-                           (if user?
-                             (nav-actions/nav-to-author! e (:user-id item) (oc-urls/contributions (:user-id item)))
-                             (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item))))))}
+                           (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item)))))}
             [:div.explore-view-block-title
               (:name item)]
-            (when (is-user? item)
-              [:div.explore-view-block-description
-                (:role item)])
             [:div.explore-view-block-footer
               (follow-button {:following (:follow item)
-                              :resource-uuid (if (is-user? item) (:user-id item) (:uuid item))
-                            :resource-type (:resource-type item)})
-              [:span.followers-count
-                (when (pos? followers-count)
-                  (str followers-count " follower" (when (not= followers-count 1) "s")))]]])]]))
+                              :resource-uuid (:uuid item)
+                            :resource-type :board})
+              (when (pos? (:total-count item))
+                [:span.posts-count
+                  (:total-count item)])
+              (when (pos? followers-count)
+                [:span.followers-count
+                  followers-count
+                  ; (str followers-count " follower" (when (not= followers-count 1) "s"))
+                  ])]])]]))
