@@ -544,8 +544,7 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
-                                (assoc :contributions-user-data contributions-user-data)
-                                (assoc :current-user-data current-user-data))))]
+                                (assoc :contributions-user-data contributions-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]
                               {:invitation-confirmed (:email-confirmed base)
