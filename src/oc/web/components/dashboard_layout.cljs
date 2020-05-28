@@ -327,14 +327,14 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
-                  (when (and is-following
-                             member?)
-                    [:button.mlb-reset.curate-feed-bt
-                      {:on-click #(nav-actions/show-follow-picker)
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Curate your Home feed"}])
+                  ; (when (and is-following
+                  ;            member?)
+                  ;   [:button.mlb-reset.curate-feed-bt
+                  ;     {:on-click #(nav-actions/show-follow-picker)
+                  ;      :data-toggle (when-not is-mobile? "tooltip")
+                  ;      :data-placement "top"
+                  ;      :data-container "body"
+                  ;      :title "Curate your Home feed"}])
                   (when (and (not is-drafts-board)
                              is-mobile?)
                     (search-box))]])
