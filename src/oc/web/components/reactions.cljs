@@ -15,7 +15,7 @@
             [cljsjs.emoji-mart]
             [goog.object :as gobj]))
 
-(def default-reaction-number 5)
+(def default-reaction-number 3)
 
 (rum/defcs reactions < (rum/local false ::show-picker)
                        ui-mixins/refresh-tooltips-mixin
