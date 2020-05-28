@@ -111,13 +111,15 @@
         days-interval (.floor js/Math (/ seconds 86400))
         hours-interval (.floor js/Math (/ seconds 3600))
         minutes-interval (.floor js/Math (/ seconds 60))
-        short? (in? flags :short)]
+        short? (in? flags :short)
+        date-prefix (in? flags :date-prefix)
+        lower-case (in? flags :lower-case)]
     (cond
       (pos? years-interval)
-      (date-string past-js-date (concat flags [:year]))
+      (str (when date-prefix " on ") (date-string past-js-date (concat flags [:year])))
 
       (pos? months-interval)
-      (date-string past-js-date flags)
+      (str (when date-prefix " on ") (date-string past-js-date flags))
 
       (pos? days-interval)
       (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
@@ -129,7 +131,11 @@
       (str minutes-interval (if short? "m" (str " " (pluralize "minute" minutes-interval) " ago")))
 
       :else
-      (if short? "now" "Just now"))))
+      (if short?
+        "now"
+        (if lower-case
+          "just now"
+          "Just now")))))
 
 (defn time-without-leading-zeros [time-string]
   (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1"))
@@ -152,6 +158,17 @@
              (= (.getDate past-js-date) (.getDate now-date)))
       (local-date-time past-js-date)
       (time-since past-date (concat flags [:short])))))
+
+(defn explore-date-time [past-date & [flags]]
+  (let [past-js-date (js-date past-date)
+        past (.getTime past-js-date)
+        now-date (js-date)
+        now (.getTime now-date)]
+    (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
+             (= (.getMonth past-js-date) (.getMonth now-date))
+             (= (.getDate past-js-date) (.getDate now-date)))
+      (str " at " (local-date-time past-js-date))
+      (time-since past-date (concat flags [:date-prefix :lower-case])))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"

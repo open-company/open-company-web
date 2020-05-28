@@ -15,7 +15,7 @@
             [cljsjs.emoji-mart]
             [goog.object :as gobj]))
 
-(def default-reaction-number 5)
+(def default-reaction-number 3)
 
 (rum/defcs reactions < (rum/local false ::show-picker)
                        ui-mixins/refresh-tooltips-mixin
@@ -88,7 +88,8 @@
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
                 [:span.reaction
-                  {:class (when (pos? (:count r)) "has-count")}
+                  {:class (utils/class-set {:has-count (pos? (:count r))
+                                            :grayscale (= (:reaction r) "👍🏿")})}
                   (:reaction r)]
                 [:div.count
                   (:count r)]]))

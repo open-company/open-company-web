@@ -528,7 +528,8 @@
     [:div.cmail-outer
       {:class (utils/class-set {:quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?
-                                :published-post (= (:status cmail-data) "published")})
+                                :published-post (= (:status cmail-data) "published")
+                                :multiple-topics show-section-picker?})
        :on-click (when (and (not is-mobile?)
                             (:collapsed cmail-state)
                             (not show-paywall-alert?))

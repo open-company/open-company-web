@@ -82,7 +82,7 @@
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
-(defn- check-and-reopen-follow-lists [s v]
+(defn- check-and-reopen-follow-lists [s]
   (let [local-follow-list-last-added @(::follow-list-last-added s)
         follow-list-last-added @(drv/get-ref s :follow-list-last-added)]
     (when (not= local-follow-list-last-added follow-list-last-added)
@@ -100,7 +100,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                ; (drv/drv :change-data)
+                                (drv/drv :change-data)
                                 (drv/drv :unread-threads)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
@@ -134,7 +134,7 @@
                                   (save-content-height s)
                                   s)
                                  :did-remount (fn [o s]
-                                  (check-and-reopen-follow-lists s "did-remount")
+                                  (check-and-reopen-follow-lists s)
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
@@ -151,15 +151,15 @@
                                           (do
                                             (dom-utils/unlock-page-scroll)
                                             (reset! (::last-mobile-navigation-panel s) false))))))
-                                  (check-and-reopen-follow-lists s "will-update")
+                                  (check-and-reopen-follow-lists s)
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
-        ; change-data (drv/react s :change-data)
-        ; filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
-        ;                                             (not= % (:uuid org-data))) change-data))
+        change-data (drv/react s :change-data)
+        filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
+                                                    (not= % (:uuid org-data))) change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
@@ -170,13 +170,16 @@
                         (= selected-slug "threads"))
         is-following (or (:following (:back-to @router/path))
                          (= selected-slug "following"))
+        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         is-explore (or (:explore (:back-to @router/path))
-                         (= selected-slug "explore"))
+                       (= selected-slug "explore")
+                       (and (seq (router/current-board-slug))
+                            (not (dis/is-container? (router/current-board-slug)))
+                            (not is-drafts-board)))
         is-my-posts (and user-is-part-of-the-team?
                          (or (= (:contributions (:back-to @router/path)) (:user-id current-user-data))
                              (= (router/current-contributions-id) (:user-id current-user-data))))
         is-bookmarks (= selected-slug "bookmarks")
-        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards false ;; Hide following boards list for now
                     ;; (or create-link (pos? (count boards)))
@@ -194,7 +197,7 @@
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
-        ; all-unread-items (mapcat :unread (vals filtered-change-data))
+        all-unread-items (mapcat :unread (vals filtered-change-data))
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? (and false ;; Remove users list from sidebar or now
                               user-is-part-of-the-team?
@@ -233,9 +236,9 @@
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
-            ; (when (pos? (count all-unread-items))
-            ;   [:span.count (count all-unread-items)])
-            ])
+            (when (pos? (count all-unread-items))
+              ; [:span.count (count all-unread-items)]
+              [:span.unread-dot])])
         (when show-threads
           [:a.nav-link.threads-view.hover-item.group
             {:class (utils/class-set {:item-selected is-threads
@@ -301,7 +304,11 @@
                 "Bookmarks"]
               (when (pos? (:bookmarks-count org-data))
                 [:span.count (:bookmarks-count org-data)])]])
-        [:div.left-navigation-sidebar-top.top-border
+        [:div.left-navigation-sidebar-top
+          {:class (when (and (not show-drafts)
+                               (not show-you)
+                               (not show-bookmarks))
+                      "top-border")}
           [:a.nav-link.explore.hover-item.group
             {:class (utils/class-set {:item-selected is-explore})
              :href (oc-urls/unfollowing)
@@ -309,7 +316,7 @@
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Topics"]
+              "Browse topics"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ]]
@@ -381,7 +388,7 @@
                    :title "Teams you follow"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")}
-                  [:span.boards "Feeds"]])
+                  [:span.boards "Topics"]])
               [:button.left-navigation-sidebar-top-title-button.btn-reset
                 {:on-click #(nav-actions/show-section-add)
                  :title "New team"
@@ -435,4 +442,4 @@
           [:div.left-navigation-sidebar-footer.top-border
             [:button.mlb-reset.invite-people-bt
               {:on-click #(nav-actions/show-org-settings :invite-picker)}
-              "Invite teammates"]])]]))
+              "Invite your team"]])]]))

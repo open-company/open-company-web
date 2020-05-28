@@ -156,6 +156,28 @@ div.section-editor-container {
         }
       }
 
+      textarea.section-editor-description {
+        border-radius: 4px;
+        background-color: var(--opac-background-color-1);
+        height: 32px;
+        width: 100%;
+        resize: none;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        padding: 5px 8px;
+        position: relative;
+        cursor: text;
+        margin-top: 8px;
+        outline: none;
+        border: none;
+        border: 1px solid var(--opac-background-color-1);
+
+        @include placeholder() {
+          color: var(--light-color);
+        }
+      }
+
       div.section-editor-private-users-search {
         width: 100%;
         position: relative;

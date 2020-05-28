@@ -235,7 +235,7 @@
 
 (def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :polls :publisher-board])
 
-(def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :publisher-board])
+(def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :publisher-board :description])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles])
 
@@ -381,7 +381,7 @@
 
 (defn patch-board [board-patch-link data note callback]
   (if (and board-patch-link data)
-    (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications])
+    (let [board-data (select-keys data [:name :slug :access :slack-mirror :authors :viewers :private-notifications :description])
           with-personal-note (assoc board-data :note note)
           json-data (cljs->json with-personal-note)]
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)

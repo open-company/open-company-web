@@ -339,7 +339,9 @@
                   (= reads-count 1)
                   "1 person viewed"
                   (pos? reads-count)
-                  (str reads-count " people viewed"))}
+                  (str reads-count " people viewed")
+                  :else
+                  "No views yet")}
         [:div.wrt-count
           {:ref :wrt-count
            :on-click #(nav-actions/show-wrt item-id)}

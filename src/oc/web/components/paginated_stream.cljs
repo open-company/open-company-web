@@ -179,11 +179,19 @@
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
                                 (drv/drv :force-list-update)
-                               {:did-update (fn [s]
-                                 (when-let [force-list-update @(drv/get-ref s :force-list-update)]
-                                   (when (not= @(::last-force-list-update s) force-list-update)
-                                     (reset! (::last-force-list-update s) force-list-update)
-                                     (.recomputeRowHeights (rum/ref s :virtualized-list-comp))))
+                                (rum/local false ::mounted)
+                               {:did-mount (fn [s]
+                                 (reset! (::mounted s) true)
+                                 s)
+                                :did-update (fn [s]
+                                 (when @(::mounted s)
+                                   (when-let [force-list-update @(drv/get-ref s :force-list-update)]
+                                     (when (not= @(::last-force-list-update s) force-list-update)
+                                       (reset! (::last-force-list-update s) force-list-update)
+                                       (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))
+                                 s)
+                                :will-unmount (fn [s]
+                                 (reset! (::mounted s) false)
                                  s)}
   [s {:keys [items
              activities-read

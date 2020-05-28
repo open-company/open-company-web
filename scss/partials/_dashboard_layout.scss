@@ -37,6 +37,14 @@ div.dashboard-layout {
     }
   }
 
+  div.dashboard-layout-follow-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: #{$navbar_height}px;
+  }
+
   div.dashboard-layout-container {
     padding: 0;
     $total_dashboard_width: $board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + 32;
@@ -508,33 +516,13 @@ div.dashboard-layout {
                 }
               }
 
-              &.explore-icon {
+              &.explore-icon:before {
+                background-image: cdnUrl("/img/ML/nav_all.svg");
+                background-size: 16px 16px;
+                opacity: 1;
 
-                &:before {
-                  opacity: 1;
-                  background-image: unset;
-
-                  @include dark_mode() {
-                    background-image: unset;
-                  }
-                }
-
-                div.explore-icon-in {
-                  width: 16px;
-                  height: 32px;
-                  text-align: center;
-                  font-size: 18px;
-                  line-height: 32px;
-                  vertical-align: bottom;
-                  color: var(--color);
-                  font-family: "Material Design Icons";
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-
-                  &:before {
-                    content: "\F18B";
-                  }
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/nav_all@dark.svg");
                 }
               }
 
@@ -733,6 +721,7 @@ div.dashboard-layout {
             float: right;
             position: relative;
             height: 32px;
+            margin-right: -12px;
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");

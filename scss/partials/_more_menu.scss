@@ -59,7 +59,7 @@ div.more-menu {
     padding: 0;
     background-repeat: no-repeat;
     display: inline-block;
-    opacity: 0.24;;
+    opacity: 0.24;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");

@@ -5,7 +5,7 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 
 $thumbnail_width: 128;
-$thumbnail_height: 96;
+$thumbnail_height: 103;
 
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
@@ -293,7 +293,7 @@ div.stream-item {
       div.separator-dot {
         width: 3px;
         height: 3px;
-        background-color: var(--divider-line);
+        background-color: var(--light-color);
         border-radius: 50%;
         margin: 1px 5px 0 5px;
         flex: 0 0 auto;
@@ -306,7 +306,7 @@ div.stream-item {
         text-align: left;
         @include OC_Body_Book();
         font-size: 12px;
-        color: var(--light-color);
+        color: var(--color);
         position: relative;
         white-space: nowrap;
         flex: 0 0 auto;
@@ -341,6 +341,10 @@ div.stream-item {
         &:not(.menu-expanded) button {
           display: none;
         }
+      }
+
+      button.more-menu-share-bt:hover {
+        border-right: none;
       }
     }
   }
@@ -393,7 +397,7 @@ div.stream-item {
         background-position: center;
         position: absolute;
         right: 0;
-        top: 0;
+        top: 3px;
         cursor: pointer;
 
         img.body-thumbnail {
