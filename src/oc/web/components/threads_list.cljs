@@ -314,7 +314,8 @@
                       item (assoc item* :current-user-data current-user-data :member? member?)]]
             (if caught-up?
               [:div.threads-list-caught-up
-                {:key (str "threads-caught-up-" (:last-activity-at item))}
+                {:key (str "threads-caught-up-" (:last-activity-at item))
+                 :class (when (:gray-style item) "gray-style")}
                 (all-caught-up "You’re all caught up")]
               (rum/with-key
                (thread-item item)

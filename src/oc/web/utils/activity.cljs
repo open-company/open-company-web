@@ -510,12 +510,14 @@
       (assoc :unread-thread thread-unread))))
 
 (defn- caught-up-map
-  ([] (caught-up-map nil))
-  ([n]
+  ([] (caught-up-map nil nil))
+  ([n pos]
    (let [t (if (:last-activity-at n)
              (-> n :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
              (utils/as-of-now))]
-     {:content-type :caught-up :last-activity-at t})))
+     {:content-type :caught-up
+      :last-activity-at t
+      :gray-style (zero? pos)})))
 
 (defn fix-threads
   "
@@ -579,7 +581,7 @@
                                            from-items threads-list]
                                       (if (or (->> from-items first (get (:fixed-items with-fixed-items)) :unread-thread not)
                                               (not (seq from-items)))
-                                        (concat to-items [(caught-up-map (last to-items))] from-items)
+                                        (concat to-items [(caught-up-map (last to-items) (count to-items))] from-items)
                                         (recur (vec (conj to-items (first from-items)))
                                                (rest from-items)))))]
       (doseq [e @entries]

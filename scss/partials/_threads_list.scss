@@ -38,15 +38,26 @@ div.threads-list {
       position: relative;
       margin: 16px 0;
 
-      &:before {
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:before, &:after {
         position: absolute;
         top: 16px;
         height: 1px;
-        left: 0;
-        width: 100%;
+        width: calc(50% - 80px);
         z-index: 1;
         background-color: $wut_green;
         content: "";
+      }
+
+      &:before {
+        left: 0;
+      }
+
+      &:after {
+        right: 0;
       }
 
       div.all-caught-up {
@@ -72,6 +83,16 @@ div.threads-list {
             @include OC_Body_Bold();
             padding-top: 0;
           }
+        }
+      }
+
+      &.gray-style {
+        &:before, &:after {
+          background-color: var(--light-color);
+        }
+
+        div.all-caught-up {
+          background-color: var(--light-color);
         }
       }
     }
