@@ -76,7 +76,7 @@
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        (= (router/current-board-slug) "threads")
-                       "Threads"
+                       "Direct"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
@@ -86,7 +86,7 @@
                        (= (router/current-board-slug) "following")
                        "Home"
                        (= (router/current-board-slug) "explore")
-                       "Topics"
+                       "Browse topics"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else

@@ -250,7 +250,7 @@
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Threads"]
+              "Direct"]
               (when (pos? unread-threads)
                 [:span.unread-dot])])
         ;; You
@@ -316,7 +316,7 @@
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Topics"]
+              "Browse topics"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ]]

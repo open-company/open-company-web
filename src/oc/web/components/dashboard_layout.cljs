@@ -184,7 +184,7 @@
                  :class (when (= current-board-slug "unfollow")
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Topics"]]
+                [:span.tab-label "Browse topics"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -194,7 +194,7 @@
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
                     [:span.unread-dot])]
-                [:span.tab-label "Threads"]]
+                [:span.tab-label "Direct"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -285,7 +285,7 @@
                                                    "Home"
 
                                                    is-threads
-                                                   "Threads"
+                                                   "Direct"
 
                                                    :default
                                                    ;; Fallback to the org board data
