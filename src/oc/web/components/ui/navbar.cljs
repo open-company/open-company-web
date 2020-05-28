@@ -94,7 +94,7 @@
          search-active? (drv/react s search/search-active?)
          editable-boards (drv/react s :editable-boards)
          can-compose? (pos? (count editable-boards))
-         show-plus-button? (and false (not is-mobile?)
+         show-plus-button? (and (not is-mobile?)
                                 can-compose?)
          org-slug (router/current-org-slug)]
     [:nav.oc-navbar.group
