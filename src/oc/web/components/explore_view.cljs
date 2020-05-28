@@ -52,17 +52,30 @@
               (:name item)]
             [:div.explore-view-block-description
               (:description item)]
-            [:div.explore-view-block-latest-activity
-              (str "Latest activity was " (utils/explore-date-time (:updated-at item)))]
+            (when (:last-entry-at item)
+              [:div.explore-view-block-latest-activity
+                (str "Last update " (utils/explore-date-time (:last-entry-at item)))])
             [:div.explore-view-block-footer
               (follow-button {:following (:follow item)
                               :resource-uuid (:uuid item)
                             :resource-type :board})
               (when (pos? (:total-count item))
                 [:span.posts-count
+                  {:data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :title "Number of updates"}
                   (:total-count item)])
               (when (pos? followers-count)
                 [:span.followers-count
+                  {:data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :title (str followers-count
+                               (if (= followers-count 1)
+                                 " person"
+                                 " people")
+                               " subscribed")}
                   followers-count
                   ; (str followers-count " follower" (when (not= followers-count 1) "s"))
                   ])]])]]))
