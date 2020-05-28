@@ -403,16 +403,16 @@ div.threads-list {
             }
 
             &.new-comment {
-              background-color: rgba($wut_purple, 0.16);
-              border-radius: 8px;
+              // background-color: rgba($wut_purple, 0.16);
+              // border-radius: 8px;
               margin-bottom: 1px;
 
               &.indented-comment {
                 background-color: transparent;
 
                 div.thread-comment div.thread-comment-inner {
-                  background-color: rgba($wut_purple, 0.16);
-                  border-radius: 8px;
+                  // background-color: rgba($wut_purple, 0.16);
+                  // border-radius: 8px;
                 }
               }
             }
@@ -791,21 +791,26 @@ div.threads-list {
                   }
 
                   div.new-comment-tag {
-                    flex: 0 0 37px;
+                    flex: 0 0 auto;
                     margin-left: 8px;
-                    width: 37px;
-                    height: 18px;
+                    width: 35px;
+                    height: 16px;
                     position: relative;
+                    background-color: $feint_emerald;
+                    border-radius: 4px;
 
                     &:before {
+                      width: 35px;
+                      height: 16px;
                       @include OC_Body_Bold();
-                      font-size: 12px;
-                      line-height: 18px;
-                      content: "(NEW)";
-                      color: $wut_purple;
+                      font-size: 11px;
+                      line-height: 16px;
+                      content: "NEW";
+                      color: $carrot_green;
                       position: absolute;
                       top: 0;
                       left: 0;
+                      text-align: center;
                     }
                   }
                 }

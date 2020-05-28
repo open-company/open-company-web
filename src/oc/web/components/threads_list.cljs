@@ -117,10 +117,10 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip comment-data)}
                     (utils/foc-date-time (:created-at comment-data))]]]
-              (when (and (:unread comment-data)
-                         (or (and is-indented-comment?
-                                  (not new-thread?))
-                             (not is-indented-comment?)))
+              (when true;(and (:unread comment-data)
+                         ; (or (and is-indented-comment?
+                         ;          (not new-thread?))
+                         ;     (not is-indented-comment?)))
                 [:div.new-comment-tag])
               (if (responsive/is-mobile-size?)
                 [:div.thread-comment-mobile-menu
