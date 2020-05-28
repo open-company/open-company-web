@@ -340,4 +340,4 @@
           (pos? reads-count)
           (str reads-count " people viewed")
           :else
-          "Viewers")]]))
+          "No views yet")]]))
