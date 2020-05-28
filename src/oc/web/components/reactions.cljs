@@ -88,7 +88,8 @@
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
                 [:span.reaction
-                  {:class (when (pos? (:count r)) "has-count")}
+                  {:class (utils/class-set {:has-count (pos? (:count r))
+                                            :grayscale (= (:reaction r) "👍🏿")})}
                   (:reaction r)]
                 [:div.count
                   (:count r)]]))

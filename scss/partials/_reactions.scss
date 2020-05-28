@@ -40,6 +40,11 @@ div.reactions {
         margin-left: 2px;
         opacity: 0.9;
 
+        &.grayscale {
+          filter: grayscale(1);
+          opacity: 0.5;
+        }
+
         @include mobile() {
           font-size: 17px;
           margin-left: 3px;
@@ -75,6 +80,10 @@ div.reactions {
               opacity: 1;
             }
 
+            span.reaction.grayscale {
+              opacity: 1;
+            }
+
             div.count {
               color: var(--color);
               opacity: 1;
@@ -82,6 +91,7 @@ div.reactions {
           }
 
           &.reacted:hover {
+
             div.count {
               @include OC_Body_Bold();
               color: $wut_purple;
