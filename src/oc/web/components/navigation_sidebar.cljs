@@ -82,7 +82,7 @@
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
-(defn- check-and-reopen-follow-lists [s v]
+(defn- check-and-reopen-follow-lists [s]
   (let [local-follow-list-last-added @(::follow-list-last-added s)
         follow-list-last-added @(drv/get-ref s :follow-list-last-added)]
     (when (not= local-follow-list-last-added follow-list-last-added)
@@ -134,7 +134,7 @@
                                   (save-content-height s)
                                   s)
                                  :did-remount (fn [o s]
-                                  (check-and-reopen-follow-lists s "did-remount")
+                                  (check-and-reopen-follow-lists s)
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
@@ -151,7 +151,7 @@
                                           (do
                                             (dom-utils/unlock-page-scroll)
                                             (reset! (::last-mobile-navigation-panel s) false))))))
-                                  (check-and-reopen-follow-lists s "will-update")
+                                  (check-and-reopen-follow-lists s)
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
