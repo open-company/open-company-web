@@ -85,8 +85,8 @@
                        "Bookmarks"
                        (= (router/current-board-slug) "following")
                        "Home"
-                       (= (router/current-board-slug) "unfollowing")
-                       "Explore"
+                       (= (router/current-board-slug) "explore")
+                       "Topics"
                        (and (router/current-contributions-id) (seq contributions-user-data))
                        (lib-user/name-for contributions-user-data)
                        :else
@@ -94,7 +94,7 @@
          search-active? (drv/react s search/search-active?)
          editable-boards (drv/react s :editable-boards)
          can-compose? (pos? (count editable-boards))
-         show-plus-button? (and (not is-mobile?)
+         show-plus-button? (and false (not is-mobile?)
                                 can-compose?)
          org-slug (router/current-org-slug)]
     [:nav.oc-navbar.group
@@ -142,6 +142,7 @@
                     {:class (utils/class-set {:scrolled @(::scrolled s)})
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "bottom"
+                     :data-container "body"
                      :title (str utils/default-body-placeholder "?")
                      :on-click #(if (:collapsed cmail-state)
                                   (do

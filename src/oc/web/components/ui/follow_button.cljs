@@ -34,3 +34,13 @@
         (if following
           hover-on
           hover-off)]]))
+
+
+(rum/defc follow-banner
+  [board-data]
+  (let []
+    [:div.follow-banner
+      [:span.follow-banner-copy (str "Previewing " (:name board-data))]
+      (follow-button {:resource-type :board
+                      :following (:following board-data)
+                      :resource-uuid (:uuid board-data)})]))

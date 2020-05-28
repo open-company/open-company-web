@@ -31,7 +31,7 @@
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
       [:div.explore-view-header
-        "Explore"]
+        "Topics"]
       [:div.explore-view-blocks
         (when can-create-topic?
           [:button.mlb-reset.explore-view-block.create-topic-bt
@@ -42,13 +42,18 @@
               :let [followers-count-data (get followers-boards-count (:uuid item))
                     followers-count (:count followers-count-data)]]
           [:a.explore-view-block.board-link
-            {:href (oc-urls/board (:slug item))
+            {:key (str "explore-view-board-" (:slug item))
+             :href (oc-urls/board (:slug item))
              :on-click (fn [e]
                          (utils/event-stop e)
                          (when-not (utils/button-clicked? e)
                            (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item)))))}
             [:div.explore-view-block-title
               (:name item)]
+            [:div.explore-view-block-description
+              (:description item)]
+            [:div.explore-view-block-latest-activity
+              (str "Latest activity was " (utils/explore-date-time (:updated-at item)))]
             [:div.explore-view-block-footer
               (follow-button {:following (:follow item)
                               :resource-uuid (:uuid item)

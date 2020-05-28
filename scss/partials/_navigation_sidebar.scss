@@ -401,7 +401,7 @@ div.left-navigation-sidebar {
         background-size: 14px 14px;
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+          background-image: cdnUrl("/img/ML/nav_home@dark.svg");
         }
       }
 
@@ -450,14 +450,27 @@ div.left-navigation-sidebar {
 
     &.explore {
       div.nav-link-icon {
-        &:before {
-          content: "\F18B";
+        background-image: cdnUrl("/img/ML/nav_all.svg");
+        background-size: 12px 14px;
+
+        @include mobile() {
+          margin-left: 0px;
+          margin-top: 0px;
+          background-position: center 5px;
+        }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/nav_all@dark.svg");
         }
       }
 
       &.item-selected {
         div.nav-link-icon {
-          color: white;
+          background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+          }
         }
       }
     }

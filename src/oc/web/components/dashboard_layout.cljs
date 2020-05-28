@@ -26,7 +26,7 @@
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.explore-view :refer (explore-view)]
-            [oc.web.components.ui.follow-button :refer (follow-button)]
+            [oc.web.components.ui.follow-button :refer (follow-banner)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -106,9 +106,10 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
+        is-container? (dis/is-container? current-board-slug)
         board-container-data (cond (seq current-contributions-id)
                                    contributions-data
-                                   (dis/is-container? current-board-slug)
+                                   is-container?
                                    container-data
                                    :else
                                    board-data)
@@ -129,7 +130,7 @@
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and current-board-slug
-                                     (not (dis/is-container? current-board-slug))
+                                     (not is-container?)
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
@@ -146,10 +147,11 @@
         search-active? (drv/react s search/search-active?)
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
         is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
-        show-follow-button? (and (contains? board-container-data :following)
-                                 (seq (:user-id current-user-data))
+        show-follow-banner? (and (not is-container?)
+                                 (not (seq current-contributions-id))
                                  (not is-drafts-board)
-                                 (not is-own-contributions))
+                                 (map? board-container-data)
+                                 (not (:following board-container-data)))
         followers-boards-count (drv/react s :followers-boards-count)]
       ;; Entries list
       [:div.dashboard-layout.group
@@ -182,7 +184,7 @@
                  :class (when (= current-board-slug "unfollow")
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Explore"]]
+                [:span.tab-label "Topics"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -235,6 +237,9 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
+            (when show-follow-banner?
+              [:div.dashboard-layout-follow-banner
+                (follow-banner board-container-data)])
             (when (not is-explore)
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -305,16 +310,6 @@
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}])]
                 [:div.board-name-right
-                  (when show-follow-button?
-                    (let [resource-type (if is-contributions :user :board)
-                          resource-data (if is-contributions
-                                          contributions-user-data
-                                          board-container-data)]
-                      (follow-button {:following (:following resource-data)
-                                      :resource-type resource-type
-                                      :resource-uuid (if is-contributions
-                                                       (:author-uuid board-container-data)
-                                                       (:uuid board-container-data))})))
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button
@@ -324,19 +319,6 @@
                          :data-container "body"
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])
-                  (when (and show-follow-button?
-                             (not is-all-posts)
-                             (not is-following)
-                             (not is-unfollowing)
-                             (not is-bookmarks)
-                             (not is-drafts-board)
-                             (not is-contributions))
-                    ; (let [followers-count (get followers-boards-count (:uuid current-board-data))]
-                    ;   [:div.followers-count
-                    ;     (if (pos? followers-count)
-                    ;       (str followers-count " follower" (when (not= followers-count 1) "s"))
-                    ;       "No followers")])
-                    )
                   (when (and dismiss-all-link
                              (pos? (count posts-data)))
                     [:button.mlb-reset.complete-all-bt

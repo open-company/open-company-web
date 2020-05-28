@@ -106,12 +106,6 @@ div.cmail-outer {
     }
   }
 
-  &.published-post div.cmail-container div.cmail-content.section-picker-visible {
-    div.rich-body-editor-container div.medium-editor-media-picker {
-      left: 269px;
-    }
-  }
-
   div.cmail-container {
     width: 100%;
     height: 100%;
@@ -454,12 +448,6 @@ div.cmail-outer {
         }
       }
 
-      &.section-picker-visible {
-        div.rich-body-editor-container div.medium-editor-media-picker {
-          left: 323px;
-        }
-      }
-
       div.rich-body-editor-container {
         position: relative;
         height: auto;
@@ -721,6 +709,27 @@ div.cmail-outer {
           flat: right;
         }
       }
+    }
+  }
+
+  $media_picker_left: 192;
+  div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
+      left: #{$media_picker_left}px;
+  }
+
+  &.multiple-topics {
+    div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
+      left: #{$media_picker_left + 132}px;
+    }
+  }
+  &.published-post {
+    div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
+      left: #{$media_picker_left - 129}px;
+    }
+  }
+  &.multiple-topics.published-post {
+    div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
+      left: #{$media_picker_left + 132 - 129}px;
     }
   }
 }

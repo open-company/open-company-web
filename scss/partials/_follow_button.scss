@@ -68,3 +68,54 @@ button.follow-button {
     }
   }
 }
+
+div.follow-banner {
+  width: 100%;
+  height: #{$navbar_height}px;
+  background-color: $wut_purple;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  span.follow-banner-copy {
+    margin-left: auto;
+    margin-right: 8px;
+    flex: 0 0 auto;
+    @include OC_Body_Bold();
+    color: white;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  button.follow-button {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    margin-right: auto;
+
+    background-color: white;
+    
+    span.main-title, span.hover-title {
+      color: $wut_purple;
+    }
+
+    &.on {
+      background-color: white;
+
+      span.main-title, span.hover-title {
+        color: $wut_purple;
+      }
+
+      @include big_web(){
+        &:not(.disabled):hover {
+          background-color: white;
+          opacity: 0.7;
+          
+          span.main-title, span.hover-title {
+            color: $wut_purple;
+          }
+        }
+      }
+    }
+  }
+}

@@ -35,7 +35,7 @@ div.explore-view {
       margin-top: 4px;
       margin-bottom: 4px;
       border-radius: 8px;
-      height: 166px;
+      height: 190px;
 
       &:nth-child(2n + 1) {
         margin-right: 4px;
@@ -88,13 +88,26 @@ div.explore-view {
 
       div.explore-view-block-description {
         margin-top: 8px;
-        @include OC_Body_Bold();
+        @include OC_Body_Book();
         font-size: 16px;
         line-height: 20px;
         max-height: 40px;
         overflow: hidden;
         color: var(--color);
         flex: 0 1 auto;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+      }
+
+      div.explore-view-block-latest-activity {
+        margin-top: 8px;
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 15px;
+        color: var(--light-color);
+        flex: 0 0 auto;
       }
 
       div.explore-view-block-footer {

@@ -116,6 +116,7 @@
   (drv/drv :team-channels)
   (drv/drv :team-roster)
   (drv/drv :current-user-data)
+  (mixins/autoresize-textarea :section-description)
   {:will-mount (fn [s]
    (team-actions/teams-get)
    (let [initial-section-data (first (:rum/args s))
@@ -123,6 +124,7 @@
          fixed-section-data (if new-section
                             utils/default-section
                             (section-for-editing initial-section-data))]
+     (js/console.log "DBG will-mount initial-section-data" initial-section-data)
      (when (string? (:name fixed-section-data))
        (reset! (::section-name s) (clojure.string/trim
         (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
@@ -135,6 +137,7 @@
   s)
   :will-update (fn [s]
    (let [section-editing @(drv/get-ref s :section-editing)]
+    (js/console.log "DBG section-editing" section-editing)
      (when @(::pre-flight-check s)
        (when-not (:pre-flight-loading section-editing)
          (reset! (::pre-flight-check s) false)
@@ -185,9 +188,11 @@
                                                     (alert-modal/hide-alert)
                                                     (on-change nil nil exit-cb))})
                               (on-change nil nil exit-cb)))]
+    (js/console.log "DBG section-editor description:" (:description section-editing))
     [:div.section-editor-container
-      {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
-                    (wrapped-on-change nav-actions/close-all-panels))}
+      ; {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
+      ;               (utils/event-stop %)
+      ;               (wrapped-on-change nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(wrapped-on-change nav-actions/close-all-panels)}]
       [:div.section-editor.group
@@ -246,11 +251,19 @@
                               (reset! (::section-name-check-timeout s)
                                (utils/after 500
                                 #(check-section-name-error s))))))}]
-          (when (or (:section-name-error section-editing)
-                    (:section-error section-editing))
-            [:div.section-editor-error-label
-              (str (or (:section-name-error section-editing)
-                       (:section-error section-editing)))])
+          [:div.section-editor-add-label
+            [:span.section-description "Description"]]
+          [:textarea.section-editor-description.oc-input
+            {:value (or (:description section-editing) "")
+             :ref :section-description
+             :placeholder "Topic description"
+             :columns 2
+             :max-length 256
+             :on-change (fn [e]
+                          (js/console.log "DBG dispatch!" (.. e -target -value))
+                          (utils/event-stop e)
+                          (dis/dispatch! [:update [:section-editing] #(merge % {:description (.. e -target -value)
+                                                                                :has-changes true})]))}]
           [:div.section-editor-add-label
             "Topic security"]
           [:div.section-editor-add-access.oc-input

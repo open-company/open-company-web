@@ -170,13 +170,16 @@
                         (= selected-slug "threads"))
         is-following (or (:following (:back-to @router/path))
                          (= selected-slug "following"))
+        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         is-explore (or (:explore (:back-to @router/path))
-                         (= selected-slug "explore"))
+                       (= selected-slug "explore")
+                       (and (seq (router/current-board-slug))
+                            (not (dis/is-container? (router/current-board-slug)))
+                            (not is-drafts-board)))
         is-my-posts (and user-is-part-of-the-team?
                          (or (= (:contributions (:back-to @router/path)) (:user-id current-user-data))
                              (= (router/current-contributions-id) (:user-id current-user-data))))
         is-bookmarks (= selected-slug "bookmarks")
-        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards false ;; Hide following boards list for now
                     ;; (or create-link (pos? (count boards)))
