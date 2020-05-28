@@ -178,7 +178,7 @@
     [:div.user-notifications-tray
       {:class (utils/class-set {:hidden-tray (not tray-open)})}
       [:div.user-notifications-tray-header.group
-        [:div.title "Threads"]
+        [:div.title "Replies"]
         (when has-new-content
           [:button.mlb-reset.all-read-bt
             {:on-click #(user-actions/read-notifications)

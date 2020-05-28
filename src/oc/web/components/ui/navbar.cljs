@@ -76,7 +76,7 @@
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        (= (router/current-board-slug) "threads")
-                       "Threads"
+                       "Replies"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
