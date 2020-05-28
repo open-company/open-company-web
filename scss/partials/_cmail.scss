@@ -613,7 +613,7 @@ div.cmail-outer {
 
         button.section-picker-bt {
           height: 32px;
-          width: 100px;
+          width: 106px;
           padding: 0 12px 0 0;
           position: relative;
           text-align: left;
@@ -719,7 +719,7 @@ div.cmail-outer {
 
   &.multiple-topics {
     div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
-      left: #{$media_picker_left + 132}px;
+      left: #{$media_picker_left + 138}px;
     }
   }
   &.published-post {
@@ -729,7 +729,7 @@ div.cmail-outer {
   }
   &.multiple-topics.published-post {
     div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
-      left: #{$media_picker_left + 132 - 56}px;
+      left: #{$media_picker_left + 138 - 56}px;
     }
   }
 }
