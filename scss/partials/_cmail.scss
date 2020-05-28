@@ -724,12 +724,12 @@ div.cmail-outer {
   }
   &.published-post {
     div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
-      left: #{$media_picker_left - 129}px;
+      left: #{$media_picker_left - 56}px;
     }
   }
   &.multiple-topics.published-post {
     div.cmail-container div.cmail-content div.rich-body-editor-container div.medium-editor-media-picker {
-      left: #{$media_picker_left + 132 - 129}px;
+      left: #{$media_picker_left + 132 - 56}px;
     }
   }
 }
