@@ -100,7 +100,7 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                ; (drv/drv :change-data)
+                                (drv/drv :change-data)
                                 (drv/drv :unread-threads)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
