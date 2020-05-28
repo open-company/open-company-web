@@ -8,15 +8,16 @@ div.explore-view {
   }
 
   div.explore-view-header {
-    height: 24px;
+    height: 32px;
     padding-left: 24px;
+    margin-bottom: 4px;
     background-image: cdnUrl("/img/ML/nav_explore.svg");
     background-size: 16px 16px;
-    background-position: left 0px top 4px;
+    background-position: left 0px top 8px;
     background-repeat: no-repeat;
     @include OC_Body_Bold();
     font-size: 18px;
-    line-height: 24px;
+    line-height: 32px;
     color: var(--color);
 
     @include dark_mode() {
