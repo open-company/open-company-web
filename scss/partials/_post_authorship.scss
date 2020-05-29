@@ -24,12 +24,7 @@ div.post-authorship {
         overflow: hidden;
         line-height: 24px;
         margin-right: 4px;
-
-        @include big_web() {
-          &:hover {
-            text-decoration: underline;
-          }
-        }
+        text-decoration: underline;
       }
     }
   }
@@ -60,12 +55,7 @@ div.post-authorship {
       line-height: 24px;
       white-space: nowrap;
       flex: 0 1 auto;
-
-      @include big_web() {
-        &:hover {
-          text-decoration: underline;
-        }
-      }
+      text-decoration: underline;
 
       @include big_web() {
         &:hover {
