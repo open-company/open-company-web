@@ -375,6 +375,7 @@
                                :hidePlaceholderOnExpand false
                                :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
                                                              :staticPositioning (:static-positioned-media-picker options)
+                                                             :mediaPickerContainerSelector (:media-picker-container-selector options)
                                                              :alwaysExpanded (:use-inline-media-picker options)
                                                              :initiallyVisible (:media-picker-initially-visible options)
                                                              :disableButtons (:paywall? options)
