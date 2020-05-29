@@ -573,8 +573,7 @@
           with-fixed-items (reduce (fn [ret item]
                                      (if-let [entry-data (get-in with-fixed-entries [:fixed-entries (:resource-uuid item)])]
                                        (let [fixed-thread (fix-thread item entry-data active-users)]
-                                       (assoc-in ret [:fixed-items (:uuid item)]
-                                        (fix-thread item entry-data active-users)))
+                                         (assoc-in ret [:fixed-items (:uuid item)] fixed-thread))
                                        ret))
                             with-fixed-entries
                             (:items with-fixed-entries))
@@ -604,7 +603,7 @@
                              :down (concat (:threads-list threads-data) items-list)
                              items-list))
           enriched-items-list (map dis/thread-data items-list)
-          items-map (merge (:fixed-entries with-fixed-items) (zipmap (map :uuid enriched-items-list) enriched-items-list))
+          items-map (merge (:fixed-items with-fixed-items) (zipmap (map :uuid enriched-items-list) enriched-items-list))
           threads-with-separators (insert-caught-up threads-list items-map (comp not :unread-thread))]
       (doseq [e @entries]
         (utils/after 0 #(comment-utils/get-comments e)))
