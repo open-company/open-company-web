@@ -129,7 +129,7 @@
         (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/all-posts (:slug org-data)))))
     (router/ap-redirect-done!)))
 
-(def other-resources-delay 1000)
+(def other-resources-delay 1500)
 
 (defn org-loaded
   "Dispatch the org data into the app-state to be used by all the components.
@@ -165,7 +165,7 @@
         is-contributions? (seq (router/current-contributions-id))
         ; is-unfollowing? (= (router/current-board-slug) "unfollowing")
         sort-type (router/current-sort-type)
-        delay-count (atom 0)
+        delay-count (atom 1)
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         ; all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
