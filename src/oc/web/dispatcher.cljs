@@ -96,6 +96,10 @@
 (defn activity-last-read-at-key [org-slug activity-uuid]
   (vec (conj (activity-key org-slug activity-uuid) :last-read-at)))
 
+(defn thread-key [org-slug thread-uuid]
+  (let [threads-key (threads-data-key org-slug)]
+    (vec (concat threads-key [thread-uuid]))))
+
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
@@ -910,6 +914,13 @@
     (let [activity-key (activity-key org-slug activity-id)]
       (get-in data activity-key))))
 (def activity-data-get activity-data)
+
+(defn thread-data
+  "Get thread data."
+  ([thread-uuid]
+    (thread-data (router/current-org-slug) thread-uuid @app-state))
+  ([org-slug thread-uuid data]
+    (get-in data (thread-key org-slug thread-uuid))))
 
 (defn secure-activity-data
   "Get secure activity data."

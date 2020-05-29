@@ -25,3 +25,64 @@ div.all-caught-up {
     }
   }
 }
+
+div.caught-up-line {
+  height: 32px;
+  width: 100%;
+  position: relative;
+  margin: 16px 0;
+
+  &:before, &:after {
+    position: absolute;
+    top: 16px;
+    height: 1px;
+    width: calc(50% - 80px);
+    z-index: 1;
+    background-color: $wut_green;
+    content: "";
+  }
+
+  &:before {
+    left: 0;
+  }
+
+  &:after {
+    right: 0;
+  }
+
+  div.all-caught-up {
+    width: 160px;
+    margin: 0 auto;
+    height: 32px;
+    padding: 4px 16px;
+    background-color: $wut_green;
+    border-radius: 4px;
+    z-index: 2;
+    position: relative;
+
+    div.all-caught-up-inner {
+      text-align: center;
+      background-image: unset;
+      width: 128px;
+      height: 24px;
+
+      div.message {
+        color: white;
+        line-height: 24px;
+        font-size: 14px;
+        @include OC_Body_Bold();
+        padding-top: 0;
+      }
+    }
+  }
+
+  &.gray-style {
+    &:before, &:after {
+      background-color: var(--light-color);
+    }
+
+    div.all-caught-up {
+      background-color: var(--light-color);
+    }
+  }
+}

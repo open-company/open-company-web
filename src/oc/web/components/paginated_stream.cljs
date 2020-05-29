@@ -15,8 +15,9 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.threads-list :refer (threads-list)]
+            [oc.web.actions.contributions :as contributions-actions]
+            [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -212,6 +213,8 @@
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
                           item (get-item items index show-loading-more show-carrot-close)]
                       (case (:content-type item)
+                        :caught-up
+                        64
                         "separator"
                         (if (= foc-layout dis/other-foc-layout)
                           foc-separators-height
@@ -235,6 +238,8 @@
                              next-item (get-item items (inc index) show-loading-more show-carrot-close)
                              prev-item (get-item items (dec index) show-loading-more show-carrot-close)]
                          (case (:content-type item)
+                           :caught-up
+                           (rum/with-key (caught-up-line item) (str "caught-up-line-" (:last-activity-at item)))
                            "carrot-close"
                            (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
                            "loading-more"
