@@ -49,28 +49,28 @@
     (cond
       (> d last-monday)
       {:label "Recent"
-       :content-type "separator"
+       :content-type :separator
        :date last-monday}
       (> d two-weeks-ago)
       {:label "Last week"
-       :content-type "separator"
+       :content-type :separator
        :date two-weeks-ago}
       (> d first-month)
       {:label "2 weeks ago"
-       :content-type "separator"
+       :content-type :separator
        :date first-month}
       (and (= (.getMonth now) (.getMonth d))
            (= (.getFullYear now) (.getFullYear d)))
       {:label "This month"
-       :content-type "separator"
+       :content-type :separator
        :date (post-month-date-from-date d)}
       (= (.getFullYear now) (.getFullYear d))
       {:label month-string
-       :content-type "separator"
+       :content-type :separator
        :date (post-month-date-from-date d)}
       :else
       {:label (str month-string ", " (.getFullYear d))
-       :content-type "separator"
+       :content-type :separator
        :date (post-month-date-from-date d)})))
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
@@ -346,7 +346,7 @@
           fixed-video-id (:video-id entry-data)
           fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
       (-> entry-data
-        (assoc :content-type "entry")
+        (assoc :content-type :entry)
         (update :publisher merge fixed-publisher)
         (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
         (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
@@ -540,7 +540,7 @@
         comment-unread (comment-unread? thread (:last-read-at entry-data))
         thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
     (-> thread
-      (assoc :content-type "comment")
+      (assoc :content-type :thread)
       (assoc :entry entry-data)
       (update :author merge fixed-author)
       (assoc :unread comment-unread)
