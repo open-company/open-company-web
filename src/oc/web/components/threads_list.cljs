@@ -313,7 +313,9 @@
                 :let [caught-up? (= (:content-type item*) :caught-up)
                       item (assoc item* :current-user-data current-user-data :member? member?)]]
             (if caught-up?
-              (caught-up-line item)
+              (rum/with-key
+               (caught-up-line item)
+               (str "thread-caught-up-" (:last-activity-at item)))
               (rum/with-key
                (thread-item item)
                (str "thread-" (:resource-uuid item) "-" (:uuid item)))))

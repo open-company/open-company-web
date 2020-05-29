@@ -289,7 +289,7 @@
       (has-attachments? data)
       (has-text? data)))
 
-(def default-caught-up-message "You’re all caught up")
+(def default-caught-up-message "You’re up to date")
 
 (defn- caught-up-map
   ([] (caught-up-map nil default-caught-up-message false))
@@ -301,7 +301,6 @@
              (utils/as-of-now))]
      {:content-type :caught-up
       :last-activity-at t
-      :key (str "caught-up-line-" t)
       :message message
       :gray-style gray-scale?})))
 
