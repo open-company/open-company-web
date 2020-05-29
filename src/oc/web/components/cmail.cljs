@@ -527,9 +527,7 @@
                                  (> (count editable-boards) 1))]
     [:div.cmail-outer
       {:class (utils/class-set {:quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
-                                :show-trial-expired-alert show-paywall-alert?
-                                :published-post (= (:status cmail-data) "published")
-                                :multiple-topics show-section-picker?})
+                                :show-trial-expired-alert show-paywall-alert?})
        :on-click (when (and (not is-mobile?)
                             (:collapsed cmail-state)
                             (not show-paywall-alert?))
@@ -604,13 +602,11 @@
             (when-not is-mobile?
               [:div.cmail-content-collapsed-placeholder
                 (str utils/default-body-placeholder "...")])
-            ; Attachments
-            (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :static-positioned-media-picker true
                                :media-picker-initially-visible false
+                               :media-picker-container-selector "div.cmail-outer div.cmail-container div.cmail-footer div.cmail-footer-media-picker-container"
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
@@ -626,6 +622,9 @@
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))
             (when (seq (:polls cmail-data))
               (polls-wrapper {:polls-data (:polls cmail-data)
                               :editing? true
@@ -667,6 +666,7 @@
            :data-placement "top"
            :data-container "body"
            :title "Add attachment"}]
+        [:div.cmail-footer-media-picker-container.group]
         [:div.cmail-footer-right
           (when (:uuid cmail-data)
             [:div.delete-bt-container

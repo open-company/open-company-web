@@ -10,8 +10,7 @@
 
 
 (rum/defc caught-up-line
-  [{:keys [message gray-style key]}]
+  [{:keys [message gray-style]}]
   [:div.caught-up-line
-    {:key key
-     :class (when gray-style "gray-style")}
+    {:class (when gray-style "gray-style")}
     (all-caught-up message)])

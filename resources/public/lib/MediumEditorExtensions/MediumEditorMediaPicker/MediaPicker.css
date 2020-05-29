@@ -10,6 +10,13 @@ div.medium-editor-media-picker {
   overflow: visible;
 }
 
+div.medium-editor-media-picker.medium-editor-media-picker-static {
+  position: relative;
+  top: unset;
+  left: unset;
+  overflow: visible;
+}
+
 div.medium-editor-media-picker button.media {
   width: 24px;
   height: var(--picker-height);

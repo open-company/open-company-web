@@ -255,7 +255,9 @@
   (let [board-uuid (:board-uuid entry)
         board-change-data (get changes board-uuid {})
         board-unread (:unread board-change-data)]
-    (utils/in? board-unread (:uuid entry))))
+    (if board-unread
+      (utils/in? board-unread (:uuid entry))
+      (nil? (:last-read-at entry)))))
 
 (defun comment-unread?
   "An entry is new if its uuid is contained in container's unread."
@@ -289,20 +291,20 @@
       (has-attachments? data)
       (has-text? data)))
 
-(def default-caught-up-message "You’re all caught up")
+(def default-caught-up-message "You’re up to date")
 
 (defn- caught-up-map
   ([] (caught-up-map nil default-caught-up-message false))
   ([n] (caught-up-map n default-caught-up-message false))
   ([n gray-scale?] (caught-up-map n gray-scale? default-caught-up-message))
-  ([n gray-scale? message]
+  ([n gray-scale? message & [opts]]
    (let [t (if (:last-activity-at n)
              (-> n :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
              (utils/as-of-now))]
      {:content-type :caught-up
       :last-activity-at t
-      :key (str "caught-up-line-" t)
       :message message
+      :opts opts
       :gray-style gray-scale?})))
 
 (defn- insert-caught-up [items-list items-map check-fn & [options]]
@@ -314,14 +316,14 @@
             item-data (if (string? item) (get items-map item) item)
             insert? (check-fn item-data)]
         (cond
-         ;;
          (and insert?
-              (empty? to-items)
+              (not (seq to-items))
               (:hide-top-line options))
          items-list
-         (or insert?
-             (not (seq to-items)))
-         (concat to-items [(caught-up-map (last to-items) (not (seq to-items)))] from-items)
+         insert?
+         (concat to-items [(caught-up-map (last to-items) (not (seq to-items)) default-caught-up-message :hide-top-line)] from-items)
+         (not (seq from-items))
+         to-items
          :else
          (recur (vec (conj to-items item))
                 (rest from-items)))))))

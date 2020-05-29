@@ -79,7 +79,6 @@ function PlaceCaretAtEnd(el) {
       // Create picker
       if (this.inlinePlusButtonOptions.inlineButtons) {
         this.pickerElement = this.createPicker();
-        editor.parentNode.appendChild(this.pickerElement);
       }
       // Picker button events
       if (this.inlinePlusButtonOptions.inlineButtons) {
@@ -213,21 +212,28 @@ function PlaceCaretAtEnd(el) {
     },
 
     createPicker: function(){
-      var picker = this.document.createElement('div');
+      var picker = this.document.createElement('div'),
+          pickerContainerNode;
       picker.id = 'medium-editor-media-picker-' + this.getEditorId();
       picker.className = 'medium-editor-media-picker';
       this.mediaButtonsContainer = this.createPickerMediaButtons();
+      picker.appendChild(this.mediaButtonsContainer);
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton = this.createPickerMainButton();
         picker.appendChild(this.mainButton);
       }
       if (this.inlinePlusButtonOptions.staticPositioning) {
-        picker.classList.add(this.expandedClass, 'medium-editor-media-picker-static');
+        picker.classList.add(this.expandedClass, 'medium-editor-media-picker-static', 'group');
         this.mediaButtonsContainer.classList.add(this.expandedClass);
+        pickerContainerNode = document.querySelector(this.inlinePlusButtonOptions.mediaPickerContainerSelector);
       } else {
         picker.style.display = "none";
       }
-      picker.appendChild(this.mediaButtonsContainer);
+      // Append the picker to the give element or the editor node
+      if (!pickerContainerNode) {
+        pickerContainerNode = this.getEditorElements()[0].parentNode;
+      }
+      pickerContainerNode.appendChild(picker);
       return picker;
     },
 
