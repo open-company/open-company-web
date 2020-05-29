@@ -23,7 +23,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
+            [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
@@ -313,10 +313,7 @@
                 :let [caught-up? (= (:content-type item*) :caught-up)
                       item (assoc item* :current-user-data current-user-data :member? member?)]]
             (if caught-up?
-              [:div.threads-list-caught-up
-                {:key (str "threads-caught-up-" (:last-activity-at item))
-                 :class (when (:gray-style item) "gray-style")}
-                (all-caught-up "You’re all caught up")]
+              (caught-up-line item)
               (rum/with-key
                (thread-item item)
                (str "thread-" (:resource-uuid item) "-" (:uuid item)))))

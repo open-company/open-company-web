@@ -194,7 +194,7 @@
                 [:span.tab-icon
                   (when (user-notifications/has-new-content? user-notifications-data)
                     [:span.unread-dot])]
-                [:span.tab-label "Threads"]]
+                [:span.tab-label "Replies"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -285,7 +285,7 @@
                                                    "Home"
 
                                                    is-threads
-                                                   "Threads"
+                                                   "Replies"
 
                                                    :default
                                                    ;; Fallback to the org board data

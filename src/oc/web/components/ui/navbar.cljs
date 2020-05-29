@@ -76,7 +76,7 @@
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        (= (router/current-board-slug) "threads")
-                       "Threads"
+                       "Replies"
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
@@ -94,7 +94,7 @@
          search-active? (drv/react s search/search-active?)
          editable-boards (drv/react s :editable-boards)
          can-compose? (pos? (count editable-boards))
-         show-plus-button? (and false (not is-mobile?)
+         show-plus-button? (and (not is-mobile?)
                                 can-compose?)
          org-slug (router/current-org-slug)]
     [:nav.oc-navbar.group

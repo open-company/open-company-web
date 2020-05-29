@@ -15,8 +15,9 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.threads-list :refer (threads-list)]
+            [oc.web.actions.contributions :as contributions-actions]
+            [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -166,12 +167,12 @@
                (nth items idx))
         separator-item? (and (not loading-more?)
                              (not carrot-close?)
-                             (= (:content-type item) "separator"))]
+                             (= (:content-type item) :separator))]
     (cond
      loading-more?
-     {:content-type "loading-more"}
+     {:content-type :loading-more}
      carrot-close?
-     {:content-type "carrot-close"}
+     {:content-type :carrot-close}
      :else
      item)))
 
@@ -212,13 +213,15 @@
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
                           item (get-item items index show-loading-more show-carrot-close)]
                       (case (:content-type item)
-                        "separator"
+                        :caught-up
+                        64
+                        :separator
                         (if (= foc-layout dis/other-foc-layout)
                           foc-separators-height
                           (- foc-separators-height 8))
-                        "loading-more"
+                        :loading-more
                         (if is-mobile? 44 60)
-                        "carrot-close"
+                        :carrot-close
                         carrot-close-height
                         ; else
                         (calc-card-height is-mobile? foc-layout))))
@@ -229,17 +232,19 @@
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
                              item (get-item items index show-loading-more show-carrot-close)
-                             reads-data (when (= (:content-type item) "entry")
+                             reads-data (when (= (:content-type item) :entry)
                                           (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)
                              next-item (get-item items (inc index) show-loading-more show-carrot-close)
                              prev-item (get-item items (dec index) show-loading-more show-carrot-close)]
                          (case (:content-type item)
-                           "carrot-close"
+                           :caught-up
+                           (rum/with-key (caught-up-line item) (str "caught-up-line-" (:last-activity-at item)))
+                           :carrot-close
                            (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
-                           "loading-more"
+                           :loading-more
                            (rum/with-key (load-more row-props) (str "loading-more-" row-key))
-                           "separator"
+                           :separator
                            (rum/with-key (separator-item (assoc row-props :foc-layout foc-layout) item) (str "separator-item-" row-key))
                            ; else
                            (rum/with-key
@@ -248,10 +253,10 @@
                                                                   :reads-data reads-data
                                                                   :open-item (or (= index 0)
                                                                                  (and prev-item
-                                                                                      (#{"loading-more" "carrot-close" "separator"} (:content-type prev-item))))
+                                                                                      (not= (:content-type prev-item) :entry)))
                                                                   :close-item (or (= index (count items))
                                                                                   (not next-item)
-                                                                                  (not= (:content-type next-item) "entry"))
+                                                                                  (not= (:content-type next-item) :entry))
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
                             row-key))))]

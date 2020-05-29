@@ -250,7 +250,7 @@
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Threads"]
+              "Replies"]
               (when (pos? unread-threads)
                 [:span.unread-dot])])
         ;; You

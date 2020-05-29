@@ -24,11 +24,7 @@ div.virtualized-list-row:not(.collapsed-item) {
   }
 
   @include big_web() {
-    z-index: 1;
-
     &:hover {
-      z-index: 2;
-
       div.stream-item {
         background-color: var(--foc-hover-color);
         z-index: 2;
@@ -49,12 +45,6 @@ div.virtualized-list-row:not(.collapsed-item) {
 
         div.activity-share-container {
           display: block;
-        }
-
-        div.stream-item-body-ext div.stream-item-footer {
-          div.reactions div.reactions-picker-container {
-            display: block;
-          }
         }
 
         &.expandable {
@@ -568,7 +558,6 @@ div.stream-item {
         float: left;
 
         div.reactions-picker-container {
-          display: none;
 
           div.emoji-mart {
             bottom: unset;
