@@ -155,6 +155,12 @@
      :class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
     label])
 
+(rum/defc caught-up-wrapper < rum/static
+  [{:keys [style item]}]
+  [:div.caught-up-wrapper
+    {:style style}
+    (caught-up-line item)])
+
 (defn- get-item [items idx show-loading-more show-carrot-close]
   (let [loading-more? (and show-loading-more
                            (= idx (count items)))
@@ -179,15 +185,14 @@
 (rum/defcs virtualized-stream < rum/static
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
-                                (drv/drv :force-list-update)
                                 (rum/local false ::mounted)
                                {:did-mount (fn [s]
                                  (reset! (::mounted s) true)
                                  s)
-                                :did-update (fn [s]
+                                :did-remount (fn [o s]
                                  (when @(::mounted s)
-                                   (when-let [force-list-update @(drv/get-ref s :force-list-update)]
-                                     (when (not= @(::last-force-list-update s) force-list-update)
+                                   (when-let [force-list-update (-> s :rum/args first :force-list-update)]
+                                     (when-not (= @(::last-force-list-update s) force-list-update)
                                        (reset! (::last-force-list-update s) force-list-update)
                                        (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))
                                  s)
@@ -199,7 +204,8 @@
              foc-layout
              show-loading-more
              show-carrot-close
-             is-mobile?]
+             is-mobile?
+             force-list-update]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -207,7 +213,6 @@
                 onChildScroll
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
-        _force-list-update (drv/react s :force-list-update)
         key-prefix (if is-mobile? "mobile" foc-layout)
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
@@ -239,7 +244,7 @@
                              prev-item (get-item items (dec index) show-loading-more show-carrot-close)]
                          (case (:content-type item)
                            :caught-up
-                           (rum/with-key (caught-up-line item) (str "caught-up-line-" (:last-activity-at item)))
+                           (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
                            :carrot-close
                            (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
                            :loading-more
@@ -292,6 +297,7 @@
                         (drv/drv :editable-boards)
                         (drv/drv :foc-layout)
                         (drv/drv :current-user-data)
+                        (drv/drv :force-list-update)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
@@ -301,7 +307,7 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         section-mixins/container-nav-in
-                        section-mixins/window-focus-auto-loader
+                        ; section-mixins/window-focus-auto-loader
 
                         {:will-mount (fn [s]
                           (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
@@ -342,6 +348,7 @@
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)
         current-user-data (drv/react s :current-user-data)
+        force-list-update (drv/react s :force-list-update)
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
@@ -361,6 +368,7 @@
                                          :comments-data comments-data
                                          :items items
                                          :is-mobile? is-mobile?
+                                         :force-list-update force-list-update
                                          :activities-read activities-read
                                          :editable-boards editable-boards
                                          :foc-layout foc-layout
