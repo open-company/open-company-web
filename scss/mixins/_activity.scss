@@ -1211,7 +1211,9 @@ $header_top_margin: 24;
   // Truncate last line of text preview
   display: -webkit-box;
   -webkit-line-clamp: $preview_lines;
-  -webkit-box-orient: vertical;
+  /*! autoprefixer: off */
+ -webkit-box-orient: vertical;
+ /* autoprefixer: on */
 
   color: var(--color);
   @include OC_Body_Book();
