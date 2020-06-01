@@ -109,38 +109,96 @@ div.threads-list {
 
       }
 
-      div.thread-item-header {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-start;
-        align-items: center;
-        height: 18px;
-        margin-bottom: 8px;
-        text-align: left;
+      div.thread-item-top {
 
-        div.thread-item-board-name-container {
-          position: relative;
+        div.thread-item-header {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: flex-start;
+          align-items: center;
+          height: 18px;
+          margin-bottom: 8px;
+          text-align: left;
 
-          span.board-name {
+          div.thread-item-author-container {
+            position: relative;
+            display: contents;
+
+            @include user-profile(24) {
+              flex: 0 0 24px;
+              margin-right: 8px;
+            }
+
+            span.author-name {
+              @include OC_Body_Book();
+              font-size: 12px;
+              line-height: 18px;
+              flex: 0 1 auto;
+              color: var(--color);
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              text-decoration: underline;
+            }
+          }
+
+          span.in {
+            flex: 0 0 auto;
+            margin: 0 6px;
             @include OC_Body_Book();
             font-size: 12px;
             line-height: 18px;
-            flex: 0 1 auto;
+          }
+
+          div.thread-item-board-container {
+            position: relative;
+            display: contents;
+
+            span.board-name {
+              @include OC_Body_Book();
+              font-size: 12px;
+              line-height: 18px;
+              flex: 0 1 auto;
+              color: var(--color);
+              display: block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              text-decoration: underline;
+            }
+          }
+
+          span.time-since {
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 18px;
+            flex: 0 0 auto;
             color: var(--color);
-            display: block;
+          }
+
+          div.thread-item-header-title {
+            margin-left: 8px;
+            @include activity-title(14px, 18px);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            text-decoration: underline;
+            flex: 0 1 50%;
           }
         }
 
-        span.time-since {
-          @include OC_Body_Book();
-          font-size: 12px;
-          line-height: 18px;
-          flex: 0 0 auto;
-          color: var(--color);
+        div.thread-item-body {
+          @include activity-body-preview(16, 22, var(--color), 3);
+          height: auto;
+          max-height: #{22 * 3}px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        div.thread-item-top-separator {
+          height: 8px;
+          background-color: var(--foc-background-color);
+          border-bottom: 1px solid var(--divider-line);
         }
       }
 
@@ -151,17 +209,6 @@ div.threads-list {
         border-radius: 50%;
         margin: 1px 5px 0 5px;
         flex: 0 0 auto;
-      }
-
-      div.thread-item-title {
-        @include activity-title(20px, 28px);
-        height: 28px;
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow-wrap: break-word;
-        max-width: 100%;
       }
 
       div.thread-item-blocks {
