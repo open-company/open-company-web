@@ -89,7 +89,8 @@
    :placeholder (or placeholder (if parent-uuid "Reply…" "Add a comment…"))
    :use-inline-media-picker true
    :static-positioned-media-picker true
-   :media-picker-initially-visible false})
+   :media-picker-initially-visible false
+   :media-picker-container-selector "div.add-comment-box-container div.add-comment-box div.add-comment-internal div.add-comment-footer-media-picker"})
 
 (defn- add-comment-did-change [s]
   (reset! (::did-change s) true)
@@ -278,6 +279,7 @@
                            :position "top"
                            :default-field-selector (str "div." add-comment-class)
                            :container-selector (str "div." add-comment-class)})
+            [:div.add-comment-footer-media-picker.group]
             (when uploading?
               [:div.upload-progress
                 (small-loading)
