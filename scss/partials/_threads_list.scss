@@ -133,7 +133,7 @@ div.threads-list {
               @include OC_Body_Book();
               font-size: 12px;
               line-height: 18px;
-              flex: 0 1 auto;
+              flex: 0 0.1 auto;
               align-self: center;
               color: var(--color);
               display: block;
@@ -161,7 +161,7 @@ div.threads-list {
               @include OC_Body_Book();
               font-size: 12px;
               line-height: 18px;
-              flex: 0 1 auto;
+              flex: 0 0.1 auto;
               color: var(--color);
               display: block;
               overflow: hidden;
@@ -187,7 +187,7 @@ div.threads-list {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            flex: 0 1 50%;
+            flex: 0 10 auto;
             align-self: center;
           }
         }
