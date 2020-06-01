@@ -161,18 +161,30 @@
                           :did-react-cb did-react-cb
                           :optional-activity-data activity-data})])]]]])
 
-(rum/defc thread-header
-  [{last-activity-at :last-activity-at {:keys [board-name published-at] :as activity-data} :activity-data}]
-  [:div.thread-item-header
-    [:div.thread-item-board-name-container
-      (board-info-hover {:activity-data activity-data})
-      [:span.board-name
-        board-name]]
-    [:div.separator-dot]
-    [:span.time-since
-      [:time
-        {:date-time published-at}
-        (utils/tooltip-date published-at)]]])
+(rum/defc thread-top
+  [{last-activity-at :last-activity-at current-user-id :current-user-id {:keys [publisher board-name published-at headline body] :as activity-data} :activity-data}]
+  [:div.thread-item-top
+    [:div.thread-item-header
+      [:div.thread-item-author-container
+        (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
+        (user-avatar-image publisher)
+        [:span.author-name
+          (:name publisher)]]
+      [:span.in "in"]
+      [:div.thread-item-board-container
+        (board-info-hover {:activity-data activity-data})
+        [:span.board-name
+          board-name]]
+      [:div.separator-dot]
+      [:span.time-since
+        [:time
+          {:date-time published-at}
+          (utils/tooltip-date published-at)]]
+      [:div.thread-item-header-title
+        (str "→ " headline)]]
+    [:div.thread-item-body.oc-mentions
+      {:dangerouslySetInnerHTML {:__html body}}]
+    [:div.thread-item-top-separator]])
 
 (rum/defcs thread-item < rum/static
                          (rum/local nil ::show-picker)
@@ -226,10 +238,7 @@
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false comment-uuid))))}
       (when open-item
-        (thread-header n))
-      (when open-item
-        [:div.thread-item-title
-          (:headline activity-data)])
+        (thread-top n))
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
           (thread-comment {:activity-data activity-data
