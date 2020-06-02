@@ -657,12 +657,12 @@
                                items-list))
                          items-list)
           unread-thread-fn (fn [thread]
-                             (let [entry-uuid (:resource-uuid thread)
-                                   entry (or (get-in with-fixed-threads [:fixed-entries entry-uuid])
-                                             (dis/activity-data entry-uuid))]
-                               (-> entry :unread not)))
+                             (let [thread-uuid (:uuid thread)
+                                   thread-data (or (get-in with-fixed-threads [:fixed-items thread-uuid])
+                                                   (dis/thread-data thread-uuid))]
+                               (-> thread-data :unread-thread not)))
           with-caught-up (insert-caught-up threads-list unread-thread-fn)
-          with-open-close-items (insert-open-close-item with-caught-up #(= (:content-type %2) :thread))]
+          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))]
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
         (utils/after 0 #(comment-utils/get-comments e)))
       (-> with-fixed-threads
