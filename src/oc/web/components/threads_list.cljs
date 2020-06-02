@@ -182,8 +182,6 @@
           (utils/tooltip-date published-at)]]
       [:div.thread-item-header-title
         (str "→ " headline)]]
-    [:div.thread-item-body.oc-mentions
-      {:dangerouslySetInnerHTML {:__html body}}]
     [:div.thread-item-top-separator]])
 
 (rum/defcs thread-item < rum/static

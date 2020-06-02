@@ -192,17 +192,8 @@ div.threads-list {
           }
         }
 
-        div.thread-item-body {
-          @include activity-body-preview(16, 22, var(--color), 3);
-          height: auto;
-          max-height: #{22 * 3}px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         div.thread-item-top-separator {
-          height: 8px;
-          background-color: var(--foc-background-color);
+          margin-top: 8px;
           border-bottom: 1px solid var(--divider-line);
         }
       }
