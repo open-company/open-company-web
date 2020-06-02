@@ -241,6 +241,9 @@
         (thread-top n))
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
+          {:data-resource-uuid resource-uuid
+           :data-comment-uuid comment-uuid
+           :data-root-comment true}
           (thread-comment {:activity-data activity-data
                            :comment-data n
                            :is-mobile? is-mobile?
@@ -276,7 +279,10 @@
                               unread-reply?
                               (= (dec (count replies)) idx))]
                 [:div.thread-item-block.horizontal-line.group
-                  {:key (str "unir-" (:created-at r) "-" (:uuid r))}
+                  {:key (str "unir-" (:created-at r) "-" (:uuid r))
+                   :data-resource-uuid (:resource-uuid r)
+                   :data-comment-uuid (:uuid r)
+                   :data-parent-uuid (:parent-uuid r)}
                   (thread-comment {:activity-data activity-data
                                    :comment-data reply-data
                                    :is-indented-comment? true
