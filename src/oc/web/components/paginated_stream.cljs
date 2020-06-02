@@ -105,9 +105,7 @@
            comments-data
            editable-boards
            foc-layout
-           is-mobile
-           open-item
-           close-item] :as props}]
+           is-mobile] :as props}]
   (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
         publisher? (activity-utils/is-publisher? entry)
         show-wrt? (and member?
@@ -117,8 +115,8 @@
                              (not is-mobile))]
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
-                               :open-item open-item
-                               :close-item close-item})
+                               :open-item (:open-item entry)
+                               :close-item (:close-item entry)})
       :style style}
      (if collapsed-item?
        (stream-collapsed-item {:activity-data entry
@@ -256,12 +254,6 @@
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry item
                                                                   :reads-data reads-data
-                                                                  :open-item (or (= index 0)
-                                                                                 (and prev-item
-                                                                                      (not= (:content-type prev-item) :entry)))
-                                                                  :close-item (or (= index (count items))
-                                                                                  (not next-item)
-                                                                                  (not= (:content-type next-item) :entry))
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
                             row-key))))]
