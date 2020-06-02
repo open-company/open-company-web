@@ -263,13 +263,9 @@
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
         container-posts (vec (remove nil?
-                         (mapv #(cond
-                                 (map? %)
-                                 %
-                                 (and (string? %) (contains? posts-data %))
-                                 (get posts-data %)
-                                 :else
-                                 nil)
+                         (map #(if (= (:content-type %) :entry)
+                                 (merge % (get posts-data (:uuid %)))
+                                 %)
                           posts-list)))]
     (if (= container-slug utils/default-drafts-board-slug)
       (filterv #(= (:status %) "draft") container-posts)
@@ -278,50 +274,19 @@
 (defn- get-container-threads [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (let [cnt-key (container-key org-slug container-slug sort-type)
         container-data (get-in base cnt-key)
+        threads-list (get container-data items-key)
         container-items (vec (remove nil?
-                          (map #(cond
-                                  (map? %)
-                                  %
-                                  (and (string? %) (contains? threads-data %))
-                                  (let [thread (get threads-data %)]
-                                    (assoc thread :activity-data (get posts-data (:resource-uuid thread))))
-                                  :else
-                                  nil)
-                           (get container-data items-key))))
-        with-thread-data (map (fn [thread-data]
-                                (let [thread-key (thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
-                                      thread-comments (get-in base thread-key)]
-                                  (merge thread-data thread-comments)))
-                          container-items)]
-    (loop [items with-thread-data
-           ret-items []
-           last-item nil]
-      (let [item (first items)
-            not-eq (not= (:resource-uuid last-item) (:resource-uuid item))
-            open? (and item
-                       (:activity-data item)
-                       (or not-eq
-                           (not last-item)))
-            close? (and last-item
-                        (:activity-data last-item)
-                        (or not-eq
-                            (not item)))
-            next-ret-items (as-> ret-items n
-                            (if close?
-                              (vec (conj (vec (butlast n)) (assoc (last n) :close-item true)))
-                              n)
-                            (if open?
-                              (vec (conj n (assoc item :open-item true)))
-                              n)
-                            (if (and (not open?)
-                                     item)
-                              (vec (conj n item))
-                              n))]
-        (if (seq items)
-          (recur (rest items)
-                 next-ret-items
-                 item)
-          next-ret-items)))))
+                          (map #(if (= (:content-type %) :thread)
+                                  (let [thread (get threads-data (:uuid %))
+                                        activity-data (get posts-data (:resource-uuid %))]
+                                    (merge % thread {:activity-data activity-data}))
+                                  %)
+                           threads-list)))]
+      (map (fn [thread-data]
+              (let [thread-key (thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
+                    thread-comments (get-in base thread-key)]
+                (merge thread-data thread-comments)))
+        container-items)))
 
 (defn- get-container-items [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (if (is-threads? container-slug)
