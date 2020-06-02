@@ -83,14 +83,17 @@
       (when (fn? add-comment-cb)
         (add-comment-cb updated-comment)))))
 
-(defn- me-options [parent-uuid placeholder]
+(defn- add-comment-unique-class [s]
+  (str "add-comment-box-container-" @(::add-comment-id s)))
+
+(defn- me-options [s parent-uuid placeholder]
   {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
    :placeholder (or placeholder (if parent-uuid "Reply…" "Add a comment…"))
    :use-inline-media-picker true
    :static-positioned-media-picker true
    :media-picker-initially-visible false
-   :media-picker-container-selector "div.add-comment-box-container div.add-comment-box div.add-comment-internal div.add-comment-footer-media-picker"})
+   :media-picker-container-selector (str "div." (add-comment-unique-class s) " div.add-comment-box div.add-comment-internal div.add-comment-footer-media-picker")})
 
 (defn- add-comment-did-change [s]
   (reset! (::did-change s) true)
@@ -193,7 +196,7 @@
                           s)
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))]
-                             (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid props) (:add-comment-placeholder props))))
+                             (me-media-utils/setup-editor s add-comment-did-change (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))))
                            (maybe-focus-field s true)
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
@@ -205,7 +208,7 @@
                            s)
                           :will-update (fn [s]
                            (let [props (first (:rum/args s))]
-                             (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid props) (:add-comment-placeholder props))))
+                             (me-media-utils/setup-editor s add-comment-did-change (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))))
                            (let [data @(drv/get-ref s :media-input)
                                  video-data (:media-video data)]
                               (when (and @(:me/media-video s)
@@ -236,7 +239,7 @@
         _followers-publishers-count (drv/react s :followers-publishers-count)
         add-comment-focus (str add-comment-focus-prefix (drv/react s :add-comment-focus))
         current-user-data (drv/react s :current-user-data)
-        container-class (str "add-comment-box-container-" @(::add-comment-id s))
+        container-class (add-comment-unique-class s)
         is-focused? (should-focus-field? s)
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)

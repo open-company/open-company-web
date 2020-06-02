@@ -74,61 +74,66 @@
        :date (post-month-date-from-date d)})))
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
-  (let [post-date (utils/js-date (:published-at post-data))]
+  (let [post-date (utils/js-date (:published-at post-data))
+        item-data (select-keys post-data [:content-type :uuid :resource-uuid])]
     (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
-      (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj (:uuid post-data)) vec))
+      (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj item-data) vec))
       (vec
        (conj separators-map
         (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
-         :posts-list [(:uuid post-data)]))))))
+         :posts-list [item-data]))))))
 
-(defn grouped-posts [container-data]
-  (let [sorted-post-uuids (:posts-list container-data)
-        sorted-posts-list (mapv #(or (get-in container-data [:fixed-items (:uuid %)])
-                                     (dis/activity-data (:uuid %)))
-                           sorted-post-uuids)
+(defn grouped-posts
+  ([full-items-list]
+   (let [items-list (map #(select-keys % [:content-type :uuid :resource-uuid]) full-items-list)
+         items-map (zipmap (map :uuid full-items-list) full-items-list)]
+     (grouped-posts items-list items-map)))
+  ([items-list fixed-items]
+   (let [sorted-posts-list (mapv #(or (get fixed-items (:uuid %))
+                                      (dis/activity-data (:uuid %)))
+                            items-list)
 
-        last-monday (utils/js-date)
-        _last-monday (doto last-monday
-                       (.setDate (- (.getDate last-monday)
-                                    ; First saturday before now
-                                    (-> (.getDay last-monday) (+ 8) (mod 7))))
-                       (.setHours 23)
-                       (.setMinutes 59)
-                       (.setSeconds 59)
-                       (.setMilliseconds 999))
+         last-monday (utils/js-date)
+         _last-monday (doto last-monday
+                        (.setDate (- (.getDate last-monday)
+                                     ; First saturday before now
+                                     (-> (.getDay last-monday) (+ 8) (mod 7))))
+                        (.setHours 23)
+                        (.setMinutes 59)
+                        (.setSeconds 59)
+                        (.setMilliseconds 999))
 
-        two-weeks-ago (utils/js-date)
-        _two-weeks-ago (doto two-weeks-ago
-                         (.setDate (- (.getDate two-weeks-ago)
-                                      ;; Saturday before last one
-                                      (-> (.getDay two-weeks-ago) (+ 8) (mod 7) (+ 7))))
-                         ;; Reset time to midnight
-                         (.setHours 23)
-                         (.setMinutes 59)
-                         (.setSeconds 59)
-                         (.setMilliseconds 999))
+         two-weeks-ago (utils/js-date)
+         _two-weeks-ago (doto two-weeks-ago
+                          (.setDate (- (.getDate two-weeks-ago)
+                                       ;; Saturday before last one
+                                       (-> (.getDay two-weeks-ago) (+ 8) (mod 7) (+ 7))))
+                          ;; Reset time to midnight
+                          (.setHours 23)
+                          (.setMinutes 59)
+                          (.setSeconds 59)
+                          (.setMilliseconds 999))
 
-        first-month (utils/js-date)
-        _first-month (doto first-month
-                       (.setDate (- (.getDate first-month)
-                                    (-> (.getDay first-month) (+ 8) (mod 7) (+ 14))))
-                       ;; Reset time to midnight
-                       (.setHours 23)
-                       (.setMinutes 59)
-                       (.setSeconds 59)
-                       (.setMilliseconds 999))
+         first-month (utils/js-date)
+         _first-month (doto first-month
+                        (.setDate (- (.getDate first-month)
+                                     (-> (.getDay first-month) (+ 8) (mod 7) (+ 14))))
+                        ;; Reset time to midnight
+                        (.setHours 23)
+                        (.setMinutes 59)
+                        (.setSeconds 59)
+                        (.setMilliseconds 999))
 
-        last-date (:published-at (last sorted-posts-list))
-        separators-data (loop [separators []
-                               posts sorted-posts-list]
-                          (if (empty? posts)
-                            separators
-                            (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
-                                   (rest posts))))]
-        (vec (rest ;; Always remove the first label
-         (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)))))
+         last-date (:published-at (last sorted-posts-list))
+         separators-data (loop [separators []
+                                posts sorted-posts-list]
+                           (if (empty? posts)
+                             separators
+                             (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
+                                    (rest posts))))]
+         (vec (rest ;; Always remove the first label
+          (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
 
 ;; 
 
@@ -388,15 +393,22 @@
 
   ([board-data change-data active-users follow-boards-list & [direction]]
     (let [links (:links board-data)
-          with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
-                                          (fix-entry %2 {:slug (:board-slug %2)
-                                                         :name (:board-name %2)
-                                                         :uuid (:board-uuid %2)
-                                                         :publisher-board (:publisher-board %2)}
-                                           change-data
-                                           active-users))
-                                 board-data
-                                 (:entries board-data))
+          with-fixed-activities* (reduce (fn [ret item]
+                                           (assoc-in ret [:fixed-items (:uuid item)]
+                                            (fix-entry item {:slug (:board-slug item)
+                                                             :name (:board-name item)
+                                                             :uuid (:board-uuid item)
+                                                             :publisher-board (:publisher-board item)}
+                                             change-data
+                                             active-users)))
+                                  board-data
+                                  (:entries board-data))
+          with-fixed-activities (reduce (fn [ret item]
+                                         (if (contains? (:fixed-items ret) (:uuid item))
+                                           ret
+                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                 with-fixed-activities*
+                                 (:posts-list board-data))
           next-links (when direction
                       (vec
                        (remove
@@ -423,7 +435,7 @@
                                 :down (concat (:posts-list board-data) items-list)
                                 items-list))
           grouped-items (if (show-separators? (:slug board-data))
-                          (grouped-posts full-items-list)
+                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
           follow-board-uuids (set (map :uuid follow-boards-list))]
@@ -450,13 +462,19 @@
 
   ([contributions-data change-data org-data active-users follow-publishers-list & [direction]]
     (let [all-boards (:boards org-data)
+          boards-map (zipmap (map :slug all-boards) all-boards)
+          with-fixed-activities* (reduce (fn [ret item]
+                                           (let [board-data (get boards-map (:board-slug item))
+                                                 fixed-entry (fix-entry item board-data change-data active-users)]
+                                             (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
+                                  contributions-data
+                                  (:items contributions-data))
           with-fixed-activities (reduce (fn [ret item]
-                                          (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
-                                                            all-boards))]
-                                            (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data active-users))))
-                                 contributions-data
-                                 (:items contributions-data))
+                                         (if (contains? (:fixed-items ret) (:uuid item))
+                                           ret
+                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                 with-fixed-activities*
+                                 (:posts-list contributions-data))
           next-links (when direction
                       (vec
                        (remove
@@ -485,7 +503,7 @@
                                   items-list))
                             items-list)
           grouped-items (if (show-separators? (:href contributions-data))
-                          (grouped-posts full-items-list)
+                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
@@ -509,13 +527,19 @@
 
   ([container-data change-data org-data active-users sort-type & [direction]]
     (let [all-boards (:boards org-data)
+          boards-map (zipmap (map :slug all-boards) all-boards)
+          with-fixed-activities* (reduce (fn [ret item]
+                                           (let [board-data (get boards-map (:board-slug item))
+                                                 fixed-entry (fix-entry item board-data change-data active-users)]
+                                             (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
+                                  container-data
+                                  (:items container-data))
           with-fixed-activities (reduce (fn [ret item]
-                                          (let [board-data (some #(when (= (:slug %) (:board-slug item)) %)
-                                                            all-boards)]
-                                            (assoc-in ret [:fixed-items (:uuid item)]
-                                             (fix-entry item board-data change-data active-users))))
-                                 container-data
-                                 (:items container-data))
+                                         (if (contains? (:fixed-items ret) (:uuid item))
+                                           ret
+                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                 with-fixed-activities*
+                                 (:posts-list container-data))
           next-links (when direction
                       (vec
                        (remove
@@ -544,10 +568,10 @@
                                   items-list))
                             items-list)
           grouped-items (if (show-separators? (:container-slug container-data) sort-type)
-                          (grouped-posts full-items-list)
+                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-caught-up (if (= (:container-slug container-data) :following)
-                           (let [enriched-items-list (map (comp dis/activity-data :uuid) full-items-list)
+                           (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
                                  items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
                              (insert-caught-up grouped-items #(->> % :uuid (get items-map) :unread not) {:hide-top-line true}))
                            grouped-items)
@@ -584,9 +608,9 @@
    (fix-threads threads-data change-data org-data active-users sort-type nil))
   ([threads-data change-data org-data active-users sort-type direction]
     (let [all-boards (:boards org-data)
+          boards-map (zipmap (map :slug all-boards) all-boards)
           with-fixed-entries (reduce (fn [ret entry]
-                                       (let [board-data (some #(when (= (:slug %) (:board-slug entry)) %)
-                                                         all-boards)
+                                       (let [board-data (get boards-map (:board-slug entry))
                                              fixed-entry (fix-entry entry board-data change-data active-users)]
                                          (assoc-in ret [:fixed-entries (:uuid entry)] fixed-entry)))
                               threads-data
