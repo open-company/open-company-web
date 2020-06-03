@@ -51,11 +51,20 @@ div.add-comment-box-container {
         }
       }
 
-      div.medium-editor-media-picker {
-        top: unset;
-        left: unset;
-        bottom: 14px;
-        left: 48px;
+      div.add-comment-footer-media-picker {
+        float: left;
+        position: relative;
+        div.medium-editor-media-picker {
+          // top: unset;
+          // left: unset;
+          // bottom: 14px;
+          // left: 48px;
+          position: relative;
+          top: unset;
+          left: unset;
+          bottom: unset;
+          right: unset;  
+        }
       }
 
       @include mobile() {

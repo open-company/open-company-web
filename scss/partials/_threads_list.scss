@@ -116,8 +116,7 @@ div.threads-list {
           flex-flow: row nowrap;
           justify-content: flex-start;
           align-items: center;
-          height: 18px;
-          margin-bottom: 8px;
+          height: 24px;
           text-align: left;
 
           div.thread-item-author-container {
@@ -134,6 +133,7 @@ div.threads-list {
               font-size: 12px;
               line-height: 18px;
               flex: 0 1 auto;
+              align-self: center;
               color: var(--color);
               display: block;
               overflow: hidden;
@@ -149,6 +149,7 @@ div.threads-list {
             @include OC_Body_Book();
             font-size: 12px;
             line-height: 18px;
+            align-self: center;
           }
 
           div.thread-item-board-container {
@@ -166,6 +167,7 @@ div.threads-list {
               text-overflow: ellipsis;
               white-space: nowrap;
               text-decoration: underline;
+              align-self: center;
             }
           }
 
@@ -175,30 +177,20 @@ div.threads-list {
             line-height: 18px;
             flex: 0 0 auto;
             color: var(--color);
-          }
-
-          div.thread-item-header-title {
-            margin-left: 8px;
-            @include activity-title(14px, 18px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex: 0 1 50%;
+            align-self: center;
           }
         }
 
-        div.thread-item-body {
-          @include activity-body-preview(16, 22, var(--color), 3);
-          height: auto;
-          max-height: #{22 * 3}px;
+        div.thread-item-title {
+          margin-top: 8px;
+          @include activity-title(22px, 28px);
           overflow: hidden;
           text-overflow: ellipsis;
-        }
-
-        div.thread-item-top-separator {
-          height: 8px;
-          background-color: var(--foc-background-color);
+          white-space: nowrap;
+          height: 44px;
+          padding-bottom: 16px;
           border-bottom: 1px solid var(--divider-line);
+          margin-bottom: 8px;
         }
       }
 

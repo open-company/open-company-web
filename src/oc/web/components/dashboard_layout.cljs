@@ -33,7 +33,6 @@
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.ui.poll :refer (poll-portal)]
             [goog.events :as events]
@@ -56,7 +55,7 @@
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
-                              (drv/drv :sorted-user-notifications)
+                              (drv/drv :unread-threads)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -134,7 +133,7 @@
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        user-notifications-data (drv/react s :sorted-user-notifications)
+        unread-threads (drv/react s :unread-threads)
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -192,7 +191,7 @@
                  :class (when is-threads
                           "active")}
                 [:span.tab-icon
-                  (when (user-notifications/has-new-content? user-notifications-data)
+                  (when (pos? unread-threads)
                     [:span.unread-dot])]
                 [:span.tab-label "Replies"]]
               (when can-compose?

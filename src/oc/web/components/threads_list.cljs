@@ -1,7 +1,8 @@
 (ns oc.web.components.threads-list
   (:require [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [goog.object :as gobj]
+            [clojure.data :as clj-data]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -19,6 +20,7 @@
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -179,12 +181,12 @@
       [:span.time-since
         [:time
           {:date-time published-at}
-          (utils/tooltip-date published-at)]]
-      [:div.thread-item-header-title
-        (str "→ " headline)]]
-    [:div.thread-item-body.oc-mentions
-      {:dangerouslySetInnerHTML {:__html body}}]
-    [:div.thread-item-top-separator]])
+          (utils/tooltip-date published-at)]]]
+    [:div.thread-item-title
+      headline]])
+
+(defn- thread-item-unique-class [{:keys [resource-uuid uuid]}]
+  (str "thread-item-" resource-uuid "-" uuid))
 
 (rum/defcs thread-item < rum/static
                          (rum/local nil ::show-picker)
@@ -224,11 +226,13 @@
                           (if (= read-count replies-count)
                             (dec read-count)
                             read-count))
-        thread-loaded? (contains? n :thread-children)]
+        thread-loaded? (contains? n :thread-children)
+        thread-item-class (thread-item-unique-class n)]
     [:div.thread-item.group
       {:class    (utils/class-set {:unread unread
                                    :close-item close-item
-                                   :open-item open-item})
+                                   :open-item open-item
+                                   thread-item-class true})
        :ref :thread
        :on-click (fn [e]
                    (let [thread-el (rum/ref-node s :thread)]
@@ -241,6 +245,9 @@
         (thread-top n))
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
+          {:data-resource-uuid resource-uuid
+           :data-comment-uuid comment-uuid
+           :data-root-comment true}
           (thread-comment {:activity-data activity-data
                            :comment-data n
                            :is-mobile? is-mobile?
@@ -276,7 +283,10 @@
                               unread-reply?
                               (= (dec (count replies)) idx))]
                 [:div.thread-item-block.horizontal-line.group
-                  {:key (str "unir-" (:created-at r) "-" (:uuid r))}
+                  {:key (str "unir-" (:created-at r) "-" (:uuid r))
+                   :data-resource-uuid (:resource-uuid r)
+                   :data-comment-uuid (:uuid r)
+                   :data-parent-uuid (:parent-uuid r)}
                   (thread-comment {:activity-data activity-data
                                    :comment-data reply-data
                                    :is-indented-comment? true
@@ -309,25 +319,66 @@
                               (fn [children]
                                 (map #(assoc % :expanded true) children))))))))
 
+(defn- mark-read-if-needed [s items-container offset-top item]
+  (when-let [item-node (.querySelector items-container (str "div." (thread-item-unique-class item)))]
+    (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
+      (swap! (::read-items s) conj (:resource-uuid item))
+      (activity-actions/mark-read (:resource-uuid item)))))
+
+(defn- did-scroll [s _scroll-event]
+  (when @(::has-unread-items s)
+    (let [items-to-render (-> s :rum/args first :items-to-render)
+          items-container (rum/ref-node s :threads-list)
+          offset-top (if (responsive/is-mobile-size?) responsive/mobile-navbar-height responsive/navbar-height)]
+      (doseq [item items-to-render
+              :when (and (= (:content-type item) :thread)
+                         (:unread-thread item)
+                         (not (@(::read-items s) (:resource-uuid item))))]
+        (mark-read-if-needed s items-container offset-top item))
+      (when-not (some :unread-thread (-> s :rum/args first :items-to-render))
+        (reset! (::has-unread-items s) false)))))
+
 (rum/defcs threads-list <
   ui-mixins/refresh-tooltips-mixin
-  [s {:keys [items-to-render current-user-data member? loading-more]}]
+  (rum/local #{} ::read-items)
+  (rum/local false ::has-unread-items)
+  (ui-mixins/on-window-scroll-mixin did-scroll)
+  {:did-mount (fn [s]
+   (reset! (::has-unread-items s) (some :unread-thread (-> s :rum/args first :items-to-render)))
+   (did-scroll s nil)
+   s)
+   :did-remount (fn [o s]
+   (let [items-changed (clj-data/diff (-> o :rum/args first :items-to-render) (-> s :rum/args first :items-to-render))]
+     (when (or (first items-changed) (second items-changed))
+       (reset! (::has-unread-items s) (some :unread-thread (-> s :rum/args first :items-to-render)))
+       (did-scroll s nil)))
+   s)}
+  [s {:keys [items-to-render current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.threads-list
       (if (empty? items-to-render)
         [:div.threads-list-empty
           (all-caught-up)]
         [:div.threads-list-container
+          {:ref :threads-list}
           (for [item* items-to-render
                 :let [caught-up? (= (:content-type item*) :caught-up)
+                      loading-more? (= (:content-type item*) :loading-more)
+                      carrot-close? (= (:content-type item*) :carrot-close)
                       item (assoc item* :current-user-data current-user-data :member? member?)]]
-            (if caught-up?
+            (cond
+              caught-up?
               (rum/with-key
                (caught-up-line item)
                (str "thread-caught-up-" (:last-activity-at item)))
+              loading-more?
+              [:div.loading-updates.bottom-loading
+                {:key (str "thread-loading-more-" (:last-activity-at item))}
+                (:message item)]
+              carrot-close?
+              [:div.carrot-close
+                (:message item)]
+              :else
               (rum/with-key
                (thread-item item)
-               (str "thread-" (:resource-uuid item) "-" (:uuid item)))))
-          (when loading-more
-            [:div.loading-updates.bottom-loading
-              "Loading more threads..."])])]))
+               (str "thread-" (:resource-uuid item) "-" (:uuid item)))))])]))
