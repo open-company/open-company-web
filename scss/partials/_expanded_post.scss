@@ -549,22 +549,17 @@ div.expanded-post {
             height: 20px;
             margin-top: 20px;
           }
-
-          div.is-comments {
-            div.is-comments-summary {
-              color: var(--color);
-            }
-          }
         }
 
         div.is-comments {
-          margin-right: 16px;
+          margin-left: 32px;
           float: left;
+          cursor: pointer;
         }
 
         div.reactions {
           float: left;
-          margin-right: 14px;
+          margin-left: 32px;
 
           @include mobile() {
             margin-top: 13px;
@@ -588,6 +583,7 @@ div.expanded-post {
 
         div.wrt-count-container {
           float: left;
+          margin-left: 32px;
         }
       }
 

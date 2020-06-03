@@ -304,34 +304,36 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (reactions {:entity-data activity-data
-                          :only-thumb? true
-                          :max-reactions (when is-mobile? 3)})
+              (when member?
+                (reactions {:entity-data activity-data
+                            :only-thumb? true}))
               [:div.stream-item-footer-mobile-group
-                [:div.stream-item-comments-summary
-                  ; {:on-click #(expand s true true)}
-                  (comments-summary {:entry-data activity-data
-                                     :comments-data comments-data
-                                     :hide-face-pile? true
-                                     :show-bubble-icon? true
-                                     :hide-label? true
-                                     :publisher? publisher?
-                                     :add-comment-focus-prefix "main-comment"})]
-                [:div.stream-item-wrt
-                  {:ref :stream-item-wrt}
-                  ; (when show-post-added-tooltip?
-                  ;   [:div.post-added-tooltip-container
-                  ;     {:ref :post-added-tooltip}
-                  ;     [:div.post-added-tooltip-title
-                  ;       "Post analytics"]
-                  ;     [:div.post-added-tooltip
-                  ;       (str "Invite your team to Wut so you can know who read your "
-                  ;        "post and when. Click here to access your post analytics anytime.")]
-                  ;     [:button.mlb-reset.post-added-tooltip-bt
-                  ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                  ;       "OK, got it"]])
-                  (wrt-count {:activity-data activity-data
-                              :reads-data read-data})]
+                (when member?
+                  [:div.stream-item-comments-summary
+                    ; {:on-click #(expand s true true)}
+                    (comments-summary {:entry-data activity-data
+                                       :comments-data comments-data
+                                       :hide-face-pile? true
+                                       :show-bubble-icon? true
+                                       :hide-label? true
+                                       :publisher? publisher?
+                                       :add-comment-focus-prefix "main-comment"})])
+                (when show-wrt?
+                  [:div.stream-item-wrt
+                    {:ref :stream-item-wrt}
+                    ; (when show-post-added-tooltip?
+                    ;   [:div.post-added-tooltip-container
+                    ;     {:ref :post-added-tooltip}
+                    ;     [:div.post-added-tooltip-title
+                    ;       "Post analytics"]
+                    ;     [:div.post-added-tooltip
+                    ;       (str "Invite your team to Wut so you can know who read your "
+                    ;        "post and when. Click here to access your post analytics anytime.")]
+                    ;     [:button.mlb-reset.post-added-tooltip-bt
+                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                    ;       "OK, got it"]])
+                    (wrt-count {:activity-data activity-data
+                                :reads-data read-data})])
                 (when (seq activity-attachments)
                   (if-not is-mobile?
                     [:div.stream-item-attachments

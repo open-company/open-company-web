@@ -40,7 +40,7 @@ div.reactions {
         span.reaction {
           line-height: $height;
           height: $height;
-          width: 26px;
+          width: 22px;
           float: left;
           display: block;
 
@@ -52,6 +52,7 @@ div.reactions {
             background-position: center;
             background-size: 14px 14px;
             background-repeat: no-repeat;
+            opacity: 0.5;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/reaction_thumb@dark.svg");
@@ -72,6 +73,7 @@ div.reactions {
 
           span.thumb-up-icon {
             background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
+            opacity: 1;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");

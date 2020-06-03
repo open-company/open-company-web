@@ -191,9 +191,12 @@
        :data-new-at (:new-at activity-data)
        :data-initial-last-read-at @(::initial-last-read-at s)
        :data-last-read-at (:last-read-at activity-data)
-       :data-new-comments-count (:new-comments-count activity-data)}
+       :data-new-comments-count (:new-comments-count activity-data)
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :expanded-post-container))
+                    (close-expanded-post %))}
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-container
+        {:ref :expanded-post-container}
         [:div.activity-share-container]
         [:div.expanded-post-header.group
           [:button.mlb-reset.back-to-board
@@ -272,13 +275,15 @@
               (reactions {:entity-data activity-data
                           :only-thumb? true})
               [:div.expanded-post-footer-mobile-group
-                (when (pos? (:count comments-link))
+                (when user-is-part-of-the-team
                   (comments-summary {:entry-data activity-data
-                                     :comments-data comments-drv
-                                     :new-comments-count 0
+                                     :comments-data comments-data
                                      :hide-face-pile? true
-                                     :publisher? is-publisher?}))]
-              (when is-publisher?
+                                     :show-bubble-icon? true
+                                     :hide-label? true
+                                     :publisher? is-publisher?
+                                     :add-comment-focus-prefix "main-comment"}))]
+              (when user-is-part-of-the-team
                 (wrt-count {:activity-data activity-data
                             :reads-data reads-data}))]
             [:div.expanded-post-comments.group
