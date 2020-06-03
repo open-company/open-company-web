@@ -331,27 +331,27 @@
                   ;       "OK, got it"]])
                   (wrt-count {:activity-data activity-data
                               :reads-data read-data})]
-                (if-not is-mobile?
-                  [:div.stream-item-attachments
-                    {:ref :stream-item-attachments}
-                    [:div.stream-item-attachments-count
-                      {:data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
-                      (count activity-attachments)]
-                    [:div.stream-item-attachments-list
-                      (for [atc activity-attachments]
-                        [:a.stream-item-attachments-item
-                          {:href (:file-url atc)
-                           :target "_blank"}
-                          [:div.stream-item-attachments-item-desc
-                            [:span.file-name
-                              (:file-name atc)]
-                            [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
-                    (when (seq activity-attachments)
-                      [:div.stream-item-mobile-attachments
-                        [:span.mobile-attachments-icon]
-                        [:span.mobile-attachments-count
-                          (count activity-attachments)]]))]])]]))
+                (when (seq activity-attachments)
+                  (if-not is-mobile?
+                    [:div.stream-item-attachments
+                      {:ref :stream-item-attachments}
+                      [:div.stream-item-attachments-count
+                        {:data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
+                        (count activity-attachments)]
+                      [:div.stream-item-attachments-list
+                        (for [atc activity-attachments]
+                          [:a.stream-item-attachments-item
+                            {:href (:file-url atc)
+                             :target "_blank"}
+                            [:div.stream-item-attachments-item-desc
+                              [:span.file-name
+                                (:file-name atc)]
+                              [:span.file-size
+                                (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
+                    [:div.stream-item-mobile-attachments
+                      [:span.mobile-attachments-icon]
+                      [:span.mobile-attachments-count
+                        (count activity-attachments)]]))]])]]))
