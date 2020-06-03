@@ -1,7 +1,8 @@
 (ns oc.web.components.threads-list
   (:require [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [goog.object :as gobj]
+            [clojure.data :as clj-data]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -180,10 +181,9 @@
       [:span.time-since
         [:time
           {:date-time published-at}
-          (utils/tooltip-date published-at)]]
-      [:div.thread-item-header-title
-        (str "→ " headline)]]
-    [:div.thread-item-top-separator]])
+          (utils/tooltip-date published-at)]]]
+    [:div.thread-item-title
+      headline]])
 
 (defn- thread-item-unique-class [{:keys [resource-uuid uuid]}]
   (str "thread-item-" resource-uuid "-" uuid))
@@ -348,7 +348,7 @@
    (did-scroll s nil)
    s)
    :did-remount (fn [o s]
-   (let [items-changed (clojure.data/diff (-> o :rum/args first :items-to-render) (-> s :rum/args first :items-to-render))]
+   (let [items-changed (clj-data/diff (-> o :rum/args first :items-to-render) (-> s :rum/args first :items-to-render))]
      (when (or (first items-changed) (second items-changed))
        (reset! (::has-unread-items s) (some :unread-thread (-> s :rum/args first :items-to-render)))
        (did-scroll s nil)))

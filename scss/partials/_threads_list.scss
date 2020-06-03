@@ -117,7 +117,6 @@ div.threads-list {
           justify-content: flex-start;
           align-items: center;
           height: 24px;
-          margin-bottom: 8px;
           text-align: left;
 
           div.thread-item-author-container {
@@ -133,7 +132,7 @@ div.threads-list {
               @include OC_Body_Book();
               font-size: 12px;
               line-height: 18px;
-              flex: 0 0.1 auto;
+              flex: 0 1 auto;
               align-self: center;
               color: var(--color);
               display: block;
@@ -161,7 +160,7 @@ div.threads-list {
               @include OC_Body_Book();
               font-size: 12px;
               line-height: 18px;
-              flex: 0 0.1 auto;
+              flex: 0 1 auto;
               color: var(--color);
               display: block;
               overflow: hidden;
@@ -180,21 +179,18 @@ div.threads-list {
             color: var(--color);
             align-self: center;
           }
-
-          div.thread-item-header-title {
-            margin-left: 8px;
-            @include activity-title(14px, 18px);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex: 0 10 auto;
-            align-self: center;
-          }
         }
 
-        div.thread-item-top-separator {
-          margin-top: 16px;
+        div.thread-item-title {
+          margin-top: 8px;
+          @include activity-title(22px, 28px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          height: 44px;
+          padding-bottom: 16px;
           border-bottom: 1px solid var(--divider-line);
+          margin-bottom: 8px;
         }
       }
 
