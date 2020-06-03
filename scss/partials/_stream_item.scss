@@ -615,7 +615,7 @@ div.stream-item {
 
       div.stream-item-attachments {
         float: left;
-        margin-right: 24px;
+        margin-left: 24px;
         height: 26px;
         position: relative;
         // position: absolute;
@@ -648,7 +648,7 @@ div.stream-item {
           &:before {
             content: "";
             width: 14px;
-            height: 18px;
+            height: 23px;
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
             background-size: 14px 18px;
             background-repeat: no-repeat;
