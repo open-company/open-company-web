@@ -298,15 +298,18 @@
 
 (def default-caught-up-message "You’re up to date")
 
+(defn- next-activity-timestamp [prev-item]
+  (if (:last-activity-at prev-item)
+   (-> prev-item :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
+   (utils/as-of-now)))
+
 (defn- caught-up-map
   ([] (caught-up-map nil false default-caught-up-message))
   ([n] (caught-up-map n false default-caught-up-message))
   ([n gray-scale?] (caught-up-map n gray-scale? default-caught-up-message))
   ([n gray-scale? message] (caught-up-map n gray-scale? default-caught-up-message nil))
   ([n gray-scale? message opts]
-   (let [t (if (:last-activity-at n)
-             (-> n :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
-             (utils/as-of-now))]
+   (let [t (next-activity-timestamp n)]
      {:content-type :caught-up
       :last-activity-at t
       :message message
@@ -341,6 +344,24 @@
            next-item (get items-list (inc idx))]
        (assoc item :open-item (check-fn :open item prev-item) :close-item (check-fn :close item next-item))))
    (range (count items-list))))
+
+(defn- insert-ending-item [items-list links]
+  (let [next-link (utils/link-for links "next")
+        carrot-close? (> (count items-list 3))
+        last-item (last items-list)]
+    (cond
+     next-link
+     (concat items-list [{:content-type :loading-more
+                          :last-activity-at (next-activity-timestamp last-item)
+                          :message (if (= (:content-type last-item) :thread)
+                                     "Loading more threads..."
+                                     "Loading more posts...")}])
+     carrot-close?
+     (concat items-list [{:content-type :carrot-close
+                          :last-activity-at (next-activity-timestamp (last items-list))
+                          :message "🤠 You've reached the end, partner"}])
+     :else
+     items-list)))
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
@@ -438,12 +459,13 @@
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
+          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)
           follow-board-uuids (set (map :uuid follow-boards-list))]
       (-> with-fixed-activities
         (assoc :read-only (readonly-board? links))
         (dissoc :old-links :items)
         (assoc :posts-list full-items-list)
-        (assoc :items-to-render with-open-close-items)
+        (assoc :items-to-render with-ending-item)
         (assoc :following (boolean (follow-board-uuids (:uuid board-data))))))))
 
 (defn fix-contributions
@@ -506,12 +528,13 @@
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
+          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
       (-> with-fixed-activities
         (dissoc :old-links :items)
         (assoc :links fixed-next-links)
         (assoc :posts-list full-items-list)
-        (assoc :items-to-render with-open-close-items)
+        (assoc :items-to-render with-ending-item)
         (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
 
 (defn fix-container
@@ -575,12 +598,13 @@
                                  items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
                              (insert-caught-up grouped-items #(->> % :uuid (get items-map) :unread not) {:hide-top-line true}))
                            grouped-items)
-          with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))]
+          with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))
+          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
       (-> with-fixed-activities
        (dissoc :old-links :items)
        (assoc :links fixed-next-links)
        (assoc :posts-list full-items-list)
-       (assoc :items-to-render with-open-close-items)))))
+       (assoc :items-to-render with-ending-item)))))
 
 (defn fix-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
@@ -662,7 +686,8 @@
                                                    (dis/thread-data thread-uuid))]
                                (-> thread-data :unread-thread not)))
           with-caught-up (insert-caught-up threads-list unread-thread-fn)
-          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))]
+          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
+          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
         (utils/after 0 #(comment-utils/get-comments e)))
       (-> with-fixed-threads
@@ -670,7 +695,7 @@
        (assoc :links fixed-next-links)
        (assoc :threads-list threads-list)
        (assoc :no-virtualized-steam true)
-       (assoc :items-to-render with-open-close-items)))))
+       (assoc :items-to-render with-ending-item)))))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

@@ -315,7 +315,7 @@
 
 (rum/defcs threads-list <
   ui-mixins/refresh-tooltips-mixin
-  [s {:keys [items-to-render current-user-data member? loading-more]}]
+  [s {:keys [items-to-render current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.threads-list
       (if (empty? items-to-render)
@@ -324,14 +324,22 @@
         [:div.threads-list-container
           (for [item* items-to-render
                 :let [caught-up? (= (:content-type item*) :caught-up)
+                      loading-more? (= (:content-type item*) :loading-more)
+                      carrot-close? (= (:content-type item*) :carrot-close)
                       item (assoc item* :current-user-data current-user-data :member? member?)]]
-            (if caught-up?
+            (cond
+              caught-up?
               (rum/with-key
                (caught-up-line item)
                (str "thread-caught-up-" (:last-activity-at item)))
+              loading-more?
+              [:div.loading-updates.bottom-loading
+                {:key (str "thread-loading-more-" (:last-activity-at item))}
+                (:message item)]
+              carrot-close?
+              [:div.carrot-close
+                (:message item)]
+              :else
               (rum/with-key
                (thread-item item)
-               (str "thread-" (:resource-uuid item) "-" (:uuid item)))))
-          (when loading-more
-            [:div.loading-updates.bottom-loading
-              "Loading more threads..."])])]))
+               (str "thread-" (:resource-uuid item) "-" (:uuid item)))))])]))

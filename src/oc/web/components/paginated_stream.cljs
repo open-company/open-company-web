@@ -109,7 +109,6 @@
   (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
         publisher? (activity-utils/is-publisher? entry)
         show-wrt? (and member?
-                       publisher?
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -135,16 +134,16 @@
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
-  [{:keys [style]}]
+  [{:keys [style item]}]
   [:div.loading-updates.bottom-loading
     {:style style}
-    "Loading more posts..."])
+    (:message item)])
 
 (rum/defc carrot-close < rum/static
-  [{:keys [style]}]
+  [{:keys [style item]}]
   [:div.carrot-close
     {:style style}
-    "🤠 You've reached the end, partner"])
+    (:message item)])
 
 (rum/defc separator-item < rum/static
   [{:keys [style foc-layout] :as row-props} {:keys [label] :as props}]
@@ -158,27 +157,6 @@
   [:div.caught-up-wrapper
     {:style style}
     (caught-up-line item)])
-
-(defn- get-item [items idx show-loading-more show-carrot-close]
-  (let [loading-more? (and show-loading-more
-                           (= idx (count items)))
-        carrot-close? (and (not loading-more?)
-                           show-carrot-close
-                           (= idx (count items)))
-        item (when (and (not loading-more?)
-                        (not carrot-close?)
-                        (<= 0 idx (dec (count items))))
-               (nth items idx))
-        separator-item? (and (not loading-more?)
-                             (not carrot-close?)
-                             (= (:content-type item) :separator))]
-    (cond
-     loading-more?
-     {:content-type :loading-more}
-     carrot-close?
-     {:content-type :carrot-close}
-     :else
-     item)))
 
 (rum/defcs virtualized-stream < rum/static
                                 rum/reactive
@@ -200,8 +178,6 @@
   [s {:keys [items
              activities-read
              foc-layout
-             show-loading-more
-             show-carrot-close
              is-mobile?
              force-list-update]
       :as derivatives}
@@ -214,7 +190,7 @@
         key-prefix (if is-mobile? "mobile" foc-layout)
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
-                          item (get-item items index show-loading-more show-carrot-close)]
+                          item (get items index)]
                       (case (:content-type item)
                         :caught-up
                         64
@@ -234,19 +210,19 @@
                                      isScrolling
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             item (get-item items index show-loading-more show-carrot-close)
+                             item (get items index)
                              reads-data (when (= (:content-type item) :entry)
                                           (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)
-                             next-item (get-item items (inc index) show-loading-more show-carrot-close)
-                             prev-item (get-item items (dec index) show-loading-more show-carrot-close)]
+                             next-item (get items (inc index))
+                             prev-item (get items (dec index))]
                          (case (:content-type item)
                            :caught-up
                            (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
                            :carrot-close
-                           (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
+                           (rum/with-key (carrot-close {:item item :style style}) (str "carrot-close-" row-key))
                            :loading-more
-                           (rum/with-key (load-more row-props) (str "loading-more-" row-key))
+                           (rum/with-key (load-more {:item item :style style}) (str "loading-more-" row-key))
                            :separator
                            (rum/with-key (separator-item (assoc row-props :foc-layout foc-layout) item) (str "separator-item-" row-key))
                            ; else
@@ -268,10 +244,7 @@
                                   620)
                          :isScrolling isScrolling
                          :onScroll onChildScroll
-                         :rowCount (if (or show-loading-more
-                                           show-carrot-close)
-                                     (inc (count items))
-                                     (count items))
+                         :rowCount (count items)
                          :rowHeight rowHeight
                          :rowRenderer row-renderer
                          :scrollTop scrollTop
@@ -344,7 +317,6 @@
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
-        show-carrot-close (> (* (count items) card-height) viewport-height)
         member? (jwt/user-is-part-of-the-team (:team-id org-data))]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
@@ -352,8 +324,7 @@
          (if (:no-virtualized-steam container-data)
            (threads-list {:items-to-render items
                           :org-data org-data
-                          :current-user-data current-user-data
-                          :loading-more @(::bottom-loading s)})
+                          :current-user-data current-user-data})
            (window-scroller
             {}
             (partial virtualized-stream {:org-data org-data
@@ -363,8 +334,4 @@
                                          :force-list-update force-list-update
                                          :activities-read activities-read
                                          :editable-boards editable-boards
-                                         :foc-layout foc-layout
-                                         :show-loading-more @(::bottom-loading s)
-                                         :show-carrot-close (and (not @(::bottom-loading s))
-                                                                 (not @(::has-next s))
-                                                                 (> (count items) 3))})))]]]))
+                                         :foc-layout foc-layout})))]]]))
