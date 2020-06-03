@@ -19,6 +19,7 @@
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -184,6 +185,9 @@
         (str "→ " headline)]]
     [:div.thread-item-top-separator]])
 
+(defn- thread-item-unique-class [{:keys [resource-uuid uuid]}]
+  (str "thread-item-" resource-uuid "-" uuid))
+
 (rum/defcs thread-item < rum/static
                          (rum/local nil ::show-picker)
                          (rum/local false ::replying)
@@ -222,11 +226,13 @@
                           (if (= read-count replies-count)
                             (dec read-count)
                             read-count))
-        thread-loaded? (contains? n :thread-children)]
+        thread-loaded? (contains? n :thread-children)
+        thread-item-class (thread-item-unique-class n)]
     [:div.thread-item.group
       {:class    (utils/class-set {:unread unread
                                    :close-item close-item
-                                   :open-item open-item})
+                                   :open-item open-item
+                                   thread-item-class true})
        :ref :thread
        :on-click (fn [e]
                    (let [thread-el (rum/ref-node s :thread)]
@@ -313,8 +319,40 @@
                               (fn [children]
                                 (map #(assoc % :expanded true) children))))))))
 
+(defn- mark-read-if-needed [s items-container offset-top item]
+  (when-let [item-node (.querySelector items-container (str "div." (thread-item-unique-class item)))]
+    (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
+      (swap! (::read-items s) conj (:resource-uuid item))
+      (activity-actions/mark-read (:resource-uuid item)))))
+
+(defn- did-scroll [s _scroll-event]
+  (when @(::has-unread-items s)
+    (let [items-to-render (-> s :rum/args first :items-to-render)
+          items-container (rum/ref-node s :threads-list)
+          offset-top (if (responsive/is-mobile-size?) responsive/mobile-navbar-height responsive/navbar-height)]
+      (doseq [item items-to-render
+              :when (and (= (:content-type item) :thread)
+                         (:unread-thread item)
+                         (not (@(::read-items s) (:resource-uuid item))))]
+        (mark-read-if-needed s items-container offset-top item))
+      (when-not (some :unread-thread (-> s :rum/args first :items-to-render))
+        (reset! (::has-unread-items s) false)))))
+
 (rum/defcs threads-list <
   ui-mixins/refresh-tooltips-mixin
+  (rum/local #{} ::read-items)
+  (rum/local false ::has-unread-items)
+  (ui-mixins/on-window-scroll-mixin did-scroll)
+  {:did-mount (fn [s]
+   (reset! (::has-unread-items s) (some :unread-thread (-> s :rum/args first :items-to-render)))
+   (did-scroll s nil)
+   s)
+   :did-remount (fn [o s]
+   (let [items-changed (clojure.data/diff (-> o :rum/args first :items-to-render) (-> s :rum/args first :items-to-render))]
+     (when (or (first items-changed) (second items-changed))
+       (reset! (::has-unread-items s) (some :unread-thread (-> s :rum/args first :items-to-render)))
+       (did-scroll s nil)))
+   s)}
   [s {:keys [items-to-render current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)]
     [:div.threads-list
@@ -322,6 +360,7 @@
         [:div.threads-list-empty
           (all-caught-up)]
         [:div.threads-list-container
+          {:ref :threads-list}
           (for [item* items-to-render
                 :let [caught-up? (= (:content-type item*) :caught-up)
                       loading-more? (= (:content-type item*) :loading-more)
