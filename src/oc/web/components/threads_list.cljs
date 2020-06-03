@@ -233,7 +233,9 @@
                      (when (and (not (utils/button-clicked? e))
                                 (not (utils/input-clicked? e))
                                 (not (utils/anchor-clicked? e))
-                                (not (utils/event-inside? e (.querySelector thread-el "div.emoji-picker-container")))
+                                (not (utils/content-editable-clicked? e))
+                                ; (not (utils/event-inside? e (.querySelector thread-el "div.emoji-picker-container")))
+                                (not (utils/event-inside? e (.querySelector thread-el "div.emoji-mart")))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false comment-uuid))))}
       (when open-item
