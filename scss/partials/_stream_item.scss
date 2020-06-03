@@ -540,7 +540,7 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         float: left;
-        margin-left: 16px;
+        margin-left: 24px;
         // position: absolute;
         // left: 150px;
         // top: 0;
@@ -615,12 +615,12 @@ div.stream-item {
 
       div.stream-item-attachments {
         float: left;
-        margin-right: 16px;
+        margin-right: 24px;
         height: 26px;
         position: relative;
-        position: absolute;
-        top: 0;
-        left: 398px;
+        // position: absolute;
+        // top: 0;
+        // left: 398px;
 
         @include mobile() {
           display: none;
@@ -722,7 +722,7 @@ div.stream-item {
       div.stream-item-wrt {
         float: left;
         position: relative;
-        margin-left: 16px;
+        margin-left: 24px;
         // position: absolute;
         // left: 274px;
         // top: 0;
