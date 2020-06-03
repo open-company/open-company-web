@@ -108,8 +108,7 @@
            is-mobile] :as props}]
   (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
         publisher? (activity-utils/is-publisher? entry)
-        show-wrt? (and member?
-                       (activity-utils/is-published? entry))
+        show-wrt? member?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
    [:div.virtualized-list-row
