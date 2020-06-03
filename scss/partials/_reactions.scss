@@ -21,7 +21,7 @@ div.reactions {
       font-size: 12px;
       color: var(--color);
       border-radius: 4px;
-      margin-left: 8px;
+      margin-left: 16px;
       opacity: 0.9;
 
       @include mobile() {
@@ -43,6 +43,11 @@ div.reactions {
           width: 22px;
           float: left;
           display: block;
+          margin-right: 0;
+
+          @include retina_screen() {
+            margin-right: 0;
+          }
 
           span.thumb-up-icon {
             float: left;
@@ -69,11 +74,14 @@ div.reactions {
           display: block;
         }
 
-        &.reacted span.reaction, &:hover span.reaction {
+        &.reacted span.reaction span.thumb-up-icon, &:hover span.reaction span.thumb-up-icon {
+          opacity: 1;
+        }
+
+        &.reacted span.reaction, &.can-react:hover span.reaction {
 
           span.thumb-up-icon {
             background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
-            opacity: 1;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
@@ -87,14 +95,13 @@ div.reactions {
         float: left;
         font-size: 16px;
         text-align: center;
-        min-width: 20px;
         vertical-align: bottom;
+        margin-right: 4px;
 
-        @media
-        not screen and (min-device-pixel-ratio: 2),
-        not screen and (min-resolution: 192dpi) {
-          font-size: 12px;
-          margin-right: 4px;
+        &.safari {
+          @include retina_screen() {
+            font-size: 12px;
+          }
         }
 
         @include mobile() {
@@ -169,7 +176,8 @@ div.reactions {
           width: 24px;
           height: 16px;
           background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
-          background-size: auto 14px;
+          background-size: 24px 16px;
+          margin-top: -2px;
           background-position: center;
           background-repeat: no-repeat;
 

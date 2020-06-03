@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent  :as ua]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.utils.reaction :as reaction-utils]
@@ -16,17 +17,6 @@
             [goog.object :as gobj]))
 
 (def default-reaction-number 3)
-
-(defn- thumb-up-reaction-map [org-uuid board-uuid resource-uuid]
-  {:reaction "👍"
-   :count 0
-   :authors []
-   :author-ids []
-   :reacted false
-   :links [{:rel "react"
-            :method "POST"
-            :href (str "/orgs/" org-uuid "/boards/" board-uuid "/resources/" resource-uuid "/reactions/👍/on")}]
-   })
 
 (rum/defcs reactions < (rum/local false ::show-picker)
                        ui-mixins/refresh-tooltips-mixin
@@ -104,7 +94,8 @@
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
                 [:span.reaction
-                  {:class (utils/class-set {:has-count (pos? (:count r))})}
+                  {:class (utils/class-set {:has-count (pos? (:count r))
+                                            :safari ua/safari?})}
                   (if only-thumb?
                     [:span.thumb-up-icon]
                     (:reaction r))]
