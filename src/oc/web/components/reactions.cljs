@@ -17,20 +17,35 @@
 
 (def default-reaction-number 3)
 
+(defn- thumb-up-reaction-map [org-uuid board-uuid resource-uuid]
+  {:reaction "👍"
+   :count 0
+   :authors []
+   :author-ids []
+   :reacted false
+   :links [{:rel "react"
+            :method "POST"
+            :href (str "/orgs/" org-uuid "/boards/" board-uuid "/resources/" resource-uuid "/reactions/👍/on")}]
+   })
+
 (rum/defcs reactions < (rum/local false ::show-picker)
                        ui-mixins/refresh-tooltips-mixin
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
-  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb]}]
+  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb only-thumb?]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
-  (let [reactions-max-count (or max-reactions default-reaction-number)
-        reactions-data (vec (take reactions-max-count (:reactions entity-data)))
+  (let [filtered-reactions (if only-thumb?
+                             (filter #(= (:reaction %) "👍") (:reactions entity-data))
+                             (:reactions entity-data))
+        reactions-max-count (if only-thumb? 1 (or max-reactions default-reaction-number))
+        reactions-data (vec (take reactions-max-count filtered-reactions))
         reactions-loading (:reactions-loading entity-data)
         react-link (utils/link-for (:links entity-data) "react")
-        should-show-picker? (and (not hide-picker)
+        should-show-picker? (and (not only-thumb?)
+                                 (not hide-picker)
                                  react-link
                                  (< (count reactions-data) reactions-max-count))
         is-mobile? (responsive/is-tablet-or-mobile?)]
@@ -71,6 +86,7 @@
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))
+                                          :only-thumb only-thumb?
                                           utils/hide-class true})
                  :on-mouse-leave (when-not is-mobile?
                                    #(this-as this
@@ -88,9 +104,10 @@
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
                 [:span.reaction
-                  {:class (utils/class-set {:has-count (pos? (:count r))
-                                            :grayscale (= (:reaction r) "👍🏿")})}
-                  (:reaction r)]
+                  {:class (utils/class-set {:has-count (pos? (:count r))})}
+                  (if only-thumb?
+                    [:span.thumb-up-icon]
+                    (:reaction r))]
                 [:div.count
                   (:count r)]]))
           (when should-show-picker?

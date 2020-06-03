@@ -305,6 +305,7 @@
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
               (reactions {:entity-data activity-data
+                          :only-thumb? true
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
                 [:div.stream-item-comments-summary
