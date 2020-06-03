@@ -539,10 +539,11 @@ div.stream-item {
       }
 
       div.stream-item-comments-summary {
-        // float: left;
-        position: absolute;
-        left: 150px;
-        top: 0;
+        float: left;
+        margin-left: 16px;
+        // position: absolute;
+        // left: 150px;
+        // top: 0;
 
         // div.is-comments:not(:empty) {
         //   margin-left: 36px;
@@ -719,12 +720,12 @@ div.stream-item {
       }
 
       div.stream-item-wrt {
-        // float: left;
-        // position: relative;
-        // margin-left: 40px;
-        position: absolute;
-        left: 274px;
-        top: 0;
+        float: left;
+        position: relative;
+        margin-left: 16px;
+        // position: absolute;
+        // left: 274px;
+        // top: 0;
 
         @include mobile() {
           display: none;

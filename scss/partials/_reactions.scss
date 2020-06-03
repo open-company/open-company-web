@@ -34,21 +34,36 @@ div.reactions {
       }
 
       &.only-thumb {
-        height: 26px;
+        $height: 23px;
+        height: $height;
 
         span.reaction {
-          line-height: 26px;
-          height: 26px;
+          line-height: $height;
+          height: $height;
           width: 26px;
           float: left;
           display: block;
+
+          span.thumb-up-icon {
+            float: left;
+            width: 14px;
+            height: $height;
+            background-image: cdnUrl("/img/ML/reaction_thumb.svg");
+            background-position: center;
+            background-size: 14px 14px;
+            background-repeat: no-repeat;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/reaction_thumb@dark.svg");
+            }
+          }
         }
 
         div.count {
           margin-top: 0;
-          line-height: 26px;
+          line-height: $height;
           font-size: 14px;
-          height: 26px;
+          height: $height;
           float: left;
           display: block;
         }
@@ -78,20 +93,6 @@ div.reactions {
         not screen and (min-resolution: 192dpi) {
           font-size: 12px;
           margin-right: 4px;
-        }
-
-        span.thumb-up-icon {
-          float: left;
-          width: 14px;
-          height: 26px;
-          background-image: cdnUrl("/img/ML/reaction_thumb.svg");
-          background-position: center;
-          background-size: 14px 14px;
-          background-repeat: no-repeat;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/reaction_thumb@dark.svg");
-          }
         }
 
         @include mobile() {
