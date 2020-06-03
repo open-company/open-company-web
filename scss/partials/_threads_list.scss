@@ -719,35 +719,12 @@ div.threads-list {
                 }
               }
             }
-
-            div.thread-comment div.add-comment-box-container {
-              padding-top: 8px;
-
-              &.collapsed-box div.add-comment-box div.add-comment-internal{
-                padding: 0;
-                border: none;
-              }
-            }
           }
         }
       }
 
       div.add-comment-box-container {
         margin-top: 8px;
-
-        &.collapsed-box {
-          height: 18px;
-          overflow: hidden;
-          div.add-comment-box div.add-comment-internal {
-            padding: 0;
-            border: none;
-
-            div.add-comment {
-              height: 18px;
-              min-height: 18px;
-            }
-          }
-        }
       }
     }
   }
