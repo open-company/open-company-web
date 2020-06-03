@@ -269,7 +269,8 @@
             ;   [:div.expanded-post-mobile-reactions
             ;     (reactions {:entity-data activity-data})])
             [:div.expanded-post-footer.group
-              (reactions {:entity-data activity-data})
+              (reactions {:entity-data activity-data
+                          :only-thumb? true})
               [:div.expanded-post-footer-mobile-group
                 (when (pos? (:count comments-link))
                   (comments-summary {:entry-data activity-data
