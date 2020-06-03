@@ -330,19 +330,18 @@
                      (dec (:count reads-data))
                      (:count reads-data))
         is-mobile? (responsive/is-tablet-or-mobile?)]
-    (when is-author?
-      [:div.wrt-count-container
-        {:data-toggle (when-not is-mobile? "tooltip")
-         :data-placement "top"
-         :data-container "body"
-         :title (cond
-                  (= reads-count 1)
-                  "1 person viewed"
-                  (pos? reads-count)
-                  (str reads-count " people viewed")
-                  :else
-                  "No views yet")}
-        [:div.wrt-count
-          {:ref :wrt-count
-           :on-click #(nav-actions/show-wrt item-id)}
-          reads-count]])))
+    [:div.wrt-count-container
+      {:data-toggle (when-not is-mobile? "tooltip")
+       :data-placement "top"
+       :data-container "body"
+       :title (cond
+                (= reads-count 1)
+                "1 person viewed"
+                (pos? reads-count)
+                (str reads-count " people viewed")
+                :else
+                "No views yet")}
+      [:div.wrt-count
+        {:ref :wrt-count
+         :on-click #(nav-actions/show-wrt item-id)}
+        reads-count]]))
