@@ -678,11 +678,14 @@
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
 
-(defn element-clicked? [e element-name]
+(defn- find-node [e fn]
   (loop [el (.-target e)]
-    (if (or (not el) (= (.-tagName el) element-name))
+    (if (or (not el) (fn el))
       el
       (recur (.-parentElement el)))))
+
+(defn element-clicked? [e element-name]
+  (find-node e #(= (.-tagName %) element-name)))
 
 (defn button-clicked? [e]
   (element-clicked? e "BUTTON"))
@@ -692,6 +695,9 @@
 
 (defn anchor-clicked? [e]
   (element-clicked? e "A"))
+
+(defn content-editable-clicked? [e]
+  (find-node e #(.. % -attributes -contenteditable)))
 
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately
