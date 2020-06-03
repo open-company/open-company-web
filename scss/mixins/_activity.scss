@@ -71,18 +71,20 @@ $header_top_margin: 24;
     &.white-bg {
       background-color: white;
     }
+
+    @content
   }
 }
 
 @mixin bookmark-tag() {
   div.bookmark-tag {
     @include image-2x("/img/ML/bookmark_tag");
-    background-size: 48px 14px;
+    background-size: 93px 14px;
     background-position: center;
     background-repeat: no-repeat;
     background-color: rgba($sea_blue, 0.2);
     height: 18px;
-    width: 59px;
+    width: 104px;
     margin-right: 8px;
     position: relative;
     vertical-align: top;
@@ -92,6 +94,8 @@ $header_top_margin: 24;
       // @include image-2x("/img/ML/bookmark_tag_white");
       background-color: white;
     }
+
+    @content
   }
 
 
@@ -112,6 +116,8 @@ $header_top_margin: 24;
       // @include image-2x("/img/ML/bookmarks_icon_white");
       background-color: rgba(white, 0.2);
     }
+
+    @content
   }
 }
 
