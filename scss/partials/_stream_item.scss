@@ -26,13 +26,14 @@ div.virtualized-list-row:not(.collapsed-item) {
   @include big_web() {
     &:hover {
       z-index: 2;
-      div.stream-item {
+      div.stream-item, div.stream-item.open-item, div.stream-item.close-item {
         background-color: var(--foc-hover-color);
         z-index: 2;
         border-top: 1px solid var(--foc-hover-border-color);
         border-right: 1px solid var(--foc-hover-border-color);
         border-bottom: 1px solid var(--foc-hover-border-color);
         border-left: 1px solid var(--foc-hover-border-color);
+        box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
 
         div.stream-item-header {
           div.more-menu {

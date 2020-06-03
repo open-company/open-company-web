@@ -180,7 +180,9 @@
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))}))
         muted-post? (seq (utils/link-for (:links activity-data) "follow"))
-        comments-link (utils/link-for (:links activity-data) "comments")]
+        comments-link (utils/link-for (:links activity-data) "comments")
+        bookmarked? (or (:must-see activity-data)
+                        (:bookmarked-at activity-data))]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -202,9 +204,32 @@
           [:div.expanded-post-header-center
             (post-authorship {:activity-data activity-data
                               :user-avatar? true
+                              :activity-board? true
                               :user-hover? true
                               :board-hover? true
-                              :current-user-id current-user-id})]
+                              :current-user-id current-user-id})
+            [:div.separator-dot]
+            [:time
+              {:date-time (:published-at activity-data)
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+               :data-title (utils/activity-date-tooltip activity-data)}
+              (utils/foc-date-time (:published-at activity-data))]
+            (when bookmarked?
+              [:div.separator-dot])
+            (when bookmarked?
+              (if (:bookmarked-at activity-data)
+                [:div.bookmark-tag]
+                [:div.must-see-tag]))
+            (when muted-post?
+              [:div.separator-dot.muted-dot])
+            (when muted-post?
+              [:div.muted-activity
+                {:data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :title "Muted"}])]
           (if show-mobile-menu?
             (rum/portal (more-menu-comp) mobile-more-menu-el)
             (more-menu-comp))
@@ -216,33 +241,6 @@
             [:div.expanded-post-headline
               {:class utils/hide-class}
               (:headline activity-data)]
-            [:div.expanded-post-author.group
-              [:div.expanded-post-author-inner
-                {:class utils/hide-class}
-                [:div.expanded-post-author-inner-label
-                  [:time
-                    {:date-time (:published-at activity-data)
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time (:published-at activity-data))]]
-                (when muted-post?
-                  [:div.expanded-post-author-dot.muted-dot])
-                (when muted-post?
-                  [:div.muted-activity
-                    {:data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :title "Muted"}])
-                (when (or (:must-see activity-data)
-                          (:bookmarked-at activity-data))
-                  [:div.expanded-post-author-dot])
-                (cond
-                  (:bookmarked-at activity-data)
-                  [:div.bookmark-tag]
-                  (:must-see activity-data)
-                  [:div.must-see-tag])]]
             (when (seq (:abstract activity-data))
               [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
                 {:class utils/hide-class

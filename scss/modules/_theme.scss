@@ -43,15 +43,15 @@ $dark_mode: "dark";
   --foc-background-color: white;; // #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: white; // #{rgba($deep_navy, 0.05)};
   --foc-hover-color: white; // #F1F0F0; // rgb(241, 240, 240)
-  --foc-hover-border-color: #{rgba($deep_navy, 0.24)};
+  --foc-hover-border-color: #{rgba($deep_navy, 0.32)};
   --foc-new-color: white;
   --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
-  --foc-new-border-color: #{rgba($deep_navy, 0.24)};
+  --foc-new-border-color: #{rgba($deep_navy, 0.32)};
   --foc-menu-gradient-from: white; // #{rgba(241, 240, 240, 1)};
   --foc-menu-gradient-to: #{rgba(white, 0)}; // #{rgba(241, 240, 240, 0)};
   --foc-new-menu-gradient-from: white;
   --foc-new-menu-gradient-to: #{rgba(white, 0)};
-  --foc-box-shadow: rgba(0, 0, 0, 0.1);
+  --foc-box-shadow: rgba(0, 0, 0, 0.07);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -152,15 +152,15 @@ $dark_mode: "dark";
   --foc-background-color: #{rgba(45, 49, 59, 1)}; // #{rgba(black, 0.16)};
   --mobile-foc-background-color: #{rgba(45, 49, 59, 1)}; // #1B202A;
   --foc-hover-color: #{rgba(45, 49, 59, 1)}; // #{rgba(36, 41, 50, 1)};
-  --foc-hover-border-color: #{rgba(white, 0.22)};
+  --foc-hover-border-color: #{rgba(white, 0.30)};
   --foc-new-color: #{rgba(45, 49, 59, 1)};
   --foc-divider-line-color: #{rgba(white, 0.16)};
-  --foc-new-border-color: #{rgba(white, 0.22)};
+  --foc-new-border-color: #{rgba(white, 0.30)};
   --foc-menu-gradient-from: #{rgba(45, 49, 59, 1)}; // #{rgba(36, 41, 50, 1)};
   --foc-menu-gradient-to: #{rgba(45, 49, 59, 0)}; // #{rgba(36, 41, 50, 0)};
   --foc-new-menu-gradient-from: #{rgba(45, 49, 59, 1)};
   --foc-new-menu-gradient-to: #{rgba(45, 49, 59, 0)};
-  --foc-box-shadow: rgba(255, 255, 255, 0.14);
+  --foc-box-shadow: rgba(255, 255, 255, 0.11);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.09)};

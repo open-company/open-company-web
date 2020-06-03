@@ -44,12 +44,13 @@ div.threads-list {
       cursor: pointer;
       position: relative;
 
-      &:hover {
+      &:hover, &.open-item:hover, &.close-item:hover {
         background-color: var(--foc-hover-color);
         border-top: 1px solid var(--foc-hover-border-color);
         border-right: 1px solid var(--foc-hover-border-color);
         border-bottom: 1px solid var(--foc-hover-border-color);
         border-left: 1px solid var(--foc-hover-border-color);
+        box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
 
         &:not(.open-item):before {
           background-color: transparent;
@@ -287,10 +288,6 @@ div.threads-list {
               padding-right: 0;
               padding-top: 2px;
               margin-top: -8px;
-
-              div.thread-comment div.thread-comment-floating-buttons {
-                right: 16px;
-              }
             }
           }
 
@@ -366,7 +363,7 @@ div.threads-list {
             }
 
             &:hover, &.showing-picker {
-              div.thread-comment div.thread-comment-floating-buttons {
+              div.thread-comment div.react-bt-container {
                 display: block;
               }
             }
@@ -470,150 +467,52 @@ div.threads-list {
                 }
               }
 
-              div.thread-comment-floating-buttons {
-                position: absolute;
-                top: -16px;
-                right: 16px;
-                height: 32px;
+              div.react-bt-container {
+                height: 24px;
                 z-index: 2;
+                float: left;
+                margin-left: 8px;
+                margin-top: -2px;
                 display: none;
-                border-radius: 4px;
-                box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-                background-color: var(--color);
 
-                @include dark_mode() {
-                  box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+                div.emoji-mart {
+                  position: absolute;
+                  margin-left: 6px;
+                  top: unset;
+                  left: unset;
+                  right: unset;
+                  bottom: unset;
                 }
 
-                div.more-bt-container {
-                  height: 32px;
-                  float: left;
-                  position: relative;
-
-                  div.comment-more-menu-container {
-                    position: absolute;
-                    top: 34px;
-                    left: 0;
-                    padding: 8px 0;
-                    border-radius: 4px;
-                    width: 78px;
-                    outline: none;
-                    z-index: 110;
-                    background-color: var(--overlay-background-color);
-                    border: 1px solid var(--divider-line);
-
-                    button {
-                      padding: 0;
-                      margin: 0;
-                      @include OC_Body_Book();
-                      font-size: 14px;
-                      color: var(--color);
-                      line-height: 18px;
-                      cursor: pointer;
-                      padding: 8px 16px;
-                      background-color: var(--overlay-background-color);
-                      position: relative;
-                    }
+                div.emoji-picker-container {
+                  button.close-bt {
+                    display: none;
                   }
                 }
 
-                div.react-bt-container {
-                  height: 32px;
-                  float: left;
-
-                  div.emoji-mart {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    bottom: unset;
-                    left: unset;
-                  }
-
-                  div.emoji-picker-container {
-                    button.close-bt {
-                      display: none;
-                    }
-                  }
-                }
-
-                div.react-bt-container .tooltip {
-                  width: 86px;
-                }
-
-                .separator-bt {
-                  border-left: 1px solid rgba(white, 0.1);
-                }
-
-                button.floating-bt {
+                button.react-bt {
                   padding: 0;
-                  height: 32px;
-                  min-width: 32px;
+                  height: 24px;
+                  min-width: 24px;
                   background-position: center;
                   background-repeat: no-repeat;
                   padding: 0;
                   float: left;
-                  @include OC_Body_Bold();
-                  font-size: 12px;
-                  line-height: 32px;
-                  color: var(--overlay-background-color);
                   text-transform: uppercase;
+                  background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
+                  background-size: 24px 16px;
+                  background-position: center;
+                  border-right: none;
 
-                  @include big_web() {
-                    opacity: 0.5;
-                    &:hover {
-                      opacity: 1;
-
-                      &:before {
-                        opacity: 0.5;
-                      }
-                    }
-                  }
-
-                  &.more-bt {
-                    padding-left: 30px;
-                    background-image: cdnUrl("/img/ML/comment_more.svg");
-                    background-size: 18px 4px;
-                    background-position: left 8px top 14px;
-                  }
-
-                  &.reply-bt {
-                    padding-left: 24px;
-                    background-image: cdnUrl("/img/ML/comment_reply.svg");
-                    background-size: 12px 12px;
-                    background-position: left 8px top 10px;
-                  }
-
-                  &.react-bt {
-                    padding-left: 26px;
-                    background-image: cdnUrl("/img/ML/comment_react.svg");
-                    background-size: 14px 14px;
-                    background-position: left 8px top 9px;
-                    border-right: none;
-
-                    div.emoji-mart {
-                      right: 0;
-                      left: unset;
-                      position: absolute;
-                      top: 34px;
-                    }
+                  div.emoji-mart {
+                    right: 0;
+                    left: unset;
+                    position: absolute;
+                    top: 34px;
                   }
 
                   @include dark_mode() {
-                    &.more-bt {
-                      background-image: cdnUrl("/img/ML/comment_more@dark.svg");
-                    }
-
-                    &.share-bt {
-                      background-image: cdnUrl("/img/ML/comment_share@dark.svg");
-                    }
-
-                    &.reply-bt {
-                      background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
-                    }
-
-                    &.react-bt {
-                      background-image: cdnUrl("/img/ML/comment_react@dark.svg");
-                    }
+                    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
                   }
                 }
               }
@@ -649,6 +548,8 @@ div.threads-list {
                   align-items: flex-start;
                   flex-wrap: nowrap;
                   height: 18px;
+                  align-items: center;
+                  justify-content: flex-start;
 
                   @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
 
@@ -755,7 +656,6 @@ div.threads-list {
 
                   div.new-comment-tag {
                     flex: 0 0 auto;
-                    margin-left: 8px;
                     width: 35px;
                     height: 16px;
                     position: relative;

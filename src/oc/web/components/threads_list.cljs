@@ -74,94 +74,88 @@
            is-mobile? member?
            showing-picker? did-react-cb new-thread?
            current-user-id replies-count]}]
-  [:div.thread-comment-outer
-    {:key (str "thread-comment-" (:created-at comment-data))
-     :data-comment-uuid (:uuid comment-data)
-     :class (utils/class-set {:open-thread (not is-indented-comment?)
-                              :new-comment (:unread comment-data)
-                              :indented-comment is-indented-comment?
-                              :showing-picker showing-picker?
-                              :no-replies (zero? replies-count)})}
-    [:div.thread-comment
-      {:ref (str "thread-comment-" (:uuid comment-data))
-       :on-mouse-leave mouse-leave-cb}
-      [:div.thread-comment-inner
-        (when is-mobile?
-          [:div.thread-comment-mobile-menu
-            (more-menu {:entity-data comment-data
-                        :external-share false
-                        :entity-type "comment"
-                        :can-react? true
-                        :react-cb react-cb
-                        :can-reply? true
-                        :reply-cb reply-cb})
-            emoji-picker])
-        [:div.thread-comment-right
-          [:div.thread-comment-header.group
-            {:class utils/hide-class}
-            [:div.thread-comment-author-right
-              [:div.thread-comment-author-right-group
-                {:class (when (:unread comment-data) "new-comment")}
-                [:div.thread-comment-author-name-container
-                  (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
-                  [:div.thread-comment-author-avatar
-                    (user-avatar-image (:author comment-data))]
-                  [:div.thread-comment-author-name
-                    {:class (when (:user-id (:author comment-data)) "clickable-name")}
-                    (:name (:author comment-data))]]
-                [:div.separator-dot]
-                [:div.thread-comment-author-timestamp
-                  [:time
-                    {:date-time (:created-at comment-data)
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip comment-data)}
-                    (utils/foc-date-time (:created-at comment-data))]]]
-              (when (and (:unread comment-data)
-                         (or (and is-indented-comment?
-                                  (not new-thread?))
-                             (not is-indented-comment?)))
-                [:div.new-comment-tag])
-              (if (responsive/is-mobile-size?)
-                [:div.thread-comment-mobile-menu
-                  (more-menu comment-data nil {:external-share false
-                                               :entity-type "comment"
-                                               :can-react? true
-                                               :react-cb react-cb
-                                               :can-reply? true
-                                               :reply-cb reply-cb})
-                  emoji-picker]
-                [:div.thread-comment-floating-buttons
-                  ;; Reply to comment
-                  ; (when (:reply-parent comment-data)
-                  ;   [:button.mlb-reset.floating-bt.reply-bt.separator-bt
-                  ;     {:data-toggle "tooltip"
-                  ;      :data-placement "top"
-                  ;      :on-click reply-cb
-                  ;      :title "Reply"}
-                  ;     "Reply"])
-                  ;; React container
-                  [:div.react-bt-container.separator-bt
-                    [:button.mlb-reset.floating-bt.react-bt
-                      {:data-toggle "tooltip"
+  (let [show-new-comment-tag (and (:unread comment-data)
+                                  (or (and is-indented-comment?
+                                           (not new-thread?))
+                                      (not is-indented-comment?)))]
+    [:div.thread-comment-outer
+      {:key (str "thread-comment-" (:created-at comment-data))
+       :data-comment-uuid (:uuid comment-data)
+       :class (utils/class-set {:open-thread (not is-indented-comment?)
+                                :new-comment (:unread comment-data)
+                                :indented-comment is-indented-comment?
+                                :showing-picker showing-picker?
+                                :no-replies (zero? replies-count)})}
+      [:div.thread-comment
+        {:ref (str "thread-comment-" (:uuid comment-data))
+         :on-mouse-leave mouse-leave-cb}
+        [:div.thread-comment-inner
+          (when is-mobile?
+            [:div.thread-comment-mobile-menu
+              (more-menu {:entity-data comment-data
+                          :external-share false
+                          :entity-type "comment"
+                          :can-react? true
+                          :react-cb react-cb
+                          :can-reply? true
+                          :reply-cb reply-cb})
+              emoji-picker])
+          [:div.thread-comment-right
+            [:div.thread-comment-header.group
+              {:class utils/hide-class}
+              [:div.thread-comment-author-right
+                [:div.thread-comment-author-right-group
+                  {:class (when (:unread comment-data) "new-comment")}
+                  [:div.thread-comment-author-name-container
+                    (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
+                    [:div.thread-comment-author-avatar
+                      (user-avatar-image (:author comment-data))]
+                    [:div.thread-comment-author-name
+                      {:class (when (:user-id (:author comment-data)) "clickable-name")}
+                      (:name (:author comment-data))]]
+                  [:div.separator-dot]
+                  [:div.thread-comment-author-timestamp
+                    [:time
+                      {:date-time (:created-at comment-data)
+                       :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
-                       :title "Add reaction"
-                       :on-click react-cb}]
-                    emoji-picker]])]]
-          [:div.thread-comment-content
-            [:div.thread-comment-body.oc-mentions.oc-mentions-hover
-              {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-               :ref (str "comment-body-" (:uuid comment-data))
-               :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                        utils/hide-class true})}]]
-          (when (seq (:reactions comment-data))
-            [:div.thread-comment-reactions-footer.group
-              (reactions {:entity-data comment-data
-                          :hide-picker (zero? (count (:reactions comment-data)))
-                          :did-react-cb did-react-cb
-                          :optional-activity-data activity-data})])]]]])
+                       :data-container "body"
+                       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                       :data-title (utils/activity-date-tooltip comment-data)}
+                      (utils/foc-date-time (:created-at comment-data))]]]
+                (when show-new-comment-tag
+                  [:div.separator-dot])
+                (when show-new-comment-tag
+                  [:div.new-comment-tag])
+                (if (responsive/is-mobile-size?)
+                  [:div.thread-comment-mobile-menu
+                    (more-menu comment-data nil {:external-share false
+                                                 :entity-type "comment"
+                                                 :can-react? true
+                                                 :react-cb react-cb
+                                                 :can-reply? true
+                                                 :reply-cb reply-cb})
+                    emoji-picker]
+                  (when-not (seq (:reactions comment-data))
+                    [:div.react-bt-container
+                      [:button.mlb-reset.react-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :title "Add reaction"
+                         :on-click react-cb}]
+                      emoji-picker]))]]
+            [:div.thread-comment-content
+              [:div.thread-comment-body.oc-mentions.oc-mentions-hover
+                {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+                 :ref (str "comment-body-" (:uuid comment-data))
+                 :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                          utils/hide-class true})}]]
+            (when (seq (:reactions comment-data))
+              [:div.thread-comment-reactions-footer.group
+                (reactions {:entity-data comment-data
+                            :hide-picker (zero? (count (:reactions comment-data)))
+                            :did-react-cb did-react-cb
+                            :optional-activity-data activity-data})])]]]]))
 
 (rum/defc thread-top
   [{last-activity-at :last-activity-at current-user-id :current-user-id {:keys [publisher board-name published-at headline body] :as activity-data} :activity-data}]
@@ -239,6 +233,7 @@
                      (when (and (not (utils/button-clicked? e))
                                 (not (utils/input-clicked? e))
                                 (not (utils/anchor-clicked? e))
+                                (not (utils/event-inside? e (.querySelector thread-el "div.emoji-picker-container")))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false comment-uuid))))}
       (when open-item
