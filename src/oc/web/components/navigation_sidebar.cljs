@@ -244,7 +244,7 @@
           [:a.nav-link.threads-view.hover-item.group
             {:class (utils/class-set {:item-selected is-threads
                                       :new unread-threads})
-             :href "."
+             :href (oc-urls/threads)
              :on-click (fn [e]
                          (utils/event-stop e)
                          (nav-actions/nav-to-url! e "threads" (oc-urls/threads)))}
