@@ -716,11 +716,11 @@
   ([] (current-user-data @app-state))
   ([data] (get-in data [:current-user-data])))
 
-(defn orgs-data
+(defn ^:export orgs-data
   ([] (orgs-data @app-state))
   ([data] (get data orgs-key)))
 
-(defn org-data
+(defn ^:export org-data
   "Get org data."
   ([]
     (org-data @app-state (router/current-org-slug)))
@@ -729,7 +729,7 @@
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
-(defn posts-data
+(defn ^:export posts-data
   "Get org all posts data."
   ([]
     (posts-data @app-state))
@@ -738,7 +738,7 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
-(defn threads-data
+(defn ^:export threads-data
   "Get all the threads of the given org."
   ([]
     (threads-data @app-state))
@@ -792,7 +792,7 @@
      (map :slug filtered-boards)
      filtered-boards))))
 
-(defn container-data
+(defn ^:export container-data
   "Get container data."
   ([]
     (container-data @app-state))
@@ -805,7 +805,7 @@
   ([data org-slug posts-filter sort-type]
     (get-in data (container-key org-slug posts-filter sort-type))))
 
-(defn filtered-posts-data
+(defn ^:export filtered-posts-data
   ([]
     (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data]
@@ -832,7 +832,7 @@
   ;       (zipmap items-list (map #(get posts-data %) items-list))))))
   )
 
-(defn items-to-render-data
+(defn ^:export items-to-render-data
   ([]
     (items-to-render-data @app-state))
   ([data]
@@ -859,7 +859,7 @@
   ;       (zipmap items-list (map #(get posts-data %) items-list))))))
   )
 
-(defn draft-posts-data
+(defn ^:export draft-posts-data
   ([]
     (draft-posts-data @app-state (router/current-org-slug)))
   ([org-slug]
@@ -867,7 +867,7 @@
   ([data org-slug]
     (filtered-posts-data data @router/path org-slug utils/default-drafts-board-slug)))
 
-(defn activity-data
+(defn ^:export activity-data
   "Get activity data."
   ([]
     (activity-data (router/current-org-slug) (router/current-activity-id) @app-state))
@@ -880,14 +880,14 @@
       (get-in data activity-key))))
 (def activity-data-get activity-data)
 
-(defn thread-data
+(defn ^:export thread-data
   "Get thread data."
   ([thread-uuid]
     (thread-data (router/current-org-slug) thread-uuid @app-state))
   ([org-slug thread-uuid data]
     (get-in data (thread-key org-slug thread-uuid))))
 
-(defn secure-activity-data
+(defn ^:export secure-activity-data
   "Get secure activity data."
   ([]
     (secure-activity-data (router/current-org-slug) (router/current-secure-activity-id) @app-state))
@@ -899,7 +899,7 @@
     (let [activity-key (secure-activity-key org-slug secure-id)]
       (get-in data activity-key))))
 
-(defn comments-data
+(defn ^:export comments-data
   ([]
     (comments-data (router/current-org-slug) @app-state))
   ([org-slug]
@@ -907,7 +907,7 @@
   ([org-slug data]
     (get-in data (comments-key org-slug))))
 
-(defn activity-comments-data
+(defn ^:export activity-comments-data
   ([]
     (activity-comments-data
      (router/current-org-slug)
@@ -922,7 +922,7 @@
   ([org-slug activity-uuid data]
     (get-in data (activity-comments-key org-slug activity-uuid))))
 
-(defn teams-data
+(defn ^:export teams-data
   ([] (teams-data @app-state))
   ([data] (get-in data teams-data-key)))
 
@@ -1120,6 +1120,9 @@
 (defn print-filtered-posts []
   (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter)))
 
+(defn print-threads-data []
+  (get-in @app-state (threads-data-key (router/current-org-slug))))
+
 (defn print-items-to-render []
   (items-to-render-data @app-state (router/current-org-slug) (router/current-posts-filter)))
 
@@ -1156,6 +1159,7 @@
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintItemsToRender js/window) print-items-to-render)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
+(set! (.-OCWebPrintThreadsData js/window) print-threads-data)
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
