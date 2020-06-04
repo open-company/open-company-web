@@ -31,6 +31,7 @@
           reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
           is-root-comment (empty? (:parent-uuid comment-map))]
       (-> comment-map
+        (assoc :content-type :comment)
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))
