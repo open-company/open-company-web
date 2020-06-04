@@ -871,16 +871,13 @@
 
 (defun mark-read
   ([activity-uuid :guard string?]
-   (js/console.log "DBG activity-actions/mark-read" activity-uuid)
    (mark-read (dis/activity-data activity-uuid)))
 
   ([activity-data]
-   (js/console.log "DBG activity-actions/mark-read" activity-data)
    (when (and activity-data
               (not= activity-data :404)
               (= (:content-type activity-data) :entry)
               (not (:loading activity-data)))
-     (js/console.log "DBG   mark-read!")
      (send-item-read (:uuid activity-data))
      (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
      (inbox-dismiss (:uuid activity-data)))))
