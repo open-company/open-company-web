@@ -180,6 +180,31 @@ div.threads-list {
             color: var(--color);
             align-self: center;
           }
+
+          button.mute-bt {
+            flex: 0 0 auto;
+            width: 24px;
+            height: 24px;
+            margin-left: auto;
+            background-size: 14px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+
+            &.following {
+              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+            }
+
+            &.unfollowing {
+              background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+            }
+
+            @include big_web() {
+              &:hover {
+                opacity: 1;
+              }
+            }
+          }
         }
 
         div.thread-item-title {

@@ -159,25 +159,37 @@
 
 (rum/defc thread-top
   [{last-activity-at :last-activity-at current-user-id :current-user-id {:keys [publisher board-name published-at headline body] :as activity-data} :activity-data}]
-  [:div.thread-item-top
-    [:div.thread-item-header
-      [:div.thread-item-author-container
-        (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
-        (user-avatar-image publisher)
-        [:span.author-name
-          (:name publisher)]]
-      [:span.in "in"]
-      [:div.thread-item-board-container
-        (board-info-hover {:activity-data activity-data})
-        [:span.board-name
-          board-name]]
-      [:div.separator-dot]
-      [:span.time-since
-        [:time
-          {:date-time published-at}
-          (utils/tooltip-date published-at)]]]
-    [:div.thread-item-title
-      headline]])
+  (let [follow-link (utils/link-for (:links activity-data) "follow")
+        unfollow-link (utils/link-for (:links activity-data) "unfollow")]
+    [:div.thread-item-top
+      [:div.thread-item-header
+        [:div.thread-item-author-container
+          (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
+          (user-avatar-image publisher)
+          [:span.author-name
+            (:name publisher)]]
+        [:span.in "in"]
+        [:div.thread-item-board-container
+          (board-info-hover {:activity-data activity-data})
+          [:span.board-name
+            board-name]]
+        [:div.separator-dot]
+        [:span.time-since
+          [:time
+            {:date-time published-at}
+            (utils/tooltip-date published-at)]]
+        (when (or follow-link unfollow-link)
+          [:button.mlb-reset.mute-bt
+            {:title (if follow-link
+                      "Get notified about new activity"
+                      "Don't show future replies to this update")
+             :class (if follow-link "unfollowing" "following")
+             :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :on-click #(activity-actions/inbox-unfollow (:uuid activity-data))}])]
+      [:div.thread-item-title
+        headline]]))
 
 (defn- thread-item-unique-class [{:keys [resource-uuid uuid]}]
   (str "thread-item-" resource-uuid "-" uuid))
