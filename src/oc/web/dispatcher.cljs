@@ -137,8 +137,8 @@
 (defn activity-threads-map-key [org-slug activity-uuid]
   (vec (concat (comments-key org-slug) [activity-uuid threads-map-key])))
 
-(defn thread-data-key [org-slug activity-uuid thread-uuid]
-  (vec (concat (comments-key org-slug) [activity-uuid threads-map-key thread-uuid])))
+(defn activity-thread-data-key [org-slug activity-uuid thread-uuid]
+  (vec (concat (activity-threads-map-key org-slug activity-uuid) [thread-uuid])))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -283,7 +283,7 @@
                                   %)
                            threads-list)))]
       (map (fn [thread-data]
-              (let [thread-key (thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
+              (let [thread-key (activity-thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
                     thread-comments (get-in base thread-key)]
                 (merge thread-data thread-comments)))
         container-items)))
