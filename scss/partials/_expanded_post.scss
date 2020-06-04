@@ -559,7 +559,6 @@ div.expanded-post {
 
         div.reactions {
           float: left;
-          margin-left: 32px;
 
           @include mobile() {
             margin-top: 13px;
