@@ -135,22 +135,43 @@
          (vec (rest ;; Always remove the first label
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
 
-;; 
-
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
 
 (defun is-publisher?
 
-  ([entry-data :guard map?]
+  ([entry-data :guard :publisher]
    (when (jwt/jwt)
      (is-publisher? (jwt/user-id) entry-data)))
 
-  ([user-data :guard :user-id entry-data :guard map?]
+  ([user-data :guard :user-id entry-data :guard :publisher]
    (is-publisher? (:user-id user-data) entry-data))
 
-  ([user-id :guard string? entry-data :guard map?]
-   (= (jwt/user-id) (-> entry-data :publisher :user-id))))
+  ([user-id :guard string? entry-data :guard :publisher]
+   (= user-id (-> entry-data :publisher :user-id)))
+
+  ([user-id :guard string? publisher-id :guard string?]
+   (= user-id publisher-id)))
+
+(defun is-author?
+  "Check if current user is the author of the entry/comment or whole thread."
+  ([entity-data :guard :author]
+   (when (jwt/jwt)
+     (is-author? (jwt/user-id) entity-data)))
+
+  ([user-data :guard :user-id entity-data :guard :author]
+   (is-author? (:user-id user-data) entity-data))
+
+  ([user-id :guard string? entity-data :guard #(and (:author %)
+                                                    (#{:comment :entry} (:content-type %)))]
+   (is-author? user-id (-> entity-data :author :user-id)))
+
+  ([user-id :guard string? entity-data :guard #(= (:content-type %) :thread)]
+   (and (is-author? user-id (-> entity-data :author :user-id))
+        (every? (partial is-author? user-id) (:reply-authors entity-data))))
+
+  ([user-id :guard string? author-id :guard string?]
+   (= user-id author-id)))
 
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
@@ -316,25 +337,41 @@
       :opts opts
       :gray-style gray-scale?})))
 
-(defn- insert-caught-up [items-list check-fn & [options]]
-  (when (seq items-list)
-    (loop [to-items []
-          from-items items-list]
-      (let [item (first from-items)
-            insert? (check-fn item)]
-        (cond
-         (and insert?
-              (not (seq to-items))
-              (:hide-top-line options))
-         items-list
-         (and insert?
-              (not (seq from-items)))
-         items-list
-         insert?
-         (vec (concat to-items [(caught-up-map (last to-items) (not (seq to-items)) default-caught-up-message options)] from-items))
-         :else
-         (recur (vec (conj to-items (first from-items)))
-                (rest from-items)))))))
+(defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
+  (let [index (loop [ret-idx 0
+                     idx 0
+                     items items-list]
+                (let [item (first items)
+                      next-items (rest items)]
+                  (cond
+                   ;; We reached the end, no more items, return last index
+                   (nil? item)
+                   ret-idx
+                   ;; Found the first read item, return
+                   (check-fn item)
+                   idx
+                   (ignore-fn item)
+                   (recur ret-idx
+                          (inc idx)
+                          next-items)
+                   :else
+                   (recur idx
+                          (inc idx)
+                          next-items))))
+        [before after] (split-at index items-list)]
+    (cond
+      (and has-next
+           (= index (count items-list)))
+      items-list
+      (= index (count items-list))
+      (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)])
+      (and hide-top-line
+           (zero? index))
+      items-list
+      :else
+      (vec (remove nil? (concat before
+                                [(caught-up-map (last before) (zero? index) default-caught-up-message opts)]
+                                after))))))
 
 (defn- insert-open-close-item [items-list check-fn]
   (map
@@ -372,19 +409,28 @@
     entry-data
     (let [comments-link (utils/link-for (:links entry-data) "comments")
           add-comment-link (utils/link-for (:links entry-data) "create" "POST")
+          published? (is-published? entry-data)
           fixed-board-uuid (or (:board-uuid entry-data) (:uuid board-data))
           fixed-board-slug (or (:board-slug entry-data) (:slug board-data))
           fixed-board-name (or (:board-name entry-data) (:name board-data))
-          fixed-board-access (if (is-published? entry-data)
+          fixed-board-access (if published?
                                (or (:board-access entry-data) (:access board-data))
                                "private")
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
           is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
-          fixed-publisher (get active-users (-> entry-data :publisher :user-id))]
+          fixed-publisher (when published?
+                            (get active-users (-> entry-data :publisher :user-id)))]
       (-> entry-data
         (assoc :content-type :entry)
-        (update :publisher merge fixed-publisher)
+        (assoc :published? published?)
+        (as-> e
+          (if published?
+            (update e :publisher merge fixed-publisher)
+            e)
+          (if published?
+            (assoc e :publisher? (is-publisher? e))
+            e))
         (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
         (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
         (assoc :read-only (readonly-entry? (:links entry-data)))
@@ -413,8 +459,7 @@
    (fix-board board-data change-data active-users (dis/follow-boards-list)))
 
   ([board-data change-data active-users follow-boards-list & [direction]]
-    (let [links (:links board-data)
-          with-fixed-activities* (reduce (fn [ret item]
+    (let [with-fixed-activities* (reduce (fn [ret item]
                                            (assoc-in ret [:fixed-items (:uuid item)]
                                             (fix-entry item {:slug (:board-slug item)
                                                              :name (:board-name item)
@@ -430,20 +475,16 @@
                                            (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
                                  with-fixed-activities*
                                  (:posts-list board-data))
+          keep-link-rel (if (= direction :down) "previous" "next")
           next-links (when direction
-                      (vec
-                       (remove
-                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
-                        links)))
+                      (vec (remove #(= (:rel %) keep-link-rel) (:links board-data))))
           link-to-move (when direction
-                         (if (= direction :down)
-                           (utils/link-for (:old-links board-data) "previous")
-                           (utils/link-for (:old-links board-data) "next")))
+                         (utils/link-for (:old-links board-data) keep-link-rel))
           fixed-next-links (if direction
                              (if link-to-move
                                (vec (conj next-links link-to-move))
                                next-links)
-                             links)
+                             (:links board-data))
           new-data-parse? (contains? board-data :items)
           items-list (if new-data-parse?
                        ;; In case we are parsing a fresh response from server
@@ -462,7 +503,7 @@
           with-ending-item (insert-ending-item with-open-close-items fixed-next-links)
           follow-board-uuids (set (map :uuid follow-boards-list))]
       (-> with-fixed-activities
-        (assoc :read-only (readonly-board? links))
+        (assoc :read-only (readonly-board? (:links board-data)))
         (dissoc :old-links :items)
         (assoc :posts-list full-items-list)
         (assoc :items-to-render with-ending-item)
@@ -497,15 +538,11 @@
                                            (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
                                  with-fixed-activities*
                                  (:posts-list contributions-data))
+          keep-link-rel (if (= direction :down) "previous" "next")
           next-links (when direction
-                      (vec
-                       (remove
-                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
-                        (:links contributions-data))))
+                      (vec (remove #(= (:rel %) keep-link-rel) (:links contributions-data))))
           link-to-move (when direction
-                         (if (= direction :down)
-                           (utils/link-for (:old-links contributions-data) "previous")
-                           (utils/link-for (:old-links contributions-data) "next")))
+                         (utils/link-for (:old-links contributions-data) keep-link-rel))
           fixed-next-links (if direction
                              (if link-to-move
                                (vec (conj next-links link-to-move))
@@ -563,15 +600,11 @@
                                            (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
                                  with-fixed-activities*
                                  (:posts-list container-data))
+          keep-link-rel (if (= direction :down) "previous" "next")
           next-links (when direction
-                      (vec
-                       (remove
-                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
-                        (:links container-data))))
+                      (vec (remove #(= (:rel %) keep-link-rel) (:links container-data))))
           link-to-move (when direction
-                         (if (= direction :down)
-                           (utils/link-for (:old-links container-data) "previous")
-                           (utils/link-for (:old-links container-data) "next")))
+                         (utils/link-for (:old-links container-data) keep-link-rel))
           fixed-next-links (if direction
                              (if link-to-move
                                (vec (conj next-links link-to-move))
@@ -596,7 +629,12 @@
           with-caught-up (if (= (:container-slug container-data) :following)
                            (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
                                  items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
-                             (insert-caught-up grouped-items #(->> % :uuid (get items-map) :unread not) {:hide-top-line true}))
+                             (insert-caught-up grouped-items
+                              #(->> % :uuid (get items-map) :unread not)
+                              #(or (not= (:content-type %) :entry)
+                                   (->> % :uuid (get items-map) :publisher?))
+                              {:hide-top-line true
+                               :has-next (utils/link-for fixed-next-links "next")}))
                            grouped-items)
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))
           with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
@@ -615,7 +653,8 @@
       (assoc :entry entry-data)
       (update :author merge fixed-author)
       (assoc :unread comment-unread)
-      (assoc :unread-thread thread-unread))))
+      (assoc :unread-thread thread-unread)
+      (as-> t (assoc t :monologue? (is-author? t))))))
 
 (defn fix-threads
   "
@@ -652,15 +691,11 @@
                                           next-ret))))
                             with-fixed-entries
                             (:items with-fixed-entries))
+          keep-link-rel (if (= direction :down) "previous" "next")
           next-links (when direction
-                      (vec
-                       (remove
-                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
-                        (:links threads-data))))
+                      (vec (remove #(= (:rel %) keep-link-rel) (:links threads-data))))
           link-to-move (when direction
-                         (if (= direction :down)
-                           (utils/link-for (:old-links threads-data) "previous")
-                           (utils/link-for (:old-links threads-data) "next")))
+                         (utils/link-for (:old-links threads-data) keep-link-rel))
           fixed-next-links (if direction
                              (if link-to-move
                                (vec (conj next-links link-to-move))
@@ -680,12 +715,14 @@
                                :down (concat (:threads-list threads-data) items-list)
                                items-list))
                          items-list)
-          unread-thread-fn (fn [thread]
-                             (let [thread-uuid (:uuid thread)
-                                   thread-data (or (get-in with-fixed-threads [:fixed-items thread-uuid])
-                                                   (dis/thread-data thread-uuid))]
-                               (-> thread-data :unread-thread not)))
-          with-caught-up (insert-caught-up threads-list unread-thread-fn)
+          get-thread-data (fn [thread-uuid]
+                            (or (get-in with-fixed-threads [:fixed-items thread-uuid])
+                                (dis/thread-data thread-uuid)))
+          with-caught-up (insert-caught-up threads-list
+                          #(-> :uuid get-thread-data :unread-thread not)
+                          #(or (not= (:content-type %) :thread)
+                               (-> :uuid get-thread-data :monologue?))
+                          {:has-next (utils/link-for fixed-next-links "next")})
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
           with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
