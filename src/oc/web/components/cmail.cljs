@@ -477,7 +477,6 @@
         post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
                       show-paywall-alert?
-                      (au/empty-body? @(::last-body s))
                       (not publishable?)
                       @(::publishing s)
                       @(::disable-post s))
