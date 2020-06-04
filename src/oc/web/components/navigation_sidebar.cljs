@@ -265,7 +265,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "You"]
+                "Wut you said"]
                 ; (when (pos? (:contributions-count org-data))
                 ;   [:span.count (:contributions-count org-data)])
                 ]])
