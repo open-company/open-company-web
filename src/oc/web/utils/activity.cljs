@@ -374,13 +374,17 @@
                                 after))))))
 
 (defn- insert-open-close-item [items-list check-fn]
-  (map
-   (fn [idx]
-     (let [prev-item (get items-list (dec idx))
-           item (get items-list idx)
-           next-item (get items-list (inc idx))]
-       (assoc item :open-item (check-fn :open item prev-item) :close-item (check-fn :close item next-item))))
-   (range (count items-list))))
+  (vec
+   (remove nil?
+    (map
+     (fn [idx]
+       (let [prev-item (get items-list (dec idx))
+             item (get items-list idx)
+             next-item (get items-list (inc idx))]
+         (when item
+           (assoc item :open-item (check-fn :open item prev-item)
+                       :close-item (check-fn :close item next-item)))))
+     (range (count items-list))))))
 
 (defn- insert-ending-item [items-list links]
   (let [next-link (utils/link-for links "next")
