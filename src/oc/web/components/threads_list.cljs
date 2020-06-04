@@ -340,8 +340,9 @@
     (let [items-to-render (-> s :rum/args first :items-to-render)
           items-container (rum/ref-node s :threads-list)
           offset-top (if (responsive/is-mobile-size?) responsive/mobile-navbar-height responsive/navbar-height)]
+      ; (js/console.log "DBG   items-to-render" items-to-render items-container offset-top)
       (doseq [item items-to-render
-              :when (and (= (:content-type item) :thread)
+              :when (and (#{:comment :thread} (:content-type item))
                          (:unread-thread item)
                          (not (@(::read-items s) (:resource-uuid item))))]
         (mark-read-if-needed s items-container offset-top item))

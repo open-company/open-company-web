@@ -15,7 +15,7 @@
 
 (def headline-placeholder "Add a title")
 
-(def empty-body-html "<p><br/></p>")
+(def empty-body-html "<p><br></p>")
 
 ;; Posts separators
 
@@ -310,7 +310,7 @@
 (defn empty-body? [body]
   (boolean
    (or (s/blank? body)
-       (re-matches #"(?i)^\s*<p[^>]*><br\s*/?></p>\s*$" body))))
+       (re-matches #"(?i)^(\s*<p[^>]*>\s*(<br[^>]*/?>)*?\s*</p>\s*)*$" body))))
 
 (defn has-body? [data]
   (not (empty-body? (:body data))))
