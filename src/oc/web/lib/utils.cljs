@@ -308,12 +308,13 @@
   (.stopPropagation e))
 
 (defn event-inside? [e el]
-  (loop [element (.-target e)]
-    (if element
-      (if (= element el)
-        true
-        (recur (.-parentElement element)))
-      false)))
+  (when e
+    (loop [element (.-target e)]
+      (if element
+        (if (= element el)
+          true
+          (recur (.-parentElement element)))
+        false))))
 
 (defn to-end-of-content-editable [content-editable-element]
   (if (.-createRange js/document)
