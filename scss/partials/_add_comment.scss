@@ -43,7 +43,7 @@ div.add-comment-box-container {
       padding: 13px 16px;
       background-color: var(--add-comment-background);
 
-      &.active {
+      &:hover, &:active, &:focus, &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
         @include dark_mode() {
