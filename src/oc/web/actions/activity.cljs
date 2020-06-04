@@ -1,6 +1,7 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [defun.core :refer (defun)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -868,14 +869,21 @@
 
 (declare inbox-dismiss)
 
-(defn mark-read [activity-uuid]
-  (let [activity-data (dis/activity-data activity-uuid)]
-    (when (and activity-data
-               (not= activity-data :404)
-               (not (:loading activity-data)))
-      (send-item-read activity-uuid)
-      (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
-      (inbox-dismiss activity-uuid))))
+(defun mark-read
+  ([activity-uuid :guard string?]
+   (js/console.log "DBG activity-actions/mark-read" activity-uuid)
+   (mark-read (dis/activity-data activity-uuid)))
+
+  ([activity-data]
+   (js/console.log "DBG activity-actions/mark-read" activity-data)
+   (when (and activity-data
+              (not= activity-data :404)
+              (= (:content-type activity-data) :entry)
+              (not (:loading activity-data)))
+     (js/console.log "DBG   mark-read!")
+     (send-item-read (:uuid activity-data))
+     (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
+     (inbox-dismiss (:uuid activity-data)))))
 
 ;; Video handling
 

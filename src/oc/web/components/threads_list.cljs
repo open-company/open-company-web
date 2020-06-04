@@ -328,9 +328,11 @@
                                 (map #(assoc % :expanded true) children))))))))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
+  (js/console.log "DBG mark-read-if-needed" item)
   (when-let [item-node (.querySelector items-container (str "div." (thread-item-unique-class item)))]
     (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
       (swap! (::read-items s) conj (:resource-uuid item))
+      (js/console.log "DBG     mark-read"  (:resource-uuid item))
       (activity-actions/mark-read (:resource-uuid item)))))
 
 (defn- did-scroll [s _scroll-event]
