@@ -370,12 +370,12 @@
     (cond
       (and has-next
            (= index (count items-list)))
-      items-list
+      (vec items-list)
       (= index (count items-list))
-      (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)])
+      (vec (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)]))
       (and hide-top-line
            (zero? index))
-      items-list
+      (vec items-list)
       :else
       (vec (remove nil? (concat before
                                 [(caught-up-map (last before) (zero? index) default-caught-up-message opts)]
@@ -399,17 +399,18 @@
         last-item (last items-list)]
     (cond
      (and (seq items-list) has-next)
-     (concat items-list [{:content-type :loading-more
-                          :last-activity-at (next-activity-timestamp last-item)
-                          :message (if (= (:content-type last-item) :thread)
-                                     "Loading more threads..."
-                                     "Loading more posts...")}])
+     (vec (concat items-list [{:content-type :loading-more
+                               :last-activity-at (next-activity-timestamp last-item)
+                               :message (if (= (:content-type last-item) :thread)
+                                          "Loading more threads..."
+                                          "Loading more posts...")}]))
      carrot-close?
-     (concat items-list [{:content-type :carrot-close
-                          :last-activity-at (next-activity-timestamp (last items-list))
-                          :message "🤠 You've reached the end, partner"}])
+     (vec
+      (concat items-list [{:content-type :carrot-close
+                           :last-activity-at (next-activity-timestamp (last items-list))
+                           :message "🤠 You've reached the end, partner"}]))
      :else
-     items-list)))
+     (vec items-list))))
 
 (defn fix-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
