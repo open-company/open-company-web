@@ -282,7 +282,7 @@
                                     (merge % thread {:activity-data activity-data}))
                                   %)
                            threads-list)))]
-      (map (fn [thread-data]
+      (mapv (fn [thread-data]
               (let [thread-key (activity-thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
                     thread-comments (get-in base thread-key)]
                 (merge thread-data thread-comments)))
