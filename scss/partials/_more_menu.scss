@@ -28,7 +28,7 @@ div.more-menu {
     background-position: center;
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.24;;
+    opacity: 0.5;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
@@ -59,7 +59,7 @@ div.more-menu {
     padding: 0;
     background-repeat: no-repeat;
     display: inline-block;
-    opacity: 0.24;
+    opacity: 0.5;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
@@ -87,7 +87,7 @@ div.more-menu {
   button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: 1px solid var(--opac-background-color-15);
+    border-right: 0px solid var(--opac-background-color-15);
   }
 
   button.more-menu-remove-bookmark-bt {
@@ -98,7 +98,7 @@ div.more-menu {
     background-position: center;
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.24;;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -144,7 +144,7 @@ div.more-menu {
       border-bottom-right-radius: 4px;
       padding: 0;
       background-repeat: no-repeat;
-      opacity: 0.24;;
+      opacity: 0.5;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
@@ -191,7 +191,7 @@ div.more-menu {
     background-position: center;
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.24;;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -220,7 +220,7 @@ div.more-menu {
     background-position: center;
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.24;;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -259,7 +259,7 @@ div.more-menu {
     background-position: center;
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.24;;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
