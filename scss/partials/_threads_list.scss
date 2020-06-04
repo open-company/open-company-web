@@ -55,6 +55,10 @@ div.threads-list {
         &:not(.open-item):before {
           background-color: transparent;
         }
+
+        div.thread-item-top div.thread-item-header button.mute-bt {
+          display: block;
+        }
       }
 
       &.unread {
@@ -190,6 +194,7 @@ div.threads-list {
             background-position: center;
             background-repeat: no-repeat;
             opacity: 0.5;
+            display: none;
 
             &.following {
               background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
