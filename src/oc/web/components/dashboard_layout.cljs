@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -144,7 +143,7 @@
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         search-active? (drv/react s search/search-active?)
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        member? (:member? org-data)
         is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
         show-follow-banner? (and (not is-container?)
                                  (not (seq current-contributions-id))

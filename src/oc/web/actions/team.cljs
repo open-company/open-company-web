@@ -2,7 +2,6 @@
   (:require [clojure.string :as string]
             [taoensso.timbre :as timbre]
             [oc.web.api :as api]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.utils.user :as uu]

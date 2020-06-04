@@ -3,7 +3,6 @@
             [dommy.core :as dom]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
@@ -76,7 +75,7 @@
                                        ;; Never if they have polls
                                        (not (seq (:polls activity-data)))
                                        ;; Only for users we can know if they read it or not
-                                       (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+                                       (:member? (dis/org-data))
                                        ;; Only when they are read
                                        (not (:unread activity-data))
                                        ;; And only when there is at least a comment
@@ -148,7 +147,7 @@
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         current-user-data (drv/react s :current-user-data)
         current-user-id (:user-id current-user-data)
-        is-publisher? (= (:user-id publisher) current-user-id)
+        is-publisher? (:publisher? publisher)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
@@ -156,7 +155,7 @@
                         :height @(::mobile-video-height s)}
                        {:width 638
                         :height (utils/calc-video-height 638)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
+        user-is-part-of-the-team (:member? org-data)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)

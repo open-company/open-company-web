@@ -29,6 +29,7 @@
     (-> org-data
      read-only-org
      (assoc :boards fixed-boards)
+     (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
      (assoc :drafts-count (org-utils/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
      (assoc :bookmarks-count (org-utils/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
      (assoc :unfollowing-count (org-utils/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data))))))

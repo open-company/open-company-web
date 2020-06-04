@@ -134,7 +134,7 @@
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
         current-user-data (drv/react s :current-user-data)
-        is-author? (au/is-publisher? (:user-id current-user-data) activity-data)
+        is-author? (:publisher? activity-data)
         read-data* (drv/react s :wrt-read-data)
         read-data (as-> read-data* rd
                    (update rd :unreads (fn [unreads]
@@ -324,7 +324,7 @@
 (rum/defc wrt-count < rum/static
   [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
-        is-author? (au/is-publisher? activity-data)
+        is-author? (:publisher? activity-data)
         reads-count (if (and is-author?
                              (:last-read-at activity-data))
                      (dec (:count reads-data))

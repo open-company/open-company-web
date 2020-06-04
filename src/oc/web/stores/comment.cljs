@@ -7,7 +7,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.utils.comment :as comment-utils]))
+            [oc.web.utils.comment :as comment-utils]
+            [oc.web.utils.activity :as activity-utils]))
 
 (defn- is-emoji
   [body]
@@ -32,6 +33,7 @@
           is-root-comment (empty? (:parent-uuid comment-map))]
       (-> comment-map
         (assoc :content-type :comment)
+        (assoc :author? (activity-utils/is-author? comment-map))
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))

@@ -38,7 +38,6 @@
         comments-data (get-in @dis/app-state comments-key)
         add-comment-link (utils/link-for (:links activity-data) "create" "POST")
         current-user-id (jwt/user-id)
-        is-publisher? (= (-> activity-data :publisher :user-id) current-user-id)
         new-comment-uuid (utils/activity-uuid)
         user-data (if (jwt/jwt)
                     (jwt/get-contents)
@@ -51,7 +50,7 @@
                          :author {:name (:name user-data)
                                   :avatar-url (:avatar-url user-data)
                                   :user-id (:user-id user-data)}}
-        first-comment-from-user? (when-not is-publisher?
+        first-comment-from-user? (when-not (:publisher? activity-data)
                                    (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))
         should-show-follow-notification? (and first-comment-from-user?
                                               (utils/link-for (:links activity-data) "follow"))]

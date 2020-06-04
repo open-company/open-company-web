@@ -5,7 +5,6 @@
             [goog.events.EventType :as EventType]
             [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]))

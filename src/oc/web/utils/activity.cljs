@@ -140,38 +140,45 @@
 
 (defun is-publisher?
 
-  ([entry-data :guard :publisher]
+  ([entry-data :guard map?]
    (when (jwt/jwt)
-     (is-publisher? (jwt/user-id) entry-data)))
+     (is-publisher? entry-data (jwt/user-id))))
 
-  ([user-data :guard :user-id entry-data :guard :publisher]
-   (is-publisher? (:user-id user-data) entry-data))
+  ([entry-author-id :guard string?]
+   (when (jwt/jwt)
+     (is-publisher? entry-author-id (jwt/user-id))))
 
-  ([user-id :guard string? entry-data :guard :publisher]
-   (= user-id (-> entry-data :publisher :user-id)))
+  ([entry-data :guard map? user-data :guard :user-id]
+   (is-publisher? entry-data (:user-id user-data)))
 
-  ([user-id :guard string? publisher-id :guard string?]
+  ([entry-data :guard map? user-id :guard string?]
+   (is-publisher? (-> entry-data :publisher :user-id)  user-id))
+
+  ([publisher-id :guard string? user-id :guard string?]
    (= user-id publisher-id)))
 
 (defun is-author?
   "Check if current user is the author of the entry/comment or whole thread."
   ([entity-data :guard :author]
    (when (jwt/jwt)
-     (is-author? (jwt/user-id) entity-data)))
+     (is-author? entity-data (jwt/user-id))))
 
-  ([user-data :guard :user-id entity-data :guard :author]
-   (is-author? (:user-id user-data) entity-data))
+  ([entity-data :guard :author user-data :guard :user-id]
+   (is-author? (-> entity-data :author :user-id) (:user-id user-data)))
 
-  ([user-id :guard string? entity-data :guard #(and (:author %)
-                                                    (#{:comment :entry} (:content-type %)))]
-   (is-author? user-id (-> entity-data :author :user-id)))
+  ([entity-data :guard :author user-id :guard string?]
+   (is-author? (-> entity-data :author :user-id) user-id))
 
-  ([user-id :guard string? entity-data :guard #(= (:content-type %) :thread)]
-   (and (is-author? user-id (-> entity-data :author :user-id))
-        (every? (partial is-author? user-id) (:reply-authors entity-data))))
-
-  ([user-id :guard string? author-id :guard string?]
+  ([author-id :guard string? user-id :guard string?]
    (= user-id author-id)))
+
+(defun is-monologue?
+  ([thread-data :guard :author]
+   (when (jwt/jwt)
+    (is-monologue? thread-data (jwt/user-id))))
+  ([thread-data :guard :author user-id :guard string?]
+   (and (is-author? (-> thread-data :author :user-id) (jwt/user-id))
+        (every? #(is-author? % user-id) (:reply-authors thread-data)))))
 
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
@@ -347,9 +354,10 @@
                    ;; We reached the end, no more items, return last index
                    (nil? item)
                    ret-idx
-                   ;; Found the first read item, return
+                   ;; Found the first truthy item, return last index
                    (check-fn item)
                    idx
+                   ;; Check if element needs to be ignored
                    (ignore-fn item)
                    (recur ret-idx
                           (inc idx)
@@ -386,12 +394,11 @@
                        :close-item (check-fn :close item next-item)))))
      (range (count items-list))))))
 
-(defn- insert-ending-item [items-list links]
-  (let [next-link (utils/link-for links "next")
-        carrot-close? (> (count items-list 3))
+(defn- insert-ending-item [items-list has-next]
+  (let [carrot-close? (> (count items-list 3))
         last-item (last items-list)]
     (cond
-     next-link
+     (and (seq items-list) has-next)
      (concat items-list [{:content-type :loading-more
                           :last-activity-at (next-activity-timestamp last-item)
                           :message (if (= (:content-type last-item) :thread)
@@ -504,7 +511,7 @@
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)
+          with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
           follow-board-uuids (set (map :uuid follow-boards-list))]
       (-> with-fixed-activities
         (assoc :read-only (readonly-board? (:links board-data)))
@@ -569,7 +576,7 @@
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)
+          with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
       (-> with-fixed-activities
         (dissoc :old-links :items)
@@ -630,6 +637,7 @@
           grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
+          next-link (utils/link-for fixed-next-links "next")
           with-caught-up (if (= (:container-slug container-data) :following)
                            (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
                                  items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
@@ -638,10 +646,10 @@
                               #(or (not= (:content-type %) :entry)
                                    (->> % :uuid (get items-map) :publisher?))
                               {:hide-top-line true
-                               :has-next (utils/link-for fixed-next-links "next")}))
+                               :has-next next-link}))
                            grouped-items)
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
+          with-ending-item (insert-ending-item with-open-close-items next-link)]
       (-> with-fixed-activities
        (dissoc :old-links :items)
        (assoc :links fixed-next-links)
@@ -658,7 +666,8 @@
       (update :author merge fixed-author)
       (assoc :unread comment-unread)
       (assoc :unread-thread thread-unread)
-      (as-> t (assoc t :monologue? (is-author? t))))))
+      (as-> t (assoc t :author? (is-author? t))
+              (assoc t :monologue? (is-monologue? t))))))
 
 (defn fix-threads
   "
@@ -722,13 +731,14 @@
           get-thread-data (fn [thread-uuid]
                             (or (get-in with-fixed-threads [:fixed-items thread-uuid])
                                 (dis/thread-data thread-uuid)))
+          next-link (utils/link-for fixed-next-links "next")
           with-caught-up (insert-caught-up threads-list
-                          #(-> :uuid get-thread-data :unread-thread not)
+                          #(-> % :uuid get-thread-data :unread-thread not)
                           #(or (not= (:content-type %) :thread)
-                               (-> :uuid get-thread-data :monologue?))
-                          {:has-next (utils/link-for fixed-next-links "next")})
+                               (-> % :uuid get-thread-data :monologue?))
+                          {:has-next next-link})
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
-          with-ending-item (insert-ending-item with-open-close-items fixed-next-links)]
+          with-ending-item (insert-ending-item with-open-close-items next-link)]
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
         (utils/after 0 #(comment-utils/get-comments e)))
       (-> with-fixed-threads

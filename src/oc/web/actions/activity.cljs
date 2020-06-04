@@ -664,7 +664,7 @@
 
    (and secure-uuid
         (jwt/jwt)
-        (jwt/user-is-part-of-the-team (:team-id activity-data)))
+        (:member? (dis/org-data)))
    (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
 
    :default
@@ -869,10 +869,13 @@
 (declare inbox-dismiss)
 
 (defn mark-read [activity-uuid]
-  (when-let [activity-data (dis/activity-data activity-uuid)]
-    (send-item-read activity-uuid)
-    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
-    (inbox-dismiss activity-uuid)))
+  (let [activity-data (dis/activity-data activity-uuid)]
+    (when (and activity-data
+               (not= activity-data :404)
+               (not (:loading activity-data)))
+      (send-item-read activity-uuid)
+      (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
+      (inbox-dismiss activity-uuid))))
 
 ;; Video handling
 

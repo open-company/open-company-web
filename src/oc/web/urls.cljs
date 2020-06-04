@@ -1,6 +1,5 @@
 (ns oc.web.urls
   (:require [oc.web.router :as router]
-            [oc.web.lib.jwt :as j]
             [clojure.string :as clj-str]))
 
 (defn params->query-string [m]

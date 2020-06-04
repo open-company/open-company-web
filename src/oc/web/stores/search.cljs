@@ -24,7 +24,7 @@
   "
   (if-not (jwt/jwt)
     false
-    (if (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
+    (if (:member? (dispatcher/org-data))
       true
       false)))
 

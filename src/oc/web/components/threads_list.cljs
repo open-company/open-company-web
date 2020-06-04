@@ -3,7 +3,6 @@
             [goog.object :as gobj]
             [clojure.data :as clj-data]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -239,6 +238,9 @@
                                    :close-item close-item
                                    :open-item open-item
                                    thread-item-class true})
+       :data-resource-uuid resource-uuid
+       :data-comment-uuid comment-uuid
+       :data-root-comment true
        :ref :thread
        :on-click (fn [e]
                    (let [thread-el (rum/ref-node s :thread)]
@@ -254,9 +256,6 @@
         (thread-top n))
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
-          {:data-resource-uuid resource-uuid
-           :data-comment-uuid comment-uuid
-           :data-root-comment true}
           (thread-comment {:activity-data activity-data
                            :comment-data n
                            :is-mobile? is-mobile?

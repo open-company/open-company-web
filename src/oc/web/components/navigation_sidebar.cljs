@@ -3,7 +3,6 @@
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.lib.user :as lib-user]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
             [oc.web.router :as router]
@@ -137,7 +136,6 @@
                                   (check-and-reopen-follow-lists s)
                                   s)
                                  :will-update (fn [s]
-                                  (save-content-height s)
                                   (when (responsive/is-mobile-size?)
                                     (let [mobile-navigation-panel (boolean @(drv/get-ref s :mobile-navigation-sidebar))
                                           last-mobile-navigation-panel (boolean @(::last-mobile-navigation-panel s))]
@@ -152,6 +150,9 @@
                                             (dom-utils/unlock-page-scroll)
                                             (reset! (::last-mobile-navigation-panel s) false))))))
                                   (check-and-reopen-follow-lists s)
+                                  s)
+                                 :did-update (fn [s]
+                                  (save-content-height s)
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -165,7 +166,7 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
-        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        user-is-part-of-the-team? (:member? org-data)
         is-threads (or (:threads (:back-to @router/path))
                         (= selected-slug "threads"))
         is-following (or (:following (:back-to @router/path))

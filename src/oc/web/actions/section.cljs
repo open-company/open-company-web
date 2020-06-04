@@ -29,7 +29,7 @@
 (defn request-reads-count
   "Request the reads count data only for the items we don't have already."
   [section]
-  (let [user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
+  (let [user-is-part-of-the-team (:member? (dispatcher/org-data))]
     (when (and user-is-part-of-the-team
                (not= (:slug section) utils/default-drafts-board-slug)
                (seq (:entries section)))
@@ -41,7 +41,7 @@
 (defn section-get-finish
   [section]
   (let [is-currently-shown (is-currently-shown? section)
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
+        user-is-part-of-the-team (:member? (dispatcher/org-data))]
     (when is-currently-shown
       (when user-is-part-of-the-team
         ;; only watch the currently visible board.

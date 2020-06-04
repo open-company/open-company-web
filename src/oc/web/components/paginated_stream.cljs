@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
             [oc.web.router :as router]
@@ -106,8 +105,8 @@
            editable-boards
            foc-layout
            is-mobile] :as props}]
-  (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
-        publisher? (activity-utils/is-publisher? entry)
+  (let [member? (:member? org-data)
+        publisher? (:publisher? entry)
         show-wrt? member?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -316,7 +315,7 @@
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
+        member? (:member? org-data)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group

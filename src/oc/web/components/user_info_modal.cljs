@@ -16,7 +16,7 @@
   [s {:keys [user-data org-data]}]
   (let [my-profile? (and (jwt/jwt)
                          (= (:user-id user-data) (jwt/user-id)))
-        member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        member? (:member? org-data)
         team-role (when member? (utils/get-user-type user-data org-data))
         panel-stack (drv/react s :panel-stack)
         followers-publishers-count (drv/react s :followers-publishers-count)

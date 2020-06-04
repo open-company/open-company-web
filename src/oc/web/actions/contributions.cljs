@@ -30,7 +30,7 @@
 (defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
   [author-uuid contrib-data]
-  (let [member? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))]
+  (let [member? (:member? (dis/org-data))]
     (when (and member?
                (seq (:items contrib-data)))
       (let [item-ids (map :uuid (:items contrib-data))
@@ -40,7 +40,7 @@
 
 (defn- contributions-get-success [author-uuid contrib-data]
   (let [is-currently-shown (is-currently-shown? author-uuid)
-        member? (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))]
+        member? (:member? (dis/org-data))]
     (when is-currently-shown
       (when member?
         ;; only watch the boards of the posts of the contributor
