@@ -36,13 +36,24 @@
   (when-let [field (add-comment-field s)]
     (.-innerHTML field)))
 
+(defn- add-comment-data
+  ([s]
+   (add-comment-data s @(::add-comment-key s)))
+  ([s add-comment-key]
+   (let [add-comment-data @(drv/get-ref s :add-comment-data)]
+     (get add-comment-data add-comment-key))))
+
+(defn- enable-post-button? [s]
+  (let [{:keys [edit-comment-data]} (first (:rum/args s))
+        activity-add-comment-data (add-comment-data s)
+        comment-text (add-comment-body s)]
+    (boolean (and (not= comment-text (:body edit-comment-data))
+                  (not (au/empty-body? comment-text))))))
+
 (defn- toggle-post-button [s]
-  (let [comment-text (add-comment-body s)
-        edit-comment-data (-> s :rum/args first :edit-comment-data)
-        next-add-bt-enabled (and (not= comment-text (:body edit-comment-data))
-                                 (not (au/empty-body? comment-text)))]
-    (compare-and-set! (::post-enabled s) (not next-add-bt-enabled) next-add-bt-enabled)
-    next-add-bt-enabled))
+  (let [enabled? (enable-post-button? s)]
+    (compare-and-set! (::post-enabled s) (not enabled?) enabled?)
+    enabled?))
 
 ;; Add commnet handling
 (defn- maybe-expand [s]
@@ -108,11 +119,9 @@
    :media-picker-container-selector (str "div." (add-comment-unique-class s) " div.add-comment-box div.add-comment-internal div.add-comment-footer-media-picker")})
 
 (defn- did-change [s]
-  (let [body (add-comment-body s)
-        initial-body @(::initial-add-comment s)
-        post-enabled (not= body initial-body)
+  (let [post-enabled (enable-post-button? s)
         {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)]
-    (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) body)
+    (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
     (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)))
 
 (defn- should-focus? [s]
@@ -176,6 +185,7 @@
                          (drv/drv :follow-publishers-list)
                          (drv/drv :followers-publishers-count)
                          ;; Locals
+                         (rum/local nil ::add-comment-key)
                          (rum/local true ::collapsed)
                          (rum/local false ::post-enabled)
                          (rum/local au/empty-body-html ::initial-add-comment)
@@ -199,18 +209,18 @@
                          {:will-mount (fn [s]
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [{:keys [activity-data parent-comment-uuid edit-comment-data collapse?]} (first (:rum/args s))
-                                add-comment-data @(drv/get-ref s :add-comment-data)
                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
-                                activity-add-comment-data (get add-comment-data add-comment-key)
+                                activity-add-comment-data (add-comment-data s add-comment-key)
                                 initial-body (or activity-add-comment-data
                                                  (:body edit-comment-data)
                                                  au/empty-body-html)]
+                            (reset! (::add-comment-key s) add-comment-key)
                             (reset! (::initial-add-comment s) initial-body)
                             (reset! (::collapsed s) (and collapse?
                                                          (au/empty-body? initial-body)))
-                            (reset! (::post-enabled s) (and (seq activity-add-comment-data)
-                                                            (not= activity-add-comment-data (:body edit-comment-data))
-                                                            (not (au/empty-body? activity-add-comment-data)))))
+                            (reset! (::post-enabled s) (boolean (and (seq activity-add-comment-data)
+                                                                     (not= activity-add-comment-data (:body edit-comment-data))
+                                                                     (not (au/empty-body? activity-add-comment-data))))))
                           s)
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))]
