@@ -327,7 +327,7 @@
 (defn- merge-items-lists
   "Given 2 list of reduced items (reduced since they contains only the uuid and content-type props)
    return a single list without duplicates depending on the direction"
-  [old-items-list new-items-list direction]
+  [new-items-list old-items-list direction]
   (if (seq new-items-list)
     (let [old-uuids (map :uuid old-items-list)
           new-uuids (map :uuid new-items-list)
@@ -336,8 +336,8 @@
                              (reverse (distinct (concat (reverse old-uuids) (reverse new-uuids)))))
           all-items-list (concat old-items-list new-items-list)
           items-map (zipmap (map :uuid all-items-list) all-items-list)]
-      (mapv items-map next-items-uuids)
-    old-items-list)))
+      (mapv items-map next-items-uuids))
+    old-items-list))
 
 (def default-caught-up-message "You’re up to date")
 
@@ -512,13 +512,10 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links board-data))
-          items-list (if (contains? board-data :items)
+          items-list (when (contains? board-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:entries board-data))
-                       ;; If we are re-parsing existing data for updated related data
-                       ;; ie: change, org or active-users
-                       (:posts-list board-data))
-          full-items-list (merge-items-lists (:posts-list board-data) items-list direction)
+                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:entries board-data)))
+          full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
           grouped-items (if (show-separators? (:slug board-data))
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
@@ -571,13 +568,10 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links contributions-data))
-          items-list (if (contains? contributions-data :items)
+          items-list (when (contains? contributions-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items contributions-data))
-                       ;; If we are re-parsing existing data for updated related data
-                       ;; ie: change, org or active-users
-                       (:posts-list contributions-data))
-          full-items-list (merge-items-lists (:posts-list contributions-data) items-list direction)
+                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items contributions-data)))
+          full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
           grouped-items (if (show-separators? (:href contributions-data))
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
@@ -627,13 +621,10 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links container-data))
-          items-list (if (contains? container-data :items)
+          items-list (when (contains? container-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items container-data))
-                       ;; If we are re-parsing existing data for updated related data
-                       ;; ie: change, org or active-users
-                       (:posts-list container-data))
-          full-items-list (merge-items-lists (:posts-list container-data) items-list direction)
+                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items container-data)))
+          full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
           grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
@@ -713,13 +704,9 @@
                                (vec (conj next-links link-to-move))
                                next-links)
                              (:links threads-data))
-          items-list (if (contains? threads-data :items)
+          items-list (when (contains? threads-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :content-type :thread :uuid (:uuid %)) (:items threads-data)))
-                       ;; If we are re-parsing existing data for updated related data
-                       ;; let's remove the separators
-                       ;; ie: change, org or active-users
-                       (:threads-list threads-data))
+                       (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :content-type :thread :uuid (:uuid %)) (:items threads-data))))
           threads-list (merge-items-lists items-list (:threads-list threads-data) direction)
           get-thread-data (fn [thread-uuid]
                             (or (get-in with-fixed-threads [:fixed-items thread-uuid])
@@ -732,9 +719,6 @@
                           {:has-next next-link})
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
           with-ending-item (insert-ending-item with-open-close-items next-link)]
-      (js/console.log "DBG fix-threads items-list:" items-list)
-      (js/console.log "DBG    direction:" direction)
-      (js/console.log "DBG    threads-list:" threads-list)
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
         (utils/after 0 #(comment-utils/get-comments e)))
       (-> with-fixed-threads
