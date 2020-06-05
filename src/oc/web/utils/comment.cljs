@@ -62,10 +62,6 @@
         _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
     (.html $comment-node)))
 
-(defn- is-own-comment?
-  [comment-data]
-  (= (jwt/user-id) (:user-id (:author comment-data))))
-
 (defn get-comments-finished
   [comments-key activity-data {:keys [status success body]}]
   (when success
@@ -135,43 +131,45 @@
   (apply merge
    (map #(hash-map (:uuid %) %) sorted-comments)))
 
-(defn new? [user-id last-read-at comment-data]
-  (if (contains? comment-data :new)
-    (:new comment-data)
-    (and (not= (-> comment-data :author :user-id) user-id)
+(defn unread? [last-read-at comment-data]
+  (if (contains? comment-data :unread)
+    (:unread comment-data)
+    (and (not (:author? comment-data))
          (< (.getTime (utils/js-date last-read-at))
             (.getTime (utils/js-date (:created-at comment-data)))))))
 
-(defn- enrich-comment [user-id last-read-at comment-data last-comment? collapsed-map]
+(defn- enrich-comment [last-read-at comment-data last-comment? collapsed-map]
   (let [collapsed-comment-map (get collapsed-map (:uuid comment-data))
-        new-comment? (new? user-id last-read-at (merge comment-data collapsed-comment-map))]
-    {:new new-comment?
-     :expanded (or (:new collapsed-comment-map)
+        unread-comment? (unread? last-read-at (merge comment-data collapsed-comment-map))]
+    {:unread unread-comment?
+     :expanded (or (:unread collapsed-comment-map)
                    ;; Keep the comment expanded if it was already
                    (:expanded collapsed-comment-map)
                    ;; Do not collapse root comments
                    (not (seq (:parent-uuid comment-data)))
                    ;; User has not read the post yet
                    (not (seq last-read-at))
-                   ;; Do not collapse new comments
-                   new-comment?
+                   ;; Do not collapse unread comments
+                   unread-comment?
                    ;; Do not collapse last comments
                    last-comment?)}))
 
 (defn collapsed-comments
-  "Add a collapsed flag to every comment that is a reply and is not new. Also add new? flag to every new one.
+  "Add a collapsed flag to every comment that is a reply and is not unread. Also add unread? flag to every unread one.
    Add a count of the collapsed comments to each root comment."
-  [user-id last-read-at comments & [collapsed-map root-comment]]
+  [last-read-at comments & [collapsed-map root-comment]]
   (mapv
    (fn [comment]
-    (let [enriched-children (collapsed-comments user-id last-read-at (:thread-children comment) collapsed-map comment)
-          last-comment? (and root-comment
-                             (= (:uuid comment) (-> root-comment :thread-children last :uuid)))]
-      (-> comment
-       (merge (enrich-comment user-id last-read-at comment last-comment? collapsed-map))
-       (assoc :thread-children enriched-children)
-       (assoc :new-count (count (filter :new enriched-children)))
-       (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children))))))
+    (if (#{:thread :comment} (:content-type comment))
+      (let [enriched-children (collapsed-comments last-read-at (:thread-children comment) collapsed-map comment)
+            last-comment? (and root-comment
+                               (= (:uuid comment) (-> root-comment :thread-children last :uuid)))]
+        (-> comment
+         (merge (enrich-comment last-read-at comment last-comment? collapsed-map))
+         (assoc :thread-children enriched-children)
+         (assoc :unread-count (count (filter :unread enriched-children)))
+         (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children)))))
+      comment))
    comments))
 
 (defun add-comment-focus-value

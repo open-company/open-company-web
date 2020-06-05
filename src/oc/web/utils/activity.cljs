@@ -664,8 +664,7 @@
       (assoc :content-type :thread)
       (assoc :entry entry-data)
       (update :author merge fixed-author)
-      (assoc :unread comment-unread)
-      (assoc :unread-thread thread-unread)
+      (assoc :unread-thread (or comment-unread thread-unread))
       (as-> t (assoc t :author? (is-author? t))
               (assoc t :monologue? (is-monologue? t))))))
 

@@ -30,10 +30,14 @@
           delete-comment-link (utils/link-for (:links comment-map) "delete")
           can-react? (utils/link-for (:links comment-map) "react"  "POST")
           reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
-          is-root-comment (empty? (:parent-uuid comment-map))]
+          is-root-comment (empty? (:parent-uuid comment-map))
+          author? (activity-utils/is-author? comment-map)
+          unread? (and (not author?)
+                       (activity-utils/comment-unread? comment-map (:last-read-at activity-data)))]
       (-> comment-map
         (assoc :content-type :comment)
-        (assoc :author? (activity-utils/is-author? comment-map))
+        (assoc :author? author?)
+        (assoc :unread unread?)
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))
@@ -309,7 +313,7 @@
         deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
         current-user-id (jwt/user-id)
         deleting-new-comment? (when deleting-comment-data
-                                (comment-utils/new? current-user-id last-read-at deleting-comment-data))
+                                (comment-utils/unread? last-read-at deleting-comment-data))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
         new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))

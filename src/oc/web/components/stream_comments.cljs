@@ -101,10 +101,10 @@
         idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
     (swap! (::threads s) (fn [threads]
                            (-> threads
-                             (assoc-in [idx :new] false)
+                             (assoc-in [idx :unread] false)
                              (update-in [idx :thread-children]
                               (fn [children]
-                                (map #(assoc % :new false) children))))))))
+                                (map #(assoc % :unread false) children))))))))
 
 (defn- comment-mark-read [s comment-data]
   (let [threads @(::threads s)]
@@ -115,7 +115,7 @@
                                (update-in threads [idx :thread-children]
                                 (fn [children]
                                   (map #(if (= (:uuid %) (:uuid comment-data))
-                                          (assoc % :new false)
+                                          (assoc % :unread false)
                                           %)
                                    children)))))))))
 
@@ -169,14 +169,14 @@
            edit-comment-key is-indented-comment? mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt? member?
-           show-more-menu showing-picker? did-react-cb new-thread?
+           show-more-menu showing-picker? did-react-cb unread-thread?
            current-user-id]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
      :class (utils/class-set {:open-thread (not is-indented-comment?)
                               :closing-thread closing-thread
-                              :new-comment (:new comment-data)
+                              :new-comment (:unread comment-data)
                               :indented-comment is-indented-comment?
                               :showing-picker showing-picker?})}
     [:div.stream-comment
@@ -205,7 +205,7 @@
             {:class utils/hide-class}
             [:div.stream-comment-author-right
               [:div.stream-comment-author-right-group
-                {:class (when (:new comment-data) "new-comment")}
+                {:class (when (:unread comment-data) "new-comment")}
                 [:div.stream-comment-author-name-container
                   (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
                   [:div.stream-comment-author-avatar
@@ -221,9 +221,9 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip comment-data)}
                     (utils/foc-date-time (:created-at comment-data))]]]
-              (when (and (:new comment-data)
+              (when (and (:unread comment-data)
                          (or (and is-indented-comment?
-                                  (not new-thread?))
+                                  (not unread-thread?))
                              (not is-indented-comment?)))
                 [:div.new-comment-tag])
               (if (responsive/is-mobile-size?)
@@ -325,7 +325,6 @@
                              (drv/drv :followers-publishers-count)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
-                             (rum/local [] ::expanded-comments)
                              (rum/local nil ::show-picker)
                              (rum/local #{} ::replying-to)
                              (rum/local {} ::comment-url-copy)
@@ -353,8 +352,8 @@
                                       (scroll-to-bottom s))))
                                s)
                              :will-mount (fn [s]
-                              (let [{:keys [current-user-id last-read-at comments-data]} (-> s :rum/args first)
-                                    threads (cu/collapsed-comments current-user-id last-read-at comments-data)]
+                              (let [{:keys [last-read-at comments-data]} (-> s :rum/args first)
+                                    threads (cu/collapsed-comments last-read-at comments-data)]
                                 (reset! (::threads s) threads))
                               ;; Restore cached comments
                               (let [add-comment-data @(drv/get-ref s :add-comment-data)
@@ -370,14 +369,14 @@
                                 (catch :default e false))
                               s)
                              :did-remount (fn [o s]
-                              (let [{:keys [comments-data current-user-id last-read-at]} (-> s :rum/args first)
+                              (let [{:keys [comments-data last-read-at]} (-> s :rum/args first)
                                     comments-diff (diff (-> o :rum/args first :comments-data) comments-data)]
                                 (when (or (seq (first comments-diff))
                                           (seq (second comments-diff))
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
-                                        collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :new]) all-comments))]
-                                    (reset! (::threads s) (cu/collapsed-comments current-user-id last-read-at comments-data collapsed-map)))))
+                                        collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))]
+                                    (reset! (::threads s) (cu/collapsed-comments last-read-at comments-data collapsed-map)))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
@@ -410,7 +409,7 @@
             [:div.stream-comment-thread
               {:class (utils/class-set {:left-border (or (-> root-comment-data :thread-children count pos?)
                                                          show-add-comment?)
-                                        :has-new (pos? (:new-count root-comment-data))})
+                                        :has-new (pos? (:unread-count root-comment-data))})
                :key (str "stream-comments-thread-" (:uuid root-comment-data))}
               (if is-editing?
                 (edit-comment {:activity-data activity-data
@@ -439,7 +438,7 @@
                                :show-more-menu (::show-more-menu s)
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key
-                               :new-thread? (:new root-comment-data)
+                               :unread-thread? (:unread root-comment-data)
                                :member? member?
                                :current-user-id current-user-id}))
                (when (and (not expanded-thread?)
@@ -491,7 +490,7 @@
                                     :show-more-menu (::show-more-menu s)
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
                                     :edit-comment-key ind-edit-comment-key
-                                    :new-thread? (:new root-comment-data)
+                                    :unread-thread? (:unread root-comment-data)
                                     :member? member?
                                     :current-user-id current-user-id}))])
           (when show-add-comment?
