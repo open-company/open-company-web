@@ -378,8 +378,8 @@
   (ui-mixins/on-window-scroll-mixin did-scroll)
   {:did-mount (fn [s]
    (let [threads (-> s :rum/args first :items-to-render)
-         last-read-at (reduce (fn [r t] (update r (:resource-uuid t) #(if (pos? (compare % (:last-read-at t))) % (:last-read-at t)))) {} threads)
-         collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:resource-uuid %)) [%]) threads))]
+         last-read-at (reduce (fn [r t] (update r (:uuid t) #(if (pos? (compare % (:last-read-at t))) % (:last-read-at t)))) {} threads)
+         collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%]) threads))]
      (reset! (::threads s) collapsed-threads)
      (reset! (::initial-last-read-at s) last-read-at)
      (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads))
@@ -393,7 +393,7 @@
        (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
              collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))
              last-read-at @(::initial-last-read-at s)
-             collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:resource-uuid %)) [%] collapsed-map) items-to-render))]
+             collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items-to-render))]
          (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads))
          (reset! (::threads s) collapsed-threads)
          (did-scroll s nil))))
