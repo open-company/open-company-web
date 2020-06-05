@@ -29,29 +29,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
-(defn- thread-mark-read [s thread-uuid]
-  (let [threads @(::threads s)
-        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
-    (swap! (::threads s) (fn [threads]
-                           (-> threads
-                             (assoc-in [idx :unread] false)
-                             (update-in [idx :thread-children]
-                              (fn [children]
-                                (map #(assoc % :unread false) children))))))))
-
-(defn- comment-mark-read [s comment-data]
-  (let [threads @(::threads s)]
-    (if-not (seq (:parent-uuid comment-data))
-      (thread-mark-read s (:uuid comment-data))
-      (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
-        (swap! (::threads s) (fn [threads]
-                               (update-in threads [idx :thread-children]
-                                (fn [children]
-                                  (map #(if (= (:uuid %) (:uuid comment-data))
-                                          (assoc % :unread false)
-                                          %)
-                                   children)))))))))
-
 (defn- reply-to [s add-comment-focus-key]
   (reset! (::replying s) true)
   (comment-actions/add-comment-focus add-comment-focus-key))
@@ -78,14 +55,14 @@
        :onClick (fn [emoji _]
                   (add-emoji-cb emoji))})])
 
-(defn- emoji-picker-container [s activity-data comment-data]
+(defn- emoji-picker-container [s activity-data comment-data read-comment-cb]
   (let [showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid comment-data)))]
     (when showing-picker?
       (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
                                      (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                       (comment-mark-read s comment-data)
+                                       (read-comment-cb comment-data)
                                        (comment-actions/react-from-picker activity-data comment-data
                                         (gobj/get emoji "native")))
                                      (reset! (::show-picker s) nil))}))))
@@ -245,14 +222,16 @@
     member?          :member?
     collapsed-count  :collapsed-count
     expand-cb        :expand-cb
-    :as n}]
+    read-thread-cb   :thread-mark-read-cb
+    read-comment-cb  :comment-mark-read-cb
+    :as thread-data}]
   (let [is-mobile? (responsive/is-mobile-size?)
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) comment-uuid))
         replies-count (count replies)
         read-count (count (filter (comp not :unread) replies))
-        thread-loaded? (contains? n :thread-children)
-        thread-item-class (thread-item-unique-class n)
+        thread-loaded? (contains? thread-data :thread-children)
+        thread-item-class (thread-item-unique-class thread-data)
         thread-focus-value (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid)
         expanded? (zero? collapsed-count)]
     [:div.thread-item.group
@@ -271,22 +250,21 @@
                                 (not (utils/input-clicked? e))
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/content-editable-clicked? e))
-                                ; (not (utils/event-inside? e (.querySelector thread-el "div.emoji-picker-container")))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.emoji-mart")))
                                 (not (utils/event-inside? e (.querySelector thread-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false comment-uuid))))}
       (when open-item
-        (thread-top n))
+        (thread-top thread-data))
       [:div.thread-item-blocks.group
         [:div.thread-item-block.vertical-line.group
           (thread-comment {:activity-data activity-data
-                           :comment-data n
+                           :comment-data thread-data
                            :is-mobile? is-mobile?
                            :react-cb #(reset! (::show-picker s) comment-uuid)
                            :reply-cb #(reply-to s thread-focus-value)
-                           :did-react-cb #(thread-mark-read s (:uuid n))
+                           :did-react-cb #(read-thread-cb comment-uuid)
                            :emoji-picker (when showing-picker?
-                                           (emoji-picker-container s activity-data n))
+                                           (emoji-picker-container s activity-data thread-data read-comment-cb))
                            :showing-picker? showing-picker?
                            :new-thread? unread
                            :unread unread
@@ -319,9 +297,9 @@
                                    :is-mobile? is-mobile?
                                    :react-cb #(reset! (::show-picker s) (:uuid reply-data))
                                    :reply-cb #(reply-to s thread-focus-value)
-                                   :did-react-cb #(comment-mark-read s reply-data)
+                                   :did-react-cb #(read-comment-cb reply-data)
                                    :emoji-picker (when ind-showing-picker?
-                                                   (emoji-picker-container s activity-data reply-data))
+                                                   (emoji-picker-container s activity-data reply-data read-comment-cb))
                                    :showing-picker? ind-showing-picker?
                                    :new-thread? unread
                                    :member? member?
@@ -331,9 +309,9 @@
                                     :parent-comment-uuid comment-uuid
                                     :collapse? true
                                     :add-comment-placeholder "Reply..."
-                                    :add-comment-cb #(do
-                                                       (thread-mark-read s comment-uuid)
-                                                       (user-actions/activity-reply-inline n %))
+                                    :add-comment-cb (fn [new-comment-data]
+                                                      (read-thread-cb comment-uuid)
+                                                      (user-actions/activity-reply-inline thread-data new-comment-data))
                                     :add-comment-focus-prefix add-comment-focus-prefix
                                     :dismiss-reply-cb #(reset! (::replying s) false)})
          (str "adc-" comment-uuid "-" last-activity-at)))]))
@@ -343,6 +321,29 @@
     (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
       (swap! (::read-items s) conj (:resource-uuid item))
       (activity-actions/mark-read (:resource-uuid item)))))
+
+(defn- thread-mark-read [s thread-uuid]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
+    (swap! (::threads s) (fn [threads]
+                           (-> threads
+                             (assoc-in [idx :unread] false)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :unread false) children))))))))
+
+(defn- comment-mark-read [s comment-data]
+  (let [threads @(::threads s)]
+    (if-not (seq (:parent-uuid comment-data))
+      (thread-mark-read s (:uuid comment-data))
+      (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
+        (swap! (::threads s) (fn [threads]
+                               (update-in threads [idx :thread-children]
+                                (fn [children]
+                                  (map #(if (= (:uuid %) (:uuid comment-data))
+                                          (assoc % :unread false)
+                                          %)
+                                   children)))))))))
 
 (defn- did-scroll [s _scroll-event]
   (when @(::has-unread-items s)
@@ -412,7 +413,10 @@
                 :let [caught-up? (= (:content-type item*) :caught-up)
                       loading-more? (= (:content-type item*) :loading-more)
                       carrot-close? (= (:content-type item*) :carrot-close)
-                      item (assoc item* :current-user-data current-user-data :member? member?)]]
+                      item (assoc item* :current-user-data current-user-data
+                                        :member? member?
+                                        :thread-mark-read-cb (partial thread-mark-read s)
+                                        :comment-mark-read-cb (partial comment-mark-read s))]]
             (cond
               caught-up?
               (rum/with-key
