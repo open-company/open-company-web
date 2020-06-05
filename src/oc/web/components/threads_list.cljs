@@ -349,6 +349,8 @@
         (reset! (::has-unread-items s) false)))))
 
 (rum/defcs threads-list <
+  rum/reactive
+  (drv/drv :users-info-hover)
   ui-mixins/refresh-tooltips-mixin
   (rum/local #{} ::read-items)
   (rum/local false ::has-unread-items)
@@ -364,7 +366,8 @@
        (did-scroll s nil)))
    s)}
   [s {:keys [items-to-render current-user-data member?]}]
-  (let [is-mobile? (responsive/is-mobile-size?)]
+  (let [is-mobile? (responsive/is-mobile-size?)
+        _user-info-hover (drv/react s :user-info-hover)]
     [:div.threads-list
       (if (empty? items-to-render)
         [:div.threads-list-empty
