@@ -18,6 +18,9 @@
      (utils/activity-uuid)
      current-value)))
 
+(defn- item-from-entity [item]
+  (select-keys item [:uuid :content-type :resource-uuid :published-at :bookmarked-at]))
+
 (defn add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
@@ -31,30 +34,18 @@
           old-ap-ra-data (get-in db ap-ra-key)
           old-ap-rp-data-posts (get old-ap-rp-data :posts-list)
           old-ap-ra-data-posts (get old-ap-ra-data :posts-list)
-          ap-rp-without-uuid (utils/vec-dissoc old-ap-rp-data-posts (:uuid activity-data))
-          ap-ra-without-uuid (utils/vec-dissoc old-ap-ra-data-posts (:uuid activity-data))
+          ap-rp-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-ap-rp-data-posts)
+          ap-ra-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-ap-ra-data-posts)
           new-ap-rp-uuids (vec (if is-published?
-                                 (conj ap-rp-without-uuid (:uuid activity-data))
+                                 (conj ap-rp-without-uuid (item-from-entity activity-data))
                                  ap-rp-without-uuid))
           new-ap-ra-uuids (vec (if is-published?
-                                 (conj ap-ra-without-uuid (:uuid activity-data))
+                                 (conj ap-ra-without-uuid (item-from-entity activity-data))
                                  ap-ra-without-uuid))
-          new-ap-rp-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-ap-rp-uuids)
-          new-ap-ra-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-ap-ra-uuids)
-          sorted-new-ap-rp-posts (reverse (sort-by :published-at new-ap-rp-data-posts))
-          sorted-new-ap-ra-posts (reverse (sort-by (juxt :new-at :published-at) new-ap-ra-data-posts))
-          sorted-new-ap-rp-uuids (mapv :uuid sorted-new-ap-rp-posts)
-          sorted-new-ap-ra-uuids (mapv :uuid sorted-new-ap-ra-posts)
-          grouped-ap-rp-uuids (if (au/show-separators? :all-posts dispatcher/recently-posted-sort)
-                                (au/grouped-posts sorted-new-ap-rp-posts)
-                                sorted-new-ap-rp-uuids)
-          grouped-ap-ra-uuids (if (au/show-separators? :all-posts dispatcher/recent-activity-sort)
-                                (au/grouped-posts sorted-new-ap-ra-posts)
-                                sorted-new-ap-ra-uuids)
-          next-ap-rp-data (merge old-ap-rp-data {:posts-list sorted-new-ap-rp-uuids
-                                                 :items-to-render grouped-ap-rp-uuids})
-          next-ap-ra-data (merge old-ap-ra-data {:posts-list sorted-new-ap-ra-uuids
-                                                 :items-to-render grouped-ap-ra-uuids})]
+          sorted-new-ap-rp-uuids (reverse (sort-by :published-at new-ap-rp-uuids))
+          sorted-new-ap-ra-uuids (reverse (sort-by (juxt :new-at :published-at) new-ap-ra-uuids))
+          next-ap-rp-data (au/fix-container (assoc old-ap-rp-data :posts-list sorted-new-ap-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort)
+          next-ap-ra-data (au/fix-container (assoc old-ap-ra-data :posts-list sorted-new-ap-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort)]
       (-> db
        (assoc-in ap-rp-key next-ap-rp-data)
        (assoc-in ap-ra-key next-ap-ra-data)))
@@ -69,18 +60,12 @@
           board-data-key (dispatcher/board-data-key org-slug (:board-slug activity-data))
           old-board-data (get-in db board-data-key)
           old-board-data-posts (get old-board-data :posts-list)
-          board-without-uuid (utils/vec-dissoc old-board-data-posts (:uuid activity-data))
+          board-without-uuid (filterv #(= (:uuid %) (:uuid activity-data)) old-board-data-posts)
           new-board-uuids (vec (if is-published?
-                                 (conj board-without-uuid (:uuid activity-data))
+                                 (conj board-without-uuid (item-from-entity activity-data))
                                  board-without-uuid))
-          new-board-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-board-uuids)
-          sorted-new-board-posts (reverse (sort-by :published-at new-board-data-posts))
-          sorted-new-board-uuids (mapv :uuid sorted-new-board-posts)
-          grouped-board-uuids (if (au/show-separators? (:board-slug activity-data))
-                                (au/grouped-posts sorted-new-board-posts)
-                                sorted-new-board-uuids)
-          next-board-data (merge old-board-data {:posts-list sorted-new-board-uuids
-                                                 :items-to-render grouped-board-uuids})]
+          sorted-new-board-uuids (reverse (sort-by :published-at new-board-uuids))
+          next-board-data (au/fix-board (assoc old-board-data :posts-list sorted-new-board-uuids))]
       (assoc-in db board-data-key next-board-data))
     db))
 
@@ -94,19 +79,13 @@
           bm-key (dispatcher/container-key org-slug :bookmarks)
           old-bm-data (get-in db bm-key)
           old-bm-data-posts (get old-bm-data :posts-list)
-          bm-without-uuid (utils/vec-dissoc old-bm-data-posts (:uuid activity-data))
+          bm-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-bm-data-posts)
           new-bm-uuids (vec
                         (if is-bookmark?
-                          (conj bm-without-uuid (:uuid activity-data))
+                          (conj bm-without-uuid (item-from-entity activity-data))
                           bm-without-uuid))
-          new-bm-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-bm-uuids)
-          sorted-new-bm-posts (reverse (sort-by :bookmarked-at new-bm-data-posts))
-          sorted-new-bm-uuids (mapv :uuid sorted-new-bm-posts)
-          grouped-bm-uuids (if (au/show-separators? "bookmarks")
-                             (au/grouped-posts sorted-new-bm-posts)
-                             sorted-new-bm-uuids)
-          next-bm-data (merge old-bm-data {:posts-list sorted-new-bm-uuids
-                                           :items-to-render grouped-bm-uuids})]
+          sorted-new-bm-posts (reverse (sort-by :bookmarked-at new-bm-uuids))
+          next-bm-data (au/fix-container (assoc old-bm-data :posts-list sorted-new-bm-posts))]
       (assoc-in db bm-key next-bm-data))
     db))
 
@@ -133,30 +112,18 @@
           old-fl-ra-data (get-in db fl-ra-key)
           old-fl-rp-data-posts (get old-fl-rp-data :posts-list)
           old-fl-ra-data-posts (get old-fl-ra-data :posts-list)
-          fl-rp-without-uuid (utils/vec-dissoc old-fl-rp-data-posts (:uuid activity-data))
-          fl-ra-without-uuid (utils/vec-dissoc old-fl-ra-data-posts (:uuid activity-data))
+          fl-rp-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-fl-rp-data-posts)
+          fl-ra-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-fl-ra-data-posts)
           new-fl-rp-uuids (vec (if (= following-container? include-activity?)
-                                 (conj fl-rp-without-uuid (:uuid activity-data))
+                                 (conj fl-rp-without-uuid (item-from-entity activity-data))
                                  fl-rp-without-uuid))
           new-fl-ra-uuids (vec (if (= following-container? include-activity?)
-                                 (conj fl-ra-without-uuid (:uuid activity-data))
+                                 (conj fl-ra-without-uuid (item-from-entity activity-data))
                                  fl-ra-without-uuid))
-          new-fl-rp-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-fl-rp-uuids)
-          new-fl-ra-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-fl-ra-uuids)
-          sorted-new-fl-rp-posts (reverse (sort-by :published-at new-fl-rp-data-posts))
-          sorted-new-fl-ra-posts (reverse (sort-by (juxt :new-at :published-at) new-fl-ra-data-posts))
-          sorted-new-fl-rp-uuids (mapv :uuid sorted-new-fl-rp-posts)
-          sorted-new-fl-ra-uuids (mapv :uuid sorted-new-fl-ra-posts)
-          grouped-fl-rp-uuids (if (au/show-separators? container-slug dispatcher/recently-posted-sort)
-                                (au/grouped-posts sorted-new-fl-rp-posts)
-                                sorted-new-fl-rp-uuids)
-          grouped-fl-ra-uuids (if (au/show-separators? container-slug dispatcher/recent-activity-sort)
-                                (au/grouped-posts sorted-new-fl-ra-posts)
-                                sorted-new-fl-ra-uuids)
-          next-fl-rp-data (merge old-fl-rp-data {:posts-list sorted-new-fl-rp-uuids
-                                                 :items-to-render grouped-fl-rp-uuids})
-          next-fl-ra-data (merge old-fl-ra-data {:posts-list sorted-new-fl-ra-uuids
-                                                 :items-to-render grouped-fl-ra-uuids})]
+          sorted-new-fl-rp-uuids (reverse (sort-by :published-at new-fl-rp-uuids))
+          sorted-new-fl-ra-uuids (reverse (sort-by (juxt :new-at :published-at) new-fl-ra-uuids))
+          next-fl-rp-data (au/fix-container (assoc old-fl-rp-data :posts-list sorted-new-fl-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort)
+          next-fl-ra-data (au/fix-container (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort)]
       (-> db
        (assoc-in fl-rp-key next-fl-rp-data)
        (assoc-in fl-ra-key next-fl-ra-data)))
@@ -174,16 +141,10 @@
             data-key (dispatcher/contributions-data-key org-slug (:user-id publisher))
             old-data (get-in db data-key)
             old-data-posts (get old-data :posts-list)
-            without-uuid (utils/vec-dissoc old-data-posts (:uuid activity-data))
-            new-uuids (vec (conj without-uuid (:uuid activity-data)))
-            new-data-posts (map #(dispatcher/activity-data org-slug % db) new-uuids)
-            sorted-new-posts (reverse (sort-by :published-at new-data-posts))
-            sorted-new-uuids (mapv :uuid sorted-new-posts)
-            grouped-uuids (if (au/show-separators? (:board-slug activity-data))
-                            (au/grouped-posts sorted-new-posts)
-                            sorted-new-uuids)
-            next-data (merge old-data {:posts-list sorted-new-uuids
-                                       :items-to-render grouped-uuids})]
+            without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-data-posts)
+            new-uuids (vec (conj without-uuid (item-from-entity activity-data)))
+            sorted-new-uuids (reverse (sort-by :published-at new-uuids))
+            next-data (au/fix-contributions (assoc old-data :posts-list sorted-new-uuids))]
         (assoc-in db data-key next-data))
       db)))
 
@@ -343,7 +304,7 @@
                                      posts-list-key (conj base-contributions-key :posts-list)
                                      next-ndb (update-in ndb posts-list-key
                                                (fn [posts-list]
-                                                 (filterv #(not= % (:uuid activity-data)) posts-list)))
+                                                 (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
                                      items-to-render-key (conj base-contributions-key :items-to-render)
                                      posts-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
                                   (assoc-in next-ndb items-to-render-key
@@ -843,7 +804,7 @@
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (-> inbox-data
-                         (update :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
+                         (update :posts-list (fn [posts-list] (filterv #(not= (:uuid %) item-id) posts-list)))
                          (update :items-to-render (fn [posts-list] (filterv #(not= % item-id) posts-list))))
           org-data-key (dispatcher/org-data-key org-slug)
           update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
@@ -862,8 +823,8 @@
           inbox-data (get-in db inbox-key)
           next-db (if inbox-data
                     (-> db
-                     (update-in posts-list-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
-                     (update-in items-to-render-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec))))
+                     (update-in posts-list-key (fn [posts-list] (->> activity-data item-from-entity (conj (set posts-list)) vec)))
+                     (update-in items-to-render-key (fn [posts-list] (->> activity-data item-from-entity (conj (set posts-list)) vec))))
                     db)
           activity-key (dispatcher/activity-key org-slug item-id)
           activity-data (get-in db activity-key)
