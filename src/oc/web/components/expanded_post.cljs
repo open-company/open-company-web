@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.comment :as cu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
@@ -81,6 +82,8 @@
                                        ;; And only when there is at least a comment
                                        (pos? comments-count))))))
 
+(def add-comment-prefix "main-comment")
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -123,8 +126,8 @@
     s)
    :will-unmount (fn [s]
     (mark-read s)
+    (comment-actions/add-comment-blur (cu/add-comment-focus-value add-comment-prefix @(::activity-uuid s)))
     (reset! (::activity-uuid s) nil)
-    (comment-actions/add-comment-blur)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -289,6 +292,7 @@
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :scroll-after-posting? true
+                                            :collapse? true
                                             :add-comment-focus-prefix "main-comment"})
                  (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
               (stream-comments {:activity-data activity-data

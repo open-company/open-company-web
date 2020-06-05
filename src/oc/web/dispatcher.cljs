@@ -1124,7 +1124,7 @@
   (get-in @app-state (threads-data-key (router/current-org-slug))))
 
 (defn print-items-to-render []
-  (items-to-render-data @app-state (router/current-org-slug) (router/current-posts-filter)))
+  (items-to-render-data @app-state @router/path (router/current-org-slug) (router/current-board-slug)))
 
 (defn print-user-notifications []
   (user-notifications-data (router/current-org-slug) @app-state))

@@ -12,11 +12,11 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn add-comment-focus [activity-uuid]
-  (dis/dispatch! [:add-comment-focus activity-uuid]))
+(defn add-comment-focus [focus-value]
+  (dis/dispatch! [:add-comment-focus focus-value]))
 
-(defn add-comment-blur []
-  (dis/dispatch! [:add-comment-focus nil]))
+(defn add-comment-blur [focus-value]
+  (dis/dispatch! [:add-comment-blur focus-value]))
 
 (defn edit-comment [activity-uuid comment-data]
   (dis/dispatch! [:add-comment-change (router/current-org-slug) activity-uuid (:reply-parent comment-data) (:uuid comment-data) (:body comment-data)]))
@@ -28,11 +28,11 @@
   ;; Save the comment change in the app state to remember it
   (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid comment-uuid comment-body]))
 
-(defn add-comment-reset [activity-uuid parent-comment-uuid comment-uuid]
+(defn add-comment-reset [prefix activity-uuid parent-comment-uuid comment-uuid]
+  (add-comment-blur (comment-utils/add-comment-focus-value prefix activity-uuid parent-comment-uuid comment-uuid))
   (dis/dispatch! [:add-comment-reset (router/current-org-slug) activity-uuid parent-comment-uuid comment-uuid]))
 
 (defn add-comment [activity-data comment-body parent-comment-uuid save-done-cb]
-  (add-comment-blur)
   (let [org-slug (router/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
         comments-data (get-in @dis/app-state comments-key)

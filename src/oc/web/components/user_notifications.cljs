@@ -150,7 +150,7 @@
       (when activity-data
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid (when (-> notifications count (= 1)) (-> notifications first :interaction-id))
-                                    :collapsed? true
+                                    :collapse? true
                                     :add-comment-placeholder "Reply..."
                                     :add-comment-cb (partial user-actions/activity-reply-inline n)
                                     :add-comment-focus-prefix "thread-comment"})

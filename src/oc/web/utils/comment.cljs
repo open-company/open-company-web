@@ -174,12 +174,15 @@
        (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children))))))
    comments))
 
-(defn add-comment-focus-value
-  ([prefix entry-uuid]
+(defun add-comment-focus-value
+  ([prefix :guard string? comment-data :guard map?]
+   (add-comment-focus-value prefix (:resource-uuid comment-data) (:parent-uuid comment-data) (:uuid comment-data)))
+
+  ([prefix :guard string? entry-uuid :guard string?]
    (add-comment-focus-value prefix entry-uuid nil nil))
 
-  ([prefix entry-uuid parent-comment-uuid]
+  ([prefix :guard string? entry-uuid parent-comment-uuid]
    (add-comment-focus-value prefix entry-uuid parent-comment-uuid nil))
 
-  ([prefix entry-uuid parent-comment-uuid edit-comment-uuid]
+  ([prefix :guard string? entry-uuid :guard string? parent-comment-uuid edit-comment-uuid]
    (str prefix "-" (dis/add-comment-string-key entry-uuid parent-comment-uuid edit-comment-uuid))))

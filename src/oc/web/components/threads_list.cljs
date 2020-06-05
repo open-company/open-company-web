@@ -193,6 +193,8 @@
 (defn- thread-item-unique-class [{:keys [resource-uuid uuid]}]
   (str "thread-item-" resource-uuid "-" uuid))
 
+(def add-comment-focus-prefix "thread-comment")
+
 (rum/defcs thread-item < rum/static
                          (rum/local nil ::show-picker)
                          (rum/local false ::replying)
@@ -222,7 +224,6 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) comment-uuid))
-        add-comment-focus-prefix "thread-comment"
         replies-count (count replies)
         read-count (count (filter (comp not :unread) replies))
         collapsed-count (when (and (not @(::expanded s))
@@ -232,7 +233,8 @@
                             (dec read-count)
                             read-count))
         thread-loaded? (contains? n :thread-children)
-        thread-item-class (thread-item-unique-class n)]
+        thread-item-class (thread-item-unique-class n)
+        thread-focus-value (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid)]
     [:div.thread-item.group
       {:class    (utils/class-set {:unread unread
                                    :close-item close-item
@@ -260,7 +262,7 @@
                            :comment-data n
                            :is-mobile? is-mobile?
                            :react-cb #(reset! (::show-picker s) comment-uuid)
-                           :reply-cb #(reply-to s (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid))
+                           :reply-cb #(reply-to s thread-focus-value)
                            :emoji-picker (when showing-picker?
                                            (emoji-picker-container s activity-data n))
                            :showing-picker? showing-picker?
@@ -300,7 +302,7 @@
                                    :is-indented-comment? true
                                    :is-mobile? is-mobile?
                                    :react-cb #(reset! (::show-picker s) (:uuid r))
-                                   :reply-cb #(reply-to s (cu/add-comment-focus-value add-comment-focus-prefix resource-uuid comment-uuid))
+                                   :reply-cb #(reply-to s thread-focus-value)
                                    :emoji-picker (when ind-showing-picker?
                                                    (emoji-picker-container s activity-data r))
                                    :showing-picker? ind-showing-picker?
@@ -310,12 +312,12 @@
       (when thread-loaded?
         (rum/with-key (add-comment {:activity-data activity-data
                                     :parent-comment-uuid comment-uuid
-                                    :collapsed? true
+                                    :collapse? true
                                     :add-comment-placeholder "Reply..."
                                     :add-comment-cb (partial user-actions/activity-reply-inline n)
                                     :add-comment-focus-prefix add-comment-focus-prefix
                                     :dismiss-reply-cb #(reset! (::replying s) false)})
-         (str "adc-" resource-uuid  last-activity-at)))]))
+         (str "adc-" comment-uuid "-" last-activity-at)))]))
 
 (defn- expand-thread [s comment-data]
   (let [threads @(::threads s)

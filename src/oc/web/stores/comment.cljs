@@ -61,14 +61,16 @@
     (-> db
       ;; Lose the cached body
       (update-in add-comment-key dissoc comment-key)
-      ;; Lose focus on the field
-      (dissoc :add-comment-focus)
       ;; Force refresh of the add comment field to remove the body
       (assoc-in (dispatcher/add-comment-force-update-key comment-key) (utils/activity-uuid)))))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
   (assoc db :add-comment-focus focus-uuid))
+
+(defmethod dispatcher/action :add-comment-blur
+  [db [_ focus-uuid]]
+  (update db :add-comment-focus #(if (= focus-uuid %) nil %)))
 
 (defmethod dispatcher/action :comment-add
   [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]

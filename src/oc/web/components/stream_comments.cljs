@@ -69,9 +69,15 @@
 (defn emoji-picked-cb [s comment-data emoji]
   (comment-actions/react-from-picker (-> s :rum/args first :activity-data) comment-data (get emoji "native")))
 
-(defn- reply-to [s parent-uuid]
-  (swap! (::replying-to s) #(conj % parent-uuid))
-  (comment-actions/add-comment-focus parent-uuid))
+(defn- add-comment-prefix [indented-comment?]
+  (if indented-comment? "edit-reply" "edit-comment"))
+
+(defn- reply-to [s comment-data]
+  (let [parent-uuid (:parent-uuid comment-data)
+        prefix (add-comment-prefix (seq parent-uuid))
+        focus-value (cu/add-comment-focus-value prefix comment-data)]
+    (swap! (::replying-to s) #(conj % (:parent-uuid comment-data)))
+    (comment-actions/add-comment-focus focus-value)))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]
@@ -154,7 +160,7 @@
                      :parent-comment-uuid (:reply-parent comment-data)
                      :dismiss-reply-cb dismiss-reply-cb
                      :edit-comment-data comment-data
-                     :add-comment-focus-prefix (if is-indented-comment? "edit-reply" "edit-comment")})
+                     :add-comment-focus-prefix (add-comment-prefix is-indented-comment?)})
        (str "edit-comment-" edit-comment-key))]])
 
 
@@ -426,7 +432,7 @@
                                :share-cb #(share-clicked root-comment-data)
                                :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
                                :did-react-cb #(thread-mark-read s (:uuid root-comment-data))
-                               :reply-cb #(reply-to s (:reply-parent root-comment-data))
+                               :reply-cb #(reply-to s root-comment-data)
                                :emoji-picker (when showing-picker?
                                                (emoji-picker-container s root-comment-data))
                                :showing-picker? showing-picker?
@@ -478,7 +484,7 @@
                                     :share-cb #(share-clicked comment-data)
                                     :react-cb #(reset! (::show-picker s) (:uuid comment-data))
                                     :did-react-cb #(comment-mark-read s comment-data)
-                                    :reply-cb #(reply-to s (:reply-parent comment-data))
+                                    :reply-cb #(reply-to s comment-data)
                                     :emoji-picker (when ind-showing-picker?
                                                     (emoji-picker-container s comment-data))
                                     :showing-picker? ind-showing-picker?
