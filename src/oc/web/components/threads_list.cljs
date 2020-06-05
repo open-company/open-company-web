@@ -367,7 +367,7 @@
    s)}
   [s {:keys [items-to-render current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
-        _user-info-hover (drv/react s :user-info-hover)]
+        _users-info-hover (drv/react s :users-info-hover)]
     [:div.threads-list
       (if (empty? items-to-render)
         [:div.threads-list-empty
