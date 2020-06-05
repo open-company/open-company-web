@@ -85,6 +85,7 @@ div.threads-list {
       &.close-item {
         border-bottom: 1px solid var(--foc-divider-line-color);
         padding-bottom: 24px;
+        margin-bottom: 16px;
       }
 
       @include mobile() {
