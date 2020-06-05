@@ -36,6 +36,7 @@ div.reactions {
       &.only-thumb {
         $height: 23px;
         height: $height;
+        opacity: 0.5;
 
         span.reaction {
           line-height: $height;
@@ -57,7 +58,7 @@ div.reactions {
             background-position: center;
             background-size: 14px 14px;
             background-repeat: no-repeat;
-            opacity: 0.5;
+            opacity: 1;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/reaction_thumb@dark.svg");
@@ -67,6 +68,7 @@ div.reactions {
 
         div.count {
           margin-top: 0;
+          color: var(--color);
           line-height: $height;
           font-size: 14px;
           height: $height;
@@ -74,7 +76,7 @@ div.reactions {
           display: block;
         }
 
-        &.reacted span.reaction span.thumb-up-icon, &:hover span.reaction span.thumb-up-icon {
+        &.reacted, &:hover {
           opacity: 1;
         }
 
