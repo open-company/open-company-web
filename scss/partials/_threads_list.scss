@@ -124,9 +124,9 @@ div.threads-list {
           align-items: center;
           height: 24px;
           text-align: left;
+          position: relative;
 
           div.thread-item-author-container {
-            position: relative;
             display: contents;
 
             @include user-profile(24) {
