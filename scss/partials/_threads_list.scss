@@ -80,12 +80,16 @@ div.threads-list {
       &.open-item {
         border-top: 1px solid var(--foc-divider-line-color);
         padding-top: 24px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
       }
 
       &.close-item {
         border-bottom: 1px solid var(--foc-divider-line-color);
         padding-bottom: 24px;
         margin-bottom: 16px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
       }
 
       @include mobile() {
