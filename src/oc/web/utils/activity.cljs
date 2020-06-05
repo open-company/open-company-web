@@ -329,7 +329,7 @@
    return a single list without duplicates depending on the direction"
   [old-items-list new-items-list direction]
   (if (seq new-items-list)
-    (let [old-uuids (map :uid old-items-list)
+    (let [old-uuids (map :uuid old-items-list)
           new-uuids (map :uuid new-items-list)
           next-items-uuids (if (= direction :down)
                              (distinct (concat old-uuids new-uuids))
@@ -732,6 +732,9 @@
                           {:has-next next-link})
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
           with-ending-item (insert-ending-item with-open-close-items next-link)]
+      (js/console.log "DBG fix-threads items-list:" items-list)
+      (js/console.log "DBG    direction:" direction)
+      (js/console.log "DBG    threads-list:" threads-list)
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
         (utils/after 0 #(comment-utils/get-comments e)))
       (-> with-fixed-threads
