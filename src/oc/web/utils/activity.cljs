@@ -646,8 +646,7 @@
                               #(->> % :uuid (get items-map) :unread not)
                               #(or (not= (:content-type %) :entry)
                                    (->> % :uuid (get items-map) :publisher?))
-                              {:hide-top-line true
-                               :has-next next-link}))
+                              {:has-next next-link}))
                            grouped-items)
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))
           with-ending-item (insert-ending-item with-open-close-items next-link)]
