@@ -328,16 +328,16 @@
   "Given 2 list of reduced items (reduced since they contains only the uuid and content-type props)
    return a single list without duplicates depending on the direction"
   [new-items-list old-items-list direction]
-  (if (seq new-items-list)
+  (if (seq old-items-list)
     (let [old-uuids (map :uuid old-items-list)
           new-uuids (map :uuid new-items-list)
           next-items-uuids (if (= direction :down)
-                             (distinct (concat old-uuids new-uuids))
-                             (reverse (distinct (concat (reverse old-uuids) (reverse new-uuids)))))
+                             (vec (distinct (concat old-uuids new-uuids)))
+                             (vec (reverse (distinct (concat (reverse old-uuids) (reverse new-uuids))))))
           all-items-list (concat old-items-list new-items-list)
           items-map (zipmap (map :uuid all-items-list) all-items-list)]
       (mapv items-map next-items-uuids))
-    old-items-list))
+    new-items-list))
 
 (def default-caught-up-message "You’re up to date")
 
