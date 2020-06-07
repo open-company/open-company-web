@@ -73,10 +73,10 @@
   (if indented-comment? "edit-reply" "edit-comment"))
 
 (defn- reply-to [s comment-data]
-  (let [parent-uuid (:parent-uuid comment-data)
+  (let [parent-uuid (:reply-parent comment-data)
         prefix (add-comment-prefix (seq parent-uuid))
         focus-value (cu/add-comment-focus-value prefix comment-data)]
-    (swap! (::replying-to s) #(conj % (:parent-uuid comment-data)))
+    (swap! (::replying-to s) #(conj % parent-uuid))
     (comment-actions/add-comment-focus focus-value)))
 
 (defn- copy-comment-url [comment-url]
