@@ -450,7 +450,7 @@ div.expanded-post {
           &:before {
             content: "";
             display: block;
-            width: #{$board_container_width}px;
+            width: 100%;
             position: absolute;
             top: 47px;
             left: 0;
