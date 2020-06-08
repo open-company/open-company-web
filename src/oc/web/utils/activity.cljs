@@ -326,11 +326,14 @@
 
 (defn- merge-items-lists
   "Given 2 list of reduced items (reduced since they contains only the uuid and content-type props)
-   return a single list without duplicates depending on the direction"
+   return a single list without duplicates depending on the direction.
+   This is necessary since the lists could contain duplicates because they are loaded in 2 different
+   moments and new activity could lead to changes in the sort."
   [new-items-list old-items-list direction]
   (cond
-    (and (seq old-items-list)
-         (seq old-items-list))
+    (and direction
+         (seq old-items-list)
+         (seq new-items-list))
     (let [old-uuids (map :uuid old-items-list)
           new-uuids (map :uuid new-items-list)
           next-items-uuids (if (= direction :down)
