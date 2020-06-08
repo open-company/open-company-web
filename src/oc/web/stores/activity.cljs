@@ -927,10 +927,10 @@
         fixed-threads-data (au/fix-threads (:collection threads-data) change-data org-data active-users sort-type)
         merged-items (merge old-threads (:fixed-items fixed-threads-data))
         merged-posts (merge old-posts (:fixed-entries fixed-threads-data))
-        container-key (dispatcher/container-key org-slug :threads sort-type)
+        threads-container-key (dispatcher/threads-container-key org-slug sort-type)
         unread-threads-key (dispatcher/unread-threads-key org-slug)]
     (as-> db ndb
-      (assoc-in ndb container-key (dissoc fixed-threads-data :fixed-items :fixed-entries))
+      (assoc-in ndb threads-container-key (dissoc fixed-threads-data :fixed-items :fixed-entries))
       (assoc-in ndb unread-threads-key (some :unread-thread (vals merged-items)))
       (assoc-in ndb threads-data-key merged-items)
       (assoc-in ndb posts-data-key merged-posts)
@@ -941,18 +941,18 @@
 
 (defmethod dispatcher/action :threads-more
   [db [_ org-slug sort-type]]
-  (let [container-key (dispatcher/container-key org-slug :threads sort-type)
-        container-data (get-in db container-key)
+  (let [threads-container-key (dispatcher/threads-container-key org-slug sort-type)
+        container-data (get-in db threads-container-key)
         next-threads-data (assoc container-data :loading-more true)]
-    (assoc-in db container-key next-threads-data)))
+    (assoc-in db threads-container-key next-threads-data)))
 
 (defmethod dispatcher/action :threads-more/finish
   [db [_ org sort-type direction threads-data]]
   (if threads-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
-          container-key (dispatcher/container-key org :threads sort-type)
-          container-data (get-in db container-key)
+          threads-container-key (dispatcher/threads-container-key org sort-type)
+          container-data (get-in db threads-container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           threads-data-key (dispatcher/threads-data-key org)
@@ -967,7 +967,7 @@
                               (dissoc :loading-more :fixed-items :fixed-entries))
           unread-threads-key (dispatcher/unread-threads-key org)]
       (as-> db ndb
-        (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb threads-container-key new-container-data)
         (assoc-in ndb unread-threads-key (some :unread-thread (vals new-threads-map)))
         (assoc-in ndb threads-data-key new-threads-map)
         (assoc-in ndb posts-data-key new-posts-map)

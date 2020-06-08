@@ -78,13 +78,23 @@
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
+(defn threads-container-key
+  ([org-slug]
+   (threads-container-key org-slug recent-activity-sort))
+  ([org-slug sort-type]
+   (vec (concat (org-key org-slug) [:threads-container sort-type]))))
+
 (defn container-key
   ([org-slug items-filter]
    (container-key org-slug items-filter recently-posted-sort))
   ([org-slug items-filter sort-type]
-   (if sort-type
-    (vec (conj (containers-key org-slug) (keyword items-filter) (keyword sort-type)))
-    (vec (conj (containers-key org-slug) (keyword items-filter))))))
+   (cond
+     (= (keyword items-filter) :threads)
+     (threads-container-key org-slug sort-type)
+     sort-type
+     (vec (conj (containers-key org-slug) (keyword items-filter) (keyword sort-type)))
+     :else
+     (vec (conj (containers-key org-slug) (keyword items-filter))))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -271,8 +281,8 @@
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
 
-(defn- get-container-threads [base route posts-data threads-data org-slug container-slug sort-type items-key]
-  (let [cnt-key (container-key org-slug container-slug sort-type)
+(defn- get-container-threads [base route posts-data threads-data org-slug sort-type items-key]
+  (let [cnt-key (threads-container-key org-slug sort-type)
         container-data (get-in base cnt-key)
         threads-list (get container-data items-key)
         container-items (vec (remove nil?
@@ -290,7 +300,7 @@
 
 (defn- get-container-items [base route posts-data threads-data org-slug container-slug sort-type items-key]
   (if (is-threads? container-slug)
-    (get-container-threads base route posts-data threads-data org-slug container-slug sort-type items-key)
+    (get-container-threads base route posts-data threads-data org-slug sort-type items-key)
     (get-container-posts base route posts-data org-slug container-slug sort-type items-key)))
 
 (def ui-theme-key [:ui-theme])
