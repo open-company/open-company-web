@@ -37,6 +37,7 @@ div.reactions {
         $height: 26px;
         height: $height;
         opacity: 0.5;
+        padding: 0;
 
         span.reaction {
           line-height: $height;
