@@ -4,8 +4,10 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.follow-button :refer (follow-button)]))
 
 (defn- filter-item [s item]
@@ -21,6 +23,11 @@
   (drv/drv :org-data)
   (drv/drv :follow-boards-list)
   (drv/drv :followers-boards-count)
+  (rum/local nil ::dropdown-menu)
+  (ui-mixins/on-window-click-mixin (fn [s e]
+    (when (and (seq @(::dropdown-menu s))
+               (not (utils/event-inside? e (rum/ref-node s (str "dropdown-menu-" @(::dropdown-menu s))))))
+      (reset! (::dropdown-menu s) nil))))
   [s]
   (let [org-data (drv/react s :org-data)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))
@@ -49,7 +56,23 @@
                          (when-not (utils/button-clicked? e)
                            (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item)))))}
             [:div.explore-view-block-title
-              (:name item)]
+              [:span.board-name (:name item)]
+              [:div.board-dropdown-container
+                {:ref (str "dropdown-menu-" (:uuid item))}
+                [:button.mlb-reset.board-dropdown-bt
+                 {:on-click #(reset! (::dropdown-menu s) (:uuid item))}]
+                (when (= @(::dropdown-menu s) (:uuid item))
+                  (dropdown-list {:items [{:label "Edit topic" :value :edit :disabled (:can-edit item)}
+                                          {:label "Preview" :value :preview}]
+                                  :on-change (fn [item]
+                                               (reset! (::dropdown-menu s) nil)
+                                               (cond
+                                                 (= (:value item) :edit)
+                                                 (nav-actions/show-section-editor (:slug item))
+                                                 (= (:value item) :preview)
+                                                 (nav-actions/nav-to-url! nil (:slug item) (oc-urls/board (:slug item)))
+                                                 :else
+                                                 nil))}))]]
             [:div.explore-view-block-description
               (:description item)]
             (when (:last-entry-at item)
