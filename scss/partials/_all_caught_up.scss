@@ -102,7 +102,12 @@ div.caught-up-line {
     }
 
     div.all-caught-up div.all-caught-up-inner {
-      background-color: var(--light-color);
+      background-color: transparent;
+
+
+      div.message {
+        color: var(--light-color);
+      }
     }
   }
 }
