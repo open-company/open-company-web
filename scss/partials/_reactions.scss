@@ -16,7 +16,7 @@ div.reactions {
       height: 26px;
       cursor: default;
       padding: 2px 0;
-      @include OC_Body_Bold();
+      @include OC_Body_Book();
       box-shadow: none;
       font-size: 12px;
       color: var(--color);
