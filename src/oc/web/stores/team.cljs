@@ -39,7 +39,7 @@
           next-db**** (reduce (fn [tdb contrib-key]
                                 (let [contrib-data-key (concat contributions-list-key [contrib-key dispatcher/recently-posted-sort])
                                       old-contributions-data (get-in tdb contrib-data-key)]
-                                  (assoc-in tdb contrib-data-key (au/fix-contributions old-contributions-data change-data org-data users-map follow-publishers-list))))
+                                  (assoc-in tdb contrib-data-key (au/parse-contributions old-contributions-data change-data org-data users-map follow-publishers-list))))
                        db
                        (keys (get-in db contributions-list-key)))
           boards-key (dispatcher/boards-key org-slug)
@@ -47,7 +47,7 @@
           next-db*** (reduce (fn [tdb board-key]
                                (let [board-data-key (concat boards-key [board-key dispatcher/recently-posted-sort :board-data])
                                      old-board-data (get-in tdb board-data-key)]
-                                 (assoc-in tdb board-data-key (au/fix-board old-board-data change-data users-map following-boards))))
+                                 (assoc-in tdb board-data-key (au/parse-board old-board-data change-data users-map following-boards))))
                       next-db****
                       (keys (get-in db boards-key)))
           containers-key (dispatcher/containers-key org-slug)
@@ -57,18 +57,18 @@
                                     container-ra-data-key (concat containers-key [container-key dispatcher/recent-activity-sort])
                                     old-container-ra-data (get-in tdb container-ra-data-key)]
                                 (-> tdb
-                                 (assoc-in container-rp-data-key (au/fix-container old-container-rp-data change-data org-data users-map dispatcher/recently-posted-sort))
-                                 (assoc-in container-ra-data-key (au/fix-container old-container-ra-data change-data org-data users-map dispatcher/recent-activity-sort)))))
+                                 (assoc-in container-rp-data-key (au/parse-container old-container-rp-data change-data org-data users-map dispatcher/recently-posted-sort))
+                                 (assoc-in container-ra-data-key (au/parse-container old-container-ra-data change-data org-data users-map dispatcher/recent-activity-sort)))))
                      next-db***
                      (keys (get-in db containers-key)))
           threads-container-key (dispatcher/threads-container-key org-slug)
-          next-db* (update-in next-db** threads-container-key #(au/fix-threads % change-data org-data users-map dispatcher/recent-activity-sort))
+          next-db* (update-in next-db** threads-container-key #(au/parse-threads % change-data org-data users-map dispatcher/recent-activity-sort))
           posts-key (dispatcher/posts-data-key org-slug)
           next-db (reduce (fn [tdb post-uuid]
                            (let [post-data-key (concat posts-key [post-uuid])
                                  old-post-data (get-in tdb post-data-key)
                                  board-data (get-in tdb (dispatcher/board-data-key org-slug (:board-slug old-post-data)))]
-                            (assoc-in tdb post-data-key (au/fix-entry old-post-data board-data change-data users-map))))
+                            (assoc-in tdb post-data-key (au/parse-entry old-post-data board-data change-data users-map))))
                    next-db*
                    (keys (get-in db posts-key)))
           org-data (get-in next-db (dispatcher/org-data-key org-slug))

@@ -435,10 +435,10 @@
      :else
      (vec items-list))))
 
-(defn fix-entry
+(defn parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
   ([entry-data board-data changes]
-   (fix-entry entry-data board-data changes (dis/active-users)))
+   (parse-entry entry-data board-data changes (dis/active-users)))
   ([entry-data board-data changes active-users]
   (if (= entry-data :404)
     entry-data
@@ -482,24 +482,24 @@
                                  (html-lib/first-body-thumbnail (:body entry-data))))
         (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))))
 
-(defn fix-board
+(defn parse-board
   "Parse board data coming from the API."
   ([board-data]
-   (fix-board board-data {} (dis/active-users) (dis/follow-boards-list)))
+   (parse-board board-data {} (dis/active-users) (dis/follow-boards-list)))
 
   ([board-data change-data]
-   (fix-board board-data change-data (dis/active-users) (dis/follow-boards-list)))
+   (parse-board board-data change-data (dis/active-users) (dis/follow-boards-list)))
 
   ([board-data change-data active-users]
-   (fix-board board-data change-data active-users (dis/follow-boards-list)))
+   (parse-board board-data change-data active-users (dis/follow-boards-list)))
 
   ([board-data change-data active-users follow-boards-list & [direction]]
     (let [with-fixed-activities* (reduce (fn [ret item]
                                            (assoc-in ret [:fixed-items (:uuid item)]
-                                            (fix-entry item {:slug (:board-slug item)
-                                                             :name (:board-name item)
-                                                             :uuid (:board-uuid item)
-                                                             :publisher-board (:publisher-board item)}
+                                            (parse-entry item {:slug (:board-slug item)
+                                                               :name (:board-name item)
+                                                               :uuid (:board-uuid item)
+                                                               :publisher-board (:publisher-board item)}
                                              change-data
                                              active-users)))
                                   board-data
@@ -537,26 +537,26 @@
         (assoc :items-to-render with-ending-item)
         (assoc :following (boolean (follow-board-uuids (:uuid board-data))))))))
 
-(defn fix-contributions
+(defn parse-contributions
   "Parse data coming from the API for a certain user's posts."
   ([contributions-data]
-   (fix-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
 
   ([contributions-data change-data]
-   (fix-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
 
   ([contributions-data change-data org-data]
-   (fix-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list)))
 
   ([contributions-data change-data org-data active-users]
-   (fix-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list)))
 
   ([contributions-data change-data org-data active-users follow-publishers-list & [direction]]
     (let [all-boards (:boards org-data)
           boards-map (zipmap (map :slug all-boards) all-boards)
           with-fixed-activities* (reduce (fn [ret item]
                                            (let [board-data (get boards-map (:board-slug item))
-                                                 fixed-entry (fix-entry item board-data change-data active-users)]
+                                                 fixed-entry (parse-entry item board-data change-data active-users)]
                                              (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
                                   contributions-data
                                   (:items contributions-data))
@@ -593,23 +593,23 @@
         (assoc :items-to-render with-ending-item)
         (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
 
-(defn fix-container
+(defn parse-container
   "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
-   (fix-container container-data {} (dis/org-data) (dis/active-users) nil))
+   (parse-container container-data {} (dis/org-data) (dis/active-users) nil))
 
   ([container-data change-data]
-   (fix-container container-data change-data (dis/org-data) (dis/active-users) nil))
+   (parse-container container-data change-data (dis/org-data) (dis/active-users) nil))
 
   ([container-data change-data org-data]
-   (fix-container container-data change-data org-data (dis/active-users) nil))
+   (parse-container container-data change-data org-data (dis/active-users) nil))
 
   ([container-data change-data org-data active-users sort-type & [direction]]
     (let [all-boards (:boards org-data)
           boards-map (zipmap (map :slug all-boards) all-boards)
           with-fixed-activities* (reduce (fn [ret item]
                                            (let [board-data (get boards-map (:board-slug item))
-                                                 fixed-entry (fix-entry item board-data change-data active-users)]
+                                                 fixed-entry (parse-entry item board-data change-data active-users)]
                                              (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
                                   container-data
                                   (:items container-data))
@@ -654,7 +654,7 @@
        (assoc :posts-list full-items-list)
        (assoc :items-to-render with-ending-item)))))
 
-(defn fix-thread [thread entry-data active-users]
+(defn parse-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
         comment-unread (comment-unread? thread (:last-read-at entry-data))
         thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
@@ -666,7 +666,7 @@
       (as-> t (assoc t :author? (is-author? t))
               (assoc t :monologue? (is-monologue? t))))))
 
-(defn fix-threads
+(defn parse-threads
   "
   Threads data looks like this:
   {:total-count 100
@@ -679,13 +679,13 @@
    :links []}
   "
   ([threads-data change-data org-data active-users sort-type]
-   (fix-threads threads-data change-data org-data active-users sort-type nil))
+   (parse-threads threads-data change-data org-data active-users sort-type nil))
   ([threads-data change-data org-data active-users sort-type direction]
     (let [all-boards (:boards org-data)
           boards-map (zipmap (map :slug all-boards) all-boards)
           with-fixed-entries (reduce (fn [ret entry]
                                        (let [board-data (get boards-map (:board-slug entry))
-                                             fixed-entry (fix-entry entry board-data change-data active-users)]
+                                             fixed-entry (parse-entry entry board-data change-data active-users)]
                                          (assoc-in ret [:fixed-entries (:uuid entry)] fixed-entry)))
                               threads-data
                               (:entries threads-data))
@@ -694,7 +694,7 @@
                                            global-entry (when-not local-entry
                                                           (dis/activity-data (:resource-uuid thread)))
                                            fixed-thread (when (or local-entry global-entry)
-                                                        (fix-thread thread (or local-entry global-entry) active-users))]
+                                                        (parse-thread thread (or local-entry global-entry) active-users))]
                                        (as-> ret next-ret
                                         (assoc-in next-ret [:fixed-items (:uuid fixed-thread)] fixed-thread)
                                         (if global-entry

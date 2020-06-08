@@ -343,7 +343,7 @@
                  (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
                  (let [json-body (json->cljs body)
                        board-data (if (:entries json-body)
-                                    (au/fix-board json-body)
+                                    (au/parse-board json-body)
                                     false)
                        fixed-items (:fixed-items board-data)
                        entry-saved (if fixed-items
