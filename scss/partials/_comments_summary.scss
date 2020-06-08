@@ -13,6 +13,34 @@ div.is-comments {
     }
   }
 
+  &.has-new-comments {
+    div.is-comments-bubble {
+      opacity: 1;
+      background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+      }
+    }
+
+    div.is-comments-summary {
+      color: $wut_purple;
+      @include OC_Body_Bold();
+
+      @include big_web() {
+        cursor: pointer;
+
+        &:hover {
+          color: $wut_purple;
+
+          span.add-a-comment {
+            color: var(--color);
+          }
+        }
+      }
+    }
+  }
+
   div.is-comments-bubble {
     float: left;
     width: 14px;

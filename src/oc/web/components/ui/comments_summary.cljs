@@ -66,7 +66,8 @@
         show-new-tag? (pos? new-comments-count)]
     (when comments-count
       [:div.is-comments
-        {:on-click (fn [e]
+        {:class (when show-new-tag? "has-new-comments")
+         :on-click (fn [e]
                      ;; To avoid navigating to the post again and lose the coming from data
                      ;; nav only when not in the expanded post
                      (if (seq (router/current-activity-id))
@@ -77,7 +78,12 @@
          :data-placement "top"
          :data-toggle (when-not is-mobile? "tooltip")
          :data-container "body"
-         :title (str comments-count " comment" (when (not= comments-count 1) "s"))}
+         :title (if (and (pos? new-comments-count)
+                         (= new-comments-count comments-count))
+                 (str new-comments-count " new comment" (when (not= new-comments-count 1) "s"))
+                 (str comments-count " comment" (when (not= comments-count 1) "s")
+                  (when (pos? new-comments-count)
+                    (str ", " new-comments-count " new"))))}
         ; Comments authors heads
         (when show-bubble-icon?
           [:div.is-comments-bubble])
@@ -97,8 +103,7 @@
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                      :add-a-comment (not (pos? comments-count))
-                                      :has-new-comments show-new-tag?})
+                                      :add-a-comment (not (pos? comments-count))})
              :data-toggle (when-not is-mobile? "tooltip")}
             [:div.is-comments-summary-inner.group
               (str
@@ -106,8 +111,7 @@
                  new-comments-count
                  comments-count)
                (if show-new-tag?
-                 (if hide-label?
-                   " new"
+                 (when-not hide-label?
                    (str " new comment" (when (not= new-comments-count 1) "s")))
                  (when-not hide-label?
                    (str " comment" (when (not= comments-count 1) "s")))))]])])))
