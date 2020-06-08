@@ -208,7 +208,7 @@ div.user-info-view {
     button.follow-button, button.profile-bt {
       float: left;
       width: calc(50% - 4px);
-      padding: 6px 0;
+      padding: 6px;
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
@@ -322,7 +322,7 @@ div.board-info-view {
     button.follow-button {
       float: left;
       width: calc(50% - 4px);
-      padding: 6px 0;
+      padding: 6px;
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
