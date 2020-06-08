@@ -317,6 +317,8 @@
                                        :show-bubble-icon? true
                                        :hide-label? true
                                        :publisher? publisher?
+                                       :show-new-tag? (pos? (:new-comments-count activity-data))
+                                       :new-comments-count (:new-comments-count activity-data)
                                        :add-comment-focus-prefix "main-comment"})])
                 (when show-wrt?
                   [:div.stream-item-wrt
