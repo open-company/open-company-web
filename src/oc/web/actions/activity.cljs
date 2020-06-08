@@ -880,7 +880,8 @@
               (not (:loading activity-data)))
      (send-item-read (:uuid activity-data))
      (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
-     (inbox-dismiss (:uuid activity-data)))))
+     (inbox-dismiss (:uuid activity-data))
+     true)))
 
 ;; Video handling
 

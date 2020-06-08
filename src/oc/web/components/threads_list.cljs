@@ -316,12 +316,6 @@
                                     :dismiss-reply-cb #(reset! (::replying s) false)})
          (str "adc-" comment-uuid "-" last-activity-at)))]))
 
-(defn- mark-read-if-needed [s items-container offset-top item]
-  (when-let [item-node (.querySelector items-container (str "div." (thread-item-unique-class item)))]
-    (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
-      (swap! (::read-items s) conj (:resource-uuid item))
-      (activity-actions/mark-read (:resource-uuid item)))))
-
 (defn- thread-mark-read [s thread-uuid]
   (let [threads @(::threads s)
         idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
@@ -344,6 +338,13 @@
                                           (assoc % :unread false)
                                           %)
                                    children)))))))))
+
+(defn- mark-read-if-needed [s items-container offset-top item]
+  (when-let [item-node (.querySelector items-container (str "div." (thread-item-unique-class item)))]
+    (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
+      (let [read (activity-actions/mark-read (:resource-uuid item))]
+        (when read
+          (swap! (::read-items s) conj (:resource-uuid item)))))))
 
 (defn- did-scroll [s _scroll-event]
   (when @(::has-unread-items s)
@@ -377,14 +378,16 @@
   (rum/local [] ::threads)
   (rum/local nil ::initial-last-read-at)
   (ui-mixins/on-window-scroll-mixin did-scroll)
-  {:did-mount (fn [s]
-   (let [threads (-> s :rum/args first :items-to-render)
+  {:will-mount (fn [s]
+    (let [threads (-> s :rum/args first :items-to-render)
          last-read-at (reduce (fn [r t] (update r (:uuid t) #(if (pos? (compare % (:last-read-at t))) % (:last-read-at t)))) {} threads)
          collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%]) threads))]
      (reset! (::threads s) collapsed-threads)
      (reset! (::initial-last-read-at s) last-read-at)
-     (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads))
-     (did-scroll s nil))
+     (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads)))
+    s)
+   :did-mount (fn [s]
+     (did-scroll s nil)
    s)
    :did-remount (fn [o s]
    (let [items-to-render (-> s :rum/args first :items-to-render)
@@ -397,7 +400,7 @@
              collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items-to-render))]
          (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads))
          (reset! (::threads s) collapsed-threads)
-         (did-scroll s nil))))
+         (utils/after 0 #(did-scroll s nil)))))
    s)}
   [s {:keys [items-to-render last-read-at current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
