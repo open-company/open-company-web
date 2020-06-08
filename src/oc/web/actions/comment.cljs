@@ -8,6 +8,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.stores.comment :as comment-store]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -76,10 +77,8 @@
                                                      :dismiss true
                                                      :expire 3
                                                      :id :first-comment-follow-post})))
-        ; (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
-        ;   (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
+          (api/get-comments comments-link #(activity-utils/get-comments-finished comments-key activity-data %)))
         ;; In case save didn't go well let's re-set the comment body in the add comment field
         (when-not success
           ;; Remove the newly added comment if still in the list
@@ -89,10 +88,10 @@
     new-comment-map))
 
 (defn get-comments [activity-data]
-  (comment-utils/get-comments activity-data))
+  (activity-utils/get-comments activity-data))
 
 (defn get-comments-if-needed [activity-data comments-data]
-  (comment-utils/get-comments-if-needed activity-data comments-data))
+  (activity-utils/get-comments-if-needed activity-data comments-data))
 
 (defn delete-comment [activity-data comment-data]
   ;; Send WRT read on comment delete
@@ -109,7 +108,7 @@
       (fn [{:keys [status success body]}]
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link
-           #(comment-utils/get-comments-finished comments-key activity-data %)))))))
+           #(activity-utils/get-comments-finished comments-key activity-data %)))))))
 
 (defn comment-reaction-toggle [activity-data comment-data reaction-data reacting?]
   (activity-actions/send-item-read (:uuid activity-data))
@@ -155,7 +154,7 @@
       (fn [{:keys [success]}]
         (save-done-cb success)
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
+          (api/get-comments comments-link #(activity-utils/get-comments-finished comments-key activity-data %)))
         (when-not success
           ;; Remove the newly added comment if still in the list
           (dis/dispatch! [:comment-save/failed activity-data comment-data comments-key])

@@ -8,7 +8,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.mention :as mention-utils]))
 
 (defn setup-medium-editor [comment-node users-list]
@@ -62,42 +61,6 @@
         _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
     (.html $comment-node)))
 
-(defn get-comments-finished
-  [comments-key activity-data {:keys [status success body]}]
-  (when success
-    (dis/dispatch! [:comments-get/finish {:success success
-                                          :error (when-not success body)
-                                          :comments-key comments-key
-                                          :body (when (seq body) (json->cljs body))
-                                          :activity-uuid (:uuid activity-data)
-                                          :secure-activity-uuid (router/current-secure-activity-id)}])))
-
-(defn get-comments [activity-data]
-  (when activity-data
-    (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
-          comments-link (utils/link-for (:links activity-data) "comments")]
-      (when comments-link
-        (dis/dispatch! [:comments-get
-                        comments-key
-                        activity-data])
-        (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))))
-
-(defn get-comments-if-needed [activity-data all-comments-data]
-  (let [comments-link (utils/link-for (:links activity-data) "comments")
-        activity-uuid (:uuid activity-data)
-        comments-data (get all-comments-data activity-uuid)
-        should-load-comments? (and ;; there is a comments link
-                                   (map? comments-link)
-                                   ;; there are comments to load,
-                                   (pos? (:count comments-link))
-                                   ;; they are not already loading,
-                                   (not (:loading comments-data))
-                                   ;; and they are not loaded already
-                                   (not (contains? comments-data :sorted-comments)))]
-    ;; Load the whole list of comments if..
-    (when should-load-comments?
-      (get-comments activity-data))))
-
 (defn ungroup-comments [comments]
   (vec (mapcat #(concat [(dissoc % :thread-children)] (:thread-children %)) comments)))
 
@@ -131,28 +94,32 @@
   (apply merge
    (map #(hash-map (:uuid %) %) sorted-comments)))
 
-(defn unread? [last-read-at comment-data]
+
+(defn unread?
+  "If unread was already set let's reuse it."
+  [last-read-at comment-data]
   (if (contains? comment-data :unread)
     (:unread comment-data)
     (and (not (:author? comment-data))
          (< (.getTime (utils/js-date last-read-at))
             (.getTime (utils/js-date (:created-at comment-data)))))))
 
-(defn- enrich-comment [last-read-at comment-data last-comment? collapsed-map]
+(defn- enrich-comment [comment-data last-read-at last-comment? collapsed-map]
   (let [collapsed-comment-map (get collapsed-map (:uuid comment-data))
         unread-comment? (unread? last-read-at (merge comment-data collapsed-comment-map))]
-    {:unread unread-comment?
-     :expanded (or (:unread collapsed-comment-map)
-                   ;; Keep the comment expanded if it was already
-                   (:expanded collapsed-comment-map)
-                   ;; Do not collapse root comments
-                   (not (seq (:parent-uuid comment-data)))
-                   ;; User has not read the post yet
-                   (not (seq last-read-at))
-                   ;; Do not collapse unread comments
-                   unread-comment?
-                   ;; Do not collapse last comments
-                   last-comment?)}))
+    (merge comment-data
+     {:unread unread-comment?
+      :expanded (or (:unread collapsed-comment-map)
+                    ;; Keep the comment expanded if it was already
+                    (:expanded collapsed-comment-map)
+                    ;; Do not collapse root comments
+                    (not (seq (:parent-uuid comment-data)))
+                    ;; User has not read the post yet
+                    (not (seq last-read-at))
+                    ;; Do not collapse unread comments
+                    unread-comment?
+                    ;; Do not collapse last comments
+                    last-comment?)})))
 
 (defn collapsed-comments
   "Add a collapsed flag to every comment that is a reply and is not unread. Also add unread? flag to every unread one.
@@ -165,7 +132,7 @@
             last-comment? (and root-comment
                                (= (:uuid comment) (-> root-comment :thread-children last :uuid)))]
         (-> comment
-         (merge (enrich-comment last-read-at comment last-comment? collapsed-map))
+         (enrich-comment last-read-at last-comment? collapsed-map)
          (assoc :thread-children enriched-children)
          (assoc :unread-count (count (filter :unread enriched-children)))
          (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children)))))

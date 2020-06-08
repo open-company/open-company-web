@@ -9,7 +9,6 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.utils.comment :as comment-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -33,7 +32,7 @@
 (defn- maybe-load-comments [s]
   (let [activity-data (:activity-data @(drv/get-ref s :secure-activity-data))
         comments-data @(drv/get-ref s :comments-data)]
-    (comment-utils/get-comments-if-needed activity-data comments-data)))
+    (au/get-comments-if-needed activity-data comments-data)))
 
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
@@ -66,7 +65,7 @@
                                             :org-logo-width :logo-width
                                             :org-logo-height :logo-height}))
         comments-drv (drv/react s :comments-data)
-        comments-data (au/get-comments activity-data comments-drv)
+        comments-data (au/activity-comments activity-data comments-drv)
         activity-link (utils/link-for (:links org-data) "entries")]
     [:div.secure-activity-container
       (login-overlays-handler)

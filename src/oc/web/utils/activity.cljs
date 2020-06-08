@@ -2,16 +2,20 @@
   (:require [cuerdas.core :as s]
             [defun.core :refer (defun)]
             [cljs-time.format :as time-format]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
             [oc.lib.html :as html-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.utils.user :as user-utils]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.utils.comment :as comment-utils]))
+            [oc.web.utils.comment :as cu]
+            [oc.web.local-settings :as ls]
+            [oc.web.utils.user :as user-utils]
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.lib.responsive :as responsive]))
 
 (def headline-placeholder "Add a title")
 
@@ -435,6 +439,79 @@
      :else
      (vec items-list))))
 
+(defn get-comments-finished
+  [comments-key activity-data {:keys [status success body]}]
+  (when success
+    (dis/dispatch! [:comments-get/finish {:success success
+                                          :error (when-not success body)
+                                          :comments-key comments-key
+                                          :body (when (seq body) (json->cljs body))
+                                          :activity-uuid (:uuid activity-data)
+                                          :secure-activity-uuid (router/current-secure-activity-id)}])))
+
+(defn get-comments [activity-data]
+  (when activity-data
+    (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
+          comments-link (utils/link-for (:links activity-data) "comments")]
+      (when comments-link
+        (dis/dispatch! [:comments-get
+                        comments-key
+                        activity-data])
+        (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))))
+
+(defn get-comments-if-needed [activity-data all-comments-data]
+  (let [comments-link (utils/link-for (:links activity-data) "comments")
+        activity-uuid (:uuid activity-data)
+        comments-data (get all-comments-data activity-uuid)
+        should-load-comments? (and ;; there is a comments link
+                                   (map? comments-link)
+                                   ;; there are comments to load,
+                                   (pos? (:count comments-link))
+                                   ;; they are not already loading,
+                                   (not (:loading comments-data))
+                                   ;; and they are not loaded already
+                                   (not (contains? comments-data :sorted-comments)))]
+    ;; Load the whole list of comments if..
+    (when should-load-comments?
+      (get-comments activity-data))))
+
+(defn- is-emoji
+  [body]
+  (let [plain-text (.text (js/$ (str "<div>" body "</div>")))
+        is-emoji? (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")
+        is-text-message? (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g")]
+    (and ;; emojis can have up to 11 codepoints
+         (<= (count plain-text) 11)
+         (.match plain-text is-emoji?)
+         (not (.match plain-text is-text-message?)))))
+
+(defun parse-comment
+  ([org-data activity-data comments :guard sequential?]
+    (map #(parse-comment org-data activity-data %) comments))
+  ([org-data activity-data comment-map :guard nil?]
+    {})
+  ([org-data :guard map? activity-data :guard map? comment-map :guard map?]
+    (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
+          delete-comment-link (utils/link-for (:links comment-map) "delete")
+          can-react? (utils/link-for (:links comment-map) "react"  "POST")
+          reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
+          is-root-comment (empty? (:parent-uuid comment-map))
+          author? (is-author? comment-map)
+          unread? (and (not author?)
+                       (comment-unread? comment-map (:last-read-at activity-data)))]
+      (-> comment-map
+        (assoc :content-type :comment)
+        (assoc :author? author?)
+        (assoc :unread unread?)
+        (assoc :is-emoji (is-emoji (:body comment-map)))
+        (assoc :can-edit (boolean edit-comment-link))
+        (assoc :can-delete (boolean delete-comment-link))
+        (assoc :can-react can-react?)
+        (assoc :reply-parent reply-parent)
+        (assoc :resource-uuid (:uuid activity-data))
+        (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
+                                               (:uuid activity-data) (:uuid comment-map))))))))
+
 (defn parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
   ([entry-data board-data changes]
@@ -480,7 +557,7 @@
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data))))
-        (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))))
+        (assoc :comments (cu/sort-comments (:comments entry-data))))))))
 
 (defn parse-board
   "Parse board data coming from the API."
@@ -728,7 +805,7 @@
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
           with-ending-item (insert-ending-item with-open-close-items next-link)]
       (doseq [e (vals (:fixed-entries with-fixed-entries))]
-        (utils/after 0 #(comment-utils/get-comments e)))
+        (utils/after 0 #(get-comments e)))
       (-> with-fixed-threads
        (dissoc :old-links :entries :items)
        (assoc :links fixed-next-links)
@@ -736,7 +813,7 @@
        (assoc :no-virtualized-steam true)
        (assoc :items-to-render with-ending-item)))))
 
-(defn get-comments [activity-data comments-data]
+(defn activity-comments [activity-data comments-data]
   (or (-> comments-data
           (get (:uuid activity-data))
           :sorted-comments)

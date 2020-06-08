@@ -5,47 +5,10 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.comment :as cu]
+            [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
-            [oc.web.dispatcher :as dispatcher]
-            [oc.web.utils.comment :as comment-utils]
-            [oc.web.utils.activity :as activity-utils]))
-
-(defn- is-emoji
-  [body]
-  (let [plain-text (.text (js/$ (str "<div>" body "</div>")))
-        is-emoji? (js/RegExp "^([\ud800-\udbff])([\udc00-\udfff])" "g")
-        is-text-message? (js/RegExp "[a-zA-Z0-9\\s!?@#\\$%\\^&(())_=\\-<>,\\.\\*;':\"]" "g")]
-    (and ;; emojis can have up to 11 codepoints
-         (<= (count plain-text) 11)
-         (.match plain-text is-emoji?)
-         (not (.match plain-text is-text-message?)))))
-
-(defun parse-comment
-  ([org-data activity-data comments :guard sequential?]
-    (map #(parse-comment org-data activity-data %) comments))
-  ([org-data activity-data comment-map :guard nil?]
-    {})
-  ([org-data :guard map? activity-data :guard map? comment-map :guard map?]
-    (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
-          delete-comment-link (utils/link-for (:links comment-map) "delete")
-          can-react? (utils/link-for (:links comment-map) "react"  "POST")
-          reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
-          is-root-comment (empty? (:parent-uuid comment-map))
-          author? (activity-utils/is-author? comment-map)
-          unread? (and (not author?)
-                       (activity-utils/comment-unread? comment-map (:last-read-at activity-data)))]
-      (-> comment-map
-        (assoc :content-type :comment)
-        (assoc :author? author?)
-        (assoc :unread unread?)
-        (assoc :is-emoji (is-emoji (:body comment-map)))
-        (assoc :can-edit (boolean edit-comment-link))
-        (assoc :can-delete (boolean delete-comment-link))
-        (assoc :can-react can-react?)
-        (assoc :reply-parent reply-parent)
-        (assoc :resource-uuid (:uuid activity-data))
-        (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
-                                               (:uuid activity-data) (:uuid comment-map))))))))
+            [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :add-comment-change
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid comment-body force-update?]]
@@ -80,14 +43,12 @@
   [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
-        new-comment-data (parse-comment (dispatcher/org-data db)
-                                        activity-data
-                                        comment-data)
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
+        new-comment-data (au/parse-comment (dispatcher/org-data db) activity-data comment-data)
         all-comments (concat comments-data [new-comment-data])
-        sorted-comments (comment-utils/sort-comments all-comments)
+        sorted-comments (cu/sort-comments all-comments)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-comments)]
+        threads-map (cu/threads-map sorted-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-comments)
      (assoc-in threads-map-key threads-map)
@@ -104,15 +65,13 @@
 (defmethod dispatcher/action :comment-add/replace
   [db [_ activity-data comment-data comments-key new-comment-uuid]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         old-comments-data (filterv #(not= (:uuid %) new-comment-uuid) comments-data)
-        new-comment-data (parse-comment (dispatcher/org-data db)
-                                        activity-data
-                                        comment-data)
+        new-comment-data (au/parse-comment (dispatcher/org-data db) activity-data comment-data)
         all-comments (concat old-comments-data [new-comment-data])
-        sorted-all-comments (comment-utils/sort-comments all-comments)
+        sorted-all-comments (cu/sort-comments all-comments)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-all-comments)]
+        threads-map (cu/threads-map sorted-all-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-all-comments)
      (assoc-in threads-map-key threads-map))))
@@ -124,11 +83,11 @@
 (defmethod dispatcher/action :comment-add/failed
   [db [_ activity-data comment-data comments-key]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        all-comments (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        all-comments (cu/ungroup-comments (get-in db sorted-comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
-        sorted-filtered-comments (comment-utils/sort-comments filtered-comments)
+        sorted-filtered-comments (cu/sort-comments filtered-comments)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-filtered-comments)]
+        threads-map (cu/threads-map sorted-filtered-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-filtered-comments)
      (assoc-in threads-map-key threads-map))))
@@ -136,11 +95,11 @@
 (defmethod dispatcher/action :comment-save/failed
   [db [_ activity-data comment-data comments-key]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        all-comments (comment-utils/ungroup-comments  (get-in db sorted-comments-key))
+        all-comments (cu/ungroup-comments  (get-in db sorted-comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
-        sorted-filtered-comments (comment-utils/sort-comments (conj filtered-comments comment-data))
+        sorted-filtered-comments (cu/sort-comments (conj filtered-comments comment-data))
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-filtered-comments)]
+        threads-map (cu/threads-map sorted-filtered-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-filtered-comments)
      (assoc-in threads-map-key threads-map))))
@@ -156,11 +115,11 @@
           activity-data (if secure-activity-uuid
                           (dispatcher/secure-activity-data (:slug org-data) secure-activity-uuid db)
                           (dispatcher/activity-data (:slug org-data) activity-uuid db))
-          cleaned-comments (map #(parse-comment org-data activity-data %) (:items (:collection body)))
+          cleaned-comments (map #(au/parse-comment org-data activity-data %) (:items (:collection body)))
           sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-          sorted-comments (comment-utils/sort-comments cleaned-comments)
+          sorted-comments (cu/sort-comments cleaned-comments)
           threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-          threads-map (comment-utils/threads-map sorted-comments)]
+          threads-map (cu/threads-map sorted-comments)]
       (-> db
        (assoc-in sorted-comments-key sorted-comments)
        (assoc-in threads-map-key threads-map)
@@ -171,13 +130,13 @@
   [db [_ activity-uuid comment-data comments-key]]
   (let [item-uuid (:uuid comment-data)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         new-comments-data (filterv #(and (not= item-uuid (:uuid %))
                                          (not= item-uuid (:parent-uuid %)))
                            comments-data)
-        sorted-comments (comment-utils/sort-comments new-comments-data)
+        sorted-comments (cu/sort-comments new-comments-data)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-comments)]
+        threads-map (cu/threads-map sorted-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-comments)
      (assoc-in threads-map-key threads-map))))
@@ -185,7 +144,7 @@
 (defmethod dispatcher/action :comment-reaction-toggle
   [db [_ comments-key activity-uuid comment-uuid reaction-data reacting?]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         comment-data (some #(when (= comment-uuid (:uuid %)) %) comments-data)]
     ;; the comment has yet to be stored locally in app state so ignore and
     ;; wait for server side reaction
@@ -207,9 +166,9 @@
             new-comments-data (->> comments-data
                                (filter #(not= (:uuid %) comment-uuid))
                                (cons new-comment-data))
-            new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+            new-sorted-comments-data (cu/sort-comments new-comments-data)
             threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-            threads-map (comment-utils/threads-map new-sorted-comments-data)]
+            threads-map (cu/threads-map new-sorted-comments-data)]
         (-> db
          (assoc-in sorted-comments-key new-sorted-comments-data)
          (assoc-in threads-map-key threads-map)))
@@ -218,7 +177,7 @@
 (defmethod dispatcher/action :comment-react-from-picker
   [db [_ comments-key activity-uuid comment-uuid reaction]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         comment-data (some #(when (= (:uuid %) comment-uuid) %) comments-data)]
     ;; the comment has yet to be stored locally in app state so ignore and
     ;; wait for server side reaction
@@ -248,9 +207,9 @@
             new-comments-data (->> comments-data
                                (filter #(not= (:uuid %) comment-uuid))
                                (cons new-comment-data))
-            new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+            new-sorted-comments-data (cu/sort-comments new-comments-data)
             threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-            threads-map (comment-utils/threads-map new-sorted-comments-data)]
+            threads-map (cu/threads-map new-sorted-comments-data)]
         (-> db
          (assoc-in sorted-comments-key new-sorted-comments-data)
          (assoc-in threads-map-key threads-map)))
@@ -260,11 +219,11 @@
   [db [_ org-slug comments-key updated-comment-map*]]
   (let [updated-comment-map (dissoc updated-comment-map* :thread-children)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        all-comments (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        all-comments (cu/ungroup-comments (get-in db sorted-comments-key))
         filtered-comments (filterv #(not= (:uuid %) (:uuid updated-comment-map)) all-comments)
-        sorted-new-comments (comment-utils/sort-comments (conj filtered-comments updated-comment-map))
+        sorted-new-comments (cu/sort-comments (conj filtered-comments updated-comment-map))
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map sorted-new-comments)]
+        threads-map (cu/threads-map sorted-new-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-new-comments)
      (assoc-in threads-map-key threads-map))))
@@ -277,7 +236,7 @@
         ws-comment-data (:interaction interaction-data)
         item-uuid (:uuid ws-comment-data)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         comment-data (some #(when (= item-uuid (:uuid %)) %) comments-data)]
     (if comment-data
       (if (<= (utils/js-date
@@ -293,9 +252,9 @@
               new-comments-data (->> comments-data
                                  (filter #(not= (:uuid %) item-uuid))
                                  (cons new-comment-data))
-              new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+              new-sorted-comments-data (cu/sort-comments new-comments-data)
               threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-              threads-map (comment-utils/threads-map new-sorted-comments-data)]
+              threads-map (cu/threads-map new-sorted-comments-data)]
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
            (assoc-in threads-map-key threads-map)))
@@ -309,15 +268,15 @@
         last-read-at (:last-read-at (dispatcher/activity-data org-slug activity-uuid db))
         comments-key (dispatcher/activity-comments-key org-slug activity-uuid)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
-        comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))
+        comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
         current-user-id (jwt/user-id)
         deleting-new-comment? (when deleting-comment-data
-                                (comment-utils/unread? last-read-at deleting-comment-data))
+                                (cu/unread? last-read-at deleting-comment-data))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
-        new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+        new-sorted-comments-data (cu/sort-comments new-comments-data)
         threads-map-key (vec (conj comments-key dispatcher/threads-map-key))
-        threads-map (comment-utils/threads-map new-sorted-comments-data)
+        threads-map (cu/threads-map new-sorted-comments-data)
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]
     (-> db
      (assoc-in sorted-comments-key new-sorted-comments-data)
@@ -333,7 +292,7 @@
           activity-uuid (:resource-uuid interaction-data)
           org-data (dispatcher/org-data db)
           activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
-          comment-data (parse-comment org-data activity-data (:interaction interaction-data))
+          comment-data (au/parse-comment org-data activity-data (:interaction interaction-data))
           created-at (:created-at comment-data)
           ;; update the comments link of the entry
           comments-link-idx (utils/index-of
@@ -361,15 +320,15 @@
                           (assoc :new-at created-at)
                           (assoc :new-comments-count new-comments-count)))
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
-          all-old-comments-data (comment-utils/ungroup-comments (get-in db sorted-comments-key))]
+          all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)
               ;; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-              new-sorted-comments-data (comment-utils/sort-comments new-comments-data)
+              new-sorted-comments-data (cu/sort-comments new-comments-data)
               threads-map-key (dispatcher/activity-threads-map-key org-slug activity-uuid)
-              threads-map (comment-utils/threads-map new-sorted-comments-data)]
+              threads-map (cu/threads-map new-sorted-comments-data)]
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
            (assoc-in threads-map-key threads-map)

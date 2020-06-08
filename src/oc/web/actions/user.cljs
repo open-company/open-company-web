@@ -21,7 +21,7 @@
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.utils.comment :as comment-utils]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.utils.notification :as notif-utils]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -87,7 +87,7 @@
                (org-actions/get-org org-data))
              (if (router/current-secure-activity-id)
                (activity-actions/secure-activity-get
-                #(comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
+                #(activity-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
                (do
                  ;; avoid infinite loop of the Go to digest button
                  ;; by changing the value of the last visited slug

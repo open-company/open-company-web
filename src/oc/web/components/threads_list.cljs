@@ -395,7 +395,8 @@
      (when (or (seq (first items-changed))
                (seq (second items-changed)))
        (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
-             collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))
+             expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
+             collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
              last-read-at @(::initial-last-read-at s)
              collapsed-threads (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items-to-render))]
          (reset! (::has-unread-items s) (some (comp pos? :unread-count) collapsed-threads))

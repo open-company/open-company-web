@@ -47,8 +47,8 @@
 (defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
     (if force?
-      (comment-actions/get-comments activity-data)
-      (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
+      (au/get-comments activity-data)
+      (au/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (defn- save-initial-read-data [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
@@ -139,7 +139,7 @@
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
         editable-boards (drv/react s :editable-boards)
-        comments-data (au/get-comments activity-data comments-drv)
+        comments-data (au/activity-comments activity-data comments-drv)
         dom-element-id (str "expanded-post-" (:uuid activity-data))
         dom-node-class (str "expanded-post-" (:uuid activity-data))
         publisher (:publisher activity-data)
