@@ -10,30 +10,6 @@
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.stores.user :as user-store]))
 
-(defn read-only-org
-  [org-data]
-  (let [links (:links org-data)
-        read-only (utils/readonly-org? links)]
-    (assoc org-data :read-only read-only)))
-
-(defn fix-org
-  "Fix org data coming from the API."
-  [db org-data]
-  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
-                      (:boards org-data))
-        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
-        drafts-link (when drafts-board
-                      (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
-        previous-org-drafts-count (get-in db (conj (dispatcher/org-data-key (:slug org-data)) :drafts-count))
-        previous-bookmarks-count (get-in db (conj (dispatcher/org-data-key (:slug org-data)) :bookmarks-count))]
-    (-> org-data
-     read-only-org
-     (assoc :boards fixed-boards)
-     (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
-     (assoc :drafts-count (org-utils/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
-     (assoc :bookmarks-count (org-utils/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
-     (assoc :unfollowing-count (org-utils/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data))))))
-
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved? email-domain]]
   ;; We need to remove the boards that are no longer in the org
@@ -48,7 +24,7 @@
         section-names (:default-board-names org-data)
         selected-sections (map :name (:boards org-data))
         sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
-        fixed-org-data (fix-org db org-data)
+        fixed-org-data (activity-utils/parse-org db org-data)
         with-saved? (if (nil? saved?)
                       ;; If saved? is nil it means no save happened, so we keep the old saved? value
                       org-data

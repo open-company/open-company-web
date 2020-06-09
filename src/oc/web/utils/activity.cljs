@@ -4,6 +4,7 @@
             [cljs-time.format :as time-format]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.org :as ou]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
             [oc.lib.html :as html-lib]
@@ -262,6 +263,10 @@
 
 (defn get-sorted-activities [posts-data]
   (vec (sort compare-activities (vals posts-data))))
+
+(defn readonly-org? [links]
+  (let [update-link (utils/link-for links "partial-update")]
+    (nil? update-link)))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")
@@ -558,6 +563,23 @@
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data))))
         (assoc :comments (cu/sort-comments (:comments entry-data))))))))
+
+(defn parse-org
+  "Fix org data coming from the API."
+  [db org-data]
+  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
+        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+        drafts-link (when drafts-board
+                      (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
+        previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
+        previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))]
+    (-> org-data
+     (assoc :read-only (readonly-org? (:links org-data)))
+     (assoc :boards fixed-boards)
+     (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
+     (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
+     (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
+     (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data))))))
 
 (defn parse-board
   "Parse board data coming from the API."

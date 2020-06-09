@@ -203,10 +203,6 @@
   (update link :href
    #(reduce (fn [href [k v]] (s/replace href v (get replacements k))) % (:replace link))))
 
-(defn readonly-org? [links]
-  (let [update-link (link-for links "partial-update")]
-    (nil? update-link)))
-
 (defn as-of-now []
   (let [date (js-date)]
     (.toISOString date)))
