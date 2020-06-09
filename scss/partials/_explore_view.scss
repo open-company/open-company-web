@@ -166,14 +166,16 @@ div.explore-view {
                   padding: 4px 8px;
                   margin: 0;
 
+                  &:not(.disabled):not(:disabled):hover {
+                    span.dropdown-list-item-label {
+                      opacity: 1;
+                    }
+                  }
+
                   span.dropdown-list-item-label {
                     color: var(--tooltip-color);
                     line-height: 18px;
                     opacity: 0.5;
-
-                    &:hover {
-                      opacity: 1;
-                    }
                   }
                 }
               }

@@ -73,6 +73,12 @@ div.dropdown-list-container {
 
         &.disabled {
           opacity: 0.5;
+          cursor: not-allowed;
+
+          &:hover {
+            color: var(--light-color);
+            opacity: 0.5;
+          }
         }
 
         &.user-avatar-icons {

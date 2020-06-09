@@ -65,7 +65,9 @@
                               (utils/event-stop e)
                               (reset! (::dropdown-menu s) (:uuid item)))}]
                 (when (= @(::dropdown-menu s) (:uuid item))
-                  (dropdown-list {:items [{:label "Edit topic" :value :edit :disabled (:read-only item)}
+                  (dropdown-list {:items [{:label "Edit topic"
+                                           :value :edit
+                                           :disabled (:read-only item)}
                                           {:label "Preview" :value :preview}]
                                   :on-change (fn [i e]
                                                (when e

@@ -42,8 +42,10 @@
           (for [item fixed-items]
             [:li.dropdown-list-item
               {:key (str "dropdown-list-item-" (if (= (:label item) :divider-line) "divider" (:value item)))
-               :on-click #(when (and (not (:disabled item)) (:value item) (fn? on-change))
-                            (on-change item %))
+               :on-click #(if (:disabled item)
+                            (utils/event-stop %)
+                            (when (and (:value item) (fn? on-change))
+                              (on-change item %)))
                :style (when (seq (:color item)) {:color (:color item)})
                :title (:tooltip item)
                :data-toggle (when (:tooltip item)
