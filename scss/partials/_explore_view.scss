@@ -101,11 +101,21 @@ div.explore-view {
           overflow: hidden;
         }
 
+        &.short-name {
+          div.board-dropdown-container {
+            div.dropdown-list-container {
+              right: unset;
+              left: 4px;
+            }
+          }
+        }
+
         div.board-dropdown-container {
           width: 24px;
           height: 24px;
           marign-right: auto;
           flex: 0 0 auto;
+          position: relative;
 
           button.board-dropdown-bt {
             height: 24px;
@@ -127,7 +137,8 @@ div.explore-view {
 
           div.dropdown-list-container {
             top: 18px;
-            left: 0;
+            left: unset;
+            right: 0;
             position: absolute;
             width: auto;
             min-width: 93px;

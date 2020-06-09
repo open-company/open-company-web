@@ -56,20 +56,26 @@
                          (when-not (utils/button-clicked? e)
                            (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item)))))}
             [:div.explore-view-block-title
+              {:class (when (< (count (:name item)) 15) "short-name")}
               [:span.board-name (:name item)]
               [:div.board-dropdown-container
                 {:ref (str "dropdown-menu-" (:uuid item))}
                 [:button.mlb-reset.board-dropdown-bt
-                 {:on-click #(reset! (::dropdown-menu s) (:uuid item))}]
+                 {:on-click (fn [e]
+                              (utils/event-stop e)
+                              (reset! (::dropdown-menu s) (:uuid item)))}]
                 (when (= @(::dropdown-menu s) (:uuid item))
-                  (dropdown-list {:items [{:label "Edit topic" :value :edit :disabled (:can-edit item)}
+                  (dropdown-list {:items [{:label "Edit topic" :value :edit :disabled (:read-only item)}
                                           {:label "Preview" :value :preview}]
-                                  :on-change (fn [item]
+                                  :on-change (fn [i e]
+                                               (when e
+                                                 (utils/event-stop e))
                                                (reset! (::dropdown-menu s) nil)
+                                               (js/console.log "DBG dropdown/on-change" i)
                                                (cond
-                                                 (= (:value item) :edit)
+                                                 (= (:value i) :edit)
                                                  (nav-actions/show-section-editor (:slug item))
-                                                 (= (:value item) :preview)
+                                                 (= (:value i) :preview)
                                                  (nav-actions/nav-to-url! nil (:slug item) (oc-urls/board (:slug item)))
                                                  :else
                                                  nil))}))]]
