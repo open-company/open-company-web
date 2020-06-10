@@ -68,6 +68,8 @@ $dark_mode: "dark";
   // Comments
   --comments-floating-bt-background: #{rgba($deep_navy, 0.05)};
   --add-comment-background: white;
+  --add-comment-border-color: --divider-line;
+  --add-comment-box-shadow: rgba(0, 0, 0, 0.07);
   --mobile-add-comment-background: white;
 
   // Cmail
@@ -178,6 +180,8 @@ $dark_mode: "dark";
   // Comments
   --comments-floating-bt-background: #{rgba(white, 0.05)};
   --add-comment-background: rgb(27, 32, 42);
+  --add-comment-border-color: --divider-line;
+  --add-comment-box-shadow: rgba(255, 255, 255, 0.07);
   --mobile-add-comment-background: #1B202A;
 
   // Cmail

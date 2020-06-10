@@ -60,6 +60,20 @@ div.threads-list {
       &.unread {
         background-color: var(--foc-hover-color);
         z-index: 2;
+
+        div.add-comment-box-container div.add-comment-box div.add-comment-internal {
+          background-color: var(--foc-hover-color);
+          border: 1px solid var(--foc-hover-border-color);
+        }
+      }
+
+      div.add-comment-box-container {
+        margin-top: 8px;
+
+        div.add-comment-box div.add-comment-internal {
+          background-color: var(--foc-background-color);
+          border: 1px solid var(--foc-divider-line-color);
+        }
       }
 
       &:not(.open-item):before {
@@ -112,6 +126,8 @@ div.threads-list {
             background-color: var(--foc-background-color);
           }
         }
+
+
 
       }
 
@@ -202,6 +218,16 @@ div.threads-list {
 
             &.unfollowing {
               background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+            }
+
+            @include dark_mode() {
+              &.following {
+                background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
+              }
+
+              &.unfollowing {
+                background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+              }
             }
 
             @include big_web() {
@@ -751,10 +777,6 @@ div.threads-list {
             }
           }
         }
-      }
-
-      div.add-comment-box-container {
-        margin-top: 8px;
       }
     }
   }

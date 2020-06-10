@@ -39,26 +39,20 @@ div.add-comment-box-container {
     div.add-comment-internal {
       position: relative;
       border-radius: 4px;
-      border: 1px solid var(--divider-line);
+      border: 1px solid var(--add-comment-border-color);
       padding: 13px 16px;
       background-color: var(--add-comment-background);
 
       &:hover, &:active, &:focus, &.active {
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-
-        @include dark_mode() {
-          box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.07);
-        }
+        box-shadow: 0 2px 8px 0 var(--add-comment-box-shadow);
       }
 
       div.add-comment-footer-media-picker {
         float: left;
         position: relative;
+        margin-left: 8px;
+
         div.medium-editor-media-picker {
-          // top: unset;
-          // left: unset;
-          // bottom: 14px;
-          // left: 48px;
           position: relative;
           top: unset;
           left: unset;
