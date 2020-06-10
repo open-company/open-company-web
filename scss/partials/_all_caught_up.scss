@@ -27,17 +27,18 @@ div.all-caught-up {
 }
 
 div.caught-up-line {
-  height: 32px;
+  height: #{$caught_up_line_height}px;
   width: 100%;
   position: relative;
-  margin: 16px 0;
+  padding: #{($caught_up_line_height - 32) / 2}px 0;
+  margin: 0;
   display: flex;
   flex-direction: row;
 
   // Line besides caught up
   &:before {
     position: absolute;
-    top: 16px;
+    top: #{$caught_up_line_height / 2}px;
     left: 0;
     height: 1px;
     width: 100%;

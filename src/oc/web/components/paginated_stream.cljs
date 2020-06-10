@@ -33,6 +33,7 @@
 (def foc-height 204)
 (def mobile-foc-height 166)
 (def foc-separators-height 58)
+(def caught-up-line-height 64)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond
@@ -191,7 +192,7 @@
                           item (get items index)]
                       (case (:content-type item)
                         :caught-up
-                        64
+                        caught-up-line-height
                         :separator
                         (if (= foc-layout dis/other-foc-layout)
                           foc-separators-height
