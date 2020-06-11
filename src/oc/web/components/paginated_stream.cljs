@@ -190,7 +190,7 @@
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
                           item (get items index)]
-                      (case (:content-type item)
+                      (case (:resource-type item)
                         :caught-up
                         caught-up-line-height
                         :separator
@@ -210,12 +210,12 @@
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
                              item (get items index)
-                             reads-data (when (= (:content-type item) :entry)
+                             reads-data (when (= (:resource-type item) :entry)
                                           (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)
                              next-item (get items (inc index))
                              prev-item (get items (dec index))]
-                         (case (:content-type item)
+                         (case (:resource-type item)
                            :caught-up
                            (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
                            :carrot-close

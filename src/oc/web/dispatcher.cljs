@@ -273,7 +273,7 @@
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
         container-posts (vec (remove nil?
-                         (map #(if (= (:content-type %) :entry)
+                         (map #(if (= (:resource-type %) :entry)
                                  (merge % (get posts-data (:uuid %)))
                                  %)
                           posts-list)))]
@@ -286,7 +286,7 @@
         container-data (get-in base cnt-key)
         threads-list (get container-data items-key)
         container-items (vec (remove nil?
-                          (map #(if (= (:content-type %) :thread)
+                          (map #(if (= (:resource-type %) :thread)
                                   (let [thread (get threads-data (:uuid %))
                                         activity-data (get posts-data (:resource-uuid %))]
                                     (merge % thread {:activity-data activity-data}))

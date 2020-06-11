@@ -54,33 +54,33 @@
     (cond
       (> d last-monday)
       {:label "Recent"
-       :content-type :separator
+       :resource-type :separator
        :date last-monday}
       (> d two-weeks-ago)
       {:label "Last week"
-       :content-type :separator
+       :resource-type :separator
        :date two-weeks-ago}
       (> d first-month)
       {:label "2 weeks ago"
-       :content-type :separator
+       :resource-type :separator
        :date first-month}
       (and (= (.getMonth now) (.getMonth d))
            (= (.getFullYear now) (.getFullYear d)))
       {:label "This month"
-       :content-type :separator
+       :resource-type :separator
        :date (post-month-date-from-date d)}
       (= (.getFullYear now) (.getFullYear d))
       {:label month-string
-       :content-type :separator
+       :resource-type :separator
        :date (post-month-date-from-date d)}
       :else
       {:label (str month-string ", " (.getFullYear d))
-       :content-type :separator
+       :resource-type :separator
        :date (post-month-date-from-date d)})))
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
-        item-data (select-keys post-data [:content-type :uuid :resource-uuid])]
+        item-data (select-keys post-data [:resource-type :uuid :resource-uuid])]
     (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj item-data) vec))
@@ -91,7 +91,7 @@
 
 (defn grouped-posts
   ([full-items-list]
-   (let [items-list (map #(select-keys % [:content-type :uuid :resource-uuid]) full-items-list)
+   (let [items-list (map #(select-keys % [:resource-type :uuid :resource-uuid]) full-items-list)
          items-map (zipmap (map :uuid full-items-list) full-items-list)]
      (grouped-posts items-list items-map)))
   ([items-list fixed-items]
@@ -334,7 +334,7 @@
       (has-text? data)))
 
 (defn- merge-items-lists
-  "Given 2 list of reduced items (reduced since they contains only the uuid and content-type props)
+  "Given 2 list of reduced items (reduced since they contains only the uuid and resource-type props)
    return a single list without duplicates depending on the direction.
    This is necessary since the lists could contain duplicates because they are loaded in 2 different
    moments and new activity could lead to changes in the sort."
@@ -370,7 +370,7 @@
   ([n gray-scale? message] (caught-up-map n gray-scale? default-caught-up-message nil))
   ([n gray-scale? message opts]
    (let [t (next-activity-timestamp n)]
-     {:content-type :caught-up
+     {:resource-type :caught-up
       :last-activity-at t
       :message message
       :opts opts
@@ -431,14 +431,14 @@
         last-item (last items-list)]
     (cond
      (and (seq items-list) has-next)
-     (vec (concat items-list [{:content-type :loading-more
+     (vec (concat items-list [{:resource-type :loading-more
                                :last-activity-at (next-activity-timestamp last-item)
-                               :message (if (= (:content-type last-item) :thread)
+                               :message (if (= (:resource-type last-item) :thread)
                                           "Loading more threads..."
                                           "Loading more posts...")}]))
      carrot-close?
      (vec
-      (concat items-list [{:content-type :carrot-close
+      (concat items-list [{:resource-type :carrot-close
                            :last-activity-at (next-activity-timestamp (last items-list))
                            :message "🤠 You've reached the end, partner"}]))
      :else
@@ -505,7 +505,7 @@
           unread? (and (not author?)
                        (comment-unread? comment-map (:last-read-at activity-data)))]
       (-> comment-map
-        (assoc :content-type :comment)
+        (assoc :resource-type :comment)
         (assoc :author? author?)
         (assoc :unread unread?)
         (assoc :is-emoji (is-emoji (:body comment-map)))
@@ -518,7 +518,7 @@
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
 (defn parse-entry
-  "Add `:read-only`, `:board-slug`, `:board-name` and `:content-type` keys to the entry map."
+  "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
   ([entry-data board-data changes]
    (parse-entry entry-data board-data changes (dis/active-users)))
   ([entry-data board-data changes active-users]
@@ -539,7 +539,7 @@
           fixed-publisher (when published?
                             (get active-users (-> entry-data :publisher :user-id)))]
       (-> entry-data
-        (assoc :content-type :entry)
+        (assoc :resource-type :entry)
         (assoc :published? published?)
         (as-> e
           (if published?
@@ -621,12 +621,12 @@
                              (:links board-data))
           items-list (when (contains? board-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:entries board-data)))
+                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:entries board-data)))
           full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
           grouped-items (if (show-separators? (:slug board-data))
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
-          with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
+          with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
           with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
           follow-board-uuids (set (map :uuid follow-boards-list))]
       (-> with-fixed-activities
@@ -677,12 +677,12 @@
                              (:links contributions-data))
           items-list (when (contains? contributions-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items contributions-data)))
+                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items contributions-data)))
           full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
           grouped-items (if (show-separators? (:href contributions-data))
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
-          with-open-close-items (insert-open-close-item grouped-items #(not= (:content-type %2) (:content-type %3)))
+          with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
           with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
       (-> with-fixed-activities
@@ -730,7 +730,7 @@
                              (:links container-data))
           items-list (when (contains? container-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :content-type :entry) (:items container-data)))
+                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items container-data)))
           full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
           grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
@@ -741,11 +741,11 @@
                                  items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
                              (insert-caught-up grouped-items
                               #(->> % :uuid (get items-map) :unread not)
-                              #(or (not= (:content-type %) :entry)
+                              #(or (not= (:resource-type %) :entry)
                                    (->> % :uuid (get items-map) :publisher?))
                               {:has-next next-link}))
                            grouped-items)
-          with-open-close-items (insert-open-close-item with-caught-up #(not= (:content-type %2) (:content-type %3)))
+          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
           with-ending-item (insert-ending-item with-open-close-items next-link)]
       (-> with-fixed-activities
        (dissoc :old-links :items)
@@ -758,7 +758,7 @@
         comment-unread (comment-unread? thread (:last-read-at entry-data))
         thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
     (-> thread
-      (assoc :content-type :thread)
+      (assoc :resource-type :thread)
       (assoc :entry entry-data)
       (update :author merge fixed-author)
       (assoc :unread-thread (or comment-unread thread-unread))
@@ -813,7 +813,7 @@
                              (:links threads-data))
           items-list (when (contains? threads-data :items)
                        ;; In case we are parsing a fresh response from server
-                       (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :content-type :thread :uuid (:uuid %)) (:items threads-data))))
+                       (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :resource-type :thread :uuid (:uuid %)) (:items threads-data))))
           threads-list (merge-items-lists items-list (:threads-list threads-data) direction)
           get-thread-data (fn [thread-uuid]
                             (or (get-in with-fixed-threads [:fixed-items thread-uuid])
@@ -821,7 +821,7 @@
           next-link (utils/link-for fixed-next-links "next")
           with-caught-up (insert-caught-up threads-list
                           #(-> % :uuid get-thread-data :unread-thread not)
-                          #(or (not= (:content-type %) :thread)
+                          #(or (not= (:resource-type %) :thread)
                                (-> % :uuid get-thread-data :monologue?))
                           {:has-next next-link})
           with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))

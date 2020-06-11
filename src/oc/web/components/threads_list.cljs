@@ -352,7 +352,7 @@
       (let [items @(::threads s)
             offset-top (if (responsive/is-mobile-size?) responsive/mobile-navbar-height responsive/navbar-height)]
         (doseq [item items
-                :when (and (#{:comment :thread} (:content-type item))
+                :when (and (#{:comment :thread} (:resource-type item))
                            (pos? (:unread-count item))
                            (not (@(::read-items s) (:resource-uuid item))))]
           (mark-read-if-needed s items-container offset-top item))
@@ -414,9 +414,9 @@
         [:div.threads-list-container
           {:ref :threads-list}
           (for [item* items
-                :let [caught-up? (= (:content-type item*) :caught-up)
-                      loading-more? (= (:content-type item*) :loading-more)
-                      carrot-close? (= (:content-type item*) :carrot-close)
+                :let [caught-up? (= (:resource-type item*) :caught-up)
+                      loading-more? (= (:resource-type item*) :loading-more)
+                      carrot-close? (= (:resource-type item*) :carrot-close)
                       item (assoc item* :current-user-data current-user-data
                                         :member? member?
                                         :thread-mark-read-cb (partial thread-mark-read s)

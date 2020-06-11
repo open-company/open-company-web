@@ -19,7 +19,7 @@
      current-value)))
 
 (defn- item-from-entity [item]
-  (select-keys item [:uuid :content-type :resource-uuid :published-at :bookmarked-at]))
+  (select-keys item [:uuid :resource-type :resource-uuid :published-at :bookmarked-at]))
 
 (defn add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity

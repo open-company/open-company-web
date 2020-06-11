@@ -127,7 +127,7 @@
   [last-read-at comments & [collapsed-map root-comment]]
   (mapv
    (fn [comment]
-    (if (#{:thread :comment} (:content-type comment))
+    (if (#{:thread :comment} (:resource-type comment))
       (let [enriched-children (collapsed-comments last-read-at (:thread-children comment) collapsed-map comment)
             last-comment? (and root-comment
                                (= (:uuid comment) (-> root-comment :thread-children last :uuid)))]
