@@ -44,8 +44,8 @@
                                  ap-ra-without-uuid))
           sorted-new-ap-rp-uuids (reverse (sort-by :published-at new-ap-rp-uuids))
           sorted-new-ap-ra-uuids (reverse (sort-by (juxt :new-at :published-at) new-ap-ra-uuids))
-          next-ap-rp-data (au/parse-container (assoc old-ap-rp-data :posts-list sorted-new-ap-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort)
-          next-ap-ra-data (au/parse-container (assoc old-ap-ra-data :posts-list sorted-new-ap-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort)]
+          next-ap-rp-data (dissoc (au/parse-container (assoc old-ap-rp-data :posts-list sorted-new-ap-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort) :fixed-items)
+          next-ap-ra-data (dissoc (au/parse-container (assoc old-ap-ra-data :posts-list sorted-new-ap-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort) :fixed-items)]
       (-> db
        (assoc-in ap-rp-key next-ap-rp-data)
        (assoc-in ap-ra-key next-ap-ra-data)))
@@ -57,16 +57,27 @@
   (if (:uuid activity-data)
     (let [;; Add/remove item from AP
           is-published? (= (:status activity-data) "published")
-          board-data-key (dispatcher/board-data-key org-slug (:board-slug activity-data))
-          old-board-data (get-in db board-data-key)
-          old-board-data-posts (get old-board-data :posts-list)
-          board-without-uuid (filterv #(= (:uuid %) (:uuid activity-data)) old-board-data-posts)
-          new-board-uuids (vec (if is-published?
-                                 (conj board-without-uuid (item-from-entity activity-data))
-                                 board-without-uuid))
-          sorted-new-board-uuids (reverse (sort-by :published-at new-board-uuids))
-          next-board-data (au/parse-board (assoc old-board-data :posts-list sorted-new-board-uuids))]
-      (assoc-in db board-data-key next-board-data))
+          rp-board-data-key (dispatcher/board-data-key org-slug (:board-slug activity-data) dispatcher/recently-posted-sort)
+          ra-board-data-key (dispatcher/board-data-key org-slug (:board-slug activity-data) dispatcher/recent-activity-sort)
+          rp-old-board-data (get-in db rp-board-data-key)
+          ra-old-board-data (get-in db ra-board-data-key)
+          rp-old-board-data-posts (get rp-old-board-data :posts-list)
+          ra-old-board-data-posts (get ra-old-board-data :posts-list)
+          rp-board-without-uuid (filterv #(= (:uuid %) (:uuid activity-data)) rp-old-board-data-posts)
+          ra-board-without-uuid (filterv #(= (:uuid %) (:uuid activity-data)) ra-old-board-data-posts)
+          rp-new-board-uuids (vec (if is-published?
+                                    (conj rp-board-without-uuid (item-from-entity activity-data))
+                                    rp-board-without-uuid))
+          ra-new-board-uuids (vec (if is-published?
+                                    (conj ra-board-without-uuid (item-from-entity activity-data))
+                                    ra-board-without-uuid))
+          rp-sorted-new-board-uuids (reverse (sort-by :published-at rp-new-board-uuids))
+          ra-sorted-new-board-uuids (reverse (sort-by (juxt :new-at :published-at) ra-new-board-uuids))
+          rp-next-board-data (dissoc (au/parse-board (assoc rp-old-board-data :posts-list rp-sorted-new-board-uuids dispatcher/recently-posted-sort) :fixed-items))
+          ra-next-board-data (dissoc (au/parse-board (assoc ra-old-board-data :posts-list ra-sorted-new-board-uuids dispatcher/recent-activity-sort) :fixed-items))]
+      (-> db
+       (assoc-in rp-board-data-key rp-next-board-data)
+       (assoc-in ra-board-data-key ra-next-board-data)))
     db))
 
 (defn add-remove-item-from-bookmarks
@@ -122,8 +133,8 @@
                                  fl-ra-without-uuid))
           sorted-new-fl-rp-uuids (reverse (sort-by :published-at new-fl-rp-uuids))
           sorted-new-fl-ra-uuids (reverse (sort-by (juxt :new-at :published-at) new-fl-ra-uuids))
-          next-fl-rp-data (au/parse-container (assoc old-fl-rp-data :posts-list sorted-new-fl-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort)
-          next-fl-ra-data (au/parse-container (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort)]
+          next-fl-rp-data (dissoc (au/parse-container (assoc old-fl-rp-data :posts-list sorted-new-fl-rp-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recently-posted-sort) :fixed-items)
+          next-fl-ra-data (dissoc (au/parse-container (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids) {} (dispatcher/org-data) (dispatcher/active-users) dispatcher/recent-activity-sort) :fixed-items)]
       (-> db
        (assoc-in fl-rp-key next-fl-rp-data)
        (assoc-in fl-ra-key next-fl-ra-data)))
@@ -132,20 +143,35 @@
 (defn add-remove-item-from-contributions
   "Given an activity map adds or remove it from it's contributions' list of posts depending on the activity status"
   [db org-slug activity-data]
-  (let [data-key (dispatcher/contributions-data-key org-slug (-> activity-data :publisher :user-id))]
+  (let [contributions-list-key (dispatcher/contributions-list-key org-slug)
+        {{author-uuid :user-id} :publisher} activity-data]
     (if (and (:uuid activity-data)
              (= (:status activity-data) "published")
-             (contains? (get db (butlast data-key)) (last data-key)))
+             (contains? (get db contributions-list-key) author-uuid))
       (let [;; Add/remove item from AP
-            publisher (:publisher activity-data)
-            data-key (dispatcher/contributions-data-key org-slug (:user-id publisher))
-            old-data (get-in db data-key)
-            old-data-posts (get old-data :posts-list)
-            without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-data-posts)
-            new-uuids (vec (conj without-uuid (item-from-entity activity-data)))
-            sorted-new-uuids (reverse (sort-by :published-at new-uuids))
-            next-data (au/parse-contributions (assoc old-data :posts-list sorted-new-uuids))]
-        (assoc-in db data-key next-data))
+            rp-contributions-data-key (dispatcher/contributions-data-key org-slug author-uuid dispatcher/recently-posted-sort)
+            ra-contributions-data-key (dispatcher/contributions-data-key org-slug author-uuid dispatcher/recent-activity-sort)
+            rp-old-data (get-in db rp-contributions-data-key)
+            ra-old-data (get-in db ra-contributions-data-key)
+            rp-old-data-posts (get rp-old-data :posts-list)
+            ra-old-data-posts (get ra-old-data :posts-list)
+            rp-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) rp-old-data-posts)
+            ra-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) ra-old-data-posts)
+            rp-new-uuids (vec (conj rp-without-uuid (item-from-entity activity-data)))
+            ra-new-uuids (vec (conj ra-without-uuid (item-from-entity activity-data)))
+            rp-sorted-new-uuids (reverse (sort-by :published-at rp-new-uuids))
+            ra-sorted-new-uuids (reverse (sort-by (juxt :new-at :published-at) ra-new-uuids))
+            rp-new-posts-list (assoc rp-old-data :posts-list rp-sorted-new-uuids)
+            ra-new-posts-list (assoc ra-old-data :posts-list ra-sorted-new-uuids)
+            change-data (dispatcher/change-data db)
+            org-data (dispatcher/org-data db org-slug)
+            active-users (dispatcher/active-users org-slug db)
+            follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
+            rp-next-data (dissoc (au/parse-contributions rp-new-posts-list change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort) :fixed-items)
+            ra-next-data (dissoc (au/parse-contributions ra-new-posts-list change-data org-data active-users follow-publishers-list dispatcher/recent-activity-sort) :fixed-items)]
+        (-> db
+         (assoc-in rp-contributions-data-key rp-next-data)
+         (assoc-in ra-contributions-data-key ra-next-data)))
       db)))
 
 (defmethod dispatcher/action :entry-edit/dismiss

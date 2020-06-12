@@ -66,10 +66,10 @@
    (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort]))))
 
 (defn board-data-key
-  ([org-slug board-slug sort-type]
-    (conj (board-key org-slug board-slug sort-type) :board-data))
   ([org-slug board-slug]
-   (conj (board-key org-slug board-slug) :board-data)))
+   (board-data-key org-slug board-slug recently-posted-sort))
+  ([org-slug board-slug sort-type]
+    (conj (board-key org-slug board-slug sort-type) :board-data)))
 
 (defn contributions-list-key [org-slug]
   (vec (conj (org-key org-slug) :contribs)))

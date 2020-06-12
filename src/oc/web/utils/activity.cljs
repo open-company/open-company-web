@@ -36,7 +36,7 @@
         ;; only on recently posted sorting
         (= sort-type dis/recently-posted-sort)
         ;; on All posts, Following and Unfollowing only
-        (#{:all-posts :following :unfollowing} (keyword container-slug)))))
+        (#{:all-posts :following :unfollowing :contributions} (keyword container-slug)))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -352,9 +352,9 @@
           items-map (zipmap (map :uuid all-items-list) all-items-list)]
       (mapv items-map next-items-uuids))
     (seq old-items-list)
-    old-items-list
+    (vec old-items-list)
     :else
-    new-items-list))
+    (vec new-items-list)))
 
 (def default-caught-up-message "You’re up to date")
 
@@ -427,7 +427,7 @@
      (range (count items-list))))))
 
 (defn- insert-ending-item [items-list has-next]
-  (let [carrot-close? (> (count items-list 3))
+  (let [carrot-close? (> (count items-list) 3)
         last-item (last items-list)]
     (cond
      (and (seq items-list) has-next)
@@ -435,7 +435,7 @@
                                :last-activity-at (next-activity-timestamp last-item)
                                :message (if (= (:resource-type last-item) :thread)
                                           "Loading more threads..."
-                                          "Loading more posts...")}]))
+                                          "Loading more updates...")}]))
      carrot-close?
      (vec
       (concat items-list [{:resource-type :carrot-close
@@ -567,20 +567,21 @@
 (defn parse-org
   "Fix org data coming from the API."
   [db org-data]
-  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
-        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
-        drafts-link (when drafts-board
-                      (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
-        previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
-        previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))]
-    (-> org-data
-     (assoc :read-only (readonly-org? (:links org-data)))
-     (assoc :boards fixed-boards)
-     (assoc :author? (is-author? org-data))
-     (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
-     (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
-     (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
-     (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data))))))
+  (when org-data
+    (let [fixed-boards (mapv #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
+          drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+          drafts-link (when drafts-board
+                        (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
+          previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
+          previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))]
+      (-> org-data
+       (assoc :read-only (readonly-org? (:links org-data)))
+       (assoc :boards fixed-boards)
+       (assoc :author? (is-author? org-data))
+       (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
+       (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
+       (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
+       (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data)))))))
 
 (defn parse-board
   "Parse board data coming from the API."
@@ -597,48 +598,49 @@
    (parse-board board-data change-data active-users follow-boards-list dis/recently-posted-sort))
 
   ([board-data change-data active-users follow-boards-list sort-type & [direction]]
-    (let [with-fixed-activities* (reduce (fn [ret item]
-                                           (assoc-in ret [:fixed-items (:uuid item)]
-                                            (parse-entry item {:slug (:board-slug item)
-                                                               :name (:board-name item)
-                                                               :uuid (:board-uuid item)
-                                                               :publisher-board (:publisher-board item)}
-                                             change-data
-                                             active-users)))
-                                  board-data
-                                  (:entries board-data))
-          with-fixed-activities (reduce (fn [ret item]
-                                         (if (contains? (:fixed-items ret) (:uuid item))
-                                           ret
-                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
-                                 with-fixed-activities*
-                                 (:posts-list board-data))
-          keep-link-rel (if (= direction :down) "previous" "next")
-          next-links (when direction
-                      (vec (remove #(= (:rel %) keep-link-rel) (:links board-data))))
-          link-to-move (when direction
-                         (utils/link-for (:old-links board-data) keep-link-rel))
-          fixed-next-links (if direction
-                             (if link-to-move
-                               (vec (conj next-links link-to-move))
-                               next-links)
-                             (:links board-data))
-          items-list (when (contains? board-data :items)
-                       ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:entries board-data)))
-          full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
-          grouped-items (if (show-separators? (:slug board-data) sort-type)
-                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
-                          full-items-list)
-          with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
-          follow-board-uuids (set (map :uuid follow-boards-list))]
-      (-> with-fixed-activities
-        (assoc :read-only (readonly-board? (:links board-data)))
-        (dissoc :old-links :items)
-        (assoc :posts-list full-items-list)
-        (assoc :items-to-render with-ending-item)
-        (assoc :following (boolean (follow-board-uuids (:uuid board-data))))))))
+    (when board-data
+      (let [with-fixed-activities* (reduce (fn [ret item]
+                                             (assoc-in ret [:fixed-items (:uuid item)]
+                                              (parse-entry item {:slug (:board-slug item)
+                                                                 :name (:board-name item)
+                                                                 :uuid (:board-uuid item)
+                                                                 :publisher-board (:publisher-board item)}
+                                               change-data
+                                               active-users)))
+                                    board-data
+                                    (:entries board-data))
+            with-fixed-activities (reduce (fn [ret item]
+                                           (if (contains? (:fixed-items ret) (:uuid item))
+                                             ret
+                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                   with-fixed-activities*
+                                   (:posts-list board-data))
+            keep-link-rel (if (= direction :down) "previous" "next")
+            next-links (when direction
+                        (vec (remove #(= (:rel %) keep-link-rel) (:links board-data))))
+            link-to-move (when direction
+                           (utils/link-for (:old-links board-data) keep-link-rel))
+            fixed-next-links (if direction
+                               (if link-to-move
+                                 (vec (conj next-links link-to-move))
+                                 next-links)
+                               (:links board-data))
+            items-list (when (contains? board-data :items)
+                         ;; In case we are parsing a fresh response from server
+                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:entries board-data)))
+            full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
+            grouped-items (if (show-separators? (:slug board-data) sort-type)
+                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            full-items-list)
+            with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
+            with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
+            follow-board-uuids (set (map :uuid follow-boards-list))]
+        (-> with-fixed-activities
+          (assoc :read-only (readonly-board? (:links board-data)))
+          (dissoc :old-links :items)
+          (assoc :posts-list full-items-list)
+          (assoc :items-to-render with-ending-item)
+          (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions
   "Parse data coming from the API for a certain user's posts."
@@ -658,48 +660,49 @@
    (parse-contributions contributions-data change-data org-data active-users follow-publishers-list dis/recently-posted-sort))
 
   ([contributions-data change-data org-data active-users follow-publishers-list sort-type & [direction]]
-    (let [all-boards (:boards org-data)
-          boards-map (zipmap (map :slug all-boards) all-boards)
-          with-fixed-activities* (reduce (fn [ret item]
-                                           (let [board-data (get boards-map (:board-slug item))
-                                                 fixed-entry (parse-entry item board-data change-data active-users)]
-                                             (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
-                                  contributions-data
-                                  (:items contributions-data))
-          with-fixed-activities (reduce (fn [ret item]
-                                         (if (contains? (:fixed-items ret) (:uuid item))
-                                           ret
-                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
-                                 with-fixed-activities*
-                                 (:posts-list contributions-data))
-          keep-link-rel (if (= direction :down) "previous" "next")
-          next-links (when direction
-                      (vec (remove #(= (:rel %) keep-link-rel) (:links contributions-data))))
-          link-to-move (when direction
-                         (utils/link-for (:old-links contributions-data) keep-link-rel))
-          fixed-next-links (if direction
-                             (if link-to-move
-                               (vec (conj next-links link-to-move))
-                               next-links)
-                             (:links contributions-data))
-          items-list (when (contains? contributions-data :items)
-                       ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items contributions-data)))
-          full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
-          grouped-items (if (show-separators? :contributions sort-type)
-                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
-                          full-items-list)
-          next-link (utils/link-for fixed-next-links "next")
-          with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items next-link)
-          follow-publishers-ids (set (map :user-id follow-publishers-list))]
-      (-> with-fixed-activities
-        (dissoc :old-links :items)
-        (assoc :links fixed-next-links)
-        (assoc :self? (= (jwt/user-id) (:author contributions-data)))
-        (assoc :posts-list full-items-list)
-        (assoc :items-to-render with-ending-item)
-        (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))
+    (when contributions-data
+      (let [all-boards (:boards org-data)
+            boards-map (zipmap (map :slug all-boards) all-boards)
+            with-fixed-activities* (reduce (fn [ret item]
+                                             (let [board-data (get boards-map (:board-slug item))
+                                                   fixed-entry (parse-entry item board-data change-data active-users)]
+                                               (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
+                                    contributions-data
+                                    (:items contributions-data))
+            with-fixed-activities (reduce (fn [ret item]
+                                           (if (contains? (:fixed-items ret) (:uuid item))
+                                             ret
+                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                   with-fixed-activities*
+                                   (:posts-list contributions-data))
+            keep-link-rel (if (= direction :down) "previous" "next")
+            next-links (when direction
+                        (vec (remove #(= (:rel %) keep-link-rel) (:links contributions-data))))
+            link-to-move (when direction
+                           (utils/link-for (:old-links contributions-data) keep-link-rel))
+            fixed-next-links (if direction
+                               (if link-to-move
+                                 (vec (conj next-links link-to-move))
+                                 next-links)
+                               (:links contributions-data))
+            items-list (when (contains? contributions-data :items)
+                         ;; In case we are parsing a fresh response from server
+                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items contributions-data)))
+            full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
+            grouped-items (if (show-separators? :contributions sort-type)
+                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            full-items-list)
+            next-link (utils/link-for fixed-next-links "next")
+            with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
+            with-ending-item (insert-ending-item with-open-close-items next-link)
+            follow-publishers-ids (set (map :user-id follow-publishers-list))]
+        (-> with-fixed-activities
+          (dissoc :old-links :items)
+          (assoc :links fixed-next-links)
+          (assoc :self? (is-author? (:author-uuid contributions-data) (jwt/user-id)))
+          (assoc :posts-list full-items-list)
+          (assoc :items-to-render with-ending-item)
+          (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
 
 (defn parse-container
   "Parse container data coming from the API, like All posts or Must see."
@@ -713,54 +716,55 @@
    (parse-container container-data change-data org-data (dis/active-users) nil))
 
   ([container-data change-data org-data active-users sort-type & [direction]]
-    (let [all-boards (:boards org-data)
-          boards-map (zipmap (map :slug all-boards) all-boards)
-          with-fixed-activities* (reduce (fn [ret item]
-                                           (let [board-data (get boards-map (:board-slug item))
-                                                 fixed-entry (parse-entry item board-data change-data active-users)]
-                                             (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
-                                  container-data
-                                  (:items container-data))
-          with-fixed-activities (reduce (fn [ret item]
-                                         (if (contains? (:fixed-items ret) (:uuid item))
-                                           ret
-                                           (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
-                                 with-fixed-activities*
-                                 (:posts-list container-data))
-          keep-link-rel (if (= direction :down) "previous" "next")
-          next-links (when direction
-                      (vec (remove #(= (:rel %) keep-link-rel) (:links container-data))))
-          link-to-move (when direction
-                         (utils/link-for (:old-links container-data) keep-link-rel))
-          fixed-next-links (if direction
-                             (if link-to-move
-                               (vec (conj next-links link-to-move))
-                               next-links)
-                             (:links container-data))
-          items-list (when (contains? container-data :items)
-                       ;; In case we are parsing a fresh response from server
-                       (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items container-data)))
-          full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
-          grouped-items (if (show-separators? (:container-slug container-data) sort-type)
-                          (grouped-posts full-items-list (:fixed-items with-fixed-activities))
-                          full-items-list)
-          next-link (utils/link-for fixed-next-links "next")
-          with-caught-up (if (= (:container-slug container-data) :following)
-                           (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
-                                 items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
-                             (insert-caught-up grouped-items
-                              #(->> % :uuid (get items-map) :unread not)
-                              #(or (not= (:resource-type %) :entry)
-                                   (->> % :uuid (get items-map) :publisher?))
-                              {:has-next next-link}))
-                           grouped-items)
-          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items next-link)]
-      (-> with-fixed-activities
-       (dissoc :old-links :items)
-       (assoc :links fixed-next-links)
-       (assoc :posts-list full-items-list)
-       (assoc :items-to-render with-ending-item)))))
+    (when container-data
+      (let [all-boards (:boards org-data)
+            boards-map (zipmap (map :slug all-boards) all-boards)
+            with-fixed-activities* (reduce (fn [ret item]
+                                             (let [board-data (get boards-map (:board-slug item))
+                                                   fixed-entry (parse-entry item board-data change-data active-users)]
+                                               (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
+                                    container-data
+                                    (:items container-data))
+            with-fixed-activities (reduce (fn [ret item]
+                                           (if (contains? (:fixed-items ret) (:uuid item))
+                                             ret
+                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                   with-fixed-activities*
+                                   (:posts-list container-data))
+            keep-link-rel (if (= direction :down) "previous" "next")
+            next-links (when direction
+                        (vec (remove #(= (:rel %) keep-link-rel) (:links container-data))))
+            link-to-move (when direction
+                           (utils/link-for (:old-links container-data) keep-link-rel))
+            fixed-next-links (if direction
+                               (if link-to-move
+                                 (vec (conj next-links link-to-move))
+                                 next-links)
+                               (:links container-data))
+            items-list (when (contains? container-data :items)
+                         ;; In case we are parsing a fresh response from server
+                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items container-data)))
+            full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
+            grouped-items (if (show-separators? (:container-slug container-data) sort-type)
+                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            full-items-list)
+            next-link (utils/link-for fixed-next-links "next")
+            with-caught-up (if (= (:container-slug container-data) :following)
+                             (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
+                                   items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
+                               (insert-caught-up grouped-items
+                                #(->> % :uuid (get items-map) :unread not)
+                                #(or (not= (:resource-type %) :entry)
+                                     (->> % :uuid (get items-map) :publisher?))
+                                {:has-next next-link}))
+                             grouped-items)
+            with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
+            with-ending-item (insert-ending-item with-open-close-items next-link)]
+        (-> with-fixed-activities
+         (dissoc :old-links :items)
+         (assoc :links fixed-next-links)
+         (assoc :posts-list full-items-list)
+         (assoc :items-to-render with-ending-item))))))
 
 (defn parse-thread [thread entry-data active-users]
   (let [fixed-author (get active-users (-> thread :author :user-id))
@@ -789,60 +793,61 @@
   ([threads-data change-data org-data active-users sort-type]
    (parse-threads threads-data change-data org-data active-users sort-type nil))
   ([threads-data change-data org-data active-users sort-type direction]
-    (let [all-boards (:boards org-data)
-          boards-map (zipmap (map :slug all-boards) all-boards)
-          with-fixed-entries (reduce (fn [ret entry]
-                                       (let [board-data (get boards-map (:board-slug entry))
-                                             fixed-entry (parse-entry entry board-data change-data active-users)]
-                                         (assoc-in ret [:fixed-entries (:uuid entry)] fixed-entry)))
-                              threads-data
-                              (:entries threads-data))
-          with-fixed-threads (reduce (fn [ret thread]
-                                     (let [local-entry (get-in with-fixed-entries [:fixed-entries (:resource-uuid thread)])
-                                           global-entry (when-not local-entry
-                                                          (dis/activity-data (:resource-uuid thread)))
-                                           fixed-thread (when (or local-entry global-entry)
-                                                        (parse-thread thread (or local-entry global-entry) active-users))]
-                                       (as-> ret next-ret
-                                        (assoc-in next-ret [:fixed-items (:uuid fixed-thread)] fixed-thread)
-                                        (if global-entry
-                                          (assoc-in next-ret [:fixed-entries (:resource-uuid fixed-thread)] global-entry)
-                                          next-ret))))
-                            with-fixed-entries
-                            (:items with-fixed-entries))
-          keep-link-rel (if (= direction :down) "previous" "next")
-          next-links (when direction
-                      (vec (remove #(= (:rel %) keep-link-rel) (:links threads-data))))
-          link-to-move (when direction
-                         (utils/link-for (:old-links threads-data) keep-link-rel))
-          fixed-next-links (if direction
-                             (if link-to-move
-                               (vec (conj next-links link-to-move))
-                               next-links)
-                             (:links threads-data))
-          items-list (when (contains? threads-data :items)
-                       ;; In case we are parsing a fresh response from server
-                       (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :resource-type :thread :uuid (:uuid %)) (:items threads-data))))
-          threads-list (merge-items-lists items-list (:threads-list threads-data) direction)
-          get-thread-data (fn [thread-uuid]
-                            (or (get-in with-fixed-threads [:fixed-items thread-uuid])
-                                (dis/thread-data thread-uuid)))
-          next-link (utils/link-for fixed-next-links "next")
-          with-caught-up (insert-caught-up threads-list
-                          #(-> % :uuid get-thread-data :unread-thread not)
-                          #(or (not= (:resource-type %) :thread)
-                               (-> % :uuid get-thread-data :monologue?))
-                          {:has-next next-link})
-          with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
-          with-ending-item (insert-ending-item with-open-close-items next-link)]
-      (doseq [e (vals (:fixed-entries with-fixed-entries))]
-        (utils/after 0 #(get-comments e)))
-      (-> with-fixed-threads
-       (dissoc :old-links :entries :items)
-       (assoc :links fixed-next-links)
-       (assoc :threads-list threads-list)
-       (assoc :no-virtualized-steam true)
-       (assoc :items-to-render with-ending-item)))))
+    (when threads-data
+      (let [all-boards (:boards org-data)
+            boards-map (zipmap (map :slug all-boards) all-boards)
+            with-fixed-entries (reduce (fn [ret entry]
+                                         (let [board-data (get boards-map (:board-slug entry))
+                                               fixed-entry (parse-entry entry board-data change-data active-users)]
+                                           (assoc-in ret [:fixed-entries (:uuid entry)] fixed-entry)))
+                                threads-data
+                                (:entries threads-data))
+            with-fixed-threads (reduce (fn [ret thread]
+                                       (let [local-entry (get-in with-fixed-entries [:fixed-entries (:resource-uuid thread)])
+                                             global-entry (when-not local-entry
+                                                            (dis/activity-data (:resource-uuid thread)))
+                                             fixed-thread (when (or local-entry global-entry)
+                                                          (parse-thread thread (or local-entry global-entry) active-users))]
+                                         (as-> ret next-ret
+                                          (assoc-in next-ret [:fixed-items (:uuid fixed-thread)] fixed-thread)
+                                          (if global-entry
+                                            (assoc-in next-ret [:fixed-entries (:resource-uuid fixed-thread)] global-entry)
+                                            next-ret))))
+                              with-fixed-entries
+                              (:items with-fixed-entries))
+            keep-link-rel (if (= direction :down) "previous" "next")
+            next-links (when direction
+                        (vec (remove #(= (:rel %) keep-link-rel) (:links threads-data))))
+            link-to-move (when direction
+                           (utils/link-for (:old-links threads-data) keep-link-rel))
+            fixed-next-links (if direction
+                               (if link-to-move
+                                 (vec (conj next-links link-to-move))
+                                 next-links)
+                               (:links threads-data))
+            items-list (when (contains? threads-data :items)
+                         ;; In case we are parsing a fresh response from server
+                         (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :resource-type :thread :uuid (:uuid %)) (:items threads-data))))
+            threads-list (merge-items-lists items-list (:threads-list threads-data) direction)
+            get-thread-data (fn [thread-uuid]
+                              (or (get-in with-fixed-threads [:fixed-items thread-uuid])
+                                  (dis/thread-data thread-uuid)))
+            next-link (utils/link-for fixed-next-links "next")
+            with-caught-up (insert-caught-up threads-list
+                            #(-> % :uuid get-thread-data :unread-thread not)
+                            #(or (not= (:resource-type %) :thread)
+                                 (-> % :uuid get-thread-data :monologue?))
+                            {:has-next next-link})
+            with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
+            with-ending-item (insert-ending-item with-open-close-items next-link)]
+        (doseq [e (vals (:fixed-entries with-fixed-entries))]
+          (utils/after 0 #(get-comments e)))
+        (-> with-fixed-threads
+         (dissoc :old-links :entries :items)
+         (assoc :links fixed-next-links)
+         (assoc :threads-list threads-list)
+         (assoc :no-virtualized-steam true)
+         (assoc :items-to-render with-ending-item))))))
 
 (defn activity-comments [activity-data comments-data]
   (or (-> comments-data

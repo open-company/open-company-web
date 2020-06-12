@@ -336,17 +336,24 @@
                             (dispatcher/active-users org-slug db)))
         next-db* (assoc-in db (dispatcher/active-users-key org-slug) next-active-users)
         next-db (reduce (fn [tdb contrib-key]
-                         (let [contrib-data-key (concat contributions-list-key [contrib-key dispatcher/recently-posted-sort])
-                               old-contributions-data (get-in tdb contrib-data-key)]
-                           (assoc-in tdb contrib-data-key
-                            (au/parse-contributions old-contributions-data change-data org-data next-active-users follow-publishers-list dispatcher/recently-posted-sort))))
+                         (let [rp-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recently-posted-sort)
+                               ra-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recent-activity-sort)]
+                           (-> tdb
+                            (update-in rp-contrib-data-key
+                             #(dissoc (au/parse-contributions % change-data org-data next-active-users follow-publishers-list dispatcher/recently-posted-sort) :fixed-items))
+                            (update-in ra-contrib-data-key
+                             #(dissoc (au/parse-contributions % change-data org-data next-active-users follow-publishers-list dispatcher/recent-activity-sort) :fixed-items)))))
                   next-db*
                   (keys (get-in db contributions-list-key)))
         boards-key (dispatcher/boards-key org-slug)]
       (reduce (fn [tdb board-key]
-               (let [board-data-key (concat boards-key [board-key dispatcher/recently-posted-sort :board-data])
-                     old-board-data (get-in tdb board-data-key)]
-                 (assoc-in tdb board-data-key (au/parse-board old-board-data change-data next-active-users follow-boards-list))))
+               (let [rp-board-data-key (dispatcher/board-data-key org-slug board-key dispatcher/recently-posted-sort)
+                     ra-board-data-key (dispatcher/board-data-key org-slug board-key dispatcher/recent-activity-sort)]
+                 (-> tdb
+                  (update-in rp-board-data-key
+                   #(dissoc (au/parse-board % change-data next-active-users follow-boards-list dispatcher/recently-posted-sort) :fixed-items))
+                  (update-in ra-board-data-key
+                   #(dissoc (au/parse-board % change-data next-active-users follow-boards-list dispatcher/recent-activity-sort) :fixed-items)))))
        next-db
        (keys (get-in db boards-key)))))
 
