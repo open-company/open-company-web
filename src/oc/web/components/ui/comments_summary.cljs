@@ -13,11 +13,9 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-author-name [author]
-  (if (= (:user-id author) (jwt/user-id))
+  (if (:author? author)
     "you"
-    (if (seq (:first-name author))
-      (:first-name author)
-      (first (string/split (:name author) " ")))))
+    (:short-name author)))
 
 (defn comment-summary-string [authors]
   (case (count authors)

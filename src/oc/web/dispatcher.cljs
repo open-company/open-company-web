@@ -59,21 +59,34 @@
 (defn unread-threads-key [org-slug]
   (vec (conj (org-key org-slug) :unread-threads)))
 
-(defn board-key [org-slug board-slug]
-  (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort])))
+(defn board-key 
+  ([org-slug board-slug sort-type]
+    (vec (concat (boards-key org-slug) [(keyword board-slug) (keyword sort-type)])))
+  ([org-slug board-slug]
+   (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort]))))
 
-(defn board-data-key [org-slug board-slug]
-  (conj (board-key org-slug board-slug) :board-data))
+(defn board-data-key
+  ([org-slug board-slug sort-type]
+    (conj (board-key org-slug board-slug sort-type) :board-data))
+  ([org-slug board-slug]
+   (conj (board-key org-slug board-slug) :board-data)))
 
 (defn contributions-list-key [org-slug]
   (vec (conj (org-key org-slug) :contribs)))
 
 (defn contributions-key
-  [org-slug author-uuid]
-   (vec (conj (contributions-list-key org-slug) (keyword author-uuid))))
+  ([org-slug author-uuid]
+   (contributions-key org-slug author-uuid recently-posted-sort))
+  ([org-slug author-uuid sort-type]
+   (if sort-type
+     (vec (concat (contributions-list-key org-slug) [(keyword author-uuid) (keyword sort-type)]))
+     (vec (conj (contributions-list-key org-slug) (keyword author-uuid))))))
 
-(defn contributions-data-key [org-slug slug-or-uuid]
-  (conj (contributions-key org-slug slug-or-uuid) :contrib-data))
+(defn contributions-data-key
+  ([org-slug slug-or-uuid sort-type]
+   (conj (contributions-key org-slug slug-or-uuid sort-type) :contrib-data))
+  ([org-slug slug-or-uuid]
+   (conj (contributions-key org-slug slug-or-uuid) :contrib-data)))
 
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))

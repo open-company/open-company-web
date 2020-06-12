@@ -15,7 +15,7 @@
                              (drv/drv :followers-publishers-count)
   [s {:keys [user-data org-data]}]
   (let [my-profile? (and (jwt/jwt)
-                         (= (:user-id user-data) (jwt/user-id)))
+                         (:self? user-data))
         member? (:member? org-data)
         team-role (when member? (utils/get-user-type user-data org-data))
         panel-stack (drv/react s :panel-stack)

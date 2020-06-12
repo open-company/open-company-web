@@ -207,7 +207,7 @@
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           ;; Drafts
           (when drafts-link
-            (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
+            (utils/maybe-after drafts-delay #(sa/section-get utils/default-drafts-board-slug drafts-link)))
           ;; contributions data
           (when (and contrib-link
                      (router/current-contributions-id))
@@ -250,10 +250,10 @@
           (when (= (:uuid board-data) current-board-slug)
             (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
           (when-let* [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-            (sa/section-get board-link)))
+            (sa/section-get (:slug board-data) board-link)))
         ; The board wasn't found, showing a 404 page
         (if is-drafts?
-          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
+          (utils/after 100 #(sa/section-get-finish (:slug org-data) utils/default-drafts-board-slug dis/recently-posted-sort utils/default-drafts-board))
           (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles

@@ -38,7 +38,7 @@
         (when (seq cleaned-ids)
           (api/request-reads-count cleaned-ids))))))
 
-(defn- contributions-get-success [author-uuid contrib-data]
+(defn- contributions-get-success [org-slug author-uuid sort-type contrib-data]
   (let [is-currently-shown (is-currently-shown? author-uuid)
         member? (:member? (dis/org-data))]
     (when is-currently-shown
@@ -49,12 +49,12 @@
           (watch-boards (:items (:collection contrib-data))))
         ;; Retrieve reads count if there are items in the loaded section
         (request-reads-count author-uuid (:collection contrib-data))))
-    (dis/dispatch! [:contributions-get/finish (router/current-org-slug) author-uuid contrib-data])))
+    (dis/dispatch! [:contributions-get/finish org-slug author-uuid sort-type contrib-data])))
 
-(defn- contributions-get-finish [author-uuid {:keys [status body success]}]
+(defn- contributions-get-finish [org-slug author-uuid sort-type {:keys [status body success]}]
   (if (= status 404)
     (router/redirect-404!)
-    (contributions-get-success author-uuid (if success (json->cljs body) {}))))
+    (contributions-get-success org-slug author-uuid sort-type (if success (json->cljs body) {}))))
 
 (defn- contributions-link [org-data author-uuid]
   (when-let [partial-link (utils/link-for (:links org-data) "partial-contributions")]
@@ -67,9 +67,9 @@
   (when-let [contrib-link (contributions-link org-data author-uuid)]
     (api/get-contributions contrib-link
      (fn [{:keys [status body success] :as resp}]
-       (contributions-get-finish author-uuid resp))))))
+       (contributions-get-finish (:slug org-data) author-uuid dis/recently-posted-sort resp))))))
 
-(defn- contributions-more-finish [author-uuid direction {:keys [success body]}]
+(defn- contributions-more-finish [org-slug author-uuid sort-type direction {:keys [success body]}]
   (let [contrib-data (when success (json->cljs body))]
     (when success
       (when (= (router/current-contributions-id) (:author-id (:collection contrib-data)))
@@ -77,13 +77,14 @@
         (watch-boards (:items (:collection contrib-data))))
       ;; Retrieve reads count if there are items in the loaded section
       (request-reads-count author-uuid (:collection contrib-data)))
-    (dis/dispatch! [:contributions-more/finish (router/current-org-slug) author-uuid
+    (dis/dispatch! [:contributions-more/finish org-slug author-uuid sort-type
      direction (when success (:collection contrib-data))])))
 
 (defn contributions-more [more-link direction]
-  (let [author-uuid (router/current-contributions-id)]
-    (api/load-more-items more-link direction (partial contributions-more-finish author-uuid direction))
-    (dis/dispatch! [:contributions-more (router/current-org-slug) author-uuid])))
+  (let [org-slug (router/current-org-slug)
+        author-uuid (router/current-contributions-id)]
+    (api/load-more-items more-link direction (partial contributions-more-finish org-slug author-uuid dis/recently-posted-sort direction))
+    (dis/dispatch! [:contributions-more org-slug author-uuid dis/recently-posted-sort])))
 
 ;; Change service actions
 

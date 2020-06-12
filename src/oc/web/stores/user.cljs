@@ -339,7 +339,7 @@
                          (let [contrib-data-key (concat contributions-list-key [contrib-key dispatcher/recently-posted-sort])
                                old-contributions-data (get-in tdb contrib-data-key)]
                            (assoc-in tdb contrib-data-key
-                            (au/parse-contributions old-contributions-data change-data org-data next-active-users follow-publishers-list))))
+                            (au/parse-contributions old-contributions-data change-data org-data next-active-users follow-publishers-list dispatcher/recently-posted-sort))))
                   next-db*
                   (keys (get-in db contributions-list-key)))
         boards-key (dispatcher/boards-key org-slug)]

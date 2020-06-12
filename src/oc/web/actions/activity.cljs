@@ -287,7 +287,7 @@
       (unfollowing-get org-data)
 
       (seq board-link)
-      (sa/section-get board-link))))
+      (sa/section-get (:slug board-data) board-link))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
@@ -531,7 +531,7 @@
   (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
-      (sa/section-get drafts-link))))
+      (sa/section-get utils/default-drafts-board-slug drafts-link))))
 
 (defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -1031,7 +1031,7 @@
         (when-let* [fixed-board-data (or board-data
                      (some #(when (= (:slug %) to-slug) %) (:boards org-data)))
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
-          (sa/section-get board-link))))))
+          (sa/section-get (:slug fixed-board-data) board-link))))))
 
 ;; FOC Layout
 

@@ -27,9 +27,6 @@
         (subs no-beginning-https 4)
         no-beginning-https))))
 
-(defn is-org-creator? [org-data]
-  (= (:user-id (:author org-data)) (jwt/user-id)))
-
 (defn disappearing-count-value [previous-val next-val]
   (if (and (integer? next-val)
            (pos? next-val))

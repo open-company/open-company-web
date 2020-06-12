@@ -10,14 +10,13 @@
             [oc.web.utils.activity :as au]))
 
 (defmethod dispatcher/action :section
-  [db [_ section-data]]
+  [db [_ org-slug section-slug sort-type section-data]]
   (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
         with-entries (:entries section-data)
-        org-slug (utils/section-org-slug section-data)
-        fixed-section-data (au/parse-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
-        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
+        fixed-section-data (au/parse-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list) sort-type)
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data) sort-type))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
@@ -31,7 +30,7 @@
         is-drafts-board? (= (:slug section-data) utils/default-drafts-board-slug)
         org-drafts-count-key (vec (conj (dispatcher/org-data-key org-slug) :drafts-count))]
     (-> with-merged-items
-     (assoc-in (dispatcher/board-data-key org-slug (:slug section-data))
+     (assoc-in (dispatcher/board-data-key org-slug (:slug section-data) sort-type)
                                  (dissoc with-current-edit :fixed-items))
      (update-in org-drafts-count-key #(if is-drafts-board?
                                         (ou/disappearing-count-value % (:total-count section-data))
@@ -218,16 +217,16 @@
     (assoc-in db change-key (update-unseen-unread-add old-change-data item-id container-id change-data))))
 
 (defmethod dispatcher/action :section-more
-  [db [_ org-slug board-slug]]
-  (let [container-key (dispatcher/board-data-key org-slug board-slug)
+  [db [_ org-slug board-slug sort-type]]
+  (let [container-key (dispatcher/board-data-key org-slug board-slug sort-type)
         container-data (get-in db container-key)
         next-container-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-container-data)))
 
 (defmethod dispatcher/action :section-more/finish
-  [db [_ org board direction next-board-data]]
+  [db [_ org board sort-type direction next-board-data]]
   (if next-board-data
-    (let [container-key (dispatcher/board-data-key org board)
+    (let [container-key (dispatcher/board-data-key org board sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)

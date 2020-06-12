@@ -66,7 +66,6 @@
                 show-login-overlay
                 orgs-dropdown-visible
                 search-active
-                threads-view
                 show-whats-new-green-dot
                 panel-stack]
          :as navbar-data} (drv/react s :navbar-data)
@@ -87,8 +86,10 @@
                        "Home"
                        (= (router/current-board-slug) "explore")
                        "Browse topics"
-                       (and (router/current-contributions-id) (seq contributions-user-data))
-                       (lib-user/name-for contributions-user-data)
+                       (and (router/current-contributions-id) (:self? contributions-user-data))
+                       "You"
+                       (and (router/current-contributions-id) (map? contributions-user-data))
+                       (:name contributions-user-data)
                        :else
                        (:name board-data))
          search-active? (drv/react s search/search-active?)

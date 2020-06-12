@@ -305,16 +305,15 @@
                         old-authors
                         (concat [new-author] old-authors))
           with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)
-          comment-from-current-user? (= (:user-id comment-data) (jwt/user-id))
           old-comments-count (:new-comments-count activity-data)
           new-comments-count (if (and ;; comment is not from current user
-                                      (not comment-from-current-user?)
+                                      (not (:author? comment-data))
                                       ;; and the activity we have is old (new-at is the created-at of the last comment)
                                       (> (.getTime (utils/js-date (:new-at activity-data)))
                                          (.getTime (utils/js-date (:created-at comment-data)))))
                                (inc old-comments-count)
                                old-comments-count)
-          with-new-at (if comment-from-current-user?
+          with-new-at (if (:author? comment-data)
                         with-authors
                         (-> with-authors
                           (assoc :new-at created-at)

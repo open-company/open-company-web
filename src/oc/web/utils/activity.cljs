@@ -576,6 +576,7 @@
     (-> org-data
      (assoc :read-only (readonly-org? (:links org-data)))
      (assoc :boards fixed-boards)
+     (assoc :author? (is-author? org-data))
      (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
      (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
      (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
@@ -584,15 +585,18 @@
 (defn parse-board
   "Parse board data coming from the API."
   ([board-data]
-   (parse-board board-data {} (dis/active-users) (dis/follow-boards-list)))
+   (parse-board board-data {} (dis/active-users) (dis/follow-boards-list) dis/recently-posted-sort))
 
   ([board-data change-data]
-   (parse-board board-data change-data (dis/active-users) (dis/follow-boards-list)))
+   (parse-board board-data change-data (dis/active-users) (dis/follow-boards-list) dis/recently-posted-sort))
 
   ([board-data change-data active-users]
-   (parse-board board-data change-data active-users (dis/follow-boards-list)))
+   (parse-board board-data change-data active-users (dis/follow-boards-list) dis/recently-posted-sort))
 
-  ([board-data change-data active-users follow-boards-list & [direction]]
+  ([board-data change-data active-users follow-boards-list]
+   (parse-board board-data change-data active-users follow-boards-list dis/recently-posted-sort))
+
+  ([board-data change-data active-users follow-boards-list sort-type & [direction]]
     (let [with-fixed-activities* (reduce (fn [ret item]
                                            (assoc-in ret [:fixed-items (:uuid item)]
                                             (parse-entry item {:slug (:board-slug item)
@@ -623,7 +627,7 @@
                        ;; In case we are parsing a fresh response from server
                        (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:entries board-data)))
           full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
-          grouped-items (if (show-separators? (:slug board-data))
+          grouped-items (if (show-separators? (:slug board-data) sort-type)
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
           with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
@@ -639,18 +643,21 @@
 (defn parse-contributions
   "Parse data coming from the API for a certain user's posts."
   ([contributions-data]
-   (parse-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
 
   ([contributions-data change-data]
-   (parse-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
 
   ([contributions-data change-data org-data]
-   (parse-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
 
   ([contributions-data change-data org-data active-users]
-   (parse-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list)))
+   (parse-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list) dis/recently-posted-sort))
 
-  ([contributions-data change-data org-data active-users follow-publishers-list & [direction]]
+  ([contributions-data change-data org-data active-users follow-publishers-list]
+   (parse-contributions contributions-data change-data org-data active-users follow-publishers-list dis/recently-posted-sort))
+
+  ([contributions-data change-data org-data active-users follow-publishers-list sort-type & [direction]]
     (let [all-boards (:boards org-data)
           boards-map (zipmap (map :slug all-boards) all-boards)
           with-fixed-activities* (reduce (fn [ret item]
@@ -679,15 +686,17 @@
                        ;; In case we are parsing a fresh response from server
                        (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items contributions-data)))
           full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
-          grouped-items (if (show-separators? (:href contributions-data))
+          grouped-items (if (show-separators? :contributions sort-type)
                           (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                           full-items-list)
+          next-link (utils/link-for fixed-next-links "next")
           with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
-          with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
+          with-ending-item (insert-ending-item with-open-close-items next-link)
           follow-publishers-ids (set (map :user-id follow-publishers-list))]
       (-> with-fixed-activities
         (dissoc :old-links :items)
         (assoc :links fixed-next-links)
+        (assoc :self? (= (jwt/user-id) (:author contributions-data)))
         (assoc :posts-list full-items-list)
         (assoc :items-to-render with-ending-item)
         (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data))))))))

@@ -229,39 +229,40 @@
           ra posts))
 
 (defmethod reducer :all-posts-get/finish
-  [db [_ org fixed-body]]
+  [db [_ org sort-type fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :all-posts-more/finish
-  [db [_ org direction fixed-body]]
+  [db [_ org sort-type direction fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :inbox-get/finish
-  [db [_ org fixed-body]]
+  [db [_ org sort-type fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :bookmarks-get/finish
-  [db [_ org fixed-body]]
+  [db [_ org sort-type fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :following-get/finish
-  [db [_ org fixed-body]]
+  [db [_ org sort-type fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
-(defmethod reducer :following-get/finish
-  [db [_ org fixed-body]]
+(defmethod reducer :unfollowing-get/finish
+  [db [_ org sort-type fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :section
-  [db [_ board-data]]
-  (let [org (utils/section-org-slug board-data)
-        fixed-board-data (au/parse-board board-data (dispatcher/change-data db))]
+  [db [_ org section-slug sort-type board-data]]
+  (let [fixed-board-data (au/parse-board board-data (dispatcher/change-data db)
+                          (dispatcher/active-users org db) (dispatcher/follow-boards-list org db)
+                          sort-type)]
     (swap! reactions-atom index-posts org (-> fixed-board-data :fixed-items vals)))
   db)
 

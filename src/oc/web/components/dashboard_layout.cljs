@@ -249,7 +249,7 @@
                     [:div.board-name-with-icon.contributions
                       [:div.board-name-with-icon-internal
                         (if is-own-contributions
-                          "Wut you said"
+                          "You"
                           (lib-user/name-for contributions-user-data))
                         ; (when (pos? (:total-count contributions-data))
                         ;   [:span.count (:total-count contributions-data)])

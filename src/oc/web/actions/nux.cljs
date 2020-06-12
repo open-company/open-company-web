@@ -61,8 +61,7 @@
   []
   (when-let* [nv (get-nux-cookie)
               org-data (dis/org-data)]
-    (let [is-org-creator (org-utils/is-org-creator? org-data)
-          team-data (dis/team-data)
+    (let [team-data (dis/team-data)
           can-edit? (utils/is-admin-or-author? org-data)
           is-admin? (jwt/is-admin? (:team-id org-data))
           add-post-tooltip (:show-add-post-tooltip nv)
@@ -97,7 +96,7 @@
         (mark-nux-step-done :show-edit-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
-                                 (if is-org-creator
+                                 (if (:author? org-data)
                                   true
                                   :is-second-user)
                                  false)

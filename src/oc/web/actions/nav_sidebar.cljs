@@ -132,7 +132,7 @@
                                    (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
               board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (when board-link
-            (section-actions/section-get board-link)))))))
+            (section-actions/section-get (:slug fixed-board-data) board-link)))))))
 
 (defn nav-to-url!
   ([e board-slug url]
