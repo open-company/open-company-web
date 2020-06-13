@@ -69,6 +69,7 @@ div.replies-list {
 
       div.add-comment-box-container {
         margin-top: 8px;
+        margin-bottom: 16px;
 
         div.add-comment-box div.add-comment-internal {
           background-color: var(--foc-background-color);
@@ -104,8 +105,8 @@ div.replies-list {
 
       @include mobile() {
         background-color: var(--mobile-background-color);
-        border-top: 1px solid var(--divider-line);
-        border-bottom: 1px solid var(--divider-line);
+        border-top: 1px solid var(--foc-divider-line-color);
+        border-bottom: 1px solid var(--foc-divider-line-color);
 
         &:first-child {
           border-top: none;
@@ -141,6 +142,7 @@ div.replies-list {
           height: 24px;
           text-align: left;
           position: relative;
+          margin-bottom: 16px;
 
           div.reply-item-author-container {
             display: contents;
@@ -361,7 +363,7 @@ div.replies-list {
             &:after {
               height: 2px;
               width: 11px;
-              background-color: var(--divider-line);
+              background-color: var(--foc-divider-line-color);
               content: "";
               position: absolute;
               top: 20px;
@@ -376,7 +378,7 @@ div.replies-list {
           &.vertical-line:before {
             width: 2px;
             height: calc(100% - 48px);
-            background-color: var(--divider-line);
+            background-color: var(--foc-divider-line-color);
             content: "";
             position: absolute;
             top: 40px;
@@ -450,10 +452,6 @@ div.replies-list {
 
               div.reply-comment-inner {
                 padding: 8px 0;
-              }
-
-              &.add-comment-container {
-                padding-bottom: 8px;
               }
 
               div.reply-comment-mobile-menu {
