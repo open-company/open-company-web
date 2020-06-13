@@ -325,12 +325,12 @@
                                  items-changed (clj-data/diff (-> o :rum/args first :comments-data) items)]
                               (when (or (seq (first items-changed))
                                         (seq (second items-changed)))
-                               (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::replies o)))
-                                     expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
-                                     collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
-                                     last-read-at @(::initial-last-read-at s)
-                                     collapsed-replies (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items))]
-                                 (reset! (::replies s) collapsed-replies))))
+                                (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::replies s)))
+                                      expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
+                                      collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
+                                      last-read-at @(::initial-last-read-at s)
+                                      collapsed-replies (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items))]
+                                  (reset! (::replies s) collapsed-replies))))
                             s)}
   [s {current-user-id  :current-user-id
       uuid             :uuid
