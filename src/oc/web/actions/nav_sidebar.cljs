@@ -77,7 +77,7 @@
 
 (defn- container-data [back-to]
   (cond
-   (or (:threads back-to)
+   (or (:replies back-to)
        (:explore back-to))
    nil
    (contains? back-to :contributions)
@@ -97,8 +97,8 @@
         (= board-slug "inbox")
         (activity-actions/inbox-get org-data)
 
-        (= board-slug "threads")
-        (activity-actions/threads-get org-data)
+        (= board-slug "replies")
+        (activity-actions/replies-get org-data)
 
         (and (= board-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
@@ -185,15 +185,15 @@
   (let [org-data (dis/org-data)
         ;; Go back to
         back-to (utils/back-to org-data)
-        is-threads? (:threads back-to)
+        is-replies? (:replies back-to)
         is-explore? (:explore back-to)
         is-following? (:following back-to)
         is-contributions? (:contributions back-to)
         to-url (cond
                  is-following?
                  (oc-urls/following)
-                 is-threads?
-                 (oc-urls/threads)
+                 is-replies?
+                 (oc-urls/replies)
                  is-explore?
                  (oc-urls/explore)
                  is-contributions?
@@ -214,8 +214,8 @@
     (cond
       is-contributions?
       (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
-      is-threads?
-      (nav-to-url! e "threads" to-url back-y should-refresh-data?)
+      is-replies?
+      (nav-to-url! e "replies" to-url back-y should-refresh-data?)
       is-explore?
       (nav-to-url! e "explore" to-url back-y should-refresh-data?)
       is-following?
@@ -235,8 +235,8 @@
                   (and (seq (router/current-contributions-id))
                        (not (seq (router/current-board-slug))))
                   {:contributions (router/current-contributions-id)}
-                  (= (router/current-board-slug) "threads")
-                  {:threads true}
+                  (= (router/current-board-slug) "replies")
+                  {:replies true}
                   (= (router/current-board-slug) "explore")
                   {:explore true}
                   (= (router/current-board-slug) "following")

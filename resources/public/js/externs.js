@@ -110,7 +110,6 @@ var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};
 var OCWebPrintPostsData = function(){};
-var OCWebPrintThreadsData = function(){};
 var OCWebPrintReactionsData = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};

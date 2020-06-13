@@ -54,7 +54,6 @@
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
-                              (drv/drv :unread-threads)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -96,7 +95,7 @@
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
         is-following (= current-board-slug "following")
-        is-threads (= current-board-slug "threads")
+        is-replies (= current-board-slug "replies")
         is-unfollowing (= current-board-slug "unfollowing")
         is-explore (= current-board-slug "explore")
         is-contributions (seq current-contributions-id)
@@ -111,13 +110,12 @@
                                    container-data
                                    :else
                                    board-data)
-        empty-board? (and (not is-threads)
-                          (or (and (not is-contributions)
-                                   (map? board-container-data)
-                                   (zero? (count (:posts-list board-container-data))))
-                              (and is-contributions
-                                   (map? contributions-data)
-                                   (zero? (count (:posts-list contributions-data))))))
+        empty-board? (or (and (not is-contributions)
+                              (map? board-container-data)
+                              (zero? (count (:posts-list board-container-data))))
+                         (and is-contributions
+                              (map? contributions-data)
+                              (zero? (count (:posts-list contributions-data)))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
@@ -132,7 +130,6 @@
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        unread-threads (drv/react s :unread-threads)
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -186,12 +183,10 @@
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "threads" (oc-urls/threads)))
-                 :class (when is-threads
+                              (nav-actions/nav-to-url! % "replies" (oc-urls/replies)))
+                 :class (when is-replies
                           "active")}
-                [:span.tab-icon
-                  (when (pos? unread-threads)
-                    [:span.unread-dot])]
+                [:span.tab-icon]
                 [:span.tab-label "Replies"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
@@ -265,7 +260,7 @@
                                                   :explore-icon is-unfollowing
                                                   :saved-icon is-bookmarks
                                                   :drafts-icon is-drafts-board
-                                                  :threads-icon is-threads})
+                                                  :replies-icon is-replies})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
                                                    "Unread"
@@ -282,7 +277,7 @@
                                                    is-following
                                                    "Home"
 
-                                                   is-threads
+                                                   is-replies
                                                    "Replies"
 
                                                    :default
@@ -352,7 +347,7 @@
               (rum/with-key (lazy-stream paginated-stream)
                (str "paginated-posts-component-" (
                 cond is-inbox       "IN"
-                     is-threads     "TH"
+                     is-replies     "RP"
                      is-all-posts   "AP"
                      is-bookmarks   "BM"
                      is-following   "FL"

@@ -100,8 +100,8 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
-                                (drv/drv :unread-threads)
                                 (drv/drv :current-user-data)
+                                (drv/drv :unread-replies)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-publishers-list)
@@ -167,8 +167,8 @@
         sorted-boards (sort-boards boards)
         selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         user-is-part-of-the-team? (:member? org-data)
-        is-threads (or (:threads (:back-to @router/path))
-                        (= selected-slug "threads"))
+        is-replies (or (:replies (:back-to @router/path))
+                        (= selected-slug "replies"))
         is-following (or (:following (:back-to @router/path))
                          (= selected-slug "following"))
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
@@ -192,20 +192,20 @@
                             (utils/link-for (:links org-data) "bookmarks"))
         show-drafts (and user-is-part-of-the-team?
                          drafts-link)
-        show-threads (and user-is-part-of-the-team?
-                          (utils/link-for (:links org-data) "threads"))
+        show-replies (and user-is-part-of-the-team?
+                          (utils/link-for (:links org-data) "replies"))
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
+        unread-replies (drv/react s :unread-replies)
         follow-publishers-list (drv/react s :follow-publishers-list)
         show-users-list? (and false ;; Remove users list from sidebar or now
                               user-is-part-of-the-team?
                               follow-publishers-list
                               (pos? (count follow-publishers-list)))
         follow-boards-list (drv/react s :follow-boards-list)
-        unread-threads (drv/react s :unread-threads)
         show-you (and user-is-part-of-the-team?
                       (pos? (:contributions-count org-data)))
         user-role (user-store/user-role org-data current-user-data)
@@ -240,19 +240,19 @@
             (when (pos? (count all-unread-items))
               ; [:span.count (count all-unread-items)]
               [:span.unread-dot])])
-        (when show-threads
-          [:a.nav-link.threads-view.hover-item.group
-            {:class (utils/class-set {:item-selected is-threads
-                                      :new unread-threads})
-             :href (oc-urls/threads)
+        (when show-replies
+          [:a.nav-link.replies-view.hover-item.group
+            {:class (utils/class-set {:item-selected is-replies
+                                      :new unread-replies})
+             :href (oc-urls/replies)
              :on-click (fn [e]
                          (utils/event-stop e)
-                         (nav-actions/nav-to-url! e "threads" (oc-urls/threads)))}
+                         (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))}
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Replies"]
-              (when (pos? unread-threads)
+              (when (pos? unread-replies)
                 [:span.unread-dot])])
         ;; You
         (when show-you

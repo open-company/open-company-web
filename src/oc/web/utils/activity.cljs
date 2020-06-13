@@ -163,7 +163,7 @@
    (= user-id publisher-id)))
 
 (defun is-author?
-  "Check if current user is the author of the entry/comment or whole thread."
+  "Check if current user is the author of the entry/comment."
   ([entity-data :guard :author]
    (when (jwt/jwt)
      (is-author? entity-data (jwt/user-id))))
@@ -176,14 +176,6 @@
 
   ([author-id :guard string? user-id :guard string?]
    (= user-id author-id)))
-
-(defun is-monologue?
-  ([thread-data :guard :author]
-   (when (jwt/jwt)
-    (is-monologue? thread-data (jwt/user-id))))
-  ([thread-data :guard :author user-id :guard string?]
-   (and (is-author? (-> thread-data :author :user-id) (jwt/user-id))
-        (every? #(is-author? % user-id) (:reply-authors thread-data)))))
 
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
@@ -433,9 +425,7 @@
      (and (seq items-list) has-next)
      (vec (concat items-list [{:resource-type :loading-more
                                :last-activity-at (next-activity-timestamp last-item)
-                               :message (if (= (:resource-type last-item) :thread)
-                                          "Loading more threads..."
-                                          "Loading more updates...")}]))
+                               :message "Loading more updates..."}]))
      carrot-close?
      (vec
       (concat items-list [{:resource-type :carrot-close
@@ -759,94 +749,16 @@
                                 {:has-next next-link}))
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
-            with-ending-item (insert-ending-item with-open-close-items next-link)]
+            with-ending-item (insert-ending-item with-open-close-items next-link)
+            replies? (= (-> container-data :container-slug keyword) :replies)]
+        (when replies?
+          (doseq [e (vals (:fixed-items with-fixed-activities))]
+            (utils/after 0 #(get-comments e))))
         (-> with-fixed-activities
+         (assoc :no-virtualized-steam replies?)
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)
-         (assoc :items-to-render with-ending-item))))))
-
-(defn parse-thread [thread entry-data active-users]
-  (let [fixed-author (get active-users (-> thread :author :user-id))
-        comment-unread (comment-unread? thread (:last-read-at entry-data))
-        thread-unread (comment-unread? (:last-activity-at thread) (:last-read-at entry-data))]
-    (-> thread
-      (assoc :resource-type :thread)
-      (assoc :entry entry-data)
-      (update :author merge fixed-author)
-      (assoc :unread-thread (or comment-unread thread-unread))
-      (as-> t (assoc t :author? (is-author? t))
-              (assoc t :monologue? (is-monologue? t))))))
-
-(defn parse-threads
-  "
-  Threads data looks like this:
-  {:total-count 100
-   :entries [...List of entry maps...]
-   :items [{...Comment map...
-            :reply-count 1
-            :resource-uuid 1234-1234-1234
-            :uuid 1234-1234-1235
-            :last-activity-at most-recent-created-at}]
-   :links []}
-  "
-  ([threads-data change-data org-data active-users sort-type]
-   (parse-threads threads-data change-data org-data active-users sort-type nil))
-  ([threads-data change-data org-data active-users sort-type direction]
-    (when threads-data
-      (let [all-boards (:boards org-data)
-            boards-map (zipmap (map :slug all-boards) all-boards)
-            with-fixed-entries (reduce (fn [ret entry]
-                                         (let [board-data (get boards-map (:board-slug entry))
-                                               fixed-entry (parse-entry entry board-data change-data active-users)]
-                                           (assoc-in ret [:fixed-entries (:uuid entry)] fixed-entry)))
-                                threads-data
-                                (:entries threads-data))
-            with-fixed-threads (reduce (fn [ret thread]
-                                       (let [local-entry (get-in with-fixed-entries [:fixed-entries (:resource-uuid thread)])
-                                             global-entry (when-not local-entry
-                                                            (dis/activity-data (:resource-uuid thread)))
-                                             fixed-thread (when (or local-entry global-entry)
-                                                          (parse-thread thread (or local-entry global-entry) active-users))]
-                                         (as-> ret next-ret
-                                          (assoc-in next-ret [:fixed-items (:uuid fixed-thread)] fixed-thread)
-                                          (if global-entry
-                                            (assoc-in next-ret [:fixed-entries (:resource-uuid fixed-thread)] global-entry)
-                                            next-ret))))
-                              with-fixed-entries
-                              (:items with-fixed-entries))
-            keep-link-rel (if (= direction :down) "previous" "next")
-            next-links (when direction
-                        (vec (remove #(= (:rel %) keep-link-rel) (:links threads-data))))
-            link-to-move (when direction
-                           (utils/link-for (:old-links threads-data) keep-link-rel))
-            fixed-next-links (if direction
-                               (if link-to-move
-                                 (vec (conj next-links link-to-move))
-                                 next-links)
-                               (:links threads-data))
-            items-list (when (contains? threads-data :items)
-                         ;; In case we are parsing a fresh response from server
-                         (remove nil? (map #(hash-map :resource-uuid (:resource-uuid %) :resource-type :thread :uuid (:uuid %)) (:items threads-data))))
-            threads-list (merge-items-lists items-list (:threads-list threads-data) direction)
-            get-thread-data (fn [thread-uuid]
-                              (or (get-in with-fixed-threads [:fixed-items thread-uuid])
-                                  (dis/thread-data thread-uuid)))
-            next-link (utils/link-for fixed-next-links "next")
-            with-caught-up (insert-caught-up threads-list
-                            #(-> % :uuid get-thread-data :unread-thread not)
-                            #(or (not= (:resource-type %) :thread)
-                                 (-> % :uuid get-thread-data :monologue?))
-                            {:has-next next-link})
-            with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-uuid %2) (:resource-uuid %3)))
-            with-ending-item (insert-ending-item with-open-close-items next-link)]
-        (doseq [e (vals (:fixed-entries with-fixed-entries))]
-          (utils/after 0 #(get-comments e)))
-        (-> with-fixed-threads
-         (dissoc :old-links :entries :items)
-         (assoc :links fixed-next-links)
-         (assoc :threads-list threads-list)
-         (assoc :no-virtualized-steam true)
          (assoc :items-to-render with-ending-item))))))
 
 (defn activity-comments [activity-data comments-data]

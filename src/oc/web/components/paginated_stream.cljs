@@ -14,7 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.threads-list :refer (threads-list)]
+            [oc.web.components.replies-list :refer (replies-list)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
@@ -75,8 +75,8 @@
         (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
-        (= current-board-slug "threads")
-        (activity-actions/threads-more @(::has-next s) :down)
+        (= current-board-slug "replies")
+        (activity-actions/replies-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "bookmarks")
@@ -321,7 +321,7 @@
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
          (if (:no-virtualized-steam container-data)
-           (threads-list {:items-to-render items
+           (replies-list {:items-to-render items
                           :org-data org-data
                           :current-user-data current-user-data})
            (window-scroller

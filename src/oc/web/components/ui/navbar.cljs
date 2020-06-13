@@ -74,7 +74,7 @@
          expanded-user-menu (= current-panel :menu)
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
-                       (= (router/current-board-slug) "threads")
+                       (= (router/current-board-slug) "replies")
                        "Replies"
                        (= (router/current-board-slug) "inbox")
                        "Unread"

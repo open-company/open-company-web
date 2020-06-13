@@ -183,7 +183,7 @@
   ;            (= last-sort-type dis/recently-posted-sort))
   ;     dis/recent-activity-sort
   ;     dis/recently-posted-sort))
-  (if (= (:board params) "threads")
+  (if (= (:board params) "replies")
     dis/recent-activity-sort
     dis/recently-posted-sort))
 
@@ -611,13 +611,13 @@
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
 
-    (defroute threads-route (urls/threads ":org") {:as params}
-      (timbre/info "Routing threads-route" (urls/threads ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "threads")))
+    (defroute replies-route (urls/replies ":org") {:as params}
+      (timbre/info "Routing replies-route" (urls/replies ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "replies")))
 
-    (defroute threads-slash-route (str (urls/threads ":org") "/") {:as params}
-      (timbre/info "Routing threads-slash-route" (str (urls/threads ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "threads")))
+    (defroute replies-slash-route (str (urls/replies ":org") "/") {:as params}
+      (timbre/info "Routing replies-slash-route" (str (urls/replies ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "replies")))
 
     (defroute explore-route (urls/explore ":org") {:as params}
       (timbre/info "Routing explore-route" (urls/explore ":org"))

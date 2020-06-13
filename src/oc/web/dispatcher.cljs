@@ -53,12 +53,6 @@
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
-(defn threads-data-key [org-slug]
-  (vec (conj (org-key org-slug) :threads)))
-
-(defn unread-threads-key [org-slug]
-  (vec (conj (org-key org-slug) :unread-threads)))
-
 (defn board-key 
   ([org-slug board-slug sort-type]
     (vec (concat (boards-key org-slug) [(keyword board-slug) (keyword sort-type)])))
@@ -91,23 +85,18 @@
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
-(defn threads-container-key
-  ([org-slug]
-   (threads-container-key org-slug recent-activity-sort))
-  ([org-slug sort-type]
-   (vec (concat (org-key org-slug) [:threads-container sort-type]))))
-
 (defn container-key
   ([org-slug items-filter]
    (container-key org-slug items-filter recently-posted-sort))
   ([org-slug items-filter sort-type]
    (cond
-     (= (keyword items-filter) :threads)
-     (threads-container-key org-slug sort-type)
      sort-type
      (vec (conj (containers-key org-slug) (keyword items-filter) (keyword sort-type)))
      :else
      (vec (conj (containers-key org-slug) (keyword items-filter))))))
+
+(defn unread-replies-key [org-slug]
+  (vec (conj (org-key org-slug) :unread-replies)))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -118,10 +107,6 @@
 
 (defn activity-last-read-at-key [org-slug activity-uuid]
   (vec (conj (activity-key org-slug activity-uuid) :last-read-at)))
-
-(defn thread-key [org-slug thread-uuid]
-  (let [threads-key (threads-data-key org-slug)]
-    (vec (concat threads-key [thread-uuid]))))
 
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
@@ -154,14 +139,6 @@
 
 (defn activity-sorted-comments-key [org-slug activity-uuid]
   (vec (concat (comments-key org-slug) [activity-uuid sorted-comments-key])))
-
-(def threads-map-key :threads-map)
-
-(defn activity-threads-map-key [org-slug activity-uuid]
-  (vec (concat (comments-key org-slug) [activity-uuid threads-map-key])))
-
-(defn activity-thread-data-key [org-slug activity-uuid thread-uuid]
-  (vec (concat (activity-threads-map-key org-slug activity-uuid) [thread-uuid])))
 
 (def teams-data-key [:teams-data :teams])
 
@@ -258,22 +235,19 @@
                           (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
-;; Threads helpers
-
-(defn is-threads? [container-slug]
-  (when (or (string? container-slug)
-            (keyword? container-slug))
-    (-> container-slug name s/lower-case (= "threads"))))
-
 ;; Container helpers
 
 (defn is-container? [container-slug]
   ;; Rest of containers
-  (#{"inbox" "all-posts" "bookmarks" "following" "unfollowing" "activity" "threads"} container-slug))
+  (#{"inbox" "all-posts" "bookmarks" "following" "unfollowing" "activity" "replies"} container-slug))
 
 (defn is-container-with-sort? [container-slug]
   ;; Rest of containers
   (#{"all-posts" "following" "unfollowing"} container-slug))
+
+(defn is-recent-activity? [container-slug]
+  (when-let [container-slug-kw (keyword container-slug)]
+    (#{:replies} container-slug-kw)))
 
 (defn- get-container-posts [base route posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond
@@ -293,28 +267,6 @@
     (if (= container-slug utils/default-drafts-board-slug)
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
-
-(defn- get-container-threads [base route posts-data threads-data org-slug sort-type items-key]
-  (let [cnt-key (threads-container-key org-slug sort-type)
-        container-data (get-in base cnt-key)
-        threads-list (get container-data items-key)
-        container-items (vec (remove nil?
-                          (map #(if (= (:resource-type %) :thread)
-                                  (let [thread (get threads-data (:uuid %))
-                                        activity-data (get posts-data (:resource-uuid %))]
-                                    (merge % thread {:activity-data activity-data}))
-                                  %)
-                           threads-list)))]
-      (mapv (fn [thread-data]
-              (let [thread-key (activity-thread-data-key org-slug (:resource-uuid thread-data) (:uuid thread-data))
-                    thread-comments (get-in base thread-key)]
-                (merge thread-data thread-comments)))
-        container-items)))
-
-(defn- get-container-items [base route posts-data threads-data org-slug container-slug sort-type items-key]
-  (if (is-threads? container-slug)
-    (get-container-threads base route posts-data threads-data org-slug sort-type items-key)
-    (get-container-posts base route posts-data org-slug container-slug sort-type items-key)))
 
 (def ui-theme-key [:ui-theme])
 
@@ -431,27 +383,16 @@
                          (fn [base org-slug]
                            (when (and base org-slug)
                              (get-in base (posts-data-key org-slug))))]
-   :filtered-posts      [[:base :org-data :posts-data :threads-data :route]
-                         (fn [base org-data posts-data threads-data route]
-                           (let [threads? (is-threads? (:board route))
-                                 container-slug (or (:contributions route) (:board route))]
-                             (when (and base org-data posts-data route container-slug (not threads?))
-                               (get-container-items base route posts-data threads-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
-   :threads-data        [[:base :org-slug]
-                         (fn [base org-slug]
-                           (when (and base org-slug)
-                             (get-in base (threads-data-key org-slug))))]
-   :items-to-render     [[:base :org-data :posts-data :threads-data :route]
-                         (fn [base org-data posts-data threads-data route]
-                           (let [threads? (is-threads? (:board route))
-                                 container-slug (or (:contributions route) (:board route))]
-                             (when (and base org-data container-slug
-                                        (or (and threads?
-                                                 threads-data
-                                                 posts-data)
-                                            (and (not threads?)
-                                                 posts-data)))
-                               (get-container-items base route posts-data threads-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
+   :filtered-posts      [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (let [container-slug (or (:contributions route) (:board route))]
+                             (when (and base org-data posts-data route container-slug)
+                               (get-container-posts base route posts-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
+   :items-to-render     [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (let [container-slug (or (:contributions route) (:board route))]
+                             (when (and base org-data container-slug posts-data)
+                               (get-container-posts base route posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -575,6 +516,9 @@
                                 (fn [base org-slug]
                                   (when (and base org-slug)
                                     (get-in base (grouped-user-notifications-key org-slug))))]
+   :unread-replies        [[:base :org-slug]
+                           (fn [base org-slug]
+                             (get-in base (unread-replies-key org-slug)))]
    :unread-notifications  [[:user-notifications]
                            (fn [notifications]
                              (filter :unread notifications))]
@@ -585,9 +529,6 @@
                                     (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
-   :unread-threads        [[:base :org-slug]
-                           (fn [base org-slug]
-                             (get-in base (unread-threads-key org-slug)))]
    :user-responded-to-push-permission? [[:base] (fn [base]
                                                   (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
@@ -761,15 +702,6 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
-(defn ^:export threads-data
-  "Get all the threads of the given org."
-  ([]
-    (threads-data @app-state))
-  ([data]
-    (threads-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (threads-data-key org-slug))))
-
 (defun board-data
   "Get board data."
   ([]
@@ -840,9 +772,8 @@
   ([data route org-slug posts-filter]
     (filtered-posts-data data route org-slug posts-filter (router/current-sort-type)))
   ([data route org-slug posts-filter sort-type]
-    (let [posts-data (get-in data (posts-data-key org-slug))
-          threads-data (get-in data (threads-data-key org-slug))]
-     (get-container-items data route posts-data threads-data org-slug posts-filter sort-type :posts-list)))
+    (let [posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data route posts-data org-slug posts-filter sort-type :posts-list)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -867,9 +798,8 @@
   ([data route org-slug posts-filter]
     (items-to-render-data data route org-slug (router/current-posts-filter) (router/current-sort-type)))
   ([data route org-slug posts-filter sort-type]
-    (let [posts-data (get-in data (posts-data-key org-slug))
-          threads-data (get-in data (threads-data-key org-slug))]
-     (get-container-items data route posts-data threads-data org-slug posts-filter sort-type :items-to-render)))
+    (let [posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data route posts-data org-slug posts-filter sort-type :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -902,13 +832,6 @@
     (let [activity-key (activity-key org-slug activity-id)]
       (get-in data activity-key))))
 (def activity-data-get activity-data)
-
-(defn ^:export thread-data
-  "Get thread data."
-  ([thread-uuid]
-    (thread-data (router/current-org-slug) thread-uuid @app-state))
-  ([org-slug thread-uuid data]
-    (get-in data (thread-key org-slug thread-uuid))))
 
 (defn ^:export secure-activity-data
   "Get secure activity data."
@@ -1143,9 +1066,6 @@
 (defn print-filtered-posts []
   (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter)))
 
-(defn print-threads-data []
-  (get-in @app-state (threads-data-key (router/current-org-slug))))
-
 (defn print-items-to-render []
   (items-to-render-data @app-state @router/path (router/current-org-slug) (router/current-board-slug)))
 
@@ -1182,7 +1102,6 @@
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
 (set! (.-OCWebPrintItemsToRender js/window) print-items-to-render)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
-(set! (.-OCWebPrintThreadsData js/window) print-threads-data)
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)

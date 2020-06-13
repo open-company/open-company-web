@@ -294,23 +294,18 @@
                                (fn [ndb ckey]
                                  (let [container-rp-key (dispatcher/container-key org-slug ckey dispatcher/recently-posted-sort)
                                        container-ra-key (dispatcher/container-key org-slug ckey dispatcher/recent-activity-sort)
-                                       threads? (= ckey :threads)
-                                       items-list-key (if threads? :threads-list :post-list)
-                                       item-key (if threads? :resource-uuid :uuid)
                                        next-ndb (-> ndb
-                                                 (update-in (conj container-rp-key items-list-key)
+                                                 (update-in (conj container-rp-key :posts-list)
                                                   (fn [items-list]
-                                                    (filterv #(not= (item-key %) (:uuid activity-data)) items-list)))
-                                                 (update-in (conj container-ra-key items-list-key)
+                                                    (filterv #(not= (:uuid %) (:uuid activity-data)) items-list)))
+                                                 (update-in (conj container-ra-key :posts-list)
                                                   (fn [items-list]
-                                                    (filterv #(not= (item-key %) (:uuid activity-data)) items-list))))
+                                                    (filterv #(not= (:uuid %) (:uuid activity-data)) items-list))))
                                        items-to-render-rp-key (conj container-rp-key :items-to-render)
-                                       items-list-rp-key (conj container-rp-key items-list-key)
+                                       items-list-rp-key (conj container-rp-key :posts-list)
                                        items-to-render-ra-key (conj container-ra-key :items-to-render)
-                                       items-list-ra-key (conj container-ra-key items-list-key)
-                                       items-data-map (if threads?
-                                                        (get-in next-ndb (dispatcher/threads-data-key org-slug))
-                                                        (get-in next-ndb (dispatcher/posts-data-key org-slug)))]
+                                       items-list-ra-key (conj container-ra-key :posts-list)
+                                       items-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
                                     (-> next-ndb
                                      (assoc-in items-to-render-rp-key
                                       (if (au/show-separators? ckey dispatcher/recently-posted-sort)
@@ -938,67 +933,61 @@
          #(notif-util/fix-notifications ndb %))))
     db))
 
-;; Threads
+;; Replies
 
-(defmethod dispatcher/action :threads-get/finish
-  [db [_ org-slug sort-type threads-data]]
+(defmethod dispatcher/action :replies-get/finish
+  [db [_ org-slug sort-type replies-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         posts-data-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-data-key)
-        threads-data-key (dispatcher/threads-data-key org-slug)
-        old-threads (get-in db threads-data-key)
-        fixed-threads-data (au/parse-threads (:collection threads-data) change-data org-data active-users sort-type)
-        merged-items (merge old-threads (:fixed-items fixed-threads-data))
-        merged-posts (merge old-posts (:fixed-entries fixed-threads-data))
-        threads-container-key (dispatcher/threads-container-key org-slug sort-type)
-        unread-threads-key (dispatcher/unread-threads-key org-slug)]
+        prepare-replies-data (-> replies-data :collection (assoc :container-slug :replies))
+        fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type)
+        merged-items (merge old-posts (:fixed-items fixed-replies-data))
+        replies-container-key (dispatcher/container-key org-slug :replies sort-type)
+        unread-replies-key (dispatcher/unread-replies-key org-slug)]
     (as-> db ndb
-      (assoc-in ndb threads-container-key (dissoc fixed-threads-data :fixed-items :fixed-entries))
-      (assoc-in ndb unread-threads-key (some :unread-thread (vals merged-items)))
-      (assoc-in ndb threads-data-key merged-items)
-      (assoc-in ndb posts-data-key merged-posts)
-      (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-threads-data))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :threads))
+      (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items :fixed-entries))
+      (assoc-in ndb unread-replies-key (some :unread (vals (:fixed-items fixed-replies-data))))
+      (assoc-in ndb posts-data-key merged-items)
+      (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
+      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
-(defmethod dispatcher/action :threads-more
+(defmethod dispatcher/action :replies-more
   [db [_ org-slug sort-type]]
-  (let [threads-container-key (dispatcher/threads-container-key org-slug sort-type)
-        container-data (get-in db threads-container-key)
-        next-threads-data (assoc container-data :loading-more true)]
-    (assoc-in db threads-container-key next-threads-data)))
+  (let [replies-container-key (dispatcher/container-key org-slug :replies sort-type)
+        container-data (get-in db replies-container-key)
+        next-replies-data (assoc container-data :loading-more true)]
+    (assoc-in db replies-container-key next-replies-data)))
 
-(defmethod dispatcher/action :threads-more/finish
-  [db [_ org sort-type direction threads-data]]
-  (if threads-data
+(defmethod dispatcher/action :replies-more/finish
+  [db [_ org sort-type direction replies-data]]
+  (if replies-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
-          threads-container-key (dispatcher/threads-container-key org sort-type)
-          container-data (get-in db threads-container-key)
+          replies-container-key (dispatcher/container-key org :replies sort-type)
+          container-data (get-in db replies-container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
-          threads-data-key (dispatcher/threads-data-key org)
-          old-threads (get-in db threads-data-key)
-          prepare-threads-data (merge (:collection threads-data) {:threads-list (:threads-list container-data)
-                                                                  :old-links (:links container-data)})
-          fixed-threads-data (au/parse-threads prepare-threads-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
-          new-threads-map (merge old-threads (:fixed-items fixed-threads-data))
-          new-posts-map (merge old-posts (:fixed-entries fixed-threads-data))
-          new-container-data (-> fixed-threads-data
+          prepare-replies-data (merge (:collection replies-data) {:posts-list (:posts-list container-data)
+                                                                  :old-links (:links container-data)
+                                                                  :container-slug :replies})
+          fixed-replies-data (au/parse-container prepare-replies-data (dispatcher/change-data db) org-data (dispatcher/active-users) sort-type direction)
+          new-posts-map (merge old-posts (:fixed-items fixed-replies-data))
+          new-container-data (-> fixed-replies-data
                               (assoc :direction direction)
                               (dissoc :loading-more :fixed-items :fixed-entries))
-          unread-threads-key (dispatcher/unread-threads-key org)]
+          unread-replies-key (dispatcher/unread-replies-key org)]
       (as-> db ndb
-        (assoc-in ndb threads-container-key new-container-data)
-        (assoc-in ndb unread-threads-key (some :unread-thread (vals new-threads-map)))
-        (assoc-in ndb threads-data-key new-threads-map)
+        (assoc-in ndb replies-container-key new-container-data)
+        (assoc-in ndb unread-replies-key (some :unread (vals (:fixed-items fixed-replies-data))))
         (assoc-in ndb posts-data-key new-posts-map)
-        (assoc-in ndb (conj org-data-key :threads-count) (:total-count fixed-threads-data))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :threads))
+        (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
+        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))

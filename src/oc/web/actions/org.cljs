@@ -153,12 +153,12 @@
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
-        threads-link (utils/link-for (:links org-data) "threads")
+        replies-link (utils/link-for (:links org-data) "replies")
         active-users-link (utils/link-for (:links org-data) "active-users")
         ; is-inbox? (= current-board-slug "inbox")
         ; is-all-posts? (= current-board-slug "all-posts")
         is-following? (= (router/current-board-slug) "following")
-        is-threads? (= (router/current-board-slug) "threads")
+        is-replies? (= (router/current-board-slug) "replies")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         is-explore? (= (router/current-board-slug) "explore")
@@ -169,7 +169,7 @@
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         ; all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        threads-delay (if is-threads? 0 (* other-resources-delay (swap! delay-count inc)))
+        replies-delay (if is-replies? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
@@ -199,9 +199,9 @@
           ;; Preload following data with recently posted sort
           (when following-link
             (utils/maybe-after following-delay #(aa/following-get org-data)))
-          ;; Preload threads data
-          (when threads-link
-            (utils/maybe-after threads-delay #(aa/threads-get org-data)))
+          ;; Preload replies data
+          (when replies-link
+            (utils/maybe-after replies-delay #(aa/replies-get org-data)))
           ;; Preload bookmarks data
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
@@ -226,8 +226,8 @@
                 ;     (not inbox-link))
                 ; (and is-all-posts?
                 ;      (not all-posts-link))
-                (and is-threads?
-                     (not threads-link))
+                (and is-replies?
+                     (not replies-link))
                 (and is-bookmarks?
                      (not bookmarks-link))
                 (and is-following?
