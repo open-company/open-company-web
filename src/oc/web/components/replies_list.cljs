@@ -67,14 +67,18 @@
                                         (gobj/get emoji "native")))
                                      (reset! (::show-picker s) nil))}))))
 
-(rum/defc reply-comment < rum/static
-  [{:keys [activity-data comment-data
-           is-indented-comment? mouse-leave-cb
-           react-cb reply-cb emoji-picker
-           is-mobile? member? showing-picker?
-           did-react-cb new-thread? current-user-id
-           replies-count replying-to]}]
-  (let [show-new-comment-tag (and (:unread comment-data)
+(rum/defcs reply-comment <
+  rum/static
+  rum/reactive
+  (drv/drv :users-info-hover)
+  [s {:keys [activity-data comment-data
+             is-indented-comment? mouse-leave-cb
+             react-cb reply-cb emoji-picker
+             is-mobile? member? showing-picker?
+             did-react-cb new-thread? current-user-id
+             replies-count replying-to]}]
+  (let [_users-info-hover (drv/react s :users-info-hover)
+        show-new-comment-tag (and (:unread comment-data)
                                   (or (and is-indented-comment?
                                            (not new-thread?))
                                       (not is-indented-comment?)))]
