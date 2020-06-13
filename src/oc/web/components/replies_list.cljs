@@ -345,8 +345,7 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class activity-data)
         replies @(::replies s)
-        comments-loaded? (and (empty? replies)
-                              (-> activity-data :links (utils/link-for "comments" "GET") :count pos?))]
+        comments-loaded? (not (seq replies))]
     [:div.reply-item.group
       {:class (utils/class-set {:unread unread
                                 :open-item true
@@ -366,11 +365,10 @@
       (reply-top activity-data)
       (if comments-loaded?
         [:div.reply-item-blocks.group
-          [:div.reply-item-block.horizontal-line.group
-            [:div.reply-item-loading.group
-              (small-loading)
-              [:span.reply-item-loading-inner
-                "Loading replies..."]]]]
+          [:div.reply-item-loading.group
+            (small-loading)
+            [:span.reply-item-loading-inner
+              "Loading replies..."]]]
         [:div.reply-item-blocks.group
           (rum/with-key (add-comment {:activity-data activity-data
                                       :collapse? true

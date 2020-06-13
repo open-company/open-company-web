@@ -280,28 +280,28 @@ div.replies-list {
           }
         }
 
+        div.reply-item-loading {
+          height: 30px;
+          margin-left: 8px;
+
+          div.small-loading {
+            margin-top: 6px;
+            margin-right: 6px;
+            float: left;
+          }
+
+          span.reply-item-loading-inner {
+            font-size: 13px;
+            @include OC_Body_Book();
+            line-height: 30px;
+            float: left;
+          }
+        }
+
         div.reply-item-block {
           margin-top: 4px;
           position: relative;
           height: 100%;
-
-          div.reply-item-loading {
-            height: 30px;
-            margin-left: 8px;
-
-            div.small-loading {
-              margin-top: 6px;
-              margin-right: 6px;
-              float: left;
-            }
-
-            span.reply-item-loading-inner {
-              font-size: 13px;
-              @include OC_Body_Book();
-              line-height: 30px;
-              float: left;
-            }
-          }
 
           button.expand-thead-bt {
             width: 100%;
