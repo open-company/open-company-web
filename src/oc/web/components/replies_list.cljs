@@ -262,7 +262,8 @@
                 has-expanded?)
         (reply-comment {:activity-data activity-data
                         :comment-data reply-data
-                        :truncated-body? has-expanded?
+                        :truncated-body? (and (not (:expanded reply-data))
+                                              has-expanded?)
                         :is-mobile? is-mobile?
                         :react-cb #(reset! (::show-picker s) (:uuid reply-data))
                         :reply-cb #(reply-to s (:uuid reply-data) reply-focus-value)

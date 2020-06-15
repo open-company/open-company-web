@@ -460,6 +460,7 @@ div.replies-list {
             &.truncated-body div.reply-comment {
               div.reply-comment-content div.reply-comment-body {
                 @include activity-comment-body-preview(15, 18, 12, 1);
+                display: inline-block;
               }
 
               div.reply-comment-reactions-footer {
