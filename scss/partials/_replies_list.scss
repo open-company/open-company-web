@@ -133,6 +133,10 @@ div.replies-list {
       }
 
       div.reply-item-top {
+        height: 40px;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--foc-divider-line-color);
 
         div.reply-item-header {
           display: flex;
@@ -142,7 +146,6 @@ div.replies-list {
           height: 24px;
           text-align: left;
           position: relative;
-          margin-bottom: 16px;
 
           div.reply-item-author-container {
             display: contents;
@@ -298,10 +301,46 @@ div.replies-list {
           }
         }
 
+        button.expand-all-bt {
+          width: 100%;
+          height: 16px;
+          padding: 0;
+          margin-top: 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          text-align: left;
+          position: relative;
+          background-color: var(--foc-background-color);
+
+          // &:before {
+          //   content: "";
+          //   width: 16px;
+          //   height: 16px;
+          //   border-radius: 50%;
+          //   background-color: var(--light-color);
+          //   background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+          //   background-size: 16px 16px;
+          //   background-repeat: no-repeat;
+          //   background-position: center;
+          //   position: absolute;
+          //   left: 4px;
+          //   top: 0;
+
+          //   @include dark_mode(){
+          //     background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+          //   }
+          // }
+        }
+
         div.reply-item-block {
-          margin-top: 4px;
           position: relative;
           height: 100%;
+
+          &:not(:empty) {
+            margin-top: 4px;
+          }
 
           button.expand-thead-bt {
             width: 100%;
@@ -418,17 +457,25 @@ div.replies-list {
               }
             }
 
-            &.showing-picker {
-              div.reply-comment div.react-bt-container {
-                display: block;
+            &.truncated-body div.reply-comment {
+              div.reply-comment-content div.reply-comment-body {
+                @include activity-comment-body-preview(15, 18, 12, 1);
+              }
+
+              div.reply-comment-reactions-footer {
+                display: none;
               }
             }
 
-            &:hover {
-              div.reply-comment {
-                div.react-bt-container, button.reply-bt {
-                  display: block;
-                }
+            // &.showing-picker {
+            //   div.reply-comment div.react-bt-container {
+            //     display: block;
+            //   }
+            // }
+
+            &.showing-picker, &:hover {
+              div.reply-comment div.reply-comment-floating-buttons {
+                display: block;
               }
             }
 
@@ -527,74 +574,176 @@ div.replies-list {
                 }
               }
 
-              button.reply-bt {
-                color: var(--color);
-                @include OC_Body_Bold();
-                font-size: 12px;
-                line-height: 24px;
-                height: 24px;
-                padding: 0;
-                margin: 0 0 0 8px;
-                float: right;
-                opacity: 0.5;
-                display: none;
-
-                @include big_web() {
-                  &:hover {
-                    opacity: 1;
-                  }
-                }
-              }
-
-              div.react-bt-container {
-                height: 24px;
+              div.reply-comment-floating-buttons {
+                position: absolute;
+                top: -8px;
+                right: 8px;
+                height: 32px;
                 z-index: 2;
-                float: left;
-                margin-left: 8px;
-                margin-top: -2px;
                 display: none;
+                border-radius: 4px;
+                box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+                background-color: var(--color);
 
-                div.emoji-mart {
-                  position: absolute;
-                  margin-left: 6px;
-                  top: unset;
-                  left: unset;
-                  right: unset;
-                  bottom: unset;
+                @include dark_mode() {
+                  box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
                 }
 
-                div.emoji-picker-container {
-                  button.close-bt {
-                    display: none;
-                  }
-                }
-
-                button.react-bt {
-                  padding: 0;
-                  height: 24px;
-                  min-width: 24px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                  padding: 0;
+                div.react-bt-container {
+                  // width: 30px;
+                  height: 32px;
                   float: left;
-                  text-transform: uppercase;
-                  background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
-                  background-size: 24px 16px;
-                  background-position: center;
-                  border-right: none;
 
                   div.emoji-mart {
-                    right: 0;
-                    left: unset;
                     position: absolute;
-                    top: 34px;
+                    top: 0;
+                    right: 0;
+                    bottom: unset;
+                    left: unset;
+                  }
+
+                  div.emoji-picker-container {
+                    button.close-bt {
+                      display: none;
+                    }
+                  }
+                }
+
+                div.react-bt-container .tooltip {
+                  width: 86px;
+                }
+
+                .separator-bt {
+                  border-left: 1px solid rgba(white, 0.1);
+                }
+
+                button.floating-bt {
+                  padding: 0;
+                  height: 32px;
+                  min-width: 20px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  padding: 0 8px;
+                  float: left;
+                  @include OC_Body_Bold();
+                  font-size: 12px;
+                  line-height: 32px;
+                  color: var(--overlay-background-color);
+                  text-transform: uppercase;
+
+                  @include big_web() {
+                    opacity: 0.5;
+                    &:hover {
+                      opacity: 1;
+
+                      &:before {
+                        opacity: 0.5;
+                      }
+                    }
+                  }
+
+                  &.reply-bt {
+                    padding-left: 24px;
+                    background-image: cdnUrl("/img/ML/comment_reply.svg");
+                    background-size: 12px 12px;
+                    background-position: left 8px top 10px;
+                  }
+
+                  &.react-bt {
+                    padding-left: 26px;
+                    background-image: cdnUrl("/img/ML/comment_react.svg");
+                    background-size: 14px 14px;
+                    background-position: left 8px top 9px;
+                    border-right: none;
+
+                    div.emoji-mart {
+                      right: 0;
+                      left: unset;
+                      position: absolute;
+                      top: 34px;
+                    }
                   }
 
                   @include dark_mode() {
-                    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
+                    &.reply-bt {
+                      background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                    }
+
+                    &.react-bt {
+                      background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                    }
                   }
                 }
               }
+
+              // button.reply-bt {
+              //   color: var(--color);
+              //   @include OC_Body_Bold();
+              //   font-size: 12px;
+              //   line-height: 24px;
+              //   height: 24px;
+              //   padding: 0;
+              //   margin: 0 0 0 8px;
+              //   float: right;
+              //   opacity: 0.5;
+              //   display: none;
+
+              //   @include big_web() {
+              //     &:hover {
+              //       opacity: 1;
+              //     }
+              //   }
+              // }
+
+              // div.react-bt-container {
+              //   height: 24px;
+              //   z-index: 2;
+              //   float: left;
+              //   margin-left: 8px;
+              //   margin-top: -2px;
+              //   display: none;
+
+              //   div.emoji-mart {
+              //     position: absolute;
+              //     margin-left: 6px;
+              //     top: unset;
+              //     left: unset;
+              //     right: unset;
+              //     bottom: unset;
+              //   }
+
+              //   div.emoji-picker-container {
+              //     button.close-bt {
+              //       display: none;
+              //     }
+              //   }
+
+              //   button.react-bt {
+              //     padding: 0;
+              //     height: 24px;
+              //     min-width: 24px;
+              //     background-position: center;
+              //     background-repeat: no-repeat;
+              //     padding: 0;
+              //     float: left;
+              //     text-transform: uppercase;
+              //     background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
+              //     background-size: 24px 16px;
+              //     background-position: center;
+              //     border-right: none;
+
+              //     div.emoji-mart {
+              //       right: 0;
+              //       left: unset;
+              //       position: absolute;
+              //       top: 34px;
+              //     }
+
+              //     @include dark_mode() {
+              //       background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
+              //     }
+              //   }
+              // }
 
               div.reply-comment-right {
                 margin-left: 32px;

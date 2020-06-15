@@ -1209,17 +1209,108 @@ $header_top_margin: 24;
   @include code-blocks(int($font-size) - 3, int($line-height) - 3, $paragraph_spacing);
 }
 
+@mixin poll-preview($font_size, $line_height, $color: var(--color)){
+  div.media-poll {
+    display: block;
+    margin: 0;
+    padding: 0;
+
+    &:before {
+      content: "";
+      background-image: cdnUrl("/img/ML/media_poll.svg");
+      background-repeat: no-repeat;
+      background-position: top #{($line_height - 11) / 2}px left 0px;
+      background-size: 16px 11px;
+      width: auto;
+      height: #{$line_height}px;
+      padding-left: 24px;
+      font-size: #{$font_size}px;
+      line-height: #{$line_height}px;
+      color: $color;
+      @include OC_Body_Book();
+      content: attr(data-question);
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/media_poll@dark.svg");
+      }
+    }
+  }
+}
+
 @mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
 
   @include activity-body($font_size, $line_height, $color, 0);
   overflow: hidden;
   text-overflow: ellipsis;
-  // Truncate last line of text preview
-  display: -webkit-box;
-  -webkit-line-clamp: $preview_lines;
-  /*! autoprefixer: off */
- -webkit-box-orient: vertical;
- /* autoprefixer: on */
+
+  @if ($preview_lines > 1) {
+    // Truncate last line of text preview
+    display: -webkit-box;
+    -webkit-line-clamp: $preview_lines;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+  }
+
+  color: $color;
+  @include OC_Body_Book();
+  line-height: #{$line_height}px;
+  font-size: #{$font_size}px;
+
+  height: #{$line_height * $preview_lines}px;
+
+  & > * {
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+  }
+
+  h1, h2, mark, mark.highlight {
+    color: $color;
+    @include OC_Body_Book();
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    background-color: transparent;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  b, strong, &.editing b, &.editing strong {
+    @include OC_Body_Book();
+    font-weight: normal;
+  }
+
+  .carrot-no-preview {
+    display: none;
+  }
+
+  blockquote, pre, code {
+    display: none;
+  }
+
+  @include poll-preview($font_size, $line_height, $color);
+}
+
+@mixin activity-comment-body-preview($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height, $preview_lines: 1){
+
+  @include activity-comment($font_size, $line_height, $paragraph_spacing);
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @if ($preview_lines > 1) {
+    // Truncate last line of text preview
+    display: -webkit-box;
+    -webkit-line-clamp: $preview_lines;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+  }
 
   color: var(--color);
   @include OC_Body_Book();
@@ -1258,34 +1349,5 @@ $header_top_margin: 24;
     display: none;
   }
 
-  div.media-poll {
-    display: block;
-    margin: 0;
-    padding: 0;
-
-    &:before {
-      content: "";
-      background-image: cdnUrl("/img/ML/media_poll.svg");
-      background-repeat: no-repeat;
-      background-position: top #{($line_height - 11) / 2}px left 0px;
-      background-size: 16px 11px;
-      width: auto;
-      height: #{$line_height}px;
-      padding-left: 24px;
-      font-size: #{$font_size}px;
-      line-height: #{$line_height}px;
-      color: $color;
-      @include OC_Body_Book();
-      content: attr(data-question);
-      display: block;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/media_poll@dark.svg");
-      }
-    }
-  }
+  @include poll-preview($font_size, $line_height);
 }

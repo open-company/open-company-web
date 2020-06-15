@@ -353,7 +353,7 @@
                                s)
                              :will-mount (fn [s]
                               (let [{:keys [last-read-at comments-data]} (-> s :rum/args first)
-                                    threads (cu/collapsed-comments last-read-at comments-data)]
+                                    threads (cu/collapse-comments last-read-at comments-data)]
                                 (reset! (::threads s) threads))
                               ;; Restore cached comments
                               (let [add-comment-data @(drv/get-ref s :add-comment-data)
@@ -376,7 +376,7 @@
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
                                         collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))]
-                                    (reset! (::threads s) (cu/collapsed-comments last-read-at comments-data collapsed-map)))))
+                                    (reset! (::threads s) (cu/collapse-comments last-read-at comments-data collapsed-map)))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}

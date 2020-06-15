@@ -76,7 +76,7 @@
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
              did-react-cb new-thread? current-user-id
-             replies-count replying-to]}]
+             replies-count replying-to truncated-body?]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         show-new-comment-tag (and (:unread comment-data)
                                   (or (and is-indented-comment?
@@ -89,7 +89,8 @@
                                 :new-comment (:unread comment-data)
                                 :indented-comment is-indented-comment?
                                 :showing-picker showing-picker?
-                                :no-replies (zero? replies-count)})}
+                                :no-replies (zero? replies-count)
+                                :truncated-body truncated-body?})}
       [:div.reply-comment
         {:ref (str "reply-comment-" (:uuid comment-data))
          :on-mouse-leave mouse-leave-cb}
@@ -140,19 +141,25 @@
                                                  :can-reply? true
                                                  :reply-cb reply-cb})
                     emoji-picker]
-                  [:div.group
-                    (when-not (seq (:reactions comment-data))
-                      [:div.react-bt-container
-                        [:button.mlb-reset.react-bt
-                          {:data-toggle "tooltip"
-                           :data-placement "top"
-                           :title "Add reaction"
-                           :on-click react-cb}]
-                        emoji-picker])
-                    (when-not replying-to
-                      [:button.mlb-reset.reply-bt
-                        {:on-click reply-cb}
-                        "Reply"])])]]
+                  [:div.reply-comment-floating-buttons
+                    {:key "reply-comment-floating-buttons"}
+                    ;; Reply to comment
+                    (when (:reply-parent comment-data)
+                      [:button.mlb-reset.floating-bt.reply-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :on-click reply-cb
+                         :title "Reply"}
+                        "Reply"])
+                    ;; React container
+                    [:div.react-bt-container.separator-bt
+                      [:button.mlb-reset.floating-bt.react-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :title "Add reaction"
+                         :on-click react-cb}
+                        "React"]
+                      emoji-picker]])]]
             [:div.reply-comment-content
               [:div.reply-comment-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
@@ -245,26 +252,31 @@
                              (= @(::show-picker s) (:uuid reply-data)))
         reply-focus-value (cu/add-comment-focus-value add-comment-focus-prefix (:uuid activity-data) (:uuid reply-data))
         collapsed-count (:collapsed-count reply-data)
-        expanded? (zero? collapsed-count)
-        replying-to (@(::replying s) (:uuid reply-data))]
+        show-more-bt? (and (:expanded reply-data)
+                           (pos? collapsed-count))
+        replying-to (@(::replying s) (:uuid reply-data))
+        has-expanded? (< collapsed-count (count (:thread-children reply-data)))]
     [:div.reply-item-block.vertical-line.group
       {:key (str "reply-thread-item-" (:uuid reply-data))}
-      (reply-comment {:activity-data activity-data
-                      :comment-data reply-data
-                      :is-mobile? is-mobile?
-                      :react-cb #(reset! (::show-picker s) (:uuid reply-data))
-                      :reply-cb #(reply-to s (:uuid reply-data) reply-focus-value)
-                      :did-react-cb #(read-reply-cb (:uuid reply-data))
-                      :emoji-picker (when showing-picker?
-                                      (emoji-picker-container s activity-data reply-data read-comment-cb))
-                      :showing-picker? showing-picker?
-                      :new-thread? (:unread reply-data)
-                      :unread (:unread reply-data)
-                      :member? member?
-                      :replies-count (:replies-count reply-data)
-                      :current-user-id current-user-id
-                      :replying-to replying-to})
-      (when-not expanded?
+      (when (or (:expanded reply-data)
+                has-expanded?)
+        (reply-comment {:activity-data activity-data
+                        :comment-data reply-data
+                        :truncated-body? has-expanded?
+                        :is-mobile? is-mobile?
+                        :react-cb #(reset! (::show-picker s) (:uuid reply-data))
+                        :reply-cb #(reply-to s (:uuid reply-data) reply-focus-value)
+                        :did-react-cb #(read-reply-cb (:uuid reply-data))
+                        :emoji-picker (when showing-picker?
+                                        (emoji-picker-container s activity-data reply-data read-comment-cb))
+                        :showing-picker? showing-picker?
+                        :new-thread? (:unread reply-data)
+                        :unread (:unread reply-data)
+                        :member? member?
+                        :replies-count (:replies-count reply-data)
+                        :current-user-id current-user-id
+                        :replying-to replying-to}))
+      (when show-more-bt?
         [:button.mlb-reset.expand-thead-bt
           {:on-click #(expand-reply s reply-data)}
           (str "View " collapsed-count " older repl" (if (not= collapsed-count 1) "ies" "y"))])
@@ -302,10 +314,27 @@
                                     :dismiss-reply-cb #(swap! (::replying s) disj (:uuid reply-data))})
          (str "adc-" (:uuid reply-data))))]))
 
+(defn- update-replies [s]
+  (let [props (-> s :rum/args first)
+        all-comments (cu/ungroup-comments @(::replies s))
+        expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
+        collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
+        strict-collapse? @(::strict-collapse s)
+        collapse-comments-fn (if strict-collapse? cu/strict-collapse-comments cu/collapse-comments)
+        collapsed-comments (collapse-comments-fn (:initial-last-read-at props) (:comments-data props) collapsed-map)
+        all-comments-after (cu/ungroup-comments collapsed-comments)
+        total-collapsed-count (if strict-collapse?
+                                (count (filter (comp not :expanded) all-comments-after))
+                                0)]
+    (reset! (::replies s) collapsed-comments)
+    (reset! (::total-collapsed-count s) total-collapsed-count)))
+
 (rum/defcs reply-item < rum/static
                         (rum/local nil ::show-picker)
                         (rum/local #{} ::replying)
-                        (rum/local [] ::replies)
+                        (rum/local nil ::replies)
+                        (rum/local nil ::total-collapsed-count)
+                        (rum/local true ::strict-collapse)
                         ui-mixins/refresh-tooltips-mixin
                         (mention-mixins/oc-mentions-hover {:click? true})
                         (ui-mixins/interactive-images-mixin "div.reply-comment-body")
@@ -315,22 +344,14 @@
                                      (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                            (reset! (::show-picker s) nil))))
                         {:will-mount (fn [s]
-                           (let [replies (-> s :rum/args first :comments-data)
-                                 last-read-at (-> s :rum/args first :initial-last-read-at)
-                                 collapsed-threads (vec (mapcat #(cu/collapsed-comments last-read-at [%]) replies))]
-                             (reset! (::replies s) collapsed-threads))
+                           (update-replies s)
                          s)
                          :did-remount (fn [o s]
                            (let [items (-> s :rum/args first :comments-data)
                                  items-changed (clj-data/diff (-> o :rum/args first :comments-data) items)]
                               (when (or (seq (first items-changed))
                                         (seq (second items-changed)))
-                                (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::replies s)))
-                                      expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
-                                      collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
-                                      last-read-at @(::initial-last-read-at s)
-                                      collapsed-replies (vec (mapcat #(cu/collapsed-comments (last-read-at (:uuid %)) [%] collapsed-map) items))]
-                                  (reset! (::replies s) collapsed-replies))))
+                                (update-replies s)))
                             s)}
   [s {current-user-id  :current-user-id
       uuid             :uuid
@@ -370,11 +391,6 @@
             [:span.reply-item-loading-inner
               "Loading replies..."]]]
         [:div.reply-item-blocks.group
-          (rum/with-key (add-comment {:activity-data activity-data
-                                      :collapse? true
-                                      :add-comment-placeholder "Reply..."
-                                      :add-comment-focus-prefix add-comment-focus-prefix})
-           (str "adc-" (:uuid activity-data) "-" last-activity-at))
           (for [reply @(::replies s)
                 :let [payload {:activity-data activity-data
                                :reply-data reply
@@ -383,7 +399,14 @@
                                :member? member?
                                :current-user-id current-user-id
                                :read-comment-cb (partial comment-mark-read s)}]]
-            (reply-thread-item s payload))])]))
+            (reply-thread-item s payload))
+          (when (and @(::strict-collapse s)
+                     (pos? @(::total-collapsed-count s)))
+            [:button.mlb-reset.expand-all-bt
+              {:on-click (fn [_e]
+                           (reset! (::strict-collapse s) false)
+                           (update-replies s))}
+              (str "View " @(::total-collapsed-count s) " older repl" (if (not= @(::total-collapsed-count s) 1) "ies" "y"))])])]))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
   (when-let [item-node (.querySelector items-container (str "div." (reply-item-unique-class item)))]
