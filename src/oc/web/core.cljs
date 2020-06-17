@@ -619,13 +619,13 @@
       (timbre/info "Routing replies-slash-route" (str (urls/replies ":org") "/"))
       (org-handler "dashboard" target org-dashboard (assoc params :board "replies")))
 
-    (defroute explore-route (urls/explore ":org") {:as params}
-      (timbre/info "Routing explore-route" (urls/explore ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "explore")))
+    (defroute topics-route (urls/topics ":org") {:as params}
+      (timbre/info "Routing topics-route" (urls/topics ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "topics")))
 
-    (defroute explore-slash-route (str (urls/explore ":org") "/") {:as params}
-      (timbre/info "Routing explore-slash-route" (str (urls/explore ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "explore")))
+    (defroute topics-slash-route (str (urls/topics ":org") "/") {:as params}
+      (timbre/info "Routing topics-slash-route" (str (urls/topics ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "topics")))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))

@@ -258,15 +258,23 @@
   (dis/dispatch! [:unfollowing-more (router/current-org-slug) (router/current-sort-type)]))
 
 ;; Referesh org when needed
-(defn- refresh-org-data-cb [{:keys [status body success]}]
+(defn- refresh-org-data-cb
+
+  ([resp]
+   (refresh-org-data-cb (router/current-board-slug) (router/current-sort-type) resp))
+
+  ([board-slug sort-type {:keys [status body success]}]
   (let [org-data (json->cljs body)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-bookmarks (= (router/current-board-slug) "bookmarks")
-        is-inbox (= (router/current-board-slug) "inbox")
-        is-following (= (router/current-board-slug) "following")
-        is-unfollowing (= (router/current-board-slug) "unfollowing")
-        is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
-        board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
+        is-all-posts (= board-slug "all-posts")
+        is-bookmarks (= board-slug "bookmarks")
+        is-inbox (= board-slug "inbox")
+        is-following (= board-slug "following")
+        is-unfollowing (= board-slug "unfollowing")
+        is-replies (= board-slug "replies")
+        is-drafts (= board-slug utils/default-drafts-board-slug)
+        active-users (dis/active-users)
+        is-contributions? (get active-users board-slug)
+        board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
                      (utils/link-for (:links board-data) ["item" "self"] "GET"))]
     (dis/dispatch! [:org-loaded org-data])
@@ -274,20 +282,41 @@
       is-inbox
       (inbox-get org-data)
 
-      is-all-posts
+      (and is-all-posts
+           (= sort-type dis/recently-posted-sort))
       (all-posts-get org-data)
+
+      (and is-all-posts
+           (= sort-type dis/recent-activity-sort))
+      (recent-all-posts-get org-data)
 
       is-bookmarks
       (bookmarks-get org-data)
 
-      is-following
+      (and is-following
+           (= sort-type dis/recently-posted-sort))
       (following-get org-data)
 
-      is-unfollowing
+      (and is-following
+           (= sort-type dis/recent-activity-sort))
+      (recent-following-get org-data)
+
+      (and is-unfollowing
+           (= sort-type dis/recently-posted-sort))
       (unfollowing-get org-data)
 
+      (and is-unfollowing
+           (= sort-type dis/recent-activity-sort))
+      (recent-unfollowing-get org-data)
+
+      is-replies
+      (replies-get org-data)
+
+      is-contributions?
+      (contrib-actions/contributions-get board-slug)
+
       (seq board-link)
-      (sa/section-get (:slug board-data) board-link))))
+      (sa/section-get board-slug board-link)))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]

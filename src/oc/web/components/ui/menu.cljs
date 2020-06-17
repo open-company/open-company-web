@@ -157,17 +157,17 @@
             [:div.oc-menu-item.personal-profile
               "My profile"]])
         ;; Show user's posts link
-        ; (when (and (jwt/jwt)
-        ;            current-user-data
-        ;            (pos? (:contributions-count org-data)))
-        ;   [:a
-        ;     {:href (oc-urls/contributions (:user-id current-user-data))
-        ;      :on-click (partial my-posts-click s (:user-id current-user-data))}
-        ;     [:div.oc-menu-item.my-posts.group
-        ;       [:span.oc-menu-item-label
-        ;         "My posts"]
-        ;       [:span.count
-        ;         (:contributions-count org-data)]]])
+        (when (and (jwt/jwt)
+                   current-user-data
+                   (pos? (:contributions-count org-data)))
+          [:a
+            {:href (oc-urls/contributions (:user-id current-user-data))
+             :on-click (partial my-posts-click s (:user-id current-user-data))}
+            [:div.oc-menu-item.my-posts.group
+              [:span.oc-menu-item-label
+                "My updates"]
+              [:span.count
+                (:contributions-count org-data)]]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))

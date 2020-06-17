@@ -84,8 +84,8 @@
                        "Bookmarks"
                        (= (router/current-board-slug) "following")
                        "Home"
-                       (= (router/current-board-slug) "explore")
-                       "Browse topics"
+                       (= (router/current-board-slug) "topics")
+                       "Topics"
                        (and (router/current-contributions-id) (:self? contributions-user-data))
                        "You"
                        (and (router/current-contributions-id) (map? contributions-user-data))

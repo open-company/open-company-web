@@ -159,7 +159,7 @@ div.dashboard-layout {
             }
           }
 
-          &.unfollowing-tab {
+          &.topics-tab {
             order: 4;
             span.tab-icon {
               width: 18px;
@@ -516,7 +516,7 @@ div.dashboard-layout {
                 }
               }
 
-              &.explore-icon:before {
+              &.topics-icon:before {
                 background-image: cdnUrl("/img/ML/nav_all.svg");
                 background-size: 16px 16px;
                 opacity: 1;

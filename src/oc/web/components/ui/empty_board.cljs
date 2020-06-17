@@ -36,7 +36,7 @@
                                       :drafts is-drafts-board?
                                       :saved is-saved?
                                       :home is-home?
-                                      :explore is-unfollowing?})}
+                                      :unfollowing is-unfollowing?})}
             (when is-contributions?
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
@@ -55,7 +55,7 @@
                ]
            is-unfollowing?
            [:div.empty-follow
-             "Explore is where you'll find updates that you decided to not follow."
+             "Here is where you'll find updates that you decided to not follow."
              ; [:button.mlb-reset.follow-picker-bt
              ;   {:on-click #(nav-actions/show-follow-picker)}
              ;   "Curate your feed"]

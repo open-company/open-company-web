@@ -97,7 +97,7 @@
         is-following (= current-board-slug "following")
         is-replies (= current-board-slug "replies")
         is-unfollowing (= current-board-slug "unfollowing")
-        is-explore (= current-board-slug "explore")
+        is-topics (= current-board-slug "topics")
         is-contributions (seq current-contributions-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -172,14 +172,14 @@
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
-              [:button.mlb-reset.tab-button.unfollowing-tab
+              [:button.mlb-reset.tab-button.topics-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "unfollow" (oc-urls/unfollowing)))
-                 :class (when (= current-board-slug "unfollow")
+                              (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
+                 :class (when is-topics
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Browse topics"]]
+                [:span.tab-label "Topics"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -233,7 +233,7 @@
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner board-container-data)])
-            (when (not is-explore)
+            (when (not is-topics)
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
@@ -257,7 +257,7 @@
                                                   :public (= (:access current-board-data) "public")
                                                   :home-icon is-following
                                                   :all-icon is-all-posts
-                                                  :explore-icon is-unfollowing
+                                                  :topics-icon is-topics
                                                   :saved-icon is-bookmarks
                                                   :drafts-icon is-drafts-board
                                                   :replies-icon is-replies})
@@ -268,8 +268,8 @@
                                                    is-all-posts
                                                    "All"
 
-                                                   is-unfollowing
-                                                   "<div class=\"explore-icon-in\"></div> Explore"
+                                                   is-topics
+                                                   "<div class=\"explore-icon-in\"></div> Topics"
 
                                                    is-bookmarks
                                                    "Bookmarks"
@@ -334,7 +334,7 @@
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; Explore view
-              is-explore
+              is-topics
               (explore-view)
               ;; No boards
               (zero? (count (:boards org-data)))

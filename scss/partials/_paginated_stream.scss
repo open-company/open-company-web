@@ -25,7 +25,7 @@ div.paginated-stream {
       }
     }
 
-    div.carrot-close {
+    div.closing-item {
       text-align: center;
       height: #{$carrot_close_height}px;
       padding: #{($carrot_close_height - 24) / 2}px 0;
@@ -33,15 +33,6 @@ div.paginated-stream {
       font-size: 16px;
       line-height: 24px;
       color: var(--light-color);
-      // background-image: cdnUrl("/img/ML/closing_carrot.svg");
-      // background-size: 14px 24px;
-      // background-position: center;
-      // background-repeat: no-repeat;
-      // opacity: 0.2;
-
-      // @include dark_mode() {
-      //   background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
-      // }
     }
 
     div.paginated-stream-cards-inner {

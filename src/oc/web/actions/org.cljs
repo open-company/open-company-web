@@ -161,7 +161,7 @@
         is-replies? (= (router/current-board-slug) "replies")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
-        is-explore? (= (router/current-board-slug) "explore")
+        is-topics? (= (router/current-board-slug) "topics")
         is-contributions? (seq (router/current-contributions-id))
         ; is-unfollowing? (= (router/current-board-slug) "unfollowing")
         sort-type (router/current-sort-type)
@@ -217,7 +217,7 @@
           ;   (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
           )))
     (cond
-      is-explore?
+      is-topics?
       ;; No-op
       true
       ;; If it's all posts page or must see, loads AP and must see for the current org

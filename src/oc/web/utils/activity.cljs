@@ -80,7 +80,7 @@
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
-        item-data (select-keys post-data [:resource-type :uuid :resource-uuid])]
+        item-data (select-keys post-data [:resource-type :uuid :resource-uuid :sort-value])]
     (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj item-data) vec))
@@ -419,16 +419,16 @@
      (range (count items-list))))))
 
 (defn- insert-ending-item [items-list has-next]
-  (let [carrot-close? (> (count items-list) 3)
+  (let [closing-item? (> (count items-list) 3)
         last-item (last items-list)]
     (cond
      (and (seq items-list) has-next)
      (vec (concat items-list [{:resource-type :loading-more
                                :last-activity-at (next-activity-timestamp last-item)
                                :message "Loading more updates..."}]))
-     carrot-close?
+     closing-item?
      (vec
-      (concat items-list [{:resource-type :carrot-close
+      (concat items-list [{:resource-type :closing-item
                            :last-activity-at (next-activity-timestamp (last items-list))
                            :message "🤠 You've reached the end, partner"}]))
      :else

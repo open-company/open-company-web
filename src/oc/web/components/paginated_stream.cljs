@@ -29,7 +29,7 @@
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
-(def carrot-close-height 60)
+(def closing-item-height 60)
 (def foc-height 204)
 (def mobile-foc-height 166)
 (def foc-separators-height 58)
@@ -138,9 +138,9 @@
     {:style style}
     (:message item)])
 
-(rum/defc carrot-close < rum/static
+(rum/defc closing-item < rum/static
   [{:keys [style item]}]
-  [:div.carrot-close
+  [:div.closing-item
     {:style style}
     (:message item)])
 
@@ -199,8 +199,8 @@
                           (- foc-separators-height 8))
                         :loading-more
                         (if is-mobile? 44 60)
-                        :carrot-close
-                        carrot-close-height
+                        :closing-item
+                        closing-item-height
                         ; else
                         (calc-card-height is-mobile? foc-layout))))
         row-renderer (fn [row-props]
@@ -218,8 +218,8 @@
                          (case (:resource-type item)
                            :caught-up
                            (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
-                           :carrot-close
-                           (rum/with-key (carrot-close {:item item :style style}) (str "carrot-close-" row-key))
+                           :closing-item
+                           (rum/with-key (closing-item {:item item :style style}) (str "closing-item-" row-key))
                            :loading-more
                            (rum/with-key (load-more {:item item :style style}) (str "loading-more-" row-key))
                            :separator

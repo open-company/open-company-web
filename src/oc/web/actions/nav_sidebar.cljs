@@ -78,7 +78,7 @@
 (defn- container-data [back-to]
   (cond
    (or (:replies back-to)
-       (:explore back-to))
+       (:topics back-to))
    nil
    (contains? back-to :contributions)
    (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
@@ -186,7 +186,7 @@
         ;; Go back to
         back-to (utils/back-to org-data)
         is-replies? (:replies back-to)
-        is-explore? (:explore back-to)
+        is-topics? (:topics back-to)
         is-following? (:following back-to)
         is-contributions? (:contributions back-to)
         to-url (cond
@@ -194,8 +194,8 @@
                  (oc-urls/following)
                  is-replies?
                  (oc-urls/replies)
-                 is-explore?
-                 (oc-urls/explore)
+                 is-topics?
+                 (oc-urls/topics)
                  is-contributions?
                  (oc-urls/contributions (:contributions back-to))
                  :else
@@ -216,8 +216,8 @@
       (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
       is-replies?
       (nav-to-url! e "replies" to-url back-y should-refresh-data?)
-      is-explore?
-      (nav-to-url! e "explore" to-url back-y should-refresh-data?)
+      is-topics?
+      (nav-to-url! e "topics" to-url back-y should-refresh-data?)
       is-following?
       (nav-to-url! e "following" to-url back-y should-refresh-data?)
       :else
@@ -237,8 +237,8 @@
                   {:contributions (router/current-contributions-id)}
                   (= (router/current-board-slug) "replies")
                   {:replies true}
-                  (= (router/current-board-slug) "explore")
-                  {:explore true}
+                  (= (router/current-board-slug) "topics")
+                  {:topics true}
                   (= (router/current-board-slug) "following")
                   {:following true}
                   :else

@@ -174,7 +174,7 @@
                             :optional-activity-data activity-data})])]]]]))
 
 (rum/defc reply-top
-  [{:keys [last-activity-at current-user-id publisher board-name published-at headline links] :as activity-data}]
+  [{:keys [current-user-id publisher board-name published-at headline links] :as activity-data}]
   (let [follow-link (utils/link-for links "follow")
         unfollow-link (utils/link-for links "unfollow")]
     [:div.reply-item-top
@@ -356,7 +356,6 @@
                             s)}
   [s {current-user-id  :current-user-id
       uuid             :uuid
-      last-activity-at :last-activity-at
       publisher        :publisher
       unread           :unread
       published-at     :published-at
@@ -484,7 +483,7 @@
           (for [item* items
                 :let [caught-up? (= (:resource-type item*) :caught-up)
                       loading-more? (= (:resource-type item*) :loading-more)
-                      carrot-close? (= (:resource-type item*) :carrot-close)
+                      closing-item? (= (:resource-type item*) :closing-item)
                       item (assoc item* :current-user-data current-user-data
                                         :member? member?
                                         :comments-data (au/activity-comments item* comments-drv)
@@ -498,8 +497,9 @@
               [:div.loading-updates.bottom-loading
                 {:key (str "reply-loading-more-" (:last-activity-at item))}
                 (:message item)]
-              carrot-close?
-              [:div.carrot-close
+              closing-item?
+              [:div.closing-item
+                {:key (str "reply-closing-item-" (:last-activity-at item))}
                 (:message item)]
               :else
               (rum/with-key

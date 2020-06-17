@@ -145,12 +145,12 @@
   ([org-slug]
     (str (org org-slug) "/replies")))
 
-(defn explore
-  "Org explore url"
+(defn topics
+  "Org topics url"
   ([]
-    (explore (router/current-org-slug)))
+    (topics (router/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/explore")))
+    (str (org org-slug) "/topics")))
 
 ;; Boards
 
