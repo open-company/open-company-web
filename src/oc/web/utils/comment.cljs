@@ -62,7 +62,6 @@
     (.html $comment-node)))
 
 (defn ungroup-comments [comments]
-  ; (vec (mapcat #(concat [(dissoc % :thread-children)] (:thread-children %)) comments))
   (filterv #(#{:thread :comment} (:resource-type %)) comments))
 
 (defun sort-comments
@@ -70,20 +69,7 @@
    [])
   ([comments :guard map?]
    (sort-comments (vals comments)))
-  ; ;; If we have already grouped  the comments we need to ungroup them to recalculate the grouping
-  ; ([comments :guard (fn [c] (and (coll? c)
-  ;                                (some #(contains? % :thread-children) c)))]
-  ;  (sort-comments (ungroup-comments comments)))
-  ;; 
   ([comments :guard coll?]
-   ; (let [root-comments (filterv (comp empty? :parent-uuid) comments)
-   ;       grouped-comments (mapv #(let [sorted-children (sort-comments comments (:uuid %))]
-   ;                                (merge % {:thread-children sorted-children
-   ;                                          :last-activity-at (if (seq sorted-children)
-   ;                                                              (-> sorted-children last :created-at)
-   ;                                                              (:created-at %))}))
-   ;                         root-comments)]
-   ;   (vec (sort-by :created-at grouped-comments)))
    (vec (sort-by :created-at comments)))
   ([comments :guard coll? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
@@ -204,34 +190,7 @@
                                          (assoc (first in-comments) :expanded true))))]
       (if (seq next-in-comments)
         (recur last-read-at next-in-comments next-out-comments collapsed-map)
-        next-out-comments)))
-
-  ; ;; Root comments
-  ; ([last-read-at :guard #(or (nil? %) (string? %))
-  ;   comments :guard coll?
-  ;   collapsed-map :guard map?]
-  ;  (mapv
-  ;   (fn [comment]
-  ;    (if (#{:thread :comment} (:resource-type comment))
-  ;      (as-> comment c
-  ;       (enrich-comment c last-read-at false collapsed-map)
-  ;       ; (collapse-comments c last-read-at (:thread-children c) collapsed-map)
-  ;       ; (assoc c :unread-count (count (filter :unread (:thread-children c))))
-  ;       ; (assoc c :collapsed-count (count (filter (comp not :expanded) (:thread-children c))))
-  ;       )
-  ;      comment))
-  ;   comments))
-
-  ; ;; Children comments
-  ; ([root-comment :guard :thread-children last-read-at :guard #(or (nil? %) (string? %)) comments :guard coll? collapsed-map :guard map?]
-  ;  (update root-comment :thread-children
-  ;   #(mapv
-  ;    (fn [comment]
-  ;     (if (#{:thread :comment} (:resource-type comment))
-  ;       (enrich-comment comment last-read-at (= (:uuid comment) (-> root-comment :thread-children last :uuid)) collapsed-map)
-  ;       comment))
-  ;    %)))
-  )
+        next-out-comments))))
 
 (defun add-comment-focus-value
   ([prefix :guard string? comment-data :guard map?]
