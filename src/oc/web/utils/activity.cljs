@@ -370,32 +370,42 @@
       :opts opts
       :gray-style gray-scale?})))
 
-(defn- insert-caught-up [items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
-
-  (if (seq items-list)
-    (let [reversed-list (vec (reverse items-list))
-          reversed-idx (utils/index-of reversed-list check-fn)
-          last-idx (dec (count items-list))
-          idx (when (number? reversed-idx) (- last-idx reversed-idx))
-          [before after] (when (number? idx) (split-at idx items-list))]
-      (cond
-        ;; No unread items, add caught up at the top
-        (nil? idx)
-        (if hide-top-line
-          items-list
-          (vec (cons (caught-up-map nil true) items-list)))
-        ;; Last item is unread
-        (= idx last-idx)
-        (if has-next
-          items-list
-          (vec (conj items-list (caught-up-map (last items-list) false default-caught-up-message opts))))
-        ;; Found an unread item
-        :else
-        (vec (remove nil?
-         (concat before
-          [(caught-up-map (last before) (zero? idx) default-caught-up-message opts)]
-          after)))))
-    items-list))
+(defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
+  (let [index (loop [ret-idx 0
+                     idx 0
+                     items items-list]
+                (let [item (first items)
+                      next-items (rest items)]
+                  (cond
+                   ;; We reached the end, no more items, return last index
+                   (nil? item)
+                   ret-idx
+                   ;; Found the first truthy item, return last index
+                   (check-fn item)
+                   idx
+                   ;; Check if element needs to be ignored
+                   (ignore-fn item)
+                   (recur ret-idx
+                          (inc idx)
+                          next-items)
+                   :else
+                   (recur idx
+                          (inc idx)
+                          next-items))))
+        [before after] (split-at index items-list)]
+    (cond
+      (and has-next
+           (= index (count items-list)))
+      (vec items-list)
+      (= index (count items-list))
+      (vec (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)]))
+      (and hide-top-line
+           (zero? index))
+      (vec items-list)
+      :else
+      (vec (remove nil? (concat before
+                                [(caught-up-map (last before) (zero? index) default-caught-up-message opts)]
+                                after))))))
 
 (defn- insert-open-close-item [items-list check-fn]
   (vec
@@ -736,7 +746,11 @@
                         (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
                           (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
             with-caught-up (if following-or-replies?
-                            (insert-caught-up grouped-items :unread {:has-next next-link})
+                            (insert-caught-up grouped-items
+                             #(->> % :uuid (get items-map) :unread not)
+                             #(or (not= (:resource-type %) :entry)
+                                  (->> % :uuid (get items-map) :publisher?))
+                             {:has-next next-link})
                             grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)
