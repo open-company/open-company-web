@@ -82,14 +82,15 @@ div.reactions {
         }
 
         &.reacted span.reaction, &.can-react:hover span.reaction {
+          opacity: 1;
 
-          span.thumb-up-icon {
-            background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
+          // span.thumb-up-icon {
+          //   background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
-            }
-          }
+          //   @include dark_mode() {
+          //     background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
+          //   }
+          // }
         }
       }
 
