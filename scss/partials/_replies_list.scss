@@ -402,6 +402,7 @@ div.replies-list {
             &.truncated-body div.reply-comment {
               div.reply-comment-content {
                 max-height: calc(3 * 18px + 1px);
+                overflow: hidden;
 
                 @include mobile() {
                   max-height: calc(3 * 24px + 1px);
