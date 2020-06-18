@@ -880,10 +880,10 @@ div.replies-list {
 
                 div.reply-comment-body {
                   display: inline;
-                  @include activity-comment(15, 18, 12);
+                  @include activity-comment(15, 18, 18);
 
                   @include mobile() {
-                    @include activity-comment(18, 24, 16);
+                    @include activity-comment(18, 24, 24);
                   }
 
                   .interactive-image {
