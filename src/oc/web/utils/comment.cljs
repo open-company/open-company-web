@@ -82,8 +82,8 @@
 (defn- get-collapsed-item [item collapsed-map]
   (get collapsed-map (:uuid item)))
 
-(defn is-collapsed? [item collapsed-map]
-  (not (:expanded (get-collapsed-item item collapsed-map))))
+(defn is-expanded? [item collapsed-map]
+  (:expanded (get-collapsed-item item collapsed-map)))
 
 (defn is-unread? [item collapsed-map]
   (not (:unread (get-collapsed-item item collapsed-map))))
@@ -108,7 +108,7 @@
   (assoc comment-data :expanded (or ;; comment is unread
                                     (:unread comment-data)
                                     ;; Keep the comment expanded if it was already
-                                    (not (is-collapsed? comment-data collapsed-map))
+                                    (is-expanded? comment-data collapsed-map)
                                     ;; Do not collapse root comments
                                     ; (not (seq (:parent-uuid comment-data)))
                                     ;; User has not read the post yet
@@ -144,21 +144,16 @@
     comments :guard #(and (coll? %)
                           (> (count %) 3))
     collapsed-map :guard map?]
-   (let [with-unread (mapv #(unread-comment % last-read-at collapsed-map) comments)
-         has-unread-comments? (some :unread with-unread)]
-     (if has-unread-comments?
-       (concat
-        [(assoc (first with-unread) :expanded (not (is-collapsed? (first with-unread) collapsed-map)))]
-        (mapv #(expanded-comment % last-read-at collapsed-map) (butlast (rest with-unread)))
-        [(assoc (last with-unread) :expanded (not (is-collapsed? (last with-unread) collapsed-map)))])
-       (collapse-comments last-read-at with-unread [] collapsed-map))))
+   (let [with-unread (mapv #(unread-comment % last-read-at collapsed-map) comments)]
+     (collapse-comments last-read-at (vec (rest with-unread)) [(assoc (first with-unread) :expanded true)]
+      collapsed-map)))
 
   ;; Recursive step: unread has been set, let's add expand now
   ([last-read-at :guard #(or (nil? %) (string? %))
     in-comments :guard coll?
     out-comments :guard coll?
     collapsed-map :guard map?]
-    (let [read-items (vec (take-while #(let [item (get-collapsed-item % collapsed-map)]
+    (let [read-items (vec (take-while #(let [item (merge % (get-collapsed-item % collapsed-map))]
                                          (and (not (:unread item))
                                               (not (:expanded item))))
                            in-comments))
@@ -166,26 +161,19 @@
                              (subvec in-comments (count read-items))
                              (vec (rest in-comments)))
           should-add-collapsed-item? (> (count read-items) 1)
-          first-expanded? (not (seq out-comments))
-          fixed-read-items (if first-expanded?
-                             (rest read-items)
-                             read-items)
           collapsed-item (when should-add-collapsed-item?
                            {:resource-type :collapsed-comments
-                            :collapsed-count (count fixed-read-items)
-                            :collapse-id (clojure.string/join "-" (map :uuid fixed-read-items))
+                            :collapsed-count (count read-items)
+                            :collapse-id (clojure.string/join "-" (map :uuid read-items))
                             :expanded true
                             :unread false
-                            :comment-uuids (set (map :uuid fixed-read-items))})
+                            :comment-uuids (map :uuid read-items)})
           next-out-comments (if should-add-collapsed-item?
                               ;; In case there are at least 2 read and not expanded items in a row
                               ;; set the 
-                              (vec (remove nil?
-                                    (concat out-comments
-                                            [(when first-expanded?
-                                               (assoc (first read-items) :expanded true))]
-                                            fixed-read-items
-                                            [collapsed-item])))
+                              (vec (concat out-comments
+                                           read-items
+                                           [collapsed-item]))
                               (vec (conj out-comments
                                          (assoc (first in-comments) :expanded true))))]
       (if (seq next-in-comments)
