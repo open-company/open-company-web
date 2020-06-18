@@ -120,16 +120,6 @@ div.replies-list {
           background-color: var(--background-color);
         }
 
-        div.reply-item-blocks div.reply-item-block button.expand-thead-bt {
-          background-color: var(--foc-background-color);
-
-          @include mobile() {
-            background-color: var(--foc-background-color);
-          }
-        }
-
-
-
       }
 
       div.reply-item-top {
@@ -283,6 +273,21 @@ div.replies-list {
           }
         }
 
+        button.view-more-bt {
+          width: 100%;
+          height: 16px;
+          padding: 0;
+          margin-left: 32px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          text-align: left;
+          position: relative;
+          background-color: var(--foc-background-color);
+          text-decoration: underline;
+        }
+
         div.reply-item-loading {
           height: 30px;
           margin-left: 8px;
@@ -301,77 +306,12 @@ div.replies-list {
           }
         }
 
-        button.expand-all-bt {
-          width: 100%;
-          height: 16px;
-          padding: 0;
-          margin-top: 8px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--color);
-          text-align: left;
-          position: relative;
-          background-color: var(--foc-background-color);
-
-          // &:before {
-          //   content: "";
-          //   width: 16px;
-          //   height: 16px;
-          //   border-radius: 50%;
-          //   background-color: var(--light-color);
-          //   background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-          //   background-size: 16px 16px;
-          //   background-repeat: no-repeat;
-          //   background-position: center;
-          //   position: absolute;
-          //   left: 4px;
-          //   top: 0;
-
-          //   @include dark_mode(){
-          //     background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-          //   }
-          // }
-        }
-
         div.reply-item-block {
           position: relative;
           height: 100%;
 
           &:not(:empty) {
             margin-top: 4px;
-          }
-
-          button.expand-thead-bt {
-            width: 100%;
-            height: 16px;
-            padding: 0 0 0 32px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 16px;
-            color: var(--color);
-            text-align: left;
-            position: relative;
-            background-color: var(--foc-background-color);
-
-            &:before {
-              content: "";
-              width: 16px;
-              height: 16px;
-              border-radius: 50%;
-              background-color: var(--light-color);
-              background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-              background-size: 16px 16px;
-              background-repeat: no-repeat;
-              background-position: center;
-              position: absolute;
-              left: 4px;
-              top: 0;
-
-              @include dark_mode(){
-                background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-              }
-            }
           }
 
           div.reply-item-block {
@@ -459,8 +399,28 @@ div.replies-list {
 
             &.truncated-body div.reply-comment {
               div.reply-comment-content div.reply-comment-body {
-                @include activity-comment-body-preview(15, 18, 12, 1);
+                @include activity-comment-body-preview(15, 18, 12, 3);
                 display: inline-block;
+
+                min-height: unset;
+                height: auto;
+                max-height: calc(3 * 18px + 1px);
+
+                @include mobile() {
+                  max-height: calc(3 * 24px + 1px);
+                }
+
+                p:empty {
+                  display: none;
+                }
+
+                p > br:only-child {
+                  display: none;
+                }
+              }
+
+              button.read-more-bt {
+                display: block;
               }
 
               div.reply-comment-reactions-footer {
@@ -928,6 +888,19 @@ div.replies-list {
                     }
                   }
                 }
+              }
+
+              button.read-more-bt {
+                text-align: left;
+                display: none;
+                width: auto;
+                @include OC_Body_Book();
+                color: var(--color);
+                font-size: 12px;
+                line-height: 18px;
+                padding: 0;
+                margin: 0;
+                text-decoration: underline;
               }
 
               div.reply-comment-reactions-footer {
