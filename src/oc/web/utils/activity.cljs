@@ -741,16 +741,26 @@
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
-            following-or-replies? (#{:following :replies} (:container-slug container-data))
-            items-map (when following-or-replies?
+            items-map (when (#{:following :replies} (:container-slug container-data))
                         (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
                           (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
-            with-caught-up (if following-or-replies?
+            with-caught-up (cond
+                            (= (:container-slug container-data) :following)
                             (insert-caught-up grouped-items
                              #(->> % :uuid (get items-map) :unread not)
                              #(or (not= (:resource-type %) :entry)
                                   (->> % :uuid (get items-map) :publisher?))
                              {:has-next next-link})
+                            (= (:container-slug container-data) :replies)
+                            (insert-caught-up grouped-items
+                             #(let [item (get items-map (:uuid %))]
+                                (and (not (:unread item))
+                                     (or (not (:new-comments-count item))
+                                         (zero? (:new-comments-count item)))))
+                             #(or (not= (:resource-type %) :entry)
+                                  (->> % :uuid (get items-map) :publisher?))
+                             {:has-next next-link})
+                            :else
                             grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)
