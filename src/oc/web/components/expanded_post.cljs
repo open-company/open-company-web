@@ -289,14 +289,14 @@
                 (wrt-count {:activity-data activity-data
                             :reads-data reads-data}))]
             [:div.expanded-post-comments.group
+              (stream-comments {:activity-data activity-data
+                                :comments-data comments-data
+                                :member? user-is-part-of-the-team
+                                :last-read-at @(::initial-last-read-at s)
+                                :current-user-id current-user-id})
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :scroll-after-posting? true
                                             :collapse? true
                                             :add-comment-focus-prefix "main-comment"})
-                 (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
-              (stream-comments {:activity-data activity-data
-                                :comments-data comments-data
-                                :member? user-is-part-of-the-team
-                                :last-read-at @(::initial-last-read-at s)
-                                :current-user-id current-user-id})]])]]))
+                 (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]])]]))

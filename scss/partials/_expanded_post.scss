@@ -587,13 +587,17 @@ div.expanded-post {
       }
 
       div.expanded-post-comments {
-        padding-bottom: 0;
-        margin-top: 40px;
+        padding-bottom: 56px;
+        // margin-top: 40px;
 
         @include mobile() {
           margin-top: 16px;
           width: 100%;
           padding: 16px 0;
+        }
+
+        div.add-comment-box-container div.add-comment-box div.add-comment-internal{
+          border: 1px solid var(--divider-line);
         }
       }
     }
