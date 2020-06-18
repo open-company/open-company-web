@@ -950,7 +950,9 @@
         unread-replies-key (dispatcher/unread-replies-key org-slug)]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items :fixed-entries))
-      (assoc-in ndb unread-replies-key (some :unread (vals (:fixed-items fixed-replies-data))))
+      (assoc-in ndb unread-replies-key (some #(or (:unread %)
+                                                  (pos? (:new-comments-count %)))
+                                        (vals (:fixed-items fixed-replies-data))))
       (assoc-in ndb posts-data-key merged-items)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
@@ -984,7 +986,9 @@
           unread-replies-key (dispatcher/unread-replies-key org)]
       (as-> db ndb
         (assoc-in ndb replies-container-key new-container-data)
-        (assoc-in ndb unread-replies-key (some :unread (vals (:fixed-items fixed-replies-data))))
+        (assoc-in ndb unread-replies-key (some #(or (:unread %)
+                                                    (pos? (:new-comments-count %)))
+                                          (vals (:fixed-items fixed-replies-data))))
         (assoc-in ndb posts-data-key new-posts-map)
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
