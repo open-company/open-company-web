@@ -78,9 +78,11 @@
        :resource-type :separator
        :date (post-month-date-from-date d)})))
 
-(defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
+(def preserved-keys [:resource-type :uuid :sort-value :unread])
+
+(defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
-        item-data (select-keys post-data [:resource-type :uuid :resource-uuid :sort-value])]
+        item-data (select-keys post-data preserved-keys)]
     (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj item-data) vec))
@@ -91,7 +93,7 @@
 
 (defn grouped-posts
   ([full-items-list]
-   (let [items-list (map #(select-keys % [:resource-type :uuid :resource-uuid]) full-items-list)
+   (let [items-list (map #(select-keys % preserved-keys) full-items-list)
          items-map (zipmap (map :uuid full-items-list) full-items-list)]
      (grouped-posts items-list items-map)))
   ([items-list fixed-items]
@@ -135,7 +137,7 @@
                                 posts sorted-posts-list]
                            (if (empty? posts)
                              separators
-                             (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
+                             (recur (add-posts-to-separator (first posts) separators last-monday two-weeks-ago first-month)
                                     (rest posts))))]
          (vec (rest ;; Always remove the first label
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
@@ -368,42 +370,32 @@
       :opts opts
       :gray-style gray-scale?})))
 
-(defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
-  (let [index (loop [ret-idx 0
-                     idx 0
-                     items items-list]
-                (let [item (first items)
-                      next-items (rest items)]
-                  (cond
-                   ;; We reached the end, no more items, return last index
-                   (nil? item)
-                   ret-idx
-                   ;; Found the first truthy item, return last index
-                   (check-fn item)
-                   idx
-                   ;; Check if element needs to be ignored
-                   (ignore-fn item)
-                   (recur ret-idx
-                          (inc idx)
-                          next-items)
-                   :else
-                   (recur idx
-                          (inc idx)
-                          next-items))))
-        [before after] (split-at index items-list)]
-    (cond
-      (and has-next
-           (= index (count items-list)))
-      (vec items-list)
-      (= index (count items-list))
-      (vec (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)]))
-      (and hide-top-line
-           (zero? index))
-      (vec items-list)
-      :else
-      (vec (remove nil? (concat before
-                                [(caught-up-map (last before) (zero? index) default-caught-up-message opts)]
-                                after))))))
+(defn- insert-caught-up [items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
+
+  (if (seq items-list)
+    (let [reversed-list (vec (reverse items-list))
+          reversed-idx (utils/index-of reversed-list check-fn)
+          last-idx (dec (count items-list))
+          idx (when (number? reversed-idx) (- last-idx reversed-idx))
+          [before after] (when (number? idx) (split-at idx items-list))]
+      (cond
+        ;; No unread items, add caught up at the top
+        (nil? idx)
+        (if hide-top-line
+          items-list
+          (vec (cons (caught-up-map nil true) items-list)))
+        ;; Last item is unread
+        (= idx last-idx)
+        (if has-next
+          items-list
+          (vec (conj items-list (caught-up-map (last items-list) false default-caught-up-message opts))))
+        ;; Found an unread item
+        :else
+        (vec (remove nil?
+         (concat before
+          [(caught-up-map (last before) (zero? idx) default-caught-up-message opts)]
+          after)))))
+    items-list))
 
 (defn- insert-open-close-item [items-list check-fn]
   (vec
@@ -739,15 +731,13 @@
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
-            with-caught-up (if (= (:container-slug container-data) :following)
-                             (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)
-                                   items-map (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))]
-                               (insert-caught-up grouped-items
-                                #(->> % :uuid (get items-map) :unread not)
-                                #(or (not= (:resource-type %) :entry)
-                                     (->> % :uuid (get items-map) :publisher?))
-                                {:has-next next-link}))
-                             grouped-items)
+            following-or-replies? (#{:following :replies} (:container-slug container-data))
+            items-map (when following-or-replies?
+                        (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
+                          (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
+            with-caught-up (if following-or-replies?
+                            (insert-caught-up grouped-items :unread {:has-next next-link})
+                            grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)
             replies? (= (-> container-data :container-slug keyword) :replies)]
