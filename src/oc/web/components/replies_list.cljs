@@ -42,7 +42,8 @@
     (utils/copy-to-clipboard input-field)
     (.removeChild (.-body js/document) input-field)))
 
-(rum/defc emoji-picker < (when (responsive/is-mobile-size?)
+(rum/defc emoji-picker < rum/static
+                         (when (responsive/is-mobile-size?)
                            ui-mixins/no-scroll-mixin)
   [{:keys [add-emoji-cb dismiss-cb]}]
   [:div.emoji-picker-container
@@ -67,18 +68,15 @@
                                         (gobj/get emoji "native")))
                                      (reset! (::show-picker s) nil))}))))
 
-(rum/defcs reply-comment <
+(rum/defc reply-comment <
   rum/static
-  rum/reactive
-  (drv/drv :users-info-hover)
-  [s {:keys [activity-data comment-data
-             is-indented-comment? mouse-leave-cb
-             react-cb reply-cb emoji-picker
-             is-mobile? member? showing-picker?
-             did-react-cb new-thread? current-user-id
-             replies-count replying-to truncated-body?]}]
-  (let [_users-info-hover (drv/react s :users-info-hover)
-        show-new-comment-tag (and (:unread comment-data)
+  [{:keys [activity-data comment-data
+           is-indented-comment? mouse-leave-cb
+           react-cb reply-cb emoji-picker
+           is-mobile? member? showing-picker?
+           did-react-cb new-thread? current-user-id
+           replies-count replying-to truncated-body?]}]
+  (let [show-new-comment-tag (and (:unread comment-data)
                                   (or (and is-indented-comment?
                                            (not new-thread?))
                                       (not is-indented-comment?)))]
@@ -163,7 +161,6 @@
             [:div.reply-comment-content
               [:div.reply-comment-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-                 :ref (str "comment-body-" (:uuid comment-data))
                  :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                           utils/hide-class true})}]]
             (when (seq (:reactions comment-data))
@@ -173,7 +170,8 @@
                             :did-react-cb did-react-cb
                             :optional-activity-data activity-data})])]]]]))
 
-(rum/defc reply-top
+(rum/defc reply-top <
+  rum/static
   [{:keys [current-user-id publisher board-name published-at headline links] :as activity-data}]
   (let [follow-link (utils/link-for links "follow")
         unfollow-link (utils/link-for links "unfollow")]
@@ -331,19 +329,25 @@
     (reset! (::total-collapsed-count s) total-collapsed-count)))
 
 (rum/defcs reply-item < rum/static
+                        rum/reactive
                         (rum/local nil ::show-picker)
                         (rum/local #{} ::replying)
                         (rum/local nil ::replies)
                         (rum/local nil ::total-collapsed-count)
                         (rum/local true ::strict-collapse)
                         ui-mixins/refresh-tooltips-mixin
-                        (mention-mixins/oc-mentions-hover {:click? true})
                         (ui-mixins/interactive-images-mixin "div.reply-comment-body")
                         (ui-mixins/on-window-click-mixin (fn [s e]
                          (when (and @(::show-picker s)
                                     (not (utils/event-inside? e
                                      (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                            (reset! (::show-picker s) nil))))
+                        ;; Mentions:
+                        (drv/drv :users-info-hover)
+                        (drv/drv :current-user-data)
+                        (drv/drv :follow-publishers-list)
+                        (drv/drv :followers-publishers-count)
+                        (mention-mixins/oc-mentions-hover {:click? true})
                         {:will-mount (fn [s]
                            (update-replies s)
                          s)
@@ -354,8 +358,7 @@
                                         (seq (second items-changed)))
                                 (update-replies s)))
                             s)}
-  [s {current-user-id  :current-user-id
-      uuid             :uuid
+  [s {uuid             :uuid
       publisher        :publisher
       unread           :unread
       published-at     :published-at
@@ -363,7 +366,11 @@
       comments-data    :comments-data
       initial-last-read-at :initial-last-read-at
       :as activity-data}]
-  (let [is-mobile? (responsive/is-mobile-size?)
+  (let [_users-info-hover (drv/react s :users-info-hover)
+        _follow-publishers-list (drv/react s :follow-publishers-list)
+        _followers-publishers-count (drv/react s :followers-publishers-count)
+        current-user-data (drv/react s :current-user-data)
+        is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class activity-data)
         replies @(::replies s)
         comments-loaded? (not (seq replies))]
@@ -383,7 +390,7 @@
                                 (not (utils/event-inside? e (.querySelector reply-el "div.emoji-mart")))
                                 (not (utils/event-inside? e (.querySelector reply-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false))))}
-      (reply-top activity-data)
+      (reply-top (assoc activity-data :current-user-id (:user-id current-user-data)))
       (if comments-loaded?
         [:div.reply-item-blocks.group
           [:div.reply-item-loading.group
@@ -397,7 +404,7 @@
                                :is-mobile? is-mobile?
                                :read-reply-cb (partial reply-mark-read s)
                                :member? member?
-                               :current-user-id current-user-id
+                               :current-user-id (:user-id current-user-data)
                                :read-comment-cb (partial comment-mark-read s)}]]
             (reply-thread-item s payload))
           (when (and @(::strict-collapse s)
@@ -430,7 +437,6 @@
 
 (rum/defcs replies-list <
   rum/reactive
-  (drv/drv :users-info-hover)
   (drv/drv :comments-data)
   ui-mixins/refresh-tooltips-mixin
   (rum/local #{} ::read-items)
@@ -469,10 +475,9 @@
          (reset! (::initial-last-read-at s) last-read-at)
          (utils/after 0 #(did-scroll s nil)))))
    s)}
-  [s {:keys [items-to-render last-read-at current-user-data member?]}]
+  [s {:keys [items-to-render last-read-at member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         items @(::entries s)
-        _users-info-hover (drv/react s :users-info-hover)
         comments-drv (drv/react s :comments-data)]
     [:div.replies-list
       (if (empty? items)
@@ -484,8 +489,7 @@
                 :let [caught-up? (= (:resource-type item*) :caught-up)
                       loading-more? (= (:resource-type item*) :loading-more)
                       closing-item? (= (:resource-type item*) :closing-item)
-                      item (assoc item* :current-user-data current-user-data
-                                        :member? member?
+                      item (assoc item* :member? member?
                                         :comments-data (au/activity-comments item* comments-drv)
                                         :initial-last-read-at (get @(::initial-last-read-at s) (:uuid item*)))]]
             (cond
