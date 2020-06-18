@@ -105,9 +105,7 @@
              :data-toggle (when-not is-mobile? "tooltip")}
             [:div.is-comments-summary-inner.group
               (str
-               (if show-new-tag?
-                 new-comments-count
-                 comments-count)
+               comments-count
                (if show-new-tag?
                  (when-not hide-label?
                    (str " new comment" (when (not= new-comments-count 1) "s")))
