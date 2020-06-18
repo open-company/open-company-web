@@ -76,9 +76,9 @@
   {:did-mount (fn [s]
    (let [props (-> s :rum/args first)]
      (when (fn? (:unwrap-body-cb props))
-       (when-let [comment-body (rum/ref-node s :reply-comment-content)]
-         (when (>= (.-height (.getBoundingClientRect comment-body))
-                   (* 4 (if (:is-mobile? props) 24 18)))
+       (when-let [comment-body (rum/ref-node s :reply-comment-body)]
+         (when (>= (.-scrollHeight comment-body)
+                   (inc (* 3 (if (:is-mobile? props) 24 18))))
            (reset! (::show-read-more s) true)))))
    s)}
   [s {:keys [activity-data comment-data
@@ -166,9 +166,9 @@
                         "React"]
                       emoji-picker]])]]
             [:div.reply-comment-content
-              {:ref :reply-comment-content}
               [:div.reply-comment-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+                 :ref :reply-comment-body
                  :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                           utils/hide-class true})}]]
             (when @(::show-read-more s)
