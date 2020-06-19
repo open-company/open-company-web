@@ -10,6 +10,14 @@
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]))
 
+(defmethod dispatcher/action :add-comment/reply
+  [db [_ focus-value parent-body]]
+  (assoc-in db [:comment-reply-to focus-value] parent-body))
+
+(defmethod dispatcher/action :add-comment/reset-reply
+  [db [_ focus-value]]
+  (update db :comment-reply-to dissoc focus-value))
+
 (defmethod dispatcher/action :add-comment-change
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid comment-body force-update?]]
   (let [comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)

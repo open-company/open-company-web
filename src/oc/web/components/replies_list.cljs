@@ -29,11 +29,8 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
-(defn- reply-to [s comment-data add-comment-focus-key]
-  ;; FIXME: add action to populate the body of the add comment field with a mention
-  ;; of the author of the comment
-  ; (comment-actions/reply-to comment-data)
-  (comment-actions/add-comment-focus add-comment-focus-key))
+(defn- reply-to [comment-data add-comment-focus-key]
+  (comment-actions/reply-to add-comment-focus-key (:body comment-data) true))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]
@@ -266,7 +263,7 @@
                                         #(unwrap-body s (:uuid reply-data)))
                       :is-mobile? is-mobile?
                       :react-cb #(reset! (::show-picker s) (:uuid reply-data))
-                      :reply-cb #(reply-to s reply-data reply-focus-value)
+                      :reply-cb #(reply-to reply-data reply-focus-value)
                       :did-react-cb #(read-reply-cb (:uuid reply-data))
                       :emoji-picker (when showing-picker?
                                       (emoji-picker-container s activity-data reply-data read-reply-cb))

@@ -16,6 +16,12 @@
 (defn add-comment-focus [focus-value]
   (dis/dispatch! [:add-comment-focus focus-value]))
 
+(defn reply-to [focus-value parent-body & [focus-field?]]
+  (dis/dispatch! [:add-comment/reply focus-value {:quote parent-body :focus focus-field?}]))
+
+(defn reset-reply-to [focus-value]
+  (dis/dispatch! [:add-comment/reset-reply focus-value]))
+
 (defn add-comment-blur [focus-value]
   (dis/dispatch! [:add-comment-blur focus-value]))
 
