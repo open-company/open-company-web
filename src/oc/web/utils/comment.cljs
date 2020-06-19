@@ -80,7 +80,7 @@
       (vec sorted-comments)))))
 
 (defn- get-collapsed-item [item collapsed-map]
-  (get collapsed-map (:uuid item)))
+  (merge item (get collapsed-map (:uuid item))))
 
 (defn is-expanded? [item collapsed-map]
   (:expanded (get-collapsed-item item collapsed-map)))
@@ -102,7 +102,12 @@
     ;; User has never read the post, so comment is new
     (assoc comment-data :unread true)
     (assoc comment-data :unread
-     (unread? last-read-at (merge comment-data (get-collapsed-item comment-data collapsed-map))))))
+     (unread? last-read-at (get-collapsed-item comment-data collapsed-map)))))
+
+(defn- unwrapped-body-comment [comment-data collapsed-map]
+  (let [item (get-collapsed-item comment-data collapsed-map)]
+    (assoc comment-data :unwrapped-body (or (:unwrapped-body item)
+                                            (:unread item)))))
 
 (defn- expanded-comment [comment-data last-read-at collapsed-map & [last-comment?]]
   (assoc comment-data :expanded (or ;; comment is unread
@@ -129,7 +134,7 @@
   ([last-read-at :guard #(or (nil? %) (string? %))
     comments :guard coll?]
     (collapse-comments last-read-at comments {}))
-
+  ;; When we have less than 4 comments we always show all of them
   ([last-read-at :guard #(or (nil? %) (string? %))
     comments :guard #(and (coll? %)
                           (<= (count %) 3))
@@ -137,15 +142,19 @@
    (mapv
     #(-> %
       (unread-comment last-read-at collapsed-map)
-      (assoc :expanded true))
+      (assoc :expanded true)
+      (unwrapped-body-comment collapsed-map))
     comments))
-
+  ;; Add :unread info to each comment before entering the recursion
   ([last-read-at :guard #(or (nil? %) (string? %))
     comments :guard #(and (coll? %)
                           (> (count %) 3))
     collapsed-map :guard map?]
-   (let [with-unread (mapv #(unread-comment % last-read-at collapsed-map) comments)]
-     (collapse-comments last-read-at (vec (rest with-unread)) [(assoc (first with-unread) :expanded true)]
+   (let [enriched-comments (mapv #(-> %
+                                   (unread-comment last-read-at collapsed-map)
+                                   (unwrapped-body-comment collapsed-map))
+                            comments)]
+     (collapse-comments last-read-at (vec (rest enriched-comments)) [(assoc (first enriched-comments) :expanded true)]
       collapsed-map)))
 
   ;; Recursive step: unread has been set, let's add expand now
@@ -153,7 +162,7 @@
     in-comments :guard coll?
     out-comments :guard coll?
     collapsed-map :guard map?]
-    (let [read-items (vec (take-while #(let [item (merge % (get-collapsed-item % collapsed-map))]
+    (let [read-items (vec (take-while #(let [item (get-collapsed-item % collapsed-map)]
                                          (and (not (:unread item))
                                               (not (:expanded item))))
                            in-comments))

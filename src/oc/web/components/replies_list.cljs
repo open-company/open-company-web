@@ -288,7 +288,7 @@
 (defn- update-replies [s]
   (let [props (-> s :rum/args first)
         all-comments (cu/ungroup-comments @(::replies s))
-        expanded-unread-map (map #(select-keys % [:expanded :unread]) all-comments)
+        expanded-unread-map (map #(select-keys % [:expanded :unread :unwrapped-body]) all-comments)
         collapsed-map (zipmap (map :uuid all-comments) expanded-unread-map)
         collapsed-comments (cu/collapse-comments (:initial-last-read-at props) (:comments-data props) collapsed-map)
         all-comments-after (cu/ungroup-comments collapsed-comments)]
