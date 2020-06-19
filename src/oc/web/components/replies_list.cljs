@@ -392,7 +392,7 @@
 
 (defn- mark-read-if-needed [s items-container offset-top item]
   (when-let [item-node (.querySelector items-container (str "div." (reply-item-unique-class item)))]
-    (when (dom-utils/is-element-top-in-viewport? item-node offset-top)
+    (when (dom-utils/is-element-bottom-in-viewport? item-node offset-top)
       (let [read (activity-actions/mark-read (:uuid item))]
         (when read
           (swap! (::read-items s) conj (:uuid item)))))))

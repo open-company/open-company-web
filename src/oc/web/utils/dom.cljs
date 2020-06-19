@@ -19,6 +19,21 @@
     (reset! _lock-counter 0)
     (dommy/remove-class! (sel1 [:html]) :no-scroll)))
 
+(defn is-element-bottom-in-viewport?
+   "Given a DOM element return true if the bottom of it is actually visible in the viewport/"
+  [el & [offset]]
+  (let [fixed-offset (or offset 0)
+        rect (.getBoundingClientRect el)
+        zero-pos? #(or (zero? %)
+                       (pos? %))
+        doc-element (.-documentElement js/document)
+        win-height (or (.-clientHeight doc-element)
+                       (.-innerHeight js/window))]
+           ;; Item bottom is more then the navbar height
+      (and (>= (+ (.-top rect) (.-height rect) fixed-offset) responsive/navbar-height)
+           ;; and less than the screen height
+           (< (+ (.-top rect) (.-height rect)) win-height))))
+
 (defn is-element-top-in-viewport?
    "Given a DOM element return true if it's actually visible in the viewport."
   [el & [offset]]
@@ -32,7 +47,7 @@
            ;; Item top is more then the navbar height
       (and (>= (+ (.-top rect) fixed-offset) responsive/navbar-height)
            ;; and less than the screen height
-           (< (- (.-top rect) fixed-offset) win-height))))
+           (< (.-top rect) win-height))))
 
 (defn viewport-width []
   (or (.-clientWidth (.-documentElement js/document))
