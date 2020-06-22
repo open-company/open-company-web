@@ -17,7 +17,7 @@
 (defn- add-events [s events-list click?]
   (let [dom-node (rum/dom-node s)
         searching-node (.find (js/$ dom-node)".oc-mentions.oc-mentions-hover")
-        all-mentions (.find searching-node ".oc-mention[data-found]")]
+        all-mentions (.find searching-node ":not(.no-mentions-popup).oc-mention[data-found]")]
     (.each all-mentions
      (fn [_]
       (this-as this

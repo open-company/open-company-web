@@ -93,7 +93,8 @@
                                 :indented-comment is-indented-comment?
                                 :showing-picker showing-picker?
                                 :no-replies (zero? replies-count)
-                                :truncated-body (fn? unwrap-body-cb)})}
+                                :truncated-body @(::show-read-more s)
+                                :no-mentions-popup @(::show-read-more s)})}
       [:div.reply-comment
         {:ref (str "reply-comment-" (:uuid comment-data))
          :on-mouse-leave mouse-leave-cb}
