@@ -371,27 +371,23 @@
       :gray-style gray-scale?})))
 
 (defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
-  (let [index (loop [ret-idx 0
-                     idx 0
-                     items items-list]
-                (let [item (first items)
-                      next-items (rest items)]
+  (let [index (loop [last-valid-idx 0
+                     current-idx 0]
+                (let [item (get items-list current-idx)]
                   (cond
                    ;; We reached the end, no more items, return last index
                    (nil? item)
-                   ret-idx
+                   last-valid-idx
                    ;; Found the first truthy item, return last index
                    (check-fn item)
-                   idx
+                   last-valid-idx
                    ;; Check if element needs to be ignored
                    (ignore-fn item)
-                   (recur ret-idx
-                          (inc idx)
-                          next-items)
+                   (recur last-valid-idx
+                          (inc current-idx))
                    :else
-                   (recur idx
-                          (inc idx)
-                          next-items))))
+                   (recur (inc current-idx)
+                          (inc current-idx)))))
         [before after] (split-at index items-list)]
     (cond
       (and has-next
@@ -744,25 +740,20 @@
             items-map (when (#{:following :replies} (:container-slug container-data))
                         (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
                           (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
-            with-caught-up (cond
-                            (= (:container-slug container-data) :following)
-                            (insert-caught-up grouped-items
-                             #(and (= (:resource-type %) :entry)
-                                   (->> % :uuid (get items-map) :unread not))
-                             #(or (not= (:resource-type %) :entry)
-                                  (->> % :uuid (get items-map) :publisher?))
-                             {:has-next next-link})
-                            (= (:container-slug container-data) :replies)
-                            (insert-caught-up grouped-items
-                             #(let [item (get items-map (:uuid %))]
-                                (and (= (:resource-type %) :entry)
+            ingnore-item-fn #(or (not= (:resource-type %) :entry)
+                                 (and (= (:resource-type %) :entry)
+                                      (->> % :uuid (get items-map) :publisher?)))
+            check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
+                            #(and (= (:resource-type %) :entry)
+                                  (->> % :uuid (get items-map) :unread not))
+                            #(let [item (get items-map (:uuid %))]
+                                (and (= (:resource-type item) :entry)
                                      (not (:unread item))
                                      (or (not (:new-comments-count item))
-                                         (zero? (:new-comments-count item)))))
-                             #(or (not= (:resource-type %) :entry)
-                                  (->> % :uuid (get items-map) :publisher?))
-                             {:has-next next-link})
-                            :else
+                                         (zero? (:new-comments-count item))))))
+            opts {:has-next next-link}
+            with-caught-up (if (#{:following :replies} (:container-slug container-data))
+                            (insert-caught-up grouped-items check-item-fn ingnore-item-fn opts)
                             grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)
