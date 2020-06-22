@@ -384,7 +384,9 @@
           (add-comment {:activity-data activity-data
                         :collapse? true
                         :add-comment-placeholder "Reply..."
-                        :add-comment-cb #(entry-mark-read s)
+                        :add-comment-cb #(do
+                                           (entry-mark-read s)
+                                           (swap! (::collapsed-comments s) assoc (:uuid %) {:unread false :expanded true :unwrapped-body true}))
                         :add-comment-focus-prefix add-comment-focus-prefix})])]))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
