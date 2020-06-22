@@ -165,29 +165,36 @@
     (let [read-items (vec (take-while #(let [item (get-collapsed-item % collapsed-map)]
                                          (and (not (:unread item))
                                               (not (:expanded item))))
-                           in-comments))
-          next-in-comments (if (seq read-items)
-                             (subvec in-comments (count read-items))
-                             (vec (rest in-comments)))
-          should-add-collapsed-item? (> (count read-items) 1)
-          collapsed-item (when should-add-collapsed-item?
-                           {:resource-type :collapsed-comments
-                            :collapsed-count (count read-items)
-                            :collapse-id (clojure.string/join "-" (map :uuid read-items))
-                            :expanded true
-                            :unread false
-                            :comment-uuids (map :uuid read-items)})
-          next-out-comments (if should-add-collapsed-item?
-                              ;; In case there are at least 2 read and not expanded items in a row
-                              ;; set the 
-                              (vec (concat out-comments
-                                           read-items
-                                           [collapsed-item]))
-                              (vec (conj out-comments
-                                         (assoc (first in-comments) :expanded true))))]
-      (if (seq next-in-comments)
-        (recur last-read-at next-in-comments next-out-comments collapsed-map)
-        next-out-comments))))
+                           in-comments))]
+      (if (seq read-items)
+        (let [next-in-comments (subvec in-comments (count read-items))
+              should-add-collapsed-item? (> (count read-items) 2)
+              collapsed-item (when should-add-collapsed-item?
+                               {:resource-type :collapsed-comments
+                                :collapsed-count (dec (count read-items))
+                                :collapse-id (clojure.string/join "-" (map :uuid (butlast read-items)))
+                                :expanded true
+                                :unread false
+                                :comment-uuids (map :uuid (butlast read-items))})
+              next-out-comments (if should-add-collapsed-item?
+                                  ;; In case there are at least 3 read and not expanded items in a row
+                                  ;; add a collapsed item after the first n-1 and add the last after (we want the most recent expanded)
+                                  (vec (concat out-comments
+                                               (mapv #(assoc % :expanded false) (butlast read-items))
+                                               [collapsed-item]
+                                               [(assoc (last read-items) :expanded true)]))
+                                  (vec (concat out-comments
+                                               (mapv #(assoc % :expanded true) read-items))))]
+          (if (seq next-in-comments)
+            (recur last-read-at next-in-comments next-out-comments collapsed-map)
+            next-out-comments))
+        ;; First comment is unread or expanded
+        (let [next-in-comments (vec (rest in-comments))
+              next-out-comments (vec (conj out-comments
+                                      (assoc (first in-comments) :expanded true)))]
+          (if (seq next-in-comments)
+            (recur last-read-at next-in-comments next-out-comments collapsed-map)
+            next-out-comments))))))
 
 (defun add-comment-focus-value
   ([prefix :guard string? comment-data :guard map?]
