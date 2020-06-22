@@ -211,13 +211,29 @@
         ;         ; (when (pos? (:contributions-count org-data))
         ;         ;   [:span.count (:contributions-count org-data)])
         ;         ]])
+        ;; Bookmarks
+        (when show-bookmarks
+          [:div.left-navigation-sidebar-top
+            {:class (when (and (or show-following show-topics)
+                               (not show-replies))
+                        "top-border")}
+            [:a.nav-link.bookmarks.hover-item.group
+              {:class (utils/class-set {:item-selected is-bookmarks})
+               :href (oc-urls/bookmarks)
+               :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                "Bookmarks"]
+              (when (pos? (:bookmarks-count org-data))
+                [:span.count (:bookmarks-count org-data)])]])
         ;; Drafts
         (when show-drafts
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:div.left-navigation-sidebar-top
               {:class (when (and (or show-following show-topics)
-                                 (not show-replies))
+                                 (not show-replies)
+                                 (not show-bookmarks))
                         "top-border")}
               [:a.nav-link.drafts.hover-item.group
                 {:class (utils/class-set {:item-selected (and (not is-following)
@@ -233,22 +249,6 @@
                   "Drafts"]
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
-        ;; Bookmarks
-        (when show-bookmarks
-          [:div.left-navigation-sidebar-top
-            {:class (when (and (or show-following show-topics)
-                               (not show-replies)
-                               (not show-drafts))
-                        "top-border")}
-            [:a.nav-link.bookmarks.hover-item.group
-              {:class (utils/class-set {:item-selected is-bookmarks})
-               :href (oc-urls/bookmarks)
-               :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
-              [:div.nav-link-icon]
-              [:div.nav-link-label
-                "Bookmarks"]
-              (when (pos? (:bookmarks-count org-data))
-                [:span.count (:bookmarks-count org-data)])]])
         (when show-invite-people?
           [:div.left-navigation-sidebar-footer.top-border
             [:button.mlb-reset.invite-people-bt
