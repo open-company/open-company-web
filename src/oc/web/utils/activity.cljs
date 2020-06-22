@@ -747,14 +747,16 @@
             with-caught-up (cond
                             (= (:container-slug container-data) :following)
                             (insert-caught-up grouped-items
-                             #(->> % :uuid (get items-map) :unread not)
+                             #(and (= (:resource-type %) :entry)
+                                   (->> % :uuid (get items-map) :unread not))
                              #(or (not= (:resource-type %) :entry)
                                   (->> % :uuid (get items-map) :publisher?))
                              {:has-next next-link})
                             (= (:container-slug container-data) :replies)
                             (insert-caught-up grouped-items
                              #(let [item (get items-map (:uuid %))]
-                                (and (not (:unread item))
+                                (and (= (:resource-type %) :entry)
+                                     (not (:unread item))
                                      (or (not (:new-comments-count item))
                                          (zero? (:new-comments-count item)))))
                              #(or (not= (:resource-type %) :entry)
