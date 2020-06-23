@@ -76,9 +76,12 @@
          :data-placement "top"
          :data-toggle (when-not is-mobile? "tooltip")
          :data-container "body"
-         :title (if (and (pos? new-comments-count)
-                         (= new-comments-count comments-count))
+         :title (cond
+                 (zero? comments-count)
+                 "Add a comment"
+                 (= new-comments-count comments-count)
                  (str new-comments-count " new comment" (when (not= new-comments-count 1) "s"))
+                 :else
                  (str comments-count " comment" (when (not= comments-count 1) "s")
                   (when (pos? new-comments-count)
                     (str ", " new-comments-count " new"))))}
@@ -101,8 +104,7 @@
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                      :add-a-comment (not (pos? comments-count))})
-             :data-toggle (when-not is-mobile? "tooltip")}
+                                      :add-a-comment (not (pos? comments-count))})}
             [:div.is-comments-summary-inner.group
               (str
                comments-count
