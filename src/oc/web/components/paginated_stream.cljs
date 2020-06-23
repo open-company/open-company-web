@@ -44,59 +44,6 @@
     :else
     foc-height))
 
-(defn did-scroll
-  "Scroll listener, load more activities when the scroll is close to a margin."
-  [s e]
-  (let [scroll-top (.. js/document -scrollingElement -scrollTop)
-        direction (if (> @(::last-scroll s) scroll-top)
-                    :up
-                    (if (< @(::last-scroll s) scroll-top)
-                      :down
-                      :stale))
-        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
-        card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
-        scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
-        current-board-slug (router/current-board-slug)]
-    ;; scrolling down
-    (when (and ;; not already loading more
-               (not @(::bottom-loading s))
-               ;; has a link to load more that can be used
-               @(::has-next s)
-               ;; scroll is moving down
-               (or (= direction :down)
-                   (= direction :stale))
-               ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
-      ;; Show a spinner at the bottom
-      (reset! (::bottom-loading s) true)
-      ;; if the user is close to the bottom margin, load more results if there is a link
-      (cond
-        (seq (router/current-contributions-id))
-        (contributions-actions/contributions-more @(::has-next s) :down)
-        (= current-board-slug "inbox")
-        (activity-actions/inbox-more @(::has-next s) :down)
-        (= current-board-slug "replies")
-        (activity-actions/replies-more @(::has-next s) :down)
-        (= current-board-slug "all-posts")
-        (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "bookmarks")
-        (activity-actions/bookmarks-more @(::has-next s) :down)
-        (= (router/current-board-slug) "following")
-        (activity-actions/following-more @(::has-next s) :down)
-        (= (router/current-board-slug) "unfollowing")
-        (activity-actions/unfollowing-more @(::has-next s) :down)
-        :else
-        (section-actions/section-more @(::has-next s) :down)))
-    ;; Save the last scrollTop value
-    (when (not= scroll-top @(::last-scroll s))
-      (reset! (::last-scroll s) scroll-top))))
-
-(defn check-pagination [s]
-  (let [container-data @(drv/get-ref s :container-data)
-        next-link (utils/link-for (:links container-data) "next")]
-    (reset! (::has-next s) next-link)
-    (did-scroll s nil)))
-
 (rum/defc wrapped-stream-item < rum/static
   [{:keys [style] :as row-props}
    {:keys [entry
@@ -161,7 +108,10 @@
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
                                 (rum/local false ::mounted)
-                               {:did-mount (fn [s]
+                               {:will-mount (fn [s]
+                                 (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
+                                 s)
+                                :did-mount (fn [s]
                                  (reset! (::mounted s) true)
                                  s)
                                 :did-remount (fn [o s]
@@ -250,8 +200,62 @@
                          :overscanRowCount 20
                          :style {:outline "none"}})]))
 
-(rum/defcs paginated-stream  < rum/static
-                               rum/reactive
+(defn did-scroll
+  "Scroll listener, load more activities when the scroll is close to a margin."
+  [s e]
+  (let [scroll-top (.. js/document -scrollingElement -scrollTop)
+        direction (if (> @(::last-scroll s) scroll-top)
+                    :up
+                    (if (< @(::last-scroll s) scroll-top)
+                      :down
+                      :stale))
+        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
+        card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
+        scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
+        current-board-slug (router/current-board-slug)]
+    ;; scrolling down
+    (when (and ;; not already loading more
+               (not @(::bottom-loading s))
+               ;; has a link to load more that can be used
+               @(::has-next s)
+               ;; scroll is moving down
+               (or (= direction :down)
+                   (= direction :stale))
+               ;; and the threshold point has been reached
+               (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
+      ;; Show a spinner at the bottom
+      (reset! (::bottom-loading s) true)
+      ;; if the user is close to the bottom margin, load more results if there is a link
+      (cond
+        (seq (router/current-contributions-id))
+        (contributions-actions/contributions-more @(::has-next s) :down)
+        (= current-board-slug "inbox")
+        (activity-actions/inbox-more @(::has-next s) :down)
+        (= current-board-slug "replies")
+        (activity-actions/replies-more @(::has-next s) :down)
+        (= current-board-slug "all-posts")
+        (activity-actions/all-posts-more @(::has-next s) :down)
+        (= (router/current-board-slug) "bookmarks")
+        (activity-actions/bookmarks-more @(::has-next s) :down)
+        (= (router/current-board-slug) "following")
+        (activity-actions/following-more @(::has-next s) :down)
+        (= (router/current-board-slug) "unfollowing")
+        (activity-actions/unfollowing-more @(::has-next s) :down)
+        :else
+        (section-actions/section-more @(::has-next s) :down)))
+    ;; Save the last scrollTop value
+    (when (not= scroll-top @(::last-scroll s))
+      (reset! (::last-scroll s) scroll-top))))
+
+(defn check-pagination [s]
+  (let [container-data @(drv/get-ref s :container-data)
+        next-link (utils/link-for (:links container-data) "next")]
+    (reset! (::has-next s) next-link)
+    (did-scroll s nil)))
+
+(rum/defcs paginated-stream  <
+                        rum/static
+                        rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
                         (drv/drv :items-to-render)
@@ -275,6 +279,8 @@
 
                         {:will-mount (fn [s]
                           (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
+                          (reset! (::scroll-listener s)
+                           (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
@@ -282,8 +288,6 @@
                          s)
                          :did-mount (fn [s]
                           (reset! (::last-scroll s) (.. js/document -scrollingElement -scrollTop))
-                          (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)
                           s)
                          :before-render (fn [s]
