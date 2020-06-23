@@ -857,7 +857,8 @@
       (dis/dispatch! [:activities-count (router/current-org-slug) (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
-      (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (count (:reads (:data data))) (:reads (:data data)) (dis/team-roster)]))))
+      (let [read-data (:data data)]
+        (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id read-data) (count (:reads read-data)) (:reads read-data)])))))
 
 ;; AP Seen
 
