@@ -1121,7 +1121,7 @@ $header_top_margin: 24;
   }
 
   & > h1, & > h2 {
-    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
+    margin: #{$paragraph_spacing * 2}px 0px #{$paragraph_spacing}px;
   }
 
   & > h1:first-child, & > h2:first-child {
@@ -1164,7 +1164,7 @@ $header_top_margin: 24;
   h1 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 11}px;
-    line-height: #{$line_height + 14}px;
+    line-height: #{$line_height * 2}px;
     font-weight: normal;
     padding-top: 0px;
     padding-bottom: 0px;
@@ -1183,7 +1183,7 @@ $header_top_margin: 24;
   h2 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 5}px;
-    line-height: #{$line_height + 6}px;
+    line-height: #{$line_height * 2}px;
     font-weight: normal;
     padding-top: 0px;
     padding-bottom: 0px;

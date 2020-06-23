@@ -409,7 +409,6 @@ div.replies-list {
                 }
 
                 div.reply-comment-body {
-                  // @include activity-comment-body-preview(15, 18, 12, 3);
                   display: inline-block;
 
                   min-height: unset;
@@ -879,7 +878,6 @@ div.replies-list {
                 position: relative;
 
                 div.reply-comment-body {
-                  display: inline;
                   @include activity-comment(15, 18, 18);
 
                   @include mobile() {
