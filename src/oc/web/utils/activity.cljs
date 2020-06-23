@@ -525,7 +525,8 @@
           is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
           fixed-publisher (when published?
-                            (get active-users (-> entry-data :publisher :user-id)))]
+                            (get active-users (-> entry-data :publisher :user-id)))
+          org-data (dis/org-data)]
       (-> entry-data
         (assoc :resource-type :entry)
         (assoc :published? published?)
@@ -550,7 +551,8 @@
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data))))
-        (assoc :comments (cu/sort-comments (:comments entry-data))))))))
+        (as-> e
+          (update e :comments #(cu/sort-comments (map (partial parse-comment org-data e) %)))))))))
 
 (defn parse-org
   "Fix org data coming from the API."
@@ -749,14 +751,18 @@
             items-map (when (#{:following :replies} (:container-slug container-data))
                         (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
                           (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
-            ignore-item-fn #(or (not= (:resource-type %) :entry)
-                                (and (= (:resource-type %) :entry)
-                                     (->> % :uuid (get items-map) :publisher?)))
+            get-item #(merge (get items-map (:uuid %)) %)
+            ignore-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
+                             #(or (not= (:resource-type %) :entry)
+                                  (and (= (:resource-type %) :entry)
+                                       (->> % get-item :publisher?)))
+                             #(not= (:resource-type %) :entry))
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                             #(and (= (:resource-type %) :entry)
-                                  (->> % :uuid (get items-map) :unread not))
-                            #(let [item (get items-map (:uuid %))]
-                                (and (= (:resource-type %) :entry)
+                                  (->> % get-item :unread not))
+                            ;; (= (:container-slug container-data) :replies)
+                            #(let [item (get-item %)]
+                                (and (= (:resource-type item) :entry)
                                      (not (:unread item))
                                      (or (not (:new-comments-count item))
                                          (zero? (:new-comments-count item))))))

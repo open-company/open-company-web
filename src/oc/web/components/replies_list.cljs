@@ -78,19 +78,19 @@
                    (inc (* 3 (if (:is-mobile? props) 24 18))))
            (reset! (::show-read-more s) true)))))
    s)}
-  [s {:keys [activity-data comment-data
-             is-indented-comment? mouse-leave-cb
+  [s {:keys [activity-data comment-data mouse-leave-cb
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
-             did-react-cb new-thread? current-user-id
+             did-react-cb current-user-id
              replies-count replying-to unwrap-body-cb]}]
   (let [show-new-comment-tag (:unread comment-data)]
-    [:div.reply-comment-outer
+    [:div.reply-comment-outer.open-reply
       {:key (str "reply-comment-" (:created-at comment-data))
        :data-comment-uuid (:uuid comment-data)
-       :class (utils/class-set {:open-reply (not is-indented-comment?)
-                                :new-comment (:unread comment-data)
-                                :indented-comment is-indented-comment?
+       :data-unwrapped-body (:unwrapped-body comment-data)
+       :data-unread (:unread comment-data)
+       :data-unwrapped-body-fn? (fn? unwrap-body-cb)
+       :class (utils/class-set {:new-comment (:unread comment-data)
                                 :showing-picker showing-picker?
                                 :no-replies (zero? replies-count)
                                 :truncated-body @(::show-read-more s)
@@ -269,8 +269,6 @@
                       :emoji-picker (when showing-picker?
                                       (emoji-picker-container s activity-data reply-data read-reply-cb))
                       :showing-picker? showing-picker?
-                      :new-thread? (:unread reply-data)
-                      :unread (:unread reply-data)
                       :member? member?
                       :replies-count (:replies-count reply-data)
                       :current-user-id current-user-id
@@ -387,7 +385,7 @@
                         :add-comment-placeholder "Reply..."
                         :add-comment-cb #(do
                                            (entry-mark-read s)
-                                           (swap! (::collapsed-comments s) assoc (:uuid %) {:unread false :expanded true :unwrapped-body true}))
+                                           (swap! (::collapsed-comments s) merge {(:uuid %) {:unread false :expanded true :unwrapped-body true}}))
                         :add-comment-focus-prefix add-comment-focus-prefix})])]))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
@@ -468,23 +466,24 @@
                 :let [caught-up? (= (:resource-type item*) :caught-up)
                       loading-more? (= (:resource-type item*) :loading-more)
                       closing-item? (= (:resource-type item*) :closing-item)
-                      item (assoc item* :member? member?
-                                        :comments-data (au/activity-comments item* comments-drv)
-                                        :initial-last-read-at (get @(::initial-last-read-at s) (:uuid item*)))]]
+                      item-comments-data (au/activity-comments item* comments-drv)
+                      item-props (assoc item* :member? member?
+                                              :comments-data item-comments-data
+                                              :initial-last-read-at (get @(::initial-last-read-at s) (:uuid item*)))]]
             (cond
               caught-up?
               (rum/with-key
-               (caught-up-line item)
-               (str "reply-caught-up-" (:last-activity-at item)))
+               (caught-up-line item-props)
+               (str "reply-caught-up-" (:last-activity-at item-props)))
               loading-more?
               [:div.loading-updates.bottom-loading
-                {:key (str "reply-loading-more-" (:last-activity-at item))}
-                (:message item)]
+                {:key (str "reply-loading-more-" (:last-activity-at item-props))}
+                (:message item-props)]
               closing-item?
               [:div.closing-item
-                {:key (str "reply-closing-item-" (:last-activity-at item))}
-                (:message item)]
+                {:key (str "reply-closing-item-" (:last-activity-at item-props))}
+                (:message item-props)]
               :else
               (rum/with-key
-               (reply-item item)
-               (str "reply-" (:uuid item)))))])]))
+               (reply-item item-props)
+               (str "reply-" (:uuid item-props) "-" (count item-comments-data)))))])]))
