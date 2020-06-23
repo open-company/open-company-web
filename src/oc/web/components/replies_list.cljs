@@ -171,7 +171,9 @@
                                           utils/hide-class true})}]]
             (when @(::show-read-more s)
               [:button.mlb-reset.read-more-bt
-                {:on-click unwrap-body-cb}
+                {:on-click #(do
+                              (reset! (::show-read-more s) false)
+                              (unwrap-body-cb))}
                 "Read more"])
             (when (seq (:reactions comment-data))
               [:div.reply-comment-reactions-footer.group
@@ -242,13 +244,11 @@
   (swap! (::replies s) (fn [replies] (mapv #(assoc % :unread false) replies))))
 
 (defn unwrap-body [s reply-uuid]
-  (let [replies @(::replies s)
-        idx (utils/index-of replies #(= (:uuid %) reply-uuid))]
-    (swap! (::replies s) (fn [replies]
-                           (mapv #(if (= (:uuid %) reply-uuid)
-                                   (assoc % :unwrapped-body true)
-                                   %)
-                            replies)))))
+  (swap! (::replies s) (fn [replies]
+                         (mapv #(if (= (:uuid %) reply-uuid)
+                                 (assoc % :unwrapped-body true)
+                                 %)
+                          replies))))
 
 (defn- comment-item
   [s {:keys [activity-data reply-data is-mobile? read-reply-cb member?
