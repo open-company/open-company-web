@@ -613,9 +613,12 @@
                                  (vec (conj next-links link-to-move))
                                  next-links)
                                (:links board-data))
-            items-list (when (contains? board-data :items)
+            items-list (when (contains? board-data :entries)
                          ;; In case we are parsing a fresh response from server
-                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:entries board-data)))
+                         (map #(-> %
+                                (select-keys preserved-keys)
+                                (assoc :resource-type :entry))
+                          (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
             grouped-items (if (show-separators? (:slug board-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
@@ -625,7 +628,7 @@
             follow-board-uuids (set (map :uuid follow-boards-list))]
         (-> with-fixed-activities
           (assoc :read-only (readonly-board? (:links board-data)))
-          (dissoc :old-links :items)
+          (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
@@ -675,7 +678,10 @@
                                (:links contributions-data))
             items-list (when (contains? contributions-data :items)
                          ;; In case we are parsing a fresh response from server
-                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items contributions-data)))
+                         (map #(-> %
+                                (select-keys preserved-keys)
+                                (assoc :resource-type :entry))
+                          (:items contributions-data)))
             full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
             grouped-items (if (show-separators? :contributions sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
@@ -731,7 +737,10 @@
                                (:links container-data))
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
-                         (map #(hash-map :uuid (:uuid %) :resource-type :entry) (:items container-data)))
+                         (map #(-> %
+                                (select-keys preserved-keys)
+                                (assoc :resource-type :entry))
+                          (:items container-data)))
             full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
