@@ -39,12 +39,6 @@
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %))))))
 
-(defn fix-org-section-data
-  [db org-data changes]
-  (assoc-in db
-            (dispatcher/org-data-key (:slug org-data))
-            org-data))
-
 (defn fix-posts-new-label
   [db changes]
   (let [posts-data (dispatcher/posts-data db)
@@ -156,17 +150,14 @@
   (timbre/debug "Change status received:" change-data)
   (if change-data
     (let [org-data (dispatcher/org-data db)
-          current-board-slug (:board (:router-path db))
-          current-board-uuid (:uuid (dispatcher/board-data db))
-          filtered-change-data (if (= current-board-slug "all-posts")
-                                 {} ;; ignore all changes if we are on AP
-                                 (into {} (filter (fn [[buid _]](not= buid current-board-uuid)) change-data)))
           old-change-data (dispatcher/change-data db)
           new-change-data (merge old-change-data change-data)
-          next-db (fix-org-section-data db org-data new-change-data)]
+          active-users (dispatcher/active-users (:slug org-data) db)
+          follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)]
       (timbre/debug "Change status data:" new-change-data)
-      (-> next-db
+      (-> db
         (fix-posts-new-label new-change-data)
+        (au/update-all-containers org-data change-data active-users follow-publishers-list)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 

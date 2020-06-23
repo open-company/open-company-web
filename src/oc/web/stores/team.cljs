@@ -35,54 +35,12 @@
           fixed-users (parse-users users follow-publishers-list)
           change-data (dispatcher/change-data db)
           org-data (dispatcher/org-data db org-slug)
-          contributions-list-key (dispatcher/contributions-list-key org-slug)
           users-map (zipmap (map :user-id users) fixed-users)
-          next-db*** (reduce (fn [tdb contrib-key]
-                                (let [rp-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recently-posted-sort)
-                                      ra-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recent-activity-sort)]
-                                  (-> tdb
-                                   (update-in rp-contrib-data-key
-                                    #(dissoc (au/parse-contributions % change-data org-data users-map follow-publishers-list dispatcher/recently-posted-sort) :fixed-items))
-                                   (update-in ra-contrib-data-key
-                                     #(dissoc (au/parse-contributions % change-data org-data users-map follow-publishers-list dispatcher/recent-activity-sort) :fixed-items)))))
-                       db
-                       (keys (get-in db contributions-list-key)))
-          boards-key (dispatcher/boards-key org-slug)
-          following-boards (dispatcher/follow-boards-list org-slug db)
-          next-db** (reduce (fn [tdb board-key]
-                               (let [rp-board-data-key (dispatcher/board-data-key org-slug board-key dispatcher/recently-posted-sort)
-                                     ra-board-data-key (dispatcher/board-data-key org-slug board-key dispatcher/recent-activity-sort)]
-                                 (-> tdb
-                                  (update-in tdb rp-board-data-key
-                                   #(dissoc (au/parse-board % change-data users-map following-boards dispatcher/recently-posted-sort) :fixed-items))
-                                  (update-in tdb ra-board-data-key
-                                   #(dissoc (au/parse-board % change-data users-map following-boards dispatcher/recent-activity-sort) :fixed-items)))))
-                      next-db***
-                      (keys (get-in db boards-key)))
-          containers-key (dispatcher/containers-key org-slug)
-          next-db* (reduce (fn [tdb container-key]
-                              (let [rp-container-data-key (dispatcher/container-key org-slug container-key dispatcher/recently-posted-sort)
-                                    ra-container-data-key (dispatcher/container-key org-slug container-key dispatcher/recent-activity-sort)]
-                                (-> tdb
-                                 (update-in rp-container-data-key
-                                  #(dissoc (au/parse-container % change-data org-data users-map dispatcher/recently-posted-sort) :fixed-items))
-                                 (update-in ra-container-data-key
-                                  #(dissoc (au/parse-container % change-data org-data users-map dispatcher/recent-activity-sort) :fixed-items)))))
-                     next-db**
-                     (keys (get-in db containers-key)))
-          posts-key (dispatcher/posts-data-key org-slug)
-          next-db (reduce (fn [tdb post-uuid]
-                           (let [post-data-key (concat posts-key [post-uuid])
-                                 old-post-data (get-in tdb post-data-key)
-                                 board-data (get-in tdb (dispatcher/board-data-key org-slug (:board-slug old-post-data)))]
-                            (assoc-in tdb post-data-key (au/parse-entry old-post-data board-data change-data users-map))))
-                   next-db*
-                   (keys (get-in db posts-key)))
-          org-data (get-in next-db (dispatcher/org-data-key org-slug))
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           old-follow-publishers-list (get-in db follow-publishers-list-key)
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list users-map)]
-      (-> next-db
+      (-> db
+       (au/update-all-containers org-data change-data users-map next-follow-publishers-list)
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
        (assoc-in follow-publishers-list-key next-follow-publishers-list)))

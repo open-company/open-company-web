@@ -837,3 +837,49 @@
         show-year (or force-year (not= now-year timestamp-year))
         f (if show-year date-format-year date-format)]
     (time-format/unparse f d)))
+
+(defn update-all-containers [db org-data change-data active-users follow-publishers-list]
+  (let [org-slug (:slug org-data)
+        contributions-list-key (dis/contributions-list-key org-slug)
+        next-db*** (reduce (fn [tdb contrib-key]
+                              (let [rp-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recently-posted-sort)
+                                    ra-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recent-activity-sort)]
+                                (-> tdb
+                                 (update-in rp-contrib-data-key
+                                  #(dissoc (parse-contributions % change-data org-data active-users follow-publishers-list dis/recently-posted-sort) :fixed-items))
+                                 (update-in ra-contrib-data-key
+                                   #(dissoc (parse-contributions % change-data org-data active-users follow-publishers-list dis/recent-activity-sort) :fixed-items)))))
+                     db
+                     (keys (get-in db contributions-list-key)))
+        boards-key (dis/boards-key org-slug)
+        following-boards (dis/follow-boards-list org-slug db)
+        next-db** (reduce (fn [tdb board-key]
+                             (let [rp-board-data-key (dis/board-data-key org-slug board-key dis/recently-posted-sort)
+                                   ra-board-data-key (dis/board-data-key org-slug board-key dis/recent-activity-sort)]
+                               (-> tdb
+                                (update-in tdb rp-board-data-key
+                                 #(dissoc (parse-board % change-data active-users following-boards dis/recently-posted-sort) :fixed-items))
+                                (update-in tdb ra-board-data-key
+                                 #(dissoc (parse-board % change-data active-users following-boards dis/recent-activity-sort) :fixed-items)))))
+                    next-db***
+                    (keys (get-in db boards-key)))
+        containers-key (dis/containers-key org-slug)
+        next-db* (reduce (fn [tdb container-key]
+                            (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
+                                  ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
+                              (-> tdb
+                               (update-in rp-container-data-key
+                                #(dissoc (parse-container % change-data org-data active-users dis/recently-posted-sort) :fixed-items))
+                               (update-in ra-container-data-key
+                                #(dissoc (parse-container % change-data org-data active-users dis/recent-activity-sort) :fixed-items)))))
+                   next-db**
+                   (keys (get-in db containers-key)))
+        posts-key (dis/posts-data-key org-slug)
+        next-db (reduce (fn [tdb post-uuid]
+                         (let [post-data-key (concat posts-key [post-uuid])
+                               old-post-data (get-in tdb post-data-key)
+                               board-data (get-in tdb (dis/board-data-key org-slug (:board-slug old-post-data)))]
+                          (assoc-in tdb post-data-key (parse-entry old-post-data board-data change-data active-users))))
+                 next-db*
+                 (keys (get-in db posts-key)))]
+    (assoc-in next-db dis/force-list-update-key (utils/activity-uuid))))
