@@ -197,7 +197,7 @@
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
-       :data-new-at (:new-at activity-data)
+       :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]

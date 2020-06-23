@@ -190,7 +190,7 @@
                                 :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
-       :data-new-at (:new-at activity-data)
+       :data-last-activity-at (:last-activity-at activity-data)
        :data-initial-last-read-at @(::initial-last-read-at s)
        :data-last-read-at (:last-read-at activity-data)
        :data-new-comments-count (:new-comments-count activity-data)

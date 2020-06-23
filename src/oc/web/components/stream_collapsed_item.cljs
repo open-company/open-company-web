@@ -44,10 +44,10 @@
                     (first (:author activity-data)))
         ;; Add NEW tag besides comment summary
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and (:new-at activity-data)
+                          (and (:last-activity-at activity-data)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at activity-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))
+                                  (.getTime (utils/js-date (:last-activity-at activity-data)))))
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
     [:div.stream-collapsed-item
@@ -58,7 +58,7 @@
                                                  (:unread activity-data))
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
-       :data-new-at (:new-at activity-data)
+       :data-last-activity-at (:last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]

@@ -794,16 +794,16 @@
         comments-data (filterv #(not= (j/user-id) (-> % :author :user-id)) all-comments-data)
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         old-activity-data (get-in db activity-key)
-        ;; Update the activity to read and update the new-at with the max btw the current value
+        ;; Update the activity to read and update the last-activity-at with the max btw the current value
         ;; and the created-at of the last comment.
         next-activity-data (merge old-activity-data {:unread false
                                                      :last-read-at dismiss-at
-                                                     :new-at (if (and (seq comments-data)
+                                                     :last-activity-at (if (and (seq comments-data)
                                                                                 (-> comments-data last :created-at
-                                                                                 (compare (:new-at old-activity-data))
+                                                                                 (compare (:last-activity-at old-activity-data))
                                                                                  pos?))
                                                                          (-> comments-data last :created-at)
-                                                                         (:new-at old-activity-data))})
+                                                                         (:last-activity-at old-activity-data))})
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))

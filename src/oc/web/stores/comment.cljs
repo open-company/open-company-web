@@ -248,7 +248,7 @@
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]
     (-> db
      (assoc-in sorted-comments-key new-sorted-comments-data)
-     (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
+     (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:last-activity-at (:created-at last-not-own-comment)})
      (update-in (vec (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count)) (if deleting-new-comment? dec identity)))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
@@ -275,15 +275,15 @@
           old-comments-count (:new-comments-count activity-data)
           new-comments-count (if (and ;; comment is not from current user
                                       (not (:author? comment-data))
-                                      ;; and the activity we have is old (new-at is the created-at of the last comment)
-                                      (> (.getTime (utils/js-date (:new-at activity-data)))
+                                      ;; and the activity we have is old (last-activity-at is the created-at of the last comment)
+                                      (> (.getTime (utils/js-date (:last-activity-at activity-data)))
                                          (.getTime (utils/js-date (:created-at comment-data)))))
                                (inc old-comments-count)
                                old-comments-count)
-          with-new-at (if (:author? comment-data)
+          with-last-activity-at (if (:author? comment-data)
                         with-authors
                         (-> with-authors
-                          (assoc :new-at created-at)
+                          (assoc :last-activity-at created-at)
                           (assoc :new-comments-count new-comments-count)))
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
           all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))]
@@ -295,8 +295,8 @@
               new-sorted-comments-data (cu/sort-comments new-comments-data)]
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
-           (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
-        ;; In case we don't have the comments already loaded just update the :new-at value
+           (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
+        ;; In case we don't have the comments already loaded just update the :last-activity-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
-        (assoc-in db (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
+        (assoc-in db (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
     db))
