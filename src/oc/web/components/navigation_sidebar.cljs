@@ -47,7 +47,8 @@
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
-                                (drv/drv :unread-replies)
+                                (drv/drv :badge-replies)
+                                (drv/drv :badge-home)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 ;; Locals
@@ -131,7 +132,8 @@
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
-        unread-replies (drv/react s :unread-replies)
+        badge-home (drv/react s :badge-home)
+        badge-replies (drv/react s :badge-replies)
         ; show-you (and user-is-part-of-the-team?
         ;               (pos? (:contributions-count org-data)))
         user-role (user-store/user-role org-data current-user-data)
@@ -155,14 +157,15 @@
         ;; All posts
         (when show-following
           [:a.nav-link.home.hover-item.group
-            {:class (utils/class-set {:item-selected is-following})
+            {:class (utils/class-set {:item-selected is-following
+                                      :new badge-home})
              :href (oc-urls/following)
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
-            (when (pos? (count all-unread-items))
+            (when badge-home
               ; [:span.count (count all-unread-items)]
               [:span.unread-dot])])
         (when show-topics
@@ -184,7 +187,7 @@
                       "top-border")}
             [:a.nav-link.replies-view.hover-item.group
               {:class (utils/class-set {:item-selected is-replies
-                                        :new unread-replies})
+                                        :new badge-replies})
                :href (oc-urls/replies)
                :on-click (fn [e]
                            (utils/event-stop e)
@@ -193,7 +196,7 @@
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
                 "Replies"]
-                (when (pos? unread-replies)
+                (when badge-replies
                   [:span.unread-dot])]])
         ;; You
         ; (when show-you

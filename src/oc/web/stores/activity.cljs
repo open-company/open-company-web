@@ -926,6 +926,11 @@
 
 ;; Following
 
+(defn- badge-home? [following-data]
+  (let [first-following-item (first (:posts-list following-data))
+        first-following-data (merge (dispatcher/activity-data (:uuid first-following-item)) (get (:fixed-items following-data) (:uuid first-following-item)) first-following-item)]
+    (:unread first-following-data)))
+
 (defmethod dispatcher/action :following-get/finish
   [db [_ org-slug sort-type following-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
@@ -937,9 +942,11 @@
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-following-data))
-        container-key (dispatcher/container-key org-slug :following sort-type)]
+        container-key (dispatcher/container-key org-slug :following sort-type)
+        badge-home-key (dispatcher/badge-home-key org-slug)]
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
+      (assoc-in ndb badge-home-key (badge-home? fixed-following-data))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
@@ -969,9 +976,11 @@
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
-                              (dissoc :loading-more :fixed-items))]
+                              (dissoc :loading-more :fixed-items))
+          badge-home-key (dispatcher/badge-home-key org)]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
+        (assoc-in ndb badge-home-key (badge-home? fixed-posts-data))
         (assoc-in ndb posts-data-key new-items-map)
         (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-posts-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
@@ -980,6 +989,12 @@
     db))
 
 ;; Replies
+
+(defn- badge-replies? [replies-data]
+  (let [first-reply-item (first (:posts-list replies-data))
+        first-reply-data (merge (dispatcher/activity-data (:uuid first-reply-item)) (get (:fixed-items replies-data) (:uuid first-reply-item)) first-reply-item)]
+    (or (:unread first-reply-data)
+        (pos? (:new-comments-count first-reply-data)))))
 
 (defmethod dispatcher/action :replies-get/finish
   [db [_ org-slug sort-type replies-data]]
@@ -993,12 +1008,10 @@
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-container-key (dispatcher/container-key org-slug :replies sort-type)
-        unread-replies-key (dispatcher/unread-replies-key org-slug)]
+        badge-replies-key (dispatcher/badge-replies-key org-slug)]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
-      (assoc-in ndb unread-replies-key (some #(or (:unread %)
-                                                  (pos? (:new-comments-count %)))
-                                        (vals (:fixed-items fixed-replies-data))))
+      (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
       (assoc-in ndb posts-data-key merged-items)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
@@ -1029,12 +1042,10 @@
           new-container-data (-> fixed-replies-data
                               (assoc :direction direction)
                               (dissoc :loading-more :fixed-items))
-          unread-replies-key (dispatcher/unread-replies-key org)]
+          badge-replies-key (dispatcher/badge-replies-key org)]
       (as-> db ndb
         (assoc-in ndb replies-container-key new-container-data)
-        (assoc-in ndb unread-replies-key (some #(or (:unread %)
-                                                    (pos? (:new-comments-count %)))
-                                          (vals (:fixed-items fixed-replies-data))))
+        (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
         (assoc-in ndb posts-data-key new-posts-map)
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
