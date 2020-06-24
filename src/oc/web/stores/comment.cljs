@@ -294,6 +294,7 @@
                                          ;; if board is in the following list
                                          ((set (map :uuid follow-boards-list)) (:board-uuid activity-data)))
                                      (pos? new-comments-count))]
+      (js/console.log "DBG comment-store//:ws-interaction/comment-add badge-replies" should-badge-replies?)
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)

@@ -990,9 +990,19 @@
 
 ;; Replies
 
-(defn- badge-replies? [replies-data]
+(defn- badge-replies? [replies-data from]
   (let [first-reply-item (first (:posts-list replies-data))
-        first-reply-data (merge (dispatcher/activity-data (:uuid first-reply-item)) (get (:fixed-items replies-data) (:uuid first-reply-item)) first-reply-item)]
+        activity-data (dispatcher/activity-data (:uuid first-reply-item))
+        fixed-item (get (:fixed-items replies-data) (:uuid first-reply-item))
+        first-reply-data (merge activity-data fixed-item first-reply-item)]
+    (js/console.log "DBG badge-replies?" from)
+    (js/console.log "DBG    replies-data" replies-data)
+    (js/console.log "DBG    first-reply-item" first-reply-item)
+    (js/console.log "DBG    activity-data" activity-data)
+    (js/console.log "DBG    fixed-item" fixed-item)
+    (js/console.log "DBG    data:" first-reply-data)
+    (js/console.log "DBG    badge->" (or (:unread first-reply-data)
+                                         (pos? (:new-comments-count first-reply-data))))
     (or (:unread first-reply-data)
         (pos? (:new-comments-count first-reply-data)))))
 
@@ -1011,7 +1021,7 @@
         badge-replies-key (dispatcher/badge-replies-key org-slug)]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
-      (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
+      (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data ":replies-get/finish"))
       (assoc-in ndb posts-data-key merged-items)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
@@ -1045,7 +1055,7 @@
           badge-replies-key (dispatcher/badge-replies-key org)]
       (as-> db ndb
         (assoc-in ndb replies-container-key new-container-data)
-        (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
+        (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data ":replies-more/finish"))
         (assoc-in ndb posts-data-key new-posts-map)
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
@@ -1122,8 +1132,10 @@
 
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
+  (js/console.log "DBG :replies-badge/on")
   (assoc-in db (dispatcher/badge-replies-key org-slug) true))
 
 (defmethod dispatcher/action :replies-badge/off
   [db [_ org-slug]]
+  (js/console.log "DBG :replies-badge/off")
   (assoc-in db (dispatcher/badge-replies-key org-slug) false))
