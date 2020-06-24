@@ -415,6 +415,9 @@
 (defn- mark-read-entries? [entries]
   (some #(and (seq (:last-read-at %)) (pos? (:new-comments-count %))) entries))
 
+(defn- last-reads-at-from-entries [entries]
+  (zipmap (map :uuid entries) (map :last-read-at entries)))
+
 (rum/defcs replies-list <
   rum/reactive
   (drv/drv :comments-data)
@@ -422,19 +425,13 @@
   (rum/local #{} ::read-items)
   (rum/local false ::has-unread-items)
   (rum/local [] ::entries)
-  (rum/local nil ::initial-last-read-at)
+  (rum/local nil ::initial-last-reads-at)
   (ui-mixins/on-window-scroll-mixin did-scroll)
   {:will-mount (fn [s]
-    (let [entries (-> s :rum/args first :items-to-render)
-          last-read-at (reduce (fn [r t]
-                                 (update r (:uuid t) #(if (pos? (compare % (:last-read-at t)))
-                                                        %
-                                                        (:last-read-at t))))
-                        {}
-                        entries)]
+    (let [entries (-> s :rum/args first :items-to-render)]
      (reset! (::entries s) entries)
      (reset! (::has-unread-items s) (mark-read-entries? entries))
-     (reset! (::initial-last-read-at s) last-read-at))
+     (reset! (::initial-last-reads-at s) (last-reads-at-from-entries entries)))
     s)
    :did-mount (fn [s]
      (did-scroll s nil)
@@ -444,16 +441,10 @@
          items-changed (clj-data/diff (-> o :rum/args first :items-to-render) entries)]
      (when (or (seq (first items-changed))
                (seq (second items-changed)))
-       (let [last-read-at (reduce (fn [r t]
-                                    (update r (:uuid t) #(if (pos? (compare % (:last-read-at t)))
-                                                           %
-                                                           (:last-read-at t))))
-                            @(::initial-last-read-at s)
-                            entries)]
-         (reset! (::entries s) entries)
-         (reset! (::has-unread-items s) (mark-read-entries? entries))
-         (reset! (::initial-last-read-at s) last-read-at)
-         (utils/after 0 #(did-scroll s nil)))))
+       (reset! (::entries s) entries)
+       (reset! (::has-unread-items s) (mark-read-entries? entries))
+       (swap! (::initial-last-reads-at s) #(merge (last-reads-at-from-entries entries) %))
+       (utils/after 0 #(did-scroll s nil))))
    s)}
   [s {:keys [items-to-render last-read-at member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
@@ -472,7 +463,7 @@
                       item-comments-data (au/activity-comments item* comments-drv)
                       item-props (assoc item* :member? member?
                                               :comments-data item-comments-data
-                                              :initial-last-read-at (get @(::initial-last-read-at s) (:uuid item*)))]]
+                                              :initial-last-read-at (get @(::initial-last-reads-at s) (:uuid item*)))]]
             (cond
               caught-up?
               (rum/with-key
