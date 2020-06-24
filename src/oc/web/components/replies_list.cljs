@@ -276,10 +276,14 @@
 
 (rum/defc collapsed-comments-button <
   rum/static
-  [{:keys [collapsed-count comment-uuids expand-cb]}]
+  [{:keys [message collapsed-count comment-uuids collapse-id expand-cb unread-collapsed]}]
   [:button.mlb-reset.view-more-bt
-    {:on-click expand-cb}
-    (str "View " collapsed-count " more comments")])
+    {:on-click expand-cb
+     :data-collapsed-count collapsed-count
+     :data-comment-uuids comment-uuids
+     :data-collapse-id collapse-id
+     :data-unread-collapsed unread-collapsed}
+    message])
 
 (defn- update-replies [s]
   (let [props (-> s :rum/args first)
@@ -370,8 +374,7 @@
                 :when (:expanded reply)]
             (if (= (:resource-type reply) :collapsed-comments)
               (rum/with-key
-               (collapsed-comments-button {:collapsed-count (:collapsed-count reply)
-                                           :expand-cb #(expand-comments s (:collapse-id reply))})
+               (collapsed-comments-button (assoc reply :expand-cb #(expand-comments s (:collapse-id reply))))
                (str "collapsed-comments-bt-" (clojure.string/join "-" (:comment-uuids reply))))
               (comment-item s {:activity-data activity-data
                                :reply-data reply
