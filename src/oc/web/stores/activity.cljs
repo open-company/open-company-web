@@ -1116,6 +1116,14 @@
   [db [_ org-slug]]
   (assoc-in db (dispatcher/badge-home-key org-slug) true))
 
+(defmethod dispatcher/action :home-badge/off
+  [db [_ org-slug]]
+  (assoc-in db (dispatcher/badge-home-key org-slug) false))
+
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
   (assoc-in db (dispatcher/badge-replies-key org-slug) true))
+
+(defmethod dispatcher/action :replies-badge/off
+  [db [_ org-slug]]
+  (assoc-in db (dispatcher/badge-replies-key org-slug) false))

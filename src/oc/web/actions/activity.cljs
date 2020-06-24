@@ -758,7 +758,7 @@
 
 ;; Home badge
 
-(defn check-activity-for-home-badge [container-id activity-uuid]
+(defn check-activity-for-badges [container-id activity-uuid]
   ;; Reload the entry from the server and check if we need to turn on the badge for home
   (let [org-slug (router/current-org-slug)
         board-data (au/board-by-uuid container-id)]
@@ -767,16 +767,24 @@
        (when success
          (let [activity-data (dis/activity-data activity-uuid)
                follow-boards-list (dis/follow-boards-list org-slug)
-               should-badge-home? (and (= (keyword (:status activity-data)) :published)
-                                       (or ;; if unfollow link is presetn it means the user is explicitly
-                                           ;; following the entry
-                                           (utils/link-for (:links activity-data) "unfollow")
-                                           ;; or if the board is followed by the user
-                                           ((set (map :uuid follow-boards-list)) container-id))
+               is-published? (= (keyword (:status activity-data)) :published)
+               is-following? (or ;; if unfollow link is present it means the user is explicitly
+                                 ;; following the entry
+                                 (utils/link-for (:links activity-data) "unfollow")
+                                 ;; or if the board is followed by the user
+                                 ((set (map :uuid follow-boards-list)) container-id))
+               should-badge-home? (and is-published?
+                                       is-following?
                                        ;; and the user has never read it
-                                       (clojure.string/blank? (:last-read-at activity-data)))]
+                                       (:unread activity-data))
+               should-badge-replies? (and is-published?
+                                          is-following?
+                                          (or (:unread activity-data)
+                                              (pos? (:new-comments-count activity-data))))]
            (when should-badge-home?
-             (dis/dispatch! [:home-badge/on org-slug]))))))))
+             (dis/dispatch! [:home-badge/on org-slug]))
+           (when should-badge-replies?
+             (dis/dispatch! [:replies-badge/on org-slug]))))))))
 
 ;; Change service actions
 
@@ -824,7 +832,7 @@
             (do
               (timbre/debug "Follow for" activity-uuid)
               ;; Reload the entry from the server and check if we need to turn on the badge for home
-              (check-activity-for-home-badge container-id activity-uuid)
+              (check-activity-for-badges container-id activity-uuid)
               (inbox-get (dis/org-data)))
             (= change-type :unfollow)
             (do
@@ -856,7 +864,7 @@
                                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
                                                                                           :board-uuid container-id}]))))]
         (when (= change-type :add)
-          (check-activity-for-home-badge container-id activity-uuid))
+          (check-activity-for-badges container-id activity-uuid))
         (when (= change-type :delete)
           (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
