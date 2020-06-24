@@ -1111,3 +1111,11 @@
 (defmethod dispatcher/action :force-list-update
   [db [_]]
   (assoc-in db dispatcher/force-list-update-key (utils/activity-uuid)))
+
+(defmethod dispatcher/action :home-badge/on
+  [db [_ org-slug]]
+  (assoc-in db (dispatcher/badge-home-key org-slug) true))
+
+(defmethod dispatcher/action :replies-badge/on
+  [db [_ org-slug]]
+  (assoc-in db (dispatcher/badge-replies-key org-slug) true))

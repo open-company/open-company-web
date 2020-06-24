@@ -781,6 +781,9 @@
       (when (and (#{:dismiss :unread :follow :unfollow :comment-add} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
+              org-slug (router/current-org-slug)
+              container-id (:container-id change-data)
+              board-data (au/board-by-uuid container-id)
               activity-uuid (:item-id change-data)
               change-type (:change-type change-data)
               inbox-action (:inbox-action change-data)]
@@ -788,16 +791,22 @@
             (= change-type :dismiss)
             (do
               (timbre/debug "Dismiss for" activity-uuid)
-              (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
+              (dis/dispatch! [:inbox/dismiss org-slug activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :unread)
             (do
               (timbre/debug "Unread for" activity-uuid)
-              (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) activity-uuid])
+              (dis/dispatch! [:inbox/unread org-slug (:slug board-data) activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :follow)
             (do
               (timbre/debug "Follow for" activity-uuid)
+              ;; Reload the entry from the server and check if we need to turn on the badge for home
+              (cmail-actions/get-entry-with-uuid (:slug board-data) activity-uuid
+               (fn [success status]
+                 (when success
+                   (when (:unread (dis/activity-data activity-uuid))
+                      (dis/dispatch! [:home-badge/on org-slug])))))
               (inbox-get (dis/org-data)))
             (= change-type :unfollow)
             (do
