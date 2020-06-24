@@ -281,12 +281,19 @@
                                (inc old-comments-count)
                                old-comments-count)
           with-last-activity-at (if (:author? comment-data)
-                        with-authors
-                        (-> with-authors
-                          (assoc :last-activity-at created-at)
-                          (assoc :new-comments-count new-comments-count)))
+                                  with-authors
+                                  (-> with-authors
+                                    (assoc :last-activity-at created-at)
+                                    (assoc :new-comments-count new-comments-count)))
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
-          all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))]
+          all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
+          badge-replies-key (dispatcher/badge-replies-key org-slug)
+          follow-boards-list (dispatcher/follow-boards-list org-slug db)
+          should-badge-replies? (and (or ;; If unfollow link is present it means the user is following the entry
+                                         (utils/link-for activity-data "unfollow")
+                                         ;; if board is in the following list
+                                         ((set (map :uuid follow-boards-list)) (:board-uuid activity-data)))
+                                     (pos? new-comments-count))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)
@@ -295,8 +302,11 @@
               new-sorted-comments-data (cu/sort-comments new-comments-data)]
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
+           (update-in badge-replies-key #(or should-badge-replies? %))
            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
         ;; In case we don't have the comments already loaded just update the :last-activity-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
-        (assoc-in db (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
+        (-> db
+         (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)
+         (update-in badge-replies-key #(or should-badge-replies? %)))))
     db))
