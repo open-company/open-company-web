@@ -388,7 +388,7 @@
                         :add-comment-placeholder "Reply..."
                         :add-comment-cb #(do
                                            (entry-mark-read s)
-                                           (swap! (::collapsed-comments s) merge {(:uuid %) {:unread false :expanded true :unwrapped-body true}}))
+                                           (swap! (::replies s) merge {(:uuid %) {:unread false :expanded true :unwrapped-body true}}))
                         :add-comment-focus-prefix add-comment-focus-prefix})])]))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
