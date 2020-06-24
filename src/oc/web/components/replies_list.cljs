@@ -89,7 +89,7 @@
        :data-comment-uuid (:uuid comment-data)
        :data-unwrapped-body (:unwrapped-body comment-data)
        :data-unread (:unread comment-data)
-       :data-unwrapped-body-fn? (fn? unwrap-body-cb)
+       :data-unwrapped-body-fn (fn? unwrap-body-cb)
        :class (utils/class-set {:new-comment (:unread comment-data)
                                 :showing-picker showing-picker?
                                 :no-replies (zero? replies-count)
