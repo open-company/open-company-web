@@ -995,14 +995,6 @@
         activity-data (dispatcher/activity-data (:uuid first-reply-item))
         fixed-item (get (:fixed-items replies-data) (:uuid first-reply-item))
         first-reply-data (merge activity-data fixed-item first-reply-item)]
-    (js/console.log "DBG badge-replies?" from)
-    (js/console.log "DBG    replies-data" replies-data)
-    (js/console.log "DBG    first-reply-item" first-reply-item)
-    (js/console.log "DBG    activity-data" activity-data)
-    (js/console.log "DBG    fixed-item" fixed-item)
-    (js/console.log "DBG    data:" first-reply-data)
-    (js/console.log "DBG    badge->" (or (:unread first-reply-data)
-                                         (pos? (:new-comments-count first-reply-data))))
     (or (:unread first-reply-data)
         (pos? (:new-comments-count first-reply-data)))))
 
@@ -1132,10 +1124,8 @@
 
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
-  (js/console.log "DBG :replies-badge/on")
   (assoc-in db (dispatcher/badge-replies-key org-slug) true))
 
 (defmethod dispatcher/action :replies-badge/off
   [db [_ org-slug]]
-  (js/console.log "DBG :replies-badge/off")
   (assoc-in db (dispatcher/badge-replies-key org-slug) false))
