@@ -288,6 +288,10 @@ div.replies-list {
           position: relative;
           background-color: var(--foc-background-color);
           text-decoration: underline;
+
+          &.has-unread {
+            color: $carrot_green;
+          }
         }
 
         div.reply-item-loading {

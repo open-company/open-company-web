@@ -284,7 +284,8 @@
      :data-collapsed-count collapsed-count
      :data-comment-uuids comment-uuids
      :data-collapse-id collapse-id
-     :data-unread-collapsed unread-collapsed}
+     :data-unread-collapsed unread-collapsed
+     :class (when unread-collapsed "has-unread")}
     message])
 
 (defn- update-replies [s]
