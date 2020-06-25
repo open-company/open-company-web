@@ -61,10 +61,10 @@ div.stream-comments {
       &.left-border {
         &:before {
           content: "";
-          width: 2px;
+          width: 0px;
           height: calc(100% - 26px);
           position: absolute;
-          left: 16px;
+          left: 18px;
           top: 24px;
           background-color: var(--opac-background-color-1);
         }
