@@ -75,15 +75,14 @@
 
 (defn- send-clicked [event s]
   (reset! (::collapsed s) true)
-  (let [add-comment-div (rum/ref-node s "editor-node")
+  (let [add-comment-div (add-comment-field s)
         comment-body (cu/add-comment-content add-comment-div)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
          edit-comment-data scroll-after-posting? add-comment-cb]} (first (:rum/args s))
         save-done-cb (fn [success]
                       (if success
-                        (let [el (rum/ref-node s "editor-node")]
-                          (when el
-                            (set! (.-innerHTML el) @(::initial-add-comment s))))
+                        (when-let [el (add-comment-field s)]
+                          (set! (.-innerHTML el) @(::initial-add-comment s)))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -133,7 +132,7 @@
 
 (defn- maybe-focus [s]
   (when (should-focus? s)
-    (let [field (add-comment-field s)]
+    (when-let [field (add-comment-field s)]
       (.focus field)
       (utils/after 0 #(utils/to-end-of-content-editable field)))))
 
@@ -142,8 +141,9 @@
          dismiss-reply-cb edit-comment-data]} (-> s :rum/args first)
         dismiss-fn (fn []
                     (comment-actions/add-comment-reset add-comment-focus-prefix (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
-                    (set! (.-innerHTML (rum/ref-node s "editor-node"))
-                     (or (-> s :rum/args first :edit-comment-data :body) au/empty-body-html))
+                    (when-let [el (add-comment-field s)]
+                      (set! (.-innerHTML el)
+                       (or (-> s :rum/args first :edit-comment-data :body) au/empty-body-html)))
                     (reset! (::collapsed s) true)
                     (when (fn? dismiss-reply-cb)
                       (dismiss-reply-cb true)))]
@@ -176,6 +176,7 @@
                          ;; Image upload lock
                          (rum/local false :me/upload-lock)
                          (rum/local "" ::add-comment-id)
+                         (rum/local false ::comment-reply-to-reset)
 
                          ;; Derivatives
                          (drv/drv :media-input)
@@ -237,19 +238,23 @@
                            (let [props (-> s :rum/args first)
                                  reply-to @(drv/get-ref s :comment-reply-to)
                                  focus-val (focus-value s)
-                                 reply-to-body (get reply-to focus-val)]
-                             (when (string? reply-to-body)
+                                 {:keys [focus body] :as r} (get reply-to focus-val)]
+                             (when (string? body)
                                (let [body-field (add-comment-field s)
                                      current-body (.-innerHTML body-field)
-                                     quoted-body (str "<blockquote>" reply-to-body "</blockquote><p><br></p>")
+                                     quoted-body (str "<blockquote>" body "</blockquote><p><br></p>")
                                      next-body (if (au/empty-body? current-body)
                                                  (str au/empty-body-html quoted-body)
                                                  (str current-body quoted-body))]
+                                 ;; If focus is required let's make sure the component force the focus
+                                 ;; in did-update
+                                 (when focus
+                                   (reset! (::last-add-comment-focus s) nil))
                                  (set! (.-innerHTML body-field) next-body)
                                  (comment-actions/add-comment-change (:activity-data props) (:parent-comment-uuid props) (:uuid (:edit-comment-data props)) (add-comment-body s))
-                                 (comment-actions/reset-reply-to focus-val)
                                  (reset! (::collapsed s) false)
-                                 (reset! (::post-enabled s) true))))
+                                 (reset! (::post-enabled s) true)
+                                 (comment-actions/reset-reply-to focus-val))))
                            (let [props (first (:rum/args s))]
                              (let [data @(drv/get-ref s :media-input)
                                    video-data (:media-video data)]

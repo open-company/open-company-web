@@ -429,6 +429,7 @@
   rum/reactive
   (drv/drv :comments-data)
   (drv/drv :comment-reply-to)
+  (drv/drv :add-comment-focus)
   ui-mixins/refresh-tooltips-mixin
   (rum/local #{} ::read-items)
   (rum/local false ::has-unread-items)
@@ -458,7 +459,8 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         items @(::entries s)
         comments-drv (drv/react s :comments-data)
-        _reply-to (drv/react s :comment-reply-to)]
+        _reply-to (drv/react s :comment-reply-to)
+        _add-comment-focus (drv/react s :add-comment-focus)]
     [:div.replies-list
       (if (empty? items)
         [:div.replies-list-empty

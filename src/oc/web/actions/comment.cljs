@@ -17,7 +17,7 @@
   (dis/dispatch! [:add-comment-focus focus-value]))
 
 (defn reply-to [focus-value parent-body & [focus-field?]]
-  (dis/dispatch! [:add-comment/reply (router/current-org-slug) focus-value {:quote parent-body :focus focus-field?}]))
+  (dis/dispatch! [:add-comment/reply (router/current-org-slug) focus-value {:body parent-body :focus focus-field?}]))
 
 (defn reset-reply-to [focus-value]
   (dis/dispatch! [:add-comment/reset-reply (router/current-org-slug) focus-value]))

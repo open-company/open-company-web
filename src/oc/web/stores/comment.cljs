@@ -13,8 +13,10 @@
 (defmethod dispatcher/action :add-comment/reply
   [db [_ org-slug focus-value reply-data]]
   (as-> db t
-   (update-in t (dispatcher/comment-reply-to-key org-slug) merge {focus-value (:quote reply-data)})
-   (assoc t :add-comment-focus focus-value)))
+   (update-in t (dispatcher/comment-reply-to-key org-slug) merge {focus-value reply-data})
+   (if (:focus reply-data)
+    (assoc t :add-comment-focus focus-value)
+    t)))
 
 (defmethod dispatcher/action :add-comment/reset-reply
   [db [_ org-slug focus-value]]
