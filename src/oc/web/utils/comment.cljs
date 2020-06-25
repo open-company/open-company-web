@@ -55,11 +55,11 @@
                                   }]}}]
     (new js/MediumEditor comment-node (clj->js config))))
 
-(defn add-comment-content [comment-node & [print?]]
+(defn add-comment-content [comment-node]
   (let [comment-html (.-innerHTML comment-node)
         $comment-node (.html (js/$ "<div/>") comment-html)
         _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
-    (.html $comment-node)))
+    (utils/clean-body-html (.html $comment-node))))
 
 (defn ungroup-comments [comments]
   (filterv #(#{:thread :comment} (:resource-type %)) comments))
