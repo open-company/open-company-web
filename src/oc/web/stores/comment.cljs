@@ -11,12 +11,14 @@
             [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :add-comment/reply
-  [db [_ focus-value parent-body]]
-  (assoc-in db [:comment-reply-to focus-value] parent-body))
+  [db [_ org-slug focus-value reply-data]]
+  (as-> db t
+   (update-in t (dispatcher/comment-reply-to-key org-slug) merge {focus-value (:quote reply-data)})
+   (assoc t :add-comment-focus focus-value)))
 
 (defmethod dispatcher/action :add-comment/reset-reply
-  [db [_ focus-value]]
-  (update db :comment-reply-to dissoc focus-value))
+  [db [_ org-slug focus-value]]
+  (update-in db (dispatcher/comment-reply-to-key org-slug) dissoc focus-value))
 
 (defmethod dispatcher/action :add-comment-change
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid comment-body force-update?]]
@@ -294,7 +296,6 @@
                                          ;; if board is in the following list
                                          ((set (map :uuid follow-boards-list)) (:board-uuid activity-data)))
                                      (pos? new-comments-count))]
-      (js/console.log "DBG comment-store//:ws-interaction/comment-add badge-replies" should-badge-replies?)
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)

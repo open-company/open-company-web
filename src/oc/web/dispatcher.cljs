@@ -132,6 +132,9 @@
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
 
+(defn comment-reply-to-key [org-slug]
+  (vec (conj (org-key org-slug) :comment-reply-to-key)))
+
 (defn comments-key [org-slug]
   (vec (conj (org-key org-slug) :comments)))
 
@@ -619,7 +622,7 @@
    :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
-   :comment-reply-to      [[:base] (fn [base] (:comment-reply-to base))]
+   :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    })
 
 ;; Action Loop =================================================================
