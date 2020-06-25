@@ -357,13 +357,13 @@ div.replies-list {
           }
 
           &.vertical-line:before {
-            width: 2px;
+            width: 0;
             height: calc(100% - 48px);
             background-color: var(--foc-divider-line-color);
             content: "";
             position: absolute;
             top: 40px;
-            left: 11px;
+            left: 13px;
           }
 
           &.no-replies.vertical-line:before {
