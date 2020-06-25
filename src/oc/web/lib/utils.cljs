@@ -596,8 +596,8 @@
         _ (.remove (js/$ ".oc-mention-popup" $container))
         _ (.remove (js/$ ".oc-poll-container" $container))
         re-check (js/RegExp "^([\\s]*|[\\<br\\s*/?\\>]{0,1}|[\\s]*|[\\&nbsp;]*)*$" "i")
-        _ (remove-elements $container "p:last-child" re-check)
-        _ (remove-elements $container "p:first-child" re-check)]
+        _ (remove-elements $container "> p:last-child" re-check)
+        _ (remove-elements $container "> p:first-child" re-check)]
     (.html $container)))
 
 (defn your-digest-url []
