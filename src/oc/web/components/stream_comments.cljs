@@ -141,7 +141,7 @@
            edit-comment-key mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt? member?
-           show-more-menu showing-picker? did-react-cb unread-thread?
+           show-more-menu showing-picker? did-react-cb
            current-user-id]}]
   [:div.stream-comment-outer.open-thread
     {:key (str "stream-comment-" (:created-at comment-data))
@@ -374,6 +374,5 @@
                                :show-more-menu (::show-more-menu s)
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key
-                               :unread-thread? (:unread root-comment-data)
                                :member? member?
                                :current-user-id current-user-id}))])])]))
