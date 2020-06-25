@@ -137,6 +137,7 @@ function PlaceCaretAtEnd(el) {
     },
 
     onKeydown: function(keydownEvent) {
+      // Down arrow
       if (MediumEditor.util.isKey(keydownEvent, [40])) {
         // In case the last child of the editor is a poll add a new paragraph when user press down arrow
         var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
@@ -147,7 +148,7 @@ function PlaceCaretAtEnd(el) {
           this.appendParagraph();
         }
       }
-
+      // Up arrow
       if (MediumEditor.util.isKey(keydownEvent, [38])) {
         if (meEl &&
             meEl.firstElementChild &&
