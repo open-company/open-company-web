@@ -68,7 +68,7 @@
                                      (reset! (::show-picker s) nil))}))))
 
 (rum/defcs reply-comment <
-  ; rum/static
+  rum/static
   (rum/local false ::show-read-more)
   {:did-mount (fn [s]
    (let [props (-> s :rum/args first)]
@@ -81,7 +81,7 @@
   [s {:keys [activity-data comment-data mouse-leave-cb
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
-             did-react-cb current-user-id
+             did-react-cb current-user-id reply-focus-value
              replies-count replying-to unwrap-body-cb]}]
   (let [show-new-comment-tag (:unread comment-data)]
     [:div.reply-comment-outer.open-reply
@@ -220,7 +220,8 @@
 (defn- reply-item-unique-class [{:keys [uuid]}]
   (str "reply-item-" uuid))
 
-(def add-comment-focus-prefix "reply-comment")
+(defn- add-comment-focus-prefix []
+  (str "reply-comment-" (int (rand 10000)) "-prefix"))
 
 (defn- expand-reply [s reply-data]
   (let [replies @(::replies s)
@@ -260,6 +261,7 @@
       {:key (str "reply-thread-item-" (:uuid reply-data))}
       (reply-comment {:activity-data activity-data
                       :comment-data reply-data
+                      :reply-focus-value reply-focus-value
                       :unwrap-body-cb (when-not (:unwrapped-body reply-data)
                                         #(unwrap-body s (:uuid reply-data)))
                       :is-mobile? is-mobile?
@@ -306,6 +308,7 @@
                         (rum/local nil ::show-picker)
                         (rum/local #{} ::replying)
                         (rum/local nil ::replies)
+                        (rum/local nil ::add-comment-focus-prefix)
                         ui-mixins/refresh-tooltips-mixin
                         (ui-mixins/interactive-images-mixin "div.reply-comment-body")
                         (ui-mixins/on-window-click-mixin (fn [s e]
@@ -320,6 +323,7 @@
                         (drv/drv :followers-publishers-count)
                         (mention-mixins/oc-mentions-hover {:click? true})
                         {:will-mount (fn [s]
+                           (reset! (::add-comment-focus-prefix s) (add-comment-focus-prefix))
                            (update-replies s)
                          s)
                          :did-remount (fn [o s]
@@ -345,7 +349,7 @@
         reply-item-class (reply-item-unique-class activity-data)
         replies @(::replies s)
         comments-loaded? (not (seq replies))
-        add-comment-focus-value (cu/add-comment-focus-value add-comment-focus-prefix uuid)]
+        add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)]
     [:div.reply-item.group
       {:class (utils/class-set {:unread unread
                                 :open-item true
@@ -383,13 +387,15 @@
                                :member? member?
                                :reply-focus-value add-comment-focus-value
                                :current-user-id (:user-id current-user-data)})))
-          (add-comment {:activity-data activity-data
-                        :collapse? true
-                        :add-comment-placeholder "Reply..."
-                        :add-comment-cb #(do
-                                           (entry-mark-read s)
-                                           (swap! (::replies s) merge {(:uuid %) {:unread false :expanded true :unwrapped-body true}}))
-                        :add-comment-focus-prefix add-comment-focus-prefix})])]))
+          (rum/with-key
+           (add-comment {:activity-data activity-data
+                         :collapse? true
+                         :add-comment-placeholder "Reply..."
+                         :add-comment-cb #(do
+                                            (entry-mark-read s)
+                                            (swap! (::replies s) merge {(:uuid %) {:unread false :expanded true :unwrapped-body true}}))
+                         :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
+           (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))])]))
 
 (defn- mark-read-if-needed [s items-container offset-top item]
   (when-let [item-node (.querySelector items-container (str "div." (reply-item-unique-class item)))]
@@ -413,14 +419,16 @@
           (reset! (::has-unread-items s) false))))))
 
 (defn- mark-read-entries? [entries]
-  (some #(and (seq (:last-read-at %)) (pos? (:new-comments-count %))) entries))
+  (some #(when (and (seq (:last-read-at %)) (pos? (:new-comments-count %))) %) entries))
 
 (defn- last-reads-at-from-entries [entries]
   (zipmap (map :uuid entries) (map :last-read-at entries)))
 
 (rum/defcs replies-list <
+  rum/static
   rum/reactive
   (drv/drv :comments-data)
+  (drv/drv :comment-reply-to)
   ui-mixins/refresh-tooltips-mixin
   (rum/local #{} ::read-items)
   (rum/local false ::has-unread-items)
@@ -449,7 +457,8 @@
   [s {:keys [items-to-render last-read-at member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         items @(::entries s)
-        comments-drv (drv/react s :comments-data)]
+        comments-drv (drv/react s :comments-data)
+        _reply-to (drv/react s :comment-reply-to)]
     [:div.replies-list
       (if (empty? items)
         [:div.replies-list-empty

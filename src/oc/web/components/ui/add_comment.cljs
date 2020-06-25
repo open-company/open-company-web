@@ -76,20 +76,22 @@
 (defn- send-clicked [event s]
   (reset! (::collapsed s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
-        comment-body (cu/add-comment-content add-comment-div true)
+        comment-body (cu/add-comment-content add-comment-div)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
          edit-comment-data scroll-after-posting? add-comment-cb]} (first (:rum/args s))
         save-done-cb (fn [success]
                       (if success
-                        (when add-comment-div
-                          (set! (.-innerHTML add-comment-div) @(::initial-add-comment s)))
+                        (let [el (rum/ref-node s "editor-node")]
+                          (when el
+                            (set! (.-innerHTML el) @(::initial-add-comment s))))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
                           :dismiss true
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
-    (set! (.-innerHTML add-comment-div) @(::initial-add-comment s))
+    (when add-comment-div
+      (set! (.-innerHTML add-comment-div) @(::initial-add-comment s)))
     (let [updated-comment (if edit-comment-data
                             (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
                             (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))]
@@ -159,7 +161,8 @@
         (alert-modal/show-alert alert-data))
       (dismiss-fn))))
 
-(rum/defcs add-comment < rum/reactive
+(rum/defcs add-comment < rum/static
+                         rum/reactive
                          ;; Locals
                          (rum/local nil :me/editor)
                          (rum/local nil :me/media-picker-ext)
@@ -224,39 +227,30 @@
                                                                      (not (au/empty-body? activity-add-comment-data))))))
                           s)
                           :did-mount (fn [s]
-                           (let [props (first (:rum/args s))]
-                             (me-media-utils/setup-editor s did-change (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))))
+                           (let [props (first (:rum/args s))
+                                 me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
+                             (me-media-utils/setup-editor s did-change me-opts))
                            (maybe-focus s)
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
-                          :did-update (fn [s]
-                           (let [add-comment-focus @(drv/get-ref s :add-comment-focus)]
-                             (when (not= @(::last-add-comment-focus s) add-comment-focus)
-                               (maybe-focus s)
-                               (reset! (::last-add-comment-focus s) add-comment-focus)))
+                          :will-update (fn [s]
                            (let [props (-> s :rum/args first)
                                  reply-to @(drv/get-ref s :comment-reply-to)
                                  focus-val (focus-value s)
-                                 reply-to-data (get reply-to focus-val)]
-                             (when (and (map? reply-to-data)
-                                        (string? (:quote reply-to-data)))
+                                 reply-to-body (get reply-to focus-val)]
+                             (when (string? reply-to-body)
                                (let [body-field (add-comment-field s)
                                      current-body (.-innerHTML body-field)
-                                     quoted-body (str "<blockquote>" (:quote reply-to-data) "</blockquote><p><br></p>")
+                                     quoted-body (str "<blockquote>" reply-to-body "</blockquote><p><br></p>")
                                      next-body (if (au/empty-body? current-body)
-                                                 quoted-body
+                                                 (str au/empty-body-html quoted-body)
                                                  (str current-body quoted-body))]
                                  (set! (.-innerHTML body-field) next-body)
                                  (comment-actions/add-comment-change (:activity-data props) (:parent-comment-uuid props) (:uuid (:edit-comment-data props)) (add-comment-body s))
                                  (comment-actions/reset-reply-to focus-val)
                                  (reset! (::collapsed s) false)
-                                 (reset! (::post-enabled s) true)
-                                 (when (:focus reply-to-data)
-                                   (utils/to-end-of-content-editable body-field)))))
-                           s)
-                          :will-update (fn [s]
+                                 (reset! (::post-enabled s) true))))
                            (let [props (first (:rum/args s))]
-                             (me-media-utils/setup-editor s did-change (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props)))
                              (let [data @(drv/get-ref s :media-input)
                                    video-data (:media-video data)]
                                 (when (and @(:me/media-video s)
@@ -270,12 +264,22 @@
                                     (me-media-utils/media-video-add s @(:me/media-picker-ext s) video-data)
                                     (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)))))
                            s)
+                          :did-update (fn [s]
+                           (let [add-comment-focus @(drv/get-ref s :add-comment-focus)]
+                             (when (not= @(::last-add-comment-focus s) add-comment-focus)
+                               (maybe-focus s)
+                               (reset! (::last-add-comment-focus s) add-comment-focus)))
+                           s)
+                          :did-remount (fn [o s]
+                           (let [props (first (:rum/args s))
+                                 me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
+                             (me-media-utils/setup-editor s did-change me-opts))
+                           s)
                           :will-unmount (fn [s]
                            (when @(:me/editor s)
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-
   [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix
              edit-comment-data scroll-after-posting? add-comment-cb collapse?]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
