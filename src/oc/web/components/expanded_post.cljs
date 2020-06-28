@@ -194,6 +194,7 @@
        :data-initial-last-read-at @(::initial-last-read-at s)
        :data-last-read-at (:last-read-at activity-data)
        :data-new-comments-count (:new-comments-count activity-data)
+       :data-unseen-comments (:unseen-comments activity-data)
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :expanded-post-container))
                     (close-expanded-post %))}
       (image-modal/image-modal {:src expand-image-src})

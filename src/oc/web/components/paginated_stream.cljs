@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.mixins.seen :as seen-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.mixins.section :as section-mixins]
@@ -108,22 +109,23 @@
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
                                 (rum/local false ::mounted)
-                               {:will-mount (fn [s]
-                                 (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
-                                 s)
-                                :did-mount (fn [s]
-                                 (reset! (::mounted s) true)
-                                 s)
-                                :did-remount (fn [o s]
-                                 (when @(::mounted s)
-                                   (when-let [force-list-update (-> s :rum/args first :force-list-update)]
-                                     (when-not (= @(::last-force-list-update s) force-list-update)
-                                       (reset! (::last-force-list-update s) force-list-update)
-                                       (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))
-                                 s)
-                                :will-unmount (fn [s]
-                                 (reset! (::mounted s) false)
-                                 s)}
+                                seen-mixins/mark-container-seen-mixin
+                                {:will-mount (fn [s]
+                                   (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
+                                   s)
+                                 :did-mount (fn [s]
+                                   (reset! (::mounted s) true)
+                                   s)
+                                 :did-remount (fn [o s]
+                                   (when @(::mounted s)
+                                     (when-let [force-list-update (-> s :rum/args first :force-list-update)]
+                                       (when-not (= @(::last-force-list-update s) force-list-update)
+                                         (reset! (::last-force-list-update s) force-list-update)
+                                         (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))
+                                   s)
+                                 :will-unmount (fn [s]
+                                   (reset! (::mounted s) false)
+                                   s)}
   [s {:keys [items
              activities-read
              foc-layout
@@ -327,12 +329,14 @@
          (if (:no-virtualized-steam container-data)
            (replies-list {:items-to-render items
                           :org-data org-data
+                          :container-data container-data
                           :current-user-data current-user-data})
            (window-scroller
             {}
             (partial virtualized-stream {:org-data org-data
                                          :comments-data comments-data
                                          :items items
+                                         :container-data container-data
                                          :is-mobile? is-mobile?
                                          :force-list-update force-list-update
                                          :activities-read activities-read

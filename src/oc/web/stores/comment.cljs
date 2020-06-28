@@ -63,6 +63,7 @@
      (assoc-in sorted-comments-key sorted-comments)
      ;; Reset new comments count
      (assoc-in (conj activity-key :new-comments-count) 0)
+     (assoc-in (conj activity-key :unseen-comments) false)
      (update-in (conj activity-key :links) (fn [links]
                                              (mapv (fn [link]
                                               (if (= (:rel link) "follow")
@@ -246,14 +247,14 @@
         deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
         current-user-id (jwt/user-id)
         deleting-new-comment? (when deleting-comment-data
-                                (cu/unread? last-read-at deleting-comment-data))
+                                (au/comment-unread? deleting-comment-data last-read-at))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
         new-sorted-comments-data (cu/sort-comments new-comments-data)
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]
     (-> db
      (assoc-in sorted-comments-key new-sorted-comments-data)
      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:last-activity-at (:created-at last-not-own-comment)})
-     (update-in (vec (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count)) (if deleting-new-comment? dec identity)))))
+     (update-in (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count) (if deleting-new-comment? dec identity)))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ org-slug entry-data interaction-data]]
@@ -288,16 +289,17 @@
                                   with-authors
                                   (-> with-authors
                                     (assoc :last-activity-at created-at)
-                                    (assoc :new-comments-count new-comments-count)))
+                                    (assoc :new-comments-count new-comments-count)
+                                    (assoc :unseen-comments true)))
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
           all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
           badge-replies-key (dispatcher/badge-replies-key org-slug)
           follow-boards-list (dispatcher/follow-boards-list org-slug db)
           should-badge-replies? (and (or ;; If unfollow link is present it means the user is following the entry
-                                         (utils/link-for activity-data "unfollow")
+                                         (utils/link-for with-last-activity-at "unfollow")
                                          ;; if board is in the following list
-                                         ((set (map :uuid follow-boards-list)) (:board-uuid activity-data)))
-                                     (pos? new-comments-count))]
+                                         ((set (map :uuid follow-boards-list)) (:board-uuid with-last-activity-at)))
+                                     (:unseen-comments with-last-activity-at))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)

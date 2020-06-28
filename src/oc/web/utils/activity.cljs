@@ -78,7 +78,8 @@
        :resource-type :separator
        :date (post-month-date-from-date d)})))
 
-(def preserved-keys [:resource-type :uuid :sort-value :unread])
+(def preserved-keys
+  [:resource-type :uuid :sort-value :unread :unseen :unseen-comments :comments :comments-data :board-slug :last-read-at])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -275,15 +276,11 @@
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn post-unseen?
+(defun post-unseen?
   "An entry is new if its uuid is contained in container's unseen."
-  [entry changes]
-  (let [board-uuid (:board-uuid entry)
-        board-change-data (get changes board-uuid {})
-        board-unseen (:unseen board-change-data)
-        user-id (jwt/user-id)]
-    (and (utils/in? board-unseen (:uuid entry))
-         (not= (:user-id (:publisher entry)) user-id))))
+  [entry last-seen-at]
+  (or (s/blank? last-seen-at)
+      (not (pos? (compare (:published-at entry) last-seen-at)))))
 
 (defn post-unread?
   "An entry is new if its uuid is contained in container's unread."
@@ -296,9 +293,11 @@
       (nil? (:last-read-at entry)))))
 
 (defun comment-unread?
-  "An entry is new if its uuid is contained in container's unread."
+  "A comment is unread if it's created-at is past the last seen-at of the contianer it belongs to."
+
   ([comment-data :guard map? last-read-at]
    (comment-unread? (:created-at comment-data) last-read-at))
+
   ([iso-date last-read-at]
    (letfn [(get-time [t] (.getTime (new js/Date t)))]
      (< (get-time last-read-at)
@@ -440,7 +439,11 @@
                                           :comments-key comments-key
                                           :body (when (seq body) (json->cljs body))
                                           :activity-uuid (:uuid activity-data)
-                                          :secure-activity-uuid (router/current-secure-activity-id)}])))
+                                          :secure-activity-uuid (router/current-secure-activity-id)}])
+    (let [replies-data (dis/container-data (router/current-org-slug) :replies (router/current-sort-type))
+          should-update-replies? (some #(= (:uuid %) (:uuid activity-data)) (:posts-list replies-data))]
+      (when should-update-replies?
+        (dis/dispatch! [:update-containers])))))
 
 (defn get-comments [activity-data]
   (when activity-data
@@ -479,11 +482,26 @@
          (not (.match plain-text is-text-message?)))))
 
 (defun parse-comment
-  ([org-data activity-data comments :guard sequential?]
-    (map #(parse-comment org-data activity-data %) comments))
-  ([org-data activity-data comment-map :guard nil?]
+
+  ([org-data activity-data nil]
     {})
+
+  ([org-data activity-data nil _]
+    {})
+
+  ([org-data activity-data comments-map :guard :sorted-comments container-seen-at]
+    (parse-comment org-data activity-data (:sorted-comments comments-map) container-seen-at))
+
+  ([org-data activity-data comments :guard sequential? container-seen-at :guard #(or (nil? %) (string? %))]
+    (map #(parse-comment org-data activity-data % container-seen-at) comments))
+
   ([org-data :guard map? activity-data :guard map? comment-map :guard map?]
+   (parse-comment org-data activity-data comment-map nil))
+
+  ; ([org-data :guard map? activity-data :guard map? comment-map :guard map? container-seen-at :guard #(or (nil? %) (string? %))]
+  ;  (parse-comment org-data activity-data comment-map container-seen-at))
+
+  ([org-data :guard map? activity-data :guard map? comment-map :guard map? container-seen-at :guard #(or (nil? %) (string? %))]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
           can-react? (utils/link-for (:links comment-map) "react"  "POST")
@@ -491,11 +509,14 @@
           is-root-comment (empty? (:parent-uuid comment-map))
           author? (is-author? comment-map)
           unread? (and (not author?)
-                       (comment-unread? comment-map (:last-read-at activity-data)))]
+                       (comment-unread? comment-map (:last-read-at activity-data)))
+          unseen? (and (not author?)
+                       (cu/unseen? comment-map container-seen-at))]
       (-> comment-map
         (assoc :resource-type :comment)
         (assoc :author? author?)
         (assoc :unread unread?)
+        (assoc :unseen unseen?)
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))
@@ -505,11 +526,24 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn parse-entry
+(defn entry-comments-data [org-data entry-data comments container-seen-at]
+  (as-> entry-data e
+   (assoc e :comments-data (or comments (:comments e)))
+   (update e :comments-data (fn [cs]
+                              (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
+   (if (seq (:comments-data e))
+     (assoc e :unseen-comments (cu/unseen? (first (:comments-data e)) container-seen-at))
+     e)))
+
+(defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
   ([entry-data board-data changes]
-   (parse-entry entry-data board-data changes (dis/active-users)))
+   (parse-entry entry-data board-data changes (dis/active-users) nil))
+
   ([entry-data board-data changes active-users]
+   (parse-entry entry-data board-data changes active-users nil))
+
+  ([entry-data board-data changes active-users container-seen-at :guard #(or (nil? %) (string? %))]
   (if (= entry-data :404)
     entry-data
     (let [comments-link (utils/link-for (:links entry-data) "comments")
@@ -537,7 +571,7 @@
           (if published?
             (assoc e :publisher? (is-publisher? e))
             e))
-        (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+        (assoc :unseen (post-unseen? entry-data container-seen-at))
         (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
         (assoc :read-only (readonly-entry? (:links entry-data)))
         (assoc :board-uuid fixed-board-uuid)
@@ -551,8 +585,7 @@
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data))))
-        (as-> e
-          (update e :comments #(cu/sort-comments (map (partial parse-comment org-data e) %)))))))))
+        (assoc :container-seen-at container-seen-at))))))
 
 (defn parse-org
   "Fix org data coming from the API."
@@ -596,7 +629,8 @@
                                                                  :uuid (:board-uuid item)
                                                                  :publisher-board (:publisher-board item)}
                                                change-data
-                                               active-users)))
+                                               active-users
+                                               (:last-seen-at board-data))))
                                     board-data
                                     (:entries board-data))
             with-fixed-activities (reduce (fn [ret item]
@@ -701,17 +735,17 @@
           (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
 
 (defn parse-container
-  "Parse container data coming from the API, like All posts or Must see."
+  "Parse container data coming from the API, like Following or Replies (AP, Bookmarks etc)."
   ([container-data]
-   (parse-container container-data {} (dis/org-data) (dis/active-users) nil))
+   (parse-container container-data {} (dis/org-data) (dis/active-users) (router/current-sort-type) false))
 
   ([container-data change-data]
-   (parse-container container-data change-data (dis/org-data) (dis/active-users) nil))
+   (parse-container container-data change-data (dis/org-data) (dis/active-users) (router/current-sort-type) false))
 
   ([container-data change-data org-data]
-   (parse-container container-data change-data org-data (dis/active-users) nil))
+   (parse-container container-data change-data org-data (dis/active-users) (router/current-sort-type) false))
 
-  ([container-data change-data org-data active-users sort-type & [direction]]
+  ([container-data change-data org-data active-users sort-type load-comments? & [direction]]
     (when container-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -740,10 +774,18 @@
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
+                                (merge (get-in with-fixed-activities [:fixed-items (:uuid %)]))
                                 (select-keys preserved-keys)
                                 (assoc :resource-type :entry))
                           (:items container-data)))
-            full-items-list (merge-items-lists items-list (:posts-list container-data) direction)
+            items-list* (merge-items-lists items-list (:posts-list container-data) direction)
+            full-items-list (map (fn [entry]
+                                   (let [board-data (get boards-map (:board-slug entry))
+                                         full-item (or (get-in with-fixed-activities [:fixed-items (:uuid entry)])
+                                                       (dis/activity-data (:slug org-data) (:uuid entry)))
+                                         comments (or (dis/activity-sorted-comments-data (:uuid entry)) (:comments full-item))]
+                                     (entry-comments-data org-data entry comments (:last-seen-at container-data))))
+                             items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                             full-items-list)
@@ -754,18 +796,14 @@
             get-item #(merge (get items-map (:uuid %)) %)
             ignore-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                              #(or (not= (:resource-type %) :entry)
-                                  (and (= (:resource-type %) :entry)
-                                       (->> % get-item :publisher?)))
+                                  (->> % get-item :publisher?))
                              #(not= (:resource-type %) :entry))
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                             #(and (= (:resource-type %) :entry)
-                                  (->> % get-item :unread not))
-                            ;; (= (:container-slug container-data) :replies)
-                            #(let [item (get-item %)]
-                                (and (= (:resource-type item) :entry)
-                                     (not (:unread item))
-                                     (or (not (:new-comments-count item))
-                                         (zero? (:new-comments-count item))))))
+                                  (not (:unseen %)))
+                            #(and (= (:resource-type %) :entry)
+                                  (not (:unseen %))
+                                  (not (:unseen-comments %))))
             opts {:has-next next-link}
             with-caught-up (if (#{:following :replies} (:container-slug container-data))
                             (insert-caught-up grouped-items check-item-fn ignore-item-fn opts)
@@ -773,7 +811,7 @@
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)
             replies? (= (-> container-data :container-slug keyword) :replies)]
-        (when replies?
+        (when load-comments?
           (doseq [e (vals (:fixed-items with-fixed-activities))]
             (utils/after 0 #(get-comments e))))
         (-> with-fixed-activities
@@ -844,48 +882,88 @@
         f (if show-year date-format-year date-format)]
     (time-format/unparse f d)))
 
-(defn update-all-containers [db org-data change-data active-users follow-publishers-list]
+(defn update-contributions [db org-data change-data active-users follow-publishers-list]
   (let [org-slug (:slug org-data)
-        contributions-list-key (dis/contributions-list-key org-slug)
-        next-db*** (reduce (fn [tdb contrib-key]
-                              (let [rp-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recently-posted-sort)
-                                    ra-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recent-activity-sort)]
-                                (-> tdb
-                                 (update-in rp-contrib-data-key
-                                  #(dissoc (parse-contributions % change-data org-data active-users follow-publishers-list dis/recently-posted-sort) :fixed-items))
-                                 (update-in ra-contrib-data-key
-                                   #(dissoc (parse-contributions % change-data org-data active-users follow-publishers-list dis/recent-activity-sort) :fixed-items)))))
-                     db
-                     (keys (get-in db contributions-list-key)))
+        contributions-list-key (dis/contributions-list-key org-slug)]
+    (reduce (fn [tdb contrib-key]
+              (let [rp-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recently-posted-sort)
+                    ra-contrib-data-key (dis/contributions-data-key org-slug contrib-key dis/recent-activity-sort)]
+                (as-> tdb tdb*
+                 (if (contains? (get-in tdb* (butlast rp-contrib-data-key)) (last rp-contrib-data-key))
+                   (update-in tdb* rp-contrib-data-key
+                    #(-> %
+                      (parse-contributions change-data org-data active-users follow-publishers-list dis/recently-posted-sort)
+                      (dissoc :fixed-items)))
+                   tdb*)
+                 (if (contains? (get-in tdb* (butlast ra-contrib-data-key)) (last ra-contrib-data-key))
+                   (update-in tdb* ra-contrib-data-key
+                     #(-> %
+                       (parse-contributions change-data org-data active-users follow-publishers-list dis/recent-activity-sort)
+                       (dissoc :fixed-items)))
+                   tdb*))))
+     db
+     (keys (get-in db contributions-list-key)))))
+
+(defn update-boards [db org-data change-data active-users]
+  (let [org-slug (:slug org-data)
         boards-key (dis/boards-key org-slug)
-        following-boards (dis/follow-boards-list org-slug db)
-        next-db** (reduce (fn [tdb board-key]
-                             (let [rp-board-data-key (dis/board-data-key org-slug board-key dis/recently-posted-sort)
-                                   ra-board-data-key (dis/board-data-key org-slug board-key dis/recent-activity-sort)]
-                               (-> tdb
-                                (update-in tdb rp-board-data-key
-                                 #(dissoc (parse-board % change-data active-users following-boards dis/recently-posted-sort) :fixed-items))
-                                (update-in tdb ra-board-data-key
-                                 #(dissoc (parse-board % change-data active-users following-boards dis/recent-activity-sort) :fixed-items)))))
-                    next-db***
-                    (keys (get-in db boards-key)))
-        containers-key (dis/containers-key org-slug)
-        next-db* (reduce (fn [tdb container-key]
-                            (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
-                                  ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
-                              (-> tdb
-                               (update-in rp-container-data-key
-                                #(dissoc (parse-container % change-data org-data active-users dis/recently-posted-sort) :fixed-items))
-                               (update-in ra-container-data-key
-                                #(dissoc (parse-container % change-data org-data active-users dis/recent-activity-sort) :fixed-items)))))
-                   next-db**
-                   (keys (get-in db containers-key)))
-        posts-key (dis/posts-data-key org-slug)
-        next-db (reduce (fn [tdb post-uuid]
-                         (let [post-data-key (concat posts-key [post-uuid])
-                               old-post-data (get-in tdb post-data-key)
-                               board-data (get-in tdb (dis/board-data-key org-slug (:board-slug old-post-data)))]
-                          (assoc-in tdb post-data-key (parse-entry old-post-data board-data change-data active-users))))
-                 next-db*
-                 (keys (get-in db posts-key)))]
-    (assoc-in next-db dis/force-list-update-key (utils/activity-uuid))))
+        following-boards (dis/follow-boards-list org-slug db)]
+    (reduce (fn [tdb board-key]
+             (let [rp-board-data-key (dis/board-data-key org-slug board-key dis/recently-posted-sort)
+                   ra-board-data-key (dis/board-data-key org-slug board-key dis/recent-activity-sort)]
+               (as-> tdb tdb*
+                (if (contains? (get-in tdb* (butlast rp-board-data-key)) (last rp-board-data-key))
+                  (update-in tdb* rp-board-data-key
+                   #(-> %
+                     (parse-board change-data active-users following-boards dis/recently-posted-sort)
+                     (dissoc :fixed-items)))
+                  tdb*)
+                (if (contains? (get-in tdb* (butlast ra-board-data-key)) (last ra-board-data-key))
+                  (update-in tdb* ra-board-data-key
+                   #(-> %
+                     (parse-board change-data active-users following-boards dis/recent-activity-sort)
+                     (dissoc :fixed-items)))
+                  tdb*))))
+    db
+    (keys (get-in db boards-key)))))
+
+(defn update-containers [db org-data change-data active-users]
+  (let [org-slug (:slug org-data)
+        containers-key (dis/containers-key org-slug)]
+    (reduce (fn [tdb container-key]
+              (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
+                    ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
+                (as-> tdb tdb*
+                 (if (contains? (get-in tdb* (butlast rp-container-data-key)) (last rp-container-data-key))
+                   (update-in tdb* rp-container-data-key
+                    #(-> %
+                      (parse-container change-data org-data active-users dis/recently-posted-sort false)
+                      (dissoc :fixed-items)))
+                   tdb*)
+                 (if (contains? (get-in tdb* (butlast ra-container-data-key)) (last ra-container-data-key))
+                   (update-in tdb* ra-container-data-key
+                    #(-> %
+                      (parse-container change-data org-data active-users dis/recent-activity-sort false)
+                      (dissoc :fixed-items)))
+                   tdb*))))
+     db
+     (keys (get-in db containers-key)))))
+
+(defn update-posts [db org-data change-data active-users]
+  (let [org-slug (:slug org-data)
+        posts-key (dis/posts-data-key org-slug)]
+    (reduce (fn [tdb post-uuid]
+             (let [post-data-key (concat posts-key [post-uuid])
+                   old-post-data (get-in tdb post-data-key)
+                   board-data (get-in tdb (dis/board-data-key org-slug (:board-slug old-post-data)))]
+              (assoc-in tdb post-data-key (parse-entry old-post-data board-data change-data active-users))))
+     db
+     (keys (get-in db posts-key)))))
+
+(defn update-all-containers [db org-data change-data active-users follow-publishers-list]
+  (-> db
+   (update-posts org-data change-data active-users)
+   (update-boards org-data change-data active-users)
+   (update-containers org-data change-data active-users)
+   (update-contributions org-data change-data active-users follow-publishers-list)
+   (assoc-in dis/force-list-update-key (utils/activity-uuid))))

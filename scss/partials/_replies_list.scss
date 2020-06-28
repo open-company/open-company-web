@@ -289,7 +289,7 @@ div.replies-list {
           background-color: var(--foc-background-color);
           text-decoration: underline;
 
-          &.has-unread {
+          &.has-unseen {
             color: $carrot_green;
           }
         }

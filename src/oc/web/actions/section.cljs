@@ -21,11 +21,6 @@
     (timbre/debug rep "Watching on socket " (:uuid section))
     (ws-ic/boards-watch [(:uuid section)]))))
 
-(defn section-seen
-  [uuid]
-  ;; Let the change service know we saw the board
-  (ws-cc/container-seen uuid))
-
 (defn request-reads-count
   "Request the reads count data only for the items we don't have already."
   [section]

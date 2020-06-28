@@ -4,6 +4,7 @@
             [defun.core :refer (defun)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
+            [oc.lib.time :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -779,8 +780,8 @@
                                        (:unread activity-data))
                should-badge-replies? (and is-published?
                                           is-following?
-                                          (or (:unread activity-data)
-                                              (pos? (:new-comments-count activity-data))))]
+                                          (or (:unseen activity-data)
+                                              (pos? (:unseen-comments activity-data))))]
            (when should-badge-home?
              (dis/dispatch! [:home-badge/on org-slug]))
            (when should-badge-replies?
@@ -799,8 +800,8 @@
           (all-posts-get (dis/org-data)))
         (when (= (router/current-board-slug) "bookmarks")
           (bookmarks-get (dis/org-data)))
-        (when (= (router/current-board-slug) "following")
-          (following-get (dis/org-data)))
+        ; (when (= (router/current-board-slug) "following")
+        ;   (following-get (dis/org-data)))
         (when (= (router/current-board-slug) "unfollowing")
           (unfollowing-get (dis/org-data)))
         (when (= (router/current-board-slug) "inbox")
@@ -880,8 +881,8 @@
             (all-posts-get org-data dispatch-unread)
             (= (router/current-board-slug) "bookmarks")
             (bookmarks-get org-data dispatch-unread)
-            (= (router/current-board-slug) "following")
-            (following-get org-data dispatch-unread)
+            ; (= (router/current-board-slug) "following")
+            ; (following-get org-data dispatch-unread)
             (= (router/current-board-slug) "unfollowing")
             (unfollowing-get org-data dispatch-unread)
             :else
@@ -905,8 +906,31 @@
   [activity-id]
   (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
               publisher-id (:user-id (:publisher activity-data))
-              container-id (:board-uuid activity-data)]
-    (ws-cc/item-seen publisher-id container-id activity-id)))
+              container-id (:board-uuid activity-data)
+              org-id (:org-uuid activity-data)]
+    (ws-cc/item-seen publisher-id org-id container-id activity-id)))
+
+(defn send-container-seen
+  "Send a seen message for the given container-id to Change service."
+  [container-id]
+  (when-let* [org-data (dis/org-data)
+              org-id (:uuid org-data)
+              seen-at (time/current-timestamp)]
+    (ws-cc/container-seen org-id container-id seen-at)
+    (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at])))
+
+;; Seen - update container on nav away
+
+(defn container-nav-away [container-data]
+  (when (:container-id container-data)
+    (send-container-seen (:container-id container-data)))
+  (cond
+    (= (:container-slug container-data) :following)
+    (dis/dispatch! [:following-nav-away])
+    (= (:container-slug container-data) :replies)
+    (dis/dispatch! [:replies-nav-away])
+    (contains? container-data :author-uuid)
+    (dis/dispatch! [:contributions-nav-away (:author-uuid container-data)])))
 
 ;; WRT read
 
@@ -919,7 +943,7 @@
               user-name (:name token-data)
               avatar-url (:avatar-url token-data)
               org-id (:uuid (dis/org-data))]
-    (ws-cc/item-seen publisher-id container-id activity-id)
+    (ws-cc/item-seen publisher-id org-id container-id activity-id)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn send-item-read

@@ -28,7 +28,6 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
-            [oc.web.actions.ui-theme]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
@@ -41,6 +40,7 @@
             [oc.web.actions.web-app-update :as web-app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.ui-theme]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]

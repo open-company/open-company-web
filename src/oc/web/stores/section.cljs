@@ -45,8 +45,7 @@
         org-slug (:org (:router-path db))]
     (reduce
       #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))]
-          (update-in %1 posts-key merge {:unseen (au/post-unseen? %2 changes)
-                                         :unread (au/post-unread? %2 changes)}))
+          (update-in %1 posts-key merge {:unread (au/post-unread? %2 changes)}))
       db
       (vals posts-data))))
 

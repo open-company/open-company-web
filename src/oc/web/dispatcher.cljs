@@ -233,6 +233,14 @@
 (def activities-read-key
   [:activities-read])
 
+;; Seen
+
+(defn org-seens-key [org-slug]
+  (vec (conj (org-key org-slug) :container-seen)))
+
+(defn container-seen-key [org-slug container-id]
+  (vec (conj (org-seens-key org-slug) (keyword container-id))))
+
 (defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
         filter-fn (if (= board-slug utils/default-drafts-board-slug)
@@ -878,6 +886,21 @@
   ([org-slug activity-uuid data]
     (get-in data (activity-comments-key org-slug activity-uuid))))
 
+(defn ^:export activity-sorted-comments-data
+  ([]
+    (activity-sorted-comments-data
+     (router/current-org-slug)
+     (router/current-activity-id)
+     @app-state))
+  ([activity-uuid]
+    (activity-sorted-comments-data
+     (router/current-org-slug)
+     activity-uuid @app-state))
+  ([org-slug activity-uuid]
+    (activity-sorted-comments-data org-slug activity-uuid @app-state))
+  ([org-slug activity-uuid data]
+    (get-in data (activity-sorted-comments-key org-slug activity-uuid))))
+
 (defn ^:export teams-data
   ([] (teams-data @app-state))
   ([data] (get-in data teams-data-key)))
@@ -977,6 +1000,18 @@
   ([item-id :guard string? data :guard map?]
     (let [all-activities-read (get-in data activities-read-key)]
       (get all-activities-read item-id))))
+
+;; Seen
+
+(defn org-seens-data
+  ([] (org-seens-data @app-state (router/current-org-slug)))
+  ([org-slug] (org-seens-data @app-state (router/current-org-slug)))
+  ([data org-slug] (get-in data (org-seens-key org-slug))))
+
+(defn container-seen-data
+ ([container-id] (container-seen-data @app-state (router/current-org-slug) container-id))
+ ([org-slug container-id] (container-seen-data @app-state org-slug container-id))
+ ([data org-slug container-id] (get-in data (container-seen-key org-slug container-id))))
 
 ;; Reminders
 

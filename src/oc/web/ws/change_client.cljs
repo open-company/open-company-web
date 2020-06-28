@@ -56,14 +56,14 @@
     (timbre/debug "Sending container/watch for:" @container-ids)
     (send! chsk-send! [:container/watch @container-ids])))
 
-(defn container-seen [container-id]
-  (timbre/debug "Sending container/seen for:" container-id)
-  (send! chsk-send! [:container/seen {:container-id container-id :seen-at (time/current-timestamp)}]))
+(defn container-seen [org-id container-id seen-at]
+  (timbre/debug "Sending container/seen for org:" org-id "container:" container-id "seen at:" seen-at)
+  (send! chsk-send! [:container/seen {:org-id org-id :container-id container-id :seen-at seen-at}]))
 
-(defn item-seen [publisher-id container-id item-id]
-  (timbre/debug "Sending item/seen for container:" container-id "item:" item-id)
-  (send! chsk-send! [:item/seen {:publisher-id publisher-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
-
+(defn item-seen [publisher-id org-id container-id item-id]
+  (timbre/debug "Sending item/seen for org:" org-id "container:" container-id "item:" item-id)
+  (send! chsk-send! [:item/seen {:publisher-id publisher-id :org-id org-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
+ 
 (defn item-read [org-id container-id item-id user-name avatar-url]
   (timbre/debug "Sending item/read for container:" container-id "item:" item-id)
   (send! chsk-send! [:item/read {:org-id org-id

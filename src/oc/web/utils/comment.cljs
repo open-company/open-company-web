@@ -85,83 +85,91 @@
 (defn is-expanded? [item collapsed-map]
   (:expanded (get-collapsed-item item collapsed-map)))
 
-(defn is-unread? [item collapsed-map]
-  (not (:unread (get-collapsed-item item collapsed-map))))
+; (defn is-unread? [item collapsed-map]
+;   (not (:unread (get-collapsed-item item collapsed-map))))
 
-(defn unread?
-  "If unread was already set let's reuse it."
-  [last-read-at comment-data]
-  (if (contains? comment-data :unread)
-    (:unread comment-data)
-    (and (not (:author? comment-data))
-         (< (.getTime (utils/js-date last-read-at))
-            (.getTime (utils/js-date (:created-at comment-data)))))))
+; (defn unread?
+;   "If unread was already set let's reuse it."
+;   [last-read-at comment-data]
+;   (if (contains? comment-data :unread)
+;     (:unread comment-data)
+;     (and (not (:author? comment-data))
+;          (< (.getTime (utils/js-date last-read-at))
+;             (.getTime (utils/js-date (:created-at comment-data)))))))
 
-(defn- unread-comment [comment-data last-read-at collapsed-map]
-  (if-not last-read-at
-    ;; User has never read the post, so comment is new
-    (assoc comment-data :unread true)
-    (assoc comment-data :unread
-     (unread? last-read-at (get-collapsed-item comment-data collapsed-map)))))
+; (defn- unread-comment [comment-data last-read-at collapsed-map]
+;   (if-not last-read-at
+;     ;; User has never read the post, so comment is new
+;     (assoc comment-data :unread true)
+;     (assoc comment-data :unread
+;      (unread? last-read-at (get-collapsed-item comment-data collapsed-map)))))
+
+(defn is-unseen? [item collapsed-map]
+  (not (:unseen (get-collapsed-item item collapsed-map))))
+
+(defun unseen?
+  "A comment is unseen if it's created-at is later than the last seen-at of the container it belongs to."
+
+  ([comment-data :guard map? container-seen-at]
+   (unseen? (:created-at comment-data) container-seen-at))
+
+  ([iso-date :guard string? container-seen-at :guard #(or (nil? %) (string? %))]
+   (or (string/blank? container-seen-at)
+       (letfn [(get-time [t] (.getTime (new js/Date t)))]
+         (< (get-time container-seen-at)
+            (get-time iso-date))))))
+
+; (defn- unseen-comment [comment-data container-seen-at collapsed-map]
+;   (assoc comment-data :unseen (unseen? comment-data container-seen-at)))
 
 (defn- unwrapped-body-comment [comment-data collapsed-map]
   (let [item (get-collapsed-item comment-data collapsed-map)]
     (assoc comment-data :unwrapped-body (:unwrapped-body item))))
 
-(defn- expanded-comment [comment-data last-read-at collapsed-map & [last-comment?]]
-  (assoc comment-data :expanded (or ;; comment is unread
-                                    (:unread comment-data)
-                                    ;; Keep the comment expanded if it was already
-                                    (is-expanded? comment-data collapsed-map)
-                                    ;; Do not collapse root comments
-                                    ; (not (seq (:parent-uuid comment-data)))
-                                    ;; User has not read the post yet
-                                    (not (seq last-read-at))
-                                    ;; Do not collapse last comments
-                                    last-comment?)))
-
-(defn- enrich-comment [comment-data last-read-at last-comment? collapsed-map]
-  (as-> comment-data c
-   (unread-comment c last-read-at collapsed-map)
-   (expanded-comment c last-read-at collapsed-map last-comment?)))
+; (defn- expanded-comment [comment-data container-seen-at collapsed-map]
+;   (assoc comment-data :expanded (or ;; comment is unseen
+;                                     (:unseen comment-data)
+;                                     ;; Keep the comment expanded if it was already
+;                                     (is-expanded? comment-data collapsed-map)
+;                                     ;; Do not collapse root comments
+;                                     ; (not (seq (:parent-uuid comment-data)))
+;                                     ;; User has not read the post yet
+;                                     (not (seq container-seen-at)))))
 
 (defun collapse-comments
-  "Add a collapsed flag to every comment that is a reply and is not unread.
-   Also add unread? flag to every unread one. Add a count of the collapsed
+  "Add a collapsed flag to every comment that is a reply and is not unseen.
+   Also add unseen? flag to every unseen one. Add a count of the collapsed
    comments to each root comment."
 
-   ([nil _comments :guard #(or (nil? %) (empty? %))]
+   ([_comments :guard empty?]
     [])
 
-  ([last-read-at :guard #(or (nil? %) (string? %))
-    comments :guard coll?]
-    (collapse-comments last-read-at comments {}))
+  ([comments :guard coll?]
+    (collapse-comments comments {}))
   ;; When we have less than 4 comments we always show all of them
-  ([last-read-at :guard #(or (nil? %) (string? %))
-    comments :guard #(and (coll? %)
+  ([comments :guard #(and (coll? %)
                           (<= (count %) 3))
     collapsed-map :guard map?]
    (mapv
     #(-> %
-      (unread-comment last-read-at collapsed-map)
+      ; (unseen-comment container-seen-at collapsed-map)
       (assoc :expanded true)
       (unwrapped-body-comment collapsed-map))
     comments))
-  ;; Add :unread info to each comment before entering the recursion
-  ([last-read-at :guard #(or (nil? %) (string? %))
-    comments :guard (fn [cs] (and (coll? cs)
+  ;; Add :unseen info to each comment before entering the recursion
+  ([comments :guard (fn [cs] (and (coll? cs)
                                   (not (some #(contains? % :expanded) cs))
                                   (> (count cs) 3)))
     collapsed-map :guard map?]
    (let [enriched-comments (mapv #(-> %
-                                   (unread-comment last-read-at collapsed-map)
+                                   ; (unseen-comment container-seen-at collapsed-map)
                                    (unwrapped-body-comment collapsed-map))
                             comments)
          comments-count (count enriched-comments)
          trailing-expanded-comments-count (if (> comments-count 4) 2 1)
          trailing-expanded-comments (subvec enriched-comments (- comments-count trailing-expanded-comments-count) comments-count)
          collapsed-comments (subvec (vec (rest enriched-comments)) 1 (- comments-count trailing-expanded-comments-count))
-         unread-collapsed (some :unread collapsed-comments)]
+         unseen-collapsed (some :unseen collapsed-comments)]
      (vec (concat
       [(assoc (first enriched-comments) :expanded true)]
       (map #(assoc % :expanded false) collapsed-comments)
@@ -169,23 +177,21 @@
        :collapsed-count (count collapsed-comments)
        :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
        :expanded true
-       :unread false
-       :unread-collapsed unread-collapsed
-       :message (str "View " (if (some :unread collapsed-comments) "new " "more ") "comments")
+       :unseen false
+       :unseen-collapsed unseen-collapsed
+       :message (str "View " (if (some :unseen collapsed-comments) "new " "more ") "comments")
        :comment-uuids (map :uuid collapsed-comments)}]
       (map #(assoc % :expanded true) trailing-expanded-comments)))))
   ;; If at least one already has expanded let's expand the remainig ones
-  ([last-read-at :guard #(or (nil? %) (string? %))
-    comments :guard (fn [cs] (and (coll? cs)
+  ([comments :guard (fn [cs] (and (coll? cs)
                                   (not-every? #(contains? % :expanded) cs)
                                   (> (count cs) 3)))
     collapsed-map :guard map?]
    (mapv #(assoc % :expanded (or (:expanded %) true)) comments)))
 
 
-  ; ;; Recursive step: unread has been set, let's add expand now
-  ; ([last-read-at :guard #(or (nil? %) (string? %))
-  ;   in-comments :guard coll?
+  ; ;; Recursive step: unseen has been set, let's add expand now
+  ; ([in-comments :guard coll?
   ;   out-comments :guard coll?
   ;   collapsed-map :guard map?]
   ;   (let [potential-collapse-items (vec (take-while #(not (contains? % :expanded)) in-comments))]
@@ -198,15 +204,15 @@
   ;             expand-items (if (> (count potential-collapse-items) 3)
   ;                            (subvec potential-collapse-items (- (count potential-collapse-items) 2) (count potential-collapse-items))
   ;                            [(last potential-collapse-items)])
-  ;             unread-collapsed (some :unread collapse-items)
+  ;             unseen-collapsed (some :unseen collapse-items)
   ;             collapsed-item (when should-add-collapsed-item?
   ;                              {:resource-type :collapsed-comments
   ;                               :collapsed-count (count collapse-items)
   ;                               :collapse-id (clojure.string/join "-" (map :uuid collapse-items))
   ;                               :expanded true
-  ;                               :unread false
-  ;                               :unread-collapsed unread-collapsed
-  ;                               :message (str "View " (if (some :unread collapse-items) "new " "more ") "comments")
+  ;                               :unseen false
+  ;                               :unseen-collapsed unseen-collapsed
+  ;                               :message (str "View " (if (some :unseen collapse-items) "new " "more ") "comments")
   ;                               :comment-uuids (map :uuid collapse-items)})
   ;             next-out-comments (if should-add-collapsed-item?
   ;                                 ;; In case there are at least 3 read and not expanded items in a row
@@ -218,14 +224,14 @@
   ;                                 (vec (concat out-comments
   ;                                              (mapv #(assoc % :expanded true) potential-collapse-items))))]
   ;         (if (seq next-in-comments)
-  ;           (recur last-read-at next-in-comments next-out-comments collapsed-map)
+  ;           (recur next-in-comments next-out-comments collapsed-map)
   ;           next-out-comments))
-  ;       ;; First comment is unread or expanded
+  ;       ;; First comment is unseen or expanded
   ;       (let [next-in-comments (vec (rest in-comments))
   ;             next-out-comments (vec (conj out-comments
   ;                                     (assoc (first in-comments) :expanded true)))]
   ;         (if (seq next-in-comments)
-  ;           (recur last-read-at next-in-comments next-out-comments collapsed-map)
+  ;           (recur next-in-comments next-out-comments collapsed-map)
   ;           next-out-comments)))))
 
 (defun add-comment-focus-value
