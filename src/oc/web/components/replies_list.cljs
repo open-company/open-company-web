@@ -417,7 +417,7 @@
                (seq (second items-changed)))
        (reset! (::entries s) entries)))
    s)}
-  [s {:keys [items-to-render container-data member?]}]
+  [s {:keys [items-to-render container-data member? force-list-update]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         items @(::entries s)
         _reply-to (drv/react s :comment-reply-to)
@@ -449,4 +449,4 @@
               :else
               (rum/with-key
                (reply-item item-props)
-               (str "reply-" (:render-key container-data) "-" (:uuid item-props)))))])]))
+               (str "reply-" force-list-update "-" (:uuid item-props)))))])]))

@@ -429,10 +429,10 @@
                                           :body (when (seq body) (json->cljs body))
                                           :activity-uuid (:uuid activity-data)
                                           :secure-activity-uuid (router/current-secure-activity-id)}])
-    (let [replies-data (dis/container-data (router/current-org-slug) :replies (router/current-sort-type))
+    (let [replies-data (dis/container-data @dis/app-state (router/current-org-slug) :replies dis/recent-activity-sort)
           should-update-replies? (some #(= (:uuid %) (:uuid activity-data)) (:posts-list replies-data))]
       (when should-update-replies?
-        (dis/dispatch! [:update-containers])))))
+        (utils/after 180 #(dis/dispatch! [:update-containers]))))))
 
 (defn get-comments [activity-data]
   (when activity-data
@@ -515,12 +515,13 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn entry-comments-data [entry-data org-data comments container-seen-at]
-  (let [full-entry (dis/activity-data (:uuid entry-data))
+(defn entry-comments-data [entry-data org-data fixed-items container-seen-at]
+  (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
+        full-entry (get fixed-items (:uuid entry-data))
         fallback-to-inline? (and (empty? comments)
                                  (not (empty? (:comments full-entry))))
         all-comments (if fallback-to-inline?
-                       (:comments (dis/activity-data (:uuid entry-data)))
+                       (:comments full-entry)
                        comments)]
     (as-> entry-data e
      (assoc e :comments-data all-comments)
@@ -775,10 +776,7 @@
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction)
             full-items-list (if replies?
-                              (map (fn [entry]
-                                    (let [comments (dis/activity-sorted-comments-data (:uuid entry))]
-                                      (entry-comments-data entry org-data comments (:last-seen-at container-data))))
-                               items-list*)
+                              (map #(entry-comments-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
                               items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))

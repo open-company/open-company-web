@@ -330,6 +330,7 @@
            (replies-list {:items-to-render items
                           :org-data org-data
                           :container-data container-data
+                          :force-list-update force-list-update
                           :current-user-data current-user-data})
            (window-scroller
             {}
