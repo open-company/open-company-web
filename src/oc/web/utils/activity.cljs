@@ -79,7 +79,7 @@
        :date (post-month-date-from-date d)})))
 
 (def preserved-keys
-  [:resource-type :uuid :sort-value :unseen :unseen-comments :comments-data :board-slug :container-seen-at :publisher? :published-at])
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :comments-data :board-slug :container-seen-at :publisher? :published-at :loading-comments?])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -516,13 +516,20 @@
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
 (defn entry-comments-data [entry-data org-data comments container-seen-at]
-  (as-> entry-data e
-   (assoc e :comments-data (or comments (:comments e)))
-   (update e :comments-data (fn [cs]
-                              (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
-   (if (seq (:comments-data e))
-     (assoc e :unseen-comments (comments-unseen? e))
-     e)))
+  (let [full-entry (dis/activity-data (:uuid entry-data))
+        fallback-to-inline? (and (empty? comments)
+                                 (not (empty? (:comments full-entry))))
+        all-comments (if fallback-to-inline?
+                       (:comments (dis/activity-data (:uuid entry-data)))
+                       comments)]
+    (as-> entry-data e
+     (assoc e :comments-data all-comments)
+     (assoc e :loading-comments? fallback-to-inline?)
+     (update e :comments-data (fn [cs]
+                                (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
+     (if (seq (:comments-data e))
+       (assoc e :unseen-comments (comments-unseen? e))
+       e))))
 
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
@@ -796,13 +803,14 @@
         (when load-comments?
           (doseq [e items-list
                   :let [entry-data (or (get-in with-fixed-activities [:fixed-items (:uuid e)]) (dis/activity-data (:uuid e)))]]
-            (utils/after 0 #(get-comments entry-data))))
+           (utils/after 0 #(get-comments entry-data))))
         (-> with-fixed-activities
          (assoc :no-virtualized-steam replies?)
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)
-         (assoc :items-to-render with-ending-item))))))
+         (assoc :items-to-render with-ending-item)
+         (update :render-key #(if-not (and replies? load-comments?) (utils/activity-uuid) %)))))))
 
 (defn activity-comments [activity-data comments-data]
   (or (-> comments-data

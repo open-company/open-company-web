@@ -335,12 +335,13 @@
                                         (seq (second items-changed)))
                                 (update-replies s)))
                             s)}
-  [s {uuid             :uuid
-      publisher        :publisher
-      unseen           :unseen
-      published-at     :published-at
-      member?          :member?
-      comments-data    :comments-data
+  [s {uuid              :uuid
+      publisher         :publisher
+      unseen            :unseen
+      published-at      :published-at
+      member?           :member?
+      comments-data     :comments-data
+      loading-comments? :loading-comments?
       :as activity-data}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -349,7 +350,6 @@
         is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class activity-data)
         replies @(::replies s)
-        comments-loaded? (not (seq replies))
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
@@ -368,35 +368,35 @@
                                 (not (utils/event-inside? e (.querySelector reply-el "div.add-comment-box-container"))))
                        (nav-actions/open-post-modal activity-data false))))}
       (reply-top (assoc activity-data :current-user-id (:user-id current-user-data)))
-      (if comments-loaded?
+      (when loading-comments?
         [:div.reply-item-blocks.group
           [:div.reply-item-loading.group
             (small-loading)
             [:span.reply-item-loading-inner
-              "Loading replies..."]]]
-        [:div.reply-item-blocks.group
-          (for [reply @(::replies s)
-                :when (:expanded reply)]
-            (if (= (:resource-type reply) :collapsed-comments)
-              (rum/with-key
-               (collapsed-comments-button (assoc reply :expand-cb #(expand-comments s (:collapse-id reply))))
-               (str "collapsed-comments-bt-" (clojure.string/join "-" (:comment-uuids reply))))
-              (comment-item s {:activity-data activity-data
-                               :reply-data reply
-                               :is-mobile? is-mobile?
-                               :seen-reply-cb (partial reply-mark-seen s)
-                               :member? member?
-                               :reply-focus-value add-comment-focus-value
-                               :current-user-id (:user-id current-user-data)})))
-          (rum/with-key
-           (add-comment {:activity-data activity-data
-                         :collapse? true
-                         :add-comment-placeholder "Reply..."
-                         :add-comment-cb #(do
-                                            (entry-mark-seen s)
-                                            (swap! (::replies s) merge {(:uuid %) {:unseen false :expanded true :unwrapped-body true}}))
-                         :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
-           (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))])]))
+              "Loading more replies..."]]])
+      [:div.reply-item-blocks.group
+        (for [reply @(::replies s)
+              :when (:expanded reply)]
+          (if (= (:resource-type reply) :collapsed-comments)
+            (rum/with-key
+             (collapsed-comments-button (assoc reply :expand-cb #(expand-comments s (:collapse-id reply))))
+             (str "collapsed-comments-bt-" (clojure.string/join "-" (:comment-uuids reply))))
+            (comment-item s {:activity-data activity-data
+                             :reply-data reply
+                             :is-mobile? is-mobile?
+                             :seen-reply-cb (partial reply-mark-seen s)
+                             :member? member?
+                             :reply-focus-value add-comment-focus-value
+                             :current-user-id (:user-id current-user-data)})))
+        (rum/with-key
+         (add-comment {:activity-data activity-data
+                       :collapse? true
+                       :add-comment-placeholder "Reply..."
+                       :add-comment-cb #(do
+                                          (entry-mark-seen s)
+                                          (swap! (::replies s) merge {(:uuid %) {:unseen false :expanded true :unwrapped-body true}}))
+                       :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
+         (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 
 (rum/defcs replies-list <
   rum/static
@@ -449,4 +449,4 @@
               :else
               (rum/with-key
                (reply-item item-props)
-               (str "reply-" (:uuid item-props)))))])]))
+               (str "reply-" (:render-key container-data) "-" (:uuid item-props)))))])]))

@@ -792,7 +792,8 @@
                                        (:unseen activity-data))
                should-badge-replies? (and is-published?
                                           is-following?
-                                          (or (:unseen activity-data)
+                                          (or (and (:unseen activity-data)
+                                                   (-> activity-data :links (utils/link-for "comments") :count pos?))
                                               (pos? (:unseen-comments activity-data))))]
            (when should-badge-home?
              (dis/dispatch! [:home-badge/on org-slug]))

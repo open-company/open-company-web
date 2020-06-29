@@ -41,7 +41,7 @@
                         (or (:published-at activity-data) (:created-at activity-data)))]
         (.getTime (utils/js-date sort-field)))))))
 
-(defn add-remove-item-from-all-posts
+(defn- add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
   [db org-slug activity-data]
@@ -77,7 +77,7 @@
        (assoc-in ap-ra-key (dissoc parsed-ap-ra-data :fixed-items))))
     db))
 
-(defn add-remove-item-from-board
+(defn- add-remove-item-from-board
   "Given an activity map adds or remove it from it's board's list of posts depending on the activity status"
   [db org-slug activity-data]
   (if (:uuid activity-data)
@@ -108,7 +108,7 @@
        (assoc-in ra-board-data-key (dissoc parsed-ra-board-data :fixed-items))))
     db))
 
-(defn add-remove-item-from-bookmarks
+(defn- add-remove-item-from-bookmarks
   "Given an activity map adds or remove it from the bookmarks list of posts."
   [db org-slug activity-data]
   (if (:uuid activity-data)
@@ -132,7 +132,23 @@
       (assoc-in db bm-key (dissoc next-bm-data :fixed-items)))
     db))
 
-(defn add-remove-item-from-follow
+(defn- add-published-post-to-home [db org-slug activity-data]
+  (let [fl-rp-key (dispatcher/container-key org-slug :following dispatcher/recently-posted-sort)
+        fl-ra-key (dispatcher/container-key org-slug :following dispatcher/recent-activity-sort)
+        old-fl-rp-data (get-in db fl-rp-key)
+        old-fl-ra-data (get-in db fl-ra-key)
+        activity-item (select-keys activity-data au/preserved-keys)
+        new-fl-rp-data (-> old-fl-rp-data
+                        (update :sort-value (partial sort-value dispatcher/recently-posted-sort))
+                        (update :post-list conj activity-item))
+        new-fl-ra-data (-> old-fl-ra-data
+                        (update :sort-value (partial sort-value dispatcher/recent-activity-sort))
+                        (update :post-list conj activity-item))]
+    (-> db
+      (assoc fl-rp-key new-fl-rp-data)
+      (assoc fl-ra-key new-fl-ra-data))))
+
+(defn- add-remove-item-from-follow
   "Given an activity map adds or remove it from the bookmarks list of posts."
   [db org-slug activity-data following-container?]
   (if (:uuid activity-data)
@@ -178,7 +194,7 @@
        (assoc-in fl-ra-key (dissoc parsed-fl-ra-data :fixed-items))))
     db))
 
-(defn add-remove-item-from-contributions
+(defn- add-remove-item-from-contributions
   "Given an activity map adds or remove it from it's contributions' list of posts depending on the activity status"
   [db org-slug activity-data]
   (let [contributions-list-key (dispatcher/contributions-list-key org-slug)
@@ -300,17 +316,20 @@
         org-data-key (dispatcher/org-data-key org-slug)
         contributions-count-key (vec (conj org-data-key :contributions-count))
         board-data (au/board-by-uuid (:board-uuid activity-data))
-        fixed-activity-data (au/parse-entry activity-data board-data (dispatcher/change-data db))
-        with-published-at (update fixed-activity-data :published-at #(if (seq %) % (utils/as-of-now)))]
+        fixed-activity-data (-> activity-data
+                             (au/parse-entry board-data (dispatcher/change-data db))
+                             (assoc :unseen false)
+                             (assoc :unread false)
+                             (update :published-at #(if (seq %) % (utils/as-of-now))))]
     (-> db
       (update-in contributions-count-key inc)
-      (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
-      (add-remove-item-from-all-posts org-slug with-published-at)
-      (add-remove-item-from-bookmarks org-slug with-published-at)
-      (add-remove-item-from-follow org-slug with-published-at true)
-      (add-remove-item-from-follow org-slug with-published-at false)
-      (add-remove-item-from-board org-slug with-published-at)
-      (add-remove-item-from-contributions org-slug with-published-at)
+      (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
+      (add-remove-item-from-all-posts org-slug fixed-activity-data)
+      (add-remove-item-from-bookmarks org-slug fixed-activity-data)
+      (add-published-post-to-home org-slug fixed-activity-data)
+      (add-remove-item-from-follow org-slug fixed-activity-data false)
+      (add-remove-item-from-board org-slug fixed-activity-data)
+      (add-remove-item-from-contributions org-slug fixed-activity-data)
       (update-in dispatcher/force-list-update-key force-list-update-value)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
