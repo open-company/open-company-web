@@ -247,7 +247,7 @@
         deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
         current-user-id (jwt/user-id)
         deleting-new-comment? (when deleting-comment-data
-                                (au/comment-unread? deleting-comment-data last-read-at))
+                                (cu/comment-unread? deleting-comment-data last-read-at))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
         new-sorted-comments-data (cu/sort-comments new-comments-data)
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]

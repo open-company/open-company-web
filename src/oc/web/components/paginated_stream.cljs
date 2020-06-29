@@ -109,7 +109,7 @@
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
                                 (rum/local false ::mounted)
-                                seen-mixins/mark-container-seen-mixin
+                                (seen-mixins/container-nav-mixin)
                                 {:will-mount (fn [s]
                                    (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
                                    s)

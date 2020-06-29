@@ -104,23 +104,29 @@
 ;     (assoc comment-data :unread
 ;      (unread? last-read-at (get-collapsed-item comment-data collapsed-map)))))
 
+(defun comment-unread?
+  "A comment is unread if it's created-at is past the last seen-at of the contianer it belongs to."
+
+  ([comment-data :guard map? last-read-at]
+   (comment-unread? (:created-at comment-data) last-read-at))
+
+  ([created-at :guard string? last-read-at :guard #(or (nil? %) (string? %))]
+   (pos? (compare created-at last-read-at))))
+
 (defn is-unseen? [item collapsed-map]
   (not (:unseen (get-collapsed-item item collapsed-map))))
 
-(defun unseen?
+(defun comment-unseen?
   "A comment is unseen if it's created-at is later than the last seen-at of the container it belongs to."
 
   ([comment-data :guard map? container-seen-at]
-   (unseen? (:created-at comment-data) container-seen-at))
+   (comment-unseen? (:created-at comment-data) container-seen-at))
 
-  ([iso-date :guard string? container-seen-at :guard #(or (nil? %) (string? %))]
-   (or (string/blank? container-seen-at)
-       (letfn [(get-time [t] (.getTime (new js/Date t)))]
-         (< (get-time container-seen-at)
-            (get-time iso-date))))))
+  ([created-at :guard string? container-seen-at :guard #(or (nil? %) (string? %))]
+   (pos? (compare created-at container-seen-at))))
 
 ; (defn- unseen-comment [comment-data container-seen-at collapsed-map]
-;   (assoc comment-data :unseen (unseen? comment-data container-seen-at)))
+;   (assoc comment-data :unseen (comment-unseen? comment-data container-seen-at)))
 
 (defn- unwrapped-body-comment [comment-data collapsed-map]
   (let [item (get-collapsed-item comment-data collapsed-map)]

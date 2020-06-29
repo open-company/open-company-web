@@ -341,7 +341,6 @@
       published-at     :published-at
       member?          :member?
       comments-data    :comments-data
-      initial-last-seen-at :initial-last-seen-at
       :as activity-data}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -406,12 +405,10 @@
   (drv/drv :add-comment-focus)
   ui-mixins/refresh-tooltips-mixin
   (rum/local [] ::entries)
-  (rum/local nil ::initial-last-seen-at)
-  seen-mixins/mark-container-seen-mixin
+  (seen-mixins/container-nav-mixin)
   {:will-mount (fn [s]
     (let [props (-> s :rum/args first)]
-     (reset! (::entries s) (:items-to-render props))
-     (reset! (::initial-last-seen-at s) (-> props :container-data :last-seen-at)))
+     (reset! (::entries s) (:items-to-render props)))
     s)
    :did-remount (fn [o s]
    (let [entries (-> s :rum/args first :items-to-render)
@@ -435,9 +432,7 @@
                 :let [caught-up? (= (:resource-type item*) :caught-up)
                       loading-more? (= (:resource-type item*) :loading-more)
                       closing-item? (= (:resource-type item*) :closing-item)
-                      item-props (assoc item* :member? member?
-                                              :initial-last-seen-at @(::initial-last-seen-at s)
-                                              :container-seen-at (:last-seen-at container-data))]]
+                      item-props (assoc item* :member? member?)]]
             (cond
               caught-up?
               (rum/with-key

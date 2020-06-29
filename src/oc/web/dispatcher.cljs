@@ -275,7 +275,9 @@
         posts-list (get container-data items-key)
         container-posts (vec (remove nil?
                          (map #(if (= (:resource-type %) :entry)
-                                 (merge % (get posts-data (:uuid %)))
+                                 ;; Make sure the local map is merged as last value
+                                 ;; since the kept value relates directly to the container
+                                 (merge (get posts-data (:uuid %)) %)
                                  %)
                           posts-list)))]
     (if (= container-slug utils/default-drafts-board-slug)

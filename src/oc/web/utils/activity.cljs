@@ -79,7 +79,7 @@
        :date (post-month-date-from-date d)})))
 
 (def preserved-keys
-  [:resource-type :uuid :sort-value :unread :unseen :unseen-comments :comments :comments-data :board-slug :last-read-at])
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :comments-data :board-slug :container-seen-at :publisher? :published-at])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -98,11 +98,7 @@
          items-map (zipmap (map :uuid full-items-list) full-items-list)]
      (grouped-posts items-list items-map)))
   ([items-list fixed-items]
-   (let [sorted-posts-list (mapv #(or (get fixed-items (:uuid %))
-                                      (dis/activity-data (:uuid %)))
-                            items-list)
-
-         last-monday (utils/js-date)
+   (let [last-monday (utils/js-date)
          _last-monday (doto last-monday
                         (.setDate (- (.getDate last-monday)
                                      ; First saturday before now
@@ -133,9 +129,9 @@
                         (.setSeconds 59)
                         (.setMilliseconds 999))
 
-         last-date (:published-at (last sorted-posts-list))
+         last-date (:published-at (last items-list))
          separators-data (loop [separators []
-                                posts sorted-posts-list]
+                                posts items-list]
                            (if (empty? posts)
                              separators
                              (recur (add-posts-to-separator (first posts) separators last-monday two-weeks-ago first-month)
@@ -276,13 +272,14 @@
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defun post-unseen?
+(defun entry-unseen?
   "An entry is new if its uuid is contained in container's unseen."
-  [entry last-seen-at]
-  (or (s/blank? last-seen-at)
-      (not (pos? (compare (:published-at entry) last-seen-at)))))
+  ([entry :guard map? last-seen-at]
+   (entry-unseen? (:published-at entry) last-seen-at))
+  ([published-at :guard string? last-seen-at :guard #(or (nil? %) (string? %))]
+   (pos? (compare published-at last-seen-at))))
 
-(defn post-unread?
+(defn entry-unread?
   "An entry is new if its uuid is contained in container's unread."
   [entry changes]
   (let [board-uuid (:board-uuid entry)
@@ -291,17 +288,6 @@
     (if board-unread
       (utils/in? board-unread (:uuid entry))
       (nil? (:last-read-at entry)))))
-
-(defun comment-unread?
-  "A comment is unread if it's created-at is past the last seen-at of the contianer it belongs to."
-
-  ([comment-data :guard map? last-read-at]
-   (comment-unread? (:created-at comment-data) last-read-at))
-
-  ([iso-date last-read-at]
-   (letfn [(get-time [t] (.getTime (new js/Date t)))]
-     (< (get-time last-read-at)
-        (get-time iso-date)))))
 
 (defn has-attachments? [data]
   (seq (:attachments data)))
@@ -509,9 +495,9 @@
           is-root-comment (empty? (:parent-uuid comment-map))
           author? (is-author? comment-map)
           unread? (and (not author?)
-                       (comment-unread? comment-map (:last-read-at activity-data)))
+                       (cu/comment-unread? comment-map (:last-read-at activity-data)))
           unseen? (and (not author?)
-                       (cu/unseen? comment-map container-seen-at))]
+                       (cu/comment-unseen? comment-map container-seen-at))]
       (-> comment-map
         (assoc :resource-type :comment)
         (assoc :author? author?)
@@ -532,7 +518,7 @@
    (update e :comments-data (fn [cs]
                               (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
    (if (seq (:comments-data e))
-     (assoc e :unseen-comments (cu/unseen? (first (:comments-data e)) container-seen-at))
+     (assoc e :unseen-comments (cu/comment-unseen? (first (:comments-data e)) container-seen-at))
      e)))
 
 (defun parse-entry
@@ -571,8 +557,8 @@
           (if published?
             (assoc e :publisher? (is-publisher? e))
             e))
-        (assoc :unseen (post-unseen? entry-data container-seen-at))
-        (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+        (assoc :unseen (entry-unseen? entry-data container-seen-at))
+        (assoc :unread (entry-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
         (assoc :read-only (readonly-entry? (:links entry-data)))
         (assoc :board-uuid fixed-board-uuid)
         (assoc :board-slug fixed-board-slug)
@@ -652,8 +638,8 @@
             items-list (when (contains? board-data :entries)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
-                                (select-keys preserved-keys)
-                                (assoc :resource-type :entry))
+                                (assoc :resource-type :entry)
+                                (select-keys preserved-keys))
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
             grouped-items (if (show-separators? (:slug board-data) sort-type)
@@ -692,7 +678,7 @@
             boards-map (zipmap (map :slug all-boards) all-boards)
             with-fixed-activities* (reduce (fn [ret item]
                                              (let [board-data (get boards-map (:board-slug item))
-                                                   fixed-entry (parse-entry item board-data change-data active-users)]
+                                                   fixed-entry (parse-entry item board-data change-data active-users (:last-seen-at contributions-data))]
                                                (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
                                     contributions-data
                                     (:items contributions-data))
@@ -751,7 +737,7 @@
             boards-map (zipmap (map :slug all-boards) all-boards)
             with-fixed-activities* (reduce (fn [ret item]
                                              (let [board-data (get boards-map (:board-slug item))
-                                                   fixed-entry (parse-entry item board-data change-data active-users)]
+                                                   fixed-entry (parse-entry item board-data change-data active-users (:last-seen-at container-data))]
                                                (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
                                     container-data
                                     (:items container-data))
@@ -771,6 +757,7 @@
                                  (vec (conj next-links link-to-move))
                                  next-links)
                                (:links container-data))
+            replies? (= (-> container-data :container-slug keyword) :replies)
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
@@ -779,24 +766,19 @@
                                 (assoc :resource-type :entry))
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction)
-            full-items-list (map (fn [entry]
-                                   (let [board-data (get boards-map (:board-slug entry))
-                                         full-item (or (get-in with-fixed-activities [:fixed-items (:uuid entry)])
-                                                       (dis/activity-data (:slug org-data) (:uuid entry)))
-                                         comments (or (dis/activity-sorted-comments-data (:uuid entry)) (:comments full-item))]
-                                     (entry-comments-data org-data entry comments (:last-seen-at container-data))))
-                             items-list*)
+            full-items-list (if replies?
+                              (map (fn [entry]
+                                    (let [comments (dis/activity-sorted-comments-data (:uuid entry))]
+                                      (entry-comments-data org-data entry comments (:last-seen-at container-data))))
+                               items-list*)
+                              items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
-            items-map (when (#{:following :replies} (:container-slug container-data))
-                        (let [enriched-items-list (map (comp (:fixed-items with-fixed-activities) :uuid) full-items-list)]
-                          (merge (:fixed-items with-fixed-activities) (zipmap (map :uuid enriched-items-list) enriched-items-list))))
-            get-item #(merge (get items-map (:uuid %)) %)
             ignore-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                              #(or (not= (:resource-type %) :entry)
-                                  (->> % get-item :publisher?))
+                                  (:publisher? %))
                              #(not= (:resource-type %) :entry))
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                             #(and (= (:resource-type %) :entry)
@@ -809,8 +791,7 @@
                             (insert-caught-up grouped-items check-item-fn ignore-item-fn opts)
                             grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
-            with-ending-item (insert-ending-item with-open-close-items next-link)
-            replies? (= (-> container-data :container-slug keyword) :replies)]
+            with-ending-item (insert-ending-item with-open-close-items next-link)]
         (when load-comments?
           (doseq [e (vals (:fixed-items with-fixed-activities))]
             (utils/after 0 #(get-comments e))))
@@ -883,6 +864,7 @@
     (time-format/unparse f d)))
 
 (defn update-contributions [db org-data change-data active-users follow-publishers-list]
+  (js.console.log "DBG update-contributions")
   (let [org-slug (:slug org-data)
         contributions-list-key (dis/contributions-list-key org-slug)]
     (reduce (fn [tdb contrib-key]
@@ -905,6 +887,7 @@
      (keys (get-in db contributions-list-key)))))
 
 (defn update-boards [db org-data change-data active-users]
+  (js.console.log "DBG update-boards")
   (let [org-slug (:slug org-data)
         boards-key (dis/boards-key org-slug)
         following-boards (dis/follow-boards-list org-slug db)]
@@ -928,11 +911,15 @@
     (keys (get-in db boards-key)))))
 
 (defn update-containers [db org-data change-data active-users]
+  (js.console.log "DBG update-containers")
   (let [org-slug (:slug org-data)
         containers-key (dis/containers-key org-slug)]
     (reduce (fn [tdb container-key]
               (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
                     ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
+                (js.console.log "DBG   k" container-key)
+                (js.console.log "DBG   rp" (get-in db rp-container-data-key))
+                (js.console.log "DBG   ra" (get-in db ra-container-data-key))
                 (as-> tdb tdb*
                  (if (contains? (get-in tdb* (butlast rp-container-data-key)) (last rp-container-data-key))
                    (update-in tdb* rp-container-data-key
@@ -950,6 +937,7 @@
      (keys (get-in db containers-key)))))
 
 (defn update-posts [db org-data change-data active-users]
+  (js.console.log "DBG update-posts")
   (let [org-slug (:slug org-data)
         posts-key (dis/posts-data-key org-slug)]
     (reduce (fn [tdb post-uuid]
@@ -961,6 +949,7 @@
      (keys (get-in db posts-key)))))
 
 (defn update-all-containers [db org-data change-data active-users follow-publishers-list]
+  (js.console.log "DBG update-all-containers")
   (-> db
    (update-posts org-data change-data active-users)
    (update-boards org-data change-data active-users)
