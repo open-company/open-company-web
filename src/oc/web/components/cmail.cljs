@@ -404,12 +404,14 @@
                       ;; Did activity get removed here or in another client?
                       (when (:delete cmail-data)
                         (real-close))
+                      ;; Saving
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
                         (reset! (::disable-post s) false)
                         (when-not (:error cmail-data)
                           (utils/after 100 real-close)))
+                      ;; Publish
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
                         (reset! (::publishing s) false)
@@ -418,28 +420,20 @@
                           (when (seq (:board-slug cmail-data))
                             ;; Redirect to the publishing board if the slug is available
                             (real-close)
-                            (utils/after
-                             180
-                             #(let [following-board-uuids (set (map :uuid @(drv/get-ref s :follow-boards-list)))
-                                    following-cmail-board? (following-board-uuids (:board-uuid cmail-data))
-                                    is-in-cmail-board? (= (router/current-board-slug) (:board-slug cmail-data))
-                                    is-home? (= (router/current-board-slug) "following")]
-                                (router/nav! (cond
-                                               ;; If user posted from that board let's leave him there
-                                               is-in-cmail-board?
-                                               (oc-urls/board (:board-slug cmail-data))
-                                               ;; If use is following the board they posted to
-                                               ;; and they are in home
-                                               (and following-cmail-board?
-                                                    is-home?)
-                                               (oc-urls/following)
-                                               ;; If user is publishing to its own publisher board
-                                               ;; redirect him there
-                                               (:publisher-board cmail-data)
-                                               (oc-urls/contributions (:user-id @(drv/get-ref s :current-user-data)))
-                                               ;; Redirect to the posting board in every other case
-                                               :else
-                                               (oc-urls/board (:board-slug cmail-data))))))))))
+                            (utils/after 180 (fn []
+                             (let [follow-boards-list @(drv/get-ref s :follow-boards-list)
+                                   following-board? (some #(when (= (:slug %) (:board-slug cmail-data)) %) follow-boards-list)
+                                   posting-to-current-board? (= (router/current-board-slug) (:board-slug cmail-data))
+                                   to-url (if (and following-board?
+                                                   (not posting-to-current-board?))
+                                            ;; If user is following the board they posted to
+                                            ;; and they are in home
+                                            {:slug :following
+                                             :url (oc-urls/following)}
+                                            ;; Redirect to the posting board in every other case
+                                            {:slug (:board-slug cmail-data)
+                                             :url (oc-urls/board (:board-slug cmail-data))})]
+                               (nav-actions/nav-to-url! nil (:slug to-url) (:url to-url) 0 false))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)

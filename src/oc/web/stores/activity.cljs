@@ -70,11 +70,21 @@
           next-ap-ra-data (assoc old-ap-ra-data :posts-list sorted-new-ap-ra-uuids)
           org-data (dispatcher/org-data)
           active-users (dispatcher/active-users org-slug db)
-          parsed-ap-rp-data (au/parse-container next-ap-rp-data {} org-data active-users dispatcher/recently-posted-sort false)
-          parsed-ap-ra-data (au/parse-container next-ap-ra-data {} org-data active-users dispatcher/recent-activity-sort false)]
-      (-> db
-       (assoc-in ap-rp-key (dissoc parsed-ap-rp-data :fixed-items))
-       (assoc-in ap-ra-key (dissoc parsed-ap-ra-data :fixed-items))))
+          parsed-ap-rp-data (when old-ap-rp-data
+                              (-> next-ap-rp-data
+                                (au/parse-container {} org-data active-users dispatcher/recently-posted-sort false)
+                                (dissoc :fixed-items)))
+          parsed-ap-ra-data (when old-ap-ra-data
+                              (-> next-ap-ra-data
+                                (au/parse-container {} org-data active-users dispatcher/recent-activity-sort false)
+                                (dissoc :fixed-items)))]
+      (as-> db tdb
+       (if old-ap-rp-data
+         (assoc-in tdb ap-rp-key parsed-ap-rp-data)
+         tdb)
+       (if old-ap-ra-data
+         (assoc-in tdb ap-ra-key parsed-ap-ra-data)
+        tdb)))
     db))
 
 (defn- add-remove-item-from-board
@@ -101,11 +111,26 @@
           new-ra-with-sort-value (map (partial sort-value dispatcher/recent-activity-sort) new-rp-list)
           sorted-new-rp-uuids (reverse (sort-by :sort-value new-rp-with-sort-value))
           sorted-new-ra-uuids (reverse (sort-by :sort-value new-ra-with-sort-value))
-          parsed-rp-board-data (au/parse-board (assoc rp-old-board-data :posts-list sorted-new-rp-uuids dispatcher/recently-posted-sort))
-          parsed-ra-board-data (au/parse-board (assoc ra-old-board-data :posts-list sorted-new-ra-uuids dispatcher/recent-activity-sort))]
-      (-> db
-       (assoc-in rp-board-data-key (dissoc parsed-rp-board-data :fixed-items))
-       (assoc-in ra-board-data-key (dissoc parsed-ra-board-data :fixed-items))))
+          change-data (dispatcher/change-data)
+          active-users (dispatcher/active-users org-slug db)
+          follow-boards-list (dispatcher/follow-boards-list org-slug db)
+          parsed-rp-board-data (when rp-old-board-data
+                                 (-> rp-old-board-data
+                                  (assoc :posts-list sorted-new-rp-uuids)
+                                  (au/parse-board change-data active-users follow-boards-list dispatcher/recently-posted-sort)
+                                  (dissoc :fixed-items)))
+          parsed-ra-board-data (when ra-old-board-data
+                                 (-> ra-old-board-data
+                                  (assoc :posts-list sorted-new-ra-uuids)
+                                  (au/parse-board change-data active-users follow-boards-list dispatcher/recent-activity-sort)
+                                  (dissoc :fixed-items)))]
+      (as-> db tdb
+       (if rp-old-board-data
+         (assoc-in tdb rp-board-data-key parsed-rp-board-data)
+         tdb)
+       (if ra-old-board-data
+         (assoc-in tdb ra-board-data-key parsed-ra-board-data)
+         tdb)))
     db))
 
 (defn- add-remove-item-from-bookmarks
@@ -128,8 +153,12 @@
           org-data (dispatcher/org-data)
           change-data (dispatcher/change-data)
           active-users (dispatcher/active-users org-slug db)
-          next-bm-data (au/parse-container (assoc old-bm-data :posts-list sorted-new-bm-posts) change-data org-data active-users dispatcher/recently-posted-sort false)]
-      (assoc-in db bm-key (dissoc next-bm-data :fixed-items)))
+          next-bm-data (when old-bm-data
+                         (-> old-bm-data
+                          (assoc :posts-list sorted-new-bm-posts)
+                          (au/parse-container change-data org-data active-users dispatcher/recently-posted-sort false)
+                          (dissoc :fixed-items)))]
+      (assoc-in db bm-key next-bm-data))
     db))
 
 (defn- add-published-post-to-home [db org-slug activity-data]
@@ -138,15 +167,31 @@
         old-fl-rp-data (get-in db fl-rp-key)
         old-fl-ra-data (get-in db fl-ra-key)
         activity-item (select-keys activity-data au/preserved-keys)
-        new-fl-rp-data (-> old-fl-rp-data
-                        (update :sort-value (partial sort-value dispatcher/recently-posted-sort))
-                        (update :post-list conj activity-item))
-        new-fl-ra-data (-> old-fl-ra-data
-                        (update :sort-value (partial sort-value dispatcher/recent-activity-sort))
-                        (update :post-list conj activity-item))]
-    (-> db
-      (assoc fl-rp-key new-fl-rp-data)
-      (assoc fl-ra-key new-fl-ra-data))))
+        first-rp-item (-> old-fl-rp-data :items-to-render first)
+        first-ra-item (-> old-fl-ra-data :items-to-render first)
+        rp-activity-item (-> activity-item
+                          (assoc :open-item true)
+                          (assoc :close-item (not= (:resource-type first-rp-item) :entry)))
+        ra-activity-item (-> activity-item
+                           (assoc :open-item true)
+                           (assoc :close-item (not= (:resource-type first-ra-item) :entry)))
+        new-fl-rp-data (when old-fl-rp-data
+                         (-> old-fl-rp-data
+                          (update :sort-value (partial sort-value dispatcher/recently-posted-sort))
+                          (update :posts-list #(vec (concat [activity-item] %)))
+                          (update :items-to-render #(vec (concat [rp-activity-item] %)))))
+        new-fl-ra-data (when old-fl-ra-data
+                         (-> old-fl-ra-data
+                          (update :sort-value (partial sort-value dispatcher/recent-activity-sort))
+                          (update :posts-list #(vec (concat [activity-item] %)))
+                          (update :items-to-render #(vec (concat [ra-activity-item] %)))))]
+    (as-> db tdb
+      (if old-fl-rp-data
+        (assoc-in tdb fl-rp-key new-fl-rp-data)
+        tdb)
+      (if old-fl-ra-data
+        (assoc-in tdb fl-ra-key new-fl-ra-data)
+        tdb))))
 
 (defn- add-remove-item-from-follow
   "Given an activity map adds or remove it from the bookmarks list of posts."
@@ -187,11 +232,21 @@
           next-fl-ra-data (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids)
           org-data (dispatcher/org-data)
           active-users (dispatcher/active-users org-slug db)
-          parsed-fl-rp-data (au/parse-container next-fl-rp-data {} org-data active-users dispatcher/recently-posted-sort false)
-          parsed-fl-ra-data (au/parse-container next-fl-ra-data {} org-data active-users dispatcher/recent-activity-sort false)]
-      (-> db
-       (assoc-in fl-rp-key (dissoc parsed-fl-rp-data :fixed-items))
-       (assoc-in fl-ra-key (dissoc parsed-fl-ra-data :fixed-items))))
+          parsed-fl-rp-data (when old-fl-rp-data
+                              (-> next-fl-rp-data
+                               (au/parse-container {} org-data active-users dispatcher/recently-posted-sort false)
+                               (dissoc :fixed-items)))
+          parsed-fl-ra-data (when old-fl-ra-data
+                              (-> next-fl-ra-data
+                               (au/parse-container {} org-data active-users dispatcher/recent-activity-sort false)
+                               (dissoc :fixed-items)))]
+      (as-> db tdb
+       (if old-fl-rp-data
+         (assoc-in tdb fl-rp-key parsed-fl-rp-data)
+         tdb)
+       (if old-fl-ra-data
+         (assoc-in tdb fl-ra-key parsed-fl-ra-data)
+         tdb)))
     db))
 
 (defn- add-remove-item-from-contributions
@@ -223,11 +278,21 @@
             org-data (dispatcher/org-data db org-slug)
             active-users (dispatcher/active-users org-slug db)
             follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
-            parsed-rp-data (au/parse-contributions rp-new-posts-list change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort)
-            parsed-ra-data (au/parse-contributions ra-new-posts-list change-data org-data active-users follow-publishers-list dispatcher/recent-activity-sort)]
-        (-> db
-         (assoc-in rp-contributions-data-key (dissoc parsed-rp-data :fixed-items))
-         (assoc-in ra-contributions-data-key (dissoc parsed-ra-data :fixed-items))))
+            parsed-rp-data (when rp-old-data
+                             (-> rp-new-posts-list
+                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort))
+                              (dissoc :fixed-items))
+            parsed-ra-data (when ra-old-data
+                             (-> ra-new-posts-list
+                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recent-activity-sort)
+                              (dissoc :fixed-items)))]
+        (as-> db tdb
+         (if rp-old-data
+           (assoc-in tdb rp-contributions-data-key parsed-rp-data)
+           tdb)
+         (if ra-old-data
+           (assoc-in tdb ra-contributions-data-key parsed-ra-data)
+           tdb)))
       db)))
 
 (defmethod dispatcher/action :entry-edit/dismiss
@@ -311,9 +376,8 @@
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish
-  [db [_ edit-key activity-data]]
-  (let [org-slug (utils/post-org-slug activity-data)
-        org-data-key (dispatcher/org-data-key org-slug)
+  [db [_ org-slug edit-key activity-data]]
+  (let [org-data-key (dispatcher/org-data-key org-slug)
         contributions-count-key (vec (conj org-data-key :contributions-count))
         board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (-> activity-data
@@ -330,7 +394,7 @@
       (add-remove-item-from-follow org-slug fixed-activity-data false)
       (add-remove-item-from-board org-slug fixed-activity-data)
       (add-remove-item-from-contributions org-slug fixed-activity-data)
-      (update-in dispatcher/force-list-update-key force-list-update-value)
+      ; (update-in dispatcher/force-list-update-key force-list-update-value)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 

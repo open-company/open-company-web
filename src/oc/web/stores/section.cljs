@@ -39,15 +39,15 @@
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %))))))
 
-(defn fix-posts-new-label
-  [db changes]
-  (let [posts-data (dispatcher/posts-data db)
-        org-slug (:org (:router-path db))]
-    (reduce
-      #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))]
-          (update-in %1 posts-key merge {:unread (au/entry-unread? %2 changes)}))
-      db
-      (vals posts-data))))
+; (defn fix-posts-new-label
+;   [db changes]
+;   (let [posts-data (dispatcher/posts-data db)
+;         org-slug (:org (:router-path db))]
+;     (reduce
+;       #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))]
+;           (update-in %1 posts-key merge {:unread (au/entry-unread? %2 changes)}))
+;       db
+;       (vals posts-data))))
 
 (defmethod dispatcher/action :section-change
   [db [_ section-uuid]]
@@ -151,12 +151,13 @@
     (let [org-data (dispatcher/org-data db)
           old-change-data (dispatcher/change-data db)
           new-change-data (merge old-change-data change-data)
-          active-users (dispatcher/active-users (:slug org-data) db)
-          follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)]
+          ; active-users (dispatcher/active-users (:slug org-data) db)
+          ; follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)
+          ]
       (timbre/debug "Change status data:" new-change-data)
       (-> db
-        (fix-posts-new-label new-change-data)
-        (au/update-all-containers org-data change-data active-users follow-publishers-list)
+        ; (fix-posts-new-label new-change-data)
+        ; (au/update-all-containers org-data change-data active-users follow-publishers-list)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 

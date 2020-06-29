@@ -423,7 +423,8 @@
                (not= board-slug (router/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
     (au/save-last-used-section board-slug)
-    (refresh-org-data)
+    (when-not is-published?
+      (sa/drafts-get))
     ;; Remove saved cached item
     (cmail-actions/remove-cached-item initial-uuid)
     ;; reset initial revision after successful save.
@@ -555,16 +556,16 @@
                    entry-create-link (utils/link-for (:links entry-board-data) "create")]
                (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))))))
 
-(defn- entry-publish-finish [initial-uuid edit-key board-slug activity-data]
+(defn- entry-publish-finish [initial-uuid edit-key org-slug board-slug activity-data]
   ;; Save last used section
   (au/save-last-used-section board-slug)
-  (refresh-org-data)
+  ; (refresh-org-data)
   ;; Remove entry cached edits
   (cmail-actions/remove-cached-item initial-uuid)
   ;; reset initial revision after successful publish.
   ;; need a new revision number on the next edit.
   (swap! initial-revision dissoc (:uuid activity-data))
-  (dis/dispatch! [:entry-publish/finish edit-key activity-data])
+  (dis/dispatch! [:entry-publish/finish org-slug edit-key activity-data])
   ;; Send item read
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
@@ -573,11 +574,12 @@
   (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
-      (sa/section-get utils/default-drafts-board-slug drafts-link))))
+      (sa/section-get utils/default-drafts-board-slug drafts-link)))
+  (dis/dispatch! [:force-list-update]))
 
 (defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
-    (entry-publish-finish entry-uuid edit-key posted-to-board-slug (when success (json->cljs body)))
+    (entry-publish-finish entry-uuid edit-key (router/current-org-slug) posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed edit-key])))
 
 (defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
@@ -588,7 +590,7 @@
     ;; reset initial revision after successful publish.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc entry-uuid)
-    (refresh-org-data)
+    ; (refresh-org-data)
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
@@ -631,7 +633,7 @@
 (defn- activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
-    (refresh-org-data)))
+    (sa/drafts-get)))
 
 (defn- real-activity-delete [activity-data]
   (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
@@ -780,21 +782,28 @@
        (when success
          (let [activity-data (dis/activity-data activity-uuid)
                follow-boards-list (dis/follow-boards-list org-slug)
+               following-data (dis/container-data @dis/app-state org-slug :following dis/recently-posted-sort)
+               replies-data (dis/container-data @dis/app-state org-slug :replies dis/recent-activity-sort)
                is-published? (= (keyword (:status activity-data)) :published)
+               current-user-data (dis/current-user-data)
+               is-publisher? (= (-> activity-data :publisher :user-id) (:user-id current-user-data))
                is-following? (or ;; if unfollow link is present it means the user is explicitly
                                  ;; following the entry
                                  (utils/link-for (:links activity-data) "unfollow")
                                  ;; or if the board is followed by the user
                                  ((set (map :uuid follow-boards-list)) container-id))
+               following-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list following-data))
+               replies-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))
                should-badge-home? (and is-published?
                                        is-following?
                                        ;; and the user has never read it
-                                       (:unseen activity-data))
+                                       (not is-publisher?)
+                                       (or (:unseen following-item)
+                                           (au/entry-unseen? activity-data (:last-seen-at following-data))))
                should-badge-replies? (and is-published?
                                           is-following?
-                                          (or (and (:unseen activity-data)
-                                                   (-> activity-data :links (utils/link-for "comments") :count pos?))
-                                              (pos? (:unseen-comments activity-data))))]
+                                          (-> activity-data :links (utils/link-for "comments") :count pos?)
+                                          (:unseen-comments replies-item))]
            (when should-badge-home?
              (dis/dispatch! [:home-badge/on org-slug]))
            (when should-badge-replies?
@@ -885,20 +894,24 @@
         (when (or (= change-type :add)
                   (= change-type :delete))
           ;; Refresh the count of drafts and bookmarks
-          (api/get-org (utils/link-for (:links org-data) "self") refresh-org-data-cb)
+          (sa/drafts-get)
+          (bookmarks-get org-data dispatch-unread)
           ;; Refresh specific containers/sections
           (cond
             (= (router/current-board-slug) "inbox")
             (inbox-get org-data dispatch-unread)
             (= (router/current-board-slug) "all-posts")
             (all-posts-get org-data dispatch-unread)
-            (= (router/current-board-slug) "bookmarks")
-            (bookmarks-get org-data dispatch-unread)
+            ; (= (router/current-board-slug) "bookmarks")
+            ; (bookmarks-get org-data dispatch-unread)
             ; (= (router/current-board-slug) "following")
             ; (following-get org-data dispatch-unread)
             (= (router/current-board-slug) "unfollowing")
             (unfollowing-get org-data dispatch-unread)
-            :else
+            ;; If it's not one of the previous containers then load
+            ;; a real board if needed
+            (and (not (dis/is-container? (router/current-board-slug)))
+                 (not (router/current-contributions-id)))
             (sa/section-change container-id dispatch-unread)))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)

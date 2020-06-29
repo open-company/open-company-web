@@ -807,8 +807,7 @@
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)
-         (assoc :items-to-render with-ending-item)
-         (update :render-key #(if-not (and replies? load-comments?) (utils/activity-uuid) %)))))))
+         (assoc :items-to-render with-ending-item))))))
 
 (defn activity-comments [activity-data comments-data]
   (or (-> comments-data

@@ -170,7 +170,7 @@
   (vec (conj (follow-list-key org-slug) :publisher-uuids)))
 
 (defn follow-boards-list-key [org-slug]
-  (vec (conj (follow-list-key org-slug) :board-uuids)))
+  (vec (conj (follow-list-key org-slug) :follow-boards-list)))
 
 (defn unfollow-board-uuids-key [org-slug]
   (vec (conj (follow-list-key org-slug) :unfollow-board-uuids)))

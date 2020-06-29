@@ -60,7 +60,7 @@
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
          (routing-actions/routing @router/path)
-         (user-actions/initial-loading true))
+         (user-actions/initial-loading refresh?))
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
@@ -155,7 +155,7 @@
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
          (routing-actions/routing @router/path)
-         (user-actions/initial-loading true))
+         (user-actions/initial-loading refresh?))
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state

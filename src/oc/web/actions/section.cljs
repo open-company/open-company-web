@@ -57,34 +57,45 @@
         (when success
           (section-get-finish (:slug (dispatcher/org-data)) (:slug section) dispatcher/recently-posted-sort (json->cljs body)))))))
 
-(declare refresh-org-data)
+(defn section-get [board-slug link & [finish-cb]]
+  (api/get-board link
+    (fn [{:keys [status body success] :as resp}]
+      (when success
+        (section-get-finish (:slug (dispatcher/org-data)) board-slug
+         dispatcher/recently-posted-sort (json->cljs body)))
+      (when (fn? finish-cb)
+        (finish-cb resp)))))
+
+(defn drafts-get []
+  (let [org-data (dispatcher/org-data)
+        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+        drafts-link (utils/link-for (:links drafts-board) ["item" "self"] "GET")]
+    (when drafts-link
+      (section-get (:slug drafts-board) drafts-link))))
 
 (defn section-change
   [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
-    (let [current-section-data (dispatcher/board-data)
-          org-data (dispatcher/org-data)]
-      (when (= section-uuid (:uuid utils/default-drafts-board))
-        (refresh-org-data))
-      (if (= section-uuid (:uuid current-section-data))
-        ;; Reload the current board data
-        (api/get-board (utils/link-for (:links current-section-data) ["item" "self"] "GET")
-                       (fn [{:keys [status body success] :as resp}]
-                         (when success (section-get-finish (:slug org-data) (:slug current-section-data) dispatcher/recently-posted-sort (json->cljs body)))
-                         (when (fn? finish-cb)
-                           (finish-cb resp))))
-        ;; Reload a secondary board data
-        (let [sections (:boards org-data)
-              filtered-sections (filterv #(= (:uuid %) section-uuid) sections)]
-          (load-other-sections filtered-sections))))))
+    (let [org-data (dispatcher/org-data)
+          current-board-data (dispatcher/board-data)
+          current-board-link (utils/link-for (:links current-board-data) ["item" "self"] "GET")
+          drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+          drafts-board-link (utils/link-for (:links drafts-board) ["item" "self"] "GET")
+          refresh-slug (cond
+                        (= section-uuid (:uuid utils/default-drafts-board))
+                        utils/default-drafts-board-slug
+                        (= section-uuid (:uuid current-board-data))
+                        (:slug current-board-data))
+          refresh-link (cond
+                        (= section-uuid (:uuid utils/default-drafts-board))
+                        drafts-board-link
+                        (= section-uuid (:uuid current-board-data))
+                        current-board-link)]
+      (when refresh-link
+        (section-get refresh-slug refresh-link finish-cb)))))
   ;; Update change-data state that the board has a change
   (dispatcher/dispatch! [:section-change section-uuid]))
-
-(defn section-get [board-slug link]
-  (api/get-board link
-    (fn [{:keys [status body success]}]
-      (when success (section-get-finish (:slug (dispatcher/org-data)) board-slug dispatcher/recently-posted-sort (json->cljs body))))))
 
 (defn section-delete [section-slug & callback]
   (let [section-data (dispatcher/board-data (router/current-org-slug) section-slug)
