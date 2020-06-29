@@ -933,9 +933,8 @@
 ;; Following
 
 (defn- badge-home? [following-data]
-  (let [first-following-item (first (:posts-list following-data))
-        first-following-data (merge (dispatcher/activity-data (:uuid first-following-item)) (get (:fixed-items following-data) (:uuid first-following-item)) first-following-item)]
-    (:unread first-following-data)))
+  (let [first-following-item (first (:posts-list following-data))]
+    (:unseen first-following-item)))
 
 (defmethod dispatcher/action :following-get/finish
   [db [_ org-slug sort-type refresh-seen? following-data]]
@@ -1007,12 +1006,9 @@
 ;; Replies
 
 (defn- badge-replies? [replies-data]
-  (let [first-reply-item (first (:posts-list replies-data))
-        activity-data (dispatcher/activity-data (:uuid first-reply-item))
-        fixed-item (get (:fixed-items replies-data) (:uuid first-reply-item))
-        first-reply-data (merge activity-data fixed-item first-reply-item)]
-    (or (:unread first-reply-data)
-        (:unseen-comments first-reply-data))))
+  (let [first-reply-item (first (:posts-list replies-data))]
+    (or (:unread first-reply-item)
+        (:unseen-comments first-reply-item))))
 
 (defmethod dispatcher/action :replies-get/finish
   [db [_ org-slug sort-type refresh-seen? replies-data]]
