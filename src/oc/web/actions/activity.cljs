@@ -789,7 +789,7 @@
                should-badge-home? (and is-published?
                                        is-following?
                                        ;; and the user has never read it
-                                       (:unread activity-data))
+                                       (:unseen activity-data))
                should-badge-replies? (and is-published?
                                           is-following?
                                           (or (:unseen activity-data)
