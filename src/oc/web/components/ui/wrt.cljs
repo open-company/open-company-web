@@ -322,26 +322,27 @@
     (>= fixed-top-position (/ win-height 2))))
 
 (rum/defc wrt-count < rum/static
-  [{:keys [activity-data reads-data]}]
+  [{:keys [activity-data read-data]}]
   (let [item-id (:uuid activity-data)
         is-author? (:publisher? activity-data)
         reads-count (if (and is-author?
                              (:last-read-at activity-data))
-                     (dec (:count reads-data))
-                     (:count reads-data))
+                     (dec (:count read-data))
+                     (:count read-data))
         is-mobile? (responsive/is-tablet-or-mobile?)]
-    [:div.wrt-count-container
-      {:data-toggle (when-not is-mobile? "tooltip")
-       :data-placement "top"
-       :data-container "body"
-       :title (cond
-                (= reads-count 1)
-                "1 person viewed"
-                (pos? reads-count)
-                (str reads-count " people viewed")
-                :else
-                "No views yet")}
-      [:div.wrt-count
-        {:ref :wrt-count
-         :on-click #(nav-actions/show-wrt item-id)}
-        reads-count]]))
+    (when (map? read-data)
+      [:div.wrt-count-container
+        {:data-toggle (when-not is-mobile? "tooltip")
+         :data-placement "top"
+         :data-container "body"
+         :title (cond
+                  (= reads-count 1)
+                  "1 person viewed"
+                  (pos? reads-count)
+                  (str reads-count " people viewed")
+                  :else
+                  "No views yet")}
+        [:div.wrt-count
+          {:ref :wrt-count
+           :on-click #(nav-actions/show-wrt item-id)}
+          reads-count]])))

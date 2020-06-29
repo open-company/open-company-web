@@ -48,7 +48,7 @@
 (rum/defc wrapped-stream-item < rum/static
   [{:keys [style] :as row-props}
    {:keys [entry
-           reads-data
+           read-data
            org-data
            comments-data
            editable-boards
@@ -67,13 +67,13 @@
      (if collapsed-item?
        (stream-collapsed-item {:activity-data entry
                                :comments-data comments-data
-                               :read-data reads-data
+                               :read-data read-data
                                :show-wrt? show-wrt?
                                :member? member?
                                :editable-boards editable-boards})
        (stream-item {:activity-data entry
                      :comments-data comments-data
-                     :read-data reads-data
+                     :read-data read-data
                      :show-wrt? show-wrt?
                      :member? member?
                      :publisher? publisher?
@@ -162,8 +162,8 @@
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
                              item (get items index)
-                             reads-data (when (= (:resource-type item) :entry)
-                                          (get activities-read (:uuid item)))
+                             read-data (when (= (:resource-type item) :entry)
+                                         (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)
                              next-item (get items (inc index))
                              prev-item (get items (dec index))]
@@ -180,7 +180,7 @@
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry item
-                                                                  :reads-data reads-data
+                                                                  :read-data read-data
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
                             row-key))))]

@@ -137,7 +137,7 @@
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
         activities-read (drv/react s :activities-read)
-        reads-data (get activities-read (:uuid activity-data))
+        read-data (get activities-read (:uuid activity-data))
         editable-boards (drv/react s :editable-boards)
         comments-data (au/activity-comments activity-data comments-drv)
         dom-element-id (str "expanded-post-" (:uuid activity-data))
@@ -288,7 +288,7 @@
                                      :add-comment-focus-prefix "main-comment"}))]
               (when user-is-part-of-the-team
                 (wrt-count {:activity-data activity-data
-                            :reads-data reads-data}))]
+                            :read-data read-data}))]
             [:div.expanded-post-comments.group
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data

@@ -39,6 +39,8 @@ div.wrt-count-container {
 
   div.wrt-count {
     @include OC_Body_Book();
+    height: 26px;
+    min-width: 29px;
     font-size: 14px;
     color: var(--color);
     line-height: 14px;
@@ -69,6 +71,7 @@ div.wrt-count-container {
       height: 32px;
       line-height: 16px;
       padding: 8px 0 8px 21px;
+      min-width: initial;
     }
   }
 }
