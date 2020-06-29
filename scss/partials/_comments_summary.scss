@@ -8,8 +8,15 @@ div.is-comments {
   }
 
   @include big_web() {
-    &:hover div.is-comments-bubble {
-      opacity: 1;
+    &:hover {
+      div.is-comments-bubble {
+        opacity: 1;
+      }
+
+      div.is-comments-summary {
+        opacity: 1;
+        color: var(--color);
+      }
     }
   }
 
