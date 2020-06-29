@@ -289,6 +289,9 @@
       (utils/in? board-unread (:uuid entry))
       (nil? (:last-read-at entry)))))
 
+(defn comments-unseen? [entry-data]
+  (some :unseen (:comments-data entry-data)))
+
 (defn has-attachments? [data]
   (seq (:attachments data)))
 
@@ -512,13 +515,13 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn entry-comments-data [org-data entry-data comments container-seen-at]
+(defn entry-comments-data [entry-data org-data comments container-seen-at]
   (as-> entry-data e
    (assoc e :comments-data (or comments (:comments e)))
    (update e :comments-data (fn [cs]
                               (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
    (if (seq (:comments-data e))
-     (assoc e :unseen-comments (cu/comment-unseen? (first (:comments-data e)) container-seen-at))
+     (assoc e :unseen-comments (comments-unseen? e))
      e)))
 
 (defun parse-entry
@@ -609,14 +612,12 @@
   ([board-data change-data active-users follow-boards-list sort-type & [direction]]
     (when board-data
       (let [with-fixed-activities* (reduce (fn [ret item]
-                                             (assoc-in ret [:fixed-items (:uuid item)]
-                                              (parse-entry item {:slug (:board-slug item)
-                                                                 :name (:board-name item)
-                                                                 :uuid (:board-uuid item)
-                                                                 :publisher-board (:publisher-board item)}
-                                               change-data
-                                               active-users
-                                               (:last-seen-at board-data))))
+                                             (let [board-data {:slug (:board-slug item)
+                                                               :name (:board-name item)
+                                                               :uuid (:board-uuid item)
+                                                               :publisher-board (:publisher-board item)}]
+                                               (assoc-in ret [:fixed-items (:uuid item)]
+                                                (parse-entry item board-data change-data active-users (:last-seen-at board-data)))))
                                     board-data
                                     (:entries board-data))
             with-fixed-activities (reduce (fn [ret item]
@@ -769,7 +770,7 @@
             full-items-list (if replies?
                               (map (fn [entry]
                                     (let [comments (dis/activity-sorted-comments-data (:uuid entry))]
-                                      (entry-comments-data org-data entry comments (:last-seen-at container-data))))
+                                      (entry-comments-data entry org-data comments (:last-seen-at container-data))))
                                items-list*)
                               items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
@@ -793,8 +794,9 @@
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
         (when load-comments?
-          (doseq [e (vals (:fixed-items with-fixed-activities))]
-            (utils/after 0 #(get-comments e))))
+          (doseq [e items-list
+                  :let [entry-data (or (get-in with-fixed-activities [:fixed-items (:uuid e)]) (dis/activity-data (:uuid e)))]]
+            (utils/after 0 #(get-comments entry-data))))
         (-> with-fixed-activities
          (assoc :no-virtualized-steam replies?)
          (dissoc :old-links :items)
@@ -864,7 +866,6 @@
     (time-format/unparse f d)))
 
 (defn update-contributions [db org-data change-data active-users follow-publishers-list]
-  (js.console.log "DBG update-contributions")
   (let [org-slug (:slug org-data)
         contributions-list-key (dis/contributions-list-key org-slug)]
     (reduce (fn [tdb contrib-key]
@@ -887,7 +888,6 @@
      (keys (get-in db contributions-list-key)))))
 
 (defn update-boards [db org-data change-data active-users]
-  (js.console.log "DBG update-boards")
   (let [org-slug (:slug org-data)
         boards-key (dis/boards-key org-slug)
         following-boards (dis/follow-boards-list org-slug db)]
@@ -911,15 +911,11 @@
     (keys (get-in db boards-key)))))
 
 (defn update-containers [db org-data change-data active-users]
-  (js.console.log "DBG update-containers")
   (let [org-slug (:slug org-data)
         containers-key (dis/containers-key org-slug)]
     (reduce (fn [tdb container-key]
               (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
                     ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
-                (js.console.log "DBG   k" container-key)
-                (js.console.log "DBG   rp" (get-in db rp-container-data-key))
-                (js.console.log "DBG   ra" (get-in db ra-container-data-key))
                 (as-> tdb tdb*
                  (if (contains? (get-in tdb* (butlast rp-container-data-key)) (last rp-container-data-key))
                    (update-in tdb* rp-container-data-key
@@ -937,7 +933,6 @@
      (keys (get-in db containers-key)))))
 
 (defn update-posts [db org-data change-data active-users]
-  (js.console.log "DBG update-posts")
   (let [org-slug (:slug org-data)
         posts-key (dis/posts-data-key org-slug)]
     (reduce (fn [tdb post-uuid]
@@ -949,7 +944,6 @@
      (keys (get-in db posts-key)))))
 
 (defn update-all-containers [db org-data change-data active-users follow-publishers-list]
-  (js.console.log "DBG update-all-containers")
   (-> db
    (update-posts org-data change-data active-users)
    (update-boards org-data change-data active-users)

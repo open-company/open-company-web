@@ -293,7 +293,7 @@
                                     (assoc :unseen-comments true)))
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
           all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
-          badge-replies-key (dispatcher/badge-replies-key org-slug)
+          replies-badge-key (dispatcher/replies-badge-key org-slug)
           follow-boards-list (dispatcher/follow-boards-list org-slug db)
           should-badge-replies? (and (or ;; If unfollow link is present it means the user is following the entry
                                          (utils/link-for with-last-activity-at "unfollow")
@@ -308,11 +308,11 @@
               new-sorted-comments-data (cu/sort-comments new-comments-data)]
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
-           (update-in badge-replies-key #(or should-badge-replies? %))
+           (update-in replies-badge-key #(or should-badge-replies? %))
            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
         ;; In case we don't have the comments already loaded just update the :last-activity-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
         (-> db
          (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)
-         (update-in badge-replies-key #(or should-badge-replies? %)))))
+         (update-in replies-badge-key #(or should-badge-replies? %)))))
     db))

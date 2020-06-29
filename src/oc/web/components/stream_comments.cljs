@@ -304,7 +304,7 @@
                                s)
                              :will-mount (fn [s]
                               (let [{:keys [last-read-at comments-data]} (-> s :rum/args first)
-                                    threads (cu/collapse-comments last-read-at comments-data)
+                                    threads (cu/collapse-comments comments-data)
                                     fixed-threads (filterv #(not= (:resource-type %) :collapsed-comments) threads)]
                                 (reset! (::threads s) fixed-threads))
                               s)
@@ -320,7 +320,7 @@
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
                                         collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))
-                                        updated-threads (cu/collapse-comments last-read-at comments-data collapsed-map)
+                                        updated-threads (cu/collapse-comments comments-data collapsed-map)
                                         fixed-updated-threads (filterv #(not= (:resource-type %) :collapsed-comments) updated-threads)]
                                     (reset! (::threads s) fixed-updated-threads))))
                               (try (js/emojiAutocomplete)
@@ -333,7 +333,7 @@
         _followers-publishers-count (drv/react s :followers-publishers-count)
         add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
-        threads @(::threads s)
+        threads (filter #(= (:resource-type %) :comment) @(::threads s))
         all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}

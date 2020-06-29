@@ -952,11 +952,11 @@
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-following-data))
-        badge-home-key (dispatcher/badge-home-key org-slug)
+        home-badge-key (dispatcher/home-badge-key org-slug)
         container-seen-key (dispatcher/container-seen-key org-slug (:container-id fixed-following-data))]
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
-      (assoc-in ndb badge-home-key (badge-home? fixed-following-data))
+      (assoc-in ndb home-badge-key (badge-home? fixed-following-data))
       (assoc-in ndb posts-key merged-items)
       (update-in ndb container-seen-key #(if (pos? (compare % (:last-seen-at fixed-following-data))) % (:last-seen-at fixed-following-data)))
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
@@ -990,11 +990,11 @@
           new-container-data (-> fixed-following-data
                               (assoc :direction direction)
                               (dissoc :loading-more :fixed-items))
-          badge-home-key (dispatcher/badge-home-key org)
+          home-badge-key (dispatcher/home-badge-key org)
           container-seen-key (dispatcher/container-seen-key org (:container-id fixed-following-data))]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
-        (assoc-in ndb badge-home-key (badge-home? fixed-following-data))
+        (assoc-in ndb home-badge-key (badge-home? fixed-following-data))
         (assoc-in ndb posts-data-key new-items-map)
         (update-in ndb container-seen-key #(if (pos? (compare % (:last-seen-at fixed-following-data))) % (:last-seen-at fixed-following-data)))
         (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
@@ -1026,11 +1026,11 @@
                               (update :last-seen-at #(if refresh-seen? % old-seen-at)))
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type true)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
-        badge-replies-key (dispatcher/badge-replies-key org-slug)
+        replies-badge-key (dispatcher/replies-badge-key org-slug)
         container-seen-key (dispatcher/container-seen-key org-slug (:container-id fixed-replies-data))]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
-      (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
+      (assoc-in ndb replies-badge-key (badge-replies? fixed-replies-data))
       (assoc-in ndb posts-data-key merged-items)
       (update-in ndb container-seen-key #(if (pos? (compare % (:last-seen-at fixed-replies-data))) % (:last-seen-at fixed-replies-data)))
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
@@ -1064,11 +1064,11 @@
           new-container-data (-> fixed-replies-data
                               (assoc :direction direction)
                               (dissoc :loading-more :fixed-items))
-          badge-replies-key (dispatcher/badge-replies-key org)
+          replies-badge-key (dispatcher/replies-badge-key org)
           container-seen-key (dispatcher/container-seen-key org (:container-id fixed-replies-data))]
       (as-> db ndb
         (assoc-in ndb replies-container-key new-container-data)
-        (assoc-in ndb badge-replies-key (badge-replies? fixed-replies-data))
+        (assoc-in ndb replies-badge-key (badge-replies? fixed-replies-data))
         (assoc-in ndb posts-data-key new-posts-map)
         (update-in ndb container-seen-key #(if (pos? (compare % (:last-seen-at fixed-replies-data))) % (:last-seen-at fixed-replies-data)))
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
@@ -1139,19 +1139,19 @@
 
 (defmethod dispatcher/action :home-badge/on
   [db [_ org-slug]]
-  (assoc-in db (dispatcher/badge-home-key org-slug) true))
+  (assoc-in db (dispatcher/home-badge-key org-slug) true))
 
 (defmethod dispatcher/action :home-badge/off
   [db [_ org-slug]]
-  (assoc-in db (dispatcher/badge-home-key org-slug) false))
+  (assoc-in db (dispatcher/home-badge-key org-slug) false))
 
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
-  (assoc-in db (dispatcher/badge-replies-key org-slug) true))
+  (assoc-in db (dispatcher/replies-badge-key org-slug) true))
 
 (defmethod dispatcher/action :replies-badge/off
   [db [_ org-slug]]
-  (assoc-in db (dispatcher/badge-replies-key org-slug) false))
+  (assoc-in db (dispatcher/replies-badge-key org-slug) false))
 
 (defmethod dispatcher/action :container-seen
   [db [_ org-slug container-id seen-at]]
@@ -1169,70 +1169,14 @@
 
 (defmethod dispatcher/action :container-nav-in
   [db [_ org-slug container-slug sort-type]]
-  db)
+  (let [home-badge-key (dispatcher/home-badge-key org-slug)
+        home-badge-fn #(if (= (keyword container-slug) :following) false %)
+        replies-badge-key (dispatcher/replies-badge-key org-slug)
+        replies-badge-fn #(if (= (keyword container-slug) :replies) false %)]
+    (-> db
+     (update-in home-badge-key home-badge-fn)
+     (update-in replies-badge-key replies-badge-fn))))
 
 (defmethod dispatcher/action :container-nav-out
   [db [_ org-slug container-slug sort-type]]
   db)
-
-; (defmethod dispatcher/action :following-nav-away
-;   [db [_]]
-;   (let [following-key (dispatcher/container-key :following (router/current-sort-type))
-;         following-data (get-in db following-key)
-;         last-seen-at (dispatcher/container-seen-data (:container-id following-data))
-;         org-data (dispatcher/org-data db)
-;         active-users (dispatcher/active-users (:slug org-data) db)
-;         change-data (dispatcher/change-data db (:slug org-data))]
-;     (-> db
-;       (update-in (vec (conj following-key :last-seen-at)) #(if (pos? (compare % last-seen-at)) % last-seen-at))
-;       (au/update-containers org-data change-data active-users))))
-
-; (defmethod dispatcher/action :replies-nav-away
-;   [db [_]]
-;   (let [replies-key (dispatcher/container-key :replies (router/current-sort-type))
-;         replies-data (get-in db replies-key)
-;         last-seen-at (dispatcher/container-seen-data (:container-id replies-data))
-;         org-data (dispatcher/org-data db)
-;         active-users (dispatcher/active-users (:slug org-data) db)
-;         change-data (dispatcher/change-data db (:slug org-data))]
-;     (-> db
-;       (update-in (vec (conj replies-key :last-seen-at)) #(if (pos? (compare % last-seen-at)) % last-seen-at))
-;       (au/update-containers org-data change-data active-users))))
-
-; (defmethod dispatcher/action :contributions-nav-away
-;   [db [_ author-uuid]]
-;   (let [contrib-key (dispatcher/contributions-key author-uuid (router/current-sort-type))
-;         contrib-data (get-in db contrib-key)
-;         last-seen-at (dispatcher/container-seen-data (:container-id contrib-data))
-;         org-data (dispatcher/org-data db)
-;         active-users (dispatcher/active-users (:slug org-data) db)
-;         change-data (dispatcher/change-data db (:slug org-data))
-;         follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)]
-;     (-> db
-;       (update-in (vec (conj contrib-key :last-seen-at)) #(if (pos? (compare % last-seen-at)) % last-seen-at))
-;       (au/update-contributions org-data change-data active-users follow-publishers-list))))
-
-; (defmethod disptacher/action :replies-comments-get/finish
-;   [db [_ org-slug sort-type entry-data]]
-;   (let [org-data (dispatcher/org-data)
-;         replies-key (dispatcher/container-key org-slug :replies sort-type)
-;         replies-data (get-in db replies-key)
-;         comments-key (dispatcher/activity-comments-key org-slug (:uuid entry-data))
-;         comments (get-in db comments-key)
-;         updated-comments (mapv #(parse-comment org-data entry-data % (:last-seen-at replies-data))
-;                           comments)
-;         posts-list-key (conj replies-key :posts-list)]
-;     (reduce (fn [tdb entry]
-;               (let [entry-]))
-;      db
-;      (get-in db posts-list-key))
-
-
-;     (update-in db posts-list-key (fn [posts-list]
-;                                    (mapv
-;                                     (fn [e]
-;                                       (if (= (:uuid entry-data) (:uuid e))
-;                                         (assoc e :comments updated-comments)
-;                                         e))
-;                                     posts-list)))))
-

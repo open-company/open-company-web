@@ -95,11 +95,11 @@
      :else
      (vec (conj (containers-key org-slug) (keyword items-filter))))))
 
-(defn badge-replies-key [org-slug]
-  (vec (conj (org-key org-slug) :badge-replies)))
+(defn replies-badge-key [org-slug]
+  (vec (conj (org-key org-slug) :replies-badge)))
 
-(defn badge-home-key [org-slug]
-  (vec (conj (org-key org-slug) :badge-home)))
+(defn home-badge-key [org-slug]
+  (vec (conj (org-key org-slug) :home-badge)))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -532,12 +532,12 @@
                                 (fn [base org-slug]
                                   (when (and base org-slug)
                                     (get-in base (grouped-user-notifications-key org-slug))))]
-   :badge-replies        [[:base :org-slug]
+   :replies-badge        [[:base :org-slug]
                            (fn [base org-slug]
-                             (get-in base (badge-replies-key org-slug)))]
-   :badge-home           [[:base :org-slug]
+                             (get-in base (replies-badge-key org-slug)))]
+   :home-badge           [[:base :org-slug]
                            (fn [base org-slug]
-                             (get-in base (badge-home-key org-slug)))]
+                             (get-in base (home-badge-key org-slug)))]
    :unread-notifications  [[:user-notifications]
                            (fn [notifications]
                              (filter :unread notifications))]

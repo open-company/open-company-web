@@ -944,14 +944,6 @@
 (defn container-nav-out [container-slug]
   (dis/dispatch! [:container-nav-out container-slug (router/current-sort-type)]))
   
-    ; (cond
-    ;   (= container-slug :following)
-    ;   (dis/dispatch! [:following-nav-away])
-    ;   (= container-slug :replies)
-    ;   (dis/dispatch! [:replies-nav-away])
-    ;   (contains? container-data :author-uuid)
-    ;   (dis/dispatch! [:contributions-nav-away (:author-uuid container-data)]))))
-
 ;; WRT read
 
 (defn send-secure-item-seen-read []
