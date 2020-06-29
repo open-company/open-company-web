@@ -110,7 +110,7 @@
   ([comment-data :guard map? last-read-at]
    (comment-unread? (:created-at comment-data) last-read-at))
 
-  ([created-at :guard string? last-read-at :guard #(or (nil? %) (string? %))]
+  ([created-at last-read-at :guard #(or (nil? %) (string? %))]
    (pos? (compare created-at last-read-at))))
 
 (defn is-unseen? [item collapsed-map]
@@ -122,7 +122,7 @@
   ([comment-data :guard map? container-seen-at]
    (comment-unseen? (:created-at comment-data) container-seen-at))
 
-  ([created-at :guard string? container-seen-at :guard #(or (nil? %) (string? %))]
+  ([created-at container-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare created-at container-seen-at))))
 
 ; (defn- unseen-comment [comment-data container-seen-at collapsed-map]

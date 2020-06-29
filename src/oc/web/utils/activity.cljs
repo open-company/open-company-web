@@ -276,7 +276,7 @@
   "An entry is new if its uuid is contained in container's unseen."
   ([entry :guard map? last-seen-at]
    (entry-unseen? (:published-at entry) last-seen-at))
-  ([published-at :guard string? last-seen-at :guard #(or (nil? %) (string? %))]
+  ([published-at last-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare published-at last-seen-at))))
 
 (defn entry-unread?
