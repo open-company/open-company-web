@@ -82,7 +82,7 @@ div.reactions {
         }
 
         &.reacted, &.can-react:hover {
-          span.reaction span.reaction {
+          span.reaction {
             opacity: 1;
 
             span.thumb-up-icon {
@@ -96,6 +96,7 @@ div.reactions {
 
           div.count {
             color: $wut_purple;
+            @include OC_Body_Bold();
           }
         }
       }
