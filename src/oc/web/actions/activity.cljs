@@ -938,14 +938,16 @@
 
 (defn send-container-seen
   "Send a seen message for the given container-id to Change service."
-  [container-id]
-  (when-let* [org-data (dis/org-data)
-              org-id (:uuid org-data)
-              seen-at (time/current-timestamp)]
-    (timbre/info "Send seen for container:" container-id "at:" seen-at)
-    (ws-cc/container-seen org-id container-id seen-at)
-    ; (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at])
-    ))
+  ([]
+   (when-let [container-id (:container-id (dis/container-data))]
+     (send-container-seen container-id)))
+  ([container-id]
+   (when-let* [org-data (dis/org-data)
+               org-id (:uuid org-data)
+               seen-at (time/current-timestamp)]
+     (timbre/info "Send seen for container:" container-id "at:" seen-at)
+     (ws-cc/container-seen org-id container-id seen-at)
+     (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at false]))))
 
 ;; Seen - containers nav events
 

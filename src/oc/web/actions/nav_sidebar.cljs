@@ -152,8 +152,11 @@
          is-container? (dis/is-container? board-slug)
          org-data (dis/org-data)]
      (if (= current-path url)
-       (do ;; In case user is clicking on the currently highlighted section
-           ;; let's refresh the posts list only
+       (do ;; If refreshing Home or Replies let's send a container seen first
+         (when (#{:following :replies} (keyword board-slug))
+           (activity-actions/send-container-seen))
+         ;; In case user clicked on the current
+         ;; location let's refresh it
          (routing-actions/routing @router/path)
          (user-actions/initial-loading refresh?))
        (do ;; If user clicked on a different section/container

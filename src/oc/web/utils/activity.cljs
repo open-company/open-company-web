@@ -140,13 +140,16 @@
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
 
 (defn is-published? [entry-data]
-  (= (:status entry-data) "published"))
+  (= (keyword (or (:status entry-data) "draft")) :published))
 
 (defun is-publisher?
 
   ([entry-data :guard map?]
-   (when (jwt/jwt)
-     (is-publisher? entry-data (jwt/user-id))))
+   (when (and (jwt/jwt)
+              (or (:published? entry-data)
+                  (is-published? entry-data))
+              (contains? entry-data :publisher))
+     (is-publisher? (-> entry-data :publisher :user-id) (jwt/user-id))))
 
   ([entry-author-id :guard string?]
    (when (jwt/jwt)
@@ -158,8 +161,8 @@
   ([entry-data :guard map? user-id :guard string?]
    (is-publisher? (-> entry-data :publisher :user-id)  user-id))
 
-  ([publisher-id :guard string? user-id :guard string?]
-   (= user-id publisher-id)))
+  ([entry-author-id :guard string? user-id :guard string?]
+   (= user-id entry-author-id)))
 
 (defun is-author?
   "Check if current user is the author of the entry/comment."
@@ -275,7 +278,8 @@
 (defun entry-unseen?
   "An entry is new if its uuid is contained in container's unseen."
   ([entry :guard map? last-seen-at]
-   (entry-unseen? (:published-at entry) last-seen-at))
+   (and (not (:publisher? entry))
+        (entry-unseen? (:published-at entry) last-seen-at)))
   ([published-at last-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare published-at last-seen-at))))
 
@@ -567,10 +571,10 @@
             e)
           (if published?
             (assoc e :publisher? (is-publisher? e))
-            e))
-        (assoc :unseen (entry-unseen? entry-data container-seen-at))
-        (assoc :unread (entry-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
-        (assoc :read-only (readonly-entry? (:links entry-data)))
+            e)
+          (assoc e :unseen (entry-unseen? e container-seen-at))
+          (assoc e :unread (entry-unread? e changes))
+          (assoc e :read-only (readonly-entry? (:links e))))
         (assoc :board-uuid fixed-board-uuid)
         (assoc :board-slug fixed-board-slug)
         (assoc :board-name fixed-board-name)
@@ -619,19 +623,22 @@
 
   ([board-data change-data active-users follow-boards-list sort-type & [direction]]
     (when board-data
-      (let [with-fixed-activities* (reduce (fn [ret item]
-                                             (let [board-data {:slug (:board-slug item)
-                                                               :name (:board-name item)
-                                                               :uuid (:board-uuid item)
-                                                               :publisher-board (:publisher-board item)}]
-                                               (assoc-in ret [:fixed-items (:uuid item)]
-                                                (parse-entry item board-data change-data active-users (:last-seen-at board-data)))))
+      (let [all-boards (:boards (dis/org-data))
+            boards-map (zipmap (map :slug all-boards) all-boards)
+            with-fixed-activities* (reduce (fn [ret item]
+                                             (assoc-in ret [:fixed-items (:uuid item)]
+                                              (parse-entry item (get boards-map (:board-slug item)) change-data active-users (:last-seen-at board-data))))
                                     board-data
                                     (:entries board-data))
             with-fixed-activities (reduce (fn [ret item]
                                            (if (contains? (:fixed-items ret) (:uuid item))
                                              ret
-                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                             (let [entry-board-data (get boards-map (:board-slug item))
+                                                   full-entry (-> (:uuid item)
+                                                               dis/activity-data
+                                                               (merge item)
+                                                               (parse-entry entry-board-data change-data active-users (:last-seen-at board-data)))]
+                                               (assoc-in ret [:fixed-items (:uuid item)] full-entry))))
                                    with-fixed-activities*
                                    (:posts-list board-data))
             keep-link-rel (if (= direction :down) "previous" "next")
@@ -694,7 +701,12 @@
             with-fixed-activities (reduce (fn [ret item]
                                            (if (contains? (:fixed-items ret) (:uuid item))
                                              ret
-                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                             (let [entry-board-data (get boards-map (:board-slug item))
+                                                   full-entry (-> (:uuid item)
+                                                               dis/activity-data
+                                                               (merge item)
+                                                               (parse-entry entry-board-data change-data active-users (:last-seen-at contributions-data)))]
+                                               (assoc-in ret [:fixed-items (:uuid item)] full-entry))))
                                    with-fixed-activities*
                                    (:posts-list contributions-data))
             keep-link-rel (if (= direction :down) "previous" "next")
@@ -753,7 +765,12 @@
             with-fixed-activities (reduce (fn [ret item]
                                            (if (contains? (:fixed-items ret) (:uuid item))
                                              ret
-                                             (assoc-in ret [:fixed-items (:uuid item)] (dis/activity-data (:uuid item)))))
+                                             (let [entry-board-data (get boards-map (:board-slug item))
+                                                   full-entry (-> (:uuid item)
+                                                               dis/activity-data
+                                                               (merge item)
+                                                               (parse-entry entry-board-data change-data active-users (:last-seen-at container-data)))]
+                                               (assoc-in ret [:fixed-items (:uuid item)] full-entry))))
                                    with-fixed-activities*
                                    (:posts-list container-data))
             keep-link-rel (if (= direction :down) "previous" "next")
