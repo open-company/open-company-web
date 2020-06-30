@@ -72,7 +72,7 @@
           (callback orgs collection)))
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
-(defn entry-point-get [org-slug]
+(defn entry-point-get [org-slug & [force-refresh?]]
   (api/get-entry-point (:org @router/path)
    (fn [success body]
      (entry-point-get-finished success body
@@ -84,7 +84,7 @@
              ;; used org uuid in token.
              (if (= (:uuid org-data) org-slug)
                (router/rewrite-org-uuid-as-slug org-slug (:slug org-data))
-               (org-actions/get-org org-data))
+               (org-actions/get-org org-data (not force-refresh?)))
              (if (router/current-secure-activity-id)
                (activity-actions/secure-activity-get
                 #(activity-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
@@ -529,7 +529,7 @@
     (when (or (> (- now latest-entry-point) reload-time)
               (and (router/current-org-slug)
                    (nil? (dis/org-data))))
-      (entry-point-get (router/current-org-slug)))
+      (entry-point-get (router/current-org-slug) force-refresh))
     (when (> (- now latest-auth-settings) reload-time)
       (auth-settings-get))))
 

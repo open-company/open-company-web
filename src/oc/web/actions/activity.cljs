@@ -4,7 +4,6 @@
             [defun.core :refer (defun)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
-            [oc.lib.time :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -156,39 +155,38 @@
 
 ;; Following stream
 
-(defn- following-get-finish [org-slug sort-type refresh-seen? {:keys [body success]}]
+(defn- following-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
-          following-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "following")
+          following-data (when success (json->cljs body))
+          current-board-slug (router/current-board-slug)]
+      (when (= current-board-slug "following")
         (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
         (request-reads-count (->> following-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection following-data))))
-      (dis/dispatch! [:following-get/finish org-slug sort-type refresh-seen? following-data]))))
+      (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug following-data]))))
 
-(defn- following-real-get [following-link org-slug sort-type refresh-seen? finish-cb]
+(defn- following-real-get [following-link org-slug sort-type finish-cb]
   (api/get-all-posts following-link
    (fn [resp]
-     (following-get-finish org-slug sort-type refresh-seen? resp)
+     (following-get-finish org-slug sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn following-get
-  ([] (following-get (dis/org-data) false nil))
-  ([org-data] (following-get org-data false nil))
-  ([org-data refresh-seen?] (following-get org-data refresh-seen? nil))
-  ([org-data refresh-seen? finish-cb]
+  ([] (following-get (dis/org-data) nil))
+  ([org-data] (following-get org-data nil))
+  ([org-data finish-cb]
    (when-let [following-link (utils/link-for (:links org-data) "following")]
-     (following-real-get following-link (:slug org-data) dis/recently-posted-sort refresh-seen? finish-cb))))
+     (following-real-get following-link (:slug org-data) dis/recently-posted-sort finish-cb))))
 
 (defn recent-following-get
-  ([] (recent-following-get (dis/org-data) false nil))
-  ([org-data] (recent-following-get org-data false nil))
-  ([org-data refresh-seen?] (recent-following-get org-data refresh-seen? nil))
-  ([org-data refresh-seen? finish-cb]
+  ([] (recent-following-get (dis/org-data) nil))
+  ([org-data] (recent-following-get org-data nil))
+  ([org-data finish-cb]
    (when-let [recent-following-link (utils/link-for (:links org-data) "recent-following")]
-     (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort refresh-seen? finish-cb))))
+     (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort finish-cb))))
 
 (defn- following-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
@@ -201,26 +199,26 @@
 
 ;; Replies stream
 
-(defn- replies-get-finish [org-slug sort-type refresh-seen? {:keys [body success]}]
+(defn- replies-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
-          replies-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "replies")
+          replies-data (when success (json->cljs body))
+          current-board-slug (router/current-board-slug)]
+      (when (= current-board-slug "replies")
         (cook/set-cookie! (router/last-board-cookie org-slug) "replies" (* 60 60 24 365))
         (request-reads-count (->> replies-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection replies-data))))
-      (dis/dispatch! [:replies-get/finish org-slug sort-type refresh-seen? replies-data]))))
+      (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug replies-data]))))
 
 (defn replies-get
-  ([] (replies-get (dis/org-data) false nil))
-  ([org-data] (replies-get org-data false nil))
-  ([org-data refresh-seen?] (replies-get org-data refresh-seen? nil))
-  ([org-data refresh-seen? finish-cb]
+  ([] (replies-get (dis/org-data) nil))
+  ([org-data] (replies-get org-data nil))
+  ([org-data finish-cb]
    (when-let [replies-link (utils/link-for (:links org-data) "replies")]
      (api/get-all-posts replies-link
       (fn [resp]
-        (replies-get-finish (:slug org-data) dis/recent-activity-sort refresh-seen? resp)
+        (replies-get-finish (:slug org-data) dis/recent-activity-sort resp)
         (when (fn? finish-cb)
           (finish-cb resp)))))))
 
@@ -936,29 +934,34 @@
               org-id (:org-uuid activity-data)]
     (ws-cc/item-seen publisher-id org-id container-id activity-id)))
 
-(defn send-container-seen
+(defn- send-container-seen
   "Send a seen message for the given container-id to Change service."
-  ([]
-   (when-let [container-id (:container-id (dis/container-data))]
-     (send-container-seen container-id)))
-  ([container-id]
-   (when-let* [org-data (dis/org-data)
-               org-id (:uuid org-data)
-               seen-at (time/current-timestamp)]
-     (timbre/info "Send seen for container:" container-id "at:" seen-at)
-     (ws-cc/container-seen org-id container-id seen-at)
-     (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at false]))))
+  [container-id seen-at]
+  (when-let* [org-data (dis/org-data)
+              org-id (:uuid org-data)
+              _seen-at seen-at]
+    (timbre/info "Send seen for container:" container-id "at:" seen-at)
+    (ws-cc/container-seen org-id container-id seen-at)
+    (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at])))
 
 ;; Seen - containers nav events
 
-(defn container-nav-in [container-slug]
-  (let [container-data (dis/container-data @dis/app-state (router/current-org-slug) container-slug (router/current-sort-type))]
-    (when (:container-id container-data)
-      (send-container-seen (:container-id container-data))))
-  (dis/dispatch! [:container-nav-in (router/current-org-slug) container-slug (router/current-sort-type)]))
+(defn reset-container-badge [container-slug]
+  (dis/dispatch! [:reset-container-badge (router/current-org-slug) container-slug (router/current-sort-type)]))
+
+(defonce last-sent-seen (atom nil))
+
+(defn container-nav-in [container-slug & [remount?]]
+  (let [container-data (dis/container-data @dis/app-state (router/current-org-slug) container-slug (router/current-sort-type))
+        next-sent-seen (str "last-sent-seen" (:container-slug container-data) "-" (:next-seen-at container-data))]
+    (when (and (:container-id container-data)
+               (not= @last-sent-seen next-sent-seen))
+      (send-container-seen (:container-id container-data) (:next-seen-at container-data))
+      (reset! last-sent-seen next-sent-seen))))
 
 (defn container-nav-out [container-slug]
-  (dis/dispatch! [:container-nav-out container-slug (router/current-sort-type)]))
+  ;; No-op
+  )
   
 ;; WRT read
 

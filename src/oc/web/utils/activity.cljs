@@ -356,13 +356,11 @@
   ([] (caught-up-map nil false default-caught-up-message))
   ([n] (caught-up-map n false default-caught-up-message))
   ([n gray-scale?] (caught-up-map n gray-scale? default-caught-up-message))
-  ([n gray-scale? message] (caught-up-map n gray-scale? default-caught-up-message nil))
-  ([n gray-scale? message opts]
+  ([n gray-scale? message]
    (let [t (next-activity-timestamp n)]
      {:resource-type :caught-up
       :last-activity-at t
       :message message
-      :opts opts
       :gray-style gray-scale?})))
 
 (defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
@@ -389,13 +387,13 @@
            (= index (count items-list)))
       (vec items-list)
       (= index (count items-list))
-      (vec (concat items-list [(caught-up-map (last items-list) (zero? index) default-caught-up-message opts)]))
+      (vec (concat items-list [(caught-up-map (last items-list) (zero? index))]))
       (and hide-top-line
            (zero? index))
       (vec items-list)
       :else
       (vec (remove nil? (concat before
-                                [(caught-up-map (last before) (zero? index) default-caught-up-message opts)]
+                                [(caught-up-map (last before) (zero? index))]
                                 after))))))
 
 (defn- insert-open-close-item [items-list check-fn]

@@ -142,7 +142,7 @@
 
 (defn post-routing []
   (routing-actions/routing @router/path)
-  (user-actions/initial-loading))
+  (user-actions/initial-loading true))
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)

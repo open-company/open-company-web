@@ -5,12 +5,13 @@
 
 (defn container-nav-mixin []
   (let [container-slug (atom nil)]
-  {:did-mount (fn [s]
-    (reset! container-slug (router/current-board-slug))
-    (aa/container-nav-in @container-slug)
-   ; (when-let [container-id (-> s :rum/args first :container-data :container-id)]
-   ;   (aa/send-container-seen container-id))
-   s)
-   :will-unmount (fn [s]
-    (aa/container-nav-out @container-slug)
-   s)}))
+    {:did-mount (fn [s]
+      (reset! container-slug (router/current-board-slug))
+      (aa/container-nav-in @container-slug)
+     s)
+     :did-remount (fn [_ s]
+      (aa/container-nav-in @container-slug)
+     s)
+     :will-unmount (fn [s]
+      (aa/container-nav-out @container-slug)
+     s)}))

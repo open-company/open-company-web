@@ -121,7 +121,9 @@
                                      (when-let [force-list-update (-> s :rum/args first :force-list-update)]
                                        (when-not (= @(::last-force-list-update s) force-list-update)
                                          (reset! (::last-force-list-update s) force-list-update)
-                                         (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))
+                                         (utils/after 180
+                                          #(when @(::mounted s)
+                                             (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))))
                                    s)
                                  :will-unmount (fn [s]
                                    (reset! (::mounted s) false)
@@ -141,7 +143,8 @@
         key-prefix (if is-mobile? "mobile" foc-layout)
         rowHeight (fn [row-props]
                     (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
-                          item (get items index)]
+                          litems (-> s :rum/args first :items)
+                          item (get litems index)]
                       (case (:resource-type item)
                         :caught-up
                         caught-up-line-height
@@ -161,12 +164,13 @@
                                      isScrolling
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             item (get items index)
+                             litems (-> s :rum/args first :items)
+                             item (get litems index)
                              read-data (when (= (:resource-type item) :entry)
                                          (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)
-                             next-item (get items (inc index))
-                             prev-item (get items (dec index))]
+                             next-item (get litems (inc index))
+                             prev-item (get litems (dec index))]
                          (case (:resource-type item)
                            :caught-up
                            (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
@@ -202,13 +206,15 @@
                          :overscanRowCount 20
                          :style {:outline "none"}})]))
 
+(defonce last-scroll-top (atom 0))
+
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
-  (let [scroll-top (.. js/document -scrollingElement -scrollTop)
-        direction (if (> @(::last-scroll s) scroll-top)
+  (let [scroll-top (or (.-pageYOffset js/window) (.. js/document -scrollingElement -scrollTop))
+        direction (if (> @last-scroll-top scroll-top)
                     :up
-                    (if (< @(::last-scroll s) scroll-top)
+                    (if (< @last-scroll-top scroll-top)
                       :down
                       :stale))
         max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
@@ -229,25 +235,24 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
+        (= current-board-slug "replies")
+        (activity-actions/replies-more @(::has-next s) :down)
+        (= current-board-slug "following")
+        (activity-actions/following-more @(::has-next s) :down)
         (seq (router/current-contributions-id))
         (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
-        (= current-board-slug "replies")
-        (activity-actions/replies-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "bookmarks")
+        (= current-board-slug "bookmarks")
         (activity-actions/bookmarks-more @(::has-next s) :down)
-        (= (router/current-board-slug) "following")
-        (activity-actions/following-more @(::has-next s) :down)
-        (= (router/current-board-slug) "unfollowing")
+        (= current-board-slug "unfollowing")
         (activity-actions/unfollowing-more @(::has-next s) :down)
-        :else
+        (not (dis/is-container? current-board-slug))
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
-    (when (not= scroll-top @(::last-scroll s))
-      (reset! (::last-scroll s) scroll-top))))
+    (reset! last-scroll-top (max 0 scroll-top))))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
@@ -270,7 +275,6 @@
                         (drv/drv :force-list-update)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
-                        (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
                         (rum/local false ::has-next)
                         (rum/local nil ::bottom-loading)
                         (rum/local nil ::last-foc-layout)
@@ -281,6 +285,7 @@
 
                         {:will-mount (fn [s]
                           (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
+                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)
@@ -289,7 +294,7 @@
                           (check-pagination s)
                          s)
                          :did-mount (fn [s]
-                          (reset! (::last-scroll s) (.. js/document -scrollingElement -scrollTop))
+                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (check-pagination s)
                           s)
                          :before-render (fn [s]

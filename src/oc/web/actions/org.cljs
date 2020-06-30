@@ -198,10 +198,10 @@
           ;   (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
           ;; Preload following data with recently posted sort
           (when following-link
-            (utils/maybe-after following-delay #(aa/following-get org-data complete-refresh?)))
+            (utils/maybe-after following-delay #(aa/following-get org-data)))
           ;; Preload replies data
           (when replies-link
-            (utils/maybe-after replies-delay #(aa/replies-get org-data complete-refresh?)))
+            (utils/maybe-after replies-delay #(aa/replies-get org-data)))
           ;; Preload bookmarks data
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))

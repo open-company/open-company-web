@@ -238,8 +238,8 @@
 (defn org-seens-key [org-slug]
   (vec (conj (org-key org-slug) :container-seen)))
 
-(defn container-seen-key [org-slug container-id]
-  (vec (conj (org-seens-key org-slug) (keyword container-id))))
+; (defn container-seen-key [org-slug container-id]
+;   (vec (conj (org-seens-key org-slug) (keyword container-id))))
 
 (defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
@@ -1010,10 +1010,10 @@
   ([org-slug] (org-seens-data @app-state (router/current-org-slug)))
   ([data org-slug] (get-in data (org-seens-key org-slug))))
 
-(defn container-seen-data
- ([container-id] (container-seen-data @app-state (router/current-org-slug) container-id))
- ([org-slug container-id] (container-seen-data @app-state org-slug container-id))
- ([data org-slug container-id] (get-in data (container-seen-key org-slug container-id))))
+; (defn container-seen-data
+;  ([container-id] (container-seen-data @app-state (router/current-org-slug) container-id))
+;  ([org-slug container-id] (container-seen-data @app-state org-slug container-id))
+;  ([data org-slug container-id] (get-in data (container-seen-key org-slug container-id))))
 
 ;; Reminders
 
