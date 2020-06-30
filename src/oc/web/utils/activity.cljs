@@ -293,8 +293,11 @@
       (utils/in? board-unread (:uuid entry))
       (nil? (:last-read-at entry)))))
 
-(defn comments-unseen? [entry-data]
-  (some :unseen (:comments-data entry-data)))
+(defn comments-unseen?
+  ([entry-data]
+   (some :unseen (:comments-data entry-data)))
+  ([entry-data last-seen-at]
+   (some #(cu/comment-unseen? % last-seen-at) (:comments-data entry-data))))
 
 (defn has-attachments? [data]
   (seq (:attachments data)))

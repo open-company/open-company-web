@@ -1020,9 +1020,9 @@
 
 ;; Following
 
-(defn- badge-home? [following-data]
+(defn- badge-home? [following-data last-seen-at]
   (let [first-following-item (first (:posts-list following-data))]
-    (:unseen first-following-item)))
+    (au/entry-unseen? first-following-item last-seen-at)))
 
 (defn- latest-seen-at [new-seen-at old-seen-at]
   (if (pos? (compare new-seen-at old-seen-at)) new-seen-at old-seen-at))
@@ -1045,12 +1045,13 @@
         merged-items (merge old-posts (:fixed-items fixed-following-data))
         home-badge-key (dispatcher/home-badge-key org-slug)
         container-seen-key (dispatcher/container-seen-key org-slug (:container-id fixed-following-data))
-        should-badge-home? (badge-home? fixed-following-data)]
+        next-seen-at (latest-seen-at (get-in db container-seen-key) (:last-seen-at fixed-following-data))
+        should-badge-home? (badge-home? fixed-following-data next-seen-at)]
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
       (assoc-in ndb home-badge-key should-badge-home?)
       (assoc-in ndb posts-key merged-items)
-      (update-in ndb container-seen-key latest-seen-at (:last-seen-at fixed-following-data))
+      (assoc-in ndb container-seen-key next-seen-at)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -1084,12 +1085,13 @@
                               (dissoc :loading-more :fixed-items))
           home-badge-key (dispatcher/home-badge-key org)
           container-seen-key (dispatcher/container-seen-key org (:container-id fixed-following-data))
-          should-badge-home? (badge-home? fixed-following-data)]
+          next-seen-at (latest-seen-at (get-in db container-seen-key) (:last-seen-at fixed-following-data))
+          should-badge-home? (badge-home? fixed-following-data next-seen-at)]
       (as-> db ndb
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb home-badge-key should-badge-home?)
         (assoc-in ndb posts-data-key new-items-map)
-        (update-in ndb container-seen-key latest-seen-at (:last-seen-at fixed-following-data))
+        (assoc-in ndb container-seen-key next-seen-at)
         (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
         (update-in ndb (dispatcher/user-notifications-key org)
@@ -1098,10 +1100,10 @@
 
 ;; Replies
 
-(defn- badge-replies? [replies-data]
+(defn- badge-replies? [replies-data last-seen-at]
   (let [first-reply-item (first (:posts-list replies-data))]
-    (or (:unread first-reply-item)
-        (:unseen-comments first-reply-item))))
+    (or (au/entry-unseen? first-reply-item last-seen-at)
+        (au/comments-unseen? first-reply-item last-seen-at))))
 
 (defmethod dispatcher/action :replies-get/finish
   [db [_ org-slug sort-type refresh-seen? replies-data]]
@@ -1120,12 +1122,14 @@
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type true)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)
-        container-seen-key (dispatcher/container-seen-key org-slug (:container-id fixed-replies-data))]
+        container-seen-key (dispatcher/container-seen-key org-slug (:container-id fixed-replies-data))
+        next-seen-at (latest-seen-at (get-in db container-seen-key) (:last-seen-at fixed-replies-data))
+        should-badge-replies? (badge-replies? fixed-replies-data next-seen-at)]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
-      (assoc-in ndb replies-badge-key (badge-replies? fixed-replies-data))
+      (assoc-in ndb replies-badge-key should-badge-replies?)
       (assoc-in ndb posts-data-key merged-items)
-      (update-in ndb container-seen-key latest-seen-at (:last-seen-at fixed-replies-data))
+      (assoc-in ndb container-seen-key next-seen-at)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
@@ -1158,12 +1162,14 @@
                               (assoc :direction direction)
                               (dissoc :loading-more :fixed-items))
           replies-badge-key (dispatcher/replies-badge-key org)
-          container-seen-key (dispatcher/container-seen-key org (:container-id fixed-replies-data))]
+          container-seen-key (dispatcher/container-seen-key org (:container-id fixed-replies-data))
+          next-seen-at (latest-seen-at (get-in db container-seen-key) (:last-seen-at fixed-replies-data))
+          should-badge-replies? (badge-replies? fixed-replies-data next-seen-at)]
       (as-> db ndb
         (assoc-in ndb replies-container-key new-container-data)
-        (assoc-in ndb replies-badge-key (badge-replies? fixed-replies-data))
+        (assoc-in ndb replies-badge-key should-badge-replies?)
         (assoc-in ndb posts-data-key new-posts-map)
-        (update-in ndb container-seen-key latest-seen-at (:last-seen-at fixed-replies-data))
+        (assoc-in ndb container-seen-key next-seen-at)
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
         (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
         (update-in ndb (dispatcher/user-notifications-key org)
