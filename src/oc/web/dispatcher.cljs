@@ -55,7 +55,9 @@
 
 (defn board-key 
   ([org-slug board-slug sort-type]
-    (vec (concat (boards-key org-slug) [(keyword board-slug) (keyword sort-type)])))
+    (if sort-type
+      (vec (concat (boards-key org-slug) [(keyword board-slug) (keyword sort-type)]))
+      (vec (concat (boards-key org-slug) [(keyword board-slug)]))))
   ([org-slug board-slug]
    (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort]))))
 
@@ -273,15 +275,15 @@
                   (board-data-key org-slug container-slug))
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
-        container-posts (vec (remove nil?
-                         (map #(if (= (:resource-type %) :entry)
-                                 ;; Make sure the local map is merged as last value
-                                 ;; since the kept value relates directly to the container
-                                 (merge (get posts-data (:uuid %)) %)
-                                 %)
-                          posts-list)))]
+        container-posts (mapv (fn [entry]
+                                (if (= (:resource-type entry) :entry)
+                                  ;; Make sure the local map is merged as last value
+                                  ;; since the kept value relates directly to the container
+                                  (merge (get posts-data (:uuid entry)) entry)
+                                  entry))
+                         posts-list)]
     (if (= container-slug utils/default-drafts-board-slug)
-      (filterv #(= (:status %) "draft") container-posts)
+      (filter (comp not :published?) container-posts)
       container-posts)))
 
 (def ui-theme-key [:ui-theme])

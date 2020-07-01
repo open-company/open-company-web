@@ -79,7 +79,7 @@
        :date (post-month-date-from-date d)})))
 
 (def preserved-keys
-  [:resource-type :uuid :sort-value :unseen :unseen-comments :comments-data :board-slug :container-seen-at :publisher? :published-at :loading-comments?])
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :container-seen-at :publisher? :published-at :loading-comments?])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -295,9 +295,9 @@
 
 (defn comments-unseen?
   ([entry-data]
-   (some :unseen (:comments-data entry-data)))
+   (some :unseen (:replies-data entry-data)))
   ([entry-data last-seen-at]
-   (some #(cu/comment-unseen? % last-seen-at) (:comments-data entry-data))))
+   (some #(cu/comment-unseen? % last-seen-at) (:replies-data entry-data))))
 
 (defn has-attachments? [data]
   (seq (:attachments data)))
@@ -327,7 +327,7 @@
    return a single list without duplicates depending on the direction.
    This is necessary since the lists could contain duplicates because they are loaded in 2 different
    moments and new activity could lead to changes in the sort."
-  [new-items-list old-items-list direction]
+  [new-items-list old-items-list direction & [x]]
   (cond
     (and direction
          (seq old-items-list)
@@ -337,9 +337,14 @@
           next-items-uuids (if (= direction :down)
                              (vec (distinct (concat old-uuids new-uuids)))
                              (vec (reverse (distinct (concat (reverse old-uuids) (reverse new-uuids))))))
-          all-items-list (concat old-items-list new-items-list)
-          items-map (zipmap (map :uuid all-items-list) all-items-list)]
-      (mapv items-map next-items-uuids))
+          ;; NB: old items needs to be after
+          old-items-map (zipmap (map :uuid old-items-list) old-items-list)
+          items-map (reduce (fn [merge-items-map item]
+                              (let [merged-item (merge item (get old-items-map (:uuid item)))]
+                                (assoc merge-items-map (:uuid item) merged-item)))
+                     old-items-map
+                     new-items-list)]
+      (map items-map next-items-uuids))
     (seq old-items-list)
     (vec old-items-list)
     :else
@@ -435,7 +440,7 @@
                                           :activity-uuid (:uuid activity-data)
                                           :secure-activity-uuid (router/current-secure-activity-id)}])
     (let [replies-data (dis/container-data @dis/app-state (router/current-org-slug) :replies dis/recent-activity-sort)
-          should-update-replies? (some #(= (:uuid %) (:uuid activity-data)) (:posts-list replies-data))]
+          should-update-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
       (when should-update-replies?
         (utils/after 180 #(dis/dispatch! [:update-containers]))))))
 
@@ -520,7 +525,31 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn entry-comments-data [entry-data org-data fixed-items container-seen-at]
+(defn parse-comments [org-data entry-data new-comments container-seen-at]
+  (let [old-comments (:replies-data entry-data)
+        old-comments-keep (map #(select-keys % [:uuid :expanded :unseen :unwrapped-body]) old-comments)
+        keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
+        parsed-new-comments (map #(as-> % c
+                                   (parse-comment org-data entry-data c container-seen-at)
+                                   (merge c (get keep-comments-map (:uuid c))))
+                             new-comments)
+        sorted-new-comments (cu/sort-comments parsed-new-comments)
+        collapsed-comments-itemv (filter #(= (:resource-type %) :collapsed-comments) old-comments)
+        final-comments (cond
+                         ;; Parsed new comments, re-adding the collapsed comments item to the new list
+                         (seq collapsed-comments-itemv)
+                         (concat [(first sorted-new-comments)] collapsed-comments-itemv (subvec sorted-new-comments 1 (count sorted-new-comments)))
+                         ;; No comments has the expanded item, let's add the collapsed comments item for the first time
+                         (not (some #(contains? % :expanded) sorted-new-comments))
+                         (cu/collapse-comments sorted-new-comments)
+                         ;; Return the new sorted comments since they are all expanded
+                         :else
+                         sorted-new-comments)
+        with-expanded (map #(assoc % :expanded (not (false? (:expanded %))))
+                       final-comments)]
+    with-expanded))
+
+(defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
         full-entry (get fixed-items (:uuid entry-data))
         fallback-to-inline? (and (empty? comments)
@@ -529,11 +558,9 @@
                        (:comments full-entry)
                        comments)]
     (as-> entry-data e
-     (assoc e :comments-data all-comments)
      (assoc e :loading-comments? fallback-to-inline?)
-     (update e :comments-data (fn [cs]
-                                (cu/sort-comments (map #(parse-comment org-data e % container-seen-at) cs))))
-     (if (seq (:comments-data e))
+     (assoc e :replies-data (parse-comments org-data e all-comments container-seen-at))
+     (if (seq (:replies-data e))
        (assoc e :unseen-comments (comments-unseen? e))
        e))))
 
@@ -593,7 +620,7 @@
   "Fix org data coming from the API."
   [db org-data]
   (when org-data
-    (let [fixed-boards (mapv #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
+    (let [fixed-boards (map #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
           drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
           drafts-link (when drafts-board
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
@@ -792,9 +819,9 @@
                                 (select-keys preserved-keys)
                                 (assoc :resource-type :entry))
                           (:items container-data)))
-            items-list* (merge-items-lists items-list (:posts-list container-data) direction)
+            items-list* (merge-items-lists items-list (:posts-list container-data) direction (:container-slug container-data))
             full-items-list (if replies?
-                              (map #(entry-comments-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
+                              (map #(entry-replies-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
                               items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))

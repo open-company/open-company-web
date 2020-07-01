@@ -19,6 +19,7 @@
             [oc.web.stores.search]
             [oc.web.stores.activity]
             [oc.web.stores.comment]
+            [oc.web.stores.reply]
             [oc.web.stores.reaction]
             [oc.web.stores.payments]
             [oc.web.stores.section]

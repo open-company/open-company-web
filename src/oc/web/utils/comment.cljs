@@ -178,7 +178,6 @@
          unseen-collapsed (some :unseen collapsed-comments)]
      (vec (concat
       [(assoc (first enriched-comments) :expanded true)]
-      (map #(assoc % :expanded false) collapsed-comments)
       [{:resource-type :collapsed-comments
         :collapsed-count (count collapsed-comments)
         :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
@@ -187,13 +186,14 @@
         :unseen-collapsed unseen-collapsed
         :message (str "View " (if (some :unseen collapsed-comments) "new " "more ") "comments")
         :comment-uuids (map :uuid collapsed-comments)}]
+      (map #(assoc % :expanded false) collapsed-comments)
       (map #(assoc % :expanded true) trailing-expanded-comments)))))
   ;; If at least one already has expanded let's expand the remainig ones
   ([comments :guard (fn [cs] (and (coll? cs)
-                                  (not-every? #(contains? % :expanded) cs)
+                                  (some #(contains? % :expanded) cs)
                                   (> (count cs) 3)))
     collapsed-map :guard map?]
-   (mapv #(assoc % :expanded (or (:expanded %) true)) comments)))
+   (mapv #(assoc % :expanded (not (false? (:expanded %)))) comments)))
 
 
   ; ;; Recursive step: unseen has been set, let's add expand now
