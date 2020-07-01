@@ -174,19 +174,19 @@
          comments-count (count enriched-comments)
          trailing-expanded-comments-count (if (> comments-count 4) 2 1)
          trailing-expanded-comments (subvec enriched-comments (- comments-count trailing-expanded-comments-count) comments-count)
-         collapsed-comments (subvec (vec (rest enriched-comments)) 1 (- comments-count trailing-expanded-comments-count))
+         collapsed-comments (subvec enriched-comments 1 (- comments-count trailing-expanded-comments-count))
          unseen-collapsed (some :unseen collapsed-comments)]
      (vec (concat
       [(assoc (first enriched-comments) :expanded true)]
       (map #(assoc % :expanded false) collapsed-comments)
       [{:resource-type :collapsed-comments
-       :collapsed-count (count collapsed-comments)
-       :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
-       :expanded true
-       :unseen false
-       :unseen-collapsed unseen-collapsed
-       :message (str "View " (if (some :unseen collapsed-comments) "new " "more ") "comments")
-       :comment-uuids (map :uuid collapsed-comments)}]
+        :collapsed-count (count collapsed-comments)
+        :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
+        :expanded true
+        :unseen false
+        :unseen-collapsed unseen-collapsed
+        :message (str "View " (if (some :unseen collapsed-comments) "new " "more ") "comments")
+        :comment-uuids (map :uuid collapsed-comments)}]
       (map #(assoc % :expanded true) trailing-expanded-comments)))))
   ;; If at least one already has expanded let's expand the remainig ones
   ([comments :guard (fn [cs] (and (coll? cs)
