@@ -442,7 +442,7 @@
     (let [replies-data (dis/replies-data org-slug @dis/app-state)
           should-update-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
       (when should-update-replies?
-        (utils/after 180 #(dis/dispatch! [:update-container org-slug (:container-slug replies-data)]))))))
+        (utils/after 180 #(dis/dispatch! [:update-container org-slug (router/current-board-slug) (:container-slug replies-data)]))))))
 
 (defn get-comments [activity-data]
   (when activity-data

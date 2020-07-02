@@ -1084,11 +1084,6 @@
 
 ;; Replies
 
-(defn- badge-replies? [replies-data]
-  (let [first-reply-item (first (:posts-list replies-data))]
-    (or (au/entry-unseen? first-reply-item (:next-seen-at replies-data))
-        (au/comments-unseen? first-reply-item (:next-seen-at replies-data)))))
-
 (defmethod dispatcher/action :replies-get/finish
   [db [_ org-slug sort-type current-container-slug replies-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)
@@ -1234,11 +1229,20 @@
   db)
 
 (defmethod dispatcher/action :update-container
-  [db [_ org-slug container-slug]]
+  [db [_ org-slug current-board-slug container-slug]]
   (let [org-data (dispatcher/org-data db org-slug)
         change-data (dispatcher/change-data db)
-        active-users (dispatcher/active-users org-slug db)]
-    (au/update-container db container-slug org-data change-data active-users)))
+        active-users (dispatcher/active-users org-slug db)
+        next-db (au/update-container db container-slug org-data change-data active-users)
+        badge-home? (when (and (not (= current-board-slug :following))
+                                  (= container-slug :following))
+                         (some :unseen (:posts-list (dispatcher/following-data org-slug next-db))))
+        badge-replies? (when (and (not (= current-board-slug :replies))
+                                  (= container-slug :replies))
+                         (some :unseen-comments (:posts-list (dispatcher/replies-data org-slug next-db))))]
+    (-> next-db
+     (update-in (dispatcher/home-badge-key org-slug) #(or badge-home? %))
+     (update-in (dispatcher/replies-badge-key org-slug) #(or badge-replies? %)))))
 
 (defmethod dispatcher/action :update-containers
   [db [_ org-slug]]

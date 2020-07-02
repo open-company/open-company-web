@@ -4,7 +4,7 @@
 ;; Reply actions
 
 (defn remove-collapse-reply-inner [entry-uuid collapse-id entries]
-  (map (fn [entry-data]
+  (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
@@ -23,7 +23,7 @@
     (assoc item kv fv)))
 
 (defn update-reply-inner [entry-uuid reply-uuid-or-set kv fv entries]
-  (map (fn [entry-data]
+  (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
@@ -49,7 +49,7 @@
    (update-in (conj replies-key :posts-list) (partial update-reply-inner entry-uuid :all kv fv))))
 
 (defn- add-reply-inner [entry-uuid parsed-reply-data entries]
-  (map (fn [entry-data]
+  (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data #(vec (conj % parsed-reply-data)))
            entry-data))
@@ -61,7 +61,7 @@
    (update-in (conj replies-key :posts-list) (partial add-reply-inner entry-uuid parsed-reply-data))))
 
 (defn- update-entry-inner [entry-uuid kv fv entries]
-  (map (fn [entry-data]
+  (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
            (update-field entry-data kv fv)
            entry-data))
