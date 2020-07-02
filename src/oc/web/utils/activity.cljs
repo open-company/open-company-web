@@ -431,7 +431,7 @@
      (vec items-list))))
 
 (defn get-comments-finished
-  [comments-key activity-data {:keys [status success body]}]
+  [org-slug comments-key activity-data {:keys [status success body]}]
   (when success
     (dis/dispatch! [:comments-get/finish {:success success
                                           :error (when-not success body)
@@ -439,20 +439,21 @@
                                           :body (when (seq body) (json->cljs body))
                                           :activity-uuid (:uuid activity-data)
                                           :secure-activity-uuid (router/current-secure-activity-id)}])
-    (let [replies-data (dis/container-data @dis/app-state (router/current-org-slug) :replies dis/recent-activity-sort)
+    (let [replies-data (dis/replies-data org-slug @dis/app-state)
           should-update-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
       (when should-update-replies?
-        (utils/after 180 #(dis/dispatch! [:update-containers]))))))
+        (utils/after 180 #(dis/dispatch! [:update-container org-slug (:container-slug replies-data)]))))))
 
 (defn get-comments [activity-data]
   (when activity-data
-    (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
+    (let [org-slug (router/current-org-slug)
+          comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
           comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
         (dis/dispatch! [:comments-get
                         comments-key
                         activity-data])
-        (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))))
+        (api/get-comments comments-link #(get-comments-finished org-slug comments-key activity-data %))))))
 
 (defn get-comments-if-needed [activity-data all-comments-data]
   (let [comments-link (utils/link-for (:links activity-data) "comments")
@@ -545,7 +546,7 @@
                          ;; Return the new sorted comments since they are all expanded
                          :else
                          sorted-new-comments)
-        with-expanded (map #(assoc % :expanded (not (false? (:expanded %))))
+        with-expanded (mapv #(assoc % :expanded (not (false? (:expanded %))))
                        final-comments)]
     with-expanded))
 
@@ -554,12 +555,15 @@
         full-entry (get fixed-items (:uuid entry-data))
         fallback-to-inline? (and (empty? comments)
                                  (not (empty? (:comments full-entry))))
-        all-comments (if fallback-to-inline?
-                       (:comments full-entry)
-                       comments)]
+        ; all-comments (if fallback-to-inline?
+        ;                (:comments full-entry)
+        ;                comments)
+        ]
     (as-> entry-data e
      (assoc e :loading-comments? fallback-to-inline?)
-     (assoc e :replies-data (parse-comments org-data e all-comments container-seen-at))
+     (if fallback-to-inline?
+       e
+       (assoc e :replies-data (parse-comments org-data e comments container-seen-at)))
      (if (seq (:replies-data e))
        (assoc e :unseen-comments (comments-unseen? e))
        e))))
@@ -960,25 +964,31 @@
     db
     (keys (get-in db boards-key)))))
 
+(defn update-container [db container-slug org-data change-data active-users]
+  (let [org-slug (:slug org-data)
+        rp-container-data-key (dis/container-key org-slug container-slug dis/recently-posted-sort)
+        ra-container-data-key (dis/container-key org-slug container-slug dis/recent-activity-sort)]
+    (as-> db tdb
+     (if (contains? (get-in tdb (butlast rp-container-data-key)) (last rp-container-data-key))
+       (update-in tdb rp-container-data-key
+        #(-> %
+          (parse-container change-data org-data active-users dis/recently-posted-sort false)
+          (dissoc :fixed-items)))
+       tdb)
+     (if (contains? (get-in tdb (butlast ra-container-data-key)) (last ra-container-data-key))
+       (update-in tdb ra-container-data-key
+        #(-> %
+          (parse-container change-data org-data active-users dis/recent-activity-sort false)
+          (dissoc :fixed-items)))
+       tdb))))
+
+(defn update-replies-container [db org-data change-data active-users]
+  (update-container db :replies org-data change-data active-users))
+
 (defn update-containers [db org-data change-data active-users]
   (let [org-slug (:slug org-data)
         containers-key (dis/containers-key org-slug)]
-    (reduce (fn [tdb container-key]
-              (let [rp-container-data-key (dis/container-key org-slug container-key dis/recently-posted-sort)
-                    ra-container-data-key (dis/container-key org-slug container-key dis/recent-activity-sort)]
-                (as-> tdb tdb*
-                 (if (contains? (get-in tdb* (butlast rp-container-data-key)) (last rp-container-data-key))
-                   (update-in tdb* rp-container-data-key
-                    #(-> %
-                      (parse-container change-data org-data active-users dis/recently-posted-sort false)
-                      (dissoc :fixed-items)))
-                   tdb*)
-                 (if (contains? (get-in tdb* (butlast ra-container-data-key)) (last ra-container-data-key))
-                   (update-in tdb* ra-container-data-key
-                    #(-> %
-                      (parse-container change-data org-data active-users dis/recent-activity-sort false)
-                      (dissoc :fixed-items)))
-                   tdb*))))
+    (reduce #(update-container %1 %2 org-data change-data active-users)
      db
      (keys (get-in db containers-key)))))
 

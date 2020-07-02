@@ -68,7 +68,7 @@
           sorted-new-ap-ra-uuids (reverse (sort-by :sort-value new-ap-ra-with-sort-value))
           next-ap-rp-data (assoc old-ap-rp-data :posts-list sorted-new-ap-rp-uuids)
           next-ap-ra-data (assoc old-ap-ra-data :posts-list sorted-new-ap-ra-uuids)
-          org-data (dispatcher/org-data)
+          org-data (dispatcher/org-data db org-slug)
           active-users (dispatcher/active-users org-slug db)
           parsed-ap-rp-data (when old-ap-rp-data
                               (-> next-ap-rp-data
@@ -150,7 +150,7 @@
                           bm-without-uuid))
           new-bm-with-sort-value (map (partial sort-value :bookmarked-at) new-bm-uuids)
           sorted-new-bm-posts (reverse (sort-by :sort-value new-bm-with-sort-value))
-          org-data (dispatcher/org-data)
+          org-data (dispatcher/org-data db org-slug)
           change-data (dispatcher/change-data)
           active-users (dispatcher/active-users org-slug db)
           next-bm-data (when old-bm-data
@@ -235,7 +235,7 @@
           sorted-new-fl-ra-uuids (reverse (sort-by :sort-value new-fl-ra-with-sort-value))
           next-fl-rp-data (assoc old-fl-rp-data :posts-list sorted-new-fl-rp-uuids)
           next-fl-ra-data (assoc old-fl-ra-data :posts-list sorted-new-fl-ra-uuids)
-          org-data (dispatcher/org-data)
+          org-data (dispatcher/org-data db org-slug)
           active-users (dispatcher/active-users org-slug db)
           parsed-fl-rp-data (when old-fl-rp-data
                               (-> next-fl-rp-data
@@ -1231,6 +1231,16 @@
   ;   db)
   db)
 
+(defmethod dispatcher/action :update-container
+  [db [_ org-slug container-slug]]
+  (let [org-data (dispatcher/org-data db org-slug)
+        change-data (dispatcher/change-data db)
+        active-users (dispatcher/active-users org-slug db)]
+    (au/update-container db container-slug org-data change-data active-users)))
+
 (defmethod dispatcher/action :update-containers
-  [db [_]]
-  (au/update-containers db (dispatcher/org-data) (dispatcher/change-data) (dispatcher/active-users)))
+  [db [_ org-slug]]
+  (let [org-data (dispatcher/org-data db org-slug)
+        change-data (dispatcher/change-data db)
+        active-users (dispatcher/active-users org-slug db)]
+    (au/update-containers db org-data change-data active-users)))

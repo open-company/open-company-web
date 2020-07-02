@@ -772,7 +772,7 @@
 (defn ^:export container-data
   "Get container data."
   ([]
-    (container-data @app-state))
+    (container-data @app-state (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data]
     (container-data data (router/current-org-slug) (router/current-posts-filter) (router/current-sort-type)))
   ([data org-slug]
@@ -781,6 +781,24 @@
     (container-data data org-slug posts-filter (router/current-sort-type)))
   ([data org-slug posts-filter sort-type]
     (get-in data (container-key org-slug posts-filter sort-type))))
+
+(defn ^:export replies-data
+  "Get replies container data."
+  ([]
+    (replies-data (router/current-org-slug) @app-state))
+  ([org-slug]
+    (replies-data org-slug @app-state))
+  ([org-slug data]
+    (container-data data org-slug :replies recent-activity-sort)))
+
+(defn ^:export following-data
+  "Get following container data."
+  ([]
+    (following-data (router/current-org-slug) @app-state))
+  ([org-slug]
+    (following-data org-slug @app-state))
+  ([org-slug data]
+    (container-data data org-slug :following recently-posted-sort)))
 
 (defn ^:export filtered-posts-data
   ([]

@@ -8,7 +8,7 @@
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
-              (filter #(not= (:collapse-id %) collapse-id) replies-data)))
+              (filterv #(not= (:collapse-id %) collapse-id) replies-data)))
            entry-data))
    entries))
 
@@ -27,14 +27,14 @@
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
-              (map (fn [reply-data]
-                     (if (or (= reply-uuid-or-set :all)
-                             (= reply-uuid-or-set (:uuid reply-data))
-                             (and (set? reply-uuid-or-set)
-                                  (reply-uuid-or-set (:uuid reply-data))))
-                       (update-field reply-data kv fv)
-                       reply-data))
-               replies-data)))
+              (mapv (fn [reply-data]
+                      (if (or (= reply-uuid-or-set :all)
+                              (= reply-uuid-or-set (:uuid reply-data))
+                              (and (set? reply-uuid-or-set)
+                                   (reply-uuid-or-set (:uuid reply-data))))
+                        (update-field reply-data kv fv)
+                        reply-data))
+                replies-data)))
            entry-data))
    entries))
 
@@ -51,7 +51,7 @@
 (defn- add-reply-inner [entry-uuid parsed-reply-data entries]
   (map (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
-           (update entry-data :replies-data conj parsed-reply-data)
+           (update entry-data :replies-data #(vec (conj % parsed-reply-data)))
            entry-data))
    entries))
 
@@ -59,6 +59,18 @@
   (-> db
    (update-in (conj replies-key :items-to-render) (partial add-reply-inner entry-uuid parsed-reply-data))
    (update-in (conj replies-key :posts-list) (partial add-reply-inner entry-uuid parsed-reply-data))))
+
+(defn- update-entry-inner [entry-uuid kv fv entries]
+  (map (fn [entry-data]
+         (if (= (:uuid entry-data) entry-uuid)
+           (update-field entry-data kv fv)
+           entry-data))
+   entries))
+
+(defn- update-entry [db replies-key entry-uuid kv fv]
+  (-> db
+   (update-in (conj replies-key :items-to-render) (partial update-entry-inner entry-uuid kv fv))
+   (update-in (conj replies-key :posts-list) (partial update-entry-inner entry-uuid kv fv))))
 
 ;; Store actions
 
@@ -93,6 +105,11 @@
   [db [_ org-slug entry-data parsed-reply-data]]
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
     (-> db
+     ;; Add the new comment as last comment
      (add-reply replies-key (:uuid entry-data) parsed-reply-data)
-     (update-replies replies-key (:uuid entry-data) :unseen false))))
+     ;; Mark all replies seen
+     (update-replies replies-key (:uuid entry-data) :unseen false)
+     ;; Mark entry seen
+     (update-entry replies-key (:uuid entry-data) :unseen false)
+     (update-entry replies-key (:uuid entry-data) :unseen-comments false))))
 
