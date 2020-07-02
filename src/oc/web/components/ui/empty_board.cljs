@@ -17,7 +17,7 @@
   [s]
   (let [is-all? (= (router/current-board-slug) "all-posts")
         is-saved? (= (router/current-board-slug) "bookmarks")
-        is-home? (= (router/current-board-slug) "following")
+        is-following? (= (router/current-board-slug) "following")
         is-unfollowing? (= (router/current-board-slug) "unfollowing")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-contributions? (seq (router/current-contributions-id))
@@ -35,7 +35,7 @@
                                       :all-posts is-all?
                                       :drafts is-drafts-board?
                                       :saved is-saved?
-                                      :home is-home?
+                                      :following is-following?
                                       :unfollowing is-unfollowing?})}
             (when is-contributions?
               (user-avatar-image contrib-user-data))]]
@@ -46,7 +46,7 @@
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"
            is-saved? "You don't have any saved update"
-           is-home?
+           is-following?
            [:div.empty-follow
              "Home is where you'll find updates from the people and topics you're following."
              ; [:button.mlb-reset.follow-picker-bt

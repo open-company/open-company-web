@@ -79,7 +79,8 @@
        :date (post-month-date-from-date d)})))
 
 (def preserved-keys
-  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :container-seen-at :publisher? :published-at :loading-comments?])
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug
+   :container-seen-at :publisher? :published-at :loading-comments? :expanded-replies])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -344,7 +345,7 @@
                                 (assoc merge-items-map (:uuid item) merged-item)))
                      old-items-map
                      new-items-list)]
-      (map items-map next-items-uuids))
+      (mapv items-map next-items-uuids))
     (seq old-items-list)
     (vec old-items-list)
     :else
@@ -530,42 +531,52 @@
   (let [old-comments (:replies-data entry-data)
         old-comments-keep (map #(select-keys % [:uuid :expanded :unseen :unwrapped-body]) old-comments)
         keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
-        parsed-new-comments (map #(as-> % c
-                                   (parse-comment org-data entry-data c container-seen-at)
-                                   (merge c (get keep-comments-map (:uuid c))))
-                             new-comments)
-        sorted-new-comments (cu/sort-comments parsed-new-comments)
-        collapsed-comments-itemv (filter #(= (:resource-type %) :collapsed-comments) old-comments)
-        final-comments (cond
-                         ;; Parsed new comments, re-adding the collapsed comments item to the new list
-                         (seq collapsed-comments-itemv)
-                         (concat [(first sorted-new-comments)] collapsed-comments-itemv (subvec sorted-new-comments 1 (count sorted-new-comments)))
-                         ;; No comments has the expanded item, let's add the collapsed comments item for the first time
-                         (not (some #(contains? % :expanded) sorted-new-comments))
-                         (cu/collapse-comments sorted-new-comments)
-                         ;; Return the new sorted comments since they are all expanded
-                         :else
-                         sorted-new-comments)
-        with-expanded (mapv #(assoc % :expanded (not (false? (:expanded %))))
-                       final-comments)]
-    with-expanded))
+        new-parsed-comments (mapv #(as-> % c
+                                    (parse-comment org-data entry-data c container-seen-at)
+                                    (merge c (get keep-comments-map (:uuid c))))
+                             new-comments)]
+    (if (:expanded-replies entry-data)
+      (mapv #(assoc % :expanded true) new-parsed-comments)
+      (cu/collapse-comments new-parsed-comments))))
+
+
+  ; (let [old-comments (:replies-data entry-data)
+  ;       old-comments-keep (map #(select-keys % [:uuid :expanded :unseen :unwrapped-body]) old-comments)
+  ;       keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
+  ;       parsed-new-comments (map #(as-> % c
+  ;                                  (parse-comment org-data entry-data c container-seen-at)
+  ;                                  (merge c (get keep-comments-map (:uuid c))))
+  ;                            new-comments)
+  ;       sorted-new-comments (cu/sort-comments parsed-new-comments)
+  ;       collapsed-comments-itemv (filter #(= (:resource-type %) :collapsed-comments) old-comments)
+  ;       final-comments (cond
+  ;                        ;; Parsed new comments, re-adding the collapsed comments item to the new list
+  ;                        (seq collapsed-comments-itemv)
+  ;                        (concat [(first sorted-new-comments)] collapsed-comments-itemv (subvec sorted-new-comments 1 (count sorted-new-comments)))
+  ;                        ;; No comments has the expanded item, let's add the collapsed comments item for the first time
+  ;                        (not (some #(contains? % :expanded) sorted-new-comments))
+  ;                        (cu/collapse-comments sorted-new-comments)
+  ;                        ;; Return the new sorted comments since they are all expanded
+  ;                        :else
+  ;                        sorted-new-comments)
+  ;       with-expanded (mapv #(assoc % :expanded (not (false? (:expanded %))))
+  ;                      final-comments)]
+  ;   with-expanded))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
         full-entry (get fixed-items (:uuid entry-data))
         fallback-to-inline? (and (empty? comments)
-                                 (not (empty? (:comments full-entry))))
-        ; all-comments (if fallback-to-inline?
-        ;                (:comments full-entry)
-        ;                comments)
-        ]
+                                 (not (empty? (:comments full-entry))))]
     (as-> entry-data e
      (assoc e :loading-comments? fallback-to-inline?)
      (if fallback-to-inline?
        e
        (assoc e :replies-data (parse-comments org-data e comments container-seen-at)))
      (if (seq (:replies-data e))
-       (assoc e :unseen-comments (comments-unseen? e))
+       (update e :unseen-comments #(if-not (seq comments)
+                                     %
+                                     (comments-unseen? e)))
        e))))
 
 (defun parse-entry
@@ -825,7 +836,7 @@
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction (:container-slug container-data))
             full-items-list (if replies?
-                              (map #(entry-replies-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
+                              (mapv #(entry-replies-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
                               items-list*)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
@@ -839,12 +850,11 @@
                             #(and (= (:resource-type %) :entry)
                                   (not (:unseen %)))
                             #(and (= (:resource-type %) :entry)
-                                  (not (:unseen %))
                                   (not (:unseen-comments %))))
             opts {:has-next next-link}
             with-caught-up (if (#{:following :replies} (:container-slug container-data))
-                            (insert-caught-up grouped-items check-item-fn ignore-item-fn opts)
-                            grouped-items)
+                             (insert-caught-up grouped-items check-item-fn ignore-item-fn (assoc opts :xxx replies?))
+                             grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
         (when load-comments?

@@ -155,7 +155,7 @@
 
 ;; Following stream
 
-(defn- following-get-finish [org-slug sort-type {:keys [body success]}]
+(defn- following-get-finish [org-slug sort-type keep-seen-at? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -165,28 +165,29 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
         (request-reads-count (->> following-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection following-data))))
-      (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug following-data]))))
+      (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug keep-seen-at? following-data]))))
 
-(defn- following-real-get [following-link org-slug sort-type finish-cb]
+(defn- following-real-get [following-link org-slug sort-type keep-seen-at? finish-cb]
   (api/get-all-posts following-link
    (fn [resp]
-     (following-get-finish org-slug sort-type resp)
+     (following-get-finish org-slug sort-type keep-seen-at? resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn following-get
-  ([] (following-get (dis/org-data) nil))
-  ([org-data] (following-get org-data nil))
-  ([org-data finish-cb]
+  ([] (following-get (dis/org-data) false nil))
+  ([org-data] (following-get org-data false nil))
+  ([org-data finish-cb] (following-get org-data false finish-cb))
+  ([org-data keep-seen-at? finish-cb]
    (when-let [following-link (utils/link-for (:links org-data) "following")]
-     (following-real-get following-link (:slug org-data) dis/recently-posted-sort finish-cb))))
+     (following-real-get following-link (:slug org-data) dis/recently-posted-sort keep-seen-at? finish-cb))))
 
 (defn recent-following-get
   ([] (recent-following-get (dis/org-data) nil))
   ([org-data] (recent-following-get org-data nil))
   ([org-data finish-cb]
    (when-let [recent-following-link (utils/link-for (:links org-data) "recent-following")]
-     (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort finish-cb))))
+     (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort false finish-cb))))
 
 (defn- following-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
@@ -199,7 +200,7 @@
 
 ;; Replies stream
 
-(defn- replies-get-finish [org-slug sort-type {:keys [body success]}]
+(defn- replies-get-finish [org-slug sort-type keep-seen-at? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -209,16 +210,17 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "replies" (* 60 60 24 365))
         (request-reads-count (->> replies-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection replies-data))))
-      (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug replies-data]))))
+      (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug keep-seen-at? replies-data]))))
 
 (defn replies-get
-  ([] (replies-get (dis/org-data) nil))
-  ([org-data] (replies-get org-data nil))
-  ([org-data finish-cb]
+  ([] (replies-get (dis/org-data) false nil))
+  ([org-data] (replies-get org-data false nil))
+  ([org-data finish-cb] (replies-get org-data false finish-cb))
+  ([org-data keep-seen-at? finish-cb]
    (when-let [replies-link (utils/link-for (:links org-data) "replies")]
      (api/get-all-posts replies-link
       (fn [resp]
-        (replies-get-finish (:slug org-data) dis/recent-activity-sort resp)
+        (replies-get-finish (:slug org-data) dis/recent-activity-sort keep-seen-at? resp)
         (when (fn? finish-cb)
           (finish-cb resp)))))))
 
@@ -769,7 +771,7 @@
     (when activity-data ;; if we have the activity in the app-state
       (get-entry activity-data))))
 
-;; Home badge
+;; Following badge
 
 (defn check-activity-for-badges [container-id activity-uuid]
   ;; Reload the entry from the server and check if we need to turn on the badge for home
@@ -792,18 +794,18 @@
                                  ((set (map :uuid follow-boards-list)) container-id))
                following-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list following-data))
                replies-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))
-               should-badge-home? (and is-published?
-                                       is-following?
-                                       ;; and the user has never read it
-                                       (not is-publisher?)
-                                       (or (:unseen following-item)
-                                           (au/entry-unseen? activity-data (:last-seen-at following-data))))
+               should-badge-following? (and is-published?
+                                            is-following?
+                                            ;; and the user has never read it
+                                            (not is-publisher?)
+                                            (or (:unseen following-item)
+                                                (au/entry-unseen? activity-data (:last-seen-at following-data))))
                should-badge-replies? (and is-published?
                                           is-following?
                                           (-> activity-data :links (utils/link-for "comments") :count pos?)
                                           (:unseen-comments replies-item))]
-           (when should-badge-home?
-             (dis/dispatch! [:home-badge/on org-slug]))
+           (when should-badge-following?
+             (dis/dispatch! [:following-badge/on org-slug]))
            (when should-badge-replies?
              (dis/dispatch! [:replies-badge/on org-slug]))))))))
 
@@ -957,7 +959,12 @@
     (when (and (:container-id container-data)
                (not= @last-sent-seen next-sent-seen))
       (send-container-seen (:container-id container-data) (:next-seen-at container-data))
-      (reset! last-sent-seen next-sent-seen))))
+      (reset! last-sent-seen next-sent-seen)
+      (cond
+       (= container-slug :following)
+       (dis/dispatch! [:following-badge/off])
+       (= container-slug :replies)
+       (dis/dispatch! [:replies-badge/off])))))
 
 (defn container-nav-out [container-slug]
   ;; No-op

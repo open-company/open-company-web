@@ -239,8 +239,8 @@
 (defn reply-unwrap-body [entry-data reply-data]
   (reply-actions/reply-unwrap-body entry-data reply-data))
 
-(defn replies-expand [entry-data collapse-item]
-  (reply-actions/replies-expand entry-data collapse-item))
+(defn replies-expand [entry-data]
+  (reply-actions/replies-expand entry-data))
 
 (defn- comment-item
   [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member?
@@ -350,7 +350,7 @@
               :when (:expanded reply)]
           (if (= (:resource-type reply) :collapsed-comments)
             (rum/with-key
-             (collapsed-comments-button (assoc reply :expand-cb #(replies-expand entry-data reply)))
+             (collapsed-comments-button (assoc reply :expand-cb #(replies-expand entry-data)))
              (str "collapsed-comments-bt-" (clojure.string/join "-" (:comment-uuids reply))))
             (comment-item s {:entry-data entry-data
                              :reply-data reply

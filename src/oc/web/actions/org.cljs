@@ -157,13 +157,13 @@
         active-users-link (utils/link-for (:links org-data) "active-users")
         ; is-inbox? (= current-board-slug "inbox")
         ; is-all-posts? (= current-board-slug "all-posts")
-        is-following? (= (router/current-board-slug) "following")
-        is-replies? (= (router/current-board-slug) "replies")
-        is-bookmarks? (= (router/current-board-slug) "bookmarks")
+        is-following? (= current-board-slug "following")
+        is-replies? (= current-board-slug "replies")
+        is-bookmarks? (= current-board-slug "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
-        is-topics? (= (router/current-board-slug) "topics")
+        is-topics? (= current-board-slug "topics")
         is-contributions? (seq (router/current-contributions-id))
-        ; is-unfollowing? (= (router/current-board-slug) "unfollowing")
+        ; is-unfollowing? (= current-board-slug "unfollowing")
         sort-type (router/current-sort-type)
         delay-count (atom 1)
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
@@ -215,7 +215,11 @@
           ;; Preload unfollowing data with recently posted sort
           ; (when unfollowing-link
           ;   (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
-          )))
+          ))
+      (when (:badge-following org-data)
+        (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
+      (when (:badge-replies org-data)
+        (dis/dispatch! [:maybe-badge-replies (:slug org-data) current-board-slug])))
     (cond
       is-topics?
       ;; No-op

@@ -97,11 +97,14 @@
      :else
      (vec (conj (containers-key org-slug) (keyword items-filter))))))
 
-(defn replies-badge-key [org-slug]
-  (vec (conj (org-key org-slug) :replies-badge)))
+(defn badges-key [org-slug]
+  (vec (conj (org-key org-slug) :badges)))
 
-(defn home-badge-key [org-slug]
-  (vec (conj (org-key org-slug) :home-badge)))
+(defn replies-badge-key [org-slug]
+  (vec (conj (badges-key org-slug) :replies)))
+
+(defn following-badge-key [org-slug]
+  (vec (conj (badges-key org-slug) :following)))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -537,9 +540,9 @@
    :replies-badge        [[:base :org-slug]
                            (fn [base org-slug]
                              (get-in base (replies-badge-key org-slug)))]
-   :home-badge           [[:base :org-slug]
-                           (fn [base org-slug]
-                             (get-in base (home-badge-key org-slug)))]
+   :following-badge           [[:base :org-slug]
+                               (fn [base org-slug]
+                                 (get-in base (following-badge-key org-slug)))]
    :unread-notifications  [[:user-notifications]
                            (fn [notifications]
                              (filter :unread notifications))]

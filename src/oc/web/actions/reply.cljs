@@ -17,8 +17,8 @@
 (defn reply-unwrap-body [entry-data reply-data]
   (dis/dispatch! [:reply-unwrap-body (router/current-org-slug) entry-data reply-data]))
 
-(defn replies-expand [entry-data collapse-item]
-  (dis/dispatch! [:replies-expand (router/current-org-slug) entry-data collapse-item]))
+(defn replies-expand [entry-data]
+  (dis/dispatch! [:replies-expand (router/current-org-slug) entry-data]))
 
 (defn replies-add [entry-data new-comment-data]
   (let [org-data (dis/org-data)

@@ -87,7 +87,7 @@
    :else
    (dis/board-data @dis/app-state (router/current-org-slug) (:board back-to))))
 
-(defn- refresh-board-data [board-slug]
+(defn- refresh-board-data [board-slug & [keep-seen-at?]]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
@@ -98,7 +98,7 @@
         (activity-actions/inbox-get org-data)
 
         (= board-slug "replies")
-        (activity-actions/replies-get org-data)
+        (activity-actions/replies-get org-data keep-seen-at?)
 
         (and (= board-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
@@ -113,7 +113,7 @@
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/following-get org-data)
+        (activity-actions/following-get org-data keep-seen-at?)
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recent-activity-sort))
@@ -165,6 +165,8 @@
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (when refresh?
+           (refresh-board-data board-slug))
          (dis/dispatch! [:force-list-update])
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          ;; Let's change the QP section if it's not active and going to an editable section
@@ -178,7 +180,8 @@
                                                    :publisher-board (:publisher-board nav-to-board-data)}])
              (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)])))
          (when refresh?
-           (utils/after 0 #(refresh-board-data board-slug))))))))))
+           (utils/after 0 #(refresh-board-data board-slug)))
+         )))))))
 
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)

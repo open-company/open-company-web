@@ -48,7 +48,7 @@
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :replies-badge)
-                                (drv/drv :home-badge)
+                                (drv/drv :following-badge)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 ;; Locals
@@ -132,7 +132,7 @@
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
-        home-badge (drv/react s :home-badge)
+        following-badge (drv/react s :following-badge)
         replies-badge (drv/react s :replies-badge)
         ; show-you (and user-is-part-of-the-team?
         ;               (pos? (:contributions-count org-data)))
@@ -158,14 +158,14 @@
         (when show-following
           [:a.nav-link.home.hover-item.group
             {:class (utils/class-set {:item-selected is-following
-                                      :new home-badge})
+                                      :new following-badge})
              :href (oc-urls/following)
              :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
             [:div.nav-link-icon]
             [:div.nav-link-label
               ; {:class (utils/class-set {:new (seq all-unread-items)})}
               "Home"]
-            (when home-badge
+            (when following-badge
               ; [:span.count (count all-unread-items)]
               [:span.unread-dot])])
         (when show-topics

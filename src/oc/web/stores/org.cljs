@@ -85,3 +85,23 @@
   [db [_ org-slug]]
   (let [drafts-count-key (vec (conj (dispatcher/org-data-key org-slug) :drafts-count))]
     (update-in db drafts-count-key #(or % 0))))
+
+(defmethod dispatcher/action :maybe-badge-following
+  [db [_ org-slug current-board-slug]]
+  (let [badges-key (dispatcher/badges-key org-slug)
+        badges-data (get-in db badges-key)]
+    (if (and (or (not badges-data)
+                 (not (contains? badges-data :following)))
+             (not= (keyword current-board-slug) :following))
+      (assoc-in db (conj badges-key :following) true)
+      db)))
+
+(defmethod dispatcher/action :maybe-badge-replies
+  [db [_ org-slug current-board-slug]]
+  (let [badges-key (dispatcher/badges-key org-slug)
+        badges-data (get-in db badges-key)]
+    (if (and (or (not badges-data)
+                 (not (contains? badges-data :replies)))
+             (not= (keyword current-board-slug) :replies))
+      (assoc-in db (conj badges-key :replies) true)
+      db)))

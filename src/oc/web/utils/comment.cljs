@@ -125,23 +125,6 @@
   ([created-at container-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare created-at container-seen-at))))
 
-; (defn- unseen-comment [comment-data container-seen-at collapsed-map]
-;   (assoc comment-data :unseen (comment-unseen? comment-data container-seen-at)))
-
-(defn- unwrapped-body-comment [comment-data collapsed-map]
-  (let [item (get-collapsed-item comment-data collapsed-map)]
-    (assoc comment-data :unwrapped-body (:unwrapped-body item))))
-
-; (defn- expanded-comment [comment-data container-seen-at collapsed-map]
-;   (assoc comment-data :expanded (or ;; comment is unseen
-;                                     (:unseen comment-data)
-;                                     ;; Keep the comment expanded if it was already
-;                                     (is-expanded? comment-data collapsed-map)
-;                                     ;; Do not collapse root comments
-;                                     ; (not (seq (:parent-uuid comment-data)))
-;                                     ;; User has not read the post yet
-;                                     (not (seq container-seen-at)))))
-
 (defun collapse-comments
   "Add a collapsed flag to every comment that is a reply and is not unseen.
    Also add unseen? flag to every unseen one. Add a count of the collapsed
@@ -149,51 +132,30 @@
 
    ([_comments :guard empty?]
     [])
-
-  ([comments :guard coll?]
-    (collapse-comments comments {}))
   ;; When we have less than 4 comments we always show all of them
   ([comments :guard #(and (coll? %)
-                          (<= (count %) 3))
-    collapsed-map :guard map?]
-   (mapv
-    #(-> %
-      ; (unseen-comment container-seen-at collapsed-map)
-      (assoc :expanded true)
-      (unwrapped-body-comment collapsed-map))
-    comments))
+                          (<= (count %) 3))]
+   (mapv #(assoc % :expanded true) comments))
   ;; Add :unseen info to each comment before entering the recursion
   ([comments :guard (fn [cs] (and (coll? cs)
-                                  (not (some #(contains? % :expanded) cs))
-                                  (> (count cs) 3)))
-    collapsed-map :guard map?]
-   (let [enriched-comments (mapv #(-> %
-                                   ; (unseen-comment container-seen-at collapsed-map)
-                                   (unwrapped-body-comment collapsed-map))
-                            comments)
-         comments-count (count enriched-comments)
+                                  (> (count cs) 3)))]
+   (let [comments-count (count comments)
          trailing-expanded-comments-count (if (> comments-count 4) 2 1)
-         trailing-expanded-comments (subvec enriched-comments (- comments-count trailing-expanded-comments-count) comments-count)
-         collapsed-comments (subvec enriched-comments 1 (- comments-count trailing-expanded-comments-count))
+         trailing-expanded-comments (subvec comments (- comments-count trailing-expanded-comments-count) comments-count)
+         collapsed-comments (subvec comments 1 (- comments-count trailing-expanded-comments-count))
          unseen-collapsed (some :unseen collapsed-comments)]
      (vec (concat
-      [(assoc (first enriched-comments) :expanded true)]
+      [(assoc (first comments) :expanded true)]
       [{:resource-type :collapsed-comments
         :collapsed-count (count collapsed-comments)
         :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
         :expanded true
         :unseen false
-        :unseen-collapsed unseen-collapsed
-        :message (str "View " (if (some :unseen collapsed-comments) "new " "more ") "comments")
+        :unseen-collapsed (boolean (seq unseen-collapsed))
+        :message (str "View more comments" (when (seq unseen-collapsed) (str " (" (count unseen-collapsed) " new)")))
         :comment-uuids (map :uuid collapsed-comments)}]
       (map #(assoc % :expanded false) collapsed-comments)
-      (map #(assoc % :expanded true) trailing-expanded-comments)))))
-  ;; If at least one already has expanded let's expand the remainig ones
-  ([comments :guard (fn [cs] (and (coll? cs)
-                                  (some #(contains? % :expanded) cs)
-                                  (> (count cs) 3)))
-    collapsed-map :guard map?]
-   (mapv #(assoc % :expanded (not (false? (:expanded %)))) comments)))
+      (map #(assoc % :expanded true) trailing-expanded-comments))))))
 
 
   ; ;; Recursive step: unseen has been set, let's add expand now

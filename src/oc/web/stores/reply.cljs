@@ -3,19 +3,19 @@
 
 ;; Reply actions
 
-(defn remove-collapse-reply-inner [entry-uuid collapse-id entries]
+(defn remove-collapse-items-inner [entry-uuid entries]
   (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
-              (filterv #(not= (:collapse-id %) collapse-id) replies-data)))
+              (filterv #(not= (:resource-type %) :collapsed-comments) replies-data)))
            entry-data))
    entries))
 
-(defn- remove-collapse-reply [db replies-key entry-uuid collapse-id]
+(defn- remove-collapse-items [db replies-key entry-uuid]
   (-> db
-   (update-in (conj replies-key :items-to-render) (partial remove-collapse-reply-inner entry-uuid collapse-id))
-   (update-in (conj replies-key :posts-list) (partial remove-collapse-reply-inner entry-uuid collapse-id))))
+   (update-in (conj replies-key :items-to-render) (partial remove-collapse-items-inner entry-uuid))
+   (update-in (conj replies-key :posts-list) (partial remove-collapse-items-inner entry-uuid))))
 
 (defn- update-field [item kv fv]
   (if (fn? fv)
@@ -95,11 +95,12 @@
     (update-replies db replies-key (:uuid entry-data) :unseen false)))
 
 (defmethod dispatcher/action :replies-expand
-  [db [_ org-slug entry-data collapse-item]]
+  [db [_ org-slug entry-data]]
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
     (-> db
-     (update-reply replies-key (:uuid entry-data) (set (:comment-uuids collapse-item)) :expanded true)
-     (remove-collapse-reply replies-key (:uuid entry-data) (:collapse-id collapse-item)))))
+     (update-entry replies-key (:uuid entry-data) :expanded-replies true)
+     (update-reply replies-key (:uuid entry-data) :all :expanded true)
+     (remove-collapse-items replies-key (:uuid entry-data)))))
 
 (defmethod dispatcher/action :replies-add
   [db [_ org-slug entry-data parsed-reply-data]]
