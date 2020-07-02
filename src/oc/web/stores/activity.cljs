@@ -1037,10 +1037,11 @@
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-following-data))
-        home-badge-key (dispatcher/home-badge-key org-slug)]
+        home-badge-key (dispatcher/home-badge-key org-slug)
+        badge-home? (some :unseen (:posts-list fixed-following-data))]
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
-      (update-in ndb home-badge-key #(if (= (keyword current-container-slug) :following) false %))
+      (update-in ndb home-badge-key #(if (= (keyword current-container-slug) :following) false badge-home?))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
@@ -1102,10 +1103,11 @@
                               (assoc :container-slug :replies))
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type true)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
-        replies-badge-key (dispatcher/replies-badge-key org-slug)]
+        replies-badge-key (dispatcher/replies-badge-key org-slug)
+        badge-replies? (some :unseen-comments (:posts-list fixed-replies-data))]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
-      (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false %))
+      (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false badge-replies?))
       (assoc-in ndb posts-data-key merged-items)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
