@@ -278,16 +278,17 @@
                   (board-data-key org-slug container-slug))
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
-        container-posts (mapv (fn [entry]
-                                (if (= (:resource-type entry) :entry)
-                                  ;; Make sure the local map is merged as last value
-                                  ;; since the kept value relates directly to the container
-                                  (merge (get posts-data (:uuid entry)) entry)
-                                  entry))
-                         posts-list)]
-    (if (= container-slug utils/default-drafts-board-slug)
-      (filter (comp not :published?) container-posts)
-      container-posts)))
+        container-posts (map (fn [entry]
+                               (if (= (:resource-type entry) :entry)
+                                 ;; Make sure the local map is merged as last value
+                                 ;; since the kept value relates directly to the container
+                                 (merge (get posts-data (:uuid entry)) entry)
+                                 entry))
+                         posts-list)
+        items (if (= container-slug utils/default-drafts-board-slug)
+                (filter (comp not :published?) container-posts)
+                container-posts)]
+    (vec items)))
 
 (def ui-theme-key [:ui-theme])
 
