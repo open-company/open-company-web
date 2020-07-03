@@ -1,5 +1,6 @@
 (ns oc.web.stores.reply
-  (:require [oc.web.dispatcher :as dispatcher]))
+  (:require [oc.web.dispatcher :as dispatcher]
+            [oc.web.utils.comment :as cu]))
 
 ;; Reply actions
 
@@ -51,7 +52,15 @@
 (defn- add-reply-inner [entry-uuid parsed-reply-data entries]
   (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
-           (update entry-data :replies-data #(vec (conj % parsed-reply-data)))
+           (update entry-data :replies-data (fn [replies-data]
+                                              (let [with-seen (map #(assoc % :unseen false) replies-data)]
+                                                (if (:expanded-replies entry-data)
+                                                  ;; If the user expanded the comments just add the new comment at the end of the list
+                                                  (vec (conj with-seen parsed-reply-data))
+                                                  ;; Otherwise re-apply the collapse logic to the new list
+                                                  (cu/collapse-comments
+                                                   (filterv #(= (:resource-type %) :comment)
+                                                    (vec (conj with-seen parsed-reply-data))))))))
            entry-data))
    entries))
 
@@ -108,8 +117,6 @@
     (-> db
      ;; Add the new comment as last comment
      (add-reply replies-key (:uuid entry-data) parsed-reply-data)
-     ;; Mark all replies seen
-     (update-replies replies-key (:uuid entry-data) :unseen false)
      ;; Mark entry seen
      (update-entry replies-key (:uuid entry-data) :unseen false)
      (update-entry replies-key (:uuid entry-data) :unseen-comments false))))

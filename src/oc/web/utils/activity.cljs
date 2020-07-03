@@ -183,7 +183,7 @@
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
         boards (:boards org-data)]
-    (first (filter #(= (:uuid %) board-uuid) boards))))
+    (some #(when (= (:uuid %) board-uuid) %) boards)))
 
 (defn reset-truncate-body
   "Reset dotdotdot for the give body element."
@@ -441,9 +441,12 @@
                                           :activity-uuid (:uuid activity-data)
                                           :secure-activity-uuid (router/current-secure-activity-id)}])
     (let [replies-data (dis/replies-data org-slug @dis/app-state)
-          should-update-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
-      (when should-update-replies?
-        (utils/after 180 #(dis/dispatch! [:update-container org-slug (router/current-board-slug) (:container-slug replies-data)]))))))
+          current-board-slug (router/current-board-slug)
+          is-replies? (= (keyword current-board-slug) :replies)
+          entry-is-in-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
+      (when (and is-replies?
+                 entry-is-in-replies?)
+        (utils/after 10 #(dis/dispatch! [:update-replies-comments org-slug current-board-slug]))))))
 
 (defn get-comments [activity-data]
   (when activity-data
@@ -534,10 +537,11 @@
         new-parsed-comments (mapv #(as-> % c
                                     (parse-comment org-data entry-data c container-seen-at)
                                     (merge c (get keep-comments-map (:uuid c))))
-                             new-comments)]
+                             new-comments)
+        new-sorted-comments (cu/sort-comments new-parsed-comments)]
     (if (:expanded-replies entry-data)
-      (mapv #(assoc % :expanded true) new-parsed-comments)
-      (cu/collapse-comments new-parsed-comments))))
+      (mapv #(assoc % :expanded true) new-sorted-comments)
+      (cu/collapse-comments new-sorted-comments))))
 
 
   ; (let [old-comments (:replies-data entry-data)
@@ -570,9 +574,10 @@
                                  (not (empty? (:comments full-entry))))]
     (as-> entry-data e
      (assoc e :loading-comments? fallback-to-inline?)
-     (if fallback-to-inline?
-       e
-       (assoc e :replies-data (parse-comments org-data e comments container-seen-at)))
+     (if (or (seq comments)
+             (seq (:comments full-entry)))
+       (assoc e :replies-data (parse-comments org-data e (or comments (:comments full-entry)) container-seen-at))
+       e)
      (if (seq (:replies-data e))
        (update e :unseen-comments #(if-not (seq comments)
                                      %
@@ -787,15 +792,21 @@
 (defn parse-container
   "Parse container data coming from the API, like Following or Replies (AP, Bookmarks etc)."
   ([container-data]
-   (parse-container container-data {} (dis/org-data) (dis/active-users) (router/current-sort-type) false))
+   (parse-container container-data {} (dis/org-data) (dis/active-users) (router/current-sort-type) nil))
 
   ([container-data change-data]
-   (parse-container container-data change-data (dis/org-data) (dis/active-users) (router/current-sort-type) false))
+   (parse-container container-data change-data (dis/org-data) (dis/active-users) (router/current-sort-type) nil))
 
   ([container-data change-data org-data]
-   (parse-container container-data change-data org-data (dis/active-users) (router/current-sort-type) false))
+   (parse-container container-data change-data org-data (dis/active-users) (router/current-sort-type) nil))
 
-  ([container-data change-data org-data active-users sort-type load-comments? & [direction]]
+  ([container-data change-data org-data active-users]
+   (parse-container container-data change-data org-data active-users (router/current-sort-type) nil))
+
+  ([container-data change-data org-data active-users sort-type]
+   (parse-container container-data change-data org-data active-users sort-type nil))
+
+  ([container-data change-data org-data active-users sort-type {:keys [direction load-comments? keep-caught-up?] :as options}]
     (when container-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -852,8 +863,18 @@
                             #(and (= (:resource-type %) :entry)
                                   (not (:unseen-comments %))))
             opts {:has-next next-link}
-            with-caught-up (if (#{:following :replies} (:container-slug container-data))
+            caught-up-item (when (and keep-caught-up?
+                                          (seq (:items-to-render container-data)))
+                             (some #(when (= (:resource-type %) :caught-up) %) (:items-to-render container-data)))
+            caught-up-index (when caught-up-item
+                              (utils/index-of (vec (:items-to-render container-data)) #(= (:resource-type %) :caught-up)))
+            with-caught-up (cond
+                             (number? caught-up-index)
+                             (let [[before after] (split-at caught-up-index (vec grouped-items))]
+                               (vec (remove nil? (concat before [caught-up-item] after))))
+                             (#{:following :replies} (:container-slug container-data))
                              (insert-caught-up grouped-items check-item-fn ignore-item-fn (assoc opts :xxx replies?))
+                             :else
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
@@ -974,7 +995,12 @@
     db
     (keys (get-in db boards-key)))))
 
-(defn update-container [db container-slug org-data change-data active-users]
+(defn update-container
+
+  ([db container-slug org-data change-data active-users]
+  (update-container db container-slug org-data change-data active-users false))
+
+  ([db container-slug org-data change-data active-users keep-caught-up?]
   (let [org-slug (:slug org-data)
         rp-container-data-key (dis/container-key org-slug container-slug dis/recently-posted-sort)
         ra-container-data-key (dis/container-key org-slug container-slug dis/recent-activity-sort)]
@@ -982,18 +1008,24 @@
      (if (contains? (get-in tdb (butlast rp-container-data-key)) (last rp-container-data-key))
        (update-in tdb rp-container-data-key
         #(-> %
-          (parse-container change-data org-data active-users dis/recently-posted-sort false)
+          (parse-container change-data org-data active-users dis/recently-posted-sort {:keep-caught-up? keep-caught-up?})
           (dissoc :fixed-items)))
        tdb)
      (if (contains? (get-in tdb (butlast ra-container-data-key)) (last ra-container-data-key))
        (update-in tdb ra-container-data-key
         #(-> %
-          (parse-container change-data org-data active-users dis/recent-activity-sort false)
+          (parse-container change-data org-data active-users dis/recent-activity-sort {:keep-caught-up? keep-caught-up?})
           (dissoc :fixed-items)))
-       tdb))))
+       tdb)))))
 
-(defn update-replies-container [db org-data change-data active-users]
-  (update-container db :replies org-data change-data active-users))
+(defn update-replies-container
+  ([db org-data change-data active-users]
+  (update-replies-container db org-data change-data active-users false))
+  ([db org-data change-data active-users keep-caught-up?]
+  (update-container db :replies org-data change-data active-users keep-caught-up?)))
+
+(defn update-replies-comments [db org-data change-data active-users]
+  (update-replies-container db org-data change-data active-users true))
 
 (defn update-containers [db org-data change-data active-users]
   (let [org-slug (:slug org-data)

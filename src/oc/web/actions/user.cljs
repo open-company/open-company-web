@@ -550,15 +550,22 @@
   (ws-cc/followers-count))
 
 (defn refresh-follow-containers []
-  (let [is-inbox? (= (router/current-org-slug) "inbox")
-        ; is-following? (= (router/current-org-slug) "following")
-        is-unfollowing? (= (router/current-org-slug) "unfollowing")
-        inbox-delay (if is-inbox? 1 500)
-        ; following-delay (if is-following? 1 500)
-        unfollowing-delay (if is-unfollowing? 1 500)]
-    (utils/maybe-after inbox-delay #(activity-actions/inbox-get (dis/org-data)))
-    ; (utils/maybe-after following-delay #(activity-actions/following-get (dis/org-data)))
-    (utils/maybe-after unfollowing-delay #(activity-actions/unfollowing-get (dis/org-data)))))
+  (let [org-data (dis/org-data)
+        current-board-slug (router/current-board-slug)
+        ; is-inbox? (= (router/current-org-slug) "inbox")
+        is-following? (= current-board-slug "following")
+        is-replies? (= current-board-slug "replies")
+        ; is-unfollowing? (= (router/current-org-slug) "unfollowing")
+        ; inbox-delay (if is-inbox? 1 500)
+        following-delay (if is-following? 1 500)
+        replies-delay (if is-replies? 1 500)
+        ; unfollowing-delay (if is-unfollowing? 1 500)
+        ]
+    ; (utils/maybe-after inbox-delay #(activity-actions/inbox-get org-data))
+    (utils/maybe-after following-delay #(activity-actions/following-get org-data is-following? nil))
+    (utils/maybe-after replies-delay #(activity-actions/replies-get org-data is-replies? nil))
+    ; (utils/maybe-after unfollowing-delay #(activity-actions/unfollowing-get org-data))
+    ))
 
 (defn toggle-publisher [publisher-uuid]
   (let [org-slug (router/current-org-slug)
@@ -596,7 +603,8 @@
                                                         :resource-type :board}]))
     (if follow?
       (ws-cc/board-follow board-uuid)
-      (ws-cc/board-unfollow board-uuid))))
+      (ws-cc/board-unfollow board-uuid))
+    (refresh-follow-containers)))
 
 ;; subscribe to websocket events
 

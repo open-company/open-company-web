@@ -72,11 +72,11 @@
           active-users (dispatcher/active-users org-slug db)
           parsed-ap-rp-data (when old-ap-rp-data
                               (-> next-ap-rp-data
-                                (au/parse-container {} org-data active-users dispatcher/recently-posted-sort false)
+                                (au/parse-container {} org-data active-users dispatcher/recently-posted-sort)
                                 (dissoc :fixed-items)))
           parsed-ap-ra-data (when old-ap-ra-data
                               (-> next-ap-ra-data
-                                (au/parse-container {} org-data active-users dispatcher/recent-activity-sort false)
+                                (au/parse-container {} org-data active-users dispatcher/recent-activity-sort)
                                 (dissoc :fixed-items)))]
       (as-> db tdb
        (if old-ap-rp-data
@@ -156,7 +156,7 @@
           next-bm-data (when old-bm-data
                          (-> old-bm-data
                           (assoc :posts-list sorted-new-bm-posts)
-                          (au/parse-container change-data org-data active-users dispatcher/recently-posted-sort false)
+                          (au/parse-container change-data org-data active-users dispatcher/recently-posted-sort)
                           (dissoc :fixed-items)))]
       (assoc-in db bm-key next-bm-data))
     db))
@@ -239,11 +239,11 @@
           active-users (dispatcher/active-users org-slug db)
           parsed-fl-rp-data (when old-fl-rp-data
                               (-> next-fl-rp-data
-                               (au/parse-container {} org-data active-users dispatcher/recently-posted-sort false)
+                               (au/parse-container {} org-data active-users dispatcher/recently-posted-sort)
                                (dissoc :fixed-items)))
           parsed-fl-ra-data (when old-fl-ra-data
                               (-> next-fl-ra-data
-                               (au/parse-container {} org-data active-users dispatcher/recent-activity-sort false)
+                               (au/parse-container {} org-data active-users dispatcher/recent-activity-sort)
                                (dissoc :fixed-items)))]
       (as-> db tdb
        (if old-fl-rp-data
@@ -632,7 +632,7 @@
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         prepare-all-posts-data (-> all-posts-data :collection (assoc :container-slug :all-posts))
-        fixed-all-posts-data (au/parse-container prepare-all-posts-data change-data org-data active-users sort-type false)
+        fixed-all-posts-data (au/parse-container prepare-all-posts-data change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-all-posts-data))
@@ -663,7 +663,7 @@
                                                                   :old-links (:links container-data)
                                                                   :container-slug :all-posts})
           active-users (dispatcher/active-users org db)
-          fixed-all-posts-data (au/parse-container prepare-all-posts-data (dispatcher/change-data db org) org-data active-users sort-type false direction)
+          fixed-all-posts-data (au/parse-container prepare-all-posts-data (dispatcher/change-data db org) org-data active-users sort-type {:direction direction})
           new-items-map (merge old-posts (:fixed-items fixed-all-posts-data))
           new-container-data (-> fixed-all-posts-data
                               (assoc :direction direction)
@@ -686,7 +686,7 @@
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         prepare-bookmarks-data (-> bookmarks-data :collection (assoc :container-slug :bookmarks))
-        fixed-bookmarks-data (au/parse-container prepare-bookmarks-data change-data org-data active-users dispatcher/recently-posted-sort false)
+        fixed-bookmarks-data (au/parse-container prepare-bookmarks-data change-data org-data active-users dispatcher/recently-posted-sort)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-bookmarks-data))
@@ -722,7 +722,7 @@
                                                                   :old-links (:links container-data)
                                                                   :container-slug :bookmarks})
           active-users (dispatcher/active-users org db)
-          fixed-bookmarks-data (au/parse-container prepare-bookmarks-data (dispatcher/change-data db org) org-data active-users dispatcher/recently-posted-sort false direction)
+          fixed-bookmarks-data (au/parse-container prepare-bookmarks-data (dispatcher/change-data db org) org-data active-users dispatcher/recently-posted-sort {:direction direction})
           new-items-map (merge old-posts (:fixed-items fixed-bookmarks-data))
           new-container-data (-> fixed-bookmarks-data
                               (assoc :direction direction)
@@ -912,7 +912,7 @@
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         prepare-inbox-data (-> inbox-data :collection (assoc :container-slug :inbox))
-        fixed-inbox-data (au/parse-container prepare-inbox-data change-data org-data active-users sort-type false)
+        fixed-inbox-data (au/parse-container prepare-inbox-data change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-inbox-data))
@@ -945,7 +945,7 @@
                                                               :old-links (:links container-data)
                                                               :container-slug :inbox})
           active-users (dispatcher/active-users org db)
-          fixed-inbox-data (au/parse-container prepare-inbox-data (dispatcher/change-data db org) org-data active-users sort-type false direction)
+          fixed-inbox-data (au/parse-container prepare-inbox-data (dispatcher/change-data db org) org-data active-users sort-type {:direction direction})
           new-items-map (merge old-posts (:fixed-items fixed-inbox-data))
           new-container-data (-> fixed-inbox-data
                               (assoc :direction direction)
@@ -1035,7 +1035,7 @@
                                 :collection
                                 (assoc :container-slug :following)
                                 (update :last-seen-at #(if keep-seen-at? (get-in db last-seen-at-key) %)))
-        fixed-following-data (au/parse-container prepare-following-data change-data org-data active-users sort-type false)
+        fixed-following-data (au/parse-container prepare-following-data change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-following-data))
@@ -1043,7 +1043,7 @@
         badge-following? (some :unseen (:posts-list fixed-following-data))]
     (as-> db ndb
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
-      (update-in ndb following-badge-key #(if (= (keyword current-container-slug) :following) false badge-following?))
+      (update-in ndb following-badge-key #(if (= (keyword current-container-slug) :following) false (boolean badge-following?)))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
@@ -1072,7 +1072,7 @@
                                                                   :last-seen-at (:last-seen-at container-data)
                                                                   :next-seen-at (:next-seen-at container-data)})
           active-users (dispatcher/active-users org db)
-          fixed-following-data (au/parse-container prepare-following-data (dispatcher/change-data db org) org-data active-users sort-type false direction)
+          fixed-following-data (au/parse-container prepare-following-data (dispatcher/change-data db org) org-data active-users sort-type {:direction direction})
           new-items-map (merge old-posts (:fixed-items fixed-following-data))
           new-container-data (-> fixed-following-data
                               (assoc :direction direction)
@@ -1102,11 +1102,10 @@
                               :collection
                               (assoc :container-slug :replies)
                               (update :last-seen-at #(if keep-seen-at? (get-in db last-seen-at-key) %)))
-        fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type true)
+        fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type {:load-comments? true})
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)
         badge-replies? (some :unseen-comments (:posts-list fixed-replies-data))]
-    (js/console.log "DBG :replies-get/finish badge-replies?" badge-replies?)
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
       (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false (boolean badge-replies?)))
@@ -1138,7 +1137,7 @@
                                                                   :last-seen-at (:last-seen-at container-data)
                                                                   :next-seen-at (:next-seen-at container-data)})
           active-users (dispatcher/active-users org db)
-          fixed-replies-data (au/parse-container prepare-replies-data (dispatcher/change-data db org) org-data active-users sort-type true direction)
+          fixed-replies-data (au/parse-container prepare-replies-data (dispatcher/change-data db org) org-data active-users sort-type {:load-comments? true :direction direction})
           new-posts-map (merge old-posts (:fixed-items fixed-replies-data))
           new-container-data (-> fixed-replies-data
                               (assoc :direction direction)
@@ -1161,7 +1160,7 @@
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         prepare-unfollowing-data (-> unfollowing-data :collection (assoc :container-slug :unfollowing))
-        fixed-unfollowing-data (au/parse-container prepare-unfollowing-data change-data org-data active-users sort-type false)
+        fixed-unfollowing-data (au/parse-container prepare-unfollowing-data change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-unfollowing-data))
@@ -1194,7 +1193,7 @@
                                                                     :old-links (:links container-data)
                                                                     :container-slug :unfollowing})
           active-users (dispatcher/active-users org db)
-          fixed-unfollowing-data (au/parse-container prepare-unfollowing-data (dispatcher/change-data db org) org-data active-users sort-type false direction)
+          fixed-unfollowing-data (au/parse-container prepare-unfollowing-data (dispatcher/change-data db org) org-data active-users sort-type {:direction direction})
           new-items-map (merge old-posts (:fixed-items fixed-unfollowing-data))
           new-container-data (-> fixed-unfollowing-data
                               (assoc :direction direction)
@@ -1222,12 +1221,10 @@
 
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
-  (js/console.log "DBG :replies-badge/on")
   (assoc-in db (dispatcher/replies-badge-key org-slug) true))
 
 (defmethod dispatcher/action :replies-badge/off
   [db [_ org-slug]]
-  (js/console.log "DBG :replies-badge/off")
   (assoc-in db (dispatcher/replies-badge-key org-slug) false))
 
 (defmethod dispatcher/action :container-seen
@@ -1237,22 +1234,33 @@
   ;   db)
   db)
 
+(defmethod dispatcher/action :container-nav-in
+  [db [_ org-slug container-slug sort-type]]
+  (cond
+   (= container-slug :replies)
+   (assoc-in db (dispatcher/replies-badge-key org-slug) false)
+   (= container-slug :following)
+   (assoc-in db (dispatcher/following-badge-key org-slug) false)
+   :else
+   db))
+
 (defmethod dispatcher/action :container-nav-out
-  [db [_ org-slug container-slug current-sort-type]]
-  (let [sort-type (cond (= (keyword container-slug) :replies)
-                        dispatcher/recent-activity-sort
-                        (= (keyword container-slug) :following)
-                        dispatcher/recently-posted-sort
-                        :else
-                        current-sort-type)
-        container-key (dispatcher/container-key org-slug container-slug sort-type)
+  [db [_ org-slug container-slug sort-type]]
+  (let [container-key (dispatcher/container-key org-slug container-slug sort-type)
         container-data (get-in db container-key)
-        org-data (dispatcher/org-data org-slug db)
+        org-data (dispatcher/org-data db org-slug)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)]
     (-> db
      (assoc-in (conj container-key :last-seen-at) (:next-seen-at container-data))
      (au/update-container container-slug org-data change-data active-users))))
+
+(defmethod dispatcher/action :update-replies-comments
+  [db [_ org-slug current-board-slug]]
+  (let [org-data (dispatcher/org-data db org-slug)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)]
+    (au/update-replies-comments db org-data change-data active-users)))
 
 (defmethod dispatcher/action :update-container
   [db [_ org-slug current-board-slug container-slug]]
@@ -1263,12 +1271,12 @@
         badge-following? (when (and (not= current-board-slug :following)
                                     (= container-slug :following))
                            (some :unseen (:posts-list (dispatcher/following-data org-slug next-db))))
-        badge-replies? (when (and (not= current-board-slug :replies)
+        badge-replies? (when (and (not= (keyword current-board-slug) :replies)
                                   (= container-slug :replies))
                          (some :unseen-comments (:posts-list (dispatcher/replies-data org-slug next-db))))]
     (-> next-db
-     (update-in (dispatcher/following-badge-key org-slug) #(or badge-following? %))
-     (update-in (dispatcher/replies-badge-key org-slug) #(or badge-replies? %)))))
+     (update-in (dispatcher/following-badge-key org-slug) #(boolean (or badge-following? %)))
+     (update-in (dispatcher/replies-badge-key org-slug) #(boolean (or badge-replies? %))))))
 
 (defmethod dispatcher/action :update-containers
   [db [_ org-slug]]

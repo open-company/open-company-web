@@ -742,8 +742,8 @@
         board-slug (router/current-board-slug)
         activity-id (router/current-activity-id)]
     (if (and (not activity-id)
-             (seq board-slug)
-             (not= board-slug default-drafts-board-slug)
+             board-slug
+             (not= (keyword board-slug) (keyword default-drafts-board-slug))
              is-mobile?)
       65
       0)))

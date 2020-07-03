@@ -98,7 +98,7 @@
         (activity-actions/inbox-get org-data)
 
         (= board-slug "replies")
-        (activity-actions/replies-get org-data keep-seen-at?)
+        (activity-actions/replies-get org-data keep-seen-at? nil)
 
         (and (= board-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
@@ -113,7 +113,7 @@
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/following-get org-data keep-seen-at?)
+        (activity-actions/following-get org-data keep-seen-at? nil)
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recent-activity-sort))
@@ -158,7 +158,7 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if is-container? "dashboard" board-slug) sort-type]
+         (router/set-route! [org-slug (if is-container? "dashboard" board-slug) sort-type]
           {:org org-slug
            :board board-slug
            :sort-type sort-type
@@ -219,8 +219,8 @@
       (nav-to-url! e "topics" to-url back-y should-refresh-data?)
       is-following?
       (nav-to-url! e "following" to-url back-y should-refresh-data?)
-      :else
-      (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
+      (:board back-to)
+      (nav-to-url! e (name (:board back-to)) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal
   ([activity-data dont-scroll]
@@ -230,15 +230,17 @@
   (let [org (router/current-org-slug)
         board (:board-slug activity-data)
         sort-type (activity-actions/saved-sort-type org board)
+        current-contributions-id (router/current-contributions-id)
+        current-board-slug (keyword (router/current-board-slug))
         back-to (cond
-                  (and (seq (router/current-contributions-id))
-                       (not (seq (router/current-board-slug))))
-                  {:contributions (router/current-contributions-id)}
-                  (= (router/current-board-slug) "replies")
+                  (and (seq current-contributions-id)
+                       (not current-board-slug))
+                  {:contributions current-contributions-id}
+                  (= current-board-slug :replies)
                   {:replies true}
-                  (= (router/current-board-slug) "topics")
+                  (= current-board-slug :topics)
                   {:topics true}
-                  (= (router/current-board-slug) "following")
+                  (= current-board-slug :following)
                   {:following true}
                   :else
                   {:board board})

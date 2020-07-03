@@ -250,15 +250,11 @@
                                 (cu/comment-unread? deleting-comment-data last-read-at))
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
         new-sorted-comments-data (cu/sort-comments new-comments-data)
-        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))
-        org-data (dispatcher/org-data db org-slug)
-        change-data (dispatcher/change-data db org-slug)
-        active-users (dispatcher/active-users org-slug db)]
+        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) current-user-id) new-comments-data)))]
     (-> db
      (assoc-in sorted-comments-key new-sorted-comments-data)
      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:last-activity-at (:created-at last-not-own-comment)})
-     (update-in (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count) (if deleting-new-comment? dec identity))
-     (au/update-replies-container org-data change-data active-users))))
+     (update-in (conj (dispatcher/activity-key org-slug activity-uuid) :new-comments-count) (if deleting-new-comment? dec identity)))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
   [db [_ org-slug entry-data interaction-data]]
@@ -305,9 +301,7 @@
                                      ;; If unfollow link is present it means the user is following the entry
                                      (utils/link-for (:links with-last-activity-at) "unfollow")
                                      ;; And if there 
-                                     (cu/comment-unseen? comment-data (:last-seen-at replies-data)))
-          change-data (dispatcher/change-data db org-slug)
-          active-users (dispatcher/active-users org-slug db)]
+                                     (cu/comment-unseen? comment-data (:last-seen-at replies-data)))]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
               old-comments-data (filterv :links all-old-comments-data)
@@ -317,12 +311,10 @@
           (-> db
            (assoc-in sorted-comments-key new-sorted-comments-data)
            (update-in replies-badge-key #(or should-badge-replies? %))
-           (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)
-           (au/update-replies-container org-data change-data active-users)))
+           (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
         ;; In case we don't have the comments already loaded just update the :last-activity-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
         (-> db
          (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)
-         (update-in replies-badge-key #(or should-badge-replies? %))
-         (au/update-replies-container org-data change-data active-users))))
+         (update-in replies-badge-key #(or should-badge-replies? %)))))
     db))

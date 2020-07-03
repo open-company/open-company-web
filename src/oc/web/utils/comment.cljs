@@ -143,7 +143,7 @@
          trailing-expanded-comments-count (if (> comments-count 4) 2 1)
          trailing-expanded-comments (subvec comments (- comments-count trailing-expanded-comments-count) comments-count)
          collapsed-comments (subvec comments 1 (- comments-count trailing-expanded-comments-count))
-         unseen-collapsed (some :unseen collapsed-comments)]
+         unseen-collapsed (filter :unseen collapsed-comments)]
      (vec (concat
       [(assoc (first comments) :expanded true)]
       [{:resource-type :collapsed-comments

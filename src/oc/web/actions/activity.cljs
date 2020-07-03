@@ -777,38 +777,38 @@
   ;; Reload the entry from the server and check if we need to turn on the badge for home
   (let [org-slug (router/current-org-slug)
         board-data (au/board-by-uuid container-id)]
-    (cmail-actions/get-entry-with-uuid (:slug board-data) activity-uuid
-     (fn [success status]
-       (when success
-         (let [activity-data (dis/activity-data activity-uuid)
-               follow-boards-list (dis/follow-boards-list org-slug)
-               following-data (dis/container-data @dis/app-state org-slug :following dis/recently-posted-sort)
-               replies-data (dis/container-data @dis/app-state org-slug :replies dis/recent-activity-sort)
-               is-published? (= (keyword (:status activity-data)) :published)
-               current-user-data (dis/current-user-data)
-               is-publisher? (= (-> activity-data :publisher :user-id) (:user-id current-user-data))
-               is-following? (or ;; if unfollow link is present it means the user is explicitly
-                                 ;; following the entry
-                                 (utils/link-for (:links activity-data) "unfollow")
-                                 ;; or if the board is followed by the user
-                                 ((set (map :uuid follow-boards-list)) container-id))
-               following-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list following-data))
-               replies-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))
-               should-badge-following? (and is-published?
+    (when (not= (:slug board-data) utils/default-drafts-board-slug)
+      (cmail-actions/get-entry-with-uuid (:slug board-data) activity-uuid
+       (fn [success status]
+         (when success
+           (let [activity-data (dis/activity-data activity-uuid)
+                 follow-boards-list (dis/follow-boards-list org-slug)
+                 following-data (dis/container-data @dis/app-state org-slug :following dis/recently-posted-sort)
+                 replies-data (dis/container-data @dis/app-state org-slug :replies dis/recent-activity-sort)
+                 is-published? (= (keyword (:status activity-data)) :published)
+                 current-user-data (dis/current-user-data)
+                 is-publisher? (= (-> activity-data :publisher :user-id) (:user-id current-user-data))
+                 is-following? (or ;; if unfollow link is present it means the user is explicitly
+                                   ;; following the entry
+                                   (utils/link-for (:links activity-data) "unfollow")
+                                   ;; or if the board is followed by the user
+                                   ((set (map :uuid follow-boards-list)) container-id))
+                 following-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list following-data))
+                 replies-item (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))
+                 should-badge-following? (and is-published?
+                                              is-following?
+                                              ;; and the user has never read it
+                                              (not is-publisher?)
+                                              (or (:unseen following-item)
+                                                  (au/entry-unseen? activity-data (:last-seen-at following-data))))
+                 should-badge-replies? (and is-published?
                                             is-following?
-                                            ;; and the user has never read it
-                                            (not is-publisher?)
-                                            (or (:unseen following-item)
-                                                (au/entry-unseen? activity-data (:last-seen-at following-data))))
-               should-badge-replies? (and is-published?
-                                          is-following?
-                                          (-> activity-data :links (utils/link-for "comments") :count pos?)
-                                          (:unseen-comments replies-item))]
-           (js/console.log "DBG check-activity-for-badges should-badge-replies?" should-badge-replies?)
-           (when should-badge-following?
-             (dis/dispatch! [:following-badge/on org-slug]))
-           (when should-badge-replies?
-             (dis/dispatch! [:replies-badge/on org-slug]))))))))
+                                            (-> activity-data :links (utils/link-for "comments") :count pos?)
+                                            (:unseen-comments replies-item))]
+             (when should-badge-following?
+               (dis/dispatch! [:following-badge/on org-slug]))
+             (when should-badge-replies?
+               (dis/dispatch! [:replies-badge/on org-slug])))))))))
 
 ;; Change service actions
 
@@ -840,41 +840,62 @@
               board-data (au/board-by-uuid container-id)
               activity-uuid (:item-id change-data)
               change-type (:change-type change-data)
-              inbox-action (:inbox-action change-data)]
+              inbox-action (:inbox-action change-data)
+              current-board-slug (router/current-board-slug)
+              org-data (dis/org-data)]
           (cond
-            (= change-type :dismiss)
-            (do
-              (timbre/debug "Dismiss for" activity-uuid)
-              (dis/dispatch! [:inbox/dismiss org-slug activity-uuid])
-              (inbox-get (dis/org-data)))
-            (= change-type :unread)
-            (do
-              (timbre/debug "Unread for" activity-uuid)
-              (dis/dispatch! [:inbox/unread org-slug (:slug board-data) activity-uuid])
-              (inbox-get (dis/org-data)))
+            ; (= change-type :dismiss)
+            ; (do
+            ;   (timbre/debug "Dismiss for" activity-uuid)
+            ;   (dis/dispatch! [:inbox/dismiss org-slug activity-uuid])
+            ;   (inbox-get org-data))
+            ; (= change-type :unread)
+            ; (do
+            ;   (timbre/debug "Unread for" activity-uuid)
+            ;   (dis/dispatch! [:inbox/unread org-slug (:slug board-data) activity-uuid])
+            ;   (inbox-get org-data))
             (= change-type :follow)
             (do
               (timbre/debug "Follow for" activity-uuid)
-              ;; Reload the entry from the server and check if we need to turn on the badge for home
-              (check-activity-for-badges container-id activity-uuid)
-              (inbox-get (dis/org-data)))
+              (if (= (keyword current-board-slug) :replies)
+                ;; Reload the entry from the server and check if we need to turn on the badge for home
+                (check-activity-for-badges container-id activity-uuid)
+                ;; Reload all replies
+                (replies-get org-data))
+              ; (inbox-get org-data)
+              )
             (= change-type :unfollow)
             (do
               (timbre/debug "Unfollow for" activity-uuid)
-              (inbox-get (dis/org-data))))))
+              ; (inbox-get org-data)
+              (if (= (keyword current-board-slug) :replies)
+                ;; Reload the entry from the server and check if we need to turn on the badge for home
+                (check-activity-for-badges container-id activity-uuid)
+                ;; Reload all replies
+                (replies-get org-data))))))
       (when (and (utils/in? (-> data :data :users) (jwt/user-id))
                  (= :comment-add (:change-type (:data data))))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
+              container-id (:container-id change-data)
               change-type (:change-type change-data)
-              inbox-action (:inbox-action change-data)]
+              inbox-action (:inbox-action change-data)
+              org-data (dis/org-data)
+              current-board-slug (router/current-board-slug)]
           (timbre/debug "Comment added for" activity-uuid)
+          (if (= (keyword current-board-slug) :replies)
+            ;; Reload the entry from the server and check if we need to turn on the badge for home
+            (check-activity-for-badges container-id activity-uuid)
+            ;; Reload all replies
+            (replies-get org-data))
           ;; Delay the inbox refresh to make sure follows have been added
           ;; for al mentioned users
-          (utils/after 500 #(inbox-get (dis/org-data)))))))
+          ; (utils/after 500 #(inbox-get org-data))
+          ))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
+            container-id (:container-id change-data)
             activity-uuid (:item-id change-data)
             container-id (:container-id change-data)
             change-type (:change-type change-data)
@@ -886,9 +907,8 @@
                               (fn [{:keys [success]}]
                                 (when success
                                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
-                                                                                          :board-uuid container-id}]))))]
-        (when (= change-type :add)
-          (check-activity-for-badges container-id activity-uuid))
+                                                                                          :board-uuid container-id}]))))
+            current-board-slug (router/current-board-slug)]
         (when (= change-type :delete)
           (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
@@ -897,21 +917,26 @@
           ;; Refresh the count of drafts and bookmarks
           (sa/drafts-get)
           (bookmarks-get org-data dispatch-unread)
+          ;; Refresh the badge
+          (check-activity-for-badges container-id activity-uuid)
+          ;; Refresh following list if not showing it now
+          (when (not= (keyword current-board-slug) :following)
+            (following-get org-data))
           ;; Refresh specific containers/sections
           (cond
-            (= (router/current-board-slug) "inbox")
+            (= current-board-slug "inbox")
             (inbox-get org-data dispatch-unread)
-            (= (router/current-board-slug) "all-posts")
+            (= current-board-slug "all-posts")
             (all-posts-get org-data dispatch-unread)
-            ; (= (router/current-board-slug) "bookmarks")
+            ; (= current-board-slug "bookmarks")
             ; (bookmarks-get org-data dispatch-unread)
-            ; (= (router/current-board-slug) "following")
+            ; (= current-board-slug "following")
             ; (following-get org-data dispatch-unread)
-            (= (router/current-board-slug) "unfollowing")
+            (= current-board-slug "unfollowing")
             (unfollowing-get org-data dispatch-unread)
             ;; If it's not one of the previous containers then load
             ;; a real board if needed
-            (and (not (dis/is-container? (router/current-board-slug)))
+            (and (not (dis/is-container? current-board-slug))
                  (not (router/current-contributions-id)))
             (sa/section-change container-id dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -949,27 +974,20 @@
 
 ;; Seen - containers nav events
 
-(defn reset-container-badge [container-slug]
-  (dis/dispatch! [:reset-container-badge (router/current-org-slug) container-slug (router/current-sort-type)]))
-
 (defonce last-sent-seen (atom nil))
 
-(defn container-nav-in [container-slug & [remount?]]
-  (let [container-data (dis/container-data @dis/app-state (router/current-org-slug) container-slug (router/current-sort-type))
-        next-sent-seen (str "last-sent-seen" (:container-slug container-data) "-" (:next-seen-at container-data))]
+(defn container-nav-in [container-slug sort-type]
+  (let [container-data (dis/container-data @dis/app-state (router/current-org-slug) container-slug sort-type)
+        next-sent-seen (str "last-sent-seen-" (:container-slug container-data) "-" (:next-seen-at container-data))]
     (when (and (:container-id container-data)
                (not= @last-sent-seen next-sent-seen))
       (send-container-seen (:container-id container-data) (:next-seen-at container-data))
       (reset! last-sent-seen next-sent-seen)
-      (cond
-       (= container-slug :following)
-       (dis/dispatch! [:following-badge/off])
-       (= container-slug :replies)
-       (do (js/console.log "DBG container-nav-in replies-badge/off") (dis/dispatch! [:replies-badge/off]))))))
+      (dis/dispatch! [:container-nav-in (router/current-org-slug) container-slug sort-type]))))
 
-(defn container-nav-out [container-slug]
+(defn container-nav-out [container-slug sort-type]
   ;; No-op
-  (dis/dispatch! [:container-nav-out (router/current-org-slug) container-slug]))
+  (dis/dispatch! [:container-nav-out (router/current-org-slug) container-slug sort-type]))
   
 ;; WRT read
 

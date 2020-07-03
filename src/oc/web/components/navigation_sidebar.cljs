@@ -108,7 +108,7 @@
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         is-topics (or (:topics (:back-to @router/path))
                        (= selected-slug "topics")
-                       (and (seq (router/current-board-slug))
+                       (and (router/current-board-slug)
                             (not (dis/is-container? (router/current-board-slug)))
                             (not is-drafts-board)))
         ; is-my-posts (and user-is-part-of-the-team?
