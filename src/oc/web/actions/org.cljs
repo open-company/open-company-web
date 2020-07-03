@@ -219,6 +219,7 @@
       (when (:badge-following org-data)
         (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
       (when (:badge-replies org-data)
+        (js/console.log "DBG org-actions/org-loaded maybe-badge-replies")
         (dis/dispatch! [:maybe-badge-replies (:slug org-data) current-board-slug])))
     (cond
       is-topics?

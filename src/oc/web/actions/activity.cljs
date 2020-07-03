@@ -804,6 +804,7 @@
                                           is-following?
                                           (-> activity-data :links (utils/link-for "comments") :count pos?)
                                           (:unseen-comments replies-item))]
+           (js/console.log "DBG check-activity-for-badges should-badge-replies?" should-badge-replies?)
            (when should-badge-following?
              (dis/dispatch! [:following-badge/on org-slug]))
            (when should-badge-replies?
@@ -964,11 +965,11 @@
        (= container-slug :following)
        (dis/dispatch! [:following-badge/off])
        (= container-slug :replies)
-       (dis/dispatch! [:replies-badge/off])))))
+       (do (js/console.log "DBG container-nav-in replies-badge/off") (dis/dispatch! [:replies-badge/off]))))))
 
 (defn container-nav-out [container-slug]
   ;; No-op
-  )
+  (dis/dispatch! [:container-nav-out (router/current-org-slug) container-slug]))
   
 ;; WRT read
 

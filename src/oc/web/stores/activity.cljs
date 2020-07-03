@@ -1106,6 +1106,7 @@
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)
         badge-replies? (some :unseen-comments (:posts-list fixed-replies-data))]
+    (js/console.log "DBG :replies-get/finish badge-replies?" badge-replies?)
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
       (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false (boolean badge-replies?)))
@@ -1221,10 +1222,12 @@
 
 (defmethod dispatcher/action :replies-badge/on
   [db [_ org-slug]]
+  (js/console.log "DBG :replies-badge/on")
   (assoc-in db (dispatcher/replies-badge-key org-slug) true))
 
 (defmethod dispatcher/action :replies-badge/off
   [db [_ org-slug]]
+  (js/console.log "DBG :replies-badge/off")
   (assoc-in db (dispatcher/replies-badge-key org-slug) false))
 
 (defmethod dispatcher/action :container-seen
@@ -1233,6 +1236,23 @@
   ;   (assoc-in db (dispatcher/container-seen-key org-slug container-id) seen-at)
   ;   db)
   db)
+
+(defmethod dispatcher/action :container-nav-out
+  [db [_ org-slug container-slug current-sort-type]]
+  (let [sort-type (cond (= (keyword container-slug) :replies)
+                        dispatcher/recent-activity-sort
+                        (= (keyword container-slug) :following)
+                        dispatcher/recently-posted-sort
+                        :else
+                        current-sort-type)
+        container-key (dispatcher/container-key org-slug container-slug sort-type)
+        container-data (get-in db container-key)
+        org-data (dispatcher/org-data org-slug db)
+        change-data (dispatcher/change-data db org-slug)
+        active-users (dispatcher/active-users org-slug db)]
+    (-> db
+     (assoc-in (conj container-key :last-seen-at) (:next-seen-at container-data))
+     (au/update-container container-slug org-data change-data active-users))))
 
 (defmethod dispatcher/action :update-container
   [db [_ org-slug current-board-slug container-slug]]

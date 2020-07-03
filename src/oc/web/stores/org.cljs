@@ -100,6 +100,9 @@
   [db [_ org-slug current-board-slug]]
   (let [badges-key (dispatcher/badges-key org-slug)
         badges-data (get-in db badges-key)]
+    (js/console.log "DBG :maybe-badge-replies" (and (or (not badges-data)
+                 (not (contains? badges-data :replies)))
+             (not= (keyword current-board-slug) :replies)))
     (if (and (or (not badges-data)
                  (not (contains? badges-data :replies)))
              (not= (keyword current-board-slug) :replies))
