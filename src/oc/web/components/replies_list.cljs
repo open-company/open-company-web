@@ -71,34 +71,19 @@
 
 (rum/defcs reply-comment <
   rum/static
-  (rum/local false ::show-read-more)
-  {:did-mount (fn [s]
-   (let [props (-> s :rum/args first)
-         line-height (if (:is-mobile? props) 24 18)
-         content-height (* 3 line-height)]
-     (when (fn? (:unwrap-body-cb props))
-       (when-let [comment-body (rum/ref-node s :reply-comment-body)]
-         (when (>= (.-scrollHeight comment-body)
-                   (+ content-height 18 1)) ;; 3 lines + Read more button height + 1px
-           (reset! (::show-read-more s) true)))))
-   s)}
   [s {:keys [entry-data comment-data mouse-leave-cb
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
              did-react-cb current-user-id reply-focus-value
-             replies-count replying-to unwrap-body-cb]}]
+             replies-count replying-to]}]
   (let [show-new-comment-tag (:unseen comment-data)]
     [:div.reply-comment-outer.open-reply
       {:key (str "reply-comment-" (:created-at comment-data))
        :data-comment-uuid (:uuid comment-data)
-       :data-unwrapped-body (:unwrapped-body comment-data)
        :data-unseen (:unseen comment-data)
-       :data-unwrapped-body-fn (fn? unwrap-body-cb)
        :class (utils/class-set {:new-comment (:unseen comment-data)
                                 :showing-picker showing-picker?
-                                :no-replies (zero? replies-count)
-                                :truncated-body @(::show-read-more s)
-                                :no-mentions-popup @(::show-read-more s)})}
+                                :no-replies (zero? replies-count)})}
       [:div.reply-comment
         {:ref (str "reply-comment-" (:uuid comment-data))
          :on-mouse-leave mouse-leave-cb}
@@ -173,12 +158,6 @@
                  :ref :reply-comment-body
                  :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                           utils/hide-class true})}]]
-            (when @(::show-read-more s)
-              [:button.mlb-reset.read-more-bt
-                {:on-click #(do
-                              (reset! (::show-read-more s) false)
-                              (unwrap-body-cb))}
-                "Read more"])
             (when (seq (:reactions comment-data))
               [:div.reply-comment-reactions-footer.group
                 (reactions {:entity-data comment-data
@@ -208,8 +187,6 @@
           [:time
             {:date-time published-at}
             (utils/tooltip-date published-at)]]
-        [:div.reply-item-title
-          (str "→ " headline)]
         (when (or follow-link unfollow-link)
           [:button.mlb-reset.mute-bt
             {:title (if follow-link
@@ -219,7 +196,9 @@
              :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
              :data-placement "top"
              :data-container "body"
-             :on-click #(activity-actions/inbox-unfollow (:uuid entry-data))}])]]))
+             :on-click #(activity-actions/inbox-unfollow (:uuid entry-data))}])]
+      [:div.reply-item-title
+        headline]]))
 
 (defn- reply-item-unique-class [{:keys [uuid]}]
   (str "reply-item-" uuid))
@@ -253,8 +232,6 @@
       (reply-comment {:entry-data entry-data
                       :comment-data reply-data
                       :reply-focus-value reply-focus-value
-                      :unwrap-body-cb (when-not (:unwrapped-body reply-data)
-                                        #(reply-unwrap-body entry-data reply-data))
                       :is-mobile? is-mobile?
                       :react-cb #(reset! (::show-picker s) (:uuid reply-data))
                       :reply-cb #(reply-to reply-data reply-focus-value)
@@ -347,7 +324,7 @@
               "Loading more replies..."]]])
       [:div.reply-item-blocks.group
         (for [reply replies-data
-              :when (:expanded reply)]
+              :when (not (:collapsed reply))]
           (if (= (:resource-type reply) :collapsed-comments)
             (rum/with-key
              (collapsed-comments-button (assoc reply :expand-cb #(replies-expand entry-data)))

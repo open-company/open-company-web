@@ -24,5 +24,5 @@
   (let [org-data (dis/org-data)
         replies-data (dis/container-data @dis/app-state (:slug org-data) :replies dis/recent-activity-sort)
         parsed-comment-data (au/parse-comment org-data entry-data new-comment-data (:last-seen-at replies-data))
-        parsed-reply-data (merge parsed-comment-data {:unwrapped-body true :expanded true :unseen false})]
+        parsed-reply-data (merge parsed-comment-data {:unwrapped-body true :collapsed true :unseen false})]
     (dis/dispatch! [:replies-add (:slug org-data) entry-data parsed-reply-data])))

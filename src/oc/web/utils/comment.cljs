@@ -82,8 +82,8 @@
 (defn- get-collapsed-item [item collapsed-map]
   (merge item (get collapsed-map (:uuid item))))
 
-(defn is-expanded? [item collapsed-map]
-  (:expanded (get-collapsed-item item collapsed-map)))
+(defn is-collapsed? [item collapsed-map]
+  (:collapsed (get-collapsed-item item collapsed-map)))
 
 ; (defn is-unread? [item collapsed-map]
 ;   (not (:unread (get-collapsed-item item collapsed-map))))
@@ -135,72 +135,25 @@
   ;; When we have less than 4 comments we always show all of them
   ([comments :guard #(and (coll? %)
                           (<= (count %) 3))]
-   (mapv #(assoc % :expanded true) comments))
+   comments)
   ;; Add :unseen info to each comment before entering the recursion
   ([comments :guard (fn [cs] (and (coll? cs)
                                   (> (count cs) 3)))]
    (let [comments-count (count comments)
-         trailing-expanded-comments-count (if (> comments-count 4) 2 1)
-         trailing-expanded-comments (subvec comments (- comments-count trailing-expanded-comments-count) comments-count)
-         collapsed-comments (subvec comments 1 (- comments-count trailing-expanded-comments-count))
+         expanded-comments (subvec comments (- comments-count 3) comments-count)
+         collapsed-comments (subvec comments 0 (- comments-count 3))
          unseen-collapsed (filter :unseen collapsed-comments)]
      (vec (concat
-      [(assoc (first comments) :expanded true)]
       [{:resource-type :collapsed-comments
         :collapsed-count (count collapsed-comments)
         :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
-        :expanded true
+        :collapsed false
         :unseen false
         :unseen-collapsed (boolean (seq unseen-collapsed))
-        :message (str "View more comments" (when (seq unseen-collapsed) (str " (" (count unseen-collapsed) " new)")))
+        :message (str "View all " (count comments) " comments")
         :comment-uuids (map :uuid collapsed-comments)}]
-      (map #(assoc % :expanded false) collapsed-comments)
-      (map #(assoc % :expanded true) trailing-expanded-comments))))))
-
-
-  ; ;; Recursive step: unseen has been set, let's add expand now
-  ; ([in-comments :guard coll?
-  ;   out-comments :guard coll?
-  ;   collapsed-map :guard map?]
-  ;   (let [potential-collapse-items (vec (take-while #(not (contains? % :expanded)) in-comments))]
-  ;     (if (seq potential-collapse-items)
-  ;       (let [next-in-comments (subvec in-comments (count potential-collapse-items))
-  ;             should-add-collapsed-item? (> (count potential-collapse-items) 2)
-  ;             collapse-items (if (> (count potential-collapse-items) 3)
-  ;                              (subvec potential-collapse-items 0 (- (count potential-collapse-items) 2))
-  ;                              (vec (butlast potential-collapse-items)))
-  ;             expand-items (if (> (count potential-collapse-items) 3)
-  ;                            (subvec potential-collapse-items (- (count potential-collapse-items) 2) (count potential-collapse-items))
-  ;                            [(last potential-collapse-items)])
-  ;             unseen-collapsed (some :unseen collapse-items)
-  ;             collapsed-item (when should-add-collapsed-item?
-  ;                              {:resource-type :collapsed-comments
-  ;                               :collapsed-count (count collapse-items)
-  ;                               :collapse-id (clojure.string/join "-" (map :uuid collapse-items))
-  ;                               :expanded true
-  ;                               :unseen false
-  ;                               :unseen-collapsed unseen-collapsed
-  ;                               :message (str "View " (if (some :unseen collapse-items) "new " "more ") "comments")
-  ;                               :comment-uuids (map :uuid collapse-items)})
-  ;             next-out-comments (if should-add-collapsed-item?
-  ;                                 ;; In case there are at least 3 read and not expanded items in a row
-  ;                                 ;; add a collapsed item after the first n-1 and add the last after (we want the most recent expanded)
-  ;                                 (vec (concat out-comments
-  ;                                              (mapv #(assoc % :expanded false) collapse-items)
-  ;                                              [collapsed-item]
-  ;                                              (mapv #(assoc % :expanded true) expand-items)))
-  ;                                 (vec (concat out-comments
-  ;                                              (mapv #(assoc % :expanded true) potential-collapse-items))))]
-  ;         (if (seq next-in-comments)
-  ;           (recur next-in-comments next-out-comments collapsed-map)
-  ;           next-out-comments))
-  ;       ;; First comment is unseen or expanded
-  ;       (let [next-in-comments (vec (rest in-comments))
-  ;             next-out-comments (vec (conj out-comments
-  ;                                     (assoc (first in-comments) :expanded true)))]
-  ;         (if (seq next-in-comments)
-  ;           (recur next-in-comments next-out-comments collapsed-map)
-  ;           next-out-comments)))))
+      (map #(assoc % :collapsed true) collapsed-comments)
+      expanded-comments)))))
 
 (defun add-comment-focus-value
   ([prefix :guard string? comment-data :guard map?]

@@ -86,7 +86,7 @@
 (defmethod dispatcher/action :reply-expand
   [db [_ org-slug entry-data reply-data]]
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
-    (update-reply db replies-key (:uuid entry-data) (:uuid reply-data) :expanded true)))
+    (update-reply db replies-key (:uuid entry-data) (:uuid reply-data) :collapsed false)))
 
 (defmethod dispatcher/action :reply-mark-seen
   [db [_ org-slug entry-data reply-data]]
@@ -108,7 +108,7 @@
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
     (-> db
      (update-entry replies-key (:uuid entry-data) :expanded-replies true)
-     (update-reply replies-key (:uuid entry-data) :all :expanded true)
+     (update-reply replies-key (:uuid entry-data) :all :collapsed false)
      (remove-collapse-items replies-key (:uuid entry-data)))))
 
 (defmethod dispatcher/action :replies-add
