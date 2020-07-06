@@ -239,6 +239,24 @@ div.replies-list {
             @include big_web() {
               &:hover {
                 opacity: 1;
+
+                &.following {
+                  background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+                }
+
+                &.unfollowing {
+                  background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+                }
+
+                @include dark_mode() {
+                  &.following {
+                    background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+                  }
+
+                  &.unfollowing {
+                    background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
+                  }
+                }
               }
             }
           }

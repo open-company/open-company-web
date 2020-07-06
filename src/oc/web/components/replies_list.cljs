@@ -168,6 +168,7 @@
 
 (rum/defc reply-top <
   rum/static
+  ui-mixins/refresh-tooltips-mixin
   [{:keys [current-user-id publisher board-name published-at headline links] :as entry-data}]
   (let [follow-link (utils/link-for links "follow")
         unfollow-link (utils/link-for links "unfollow")]
