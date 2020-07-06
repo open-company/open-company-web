@@ -326,7 +326,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data last-read-at current-user-id member?]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _current-user-data (drv/react s :current-user-data)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -334,7 +334,8 @@
         add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads (filter #(= (:resource-type %) :comment) @(::threads s))
-        all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))]
+        all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))
+        reply-focus-value (cu/add-comment-focus-value reply-add-comment-prefix (:uuid activity-data))]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
       (if (pos? (count threads))
@@ -367,6 +368,7 @@
                                :delete-cb (partial delete-clicked s activity-data)
                                :share-cb #(share-clicked root-comment-data)
                                :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
+                               :reply-cb #(comment-actions/reply-to reply-focus-value (:body root-comment-data) true)
                                :did-react-cb #(comment-mark-read s (:uuid root-comment-data))
                                :emoji-picker (when showing-picker?
                                                (emoji-picker-container s root-comment-data))

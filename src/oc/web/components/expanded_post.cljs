@@ -294,6 +294,7 @@
                                 :comments-data comments-data
                                 :member? user-is-part-of-the-team
                                 :last-read-at @(::initial-last-read-at s)
+                                :reply-add-comment-prefix add-comment-prefix
                                 :current-user-id current-user-id})
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment {:activity-data activity-data
