@@ -153,8 +153,8 @@
      container-seen-at :guard #(or (nil? %) (string? %))
     true]
    (let [comments-count (count comments)
-         expanded-comments (subvec comments (- comments-count 3) comments-count)
-         collapsed-comments (subvec comments 0 (- comments-count 3))
+         expanded-comments (subvec (vec comments) (- comments-count 3) comments-count)
+         collapsed-comments (subvec (vec comments) 0 (- comments-count 3))
          unseen-collapsed (filter :unseen collapsed-comments)]
      (vec (concat
       (map #(assoc % :collapsed true) collapsed-comments)
