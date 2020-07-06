@@ -876,6 +876,7 @@
     (let [activity-key (activity-key org-slug activity-id)]
       (get-in data activity-key))))
 (def activity-data-get activity-data)
+(def entry-data activity-data)
 
 (defn ^:export secure-activity-data
   "Get secure activity data."
