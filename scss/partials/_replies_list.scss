@@ -17,6 +17,60 @@ div.replies-list {
   }
 
   div.replies-list-container {
+    position: relative;
+
+    div.refresh-button-container {
+      position: fixed;
+      bottom: 24px;
+      width: #{$board_container_width}px;
+      height: 40px;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+
+      @include mobile() {
+        width: 100vw;
+      }
+
+      div.refresh-button-inner {
+        margin: 0 auto;
+        padding: 8px 32px;
+        background-color: var(--tooltip-background-color);
+        border-radius: 90px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+        width: auto;
+        display: inline-block;
+        text-align: left;
+        flex: 0 0 auto;
+
+        span.comments-number {
+          display: inline-block;
+          margin-right: 10px;
+          @include OC_Body_Book();
+          color: var(--tooltip-color);
+          font-size: 14px;
+          line-height: 24px;
+
+        }
+
+        button.refresh-button {
+          display: inline-block;
+          background-color: $wut_purple;
+          padding: 3px 12px 3px 30px;
+          height: 24px;
+          border-radius: 4px;
+          background-image: cdnUrl("/img/ML/refresh_button.svg");
+          background-size: 14px 12px;
+          background-position: left 12px top 6px;
+          background-repeat: no-repeat;
+          @include OC_Body_Book();
+          color: white;
+          font-size: 14px;
+          line-height: 18px;
+        }
+      }
+    }
 
     div.loading-updates {
       text-align: center;
@@ -234,12 +288,9 @@ div.replies-list {
 
         div.reply-item-title {
           @include activity-title(16px, 20px);
-          height: 20px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          height: 18px;
           margin-top: 8px;
+
+          @include truncate (2, 20px);
         }
       }
 
@@ -256,14 +307,14 @@ div.replies-list {
 
         @include big_web() {
 
-          & > div.reply-item-block > div.reply-comment-outer:not(.new-comment) {
+          & > div.reply-item-block > div.reply-comment-outer {
             &:hover, &.showing-picker {
               background-color: var(--comments-floating-bt-background);
               border-radius: 4px;
             }
           }
 
-          & > div.reply-item-block div.reply-item-block > div.reply-comment-outer:not(.new-comment) {
+          & > div.reply-item-block div.reply-item-block > div.reply-comment-outer {
             &:hover div.reply-comment div.reply-comment-inner,
             &.showing-picker div.reply-comment div.reply-comment-inner {
               background-color: var(--comments-floating-bt-background);

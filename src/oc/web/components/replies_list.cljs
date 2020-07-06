@@ -246,14 +246,9 @@
 
 (rum/defc collapsed-comments-button <
   rum/static
-  [{:keys [message collapsed-count comment-uuids collapse-id expand-cb unseen-collapsed]}]
+  [{:keys [message expand-cb]}]
   [:button.mlb-reset.view-more-bt
-    {:on-click expand-cb
-     :data-collapsed-count collapsed-count
-     :data-comment-uuids comment-uuids
-     :data-collapse-id collapse-id
-     :data-unseen-collapsed unseen-collapsed
-     :class (when unseen-collapsed "has-unseen")}
+    {:on-click expand-cb}
     message])
 
 (rum/defcs reply-item < rum/static
@@ -289,7 +284,8 @@
       unseen            :unseen
       published-at      :published-at
       member?           :member?
-      replies-data     :replies-data
+      replies-data      :replies-data
+      expanded-replies  :expanded-replies
       loading-comments? :loading-comments?
       :as entry-data}]
   (let [_users-info-hover (drv/react s :users-info-hover)
@@ -298,7 +294,9 @@
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class entry-data)
-        add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)]
+        add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
+        show-expand-replies? (and (not expanded-replies)
+                                  (seq (filter :collapsed replies-data)))]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
                                 :open-item true
@@ -323,19 +321,21 @@
             [:span.reply-item-loading-inner
               "Loading more replies..."]]])
       [:div.reply-item-blocks.group
+        (when show-expand-replies?
+          (rum/with-key
+           (collapsed-comments-button {:expand-cb #(replies-expand entry-data)
+                                       :message (str "View all " (count replies-data) " comments")})
+           (str "collapsed-comments-bt-" uuid "-" (count replies-data))))
         (for [reply replies-data
-              :when (not (:collapsed reply))]
-          (if (= (:resource-type reply) :collapsed-comments)
-            (rum/with-key
-             (collapsed-comments-button (assoc reply :expand-cb #(replies-expand entry-data)))
-             (str "collapsed-comments-bt-" (clojure.string/join "-" (:comment-uuids reply))))
-            (comment-item s {:entry-data entry-data
-                             :reply-data reply
-                             :is-mobile? is-mobile?
-                             :seen-reply-cb #(reply-mark-seen entry-data reply)
-                             :member? member?
-                             :reply-focus-value add-comment-focus-value
-                             :current-user-id (:user-id current-user-data)})))
+              :when (or expanded-replies
+                        (not (:collapsed reply)))]
+          (comment-item s {:entry-data entry-data
+                           :reply-data reply
+                           :is-mobile? is-mobile?
+                           :seen-reply-cb #(reply-mark-seen entry-data reply)
+                           :member? member?
+                           :reply-focus-value add-comment-focus-value
+                           :current-user-id (:user-id current-user-data)}))
         (rum/with-key
          (add-comment {:activity-data entry-data
                        :collapse? true
@@ -345,17 +345,48 @@
                        :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
          (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 
+(rum/defc refresh-button <
+  rum/static
+  [new-comments]
+  [:div.refresh-button-container
+    [:div.refresh-button-inner
+      [:span.comments-number
+        (if (pos? new-comments)
+          (str new-comments " unread comment" (when-not (= new-comments 1) "s"))
+          "New replies available")]
+      [:button.mlb-reset.refresh-button
+        {:on-click #(nav-actions/nav-to-url! % "replies" (oc-urls/replies))}
+        "Refresh"]]])
+
+(defn- count-unseen-comments [items]
+  (reduce (fn [c item]
+            (+ c (count (filter :unseen (:replies-data item)))))
+   0
+   items))
+
 (rum/defcs replies-list <
   rum/static
   rum/reactive
   (drv/drv :comment-reply-to)
   (drv/drv :add-comment-focus)
+  (drv/drv :replies-badge)
   ui-mixins/refresh-tooltips-mixin
   (seen-mixins/container-nav-mixin)
+  (rum/local 0 ::initial-unseen-comments)
+  (rum/local nil ::last-force-list-update)
+  {:will-update (fn [s]
+    (let [props (-> s :rum/args first)
+          force-list-update (:force-list-update s)]
+      (when-not (= @(::last-force-list-update s) force-list-update)
+        (reset! (::initial-unseen-comments s) (count-unseen-comments (:items-to-render props)))
+        (reset! (::last-force-list-update s) force-list-update)))
+    s)}
   [s {:keys [items-to-render container-data member? force-list-update]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         _reply-to (drv/react s :comment-reply-to)
-        _add-comment-focus (drv/react s :add-comment-focus)]
+        _add-comment-focus (drv/react s :add-comment-focus)
+        replies-badge (drv/react s :replies-badge)
+        new-comments (- (count-unseen-comments items-to-render) @(::initial-unseen-comments s))]
     [:div.replies-list
       (if (empty? items-to-render)
         [:div.replies-list-empty
@@ -383,4 +414,7 @@
               :else
               (rum/with-key
                (reply-item item-props)
-               (str "reply-" force-list-update "-" (:uuid item-props)))))])]))
+               (str "reply-" force-list-update "-" (:uuid item-props)))))
+          (when (or replies-badge
+                    (pos? new-comments))
+            (refresh-button new-comments))])]))
