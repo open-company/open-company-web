@@ -256,3 +256,22 @@
     @content
   }
 }
+
+@mixin truncate($lines, $line-height: null) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @if ($line-height) {
+    max-height: #{$line-height * $lines};
+  }
+
+  @if ($lines > 1) {
+    // Truncate last line of text preview
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+  }
+}
