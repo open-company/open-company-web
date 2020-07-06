@@ -530,8 +530,9 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn parse-comments [org-data entry-data new-comments container-seen-at full-comments-loaded?]
+(defn parse-comments [org-data entry-data new-comments container-seen-at]
   (let [old-comments (:replies-data entry-data)
+        expanded-replies? (:expanded-replies entry-data)
         old-comments-keep (map #(select-keys % [:uuid :collapsed :unseen :unwrapped-body]) old-comments)
         keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
         new-parsed-comments (mapv #(as-> % c
@@ -539,20 +540,12 @@
                                     (merge c (get keep-comments-map (:uuid c))))
                              new-comments)
         new-sorted-comments (cu/sort-comments new-parsed-comments)]
-    (cond
-      ;; We just loaded the complete list of comments from the interaction service
-      ;; and we need to re-collapse them
-      (and full-comments-loaded?
-           (not (:expanded-replies entry-data)))
-      (cu/collapse-comments new-sorted-comments)
-      ;; Just return the comments with the new one added at the end
-      ;; in case we are adding new comments
-      (or (:expanded-replies entry-data)
-          (contains? entry-data :replies-data))
+    ;; Collapse the comments only the first time or when the expanded replies
+    ;; are not already required explicitly
+    (if (or expanded-replies?
+           (contains? entry-data :replies-data))
       new-sorted-comments
-      ;; Re-collapse the comments in any other scenario
-      :else
-      (cu/collapse-comments new-sorted-comments))))
+      (cu/collapse-comments new-sorted-comments container-seen-at))))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
@@ -563,9 +556,8 @@
                               (not fallback-to-inline?))]
     (as-> entry-data e
      (assoc e :loading-comments? fallback-to-inline?)
-     (if (or (seq comments)
-             (seq (:comments full-entry)))
-       (assoc e :replies-data (parse-comments org-data e (or comments (:comments full-entry)) container-seen-at loaded-complete?))
+     (if (seq comments)
+       (assoc e :replies-data (parse-comments org-data e comments container-seen-at))
        e)
      (if (seq (:replies-data e))
        (update e :unseen-comments #(if-not (seq comments)

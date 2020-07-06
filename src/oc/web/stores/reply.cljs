@@ -52,15 +52,12 @@
 (defn- add-reply-inner [entry-uuid parsed-reply-data entries]
   (mapv (fn [entry-data]
          (if (= (:uuid entry-data) entry-uuid)
-           (update entry-data :replies-data (fn [replies-data]
-                                              (let [with-seen (map #(assoc % :unseen false) replies-data)]
-                                                (if (:expanded-replies entry-data)
-                                                  ;; If the user expanded the comments just add the new comment at the end of the list
-                                                  (vec (conj with-seen parsed-reply-data))
-                                                  ;; Otherwise re-apply the collapse logic to the new list
-                                                  (cu/collapse-comments
-                                                   (filterv #(= (:resource-type %) :comment)
-                                                    (vec (conj with-seen parsed-reply-data))))))))
+           (-> entry-data
+            (update :replies-data (fn [replies-data]
+                                    ;; Mark all previous comments as unseen when adding a new comment
+                                    (let [with-seen (map #(assoc % :unseen false) replies-data)]
+                                      (vec (concat with-seen [parsed-reply-data])))))
+            (assoc :unseen-comments false))
            entry-data))
    entries))
 
@@ -108,16 +105,11 @@
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
     (-> db
      (update-entry replies-key (:uuid entry-data) :expanded-replies true)
-     (update-reply replies-key (:uuid entry-data) :all :collapsed false)
      (remove-collapse-items replies-key (:uuid entry-data)))))
 
 (defmethod dispatcher/action :replies-add
   [db [_ org-slug entry-data parsed-reply-data]]
   (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
-    (-> db
-     ;; Add the new comment as last comment
-     (add-reply replies-key (:uuid entry-data) parsed-reply-data)
-     ;; Mark entry seen
-     (update-entry replies-key (:uuid entry-data) :unseen false)
-     (update-entry replies-key (:uuid entry-data) :unseen-comments false))))
+    ;; Add the new comment as last comment
+    (add-reply db replies-key (:uuid entry-data) parsed-reply-data)))
 

@@ -130,28 +130,33 @@
    Also add unseen? flag to every unseen one. Add a count of the collapsed
    comments to each root comment."
 
-   ([_comments :guard empty?]
+   ([_comments :guard empty?
+     _container-seen-at]
     [])
+  ;; Add :unseen info to each comment before entering the recursion
+  ([comments :guard coll?
+    container-seen-at :guard #(or (nil? %) (string? %))]
+   (let [first-unseen-comment-index (utils/index-of comments :unseen)]
+     (if first-unseen-comment-index
+       (let [[seen-comments unseen-comments] (split-at first-unseen-comment-index (vec comments))]
+         (concat (collapse-comments seen-comments container-seen-at true)
+                 unseen-comments))
+       (collapse-comments comments container-seen-at true))))
   ;; When we have less than 4 comments we always show all of them
   ([comments :guard #(and (coll? %)
-                          (<= (count %) 3))]
-   comments)
-  ;; Add :unseen info to each comment before entering the recursion
+                          (<= (count %) 3))
+    container-seen-at :guard #(or (nil? %) (string? %))
+    true]
+   (map #(assoc % :collapsed false) comments))
   ([comments :guard (fn [cs] (and (coll? cs)
-                                  (> (count cs) 3)))]
+                                  (> (count cs) 3)))
+     container-seen-at :guard #(or (nil? %) (string? %))
+    true]
    (let [comments-count (count comments)
          expanded-comments (subvec comments (- comments-count 3) comments-count)
          collapsed-comments (subvec comments 0 (- comments-count 3))
          unseen-collapsed (filter :unseen collapsed-comments)]
      (vec (concat
-      [{:resource-type :collapsed-comments
-        :collapsed-count (count collapsed-comments)
-        :collapse-id (clojure.string/join "-" (map :uuid collapsed-comments))
-        :collapsed false
-        :unseen false
-        :unseen-collapsed (boolean (seq unseen-collapsed))
-        :message (str "View all " (count comments) " comments")
-        :comment-uuids (map :uuid collapsed-comments)}]
       (map #(assoc % :collapsed true) collapsed-comments)
       expanded-comments)))))
 
