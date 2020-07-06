@@ -319,7 +319,7 @@
           [:div.reply-item-loading.group
             (small-loading)
             [:span.reply-item-loading-inner
-              "Loading more replies..."]]])
+              "Loading replies..."]]])
       [:div.reply-item-blocks.group
         (when show-expand-replies?
           (rum/with-key
