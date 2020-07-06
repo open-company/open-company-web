@@ -93,6 +93,21 @@ div.paginated-stream {
           }
         }
       }
+
+      div.virtualized-list-container {
+        position: relative;
+
+        div.refresh-button-container {
+          position: fixed;
+          bottom: 24px;
+          width: #{$board_container_width}px;
+          height: 40px;
+
+          @include mobile() {
+            width: 100vw;
+          }
+        }
+      }
     }
 
     div.load-next {

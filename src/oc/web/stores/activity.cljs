@@ -399,7 +399,7 @@
       (add-remove-item-from-follow org-slug fixed-activity-data false)
       (add-remove-item-from-board org-slug fixed-activity-data)
       (add-remove-item-from-contributions org-slug fixed-activity-data)
-      ; (update-in dispatcher/force-list-update-key force-list-update-value)
+      (update-in dispatcher/force-list-update-key force-list-update-value)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 

@@ -15,18 +15,19 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.reply :as reply-actions]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.actions.reply :as reply-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
@@ -345,19 +346,6 @@
                        :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
          (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 
-(rum/defc refresh-button <
-  rum/static
-  [new-comments]
-  [:div.refresh-button-container
-    [:div.refresh-button-inner
-      [:span.comments-number
-        (if (pos? new-comments)
-          (str new-comments " unread comment" (when-not (= new-comments 1) "s"))
-          "New replies available")]
-      [:button.mlb-reset.refresh-button
-        {:on-click #(nav-actions/nav-to-url! % "replies" (oc-urls/replies))}
-        "Refresh"]]])
-
 (defn- count-unseen-comments [items]
   (reduce (fn [c item]
             (+ c (count (filter :unseen (:replies-data item)))))
@@ -417,4 +405,6 @@
                (str "reply-" force-list-update "-" (:uuid item-props)))))
           (when (or replies-badge
                     (pos? new-comments))
-            (refresh-button new-comments))])]))
+            (refresh-button {:message (if (pos? new-comments)
+                                        (str new-comments " unread comment" (when-not (= new-comments 1) "s"))
+                                        "New replies available")}))])]))
