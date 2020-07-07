@@ -13,7 +13,6 @@
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
@@ -40,7 +39,6 @@
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (drv/drv :cmail-state)
-                    (drv/drv :editable-boards)
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
                     (rum/local nil ::throttled-scroll-check)
@@ -93,10 +91,6 @@
                        :else
                        (:name board-data))
          search-active? (drv/react s search/search-active?)
-         editable-boards (drv/react s :editable-boards)
-         can-compose? (pos? (count editable-boards))
-         show-plus-button? (and (not is-mobile?)
-                                can-compose?)
          org-slug (router/current-org-slug)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
@@ -137,21 +131,6 @@
                 (search-box)])
             (if (jwt/jwt)
               [:div.navbar-right.group
-                {:class (utils/class-set {:create-post show-plus-button?})}
-                (when show-plus-button?
-                  [:button.mlb-reset.navbar-create-bt
-                    {:class (utils/class-set {:scrolled @(::scrolled s)})
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "bottom"
-                     :data-container "body"
-                     :title (str utils/default-body-placeholder "?")
-                     :on-click #(if (:collapsed cmail-state)
-                                  (do
-                                    (.stopPropagation %)
-                                    (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
-                                  (cmail-actions/cmail-toggle-fullscreen))}
-                    [:span.plus-icon]
-                    [:span.plus-icon-active]])
                 [:div.user-menu
                   [:div.user-menu-button
                     {:ref "user-menu"
