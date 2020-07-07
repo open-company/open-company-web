@@ -268,11 +268,7 @@
           [:div.left-navigation-sidebar-footer
             (when show-plus-button?
               [:button.mlb-reset.create-bt
-                {:data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "right"
-                 :data-container "body"
-                 :title (str utils/default-body-placeholder "?")
-                 :on-click #(if (:collapsed cmail-state)
+                {:on-click #(if (:collapsed cmail-state)
                               (do
                                 (.stopPropagation %)
                                 (ui-compose show-add-post-tooltip))

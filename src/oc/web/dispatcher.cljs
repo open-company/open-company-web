@@ -246,6 +246,14 @@
 ; (defn container-seen-key [org-slug container-id]
 ;   (vec (conj (org-seens-key org-slug) (keyword container-id))))
 
+;; Cmail keys
+
+(def cmail-state-key [:cmail-state])
+
+(def cmail-data-key [:cmail-data])
+
+;; Boards helpers
+
 (defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
         filter-fn (if (= board-slug utils/default-drafts-board-slug)
@@ -603,7 +611,7 @@
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
-                               :cmail-state (:cmail-state base)
+                               :cmail-state (get-in base cmail-state-key)
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
                                :search-active search-active
@@ -617,8 +625,8 @@
    :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
    :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]
    ;; Cmail
-   :cmail-state           [[:base] (fn [base] (:cmail-state base))]
-   :cmail-data            [[:base] (fn [base] (:cmail-data base))]
+   :cmail-state           [[:base] (fn [base] (get-in base cmail-state-key))]
+   :cmail-data            [[:base] (fn [base] (get-in base cmail-data-key))]
    :reminders-data        [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminders-data-key org-slug)))]
    :reminders-roster      [[:base :org-slug] (fn [base org-slug]
@@ -1039,6 +1047,16 @@
 ;  ([container-id] (container-seen-data @app-state (router/current-org-slug) container-id))
 ;  ([org-slug container-id] (container-seen-data @app-state org-slug container-id))
 ;  ([data org-slug container-id] (get-in data (container-seen-key org-slug container-id))))
+
+;; Cmail
+
+(defn ^:export cmail-data
+  ([] (cmail-data @app-state))
+  ([data] (get-in data cmail-data-key)))
+
+(defn ^:export cmail-state
+  ([] (cmail-state @app-state))
+  ([data] (get-in data cmail-state-key)))
 
 ;; Reminders
 

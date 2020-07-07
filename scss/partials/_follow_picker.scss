@@ -212,7 +212,7 @@ div.follow-picker {
         div.follow-picker-empty-users {
 
           div.invite-users-box {
-            width: 640px;
+            width: #{$modal_width}px;
             border: 1px solid var(--opac-background-color-08);
             border-radius: 6px;
 

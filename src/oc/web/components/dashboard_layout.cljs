@@ -17,12 +17,12 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
@@ -53,7 +53,6 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
-                              (drv/drv :cmail-data)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -129,7 +128,6 @@
                                      (not is-container?)
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
-        _cmail-data (drv/react s :cmail-data)
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -229,7 +227,9 @@
             ;           {:class (when is-second-user "second-user")}]]]))
             (when (and (not is-mobile?)
                        can-compose?)
-               (cmail))
+               [:button.mlb-reset.quick-post-bt
+                 {:on-click #(cmail-actions/cmail-expand)}
+                 (str utils/default-body-placeholder "?")])
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner board-container-data)])

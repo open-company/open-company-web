@@ -177,7 +177,8 @@
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline clean-headline
                                                        :has-changes true})])
       (reset! (::post-tt-kw state) post-button-title)
-      (debounced-autosave! state))))
+      (debounced-autosave! state))
+    (reset! (::top-padding state) (.. headline -parentElement -scrollHeight))))
 
 ;; Headline setup and paste handler
 
@@ -327,12 +328,14 @@
                    (rum/local false ::show-sections-picker)
                    (rum/local nil ::last-body)
                    (rum/local nil ::post-tt-kw)
+                   (rum/local 68 ::top-padding)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
                    ;; Go back to collapsed state on desktop if user didn't touch anything
                    (when-not (responsive/is-mobile-size?)
                      (mixins/on-window-click-mixin collapse-if-needed))
+                   mixins/no-scroll-mixin
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-window-click-mixin (fn [s e]
@@ -365,13 +368,13 @@
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state))
                       (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title)))
-                    (when (responsive/is-mobile-size?)
-                      (dom-utils/lock-page-scroll))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
+                    (when-let [headline (headline-element s)]
+                      (reset! (::top-padding s) (.. headline -parentElement -scrollHeight)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -443,8 +446,6 @@
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
-                    (when (responsive/is-mobile-size?)
-                      (dom-utils/unlock-page-scroll))
                     (when-let [debounced-autosave @(::debounced-autosave s)]
                       (.dispose debounced-autosave))
                     s)}
@@ -521,19 +522,23 @@
     [:div.cmail-outer
       {:class (utils/class-set {:quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
-       :on-click (when (and (not is-mobile?)
-                            (:collapsed cmail-state)
-                            (not show-paywall-alert?))
+       :on-click (when (not is-mobile?)
+                 (if-not (:collapsed cmail-state)
                    (fn [e]
-                      (nux-actions/dismiss-add-post-tooltip)
-                      (cmail-actions/cmail-expand cmail-data cmail-state)
-                      (utils/after 280
-                       #(when-let [el (headline-element s)]
-                          (.focus el)))))}
+                     (when-not (utils/event-inside? e (rum/ref-node s :cmail-container))
+                       (close-cb e)))
+                   (when-not show-paywall-alert?
+                     (fn [e]
+                        (nux-actions/dismiss-add-post-tooltip)
+                        (cmail-actions/cmail-expand cmail-data cmail-state)
+                        (utils/after 280
+                         #(when-let [el (headline-element s)]
+                            (.focus el)))))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state))
         (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
+        {:ref :cmail-container}
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
@@ -551,12 +556,14 @@
           [:button.mlb-reset.dismiss-inline-cmail
             {:on-click close-cb
              :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "right"
+             :data-placement "top"
              :title (if unpublished?
                       "Save & Close"
                       "Close")}]]
         [:div.cmail-content-outer
-          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
+           :style (when-not is-mobile?
+                    {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
             {:class (when show-section-picker? "section-picker-visible")}
             (when is-mobile?

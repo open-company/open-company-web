@@ -122,11 +122,15 @@
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
-(defn cmail-expand [initial-entry-data cmail-state]
+(defn cmail-expand
+ ([]
+  (cmail-expand (dis/cmail-data) {:collapsed false :key (utils/activity-uuid)}))
+
+ ([initial-entry-data cmail-state]
   (cook/remove-cookie! (cmail-fullscreen-cookie))
   (save-edit-open-cookie initial-entry-data)
   (load-cached-item initial-entry-data :cmail-data
-   #(dis/dispatch! [:input [:cmail-state] (merge cmail-state {:collapsed false})])))
+   #(dis/dispatch! [:input [:cmail-state] (merge cmail-state {:collapsed false})]))))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
