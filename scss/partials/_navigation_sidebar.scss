@@ -52,8 +52,7 @@
     float: right;
     width: 8px;
     height: 8px;
-    background-color: $wut_purple;
-    border: 1px solid var(--color);
+    background-color: var(--navigation-sidebar-badge-color);
     border-radius: 50%;
     margin-right: 20px;
     margin-top: 8px;
@@ -109,7 +108,8 @@
 }
 
 @mixin item-selected() {
-  background-color: $wut_purple;
+  -webkit-tap-highlight-color: var(--navigation-sidebar-hover-bg);
+  background-color: var(--navigation-sidebar-hover-bg);
   outline: none;
   border-radius: 4px;
 
@@ -118,7 +118,6 @@
   }
 
   .internal, div.nav-link-label {
-    // color: $wut_purple;
     @include OC_Body_Book();
     font-size: 14px;
     text-decoration: none;
@@ -135,8 +134,7 @@
     }
 
     span.unread-dot {
-      border: 1px solid white;
-      background-color: var(--tooltip-color);
+      background-color: var(--navigation-sidebar-badge-color);
     }
 
     @include mobile() {
@@ -154,8 +152,7 @@
   }
 
   span.unread-dot {
-    border: 1px solid white;
-    background-color: var(--tooltip-color);
+    background-color: var(--navigation-sidebar-badge-color);
   }
 
   div.nav-link-label {
@@ -240,7 +237,6 @@ div.left-navigation-sidebar {
   overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
-  // height: calc(100vh - #{$navbar_height + 1}px);
   @include no-user-select();
   padding: 24px 0 0;
 
@@ -375,7 +371,7 @@ div.left-navigation-sidebar {
       }
 
       &.item-selected {
-        @include item-selected();
+        @include item-hover();
       }
     }
 
@@ -430,16 +426,6 @@ div.left-navigation-sidebar {
         }
       }
 
-      &.item-selected {
-        div.nav-link-icon {
-          background-image: cdnUrl("/img/ML/nav_home@dark.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/nav_home@dark.svg");
-          }
-        }
-      }
-
       @include big_web() {
         &:hover {
           button.home-ellipsis-bt {
@@ -488,16 +474,6 @@ div.left-navigation-sidebar {
           background-image: cdnUrl("/img/ML/nav_all@dark.svg");
         }
       }
-
-      &.item-selected {
-        div.nav-link-icon {
-          background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/nav_all@dark.svg");
-          }
-        }
-      }
     }
 
     &.replies-view {
@@ -509,12 +485,6 @@ div.left-navigation-sidebar {
           background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
         }
       }
-
-      &.item-selected {
-        div.nav-link-icon {
-          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
-        }
-      }
     }
 
     &.my-posts {
@@ -523,12 +493,6 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/nav_my_posts.svg");
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/nav_my_posts@dark.svg");
-        }
-      }
-
-      &.item-selected {
-        div.nav-link-icon {
           background-image: cdnUrl("/img/ML/nav_my_posts@dark.svg");
         }
       }
@@ -549,16 +513,6 @@ div.left-navigation-sidebar {
           background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
         }
       }
-
-      &.item-selected {
-        div.nav-link-icon {
-          background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
-          }
-        }
-      }
     }
 
     &.drafts {
@@ -577,16 +531,6 @@ div.left-navigation-sidebar {
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
-        }
-      }
-
-      &.item-selected {
-        div.nav-link-icon {
-          background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
-          }
         }
       }
 
@@ -795,25 +739,6 @@ div.left-navigation-sidebar {
             @include item-hover();
           }
         }
-
-        &.item-selected {
-          @include item-selected();
-
-          div.public {
-            background-image: cdnUrl("/img/ML/board_public_white.svg");
-            opacity: 1;
-          }
-
-          div.private {
-            background-image: cdnUrl("/img/ML/board_private_white.svg");
-            opacity: 1;
-          }
-
-          div.team {
-            background-image: cdnUrl("/img/ML/number_sign@dark.svg");
-            opacity: 1;
-          }
-        }
       }
 
       div.public {
@@ -929,40 +854,99 @@ div.left-navigation-sidebar {
     width: 100%;
     overflow: visible;
     padding: 0 0 16px;
-
-    &.top-border {
-      margin-top: 16px;
-      border-top: 1px solid var(--opac-background-color-08);
-      padding-top: 16px;
-    }
+    margin-top: 16px;
 
     @include mobile() {
       display: none;
     }
 
-    button.invite-people-bt {
+    div.invite-people-box {
+      margin-top: 16px;
+      position: relative;
       width: 100%;
-      height: 32px;
-      text-align: left;
-      padding-left: 40px;
-      border-radius: 4px;
-      background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-      background-size: 14px 14px;
-      background-position: left 17px top 9px;
+      padding: 22px 22px 136px 22px;
+      @include image-2x("/img/ML/invite_box");
+      background-position: bottom 0px left 50%;
       background-repeat: no-repeat;
-      @include OC_Body_Book();
-      font-size: 14px;
-      color: var(--color);
-      line-height: 18px;
+      background-size: 117px 120px;
+      background-color: white;
+      border: 1px solid #DCDDE1;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+      border-radius: 8px;
 
-      @include big_web(){
-        &:hover {
-          background-color: var(--navigation-sidebar-hover-bg);
+      button.invite-people-close {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background-image: cdnUrl("/img/ML/close_x.svg");
+        background-size: 8px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+      }
+
+      label.explore-label {
+        text-align: center;
+        @include OC_Body_Bold();
+        font-size: 18px;
+        line-height: 20px;
+        color: $deep_navy;
+        margin-bottom: 16px;
+      }
+      
+      button.invite-people-bt {
+        width: 100%;
+        height: 34px;
+        padding: 8px;
+        text-align: center;
+        border-radius: 4px;
+        background-color: $wut_feint_purple;
+        color: $wut_purple;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+      }
+    }
+
+    button.create-bt {
+      border-radius: 4px;
+      width: 100%;
+      height: 34px;
+      padding: 0;
+      position: relative;
+      background-color: var(--navigation-sidebar-create-bt-background);
+      color: var(--navigation-sidebar-create-bt-color);
+      transition: background-color 180ms ease-in;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+
+      span.plus-icon {
+        width: 11px;
+        height: 11px;
+        background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+        background-size: 11px 11px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: auto;
+        margin-right: 10px;
+        flex: 0 0 auto;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/add_to_board_plus.svg");
         }
       }
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+      span.copy-text {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--navigation-sidebar-create-bt-color);
+        flex: 0 0 auto;
+        margin-right: auto;
       }
     }
   }

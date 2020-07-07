@@ -15,6 +15,7 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -51,11 +52,15 @@
                                 (drv/drv :following-badge)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
+                                (drv/drv :editable-boards)
+                                (drv/drv :cmail-state)
+                                (drv/drv :show-add-post-tooltip)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
+                                (rum/local true ::show-invite-people?)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -140,7 +145,13 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        show-topics user-is-part-of-the-team?]
+        show-topics user-is-part-of-the-team?
+        show-add-post-tooltip (drv/react s :show-add-post-tooltip)
+        editable-boards (drv/react s :editable-boards)
+        cmail-state (drv/react s :cmail-state)
+        can-compose? (pos? (count editable-boards))
+        show-plus-button? (and (not is-mobile?)
+                                can-compose?)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)})
@@ -252,8 +263,30 @@
                   "Drafts"]
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
-        (when show-invite-people?
-          [:div.left-navigation-sidebar-footer.top-border
-            [:button.mlb-reset.invite-people-bt
-              {:on-click #(nav-actions/show-org-settings :invite-picker)}
-              "Invite your team"]])]]))
+        (when (or show-invite-people?
+                  show-plus-button?)
+          [:div.left-navigation-sidebar-footer
+            (when show-plus-button?
+              [:button.mlb-reset.create-bt
+                {:data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "right"
+                 :data-container "body"
+                 :title (str utils/default-body-placeholder "?")
+                 :on-click #(if (:collapsed cmail-state)
+                              (do
+                                (.stopPropagation %)
+                                (ui-compose show-add-post-tooltip))
+                              (cmail-actions/cmail-toggle-fullscreen))}
+                [:span.plus-icon]
+                [:span.copy-text
+                  "New update"]])
+            (when (and show-invite-people?
+                       @(::show-invite-people? s))
+              [:div.invite-people-box
+                [:button.mlb-reset.invite-people-close
+                  {:on-click #(reset! (::show-invite-people? s) false)}]
+                [:label.explore-label
+                  "Explore Wut together"]
+                [:button.mlb-reset.invite-people-bt
+                  {:on-click #(nav-actions/show-org-settings :invite-picker)}
+                  "Invite teammates"]])])]]))
