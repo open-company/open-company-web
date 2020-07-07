@@ -869,22 +869,30 @@ div.left-navigation-sidebar {
       background-position: bottom 0px left 50%;
       background-repeat: no-repeat;
       background-size: 117px 120px;
-      background-color: white;
-      border: 1px solid #DCDDE1;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+      background-color: var(--navigation-sidebar-invite-background);
+      border: var(--navigation-sidebar-invite-border);
+      box-shadow: var(--navigation-sidebar-invite-shadow);
       border-radius: 8px;
+
+      @include dark_mode() {
+        @include image-2x("/img/ML/invite_box@dark");
+      }
 
       button.invite-people-close {
         width: 24px;
         height: 24px;
         position: absolute;
-        top: 8px;
-        left: 8px;
+        top: 4px;
+        left: 4px;
         background-image: cdnUrl("/img/ML/close_x.svg");
         background-size: 8px 8px;
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/close_x@dark.svg");
+        }
       }
 
       label.explore-label {
@@ -892,7 +900,7 @@ div.left-navigation-sidebar {
         @include OC_Body_Bold();
         font-size: 18px;
         line-height: 20px;
-        color: $deep_navy;
+        color: var(--color);
         margin-bottom: 16px;
       }
       
@@ -902,8 +910,8 @@ div.left-navigation-sidebar {
         padding: 8px;
         text-align: center;
         border-radius: 4px;
-        background-color: $wut_feint_purple;
-        color: $wut_purple;
+        background-color: var(--navigation-sidebar-create-bt-background);
+        color: var(--navigation-sidebar-create-bt-color);
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 18px;
@@ -936,7 +944,7 @@ div.left-navigation-sidebar {
         flex: 0 0 auto;
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/add_to_board_plus.svg");
+          background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
         }
       }
 

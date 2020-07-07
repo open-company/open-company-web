@@ -60,6 +60,9 @@ $dark_mode: "dark";
   --navigation-sidebar-badge-color: #21B368;
   --navigation-sidebar-create-bt-background: #{$wut_purple};
   --navigation-sidebar-create-bt-color: white;
+  --navigation-sidebar-invite-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  --navigation-sidebar-invite-border: 1px solid #DCDDE1;
+  --navigation-sidebar-invite-background: white;
 
   // Notifications tray
   --notifications-item-background: #848D95;
@@ -170,11 +173,14 @@ $dark_mode: "dark";
   --foc-box-shadow: rgba(255, 255, 255, 0.11);
 
   //Navigation item
-  --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
-  --navigation-sidebar-hover-bg: #{rgba(white, 0.03)};
+  --navigation-sidebar-count-bg: #{rgba(white, 0.11)};
+  --navigation-sidebar-hover-bg: #{rgba(white, 0.09)};
   --navigation-sidebar-badge-color: #21B368;
   --navigation-sidebar-create-bt-background: white;
   --navigation-sidebar-create-bt-color: #{$wut_purple};
+  --navigation-sidebar-invite-shadow: 0 2px 4px 0 rgba(255, 255, 255, 0.11);
+  --navigation-sidebar-invite-border: 1px solid #{rgba(white, 0.08)};
+  --navigation-sidebar-invite-background: #{rgba(white, 0.09)};
 
   // Notifications tray
   --notifications-item-background: #1B202A;
