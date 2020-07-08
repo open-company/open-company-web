@@ -18,11 +18,11 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
@@ -53,6 +53,7 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
+                              (drv/drv :cmail-data)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
@@ -128,6 +129,7 @@
                                      (not is-container?)
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
+        _cmail-data (drv/react s :cmail-data)
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
@@ -145,7 +147,16 @@
                                  (not is-drafts-board)
                                  (map? board-container-data)
                                  (not (:following board-container-data)))
-        followers-boards-count (drv/react s :followers-boards-count)]
+        followers-boards-count (drv/react s :followers-boards-count)
+        cmail-container-el (.querySelector js/document "div.org-dashboard-cmail-container")
+        cmail-fn (when (and (not is-mobile?)
+                       can-compose?)
+                   (if (and (:fullscreen cmail-state)
+                            (= (.-nodeType cmail-container-el) js/Node.-elementNode))
+                     #(rum/portal
+                       (cmail)
+                       cmail-container-el)
+                     #(cmail)))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:search-active search-active?})}
@@ -225,11 +236,8 @@
             ;               "New post"])
             ;         [:div.add-post-tooltip-box.big-web-only
             ;           {:class (when is-second-user "second-user")}]]]))
-            (when (and (not is-mobile?)
-                       can-compose?)
-               [:button.mlb-reset.quick-post-bt
-                 {:on-click #(cmail-actions/cmail-expand)}
-                 (str utils/default-body-placeholder "?")])
+            (when (fn? cmail-fn)
+              (cmail-fn))
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner board-container-data)])

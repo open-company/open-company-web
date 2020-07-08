@@ -147,8 +147,9 @@
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))
-        show-cmail? (and cmail-state
-                         (not (:collapsed cmail-state)))
+        show-mobile-cmail? (and cmail-state
+                                (not (:collapsed cmail-state))
+                                is-mobile?)
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
@@ -247,9 +248,12 @@
             (if portal-element
               (rum/portal (activity-share) portal-element)
               (activity-share))))
-        ;; cmail editor
-        (when show-cmail?
+        ;; Cmail mobile editor
+        (when show-mobile-cmail?
           (cmail))
+        ;; cmail editor fullscreen container for portal
+        ;; DO NOT REMOVE
+        [:div.org-dashboard-cmail-container]
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
         (when (or (not is-mobile?)
@@ -266,7 +270,7 @@
         (when (or ;; On mobile don't show the dashboard/stream when showing another panel
                   (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-cmail?)
+                       (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
             (when show-trial-expired?
