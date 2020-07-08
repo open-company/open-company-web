@@ -44,6 +44,14 @@
      (dom-utils/unlock-page-scroll)
      state)})
 
+(def mounted-flag
+  "Adds a flag to the component state with a boolean value.
+   It's true if the component is currently mounted,
+   false if not or is being unmounted."
+  {:init #(assoc % ::mounted? false)
+   :did-mount #(assoc % ::mounted? true)
+   :will-unmount #(assoc % ::mounted? false)})
+
 (def first-render-mixin
   "This mixin will add a :first-render-done atom to your component state. It will
    be false when the component is not mounted, and true when it is. Very useful for
@@ -305,3 +313,33 @@
           (events/unlistenByKey @lst)
           (reset! lst nil))
        s)})))
+
+(defn on-click-out
+ "C"
+ ([callback] (on-click-out nil callback))
+ ([optional-ref callback]
+  (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
+    {:will-mount (fn [s]
+       (assoc s ::click-out-mounted? (atom true)))
+     :did-mount (fn [s]
+       (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
+                                (fn [e]
+                                 (when @(::click-out-mounted? s)
+                                   (when-let [node (cond
+                                                     (fn? optional-ref)
+                                                     (rum/ref-node s (optional-ref s))
+                                                     (not (nil? optional-ref))
+                                                     (rum/ref-node s optional-ref)
+                                                     :else
+                                                     (rum/dom-node s))]
+                                     (when (and (not (utils/event-inside? e node))
+                                                (fn? callback))
+                                       (callback s e))))))]
+         (assoc s click-out-kw on-click-listener)))
+     :will-unmount (fn [s]
+       (reset! (::click-out-mounted? s) false)
+       (if (click-out-kw s)
+         (do
+           (events/unlistenByKey (click-out-kw s))
+           (dissoc s click-out-kw))
+         s))})))

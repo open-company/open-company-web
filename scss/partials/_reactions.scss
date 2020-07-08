@@ -97,6 +97,10 @@ div.reactions {
           div.count {
             color: $wut_purple;
             @include OC_Body_Bold();
+
+            @include dark_mode() {
+              color: $wut_purple;
+            }
           }
         }
       }

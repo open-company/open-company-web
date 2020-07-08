@@ -21,16 +21,7 @@
 (rum/defcs reactions < (rum/local false ::show-picker)
                        (rum/local false ::mounted)
                        ui-mixins/refresh-tooltips-mixin
-                       (ui-mixins/on-window-click-mixin (fn [s e]
-                        (when (and @(::mounted s)
-                                   (not (utils/event-inside? e (rum/dom-node s))))
-                          (reset! (::show-picker s) false))))
-                       {:did-mount (fn [s]
-                        (reset! (::mounted s) true)
-                        s)
-                       :will-unmount (fn [s]
-                        (reset! (::mounted s) false)
-                        s)}
+                       (ui-mixins/on-click-out #(reset! (::show-picker %1) false))
   [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb only-thumb?]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means

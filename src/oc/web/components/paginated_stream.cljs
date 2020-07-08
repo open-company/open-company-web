@@ -109,25 +109,19 @@
 (rum/defcs virtualized-stream < rum/static
                                 rum/reactive
                                 (rum/local nil ::last-force-list-update)
-                                (rum/local false ::mounted)
                                 (seen-mixins/container-nav-mixin)
+                                mixins/mounted-flag
                                 {:will-mount (fn [s]
                                    (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
                                    s)
-                                 :did-mount (fn [s]
-                                   (reset! (::mounted s) true)
-                                   s)
                                  :did-remount (fn [o s]
-                                   (when @(::mounted s)
+                                   (when (::mixins/mounted? s)
                                      (when-let [force-list-update (-> s :rum/args first :force-list-update)]
                                        (when-not (= @(::last-force-list-update s) force-list-update)
                                          (reset! (::last-force-list-update s) force-list-update)
                                          (utils/after 180
-                                          #(when @(::mounted s)
+                                          #(when (::mixins/mounted? s)
                                              (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))))
-                                   s)
-                                 :will-unmount (fn [s]
-                                   (reset! (::mounted s) false)
                                    s)}
   [s {:keys [items
              activities-read

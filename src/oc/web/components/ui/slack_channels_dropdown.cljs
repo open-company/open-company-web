@@ -4,7 +4,7 @@
             [cuerdas.core :as string]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :refer (on-click-out)]))
 
 (defn filter-team-channels [channels s]
   (let [look-for (string/lower
@@ -19,9 +19,8 @@
                                      (rum/local "" ::slack-channel)
                                      (rum/local false ::typing)
                                      rum/reactive
-                                     (on-window-click-mixin (fn [s e]
-                                      (when (and @(::show-channels-dropdown s)
-                                                (not (utils/event-inside? e (rum/dom-node s))))
+                                     (on-click-out (fn [s e]
+                                      (when @(::show-channels-dropdown s)
                                        (reset! (::show-channels-dropdown s) false))))
                                      (drv/drv :team-data)
                                      (drv/drv :team-channels)

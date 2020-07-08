@@ -24,11 +24,10 @@
   {:value nil :label :divider-line}."
   < rum/static
     ;; Mixins
-    (ui-mixins/on-window-click-mixin (fn [s e]
-     (when-not (utils/event-inside? e (rum/ref-node s :dropdown-list))
-       (let [on-blur (:on-blur (first (:rum/args s)))]
-         (when (fn? on-blur)
-           (on-blur))))))
+    (ui-mixins/on-click-out :dropdown-list (fn [s e]
+     (let [on-blur (:on-blur (first (:rum/args s)))]
+       (when (fn? on-blur)
+         (on-blur)))))
     ui-mixins/refresh-tooltips-mixin
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
   (let [fixed-items (map #(if-not (contains? % :label)

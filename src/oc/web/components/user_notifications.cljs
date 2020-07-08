@@ -214,8 +214,8 @@
                  children-key)))))]]))
 
 (defn- close-tray [s]
-  (reset! (::tray-open s) false)
-  (user-actions/read-notifications))
+  (when (compare-and-set! (::tray-open s) true false)
+    (user-actions/read-notifications)))
 
 (rum/defcs user-notifications-button < rum/static
                                        rum/reactive
@@ -223,12 +223,9 @@
                                        (rum/local false ::tray-open)
                                        ; (rum/local (rum/create-ref) ::list-ref)
                                        ui-mixins/refresh-tooltips-mixin
-                                       (ui-mixins/on-window-click-mixin (fn [s e]
+                                       (ui-mixins/on-click-out "user-notifications-list" (fn [s e]
                                         (when-let [user-notifications-node (rum/ref-node s "user-notifications-list")]
-                                          (when (and @(::tray-open s)
-                                                     (.-parentElement user-notifications-node)
-                                                     (not (utils/event-inside? e user-notifications-node)))
-
+                                          (when (.-parentElement user-notifications-node)
                                             (close-tray s)))))
                                        {:will-mount (fn [s]
                                          (when (responsive/is-mobile-size?)

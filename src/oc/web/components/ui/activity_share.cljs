@@ -12,7 +12,7 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.mixins.ui :refer (on-click-out)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]
@@ -52,9 +52,7 @@
                             (rum/local :team ::url-audience)
                             ;; Mixins
                             mixins/first-render-mixin
-                            (on-window-click-mixin (fn [s e]
-                              (when-not (utils/event-inside? e (rum/dom-node s))
-                                (close-clicked s))))
+                            (on-click-out #(close-clicked %1))
                             {:will-mount (fn [s]
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))

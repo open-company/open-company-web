@@ -10,8 +10,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
-            [oc.web.stores.search :as store]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)])
+            [oc.web.stores.search :as store])
   (:import [goog.async Debouncer]))
 
 (rum/defcs entry-display < rum/static

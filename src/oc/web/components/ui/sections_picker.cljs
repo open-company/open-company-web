@@ -6,7 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :refer (on-click-out)]))
 
 (def self-board-name "All")
 
@@ -31,9 +31,8 @@
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
-                             (on-window-click-mixin (fn [s e]
-                              (when-not (utils/event-inside? e (rum/dom-node s))
-                                (dis/dispatch! [:input [:show-sections-picker] false]))))
+                             (on-click-out (fn [s e]
+                              (dis/dispatch! [:input [:show-sections-picker] false])))
                              ;; Derivatives
                              (drv/drv :org-data)
                              (drv/drv :editable-boards)

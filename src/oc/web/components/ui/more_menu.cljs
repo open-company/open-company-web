@@ -58,12 +58,11 @@
                        (rum/local false ::move-activity)
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
-                       (ui-mixins/on-window-click-mixin (fn [s e]
-                        (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
-                          (when-let [will-close (-> s :rum/args first :will-close)]
-                            (when (fn? will-close)
-                              (will-close)))
-                         (reset! (::showing-menu s) false))))
+                       (ui-mixins/on-click-out "more-menu" (fn [s e]
+                        (when-let [will-close (-> s :rum/args first :will-close)]
+                          (when (fn? will-close)
+                            (will-close)))
+                        (reset! (::showing-menu s) false)))
                        {:did-mount (fn [s]
                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                        s)

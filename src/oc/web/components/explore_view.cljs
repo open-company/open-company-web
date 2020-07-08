@@ -24,10 +24,10 @@
   (drv/drv :follow-boards-list)
   (drv/drv :followers-boards-count)
   (rum/local nil ::dropdown-menu)
-  (ui-mixins/on-window-click-mixin (fn [s e]
-    (when (and (seq @(::dropdown-menu s))
-               (not (utils/event-inside? e (rum/ref-node s (str "dropdown-menu-" @(::dropdown-menu s))))))
-      (reset! (::dropdown-menu s) nil))))
+  (ui-mixins/on-click-out #(str "dropdown-menu-" @(::dropdown-menu %))
+   (fn [s e]
+     (when (seq @(::dropdown-menu s))
+       (reset! (::dropdown-menu s) nil))))
   [s]
   (let [org-data (drv/react s :org-data)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))

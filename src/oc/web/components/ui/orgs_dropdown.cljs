@@ -6,7 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.mixins.ui :refer (on-click-out)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]))
 
 (rum/defc org-dropdown-item < rum/static
@@ -26,9 +26,8 @@
                            (drv/drv :orgs)
                            (drv/drv :org-data)
                            (drv/drv :orgs-dropdown-visible)
-                           (on-window-click-mixin (fn [s e]
-                            (when (and @(drv/get-ref s :orgs-dropdown-visible)
-                                        (not (utils/event-inside? e (rum/dom-node s))))
+                           (on-click-out (fn [s e]
+                            (when @(drv/get-ref s :orgs-dropdown-visible)
                               (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
   [s]
   (let [orgs (drv/react s :orgs)

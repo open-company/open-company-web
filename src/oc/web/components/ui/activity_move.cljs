@@ -3,7 +3,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :refer (on-click-out)]))
 
 (defn move-post [s]
   ;; move the post
@@ -22,11 +22,10 @@
 
 (rum/defcs activity-move < (rum/local nil ::show-boards-list)
                            (rum/local nil ::selected-board)
-                           (on-window-click-mixin (fn [s e]
+                           (on-click-out (fn [s e]
                             (let [opts (first (:rum/args s))
                                   dismiss-cb (:dismiss-cb opts)]
-                              (when (and (not (utils/event-inside? e (rum/dom-node s)))
-                                         (fn? dismiss-cb))
+                              (when (fn? dismiss-cb)
                                 (dismiss-cb)))))
   [s {:keys [boards-list activity-data dismiss-cb]}]
   (let [sorted-boards-list (sort-by :name boards-list)]
