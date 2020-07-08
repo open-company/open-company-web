@@ -237,32 +237,7 @@ div.left-navigation-sidebar {
   overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
-  @include no-user-select();
   padding: 24px 0 0;
-
-  @include big_web() {
-    &.collapsed-boards {
-      overflow-y: hidden;
-
-      div.left-navigation-sidebar-content {
-        overflow-y: hidden;
-      }
-    }
-  }
-
-  @include big_web() {
-    &.absolute-position {
-      position: absolute;
-      top: 0;
-      overflow-y: visible;
-      overflow: visible;
-    }
-  }
-
-  @media screen and (max-width: 975px) {
-    position: absolute;
-    top: 0;
-  }
 
   @include mobile() {
     position: fixed;
@@ -284,10 +259,32 @@ div.left-navigation-sidebar {
     }
   }
 
+  @media (max-height: 628px), (max-width: 975px) {
+    position: absolute !important;
+    top: 0;
+    overflow-y: visible;
+    display: block;
+
+    div.left-navigation-sidebar-content {
+      // min-height: initial;
+      // height: auto;
+      display: block;
+
+      div.invite-people-box {
+        margin-top: 16px;
+      }
+    }
+  }
+
+  @include no-user-select();
+
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
     overflow-x: hidden;
     overflow-y: auto;
+    min-height: calc(100vh - #{$navbar_height}px - 24px - 40px);
+    display: flex;
+    flex-flow: column nowrap;
 
     @include mobile() {
       position: relative;
@@ -298,6 +295,7 @@ div.left-navigation-sidebar {
       min-height: 100%;
       padding-top: #{$mobile_navbar_height + 16}px;
       -webkit-overflow-scrolling: touch;
+      display: block;
     }
 
     div.left-navigation-sidebar-mobile-header {
@@ -352,6 +350,7 @@ div.left-navigation-sidebar {
     border: none;
     outline: none;
     padding-left: 16px;
+    flex: 0 0 auto;
 
     @include mobile() {
       padding-left: 0px;
@@ -545,6 +544,7 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top {
+    flex: 0 0 auto;
 
     &.top-border {
       margin-top: 16px;
@@ -849,113 +849,112 @@ div.left-navigation-sidebar {
     }
   }
 
-  div.left-navigation-sidebar-footer {
-    position: relative;
+  button.create-bt {
+    border-radius: 4px;
     width: 100%;
-    overflow: visible;
-    padding: 0 0 16px;
+    height: 34px;
+    padding: 0;
+    position: relative;
+    background-color: var(--navigation-sidebar-create-bt-background);
+    color: var(--navigation-sidebar-create-bt-color);
+    transition: background-color 180ms ease-in;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
     margin-top: 16px;
 
     @include mobile() {
       display: none;
     }
 
-    div.invite-people-box {
-      margin-top: 16px;
-      position: relative;
-      width: 100%;
-      padding: 22px 22px 136px 22px;
-      @include image-2x("/img/ML/invite_box");
-      background-position: bottom 0px left 50%;
+    span.plus-icon {
+      width: 11px;
+      height: 11px;
+      background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+      background-size: 11px 11px;
       background-repeat: no-repeat;
-      background-size: 117px 120px;
-      background-color: var(--navigation-sidebar-invite-background);
-      border: var(--navigation-sidebar-invite-border);
-      box-shadow: var(--navigation-sidebar-invite-shadow);
-      border-radius: 8px;
+      background-position: center;
+      margin-left: auto;
+      margin-right: 10px;
+      flex: 0 0 auto;
 
       @include dark_mode() {
-        @include image-2x("/img/ML/invite_box@dark");
-      }
-
-      button.invite-people-close {
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        background-image: cdnUrl("/img/ML/close_x.svg");
-        background-size: 8px 8px;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.5;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/close_x@dark.svg");
-        }
-      }
-
-      label.explore-label {
-        text-align: center;
-        @include OC_Body_Bold();
-        font-size: 18px;
-        line-height: 20px;
-        color: var(--color);
-        margin-bottom: 16px;
-      }
-      
-      button.invite-people-bt {
-        width: 100%;
-        height: 34px;
-        padding: 8px;
-        text-align: center;
-        border-radius: 4px;
-        background-color: var(--navigation-sidebar-create-bt-background);
-        color: var(--navigation-sidebar-create-bt-color);
-        @include OC_Body_Bold();
-        font-size: 14px;
-        line-height: 18px;
+        background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
       }
     }
 
-    button.create-bt {
-      border-radius: 4px;
+    span.copy-text {
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
+      color: var(--navigation-sidebar-create-bt-color);
+      flex: 0 0 auto;
+      margin-right: auto;
+    }
+  }
+
+  div.invite-people-box {
+    position: relative;
+    width: 100%;
+    padding: 22px 22px 136px 22px;
+    @include image-2x("/img/ML/invite_box");
+    background-position: bottom 0px left 50%;
+    background-repeat: no-repeat;
+    background-size: 117px 120px;
+    background-color: var(--navigation-sidebar-invite-background);
+    border: var(--navigation-sidebar-invite-border);
+    box-shadow: var(--navigation-sidebar-invite-shadow);
+    border-radius: 8px;
+    flex: 0 0 auto;
+    margin-top: auto;
+
+    @include mobile() {
+      display: none;
+    }
+
+    @include dark_mode() {
+      @include image-2x("/img/ML/invite_box@dark");
+    }
+
+    button.invite-people-close {
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background-image: cdnUrl("/img/ML/close_x.svg");
+      background-size: 8px 8px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.5;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/close_x@dark.svg");
+      }
+    }
+
+    label.explore-label {
+      text-align: center;
+      @include OC_Body_Bold();
+      font-size: 18px;
+      line-height: 20px;
+      color: var(--color);
+      margin-bottom: 16px;
+    }
+
+    button.invite-people-bt {
       width: 100%;
       height: 34px;
-      padding: 0;
-      position: relative;
-      background-color: var(--navigation-sidebar-create-bt-background);
-      color: var(--navigation-sidebar-create-bt-color);
-      transition: background-color 180ms ease-in;
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: center;
-      align-items: center;
-
-      span.plus-icon {
-        width: 11px;
-        height: 11px;
-        background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-        background-size: 11px 11px;
-        background-repeat: no-repeat;
-        background-position: center;
-        margin-left: auto;
-        margin-right: 10px;
-        flex: 0 0 auto;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
-        }
-      }
-
-      span.copy-text {
-        @include OC_Body_Bold();
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--navigation-sidebar-create-bt-color);
-        flex: 0 0 auto;
-        margin-right: auto;
-      }
+      padding: 8px;
+      text-align: center;
+      border-radius: 4px;
+      background-color: var(--navigation-sidebar-invite-bt-background);
+      color: var(--navigation-sidebar-invite-bt-color);
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
     }
   }
 }

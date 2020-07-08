@@ -26,20 +26,6 @@
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
-(def sidebar-top-margin 56)
-
-(defn save-content-height [s]
-  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
-    (let [height (.-offsetHeight navigation-sidebar)]
-      (when (not= height @(::content-height s))
-        (reset! (::content-height s) height)))))
-
-(defn save-window-size
-  "Save the window height in the local state."
-  [s]
-  (reset! (::window-height s) (.-innerHeight js/window))
-  (reset! (::window-width s) (.-innerWidth js/window)))
-
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
 (rum/defcs navigation-sidebar < rum/reactive
@@ -56,26 +42,13 @@
                                 (drv/drv :cmail-state)
                                 (drv/drv :show-add-post-tooltip)
                                 ;; Locals
-                                (rum/local false ::content-height)
-                                (rum/local nil ::window-height)
-                                (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local true ::show-invite-people?)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
-                                (ui-mixins/render-on-resize save-window-size)
 
-                                {:will-mount (fn [s]
-                                  (save-window-size s)
-                                  (save-content-height s)
-                                  s)
-                                 :before-render (fn [s]
+                                {:before-render (fn [s]
                                   (nux-actions/check-nux)
-                                  s)
-                                 :did-mount (fn [s]
-                                  (save-content-height s)
-                                  s)
-                                 :did-remount (fn [o s]
                                   s)
                                  :will-update (fn [s]
                                   (when (responsive/is-mobile-size?)
@@ -91,9 +64,6 @@
                                           (do
                                             (dom-utils/unlock-page-scroll)
                                             (reset! (::last-mobile-navigation-panel s) false))))))
-                                  s)
-                                 :did-update (fn [s]
-                                  (save-content-height s)
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -134,7 +104,6 @@
                           (utils/link-for (:links org-data) "replies"))
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
-        is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
         following-badge (drv/react s :following-badge)
@@ -153,8 +122,7 @@
         show-plus-button? (and (not is-mobile?)
                                 can-compose?)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
-                                :absolute-position (not is-tall-enough?)})
+      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -263,26 +231,23 @@
                   "Drafts"]
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
-        (when (or show-invite-people?
-                  show-plus-button?)
-          [:div.left-navigation-sidebar-footer
-            (when show-plus-button?
-              [:button.mlb-reset.create-bt
-                {:on-click #(if (:collapsed cmail-state)
-                              (do
-                                (.stopPropagation %)
-                                (ui-compose show-add-post-tooltip))
-                              (cmail-actions/cmail-toggle-fullscreen))}
-                [:span.plus-icon]
-                [:span.copy-text
-                  "New update"]])
-            (when (and show-invite-people?
-                       @(::show-invite-people? s))
-              [:div.invite-people-box
-                [:button.mlb-reset.invite-people-close
-                  {:on-click #(reset! (::show-invite-people? s) false)}]
-                [:label.explore-label
-                  "Explore Wut together"]
-                [:button.mlb-reset.invite-people-bt
-                  {:on-click #(nav-actions/show-org-settings :invite-picker)}
-                  "Invite teammates"]])])]]))
+        (when show-plus-button?
+          [:button.mlb-reset.create-bt
+            {:on-click #(if (:collapsed cmail-state)
+                          (do
+                            (.stopPropagation %)
+                            (ui-compose show-add-post-tooltip))
+                          (cmail-actions/cmail-toggle-fullscreen))}
+            [:span.plus-icon]
+            [:span.copy-text
+              "New update"]])
+        (when (and show-invite-people?
+                   @(::show-invite-people? s))
+          [:div.invite-people-box
+            [:button.mlb-reset.invite-people-close
+              {:on-click #(reset! (::show-invite-people? s) false)}]
+            [:label.explore-label
+              "Explore Wut together"]
+            [:button.mlb-reset.invite-people-bt
+              {:on-click #(nav-actions/show-org-settings :invite-picker)}
+              "Invite teammates"]])]]))
