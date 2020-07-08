@@ -365,9 +365,11 @@
   (rum/local nil ::last-force-list-update)
   {:will-update (fn [s]
     (let [props (-> s :rum/args first)
+          initial-unseen-comments (::initial-unseen-comments s)
+          last-force-list-update (::last-force-list-update s)
           force-list-update (:force-list-update s)]
-      (when-not (= @(::last-force-list-update s) force-list-update)
-        (reset! (::initial-unseen-comments s) (count-unseen-comments (:items-to-render props)))
+      (when-not (= @last-force-list-update force-list-update)
+        (reset! initial-unseen-comments (count-unseen-comments (:items-to-render props)))
         (reset! (::last-force-list-update s) force-list-update)))
     s)}
   [s {:keys [items-to-render container-data member? force-list-update]}]
@@ -375,7 +377,9 @@
         _reply-to (drv/react s :comment-reply-to)
         _add-comment-focus (drv/react s :add-comment-focus)
         replies-badge (drv/react s :replies-badge)
-        new-comments (- (count-unseen-comments items-to-render) @(::initial-unseen-comments s))]
+        delta-new-comments (- (count-unseen-comments items-to-render) @(::initial-unseen-comments s))
+        show-refresh-button? (and replies-badge
+                                 (pos? delta-new-comments))]
     [:div.replies-list
       (if (empty? items-to-render)
         [:div.replies-list-empty
@@ -404,8 +408,7 @@
               (rum/with-key
                (reply-item item-props)
                (str "reply-" force-list-update "-" (:uuid item-props)))))
-          (when (or replies-badge
-                    (pos? new-comments))
-            (refresh-button {:message (if (pos? new-comments)
-                                        (str new-comments " unread comment" (when-not (= new-comments 1) "s"))
-                                        "New replies available")}))])]))
+          (refresh-button {:message (if (pos? delta-new-comments)
+                                      (str delta-new-comments " unread comment" (when-not (= delta-new-comments 1) "s"))
+                                      "New replies available")
+                           :visible show-refresh-button?})])]))

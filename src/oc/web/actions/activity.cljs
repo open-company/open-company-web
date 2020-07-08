@@ -794,7 +794,6 @@
                                    ;; or if the board is followed by the user
                                    ((set (map :uuid follow-boards-list)) container-id))
                  following-item (some #(when (= (:uuid %) (:uuid entry-data)) %) (:posts-list following-data))
-                 replies-item (some #(when (= (:uuid %) (:uuid entry-data)) %) (:posts-list replies-data))
                  should-badge-following? (and is-published?
                                               is-following?
                                               ;; and the user has never read it

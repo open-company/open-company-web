@@ -5,6 +5,14 @@ div.refresh-button-container {
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: .18ms opacity .5s ease-in-out;
+
+  &.visible {
+    pointer-events: initial;
+    opacity: 1;
+  }
 
   div.refresh-button-inner {
     margin: 0 auto;
