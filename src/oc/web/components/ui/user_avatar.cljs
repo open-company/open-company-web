@@ -39,10 +39,14 @@
                          rum/reactive
                          (drv/drv :current-user-data)
   [s {:keys [click-cb]}]
-  (let [not-mobile? (not (responsive/is-tablet-or-mobile?))]
+  (let [is-mobile? (responsive/is-mobile-size?)
+        user-data (drv/react s :current-user-data)]
     [:button.mlb-reset.user-avatar-button.group
       {:type "button"
        :on-click #(when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image (drv/react s :current-user-data) {:tooltip? not-mobile?})]))
+      (user-avatar-image user-data)
+      (when-not is-mobile?
+        [:span.user-name
+          (:name user-data)])]))
