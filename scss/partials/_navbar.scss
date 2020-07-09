@@ -57,7 +57,7 @@ nav.oc-navbar {
       height: 32px;
       display: flex;
       flex-flow: row nowrap;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
 
       @include mobile(){
@@ -73,8 +73,6 @@ nav.oc-navbar {
         font-size: 26px;
         transition: margin-left 320ms ease-in, width 320ms ease-in;
         flex: 0 0 auto;
-        margin-left: auto;
-        margin-right: auto;
 
         @include mobile() {
           position: absolute;
@@ -109,7 +107,10 @@ nav.oc-navbar {
       div.navbar-left {
         height: 32px;
         margin-left: 0;
-        flex: 0 0 auto;
+        flex: 0 0 250px;
+        margin-right: auto;
+        width: 250px;
+        text-align: left;
 
         @include mobile() {
           height: 24px;
@@ -205,9 +206,11 @@ nav.oc-navbar {
 
       div.navbar-right {
         margin-right: 0px;
-        width: auto;
+        width: 250px;
         margin-right: 0;
-        flex: 0 0 auto;
+        flex: 0 0 250px;
+        margin-left: auto;
+        text-align: right;
 
         &.anonymous-user {
           position: relative;
