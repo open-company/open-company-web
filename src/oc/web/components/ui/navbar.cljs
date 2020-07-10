@@ -133,11 +133,7 @@
               [:div.navbar-right.group
                 [:div.user-menu
                   [:div.user-menu-button
-                    {:ref "user-menu"
-                     :class (when show-whats-new-green-dot "green-dot")
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "bottom"
-                     :title "Menu"}
+                    {:class (when show-whats-new-green-dot "green-dot")}
                     (user-avatar
                      {:click-cb #(nav-actions/menu-toggle)})]]]
               [:div.navbar-right.anonymous-user
