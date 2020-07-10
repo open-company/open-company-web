@@ -319,8 +319,8 @@
                      (utils/link-for (:links board-data) ["item" "self"] "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
-      is-inbox
-      (inbox-get org-data)
+      ; is-inbox
+      ; (inbox-get org-data)
 
       (and is-all-posts
            (= sort-type dis/recently-posted-sort))
@@ -853,16 +853,17 @@
             container-id (:item-id change-data)
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
-        (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data)))
+        ; (when (= (router/current-board-slug) "all-posts")
+        ;   (all-posts-get (dis/org-data)))
         (when (= (router/current-board-slug) "bookmarks")
           (bookmarks-get (dis/org-data)))
         ; (when (= (router/current-board-slug) "following")
         ;   (following-get (dis/org-data)))
         (when (= (router/current-board-slug) "unfollowing")
           (unfollowing-get (dis/org-data)))
-        (when (= (router/current-board-slug) "inbox")
-          (inbox-get (dis/org-data))))))
+        ; (when (= (router/current-board-slug) "inbox")
+        ;   (inbox-get (dis/org-data)))
+        )))
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
@@ -963,10 +964,10 @@
               (following-did-change)
               ;; Refresh specific containers/sections
               (cond
-                (= current-board-slug "inbox")
-                (inbox-get org-data dispatch-unread)
-                (= current-board-slug "all-posts")
-                (all-posts-get org-data dispatch-unread)
+                ; (= current-board-slug "inbox")
+                ; (inbox-get org-data dispatch-unread)
+                ; (= current-board-slug "all-posts")
+                ; (all-posts-get org-data dispatch-unread)
                 ; (= current-board-slug "bookmarks")
                 ; (bookmarks-get org-data dispatch-unread)
                 ; (= current-board-slug "following")
@@ -1275,7 +1276,8 @@
              (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
              (routing-actions/maybe-404))
            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-          (inbox-get (dis/org-data)))))))
+          ; (inbox-get (dis/org-data))
+          )))))
 
 (declare inbox-unread)
 
@@ -1302,7 +1304,8 @@
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-       (inbox-get (dis/org-data))))))
+       ; (inbox-get (dis/org-data))
+       ))))
 
 (defn- inbox-real-dismiss-all []
   (let [dismiss-at (utils/as-of-now)
@@ -1311,7 +1314,8 @@
     (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link dismiss-at
      (fn [{:keys [status success body]}]
-       (inbox-get (dis/org-data))))))
+       ; (inbox-get (dis/org-data))
+       ))))
 
 (defn inbox-dismiss-all []
   (let [alert-data {:action "dismiss-all"
