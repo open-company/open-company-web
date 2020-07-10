@@ -702,6 +702,7 @@
           (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
+          (assoc :resource-type :board)
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions
@@ -772,6 +773,7 @@
           (assoc :self? (is-author? (:author-uuid contributions-data) (jwt/user-id)))
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
+          (assoc :resource-type :contributions)
           (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
 
 (defn parse-container
@@ -872,6 +874,7 @@
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)
+         (assoc :resource-type :container)
          (assoc :items-to-render with-ending-item))))))
 
 (defn activity-comments [activity-data comments-data]

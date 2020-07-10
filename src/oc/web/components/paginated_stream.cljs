@@ -54,7 +54,8 @@
            comments-data
            editable-boards
            foc-layout
-           is-mobile] :as props}]
+           is-mobile
+           collection-resource-type] :as props}]
   (let [member? (:member? org-data)
         publisher? (:publisher? entry)
         show-wrt? member?
@@ -79,6 +80,7 @@
                      :member? member?
                      :publisher? publisher?
                      :editable-boards editable-boards
+                     :foc-board (not= collection-resource-type :board)
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
@@ -182,7 +184,8 @@
                                                                  {:entry item
                                                                   :read-data read-data
                                                                   :foc-layout foc-layout
-                                                                  :is-mobile is-mobile?}))
+                                                                  :is-mobile is-mobile?
+                                                                  :collection-resource-type (:resource-type container-data)}))
                             row-key))))]
     [:div.virtualized-list-container
       {:ref registerChild

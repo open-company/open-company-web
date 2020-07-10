@@ -148,7 +148,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher? boards-count]}]
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher? boards-count foc-board]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -248,6 +248,7 @@
                             :user-avatar? true
                             :user-hover? true
                             :board-hover? true
+                            ; :show-board? foc-board
                             :activity-board? (and (not (:publisher-board activity-data))
                                                   (not= (:board-slug activity-data) (router/current-board-slug))
                                                   (> boards-count 1))
@@ -262,7 +263,7 @@
                :data-title (utils/activity-date-tooltip activity-data)}
               [:time
                 {:date-time t}
-                (utils/foc-date-time t)]])
+                (utils/time-since t [:short :lower-case])]])
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
         (when is-published?

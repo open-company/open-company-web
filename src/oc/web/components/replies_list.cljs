@@ -187,8 +187,12 @@
         [:div.separator-dot]
         [:span.time-since
           [:time
-            {:date-time published-at}
-            (utils/tooltip-date published-at)]]
+            {:date-time published-at
+             :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :title (utils/activity-date-tooltip (utils/js-date published-at))}
+            (utils/time-since published-at [:short :lower-case])]]
         (when (or follow-link unfollow-link)
           [:button.mlb-reset.mute-bt
             {:title (if follow-link
