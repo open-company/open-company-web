@@ -16,7 +16,7 @@
                          section-mixins/container-nav-in
   [s]
   (let [is-all? (= (router/current-board-slug) "all-posts")
-        is-saved? (= (router/current-board-slug) "bookmarks")
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-following? (= (router/current-board-slug) "following")
         is-unfollowing? (= (router/current-board-slug) "unfollowing")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -34,7 +34,7 @@
             {:class (utils/class-set {:contributions is-contributions?
                                       :all-posts is-all?
                                       :drafts is-drafts-board?
-                                      :saved is-saved?
+                                      :bookmarks is-bookmarks?
                                       :following is-following?
                                       :unfollowing is-unfollowing?})}
             (when is-contributions?
@@ -45,7 +45,7 @@
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"
-           is-saved? "You don't have any saved update"
+           is-bookmarks? "No updates are bookmarked"
            is-following?
            [:div.empty-follow
              "Home is where you'll find updates from the people and topics you're following."

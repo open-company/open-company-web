@@ -383,7 +383,7 @@
     [:div.replies-list
       (if (empty? items-to-render)
         [:div.replies-list-empty
-          (all-caught-up)]
+          (all-caught-up "When someone replies to you, or mentions your name, you'll see it here.")]
         [:div.replies-list-container
           {:ref :entries-list}
           (for [item* items-to-render

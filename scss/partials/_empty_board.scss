@@ -61,8 +61,8 @@ div.empty-board {
           background-size: 24px 24px;
         }
 
-        &.saved {
-          background-image: cdnUrl("/img/ML/nav_saved.svg");
+        &.bookmarks {
+          background-image: cdnUrl("/img/ML/nav_bookmarks.svg");
           background-size: 24px 24px;
         }
 
@@ -82,8 +82,8 @@ div.empty-board {
             background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
           }
 
-          &.saved {
-            background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+          &.bookmarks {
+            background-image: cdnUrl("/img/ML/nav_bookmarks@dark.svg");
           }
 
           &.following {
