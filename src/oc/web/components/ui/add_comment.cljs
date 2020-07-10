@@ -242,10 +242,7 @@
                              (when (string? body)
                                (let [body-field (add-comment-field s)
                                      current-body (.-innerHTML body-field)
-                                     quoted-body (str "<blockquote>" body "</blockquote><p><br></p>")
-                                     next-body (if (au/empty-body? current-body)
-                                                 (str au/empty-body-html quoted-body)
-                                                 (str current-body quoted-body))]
+                                     next-body (str current-body "<blockquote>" body "</blockquote><p><br></p>")]
                                  ;; If focus is required let's make sure the component force the focus
                                  ;; in did-update
                                  (when focus
