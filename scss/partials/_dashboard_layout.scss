@@ -45,6 +45,36 @@ div.dashboard-layout {
     height: #{$navbar_height}px;
   }
 
+  div.dashboard-layout-cmail-placeholder {
+    @include OC_Body_Book();
+    font-size: 16px;
+    line-height: 20px;
+    height: 20px;
+    color: var(--light-color);
+    display: block;
+    padding: 18px 24px;
+    background-color: var(--cmail-background-color);
+    box-shadow: var(--cmail-active-box-shadow);
+    border: var(--cmail-active-border);
+    border-radius: 6px;
+    text-align: left;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 24px;
+
+    @include big_web() {
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    @include no-user-select();
+
+    @include mobile() {
+      display: none;
+    }
+  }
+
   div.dashboard-layout-container {
     padding: 0;
     $total_dashboard_width: $board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + 32;

@@ -251,9 +251,6 @@
         ;; Cmail mobile editor
         (when show-mobile-cmail?
           (cmail))
-        ;; cmail editor fullscreen container for portal
-        ;; DO NOT REMOVE
-        [:div.org-dashboard-cmail-container]
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
         (when (or (not is-mobile?)

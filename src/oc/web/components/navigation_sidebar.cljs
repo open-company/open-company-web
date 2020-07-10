@@ -233,11 +233,7 @@
                   [:span.count draft-count])]]))
         (when show-plus-button?
           [:button.mlb-reset.create-bt
-            {:on-click #(if (:collapsed cmail-state)
-                          (do
-                            (.stopPropagation %)
-                            (ui-compose show-add-post-tooltip))
-                          (cmail-actions/cmail-toggle-fullscreen))}
+            {:on-click #(cmail-actions/cmail-fullscreen)}
             [:span.plus-icon]
             [:span.copy-text
               "New update"]])

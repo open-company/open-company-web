@@ -148,15 +148,8 @@
                                  (map? board-container-data)
                                  (not (:following board-container-data)))
         followers-boards-count (drv/react s :followers-boards-count)
-        cmail-container-el (.querySelector js/document "div.org-dashboard-cmail-container")
-        cmail-fn (when (and (not is-mobile?)
-                       can-compose?)
-                   (if (and (:fullscreen cmail-state)
-                            (= (.-nodeType cmail-container-el) js/Node.-elementNode))
-                     #(rum/portal
-                       (cmail)
-                       cmail-container-el)
-                     #(cmail)))]
+        show-desktop-cmail? (and (not is-mobile?)
+                                 can-compose?)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:search-active search-active?})}
@@ -236,8 +229,12 @@
             ;               "New post"])
             ;         [:div.add-post-tooltip-box.big-web-only
             ;           {:class (when is-second-user "second-user")}]]]))
-            (when (fn? cmail-fn)
-              (cmail-fn))
+            (when show-desktop-cmail?
+              (cmail))
+            (when (and show-desktop-cmail?
+                       (not (:collapsed cmail-state))
+                       (:fullscreen cmail-state))
+              [:div.dashboard-layout-cmail-placeholder])
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner board-container-data)])

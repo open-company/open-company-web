@@ -134,8 +134,15 @@
   (dis/dispatch! [:input [:cmail-state] {:collapsed true :key (utils/activity-uuid)}])
   (dom-utils/unlock-page-scroll))
 
+(defn cmail-fullscreen []
+  (let [current-state (dis/cmail-state)]
+    (cmail-fullscreen-save true)
+    (utils/scroll-to-y 0 0)
+    (dom-utils/lock-page-scroll)
+    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen true :collapsed false})])))
+
 (defn cmail-toggle-fullscreen []
-  (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
+  (let [next-fullscreen-value (not (:fullscreen (dis/cmail-state)))]
     (cmail-fullscreen-save next-fullscreen-value)
     (when next-fullscreen-value
       (utils/scroll-to-y 0 0))
