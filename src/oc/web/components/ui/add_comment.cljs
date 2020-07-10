@@ -242,7 +242,21 @@
                              (when (string? body)
                                (let [body-field (add-comment-field s)
                                      current-body (.-innerHTML body-field)
-                                     next-body (str current-body "<blockquote>" body "</blockquote><p><br></p>")]
+                                     is-empty? (au/empty-body? current-body)
+                                     quoted-body (str "<blockquote>" body "</blockquote>" au/empty-body-html)
+                                     last-element (when-not is-empty?
+                                                    (.-lastElementChild body-field))
+                                     last-element-tag (when last-element
+                                                        (.toLowerCase (.-nodeName last-element)))
+                                     next-body (cond is-empty?
+                                                     quoted-body
+                                                     (and last-element
+                                                          (or (= last-element-tag "blockquote")
+                                                              (and (= last-element-tag "blockquote")
+                                                                   (not (.-isContentEditable last-element)))))
+                                                     (str current-body au/empty-body-html quoted-body)
+                                                     :else
+                                                     (str current-body quoted-body))]
                                  ;; If focus is required let's make sure the component force the focus
                                  ;; in did-update
                                  (when focus

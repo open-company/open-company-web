@@ -444,7 +444,7 @@ function PlaceCaretAtEnd(el) {
     isTextElement: function(el){
       return (el && el.nodeType &&
               el.nodeType === Node.ELEMENT_NODE &&
-              ['p', 'h1', 'h2'].indexOf(el.nodeName.toLowerCase()) >= 0);
+              ['p', 'h1', 'h2', 'pre', 'blockquote', 'code'].indexOf(el.nodeName.toLowerCase()) >= 0);
     },
 
     addPoll: function(pollId) {
