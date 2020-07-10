@@ -1264,12 +1264,12 @@ $header_top_margin: 24;
 
   height: #{$line_height * $preview_lines}px;
 
-  & > * {
+  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2, & > h3, & > h4, & > h5, & > h6, & > img, & > iframe {
     margin-top: 0!important;
     margin-bottom: 0!important;
     padding-top: 0!important;
     padding-bottom: 0!important;
-    display: inline-block!important;
+    display: block!important;
   }
 
   h1, h2, mark, mark.highlight {
