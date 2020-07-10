@@ -353,6 +353,8 @@
    0
    items))
 
+(def replies-empty-message "When someone replies to you, or mentions your name, you'll see it here.")
+
 (rum/defcs replies-list <
   rum/static
   rum/reactive
@@ -383,7 +385,7 @@
     [:div.replies-list
       (if (empty? items-to-render)
         [:div.replies-list-empty
-          (all-caught-up "When someone replies to you, or mentions your name, you'll see it here.")]
+          (all-caught-up replies-empty-message)]
         [:div.replies-list-container
           {:ref :entries-list}
           (for [item* items-to-render
