@@ -499,7 +499,7 @@ div.left-navigation-sidebar {
 
     &.bookmarks {
       div.nav-link-icon {
-        background-image: cdnUrl("/img/ML/nav_saved.svg");
+        background-image: cdnUrl("/img/ML/nav_bookmarks.svg");
         background-size: 12px 14px;
 
         @include mobile() {
@@ -509,7 +509,7 @@ div.left-navigation-sidebar {
         }
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+          background-image: cdnUrl("/img/ML/nav_bookmarks@dark.svg");
         }
       }
     }

@@ -567,12 +567,12 @@ div.dashboard-layout {
               }
 
               &.saved-icon:before {
-                background-image: cdnUrl("/img/ML/nav_saved.svg");
+                background-image: cdnUrl("/img/ML/nav_bookmarks.svg");
                 background-size: 16px 16px;
                 opacity: 1;
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/nav_saved@dark.svg");
+                  background-image: cdnUrl("/img/ML/nav_bookmarks@dark.svg");
                 }
               }
 
