@@ -678,13 +678,13 @@
            :title "Add attachment"}]
         [:div.cmail-footer-media-picker-container.group]
         [:div.cmail-footer-right
-          (when-not (:fullscreen cmail-state)
-            [:div.fullscreen-bt-container
-              [:button.mlb-reset.fullscreen-bt
-                {:on-click #(cmail-actions/cmail-toggle-fullscreen)
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :title "Fullscreen"}]])
+          ; (when-not (:fullscreen cmail-state)
+          ;   [:div.fullscreen-bt-container
+          ;     [:button.mlb-reset.fullscreen-bt
+          ;       {:on-click #(cmail-actions/cmail-toggle-fullscreen)
+          ;        :data-toggle (when-not is-mobile? "tooltip")
+          ;        :data-placement "top"
+          ;        :title "Fullscreen"}]])
           (when (:uuid cmail-data)
             [:div.delete-bt-container
               [:button.mlb-reset.delete-bt

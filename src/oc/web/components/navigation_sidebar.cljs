@@ -233,7 +233,8 @@
                   [:span.count draft-count])]]))
         (when show-plus-button?
           [:button.mlb-reset.create-bt
-            {:on-click #(cmail-actions/cmail-fullscreen)}
+            {:on-click #(cmail-actions/cmail-fullscreen)
+             :disabled (not (:collapsed cmail-state))}
             [:span.plus-icon]
             [:span.copy-text
               "New update"]])
