@@ -128,8 +128,7 @@
              foc-layout
              is-mobile?
              force-list-update
-             container-data
-             following-badge]
+             container-data]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -201,10 +200,7 @@
                          :rowRenderer row-renderer
                          :scrollTop scrollTop
                          :overscanRowCount 20
-                         :style {:outline "none"}})
-      (when (and (= (keyword (:container-slug container-data)) :following)
-                 following-badge)
-        (refresh-button {:message "New updates available"}))]))
+                         :style {:outline "none"}})]))
 
 (defonce last-scroll-top (atom 0))
 
@@ -273,7 +269,6 @@
                         (drv/drv :foc-layout)
                         (drv/drv :current-user-data)
                         (drv/drv :force-list-update)
-                        (drv/drv :following-badge)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -328,8 +323,7 @@
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
-        member? (:member? org-data)
-        following-badge (drv/react s :following-badge)]
+        member? (:member? org-data)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -349,5 +343,4 @@
                                          :force-list-update force-list-update
                                          :activities-read activities-read
                                          :editable-boards editable-boards
-                                         :foc-layout foc-layout
-                                         :following-badge following-badge})))]]]))
+                                         :foc-layout foc-layout})))]]]))
