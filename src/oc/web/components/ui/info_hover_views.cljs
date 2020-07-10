@@ -75,14 +75,13 @@
         [:div.user-info-buttons.group
           [:button.mlb-reset.posts-bt
             {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
-            (if my-profile?
-              "My posts"
-              "Posts")]
-          (if my-profile?
-            [:button.mlb-reset.profile-bt
-              {:on-click #(nav-actions/show-user-info (:user-id user-data))}
-              "My profile"]
-            (follow-button {:following following :resource-type :user :resource-uuid (:user-id user-data)}))])]))
+            "Posts"]
+          [:button.mlb-reset.profile-bt
+            {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+            "Profile"]
+          ; (when-not my-profile?
+          ;   (follow-button {:following following :resource-type :user :resource-uuid (:user-id user-data)}))
+          ])]))
 
 (rum/defc user-info-otf < rum/static
   [{:keys [portal-el] :as props}]
