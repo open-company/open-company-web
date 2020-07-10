@@ -951,13 +951,14 @@
           ;; Refresh the count of drafts and bookmarks
           (sa/drafts-get)
           (do
+            (when (not= change-type :delete)
+              ;; Refresh the badge
+              (check-entry-for-badges container-id entry-uuid))
             ;; Refresh the AP in case of items added or removed
             (when (or (= change-type :add)
                       (= change-type :delete))
             
               (bookmarks-get org-data dispatch-unread)
-              ;; Refresh the badge
-              (check-entry-for-badges container-id entry-uuid)
               ;; Refresh following items
               (following-did-change)
               ;; Refresh specific containers/sections
