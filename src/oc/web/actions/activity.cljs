@@ -936,6 +936,7 @@
             entry-uuid (:item-id change-data)
             container-id (:container-id change-data)
             change-type (:change-type change-data)
+            item-status (keyword (:item-status change-data))
             org-data (dis/org-data)
             ;; In case another user is adding a new post mark it as unread
             ;; directly to avoid delays in the newly added post propagation
@@ -946,38 +947,41 @@
                                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid entry-uuid
                                                                                           :board-uuid container-id}]))))
             current-board-slug (router/current-board-slug)]
-        (when (= change-type :delete)
-          (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid entry-uuid}]))
-        ;; Refresh the AP in case of items added or removed
-        (when (or (= change-type :add)
-                  (= change-type :delete))
+        (if-not (au/is-published? item-status)
           ;; Refresh the count of drafts and bookmarks
           (sa/drafts-get)
-          (bookmarks-get org-data dispatch-unread)
-          ;; Refresh the badge
-          (check-entry-for-badges container-id entry-uuid)
-          ;; Refresh following items
-          (following-did-change)
-          ;; Refresh specific containers/sections
-          (cond
-            (= current-board-slug "inbox")
-            (inbox-get org-data dispatch-unread)
-            (= current-board-slug "all-posts")
-            (all-posts-get org-data dispatch-unread)
-            ; (= current-board-slug "bookmarks")
-            ; (bookmarks-get org-data dispatch-unread)
-            ; (= current-board-slug "following")
-            ; (following-get org-data dispatch-unread)
-            (= current-board-slug "unfollowing")
-            (unfollowing-get org-data dispatch-unread)
-            ;; If it's not one of the previous containers then load
-            ;; a real board if needed
-            (and (not (dis/is-container? current-board-slug))
-                 (not (router/current-contributions-id)))
-            (sa/section-change container-id dispatch-unread)))
-        ;; Refresh the entry in case of an item update
-        (when (= change-type :update)
-          (entry-change container-id entry-uuid)))))
+          (do
+            ;; Refresh the AP in case of items added or removed
+            (when (or (= change-type :add)
+                      (= change-type :delete))
+            
+              (bookmarks-get org-data dispatch-unread)
+              ;; Refresh the badge
+              (check-entry-for-badges container-id entry-uuid)
+              ;; Refresh following items
+              (following-did-change)
+              ;; Refresh specific containers/sections
+              (cond
+                (= current-board-slug "inbox")
+                (inbox-get org-data dispatch-unread)
+                (= current-board-slug "all-posts")
+                (all-posts-get org-data dispatch-unread)
+                ; (= current-board-slug "bookmarks")
+                ; (bookmarks-get org-data dispatch-unread)
+                ; (= current-board-slug "following")
+                ; (following-get org-data dispatch-unread)
+                (= current-board-slug "unfollowing")
+                (unfollowing-get org-data dispatch-unread)
+                ;; If it's not one of the previous containers then load
+                ;; a real board if needed
+                (and (not (dis/is-container? current-board-slug))
+                     (not (router/current-contributions-id)))
+                (sa/section-change container-id dispatch-unread)))
+            (when (= change-type :delete)
+              (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid entry-uuid}]))
+            ;; Refresh the entry in case of an item update
+            (when (= change-type :update)
+              (entry-change container-id entry-uuid)))))))
   (ws-cc/subscribe :item/counts
     (fn [data]
       (dis/dispatch! [:activities-count (router/current-org-slug) (:data data)])))

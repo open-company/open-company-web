@@ -140,8 +140,12 @@
          (vec (rest ;; Always remove the first label
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
 
-(defn is-published? [entry-data]
-  (= (keyword (or (:status entry-data) "draft")) :published))
+(defun is-published?
+  ([entry-data :guard map?]
+  (is-published? (:status entry-data)))
+  ([entry-status :guard #(or (string? %) (nil? %) (keyword? %))]
+   (and entry-status
+        (= (keyword entry-status) :published))))
 
 (defun is-publisher?
 
