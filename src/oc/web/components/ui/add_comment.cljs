@@ -111,7 +111,7 @@
   (str "add-comment-box-container-" @(::add-comment-id s)))
 
 (defn- me-options [s parent-uuid placeholder]
-  {:media-config ["code" "gif" "photo" "video"]
+  {:media-config ["gif"]
    :comment-parent-uuid parent-uuid
    :placeholder (or placeholder (if parent-uuid "Reply…" "Add a comment…"))
    :use-inline-media-picker true
