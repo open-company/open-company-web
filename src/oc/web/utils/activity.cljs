@@ -308,7 +308,7 @@
   (seq (:attachments data)))
 
 (defn has-headline? [data]
-  (-> data :headline s/trim s/blank?))
+  (-> data :headline s/trim s/blank? not))
 
 (defn empty-body? [body]
   (boolean

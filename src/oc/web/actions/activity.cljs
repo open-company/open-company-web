@@ -1129,7 +1129,9 @@
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")
-          cmail-state {:key (utils/activity-uuid)}]
+          cmail-state {:key (utils/activity-uuid)
+                       :fullscreen true
+                       :collapsed false}]
       (cmail-actions/cmail-show fixed-activity-data cmail-state))))
 
 (defn add-bookmark [activity-data add-bookmark-link]
