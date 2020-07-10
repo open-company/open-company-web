@@ -175,19 +175,35 @@
        (finish-cb resp)))))
 
 (defn following-get
-  ([] (following-get (dis/org-data) false nil))
-  ([org-data] (following-get org-data false nil))
-  ([org-data finish-cb] (following-get org-data false finish-cb))
-  ([org-data keep-seen-at? finish-cb]
-   (when-let [following-link (utils/link-for (:links org-data) "following")]
-     (following-real-get following-link (:slug org-data) dis/recently-posted-sort keep-seen-at? finish-cb))))
+ ([] (following-get (dis/org-data) false nil))
+ ([org-data] (following-get org-data false nil))
+ ([org-data finish-cb] (following-get org-data false finish-cb))
+ ([org-data keep-seen-at? finish-cb]
+  (when-let [following-link (utils/link-for (:links org-data) "following")]
+    (following-real-get following-link (:slug org-data) dis/recently-posted-sort keep-seen-at? finish-cb))))
+
+(defn following-refresh
+ "If the user is looking at the following view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+ ([] (following-refresh (dis/org-data)))
+ ([org-data]
+  (when-let* [following-data (dis/following-data)
+              refresh-link (utils/link-for (:links following-data) "refresh")]
+    (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil))))
+
+(defn following-did-change []
+  (let [current-board-slug (keyword (router/current-board-slug))
+        org-data (dis/org-data)]
+    (if (= current-board-slug :following)
+      (following-refresh org-data)
+      (following-get org-data true nil))))
 
 (defn recent-following-get
-  ([] (recent-following-get (dis/org-data) nil))
-  ([org-data] (recent-following-get org-data nil))
-  ([org-data finish-cb]
-   (when-let [recent-following-link (utils/link-for (:links org-data) "recent-following")]
-     (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort false finish-cb))))
+ ([] (recent-following-get (dis/org-data) nil))
+ ([org-data] (recent-following-get org-data nil))
+ ([org-data finish-cb]
+  (when-let [recent-following-link (utils/link-for (:links org-data) "recent-following")]
+    (following-real-get recent-following-link (:slug org-data) dis/recent-activity-sort false finish-cb))))
 
 (defn- following-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
@@ -212,17 +228,28 @@
         (watch-boards (:items (:collection replies-data))))
       (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug keep-seen-at? replies-data]))))
 
+(defn- replies-real-get [replies-link org-slug sort-type keep-seen-at? finish-cb]
+  (api/get-all-posts replies-link
+   (fn [resp]
+     (replies-get-finish org-slug sort-type keep-seen-at? resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
 (defn replies-get
   ([] (replies-get (dis/org-data) false nil))
   ([org-data] (replies-get org-data false nil))
   ([org-data finish-cb] (replies-get org-data false finish-cb))
   ([org-data keep-seen-at? finish-cb]
    (when-let [replies-link (utils/link-for (:links org-data) "replies")]
-     (api/get-all-posts replies-link
-      (fn [resp]
-        (replies-get-finish (:slug org-data) dis/recent-activity-sort keep-seen-at? resp)
-        (when (fn? finish-cb)
-          (finish-cb resp)))))))
+     (replies-real-get replies-link (:slug org-data) dis/recent-activity-sort keep-seen-at? finish-cb))))
+
+(defn replies-refresh
+ ([] (replies-refresh (dis/org-data) (router/current-board-slug)))
+ ([org-data] (replies-refresh org-data (router/current-board-slug)))
+ ([org-data current-board-slug]
+  (when-let* [replies-data (dis/following-data)
+              refresh-link (utils/link-for (:links replies-data) "refresh")]
+    (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil))))
 
 (defn- replies-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
@@ -776,6 +803,7 @@
 (defn check-entry-for-badges [container-id entry-uuid]
   ;; Reload the entry from the server and check if we need to turn on the badge for home
   (let [org-slug (router/current-org-slug)
+        current-board-slug (router/current-board-slug)
         board-data (au/board-by-uuid container-id)]
     (when (not= (:slug board-data) utils/default-drafts-board-slug)
       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
@@ -785,23 +813,30 @@
                  follow-boards-list (dis/follow-boards-list org-slug)
                  following-data (dis/container-data @dis/app-state org-slug :following dis/recently-posted-sort)
                  replies-data (dis/container-data @dis/app-state org-slug :replies dis/recent-activity-sort)
+                 is-following? (= (keyword current-board-slug) :following)
+                 is-replies? (= (keyword current-board-slug) :replies)
                  is-published? (= (keyword (:status entry-data)) :published)
                  current-user-data (dis/current-user-data)
                  is-publisher? (= (-> entry-data :publisher :user-id) (:user-id current-user-data))
-                 is-following? (or ;; if unfollow link is present it means the user is explicitly
-                                   ;; following the entry
-                                   (utils/link-for (:links entry-data) "unfollow")
-                                   ;; or if the board is followed by the user
-                                   ((set (map :uuid follow-boards-list)) container-id))
+                 following-entry? (or ;; if unfollow link is present it means the user is explicitly
+                                      ;; following the entry
+                                      (utils/link-for (:links entry-data) "unfollow")
+                                      ;; or if the board is followed by the user
+                                      ((set (map :uuid follow-boards-list)) container-id))
                  following-item (some #(when (= (:uuid %) (:uuid entry-data)) %) (:posts-list following-data))
-                 should-badge-following? (and is-published?
-                                              is-following?
+                 should-badge-following? (and ;; Show badge on following only if user is not looking at it
+                                              (not is-following?)
+                                              is-published?
+                                              following-entry?
                                               ;; and the user has never read it
                                               (not is-publisher?)
                                               (or (:unseen following-item)
                                                   (au/entry-unseen? entry-data (:last-seen-at following-data))))
-                 should-badge-replies? (and is-published?
-                                            is-following?
+                 should-badge-replies? (and ;; Show badge on replies only when user is looking at it
+                                            ;; since we don't want them to re-arrange when visible
+                                            is-replies?
+                                            is-published?
+                                            following-entry?
                                             (-> entry-data :links (utils/link-for "comments") :count pos?)
                                             (au/comments-unseen? entry-data (:last-seen-at replies-data)))]
              (when should-badge-following?
@@ -856,22 +891,25 @@
             (= change-type :follow)
             (do
               (timbre/debug "Follow for" entry-uuid)
-              (if (= (keyword current-board-slug) :replies)
-                ;; Reload the entry from the server and check if we need to turn on the badge for home
-                (check-entry-for-badges container-id entry-uuid)
+              ;; Reload the entry from the server and check if we need to turn on the badge for home
+              (check-entry-for-badges container-id entry-uuid)
+              ; (inbox-get org-data)
+              (when (not= (keyword current-board-slug) :replies)
                 ;; Reload all replies
                 (replies-get org-data))
-              ; (inbox-get org-data)
-              )
+              ;; Refresh following items
+              (following-did-change))
             (= change-type :unfollow)
             (do
               (timbre/debug "Unfollow for" entry-uuid)
               ; (inbox-get org-data)
-              (if (= (keyword current-board-slug) :replies)
-                ;; Reload the entry from the server and check if we need to turn on the badge for home
-                (check-entry-for-badges container-id entry-uuid)
-                ;; Reload all replies
-                (replies-get org-data))))))
+              ;; Reload the entry from the server and check if we need to turn on the badge for home
+              (check-entry-for-badges container-id entry-uuid)
+              ;; Reload Replies if user is not currently there
+              (when (not= (keyword current-board-slug) :replies)
+                (replies-get org-data))
+              ;; Refresh following items
+              (following-did-change)))))
       (when (and (utils/in? (-> data :data :users) (jwt/user-id))
                  (= :comment-add (:change-type (:data data))))
         (let [change-data (:data data)
@@ -882,10 +920,10 @@
               org-data (dis/org-data)
               current-board-slug (router/current-board-slug)]
           (timbre/debug "Comment added for" entry-uuid)
-          (if (= (keyword current-board-slug) :replies)
-            ;; Reload the entry from the server and check if we need to turn on the badge for home
-            (check-entry-for-badges container-id entry-uuid)
-            ;; Reload all replies
+          ;; Reload the entry from the server and check if we need to turn on the badge for home
+          (check-entry-for-badges container-id entry-uuid)
+          ;; Reload Replies if user is not currently there
+          (when (not= (keyword current-board-slug) :replies)
             (replies-get org-data))
           ;; Delay the inbox refresh to make sure follows have been added
           ;; for al mentioned users
@@ -918,9 +956,8 @@
           (bookmarks-get org-data dispatch-unread)
           ;; Refresh the badge
           (check-entry-for-badges container-id entry-uuid)
-          ;; Refresh following list if not showing it now
-          (when (not= (keyword current-board-slug) :following)
-            (following-get org-data))
+          ;; Refresh following items
+          (following-did-change)
           ;; Refresh specific containers/sections
           (cond
             (= current-board-slug "inbox")
