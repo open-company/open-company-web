@@ -36,7 +36,7 @@ div.add-comment-box-container {
       height: 48px;
 
       @include mobile() {
-        padding: 11px 14px;
+        padding: 9px 16px;
       }
 
       div.add-comment {
@@ -45,8 +45,13 @@ div.add-comment-box-container {
         overflow: hidden;
         height: 18px;
         margin-right: auto;
-        min-width: 50px;
+        min-width: 60px;
         min-height: 18px;
+
+        @include mobile() {
+          height: 24px;
+          min-height: 24px;
+        }
       }
 
       div.add-comment-footer {
@@ -107,9 +112,9 @@ div.add-comment-box-container {
         outline: none;
         flex: 0 1 auto;
 
-        @include mobile(){
-          min-height: 24px;
-        }
+        // @include mobile(){
+        //   min-height: 24px;
+        // }
 
         &.medium-editor-placeholder-hidden:after {
           display: none !important;

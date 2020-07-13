@@ -239,8 +239,25 @@ div.left-navigation-sidebar {
   top: #{$navbar_height}px;
   padding: 24px 0 0;
 
+  @media (max-height: 628px), (max-width: 975px) {
+    position: absolute !important;
+    top: 0;
+    overflow-y: visible;
+    display: block;
+
+    div.left-navigation-sidebar-content {
+      // min-height: initial;
+      // height: auto;
+      display: block;
+
+      div.invite-people-box {
+        margin-top: 16px;
+      }
+    }
+  }
+
   @include mobile() {
-    position: fixed;
+    position: fixed!important;
     margin-top: 0;
     top: 0;
     left: 0;
@@ -256,23 +273,6 @@ div.left-navigation-sidebar {
 
     &.mobile-show-side-panel {
       display: block;
-    }
-  }
-
-  @media (max-height: 628px), (max-width: 975px) {
-    position: absolute !important;
-    top: 0;
-    overflow-y: visible;
-    display: block;
-
-    div.left-navigation-sidebar-content {
-      // min-height: initial;
-      // height: auto;
-      display: block;
-
-      div.invite-people-box {
-        margin-top: 16px;
-      }
     }
   }
 

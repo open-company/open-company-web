@@ -47,6 +47,16 @@ div.caught-up-line {
     content: "";
   }
 
+  @include mobile() {
+    height: #{$mobile_caught_up_line_height}px;
+    padding: #{($mobile_caught_up_line_height - 32) / 2}px 0;
+    
+    // Line besides caught up
+    &:before {
+      top: #{$mobile_caught_up_line_height / 2}px;
+    }
+  }
+
   div.all-caught-up {
     width: auto;
     display: inline-block;
