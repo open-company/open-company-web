@@ -61,8 +61,15 @@
     (when (add-comment-field s)
       (compare-and-set! (::collapsed s) true false))))
 
+(defn- multiple-lines? [s]
+  (when-not @(::collapsed s)
+    (when-let [f (add-comment-field s)]
+      (reset! (::multiple-lines s) (or (> (.-scrollWidth f) 387)
+                                       (> (.-scrollHeight f) 18))))))
+
 (defn- focus [s]
   (maybe-expand s)
+  (multiple-lines? s)
   (toggle-post-button s))
 
 (defn- blur [s]
@@ -122,6 +129,7 @@
 (defn- did-change [s]
   (let [post-enabled (enable-post-button? s)
         {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)]
+    (multiple-lines? s)
     (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
     (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)))
 
@@ -192,6 +200,7 @@
                          ;; Locals
                          (rum/local nil ::add-comment-key)
                          (rum/local true ::collapsed)
+                         (rum/local true ::multiple-lines)
                          (rum/local false ::post-enabled)
                          (rum/local au/empty-body-html ::initial-add-comment)
                          ; (rum/local false ::did-change)
@@ -232,6 +241,7 @@
                                  me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
                              (me-media-utils/setup-editor s did-change me-opts))
                            (maybe-focus s)
+                           (multiple-lines? s)
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
                           :will-update (fn [s]
@@ -262,6 +272,7 @@
                                  (when focus
                                    (reset! (::last-add-comment-focus s) nil))
                                  (set! (.-innerHTML body-field) next-body)
+                                 (multiple-lines? s)
                                  (comment-actions/add-comment-change (:activity-data props) (:parent-comment-uuid props) (:uuid (:edit-comment-data props)) (add-comment-body s))
                                  (reset! (::collapsed s) false)
                                  (reset! (::post-enabled s) true)
@@ -316,11 +327,13 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
-                                :collapsed-box @(::collapsed s)})
+                                :collapsed-box @(::collapsed s)
+                                :inline-reply (not @(::multiple-lines s))})
        :on-click (when @(::collapsed s)
                    #(.focus (rum/ref-node s "editor-node")))}
       [:div.add-comment-box
         [:div.add-comment-internal
+          {:ref :add-comment-internal}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
@@ -340,37 +353,38 @@
                                   (dismiss-reply-cb true))
                                 (.blur add-comment-node)))
                             (when (and (= (.-activeElement js/document) add-comment-node)
-                                       (.-metaKey e)
                                        (= (.-key e) "Enter"))
-                              (send-clicked e s))))
+                              (if (.-metaKey e)
+                                (send-clicked e s)
+                                (compare-and-set! (::multiple-lines s) false true)))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
-            (emoji-picker {:add-emoji-cb #(did-change s)
-                           :width 24
-                           :height 32
-                           :position "top"
-                           :default-field-selector (str "div." add-comment-class)
-                           :container-selector (str "div." add-comment-class)})
-            [:div.add-comment-footer-media-picker.group]
+            [:button.mlb-reset.close-reply-bt
+              {:on-click #(close-reply-clicked s)
+               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title (if edit-comment-data "Cancel edit" "Cancel")}]
             (when uploading?
               [:div.upload-progress
                 (small-loading)
                 [:span.attachment-uploading
                   (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])
+            (emoji-picker {:add-emoji-cb #(did-change s)
+                           :width 24
+                           :height 24
+                           :position "top"
+                           :default-field-selector (str "div." add-comment-class)
+                           :container-selector (str "div." add-comment-class)})
+            [:div.add-comment-footer-media-picker.group]
             [:button.mlb-reset.send-btn
               {:on-click #(send-clicked % s)
                :disabled (not @(::post-enabled s))
                :class (when uploading? "separator-line")}
               (if edit-comment-data
                 "Save"
-                "Reply")]
-            [:button.mlb-reset.close-reply-bt
-              {:on-click #(close-reply-clicked s)
-               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title (if edit-comment-data "Cancel edit" "Cancel")}]]]
+                "Reply")]]]
         (when @(:me/showing-media-video-modal s)
           [:div.video-container
             {:ref :video-container}

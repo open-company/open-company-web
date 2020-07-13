@@ -2,26 +2,61 @@ div.add-comment-box-container {
   position: relative;
   width: 100%;
 
-  &.collapsed-box {
+  &.collapsed-box div.add-comment-box {
+    div.add-comment p:first-child {
+      display: none;
+    }
+  }
+
+  &:not(.collapsed-box) div.add-comment-box div.add-comment-internal {
+    div.add-comment:after {
+      display: none;
+    }
+  }
+
+  &.collapsed-box div.add-comment-box div.add-comment-internal {
+    div.add-comment-footer {
+      button.send-btn {
+        width: 0;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  &.collapsed-box, &.inline-reply {
     div.add-comment-box div.add-comment-internal {
-      height: 48px;
       cursor: text;
       padding: 12px 16px;
-
-      p:first-child {
-        display: none;
-      }
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      height: 48px;
 
       @include mobile() {
         padding: 11px 14px;
       }
 
-      div.medium-editor-media-picker {
-        display: none!important;
+      div.add-comment {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        overflow: hidden;
+        height: 18px;
+        margin-right: auto;
+        min-width: 50px;
+        min-height: 18px;
       }
 
       div.add-comment-footer {
-        display: none;
+        flex: 0 0 auto;
+        margin-top: 0;
+        margin-left: 8px;
+
+        button.close-reply-bt {
+          display: none;
+        }
       }
     }
   }
@@ -40,25 +75,16 @@ div.add-comment-box-container {
       position: relative;
       border-radius: 4px;
       border: 1px solid var(--add-comment-border-color);
-      padding: 13px 16px;
+      padding: 12px 12px 12px 16px;
       background-color: var(--add-comment-background);
+      flex-flow: column nowrap;
+      width: 100%;
+      max-height: 500px;
+      overflow-x: hidden;
+      overflow-y: auto;
 
       &:hover, &:active, &:focus, &.active {
         box-shadow: 0 2px 8px 0 var(--add-comment-box-shadow);
-      }
-
-      div.add-comment-footer-media-picker {
-        float: left;
-        position: relative;
-        margin-left: 8px;
-
-        div.medium-editor-media-picker {
-          position: relative;
-          top: unset;
-          left: unset;
-          bottom: unset;
-          right: unset;  
-        }
       }
 
       @include mobile() {
@@ -77,11 +103,12 @@ div.add-comment-box-container {
         cursor: auto;
         margin: 0;
         height: auto;
-        min-height: 48px;
+        min-height: 24px;
         outline: none;
+        flex: 0 1 auto;
 
         @include mobile(){
-          min-height: 32px;
+          min-height: 24px;
         }
 
         &.medium-editor-placeholder-hidden:after {
@@ -100,14 +127,17 @@ div.add-comment-box-container {
       }
 
       div.add-comment-footer {
-        height: 32px;
-        margin-top: 16px;
-        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        margin-top: 8px;
 
         div.upload-progress {
-          float: right;
           margin-right: 16px;
           margin-top: 6px;
+          flex: 0 0 auto;
+          order: 2;
 
           div.small-loading {
             float: left;
@@ -121,34 +151,15 @@ div.add-comment-box-container {
           }
         }
 
-        button.close-reply-bt {
-          width: 24px;
-          height: 32px;
-          opacity: 0.3;
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          padding: 0;
-          float: right;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-
         div.emoji-picker {
-          float: left;
           width: 24px;
-          height: 32px;
+          height: 24px;
+          flex: 0 0 auto;
+          order: 3;
 
           button.emoji-button {
             width: 24px;
-            height: 32px;
+            height: 24px;
             padding: 0;
             position: unset;
             top: unset;
@@ -166,23 +177,48 @@ div.add-comment-box-container {
               opacity: 1;
             }
           }
+        }
 
-          div.picker-container {
-            right: -16px;
+        div.add-comment-footer-media-picker {
+          position: relative;
+          margin-left: 8px;
+          flex: 0 0 auto;
+          order: 4;
+
+          div.medium-editor-media-picker {
+            position: relative;
+            top: unset;
             left: unset;
+            bottom: unset;
+            right: unset;
+          }
+        }
 
-            @include mobile() {
-              left: 0;
-              right: 0;
-              top: 0 !important;
-            }
+        button.close-reply-bt {
+          width: 24px;
+          height: 24px;
+          opacity: 0.3;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+          padding: 0;
+          flex: 0 0 auto;
+          margin-right: auto;
+          order: 1;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+
+          &:hover {
+            opacity: 1;
           }
         }
 
         button.send-btn {
-          float: right;
-          height: 32px;
-          padding: 7px 16px;
+          height: 24px;
+          padding: 3px 12px;
           margin: 0 0 0 8px;
           background-color: $wut_purple;
           color: white;
@@ -191,6 +227,12 @@ div.add-comment-box-container {
           line-height: 18px;
           border-radius: 4px;
           position: relative;
+          flex: 0 0 auto;
+          transition: width 180ms ease-out;
+          width: auto;
+          overflow: hidden;
+          display: block;
+          order: 5;
 
           &.separator-line:before {
             content: "";
@@ -198,7 +240,7 @@ div.add-comment-box-container {
             top: 0;
             left: -16px;
             width: 1px;
-            height: 32px;
+            height: 24px;
             background-color: var(--divider-line);
           }
 
