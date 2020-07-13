@@ -64,7 +64,7 @@
 (defn- multiple-lines? [s]
   (when-not @(::collapsed s)
     (when-let [f (add-comment-field s)]
-      (reset! (::multiple-lines s) (or (> (.-scrollWidth f) 387)
+      (reset! (::multiple-lines s) (or (> (.-scrollWidth f) @(::inline-reply-max-width s))
                                        (> (.-scrollHeight f) 18))))))
 
 (defn- focus [s]
@@ -205,6 +205,7 @@
                          (rum/local au/empty-body-html ::initial-add-comment)
                          ; (rum/local false ::did-change)
                          (rum/local false ::last-add-comment-focus)
+                         (rum/local 10000 ::inline-reply-max-width)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -240,6 +241,17 @@
                            (let [props (first (:rum/args s))
                                  me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
                              (me-media-utils/setup-editor s did-change me-opts))
+                           (let [add-comment-internal (rum/ref-node s :add-comment-internal)
+                                 bounding-box (.getBoundingClientRect add-comment-internal)
+                                 computed-style (.getComputedStyle js/window add-comment-internal)
+                                 v #(.parseInt js/window % 10)
+                                 max-width (- (.-clientWidth add-comment-internal)
+                                              (v (.-borderLeftWidth computed-style))
+                                              (v (.-paddingLeft computed-style))
+                                              (v (.-paddingRight computed-style))
+                                              (v (.-borderRightWidth computed-style))
+                                              132)] ;; Width of the buttons on the right
+                             (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
                            (multiple-lines? s)
                            (utils/after 2500 #(js/emojiAutocomplete))
