@@ -23,7 +23,6 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment-thread {
-      margin-bottom: 16px;
       position: relative;
 
       button.expand-thead-bt {
@@ -58,27 +57,6 @@ div.stream-comments {
         }
       }
 
-      &.left-border {
-        &:before {
-          content: "";
-          width: 0px;
-          height: calc(100% - 26px);
-          position: absolute;
-          left: 18px;
-          top: 24px;
-          background-color: var(--opac-background-color-1);
-        }
-
-        // &.has-new:before {
-        //   background-color: rgba($wut_purple, 0.4);
-        // }
-
-        &.open-thread:before {
-          height: calc(100% - 16px);
-          top: 16px;
-        }
-      }
-
       div.stream-comment-outer {
         padding: 0;
         position: relative;
@@ -87,50 +65,18 @@ div.stream-comments {
         padding-right: 8px;
         margin-left: -8px;
 
-        @include big_web() {
+        // @include big_web() {
 
-          &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
-            background-color: var(--comments-floating-bt-background);
-            border-radius: 4px;
-          }
+        //   &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
+        //     background-color: var(--comments-floating-bt-background);
+        //     border-radius: 4px;
+        //   }
 
-          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment:hover div.stream-comment div.stream-comment-inner,
-          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment.showing-picker div.stream-comment div.stream-comment-inner {
-            background-color: var(--comments-floating-bt-background);
-            border-radius: 4px;
-          }
-        }
+        // }
 
         &.open-thread {
           &:not(:first-child) {
             margin-top: 16px;
-          }
-        }
-
-        &.indented-comment div.stream-comment div.stream-comment-inner {
-          margin-left: 40px;
-          width: calc(100% - 32px);
-          padding: 8px 0 8px 8px;
-
-          @include mobile() {
-            display: block;
-            margin-left: 32px;
-            width: calc(100% - 24px);
-
-            div.more-menu {
-              button.more-menu-bt {
-                background-position: 0px left 4px top;
-                margin-top: -4px;
-                background-color: transparent;
-              }
-
-              ul.more-menu-list {
-                width: 94px;
-                top: 20px;
-                right: 13px;
-                left: unset;
-              }
-            }
           }
         }
 
@@ -144,27 +90,18 @@ div.stream-comments {
           background-color: rgba($wut_purple, 0.16);
           border-radius: 8px;
           margin-bottom: 1px;
-
-          &.indented-comment {
-            background-color: transparent;
-
-            div.stream-comment div.stream-comment-inner {
-              background-color: rgba($wut_purple, 0.16);
-              border-radius: 8px;
-            }
-          }
         }
 
         div.stream-comment {
           position: relative;
 
           div.stream-comment-inner {
-            padding: 8px 0;
+            padding: 4px 0;
           }
 
-          &.add-comment-container {
-            padding-bottom: 8px;
-          }
+          // &.add-comment-container {
+          //   padding-bottom: 8px;
+          // }
 
           div.stream-comment-mobile-menu {
             display: none;
@@ -566,11 +503,61 @@ div.stream-comments {
           }
 
           div.stream-comment-reactions-footer {
-            height: 26px;
-            margin-top: 8px;
+            height: 18px;
+            margin-top: 4px;
 
             @include mobile() {
-              margin-bottom: 8px;
+              margin-bottom: 4px;
+            }
+
+            div.reactions {
+              height: 18px;
+
+              div.reactions-list {
+
+                button.reaction-btn {
+                  height: 18px;
+                  padding: 0;
+                  margin-left: 8px;
+
+                  &:first-child {
+                    margin-left: 0px;
+                  }
+
+                  span.reaction {
+                    font-size: 18px;
+                    line-height: 21px;
+                    margin-right: 0;
+                    display: inline;
+                    text-align: left;
+
+                    &.safari {
+                      @include retina_screen() {
+                        font-size: 15px;
+                      }
+                    }
+                  }
+
+                  div.count {
+                    line-height: 20px;
+                    font-size: 14px;
+                    margin-left: 4px;
+                    margin-top: 0;
+                  }
+
+                  &.reaction-picker {
+                    span.reaction {
+                      margin-top: 0;
+                      width: 24px;
+                      height: 18px;
+                      background-size: 24px 18px;
+                      background-position: top 1px left 0;
+                      margin-top: 0;
+                      margin-right: 0;
+                    }
+                  }
+                }
+              }
             }
           }
 
@@ -634,28 +621,6 @@ div.stream-comments {
 
         div.stream-comment div.add-comment-box-container {
           padding-top: 8px;
-        }
-
-        &.indented-comment div.stream-comment {
-          div.add-comment-box-container {
-            margin-left: 40px;
-
-            @include mobile() {
-              margin-left: 0;
-            }
-
-            div.add-comment-box {
-              width: calc(100% - 32px);
-
-              @include mobile() {
-                width: 100%;
-              }
-
-              div.add-comment-footer.hide-footer {
-                display: none;
-              }
-            }
-          }
         }
       }
     }
