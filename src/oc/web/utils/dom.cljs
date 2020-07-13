@@ -74,3 +74,12 @@
         true
         (recur (.-parentElement element)))
       false)))
+
+(defn event-cotainer-has-class [e class-name]
+  (when e
+    (loop [element (.-target e)]
+      (if element
+        (if (.contains (.-classList element) class-name)
+          true
+          (recur (.-parentElement element)))
+        false))))

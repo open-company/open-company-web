@@ -33,7 +33,7 @@
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
 (defn- reply-to [comment-data add-comment-focus-key]
-  (comment-actions/reply-to add-comment-focus-key (:body comment-data) true))
+  (comment-actions/reply-to add-comment-focus-key (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>" (:body comment-data)) true))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]
@@ -316,8 +316,9 @@
                                 (not (utils/input-clicked? e))
                                 (not (utils/anchor-clicked? e))
                                 (not (utils/content-editable-clicked? e))
-                                (not (utils/event-inside? e (.querySelector reply-el "div.emoji-mart")))
-                                (not (utils/event-inside? e (.querySelector reply-el "div.add-comment-box-container"))))
+                                (not (dom-utils/event-inside? e (.querySelector reply-el "div.emoji-mart")))
+                                (not (dom-utils/event-inside? e (.querySelector reply-el "div.add-comment-box-container")))
+                                (not (dom-utils/event-cotainer-has-class e "reply-comment-body")))
                        (nav-actions/open-post-modal entry-data false))))}
       (reply-top (assoc entry-data :current-user-id (:user-id current-user-data)))
       (when loading-comments?
