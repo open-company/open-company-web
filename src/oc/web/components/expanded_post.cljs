@@ -110,6 +110,7 @@
   ;; Mixins
   (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
+  mixins/no-scroll-mixin
   {:will-mount (fn [s]
     (check-collapse-post s)
     (save-initial-read-data s)

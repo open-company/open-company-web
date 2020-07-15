@@ -43,8 +43,6 @@
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
-                              (drv/drv :board-data)
-                              (drv/drv :contributions-data)
                               (drv/drv :contributions-user-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
@@ -76,10 +74,8 @@
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
-        contributions-data (drv/react s :contributions-data)
         contributions-user-data (drv/react s :contributions-user-data)
-        container-data (drv/react s :container-data)
+        container-data* (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
@@ -102,20 +98,14 @@
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
-        current-board-data (or board-data org-board-data)
         is-container? (dis/is-container? current-board-slug)
-        board-container-data (cond (seq current-contributions-id)
-                                   contributions-data
-                                   is-container?
-                                   container-data
-                                   :else
-                                   board-data)
-        empty-board? (or (and (not is-contributions)
-                              (map? board-container-data)
-                              (zero? (count (:posts-list board-container-data))))
-                         (and is-contributions
-                              (map? contributions-data)
-                              (zero? (count (:posts-list contributions-data)))))
+        container-data (if (and (not is-contributions)
+                                (not is-container?)
+                                (not container-data*))
+                         org-board-data
+                         container-data*)
+        empty-board? (and (map? container-data)
+                          (zero? (count (:posts-list container-data))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
@@ -127,7 +117,7 @@
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and current-board-slug
                                      (not is-container?)
-                                     (not (:read-only current-board-data)))
+                                     (not (:read-only container-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         show-expanded-post (and current-activity-id
@@ -145,8 +135,8 @@
         show-follow-banner? (and (not is-container?)
                                  (not (seq current-contributions-id))
                                  (not is-drafts-board)
-                                 (map? board-container-data)
-                                 (not (:following board-container-data)))
+                                 (map? container-data)
+                                 (false? (:following container-data)))
         followers-boards-count (drv/react s :followers-boards-count)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?)]
@@ -237,7 +227,7 @@
               [:div.dashboard-layout-cmail-placeholder])
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
-                (follow-banner board-container-data)])
+                (follow-banner container-data)])
             (when (not is-topics)
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -257,9 +247,9 @@
                     :else
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
+                        {:class (utils/class-set {:private (and (= (:access container-data) "private")
                                                                 (not is-drafts-board))
-                                                  :public (= (:access current-board-data) "public")
+                                                  :public (= (:access container-data) "public")
                                                   :home-icon is-following
                                                   :all-icon is-all-posts
                                                   :topics-icon is-topics
@@ -289,8 +279,8 @@
                                                    ;; Fallback to the org board data
                                                    ;; to avoid showing an empty name while loading
                                                    ;; the board data
-                                                   (:name current-board-data)))}]])
-                  (when (and (= (:access current-board-data) "private")
+                                                   (:name container-data)))}]])
+                  (when (and (= (:access container-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -300,7 +290,7 @@
                        :title (if (= current-board-slug utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}])
-                  (when (= (:access current-board-data) "public")
+                  (when (= (:access container-data) "public")
                     [:div.public-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
@@ -315,8 +305,8 @@
                         {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :title (str (:name current-board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])
+                         :title (str (:name container-data) " settings")
+                         :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
                   (when (and dismiss-all-link
                              (pos? (count posts-data)))
                     [:button.mlb-reset.complete-all-bt
@@ -350,11 +340,7 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (
-                cond is-inbox       "IN"
-                     is-replies     "RP"
-                     is-all-posts   "AP"
-                     is-bookmarks   "BM"
-                     is-following   "FL"
-                     is-unfollowing "UF"
-                     :else          (:slug current-board-data)))))]]]))
+               (str "paginated-posts-component-" (cond is-contributions
+                                                       current-contributions-id
+                                                       current-board-slug
+                                                       (name current-board-slug)))))]]]))

@@ -342,7 +342,8 @@
                           s)
                          :will-unmount (fn [s]
                           (when @(::scroll-listener s)
-                            (events/unlistenByKey @(::scroll-listener s)))
+                            (events/unlistenByKey @(::scroll-listener s))
+                            (reset! (::scroll-listener s) nil))
                           s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -357,12 +358,14 @@
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         card-height (calc-card-height is-mobile? foc-layout)
-        member? (:member? org-data)]
+        member? (:member? org-data)
+        replies? (= (:container-slug container-data) :replies)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
-          (replies-refresh-button {:items-to-render items
-                                   :force-list-update force-list-update})
+          (when replies?
+            (replies-refresh-button {:items-to-render items
+                                     :force-list-update force-list-update}))
           (window-scroller
            {}
            (partial virtualized-stream {:org-data org-data

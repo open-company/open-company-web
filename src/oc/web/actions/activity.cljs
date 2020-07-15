@@ -1,5 +1,5 @@
 (ns oc.web.actions.activity
-  (:require-macros [if-let.core :refer (when-let*)])
+  (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
             [dommy.core :as dommy :refer-macros (sel1)]
@@ -185,17 +185,19 @@
 (defn following-refresh
  "If the user is looking at the following view we need to reload all the items that are visible right now.
   Instead, if the user is looking at another view we can just reload the first page."
- ([] (following-refresh (dis/org-data)))
- ([org-data]
-  (when-let* [following-data (dis/following-data)
+ ([] (following-refresh (dis/org-data) true))
+ ([org-data] (following-refresh org-data true))
+ ([org-data keep-seen-at?]
+  (if-let* [following-data (dis/following-data)
               refresh-link (utils/link-for (:links following-data) "refresh")]
-    (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil))))
+    (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? nil)
+    (following-get org-data keep-seen-at? nil))))
 
 (defn following-did-change []
   (let [current-board-slug (keyword (router/current-board-slug))
         org-data (dis/org-data)]
     (if (= current-board-slug :following)
-      (following-refresh org-data)
+      (following-refresh org-data true)
       (following-get org-data true nil))))
 
 (defn recent-following-get
@@ -244,12 +246,13 @@
      (replies-real-get replies-link (:slug org-data) dis/recent-activity-sort keep-seen-at? finish-cb))))
 
 (defn replies-refresh
- ([] (replies-refresh (dis/org-data) (router/current-board-slug)))
- ([org-data] (replies-refresh org-data (router/current-board-slug)))
- ([org-data current-board-slug]
-  (when-let* [replies-data (dis/following-data)
-              refresh-link (utils/link-for (:links replies-data) "refresh")]
-    (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil))))
+ ([] (replies-refresh (dis/org-data) true))
+ ([org-data] (replies-refresh org-data true))
+ ([org-data keep-seen-at?]
+  (if-let* [replies-data (dis/following-data)
+            refresh-link (utils/link-for (:links replies-data) "refresh")]
+    (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? nil)
+    (replies-get org-data keep-seen-at? nil))))
 
 (defn- replies-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success

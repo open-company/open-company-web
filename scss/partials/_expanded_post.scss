@@ -3,10 +3,11 @@ $expanded_post_header_height: 56;
 div.expanded-post {
   width: 100%;
   position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   background-color: $carrot_modal_bg;
-  height: 100%;
+  height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
   z-index: #{$navbar_zindex + 100};

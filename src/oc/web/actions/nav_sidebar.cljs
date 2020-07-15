@@ -75,30 +75,31 @@
          (when refresh?
            (refresh-contributions-data author-uuid)))))))))
 
-(defn- container-data [back-to]
-  (cond
-   (or (:replies back-to)
-       (:topics back-to))
-   nil
-   (contains? back-to :contributions)
-   (dis/contributions-data @dis/app-state (router/current-org-slug) (:contributions back-to))
-   (dis/is-container? (:board back-to))
-   (dis/contributions-data @dis/app-state (router/current-org-slug) (:board back-to))
-   :else
-   (dis/board-data @dis/app-state (router/current-org-slug) (:board back-to))))
+(defn- current-container-data []
+  (let [board-slug (router/current-board-slug)
+        contributions-id (router/current-contributions-id)]
+    (cond
+     (seq contributions-id)
+     (dis/contributions-data @dis/app-state (router/current-org-slug) contributions-id)
+     (dis/is-container? board-slug)
+     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+     (= (keyword board-slug) :topic)
+     nil
+     :else
+     (dis/board-data @dis/app-state (router/current-org-slug) board-slug))))
 
-(defn- refresh-board-data [board-slug & [keep-seen-at?]]
-  (when (and (not (router/current-activity-id))
-             board-slug)
-    (let [org-data (dis/org-data)
-          board-data (container-data {:board board-slug})]
+(defn- reload-board-data []
+  (when-not (router/current-activity-id)
+    (let [board-slug (router/current-board-slug)
+          org-data (dis/org-data)
+          board-data (current-container-data)]
        (cond
 
         (= board-slug "inbox")
         (activity-actions/inbox-get org-data)
 
         (= board-slug "replies")
-        (activity-actions/replies-get org-data keep-seen-at? nil)
+        (activity-actions/replies-get org-data true nil)
 
         (and (= board-slug "all-posts")
              (= (router/current-sort-type) dis/recently-posted-sort))
@@ -113,7 +114,7 @@
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/following-get org-data keep-seen-at? nil)
+        (activity-actions/following-get org-data true nil)
 
         (and (= board-slug "following")
              (= (router/current-sort-type) dis/recent-activity-sort))
@@ -134,6 +135,17 @@
           (when board-link
             (section-actions/section-get (:slug fixed-board-data) board-link)))))))
 
+(defn- refresh-board-data []
+  (when-not (router/current-activity-id)
+    (let [current-board-slug (router/current-board-slug)
+          org-data (dis/org-data)
+          container-data (current-container-data)]
+       (if (#{:replies :following} (:container-slug container-data))
+         (if (= :replies (:container-slug container-data))
+           (activity-actions/replies-refresh org-data true)
+           (activity-actions/following-refresh org-data true))
+         (reload-board-data)))))
+
 (defn nav-to-url!
   ([e board-slug url]
   (nav-to-url! e board-slug url (or (:back-y @router/path) (utils/page-scroll-top)) true))
@@ -150,7 +162,8 @@
          sort-type (activity-actions/saved-sort-type org-slug board-slug)
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          is-container? (dis/is-container? board-slug)
-         org-data (dis/org-data)]
+         org-data (dis/org-data)
+         current-activity-id (router/current-activity-id)]
      (if (= current-path url)
        (do ;; In case user clicked on the current location let's refresh it
          (routing-actions/routing @router/path)
@@ -166,9 +179,8 @@
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
-           (refresh-board-data board-slug true))
+           (reload-board-data))
          (dis/dispatch! [:force-list-update])
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          ;; Let's change the QP section if it's not active and going to an editable section
          (when (and (not is-container?)
                     (not is-drafts-board?)
@@ -182,91 +194,67 @@
 
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)
-        ;; Go back to
-        back-to (utils/back-to org-data)
-        is-replies? (:replies back-to)
-        is-topics? (:topics back-to)
-        is-following? (:following back-to)
-        is-contributions? (:contributions back-to)
-        to-url (cond
-                 is-following?
-                 (oc-urls/following)
-                 is-replies?
-                 (oc-urls/replies)
-                 is-topics?
-                 (oc-urls/topics)
-                 is-contributions?
-                 (oc-urls/contributions (:contributions back-to))
-                 :else
-                 (oc-urls/board (:board back-to)))
-        cont-data (container-data back-to)
+        route @router/path
+        board (router/current-board-slug)
+        contributions-id (router/current-contributions-id)
+        is-contributions? (seq contributions-id)
+        to-url (or (:back-to route) (oc-urls/following))
+        cont-data (current-container-data)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
-                                 (:refresh @router/path)
+                                 (:refresh route)
                                  (not cont-data))
         ;; Get the previous scroll top position
         default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
-        back-y (if should-refresh-data?
-                 (utils/page-scroll-top)
-                 default-back-y)]
-    (cond
-      is-contributions?
-      (nav-to-author! e (:contributions back-to) to-url back-y should-refresh-data?)
-      is-replies?
-      (nav-to-url! e "replies" to-url back-y should-refresh-data?)
-      is-topics?
-      (nav-to-url! e "topics" to-url back-y should-refresh-data?)
-      is-following?
-      (nav-to-url! e "following" to-url back-y should-refresh-data?)
-      (:board back-to)
-      (nav-to-url! e (name (:board back-to)) to-url back-y should-refresh-data?))))
+        back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
+    (if is-contributions?
+      (nav-to-author! e contributions-id to-url back-y false)
+      (nav-to-url! e board to-url back-y false))
+    (when should-refresh-data?
+      (utils/after 180 refresh-board-data))))
 
 (defn open-post-modal
-  ([activity-data dont-scroll]
-   (open-post-modal activity-data dont-scroll nil))
+  ([entry-data dont-scroll]
+   (open-post-modal entry-data dont-scroll nil))
 
-  ([activity-data dont-scroll comment-uuid]
+  ([entry-data dont-scroll comment-uuid]
   (let [org (router/current-org-slug)
-        board (:board-slug activity-data)
-        sort-type (activity-actions/saved-sort-type org board)
+        entry-board-slug (:board-slug entry-data)
+        current-sort-type (router/current-sort-type)
         current-contributions-id (router/current-contributions-id)
-        current-board-slug (keyword (router/current-board-slug))
+        current-board-slug (router/current-board-slug)
         back-to (cond
                   (and (seq current-contributions-id)
                        (not current-board-slug))
-                  {:contributions current-contributions-id}
-                  (= current-board-slug :replies)
-                  {:replies true}
-                  (= current-board-slug :topics)
-                  {:topics true}
-                  (= current-board-slug :following)
-                  {:following true}
+                  (oc-urls/contributions current-contributions-id)
+                  (= (keyword current-board-slug) :replies)
+                  (oc-urls/replies)
+                  (= (keyword current-board-slug) :topics)
+                  (oc-urls/topics)
+                  (= (keyword current-board-slug) :following)
+                  (oc-urls/following)
                   :else
-                  {:board board})
-        activity (:uuid activity-data)
+                  (oc-urls/board entry-board-slug))
+        entry-uuid (:uuid entry-data)
         post-url (if comment-uuid
-                   (oc-urls/comment-url org board activity comment-uuid)
-                   (oc-urls/entry org board activity))
+                   (oc-urls/comment-url org entry-board-slug entry-uuid comment-uuid)
+                   (oc-urls/entry org entry-board-slug entry-uuid))
         query-params (router/query-params)
-        route [org board sort-type activity "activity"]
-        scroll-y-position (.. js/document -scrollingElement -scrollTop)
+        route (vec (remove nil? [org current-board-slug current-contributions-id current-sort-type entry-uuid "activity"]))
         route-path* {:org org
-                     :board board
-                     :sort-type sort-type
-                     :activity activity
-                     :query-params query-params
+                     :board current-board-slug
+                     :entry-board entry-board-slug
+                     :contributions (router/current-contributions-id)
+                     :sort-type current-sort-type
+                     :activity entry-uuid
                      :back-to back-to
-                     :back-y scroll-y-position}
+                     :query-params query-params}
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)
                      route-path*)]
     (router/set-route! route route-path)
     (cmail-actions/cmail-hide)
-    (when-not dont-scroll
-      (if ua/mobile?
-        (utils/after 10 #(utils/scroll-to-y 0 0))
-        (utils/scroll-to-y 0 0)))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url))))
 
 ;; Push panel

@@ -807,11 +807,12 @@
                                            (if (contains? (:fixed-items ret) (:uuid item))
                                              ret
                                              (let [entry-board-data (get boards-map (:board-slug item))
-                                                   full-entry (-> (:uuid item)
-                                                               dis/activity-data
-                                                               (merge item)
-                                                               (parse-entry entry-board-data change-data active-users (:last-seen-at container-data)))]
-                                               (assoc-in ret [:fixed-items (:uuid item)] full-entry))))
+                                                   app-state-entry (dis/activity-data (:uuid item))]
+                                               (when app-state-entry
+                                                 (let [parsed-entry (-> app-state-entry
+                                                                     (merge item)
+                                                                     (parse-entry  entry-board-data change-data active-users (:last-seen-at container-data)))]
+                                                   (assoc-in ret [:fixed-items (:uuid item)] parsed-entry))))))
                                    with-fixed-activities*
                                    (:posts-list container-data))
             keep-link-rel (if (= direction :down) "previous" "next")

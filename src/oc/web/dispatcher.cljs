@@ -287,7 +287,7 @@
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
         container-posts (map (fn [entry]
-                               (if (= (:resource-type entry) :entry)
+                               (if (and (map? entry) (= (:resource-type entry) :entry))
                                  ;; Make sure the local map is merged as last value
                                  ;; since the kept value relates directly to the container
                                  (merge (get posts-data (:uuid entry)) entry)
@@ -322,6 +322,7 @@
    :org-slug            [[:route] (fn [route] (:org route))]
    :contributions-id    [[:route] (fn [route] (:contributions route))]
    :board-slug          [[:route] (fn [route] (:board route))]
+   :entry-board-slug    [[:route] (fn [route] (:entry-board route))]
    :sort-type           [[:route] (fn [route] (:sort-type route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
@@ -434,16 +435,22 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
-                         (fn [base org-slug board-slug contributions-id sort-type]
+   :container-data      [[:base :org-slug :route :board-slug :sort-type]
+                         (fn [base org-slug route board-slug sort-type]
                            (when (and org-slug
-                                      (or board-slug
-                                          contributions-id))
-                             (let [container-key (cond
-                                                   (seq contributions-id)
-                                                   (contributions-data-key org-slug contributions-id)
+                                      board-slug)
+                             (let [activity? (seq (:activity route))
+                                   is-contributions? (or (:contributions route)
+                                                         (contains? (:back-to route) :contributions))
+                                   sort (if (and activity?
+                                                 (contains? (:back-to route) :sort-type))
+                                          (get-in route [:back-to :sort-type])
+                                          sort-type)
+                                   container-key (cond
+                                                   is-contributions?
+                                                   (contributions-data-key org-slug board-slug)
                                                    (is-container? board-slug)
-                                                   (container-key org-slug board-slug sort-type)
+                                                   (container-key org-slug board-slug sort)
                                                    :else
                                                    (board-data-key org-slug board-slug))]
                                (get-in base container-key))))]
@@ -587,18 +594,20 @@
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :contributions-data :container-data :posts-data :activity-data
+   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
-                            :active-users :follow-publishers-list :follow-boards-list]
-                            (fn [base orgs org-data board-data contributions-data container-data posts-data activity-data
+                            :active-users :follow-publishers-list :follow-boards-list :board-slug :contributions-id :activity-uuid]
+                            (fn [base orgs org-data contributions-data container-data posts-data activity-data
                                  show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data
-                                 active-users follow-publishers-list follow-boards-list]
+                                 active-users follow-publishers-list follow-boards-list board-slug contributions-id activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
                                :payments-data payments
                                :container-data container-data
-                               :board-data board-data
+                               :current-board-slug board-slug
+                               :current-contributions-id contributions-id
+                               :current-activity-id activity-uuid
                                :contributions-data contributions-data
                                :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data

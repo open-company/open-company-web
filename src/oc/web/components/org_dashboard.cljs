@@ -67,7 +67,9 @@
   (let [{:keys [orgs
                 org-data
                 jwt-data
-                board-data
+                current-board-slug
+                current-contributions-id
+                current-activity-id
                 contributions-data
                 initial-section-editing
                 container-data
@@ -90,8 +92,8 @@
                      ;; the org data are not loaded yet
                      (not org-data)
                      ;; No board or contributions specified
-                     (and (not (router/current-board-slug))
-                          (not (router/current-contributions-id))
+                     (and (not current-board-slug)
+                          (not current-contributions-id)
                           ;; but there are some
                           (pos? (count (:boards org-data))))
                      ;; Active users have not been loaded yet:
@@ -106,11 +108,11 @@
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
-                               (not (router/current-contributions-id))
-                               (not (dis/is-container? (router/current-board-slug)))
-                               (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
-        current-activity-data (when (router/current-activity-id)
-                                (get posts-data (router/current-activity-id)))
+                               (not current-contributions-id)
+                               (not (dis/is-container? current-board-slug))
+                               (not ((set (map :slug (:boards org-data))) current-board-slug)))
+        current-activity-data (when current-activity-id
+                                (get posts-data current-activity-id))
         entry-not-found (and ;; org is present
                              (not org-not-found)
                              ;; Users for mentions has not been loaded
@@ -122,16 +124,16 @@
                              ;; post wasn't found
                              (or (= current-activity-data :404)
                                  ;; route has wrong board slug/uuid for the current post
-                                 (and (not= (:board-slug current-activity-data) (router/current-board-slug))
-                                      (not= (:board-uuid current-activity-data) (router/current-board-slug)))))
+                                 (and (not= (:board-slug current-activity-data) current-board-slug)
+                                      (not= (:board-uuid current-activity-data) current-board-slug))))
         show-login-wall (and (not jwt-data)
                              (or force-login-wall
-                                 (and (router/current-activity-id)
-                                     (or org-not-found
-                                         section-not-found
-                                         entry-not-found))))
+                                 (and current-activity-id
+                                      (or org-not-found
+                                          section-not-found
+                                          entry-not-found))))
         show-activity-removed (and jwt-data
-                                   (router/current-activity-id)
+                                   current-activity-id
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))
@@ -167,7 +169,7 @@
                                   :mobile-or-tablet is-mobile?
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
-                                  :expanded-activity (router/current-activity-id)
+                                  :expanded-activity current-activity-id
                                   :trial-expired show-trial-expired?
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
@@ -276,5 +278,5 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (dashboard-layout)]
-              (when (router/current-activity-id)
+              (when current-activity-id
                 (expanded-post))]])])))

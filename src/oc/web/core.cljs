@@ -191,7 +191,8 @@
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
-        board (:board params)
+        board (or (:board params) "following")
+        entry-board (::entry-board params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
@@ -210,7 +211,7 @@
       (do
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :entry-board entry-board :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -234,7 +235,8 @@
 ;; Component specific to a board
 (defn board-handler [route target component params]
   (let [org (:org params)
-        board (:board params)
+        board (or (:board params) "following")
+        entry-board (:entry-board params)
         sort-type (read-sort-type-from-cookie params)
         entry (:entry params)
         comment (:comment params)
@@ -250,6 +252,7 @@
      {:org org
       :board board
       :sort-type sort-type
+      :entry-board entry-board
       :activity entry
       :comment comment
       :query-params query-params})
@@ -652,20 +655,20 @@
       (timbre/info "Routing contributions-slash-route" (str (urls/board ":org" ":contributions") "/"))
       (contributions-handler "dashboard" target org-dashboard params))
 
-    (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
-      (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
+    (defroute entry-route (urls/entry ":org" ":entry-board" ":entry") {:as params}
+      (timbre/info "Routing entry-route" (urls/entry ":org" ":entry-board" ":entry"))
       (entry-handler target params))
 
-    (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
-      (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
+    (defroute entry-slash-route (str (urls/entry ":org" ":entry-board" ":entry") "/") {:as params}
+      (timbre/info "Routing entry-route" (str (urls/entry ":org" ":entry-board" ":entry") "/"))
       (entry-handler target params))
 
-    (defroute comment-route (urls/comment-url ":org" ":board" ":entry" ":comment") {:as params}
-      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":board" ":entry" ":comment"))
+    (defroute comment-route (urls/comment-url ":org" ":entry-board" ":entry" ":comment") {:as params}
+      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":entry-board" ":entry" ":comment"))
       (entry-handler target params))
 
-    (defroute comment-slash-route (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/") {:as params}
-      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/"))
+    (defroute comment-slash-route (str (urls/comment-url ":org" ":entry-board" ":entry" ":comment") "/") {:as params}
+      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":entry-board" ":entry" ":comment") "/"))
       (entry-handler target params))
 
     (defroute not-found-route "*" []

@@ -187,8 +187,9 @@
           (when active-users-link
             (load-active-users active-users-link))
           ;; Load the current activity
-          (when (router/current-activity-id)
-            (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
+          (when (and (router/current-activity-id)
+                     (router/current-entry-board-slug))
+            (cmail-actions/get-entry-with-uuid (router/current-entry-board-slug) (router/current-activity-id)))
           ;; Load inbox data
           ; (when (and ls/wut?
           ;            inbox-link)

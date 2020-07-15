@@ -126,6 +126,9 @@
 (defn current-activity-id []
   (:activity @path))
 
+(defn current-entry-board-slug []
+  (:entry-board @path))
+
 (defn current-secure-activity-id []
   (:secure-id @path))
 
