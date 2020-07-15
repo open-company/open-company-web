@@ -15,7 +15,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.replies-list :refer (replies-list)]
+            [oc.web.components.replies-list :refer (replies-refresh-button reply-item)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
@@ -24,8 +24,9 @@
             [goog.events.EventType :as EventType]
             cljsjs.react-virtualized))
 
-(def virtualized-list (partial rutils/build js/ReactVirtualized.List))
+(def virtualized-grid (partial rutils/build js/ReactVirtualized.Grid))
 (def window-scroller (partial rutils/build js/ReactVirtualized.WindowScroller))
+(def cell-measurer (partial rutils/build js/ReactVirtualized.CellMeasurer))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
@@ -47,89 +48,153 @@
     foc-height))
 
 (rum/defc wrapped-stream-item < rum/static
-  [{:keys [style] :as row-props}
-   {:keys [entry
+  [{:keys [item
            read-data
            org-data
+           container-data
            comments-data
            editable-boards
            foc-layout
-           is-mobile
-           collection-resource-type] :as props}]
+           is-mobile] :as props}]
   (let [member? (:member? org-data)
-        publisher? (:publisher? entry)
+        publisher? (:publisher? item)
         show-wrt? member?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
-                               :open-item (:open-item entry)
-                               :close-item (:close-item entry)})
-      :style style}
-     (if collapsed-item?
-       (stream-collapsed-item {:activity-data entry
+                               :open-item (:open-item item)
+                               :close-item (:close-item item)})}
+     (cond
+       (= (:container-slug container-data) :replies)
+       (reply-item item)
+       collapsed-item?
+       (stream-collapsed-item {:activity-data item
                                :comments-data comments-data
                                :read-data read-data
                                :show-wrt? show-wrt?
                                :member? member?
                                :editable-boards editable-boards})
-       (stream-item {:activity-data entry
+       :else
+       (stream-item {:activity-data item
                      :comments-data comments-data
                      :read-data read-data
                      :show-wrt? show-wrt?
                      :member? member?
                      :publisher? publisher?
                      :editable-boards editable-boards
-                     :foc-board (not= collection-resource-type :board)
+                     :foc-board (not= (:resource-type container-data) :board)
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
-  [{:keys [style item]}]
+  [{:keys [item]}]
   [:div.loading-updates.bottom-loading
-    {:style style}
     (:message item)])
 
 (rum/defc closing-item < rum/static
-  [{:keys [style item]}]
+  [{:keys [item]}]
   [:div.closing-item
-    {:style style}
     (:message item)])
 
 (rum/defc separator-item < rum/static
-  [{:keys [style foc-layout] :as row-props} {:keys [label] :as props}]
+  [{:keys [foc-layout item] :as props}]
   [:div.virtualized-list-separator
-    {:style style
-     :class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
-    label])
+    {:class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
+    (:label item)])
 
 (rum/defc caught-up-wrapper < rum/static
-  [{:keys [style item]}]
+  [{:keys [item]}]
   [:div.caught-up-wrapper
-    {:style style}
     (caught-up-line item)])
 
-(rum/defcs virtualized-stream < rum/static
-                                rum/reactive
-                                (rum/local nil ::last-force-list-update)
-                                (seen-mixins/container-nav-mixin)
-                                mixins/mounted-flag
-                                {:will-mount (fn [s]
-                                   (reset! (::last-force-list-update s) (-> s :rum/args first :force-list-update))
-                                   s)
-                                 :did-remount (fn [o s]
-                                   (when (::mixins/mounted? s)
-                                     (when-let [force-list-update (-> s :rum/args first :force-list-update)]
-                                       (when-not (= @(::last-force-list-update s) force-list-update)
-                                         (reset! (::last-force-list-update s) force-list-update)
-                                         (utils/after 180
-                                          #(when (::mixins/mounted? s)
-                                             (.recomputeRowHeights (rum/ref s :virtualized-list-comp)))))))
-                                   s)}
+(rum/defcs list-item
   [s {:keys [items
              activities-read
              foc-layout
              is-mobile?
-             force-list-update
+             container-data]
+    :as derivatives}
+   {:keys [rowIndex key style isScrolling] :as row-props}
+   props]
+  (let [{:keys [registerChild measure] :as clj-props} (js->clj props :keywordize-keys true)
+        item (get items rowIndex)
+        read-data (when (= (:resource-type item) :entry)
+                    (get activities-read (:uuid item)))]
+    [:div.virtualized-list-item
+      {:key (str (name (:resource-type item)) "-" key "-" (or (:uuid item)
+                                                              (:sort-value item)
+                                                              (:last-activity-at item)
+                                                              (:published-at item)
+                                                              (:created-at item)
+                                                              (:updated-at item)
+                                                              (count (keys item))))
+       :ref registerChild
+       :style style}
+      (cond
+        (= (:resource-type item) :caught-up)
+        (caught-up-wrapper {:item item})
+        (= (:resource-type item) :closing-item)
+        (closing-item {:item item})
+        (= (:resource-type item) :loading-more)
+        (load-more {:item item})
+        (= (:resource-type item) :separator)
+        (separator-item {:item item :foc-layout foc-layout})
+        ; isScrolling
+        ; [:div.virtualized-list-placeholder]
+        :else
+        (wrapped-stream-item (merge derivatives {:item item
+                                                 :container-data container-data
+                                                 :read-data read-data
+                                                 :foc-layout foc-layout
+                                                 :is-mobile is-mobile?})))]))
+
+(defn- unique-row-string [replies? item]
+  (if replies?
+    (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:loading-comments? item) "done" "load")))
+    (:resource-type item)))
+
+(defn- clear-changed-rows-cache [s next-resource-types]
+  (let [props (-> s :rum/args first)
+        container-data (:container-data props)
+        items (:items props)
+        resource-types (::resource-types s)
+        cache @(::cache s)]
+    (doseq [idx (range (count items))
+            :let [old-resource-type (get @resource-types idx)
+                  new-resource-type (get next-resource-types idx)]
+            :when (not= old-resource-type new-resource-type)]
+      (.clear cache idx 0))
+    (reset! resource-types next-resource-types)))
+
+(rum/defcs virtualized-stream < rum/static
+                                rum/reactive
+                                (seen-mixins/container-nav-mixin)
+                                (rum/local nil ::resource-types)
+                                (rum/local nil ::cache)
+                                mixins/mounted-flag
+                                {:will-mount (fn [s]
+                                   (let [props (-> s :rum/args s first)
+                                        replies? (-> props :container-data :container-slug (= :replies))
+                                        next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
+                                     (reset! (::cache s)
+                                      (js/ReactVirtualized.CellMeasurerCache.
+                                       (clj->js {:defaultHeight (if (:is-mobile? props) mobile-foc-height foc-height)
+                                                 :minHeight 1
+                                                 :fixedWidth true})))
+                                     (reset! (::resource-types s) next-resource-types))
+                                   s)
+                                 :will-update (fn [s]
+                                  (let [props (-> s :rum/args first)
+                                        replies? (-> props :container-data :container-slug (= :replies))
+                                        next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
+                                    (when-not (= @(::resource-types s) next-resource-types)
+                                      (clear-changed-rows-cache s next-resource-types)))
+                                  s)}
+  [s {:keys [items
+             activities-read
+             foc-layout
+             is-mobile?
+             ; force-list-update
              container-data]
       :as derivatives}
      virtualized-props]
@@ -139,70 +204,36 @@
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         key-prefix (if is-mobile? "mobile" foc-layout)
-        rowHeight (fn [row-props]
-                    (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
-                          litems (-> s :rum/args first :items)
-                          item (get litems index)]
-                      (case (:resource-type item)
-                        :caught-up
-                        caught-up-line-height
-                        :separator
-                        (if (= foc-layout dis/other-foc-layout)
-                          foc-separators-height
-                          (- foc-separators-height 8))
-                        :loading-more
-                        (if is-mobile? 44 60)
-                        :closing-item
-                        closing-item-height
-                        ; else
-                        (calc-card-height is-mobile? foc-layout))))
-        row-renderer (fn [row-props]
-                       (let [{:keys [key
-                                     index
-                                     isScrolling
-                                     isVisible
-                                     style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             litems (-> s :rum/args first :items)
-                             item (get litems index)
-                             read-data (when (= (:resource-type item) :entry)
-                                         (get activities-read (:uuid item)))
-                             row-key (str key-prefix "-" key)
-                             next-item (get litems (inc index))
-                             prev-item (get litems (dec index))]
-                         (case (:resource-type item)
-                           :caught-up
-                           (rum/with-key (caught-up-wrapper {:item item :style style}) (str "caught-up-" (:last-activity-at item)))
-                           :closing-item
-                           (rum/with-key (closing-item {:item item :style style}) (str "closing-item-" row-key))
-                           :loading-more
-                           (rum/with-key (load-more {:item item :style style}) (str "loading-more-" row-key))
-                           :separator
-                           (rum/with-key (separator-item (assoc row-props :foc-layout foc-layout) item) (str "separator-item-" row-key))
-                           ; else
-                           (rum/with-key
-                            (wrapped-stream-item row-props (merge derivatives
-                                                                 {:entry item
-                                                                  :read-data read-data
-                                                                  :foc-layout foc-layout
-                                                                  :is-mobile is-mobile?
-                                                                  :collection-resource-type (:resource-type container-data)}))
-                            row-key))))]
+        cell-measurer-renderer (fn [{:keys [cache]} props]
+                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
+                                   (cell-measurer (clj->js {:cache cache
+                                                            :columnIndex columnIndex
+                                                            :rowIndex rowIndex
+                                                            :index rowIndex
+                                                            :key key
+                                                            :parent parent})
+                                    (partial list-item derivatives row-props))))
+        width (if is-mobile?
+                js/window.innerWidth
+                620)]
     [:div.virtualized-list-container
       {:ref registerChild
        :key (str "virtualized-list-" key-prefix)}
-      (virtualized-list {:autoHeight true
+      (virtualized-grid {:autoHeight true
                          :ref :virtualized-list-comp
+                         :deferredMeasurementCache @(::cache s)
+                         :estimatedRowSize (if is-mobile? mobile-foc-height foc-height)
                          :height height
-                         :width (if is-mobile?
-                                  js/window.innerWidth
-                                  620)
+                         :width width
+                         :columnWidth width
                          :isScrolling isScrolling
                          :onScroll onChildScroll
                          :rowCount (count items)
-                         :rowHeight rowHeight
-                         :rowRenderer row-renderer
+                         :rowHeight (.-rowHeight @(::cache s))
+                         :cellRenderer (partial cell-measurer-renderer {:cache @(::cache s)})
                          :scrollTop scrollTop
-                         :overscanRowCount 20
+                         ; :overscanRowCount 20
+                         :columnCount 1
                          :style {:outline "none"}})]))
 
 (defonce last-scroll-top (atom 0))
@@ -330,20 +361,15 @@
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
-         (if (:no-virtualized-steam container-data)
-           (replies-list {:items-to-render items
-                          :org-data org-data
-                          :container-data container-data
-                          :force-list-update force-list-update
-                          :current-user-data current-user-data})
-           (window-scroller
-            {}
-            (partial virtualized-stream {:org-data org-data
-                                         :comments-data comments-data
-                                         :items items
-                                         :container-data container-data
-                                         :is-mobile? is-mobile?
-                                         :force-list-update force-list-update
-                                         :activities-read activities-read
-                                         :editable-boards editable-boards
-                                         :foc-layout foc-layout})))]]]))
+          (replies-refresh-button {:items-to-render items
+                                   :force-list-update force-list-update})
+          (window-scroller
+           {}
+           (partial virtualized-stream {:org-data org-data
+                                        :comments-data comments-data
+                                        :items items
+                                        :container-data container-data
+                                        :is-mobile? is-mobile?
+                                        :activities-read activities-read
+                                        :editable-boards editable-boards
+                                        :foc-layout foc-layout}))]]]));)]]]))

@@ -40,8 +40,8 @@ div.paginated-stream {
       overflow: visible !important;
       padding-bottom: 24px;
 
-      .ReactVirtualized__Grid.ReactVirtualized__List,
-      .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
+      .ReactVirtualized__Grid,
+      .ReactVirtualized__Grid .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;
 
         div.virtualized-list-separator {
@@ -96,6 +96,32 @@ div.paginated-stream {
 
       div.virtualized-list-container {
         position: relative;
+        background-size: contain;
+        background-repeat-x: no-repeat;
+        background-repeat-y: repeat;
+        background-position: 0px 0px;
+        width: 100%;
+        background-image: cdnUrl("/img/ML/interstitial.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/interstitial@dark.svg");
+        }
+
+        @include mobile() {
+          background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
+          }
+        }
+
+        div.virtualized-list-item {
+          background-color: var(--background-color);
+
+          @include mobile() {
+            background-color: var(--mobile-background-color);
+          }
+        }
 
         div.refresh-button-container {
           position: fixed;

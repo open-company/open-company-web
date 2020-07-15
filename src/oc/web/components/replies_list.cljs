@@ -358,16 +358,8 @@
    0
    items))
 
-(def replies-empty-message "When someone replies to you, or mentions your name, you'll see it here.")
-
-(rum/defcs replies-list <
-  rum/static
-  rum/reactive
-  (drv/drv :comment-reply-to)
-  (drv/drv :add-comment-focus)
+(rum/defcs replies-refresh-button < rum/reactive
   (drv/drv :replies-badge)
-  ui-mixins/refresh-tooltips-mixin
-  (seen-mixins/container-nav-mixin)
   (rum/local 0 ::initial-unseen-comments)
   (rum/local nil ::last-force-list-update)
   {:will-update (fn [s]
@@ -379,43 +371,21 @@
         (reset! initial-unseen-comments (count-unseen-comments (:items-to-render props)))
         (reset! (::last-force-list-update s) force-list-update)))
     s)}
-  [s {:keys [items-to-render container-data member? force-list-update]}]
-  (let [is-mobile? (responsive/is-mobile-size?)
-        _reply-to (drv/react s :comment-reply-to)
-        _add-comment-focus (drv/react s :add-comment-focus)
-        replies-badge (drv/react s :replies-badge)
+  [s {:keys [items-to-render]}]
+  (let [replies-badge (drv/react s :replies-badge)
         delta-new-comments (- (count-unseen-comments items-to-render) @(::initial-unseen-comments s))
         show-refresh-button? (and replies-badge
-                                 (pos? delta-new-comments))]
-    [:div.replies-list
-      (if (empty? items-to-render)
-        [:div.replies-list-empty
-          (all-caught-up replies-empty-message)]
-        [:div.replies-list-container
-          {:ref :entries-list}
-          (for [item* items-to-render
-                :let [caught-up? (= (:resource-type item*) :caught-up)
-                      loading-more? (= (:resource-type item*) :loading-more)
-                      closing-item? (= (:resource-type item*) :closing-item)
-                      item-props (assoc item* :member? member?)]]
-            (cond
-              caught-up?
-              (rum/with-key
-               (caught-up-line item-props)
-               (str "reply-caught-up-" (:last-activity-at item-props)))
-              loading-more?
-              [:div.loading-updates.bottom-loading
-                {:key (str "reply-loading-more-" (:last-activity-at item-props))}
-                (:message item-props)]
-              closing-item?
-              [:div.closing-item
-                {:key (str "reply-closing-item-" (:last-activity-at item-props))}
-                (:message item-props)]
-              :else
-              (rum/with-key
-               (reply-item item-props)
-               (str "reply-" force-list-update "-" (:uuid item-props)))))
-          (refresh-button {:message (if (pos? delta-new-comments)
-                                      (str delta-new-comments " unread comment" (when-not (= delta-new-comments 1) "s"))
-                                      "New replies available")
-                           :visible show-refresh-button?})])]))
+                                  (pos? delta-new-comments))]
+    (when show-refresh-button?
+      (refresh-button {:message (if (pos? delta-new-comments)
+                                  (str delta-new-comments " unread comment" (when-not (= delta-new-comments 1) "s"))
+                                  "New replies available")
+                       :visible show-refresh-button?
+                       :class-name :replies-refresh-button-container}))))
+
+(def replies-empty-message "When someone replies to you, or mentions your name, you'll see it here.")
+
+(rum/defc replies-empty-list < rum/static
+  []
+  [:div.replies-list-empty
+    (all-caught-up replies-empty-message)])

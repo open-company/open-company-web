@@ -15,11 +15,13 @@
                          (drv/drv :contributions-user-data)
                          section-mixins/container-nav-in
   [s]
-  (let [is-all? (= (router/current-board-slug) "all-posts")
-        is-bookmarks? (= (router/current-board-slug) "bookmarks")
-        is-following? (= (router/current-board-slug) "following")
-        is-unfollowing? (= (router/current-board-slug) "unfollowing")
-        is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
+  (let [current-board-kw (keyword (router/current-board-slug))
+        is-all? (= current-board-kw :all-posts)
+        is-replies? (= current-board-kw :replies)
+        is-bookmarks? (= current-board-kw :bookmarks)
+        is-following? (= current-board-kw :following)
+        is-unfollowing? (= current-board-kw :unfollowing)
+        is-drafts-board? (= current-board-kw (keyword utils/default-drafts-board-slug))
         is-contributions? (seq (router/current-contributions-id))
         org-data (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
@@ -33,6 +35,7 @@
           [:div.empty-board-illustration
             {:class (utils/class-set {:contributions is-contributions?
                                       :all-posts is-all?
+                                      :replies is-replies?
                                       :drafts is-drafts-board?
                                       :bookmarks is-bookmarks?
                                       :following is-following?
@@ -42,6 +45,7 @@
         [:div.empty-board-title
           (cond
            current-user-contrib? "You haven't published any posts yet"
+           is-replies? "When someone replies to you, or mentions your name, you'll see it here."
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"

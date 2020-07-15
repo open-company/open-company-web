@@ -1030,11 +1030,11 @@
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)
         container-key (dispatcher/container-key org-slug :following sort-type)
-        last-seen-at-key (conj container-key :last-seen-at)
+        old-container-data (get-in db container-key)
         prepare-following-data (-> following-data
                                 :collection
                                 (assoc :container-slug :following)
-                                (update :last-seen-at #(if keep-seen-at? (get-in db last-seen-at-key) %)))
+                                (update :last-seen-at #(if (and keep-seen-at? (map? old-container-data)) (:last-seen-at old-container-data) %)))
         fixed-following-data (au/parse-container prepare-following-data change-data org-data active-users sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
@@ -1097,11 +1097,11 @@
         posts-data-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-data-key)
         replies-container-key (dispatcher/container-key org-slug :replies sort-type)
-        last-seen-at-key (conj replies-container-key :last-seen-at)
+        old-container-data (get-in db replies-container-key)
         prepare-replies-data (-> replies-data
                               :collection
                               (assoc :container-slug :replies)
-                              (update :last-seen-at #(if keep-seen-at? (get-in db last-seen-at-key) %)))
+                              (update :last-seen-at #(if (and keep-seen-at? (map? old-container-data)) (:last-seen-at old-container-data) %)))
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type {:load-comments? true})
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)

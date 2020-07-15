@@ -5,34 +5,8 @@ div.replies-list {
     width: 100%;
   }
 
-  div.replies-list-empty {
-    margin-top: 100px;
-
-    div.all-caught-up {
-      div.all-caught-up-inner {
-        width: 260px;
-      }
-
-      @include mobile() {
-        display: block !important;
-        margin-top: 100px;
-      }
-    }
-  }
-
   div.replies-list-container {
     position: relative;
-
-    div.refresh-button-container {
-      position: fixed;
-      bottom: 24px;
-      width: #{$board_container_width}px;
-      height: 40px;
-
-      @include mobile() {
-        width: 100vw;
-      }
-    }
 
     div.loading-updates {
       text-align: center;
@@ -47,948 +21,974 @@ div.replies-list {
         padding: 16px 0 8px;
       }
     }
+  }
+}
 
-    div.reply-item {
-      margin: 0;
-      border-top: 1px solid transparent;
-      border-right: 1px solid var(--foc-divider-line-color);
-      border-bottom: 1px solid transparent;
-      border-left: 1px solid var(--foc-divider-line-color);
-      padding: 16px 32px;
-      background-color: var(--foc-background-color);
-      overflow: visible;
-      cursor: pointer;
-      position: relative;
+div.replies-refresh-button-container {
+  position: fixed;
+  bottom: 24px;
+  width: #{$board_container_width}px;
+  height: 40px;
 
-      @include big_web() {
-        &:hover, &.open-item:hover, &.close-item:hover {
-          background-color: var(--foc-hover-color);
-          border-top: 1px solid var(--foc-hover-border-color);
-          border-right: 1px solid var(--foc-hover-border-color);
-          border-bottom: 1px solid var(--foc-hover-border-color);
-          border-left: 1px solid var(--foc-hover-border-color);
-          box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
+  @include mobile() {
+    width: 100vw;
+  }
+}
 
-          &:not(.open-item):before {
-            background-color: transparent;
-          }
-        }
-      }
+div.replies-list-empty {
+  margin-top: 100px;
 
-      @include mobile() {
-        border-top: none;
-        border-right: none;
-        border-bottom: none;
-        border-left: none;
-        border-radius: 0;
-        padding: 16px 24px;
-      }
+  div.all-caught-up {
+    div.all-caught-up-inner {
+      width: 260px;
+    }
 
-      &.unread {
-        background-color: var(--foc-hover-color);
-        z-index: 2;
+    @include mobile() {
+      display: block !important;
+      margin-top: 100px;
+    }
+  }
+}
 
-        div.add-comment-box-container div.add-comment-box div.add-comment-internal {
-          background-color: var(--foc-hover-color);
-          border: 1px solid var(--foc-hover-border-color);
-        }
-      }
+div.reply-item {
+  margin: 0;
+  border-top: 1px solid transparent;
+  border-right: 1px solid var(--foc-divider-line-color);
+  border-bottom: 1px solid transparent;
+  border-left: 1px solid var(--foc-divider-line-color);
+  padding: 16px 32px;
+  background-color: var(--foc-background-color);
+  overflow: visible;
+  cursor: pointer;
+  position: relative;
 
-      div.add-comment-box-container {
-        margin-top: 8px;
-        margin-bottom: 16px;
-
-        @include mobile(){
-          margin-bottom: 0;
-        }
-
-        div.add-comment-box div.add-comment-internal {
-          background-color: var(--foc-background-color);
-          border: 1px solid var(--foc-divider-line-color);
-        }
-      }
+  @include big_web() {
+    &:hover, &.open-item:hover, &.close-item:hover {
+      background-color: var(--foc-hover-color);
+      border-top: 1px solid var(--foc-hover-border-color);
+      border-right: 1px solid var(--foc-hover-border-color);
+      border-bottom: 1px solid var(--foc-hover-border-color);
+      border-left: 1px solid var(--foc-hover-border-color);
+      box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
 
       &:not(.open-item):before {
-        content: "";
-        width: calc(100% - 64px);
-        margin-left: 32px;
-        height: 1px;
-        background-color: var(--foc-divider-line-color);
-        position: absolute;
-        top: 0;
-        left: 0;
+        background-color: transparent;
       }
+    }
+  }
 
-      &.open-item {
-        border-top: 1px solid var(--foc-divider-line-color);
-        padding-top: 24px;
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-      }
+  @include mobile() {
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+    border-radius: 0;
+    padding: 16px 24px;
+  }
 
-      &.close-item {
-        border-bottom: 1px solid var(--foc-divider-line-color);
-        padding-bottom: 24px;
-        margin-bottom: 16px;
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
-      }
+  &.unread {
+    background-color: var(--foc-hover-color);
+    z-index: 2;
 
-      @include mobile() {
-        background-color: var(--mobile-background-color);
+    div.add-comment-box-container div.add-comment-box div.add-comment-internal {
+      background-color: var(--foc-hover-color);
+      border: 1px solid var(--foc-hover-border-color);
+    }
+  }
 
-        &:first-child {
-          border-top: 1px solid var(--foc-divider-line-color)!important;
+  div.add-comment-box-container {
+    margin-top: 8px;
+    margin-bottom: 16px;
+
+    @include mobile(){
+      margin-bottom: 0;
+    }
+
+    div.add-comment-box div.add-comment-internal {
+      background-color: var(--foc-background-color);
+      border: 1px solid var(--foc-divider-line-color);
+    }
+  }
+
+  &:not(.open-item):before {
+    content: "";
+    width: calc(100% - 64px);
+    margin-left: 32px;
+    height: 1px;
+    background-color: var(--foc-divider-line-color);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &.open-item {
+    border-top: 1px solid var(--foc-divider-line-color);
+    padding-top: 24px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &.close-item {
+    border-bottom: 1px solid var(--foc-divider-line-color);
+    padding-bottom: 24px;
+    margin-bottom: 16px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  @include mobile() {
+    background-color: var(--mobile-background-color);
+
+    &:first-child {
+      border-top: 1px solid var(--foc-divider-line-color)!important;
+    }
+
+    &.open-item {
+      border-top: none;
+      padding-top: 24px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &.close-item {
+      border-bottom: 1px solid var(--foc-divider-line-color);
+      padding-bottom: 24px;
+      margin-bottom: 0;
+    }
+  }
+
+  &.unread {
+    background-color: var(--overlay-background-color);
+
+    @include mobile() {
+      background-color: var(--background-color);
+    }
+
+  }
+
+  div.reply-item-top {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--foc-divider-line-color);
+
+    div.reply-item-header {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      height: 24px;
+      text-align: left;
+      position: relative;
+
+      div.reply-item-author-container {
+        display: contents;
+
+        @include user-profile(24) {
+          flex: 0 0 24px;
+          margin-right: 8px;
         }
 
-        &.open-item {
-          border-top: none;
-          padding-top: 24px;
-          border-top-left-radius: 0;
-          border-top-right-radius: 0;
-        }
-
-        &.close-item {
-          border-bottom: 1px solid var(--foc-divider-line-color);
-          padding-bottom: 24px;
-          margin-bottom: 0;
+        span.author-name {
+          @include OC_Body_Book();
+          font-size: 12px;
+          line-height: 18px;
+          flex: 0 1 auto;
+          align-self: center;
+          color: var(--color);
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          text-decoration: underline;
         }
       }
 
-      &.unread {
-        background-color: var(--overlay-background-color);
-
-        @include mobile() {
-          background-color: var(--background-color);
-        }
-
+      span.in {
+        flex: 0 0 auto;
+        margin: 0 6px;
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 18px;
+        align-self: center;
       }
 
-      div.reply-item-top {
-        padding-bottom: 16px;
-        margin-bottom: 16px;
-        border-bottom: 1px solid var(--foc-divider-line-color);
+      div.reply-item-board-container {
+        position: relative;
+        display: contents;
 
-        div.reply-item-header {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: flex-start;
-          align-items: center;
-          height: 24px;
-          text-align: left;
-          position: relative;
+        span.board-name {
+          @include OC_Body_Book();
+          font-size: 12px;
+          line-height: 18px;
+          flex: 0 1 auto;
+          color: var(--color);
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          text-decoration: underline;
+          align-self: center;
+        }
+      }
 
-          div.reply-item-author-container {
-            display: contents;
+      span.time-since {
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 18px;
+        flex: 0 0 auto;
+        color: var(--color);
+        align-self: center;
+      }
 
-            @include user-profile(24) {
-              flex: 0 0 24px;
-              margin-right: 8px;
-            }
+      button.mute-bt {
+        flex: 0 0 auto;
+        width: 24px;
+        height: 24px;
+        margin-left: auto;
+        background-size: 14px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
 
-            span.author-name {
-              @include OC_Body_Book();
-              font-size: 12px;
-              line-height: 18px;
-              flex: 0 1 auto;
-              align-self: center;
-              color: var(--color);
-              display: block;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              text-decoration: underline;
-            }
+        &.following {
+          background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+        }
+
+        &.unfollowing {
+          background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+        }
+
+        @include dark_mode() {
+          &.following {
+            background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
           }
 
-          span.in {
-            flex: 0 0 auto;
-            margin: 0 6px;
-            @include OC_Body_Book();
-            font-size: 12px;
-            line-height: 18px;
-            align-self: center;
+          &.unfollowing {
+            background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
           }
+        }
 
-          div.reply-item-board-container {
-            position: relative;
-            display: contents;
-
-            span.board-name {
-              @include OC_Body_Book();
-              font-size: 12px;
-              line-height: 18px;
-              flex: 0 1 auto;
-              color: var(--color);
-              display: block;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              text-decoration: underline;
-              align-self: center;
-            }
-          }
-
-          span.time-since {
-            @include OC_Body_Book();
-            font-size: 12px;
-            line-height: 18px;
-            flex: 0 0 auto;
-            color: var(--color);
-            align-self: center;
-          }
-
-          button.mute-bt {
-            flex: 0 0 auto;
-            width: 24px;
-            height: 24px;
-            margin-left: auto;
-            background-size: 14px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.5;
+        @include big_web() {
+          &:hover {
+            opacity: 1;
 
             &.following {
-              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+              background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
             }
 
             &.unfollowing {
-              background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
             }
 
             @include dark_mode() {
               &.following {
-                background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
+                background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
               }
 
               &.unfollowing {
-                background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
-              }
-            }
-
-            @include big_web() {
-              &:hover {
-                opacity: 1;
-
-                &.following {
-                  background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
-                }
-
-                &.unfollowing {
-                  background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
-                }
-
-                @include dark_mode() {
-                  &.following {
-                    background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
-                  }
-
-                  &.unfollowing {
-                    background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
-                  }
-                }
+                background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
               }
             }
           }
         }
+      }
+    }
 
-        div.reply-item-title {
-          @include activity-title(16px, 20px);
-          margin-top: 8px;
+    div.reply-item-title {
+      @include activity-title(16px, 20px);
+      margin-top: 8px;
 
-          @include truncate (2, 20px);
+      @include truncate (2, 20px);
+    }
+  }
+
+  div.separator-dot {
+    width: 3px;
+    height: 3px;
+    background-color: var(--light-color);
+    border-radius: 50%;
+    margin: 1px 5px 0 5px;
+    flex: 0 0 auto;
+  }
+
+  div.reply-item-blocks {
+
+    button.view-more-bt {
+      width: 100%;
+      height: 20px;
+      padding: 0;
+      margin-bottom: 12px;
+      @include OC_Body_Book();
+      font-size: 16px;
+      line-height: 20px;
+      color: var(--light-color);
+      text-align: left;
+      position: relative;
+      background-color: var(--foc-background-color);
+
+      &.has-unseen {
+        color: $carrot_green;
+      }
+
+      @include big_web() {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    div.reply-item-loading {
+      height: 30px;
+      margin-left: 8px;
+
+      div.small-loading {
+        margin-top: 6px;
+        margin-right: 6px;
+        float: left;
+      }
+
+      span.reply-item-loading-inner {
+        font-size: 13px;
+        @include OC_Body_Book();
+        line-height: 30px;
+        float: left;
+      }
+    }
+
+    div.reply-item-block {
+      position: relative;
+      height: 100%;
+
+      // &:not(:empty) {
+      //   margin-top: 4px;
+      // }
+
+      div.reply-item-block {
+        margin-top: 4px;
+      }
+
+      &.horizontal-line {
+        div.reply-comment-outer {
+          padding-right: 0;
+          padding-top: 2px;
+          margin-top: -8px;
         }
       }
 
-      div.separator-dot {
-        width: 3px;
-        height: 3px;
-        background-color: var(--light-color);
-        border-radius: 50%;
-        margin: 1px 5px 0 5px;
-        flex: 0 0 auto;
-      }
+      &.horizontal-line {
+        margin-left: 24px;
 
-      div.reply-item-blocks {
-
-        button.view-more-bt {
-          width: 100%;
-          height: 20px;
-          padding: 0;
-          margin-bottom: 12px;
-          @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 20px;
-          color: var(--light-color);
-          text-align: left;
-          position: relative;
+        &:last-child:before {
+          width: 2px;
+          height: calc(100% - 24px);
+          content: "";
           background-color: var(--foc-background-color);
+          position: absolute;
+          left: -13px;
+          top: 22px;
+        }
 
-          &.has-unseen {
-            color: $carrot_green;
-          }
+        &:after {
+          height: 2px;
+          width: 11px;
+          background-color: var(--foc-divider-line-color);
+          content: "";
+          position: absolute;
+          top: 20px;
+          left: -11px;
+        }
 
-          @include big_web() {
-            &:hover {
-              text-decoration: underline;
+        div.reply-comment-outer div.reply-comment div.reply-comment-inner {
+          padding: 4px 8px;
+        }
+      }
+
+      &.vertical-line:before {
+        width: 0;
+        height: calc(100% - 48px);
+        background-color: var(--foc-divider-line-color);
+        content: "";
+        position: absolute;
+        top: 40px;
+        left: 13px;
+      }
+
+      &.no-replies.vertical-line:before {
+        height: calc(100% - 24px);
+      }
+
+      div.reply-comment-outer {
+        padding: 0;
+        position: relative;
+        width: calc(100% + 16px);
+        padding-left: 8px;
+        padding-right: 8px;
+        margin-left: -8px;
+
+        &.truncated-body div.reply-comment {
+          div.reply-comment-content {
+            max-height: calc(3 * 18px + 1px);
+            overflow: hidden;
+
+            @include mobile() {
+              max-height: calc(3 * 24px + 1px);
+            }
+
+            div.reply-comment-body {
+              display: inline-block;
+
+              min-height: unset;
+              height: auto;
+
+              p:empty {
+                display: none;
+              }
+
+              p > br:only-child {
+                display: none;
+              }
             }
           }
-        }
 
-        div.reply-item-loading {
-          height: 30px;
-          margin-left: 8px;
-
-          div.small-loading {
-            margin-top: 6px;
-            margin-right: 6px;
-            float: left;
+          button.read-more-bt {
+            display: block;
           }
 
-          span.reply-item-loading-inner {
-            font-size: 13px;
-            @include OC_Body_Book();
-            line-height: 30px;
-            float: left;
+          div.reply-comment-reactions-footer {
+            display: none;
           }
         }
 
-        div.reply-item-block {
+        // &.showing-picker {
+        //   div.reply-comment div.react-bt-container {
+        //     display: block;
+        //   }
+        // }
+
+        &.showing-picker, &:hover {
+          div.reply-comment div.reply-comment-floating-buttons {
+            display: block;
+          }
+        }
+
+        &.new-comment {
+          // background-color: rgba($wut_purple, 0.16);
+          // border-radius: 8px;
+          margin-bottom: 1px;
+        }
+
+        div.reply-comment {
           position: relative;
-          height: 100%;
 
-          // &:not(:empty) {
-          //   margin-top: 4px;
+          div.reply-comment-inner {
+            padding: 4px 0;
+          }
+
+          div.reply-comment-mobile-menu {
+            display: none;
+            float: right;
+
+            div.emoji-picker-container {
+              button.close-bt {
+                display: none;
+              }
+            }
+
+            @include mobile() {
+              display: block;
+
+              div.emoji-picker-container {
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 100vh;
+                background-color: white;
+                z-index: 104;
+                padding-top: 29px;
+
+                button.close-bt {
+                  color: var(--color);
+                  padding: 0;
+                  margin: 0;
+                  @include OC_Body_Bold();
+                  font-size: 16px;
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  display: block;
+                }
+
+                div.emoji-mart {
+                  position: relative;
+                  width: 100% !important;
+                  height: calc(100vh - 29px);
+                  bottom: unset;
+                  box-shadow: none;
+                  border-radius: none;
+                  border: none;
+
+                  div.emoji-mart-scroll {
+                    height: calc(100vh - 29px - 46px - 29px);
+                  }
+
+                  div.emoji-mart-bar:last-child {
+                    display: none;
+                  }
+                }
+              }
+
+              div.more-menu {
+                button.more-menu-bt {
+                  margin-top: -12px;
+                  margin-left: 7px;
+                  background-color: transparent;
+                }
+
+                ul.more-menu-list {
+                  width: 94px;
+                  top: 20px;
+                  right: 0;
+                  left: unset;
+                }
+              }
+            }
+          }
+
+          div.reply-comment-floating-buttons {
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            height: 32px;
+            z-index: 2;
+            display: none;
+            border-radius: 4px;
+            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+            background-color: var(--color);
+
+            @include dark_mode() {
+              box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+            }
+
+            div.react-bt-container {
+              // width: 30px;
+              height: 32px;
+              float: left;
+
+              div.emoji-mart {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: unset;
+                left: unset;
+              }
+
+              div.emoji-picker-container {
+                button.close-bt {
+                  display: none;
+                }
+              }
+            }
+
+            div.react-bt-container .tooltip {
+              width: 86px;
+            }
+
+            .separator-bt {
+              border-left: 1px solid rgba(white, 0.1);
+            }
+
+            button.floating-bt {
+              padding: 0;
+              height: 32px;
+              min-width: 20px;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 0 8px;
+              float: left;
+              @include OC_Body_Bold();
+              font-size: 12px;
+              line-height: 32px;
+              color: var(--overlay-background-color);
+              text-transform: uppercase;
+
+              @include big_web() {
+                opacity: 0.5;
+                &:hover {
+                  opacity: 1;
+
+                  &:before {
+                    opacity: 0.5;
+                  }
+                }
+              }
+
+              &.reply-bt {
+                padding-left: 24px;
+                background-image: cdnUrl("/img/ML/comment_reply.svg");
+                background-size: 12px 12px;
+                background-position: left 8px top 10px;
+              }
+
+              &.react-bt {
+                padding-left: 26px;
+                background-image: cdnUrl("/img/ML/comment_react.svg");
+                background-size: 14px 14px;
+                background-position: left 8px top 9px;
+                border-right: none;
+
+                div.emoji-mart {
+                  right: 0;
+                  left: unset;
+                  position: absolute;
+                  top: 34px;
+                }
+              }
+
+              @include dark_mode() {
+                &.reply-bt {
+                  background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                }
+
+                &.react-bt {
+                  background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                }
+              }
+            }
+          }
+
+          // button.reply-bt {
+          //   color: var(--color);
+          //   @include OC_Body_Bold();
+          //   font-size: 12px;
+          //   line-height: 24px;
+          //   height: 24px;
+          //   padding: 0;
+          //   margin: 0 0 0 8px;
+          //   float: right;
+          //   opacity: 0.5;
+          //   display: none;
+
+          //   @include big_web() {
+          //     &:hover {
+          //       opacity: 1;
+          //     }
+          //   }
           // }
 
-          div.reply-item-block {
-            margin-top: 4px;
-          }
+          // div.react-bt-container {
+          //   height: 24px;
+          //   z-index: 2;
+          //   float: left;
+          //   margin-left: 8px;
+          //   margin-top: -2px;
+          //   display: none;
 
-          &.horizontal-line {
-            div.reply-comment-outer {
-              padding-right: 0;
-              padding-top: 2px;
-              margin-top: -8px;
+          //   div.emoji-mart {
+          //     position: absolute;
+          //     margin-left: 6px;
+          //     top: unset;
+          //     left: unset;
+          //     right: unset;
+          //     bottom: unset;
+          //   }
+
+          //   div.emoji-picker-container {
+          //     button.close-bt {
+          //       display: none;
+          //     }
+          //   }
+
+          //   button.react-bt {
+          //     padding: 0;
+          //     height: 24px;
+          //     min-width: 24px;
+          //     background-position: center;
+          //     background-repeat: no-repeat;
+          //     padding: 0;
+          //     float: left;
+          //     text-transform: uppercase;
+          //     background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
+          //     background-size: 24px 16px;
+          //     background-position: center;
+          //     border-right: none;
+
+          //     div.emoji-mart {
+          //       right: 0;
+          //       left: unset;
+          //       position: absolute;
+          //       top: 34px;
+          //     }
+
+          //     @include dark_mode() {
+          //       background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
+          //     }
+          //   }
+          // }
+
+          div.reply-comment-right {
+            margin-left: 32px;
+
+            @include mobile() {
+              margin-left: 32px;
+            }
+
+            @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
+
+            @include dark_mode() {
+              @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
             }
           }
 
-          &.horizontal-line {
-            margin-left: 24px;
+          div.reply-comment-header {
+            height: 24px;
 
-            &:last-child:before {
-              width: 2px;
-              height: calc(100% - 24px);
-              content: "";
-              background-color: var(--foc-background-color);
-              position: absolute;
-              left: -13px;
-              top: 22px;
+            @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
+
+            @include dark_mode() {
+              @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
             }
 
-            &:after {
-              height: 2px;
-              width: 11px;
-              background-color: var(--foc-divider-line-color);
-              content: "";
-              position: absolute;
-              top: 20px;
-              left: -11px;
-            }
+            div.reply-comment-author-right {
+              float: left;
+              max-width: 100%;
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              flex-wrap: nowrap;
+              height: 18px;
+              align-items: center;
+              justify-content: flex-start;
 
-            div.reply-comment-outer div.reply-comment div.reply-comment-inner {
-              padding: 4px 8px;
-            }
-          }
+              @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
 
-          &.vertical-line:before {
-            width: 0;
-            height: calc(100% - 48px);
-            background-color: var(--foc-divider-line-color);
-            content: "";
-            position: absolute;
-            top: 40px;
-            left: 13px;
-          }
-
-          &.no-replies.vertical-line:before {
-            height: calc(100% - 24px);
-          }
-
-          div.reply-comment-outer {
-            padding: 0;
-            position: relative;
-            width: calc(100% + 16px);
-            padding-left: 8px;
-            padding-right: 8px;
-            margin-left: -8px;
-
-            &.truncated-body div.reply-comment {
-              div.reply-comment-content {
-                max-height: calc(3 * 18px + 1px);
-                overflow: hidden;
-
-                @include mobile() {
-                  max-height: calc(3 * 24px + 1px);
-                }
-
-                div.reply-comment-body {
-                  display: inline-block;
-
-                  min-height: unset;
-                  height: auto;
-
-                  p:empty {
-                    display: none;
-                  }
-
-                  p > br:only-child {
-                    display: none;
-                  }
-                }
+              @include dark_mode() {
+                @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
               }
 
-              button.read-more-bt {
-                display: block;
-              }
-
-              div.reply-comment-reactions-footer {
-                display: none;
-              }
-            }
-
-            // &.showing-picker {
-            //   div.reply-comment div.react-bt-container {
-            //     display: block;
-            //   }
-            // }
-
-            &.showing-picker, &:hover {
-              div.reply-comment div.reply-comment-floating-buttons {
-                display: block;
-              }
-            }
-
-            &.new-comment {
-              // background-color: rgba($wut_purple, 0.16);
-              // border-radius: 8px;
-              margin-bottom: 1px;
-            }
-
-            div.reply-comment {
-              position: relative;
-
-              div.reply-comment-inner {
-                padding: 4px 0;
-              }
-
-              div.reply-comment-mobile-menu {
-                display: none;
-                float: right;
-
-                div.emoji-picker-container {
-                  button.close-bt {
-                    display: none;
-                  }
-                }
-
-                @include mobile() {
-                  display: block;
-
-                  div.emoji-picker-container {
-                    width: 100vw;
-                    position: fixed;
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    height: 100vh;
-                    background-color: white;
-                    z-index: 104;
-                    padding-top: 29px;
-
-                    button.close-bt {
-                      color: var(--color);
-                      padding: 0;
-                      margin: 0;
-                      @include OC_Body_Bold();
-                      font-size: 16px;
-                      position: absolute;
-                      top: 8px;
-                      right: 8px;
-                      display: block;
-                    }
-
-                    div.emoji-mart {
-                      position: relative;
-                      width: 100% !important;
-                      height: calc(100vh - 29px);
-                      bottom: unset;
-                      box-shadow: none;
-                      border-radius: none;
-                      border: none;
-
-                      div.emoji-mart-scroll {
-                        height: calc(100vh - 29px - 46px - 29px);
-                      }
-
-                      div.emoji-mart-bar:last-child {
-                        display: none;
-                      }
-                    }
-                  }
-
-                  div.more-menu {
-                    button.more-menu-bt {
-                      margin-top: -12px;
-                      margin-left: 7px;
-                      background-color: transparent;
-                    }
-
-                    ul.more-menu-list {
-                      width: 94px;
-                      top: 20px;
-                      right: 0;
-                      left: unset;
-                    }
-                  }
-                }
-              }
-
-              div.reply-comment-floating-buttons {
-                position: absolute;
-                top: -8px;
-                right: 8px;
-                height: 32px;
-                z-index: 2;
-                display: none;
-                border-radius: 4px;
-                box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-                background-color: var(--color);
-
-                @include dark_mode() {
-                  box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
-                }
-
-                div.react-bt-container {
-                  // width: 30px;
-                  height: 32px;
-                  float: left;
-
-                  div.emoji-mart {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    bottom: unset;
-                    left: unset;
-                  }
-
-                  div.emoji-picker-container {
-                    button.close-bt {
-                      display: none;
-                    }
-                  }
-                }
-
-                div.react-bt-container .tooltip {
-                  width: 86px;
-                }
-
-                .separator-bt {
-                  border-left: 1px solid rgba(white, 0.1);
-                }
-
-                button.floating-bt {
-                  padding: 0;
-                  height: 32px;
-                  min-width: 20px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                  padding: 0 8px;
-                  float: left;
-                  @include OC_Body_Bold();
-                  font-size: 12px;
-                  line-height: 32px;
-                  color: var(--overlay-background-color);
-                  text-transform: uppercase;
-
-                  @include big_web() {
-                    opacity: 0.5;
-                    &:hover {
-                      opacity: 1;
-
-                      &:before {
-                        opacity: 0.5;
-                      }
-                    }
-                  }
-
-                  &.reply-bt {
-                    padding-left: 24px;
-                    background-image: cdnUrl("/img/ML/comment_reply.svg");
-                    background-size: 12px 12px;
-                    background-position: left 8px top 10px;
-                  }
-
-                  &.react-bt {
-                    padding-left: 26px;
-                    background-image: cdnUrl("/img/ML/comment_react.svg");
-                    background-size: 14px 14px;
-                    background-position: left 8px top 9px;
-                    border-right: none;
-
-                    div.emoji-mart {
-                      right: 0;
-                      left: unset;
-                      position: absolute;
-                      top: 34px;
-                    }
-                  }
-
-                  @include dark_mode() {
-                    &.reply-bt {
-                      background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
-                    }
-
-                    &.react-bt {
-                      background-image: cdnUrl("/img/ML/comment_react@dark.svg");
-                    }
-                  }
-                }
-              }
-
-              // button.reply-bt {
-              //   color: var(--color);
-              //   @include OC_Body_Bold();
-              //   font-size: 12px;
-              //   line-height: 24px;
-              //   height: 24px;
-              //   padding: 0;
-              //   margin: 0 0 0 8px;
-              //   float: right;
-              //   opacity: 0.5;
-              //   display: none;
-
-              //   @include big_web() {
-              //     &:hover {
-              //       opacity: 1;
-              //     }
-              //   }
-              // }
-
-              // div.react-bt-container {
-              //   height: 24px;
-              //   z-index: 2;
-              //   float: left;
-              //   margin-left: 8px;
-              //   margin-top: -2px;
-              //   display: none;
-
-              //   div.emoji-mart {
-              //     position: absolute;
-              //     margin-left: 6px;
-              //     top: unset;
-              //     left: unset;
-              //     right: unset;
-              //     bottom: unset;
-              //   }
-
-              //   div.emoji-picker-container {
-              //     button.close-bt {
-              //       display: none;
-              //     }
-              //   }
-
-              //   button.react-bt {
-              //     padding: 0;
-              //     height: 24px;
-              //     min-width: 24px;
-              //     background-position: center;
-              //     background-repeat: no-repeat;
-              //     padding: 0;
-              //     float: left;
-              //     text-transform: uppercase;
-              //     background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
-              //     background-size: 24px 16px;
-              //     background-position: center;
-              //     border-right: none;
-
-              //     div.emoji-mart {
-              //       right: 0;
-              //       left: unset;
-              //       position: absolute;
-              //       top: 34px;
-              //     }
-
-              //     @include dark_mode() {
-              //       background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
-              //     }
-              //   }
-              // }
-
-              div.reply-comment-right {
-                margin-left: 32px;
-
-                @include mobile() {
-                  margin-left: 32px;
-                }
-
-                @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
-
-                @include dark_mode() {
-                  @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
-                }
-              }
-
-              div.reply-comment-header {
-                height: 24px;
-
-                @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
-
-                @include dark_mode() {
-                  @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
-                }
-
-                div.reply-comment-author-right {
-                  float: left;
-                  max-width: 100%;
-                  display: flex;
-                  flex-direction: row;
-                  align-items: flex-start;
-                  flex-wrap: nowrap;
-                  height: 18px;
-                  align-items: center;
-                  justify-content: flex-start;
-
-                  @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
-
-                  @include dark_mode() {
-                    @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
-                  }
-
-                  div.reply-comment-author-name {
-                    @include OC_Body_Book();
-                    font-size: 12px;
-                    color: var(--color);
-                    line-height: 15px;
-                    float: left;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    text-decoration: underline;
-
-                    &.clickable-name {
-                      cursor: pointer;
-                    }
-
-                    @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
-
-                    @include dark_mode() {
-                      @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
-                    }
-                  }
-
-                  @include mobile() {
-                    max-width: 80%;
-                  }
-
-                  div.reply-comment-author-right-group {
-                    width: auto;
-                    flex: 1 1 auto;
-                    display: flex;
-                    flex-direction: row;
-                    flex-wrap: nowrap;
-                    align-items: center;
-                    justify-content: flex-start;
-                    max-width: 100%;
-
-                    &.new-comment {
-                      max-width: calc(100% - 35px);
-                    }
-
-                    div.reply-comment-author-name-container {
-                      flex: 1 0 auto;
-                      position: relative;
-
-                      div.user-info-hover {
-                        transform: translateX(-40px);
-                      }
-
-                      div.reply-comment-author-avatar {
-                        position: absolute;
-                        left: -32px;
-                        top: 0;
-                        width: 32px;
-                        height: 24px;
-                        padding-right: 8px;
-
-                        @include user-profile(24);
-
-                        @include mobile() {
-                          left: -32px;
-                          padding-right: 8px;
-                        }
-                      }
-
-                      @include mobile() {
-                        flex: 1 1 auto;
-                      }
-                    }
-
-                    div.reply-comment-author-timestamp {
-                      flex: 0 0 auto;
-                    }
-                  }
-
-                  div.reply-comment-author-name {
-                    @include OC_Body_Book();
-                    font-size: 12px;
-                    color: var(--color);
-                    line-height: 18px;
-                    float: left;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    height: 18px;
-                    cursor: pointer;
-                    text-decoration: underline;
-                  }
-
-                  div.reply-comment-author-timestamp {
-                    @include OC_Body_Book();
-                    font-size: 14px;
-                    color: var(--color);
-                    float: left;
-                    line-height: 18px;
-                    height: 18px;
-                  }
-
-                  div.new-comment-tag {
-                    flex: 0 0 auto;
-                    width: 35px;
-                    height: 16px;
-                    position: relative;
-                    background-color: $feint_emerald;
-                    border-radius: 4px;
-
-                    &:before {
-                      width: 35px;
-                      height: 16px;
-                      @include OC_Body_Bold();
-                      font-size: 11px;
-                      line-height: 16px;
-                      content: "NEW";
-                      color: $carrot_green;
-                      position: absolute;
-                      top: 0;
-                      left: 0;
-                      text-align: center;
-                    }
-                  }
-                }
-              }
-
-              div.reply-comment-content {
-                text-align: left;
-                position: relative;
-
-                div.reply-comment-body {
-                  @include activity-comment(15, 18, 18);
-
-                  @include mobile() {
-                    @include activity-comment(18, 24, 24);
-                  }
-
-                  .interactive-image {
-                    cursor: zoom-in;
-
-                    &:hover {
-                      opacity: 0.7;
-                    }
-                  }
-                }
-              }
-
-              button.read-more-bt {
-                text-align: left;
-                display: none;
-                width: auto;
+              div.reply-comment-author-name {
                 @include OC_Body_Book();
-                color: var(--color);
                 font-size: 12px;
+                color: var(--color);
+                line-height: 15px;
+                float: left;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                text-decoration: underline;
+
+                &.clickable-name {
+                  cursor: pointer;
+                }
+
+                @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
+
+                @include dark_mode() {
+                  @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
+                }
+              }
+
+              @include mobile() {
+                max-width: 80%;
+              }
+
+              div.reply-comment-author-right-group {
+                width: auto;
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: flex-start;
+                max-width: 100%;
+
+                &.new-comment {
+                  max-width: calc(100% - 35px);
+                }
+
+                div.reply-comment-author-name-container {
+                  flex: 1 0 auto;
+                  position: relative;
+
+                  div.user-info-hover {
+                    transform: translateX(-40px);
+                  }
+
+                  div.reply-comment-author-avatar {
+                    position: absolute;
+                    left: -32px;
+                    top: 0;
+                    width: 32px;
+                    height: 24px;
+                    padding-right: 8px;
+
+                    @include user-profile(24);
+
+                    @include mobile() {
+                      left: -32px;
+                      padding-right: 8px;
+                    }
+                  }
+
+                  @include mobile() {
+                    flex: 1 1 auto;
+                  }
+                }
+
+                div.reply-comment-author-timestamp {
+                  flex: 0 0 auto;
+                }
+              }
+
+              div.reply-comment-author-name {
+                @include OC_Body_Book();
+                font-size: 12px;
+                color: var(--color);
                 line-height: 18px;
-                padding: 0;
-                margin: 0;
+                float: left;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                height: 18px;
+                cursor: pointer;
                 text-decoration: underline;
               }
 
-              div.reply-comment-reactions-footer {
+              div.reply-comment-author-timestamp {
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: var(--color);
+                float: left;
+                line-height: 18px;
                 height: 18px;
-                margin-top: 4px;
+              }
 
-                @include mobile() {
-                  margin-bottom: 4px;
+              div.new-comment-tag {
+                flex: 0 0 auto;
+                width: 35px;
+                height: 16px;
+                position: relative;
+                background-color: $feint_emerald;
+                border-radius: 4px;
+
+                &:before {
+                  width: 35px;
+                  height: 16px;
+                  @include OC_Body_Bold();
+                  font-size: 11px;
+                  line-height: 16px;
+                  content: "NEW";
+                  color: $carrot_green;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  text-align: center;
                 }
+              }
+            }
+          }
 
-                div.reactions {
+          div.reply-comment-content {
+            text-align: left;
+            position: relative;
+
+            div.reply-comment-body {
+              @include activity-comment(15, 18, 18);
+
+              @include mobile() {
+                @include activity-comment(18, 24, 24);
+              }
+
+              .interactive-image {
+                cursor: zoom-in;
+
+                &:hover {
+                  opacity: 0.7;
+                }
+              }
+            }
+          }
+
+          button.read-more-bt {
+            text-align: left;
+            display: none;
+            width: auto;
+            @include OC_Body_Book();
+            color: var(--color);
+            font-size: 12px;
+            line-height: 18px;
+            padding: 0;
+            margin: 0;
+            text-decoration: underline;
+          }
+
+          div.reply-comment-reactions-footer {
+            height: 18px;
+            margin-top: 4px;
+
+            @include mobile() {
+              margin-bottom: 4px;
+            }
+
+            div.reactions {
+              height: 18px;
+
+              div.reactions-list {
+
+                button.reaction-btn {
                   height: 18px;
+                  padding: 0;
+                  margin-left: 8px;
 
-                  div.reactions-list {
+                  &:first-child {
+                    margin-left: 0px;
+                  }
 
-                    button.reaction-btn {
+                  span.reaction {
+                    font-size: 18px;
+                    line-height: 21px;
+                    margin-right: 0;
+                    display: inline;
+                    text-align: left;
+
+                    &.safari {
+                      @include retina_screen() {
+                        font-size: 15px;
+                      }
+                    }
+                  }
+
+                  div.count {
+                    line-height: 20px;
+                    font-size: 14px;
+                    margin-left: 5px;
+                    margin-top: 0;
+                  }
+
+                  &.reaction-picker {
+                    span.reaction {
+                      margin-top: 0;
+                      width: 24px;
                       height: 18px;
-                      padding: 0;
-                      margin-left: 8px;
-
-                      &:first-child {
-                        margin-left: 0px;
-                      }
-
-                      span.reaction {
-                        font-size: 18px;
-                        line-height: 21px;
-                        margin-right: 0;
-                        display: inline;
-                        text-align: left;
-
-                        &.safari {
-                          @include retina_screen() {
-                            font-size: 15px;
-                          }
-                        }
-                      }
-
-                      div.count {
-                        line-height: 20px;
-                        font-size: 14px;
-                        margin-left: 5px;
-                        margin-top: 0;
-                      }
-
-                      &.reaction-picker {
-                        span.reaction {
-                          margin-top: 0;
-                          width: 24px;
-                          height: 18px;
-                          background-size: 24px 18px;
-                          background-position: top 1px left 0;
-                          margin-top: 0;
-                          margin-right: 0;
-                        }
-                      }
+                      background-size: 24px 18px;
+                      background-position: top 1px left 0;
+                      margin-top: 0;
+                      margin-right: 0;
                     }
                   }
                 }
               }
+            }
+          }
 
-              div.reply-comment-footer {
-                height: 24px;
-                margin-top: 2px;
+          div.reply-comment-footer {
+            height: 24px;
+            margin-top: 2px;
 
-                @include mobile() {
-                  margin-top: 8px;
-                }
-              }
+            @include mobile() {
+              margin-top: 8px;
             }
           }
         }
