@@ -6,7 +6,6 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.chat :as chat]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
@@ -110,17 +109,16 @@
      (whats-new/check-whats-new-badge))
     s)}
   [s]
-  (let [{:keys [panel-stack org-data board-data]} (drv/react s :navbar-data)
+  (let [{:keys [panel-stack org-data board-data current-org-slug]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
-        org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
         expo-app-version (drv/react s :expo-app-version)
-        show-invite-people? (and org-slug
+        show-invite-people? (and current-org-slug
                                  is-admin-or-author?)
         desktop-app-data (detect-desktop-app)
         app-version (cond
@@ -129,7 +127,7 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))
+                           current-org-slug)
         can-compose? (pos? (count (drv/react s :editable-boards)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
@@ -198,14 +196,14 @@
               "Recurring updates"]])
         ;; Settings separator
         (when (and (not is-mobile?)
-                   (or org-slug
+                   (or current-org-slug
                        show-invite-people?
                        show-billing?))
           [:div.oc-menu-separator])
         ;; Admin settings
         (when (and (not is-mobile?)
                    (= user-role :admin)
-                   org-slug)
+                   current-org-slug)
           [:a
             {:href "#"
              :on-click #(team-settings-click s %)}
@@ -221,7 +219,7 @@
               "Invite people"]])
         ;; Manage team
         (when (and (not is-mobile?)
-                   org-slug)
+                   current-org-slug)
           [:a
             {:href "#"
              :on-click #(manage-team-click s %)}
@@ -231,7 +229,7 @@
                 "View team")]])
         ;; Integrations
         (when (and (not is-mobile?)
-                   org-slug
+                   current-org-slug
                    (= user-role :admin))
           [:a
             {:href "#"

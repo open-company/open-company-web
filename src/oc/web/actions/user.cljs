@@ -73,7 +73,7 @@
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug & [force-refresh?]]
-  (api/get-entry-point (:org @router/path)
+  (api/get-entry-point (dis/current-org-slug)
    (fn [success body]
      (entry-point-get-finished success body
        (fn [orgs collection]
@@ -85,7 +85,7 @@
              (if (= (:uuid org-data) org-slug)
                (router/rewrite-org-uuid-as-slug org-slug (:slug org-data))
                (org-actions/get-org org-data (not force-refresh?)))
-             (if (router/current-secure-activity-id)
+             (if (dis/current-secure-activity-id)
                (activity-actions/secure-activity-get
                 #(activity-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
                (do
@@ -96,13 +96,13 @@
                    (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
                    ;; no orgs present, remove the last org cookie to avoid infinite loops
                    (cook/remove-cookie! (router/last-org-cookie)))
-                 (when-not (router/current-secure-activity-id)
+                 (when-not (dis/current-secure-activity-id)
                    ;; 404: secure entry can't 404 here since the org response is included in the
                    ;; secure entry response and not in the entry point response
                    (routing-actions/maybe-404)))))
            ;; If user is on login page and he's logged in redirect to the org page
            (when (and (jwt/jwt)
-                      (utils/in? (:route @router/path) "login")
+                      (utils/in? (dis/route) "login")
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
@@ -123,6 +123,19 @@
       (not is-login-route?)
       (save-login-redirect))))
 
+(defn- newest-org [orgs]
+  (first (sort-by :created-at orgs)))
+
+(defn- get-default-org [orgs]
+  (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
+    (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
+      (or
+        ; Get the last accessed board from the saved cookie
+        last-org
+        ; Fallback to the newest board if the saved board was not found
+        (newest-org orgs)))
+    (newest-org orgs)))
+
 (defn login-redirect []
   (let [redirect-url (cook/get-cookie router/login-redirect-cookie)
         orgs (dis/orgs-data)]
@@ -132,10 +145,10 @@
       (router/nav!
        (if (zero? (count orgs))
          oc-urls/sign-up-profile
-         (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))
+         (oc-urls/default-landing (:slug (get-default-org orgs))))))))
 
 (defn lander-check-team-redirect []
-  (utils/after 100 #(api/get-entry-point (:org @router/path)
+  (utils/after 100 #(api/get-entry-point (dis/current-org-slug)
     (fn [success body]
       (entry-point-get-finished success body login-redirect)))))
 
@@ -237,7 +250,7 @@
     (jwt-actions/update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
-      (api/get-entry-point (:org @router/path) entry-point-get-finished)
+      (api/get-entry-point (dis/current-org-slug) entry-point-get-finished)
       (auth-settings-get))
     ;; Go to password setup
     (router/nav! oc-urls/confirm-invitation-password))
@@ -252,11 +265,11 @@
 (defn auth-with-token-success [token-type jwt]
   (api/get-auth-settings
    (fn [auth-body]
-     (api/get-entry-point (:org @router/path)
+     (api/get-entry-point (dis/current-org-slug)
       (fn [success body]
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
-              to-org (utils/get-default-org orgs)]
+              to-org (get-default-org orgs)]
           (router/redirect! (if to-org (oc-urls/default-landing (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
@@ -280,7 +293,7 @@
 (defn auth-with-token [token-type]
   (let [token-links (:links (dis/auth-settings))
         auth-url (utils/link-for token-links "authenticate" "GET" {:auth-source "email"})
-        token (:token (:query-params @router/path))]
+        token (dis/query-param :token)]
     (api/auth-with-token auth-url token (partial auth-with-token-callback token-type))
     (dis/dispatch! [:auth-with-token token-type])))
 
@@ -293,7 +306,8 @@
   [user-email team-token-signup? status jwt]
   (let [signup-redirect (if team-token-signup?
                          oc-urls/confirm-invitation-profile
-                         oc-urls/sign-up-profile)]
+                         oc-urls/sign-up-profile)
+        current-org-slug (dis/current-org-slug)]
     (cond
       (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
       (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
@@ -303,19 +317,19 @@
             (empty? (:avatar-url jwt)))
         (do
           (utils/after 200 #(router/nav! signup-redirect))
-          (api/get-entry-point (:org @router/path) entry-point-get-finished))
-        (api/get-entry-point (:org @router/path)
+          (api/get-entry-point current-org-slug entry-point-get-finished))
+        (api/get-entry-point current-org-slug
          (fn [success body]
            (entry-point-get-finished success body
              (fn [orgs collection]
                (when (pos? (count orgs))
-                 (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))))
+                 (router/nav! (oc-urls/default-landing (:slug (get-default-org orgs))))))))))
       :else ;; Valid signup let's collect user data
       (do
         (jwt-actions/update-jwt-cookie jwt)
         (nux-actions/new-user-registered "email")
         (utils/after 200 #(router/nav! signup-redirect))
-        (api/get-entry-point (:org @router/path) entry-point-get-finished)
+        (api/get-entry-point (dis/current-org-slug) entry-point-get-finished)
         (dis/dispatch! [:signup-with-email/success])))))
 
 (defn signup-with-email-callback
@@ -469,6 +483,15 @@
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
+(defn verify-continue [orgs]
+  (let [org (get-default-org orgs)]
+    (router/nav! (if org
+                   (if (and (empty? (jwt/get-key :first-name))
+                            (empty? (jwt/get-key :last-name)))
+                     oc-urls/confirm-invitation-profile
+                     (oc-urls/org (:slug org)))
+                  oc-urls/sign-up-profile))))
+
 ;; Mobile push notifications
 
 (def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
@@ -514,8 +537,8 @@
 
 (defn initial-loading [& [force-refresh]]
   (let [force-refresh (or force-refresh
-                          (utils/in? (:route @router/path) "org")
-                          (utils/in? (:route @router/path) "login"))
+                          (utils/in? (dis/route-param :route) "org")
+                          (utils/in? (dis/route-param :route) "login"))
         latest-entry-point (if (or force-refresh
                                    (nil? (:latest-entry-point @dis/app-state)))
                              0
@@ -527,19 +550,19 @@
         now (.getTime (js/Date.))
         reload-time (* 1000 60 20)] ; every 20m
     (when (or (> (- now latest-entry-point) reload-time)
-              (and (router/current-org-slug)
+              (and (dis/current-org-slug)
                    (nil? (dis/org-data))))
-      (entry-point-get (router/current-org-slug) force-refresh))
+      (entry-point-get (dis/current-org-slug) force-refresh))
     (when (> (- now latest-auth-settings) reload-time)
       (auth-settings-get))))
 
 ;; User notifications
 
 (defn read-notifications []
-  (dis/dispatch! [:user-notifications/read (router/current-org-slug)]))
+  (dis/dispatch! [:user-notifications/read (dis/current-org-slug)]))
 
 (defn read-notification [notification]
-  (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))
+  (dis/dispatch! [:user-notification/read (dis/current-org-slug) notification]))
 
 ;; Follow/unfollow related actions
 
@@ -551,11 +574,11 @@
 
 (defn refresh-follow-containers []
   (let [org-data (dis/org-data)
-        current-board-slug (router/current-board-slug)
-        ; is-inbox? (= (router/current-org-slug) "inbox")
+        current-board-slug (dis/current-board-slug)
+        ; is-inbox? (= (dis/current-org-slug) "inbox")
         is-following? (= current-board-slug "following")
         is-replies? (= current-board-slug "replies")
-        ; is-unfollowing? (= (router/current-org-slug) "unfollowing")
+        ; is-unfollowing? (= (dis/current-org-slug) "unfollowing")
         ; inbox-delay (if is-inbox? 1 500)
         following-delay (if is-following? 1 500)
         replies-delay (if is-replies? 1 500)
@@ -568,13 +591,13 @@
     ))
 
 (defn toggle-publisher [publisher-uuid]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (dis/current-org-slug)
         current-publishers (map :user-id (dis/follow-publishers-list org-slug))
         follow? (not (utils/in? current-publishers publisher-uuid))
         next-publishers (if follow?
                           (vec (conj (set current-publishers) publisher-uuid))
                           (vec (disj (set current-publishers) publisher-uuid)))]
-    (dis/dispatch! [:publisher/follow (router/current-org-slug)
+    (dis/dispatch! [:publisher/follow (dis/current-org-slug)
                                       {:org-slug org-slug
                                        :publisher-uuids next-publishers
                                        :follow? follow?
@@ -587,13 +610,13 @@
       (ws-cc/publisher-unfollow publisher-uuid))))
 
 (defn toggle-board [board-uuid]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (dis/current-org-slug)
         current-boards (map :uuid (dis/follow-boards-list org-slug))
         follow? (not (utils/in? current-boards board-uuid))
         next-boards (if follow?
                       (vec (conj (set current-boards) board-uuid))
                       (vec (disj (set current-boards) board-uuid)))]
-    (dis/dispatch! [:board/follow (router/current-org-slug)
+    (dis/dispatch! [:board/follow (dis/current-org-slug)
                                   {:org-slug org-slug
                                    :board-uuids next-boards
                                    :follow? follow?
@@ -612,12 +635,12 @@
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [data]}]
       ; (let [fixed-notifications (notif-utils/fix-notifications @dis/app-state (:notifications data))]
-      ;   (dis/dispatch! [:user-notifications (router/current-org-slug) fixed-notifications]))
+      ;   (dis/dispatch! [:user-notifications (dis/current-org-slug) fixed-notifications]))
       ))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
       (when-let [fixed-notification (notif-utils/fix-notification @dis/app-state (assoc data :unread true))]
-        ; (dis/dispatch! [:user-notification (router/current-org-slug) data])
+        ; (dis/dispatch! [:user-notification (dis/current-org-slug) data])
         (notification-actions/show-notification
          {:title (:title fixed-notification)
           :mention true
@@ -629,10 +652,10 @@
           :expire 5}))))
   (ws-cc/subscribe :follow/list
     (fn [{:keys [data]}]
-      (dis/dispatch! [:follow/loaded (router/current-org-slug) data])))
+      (dis/dispatch! [:follow/loaded (dis/current-org-slug) data])))
   (ws-cc/subscribe :followers/count
     (fn [{:keys [data]}]
-      (dis/dispatch! [:followers-count/finish (router/current-org-slug) data]))))
+      (dis/dispatch! [:followers-count/finish (dis/current-org-slug) data]))))
 
 ;; Debug
 

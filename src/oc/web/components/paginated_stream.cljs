@@ -4,7 +4,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.dom :as dom-utils]
@@ -250,7 +249,9 @@
         max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
         card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
         scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
-        current-board-slug (router/current-board-slug)]
+        current-board-slug @(drv/get-ref s :board-slug)
+        current-contributions-id @(drv/get-ref s :contributions-id)
+        current-contributions-id @(drv/get-ref s :contributions-id)]
     ;; scrolling down
     (when (and ;; not already loading more
                (not @(::bottom-loading s))
@@ -269,7 +270,7 @@
         (activity-actions/replies-more @(::has-next s) :down)
         (= current-board-slug "following")
         (activity-actions/following-more @(::has-next s) :down)
-        (seq (router/current-contributions-id))
+        (seq current-contributions-id)
         (contributions-actions/contributions-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
@@ -303,6 +304,8 @@
                         (drv/drv :foc-layout)
                         (drv/drv :current-user-data)
                         (drv/drv :force-list-update)
+                        (drv/drv :board-slug)
+                        (drv/drv :contributions-id)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -347,6 +350,8 @@
                           s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        _board-slug (drv/react s :board-slug)
+        _contributions-id (drv/react s :contributions-id)
         comments-data (drv/react s :comments-data)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)

@@ -1,7 +1,6 @@
 (ns oc.web.actions.nav-sidebar
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
@@ -43,7 +42,7 @@
 
 (defn nav-to-author!
   ([e author-uuid url]
-  (nav-to-author! e author-uuid url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+  (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
 
   ([e author-uuid url back-y refresh?]
   (when (and e
@@ -53,44 +52,44 @@
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (router/current-org-slug)
+         org-slug (dis/current-org-slug)
          sort-type (activity-actions/saved-sort-type org-slug author-uuid)
          org-data (dis/org-data)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
-         (routing-actions/routing @router/path)
+         (routing-actions/post-routing)
          (user-actions/initial-loading refresh?))
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug author-uuid sort-type "dashboard"]
-          {:org org-slug
-           :contributions author-uuid
-           :sort-type sort-type
-           :scroll-y back-y
-           :query-params (router/query-params)})
+         (dis/dispatch! [:routing {:org org-slug
+                                   :contributions author-uuid
+                                   :sort-type sort-type
+                                   :scroll-y back-y
+                                   :query-params (dis/query-params)
+                                   :route [org-slug author-uuid sort-type "dashboard"]}])
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
            (refresh-contributions-data author-uuid)))))))))
 
 (defn- current-container-data []
-  (let [board-slug (router/current-board-slug)
-        contributions-id (router/current-contributions-id)]
+  (let [board-slug (dis/current-board-slug)
+        contributions-id (dis/current-contributions-id)]
     (cond
      (seq contributions-id)
-     (dis/contributions-data @dis/app-state (router/current-org-slug) contributions-id)
+     (dis/contributions-data @dis/app-state (dis/current-org-slug) contributions-id)
      (dis/is-container? board-slug)
-     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+     (dis/container-data @dis/app-state (dis/current-org-slug) board-slug)
      (= (keyword board-slug) :topic)
      nil
      :else
-     (dis/board-data @dis/app-state (router/current-org-slug) board-slug))))
+     (dis/board-data @dis/app-state (dis/current-org-slug) board-slug))))
 
 (defn- reload-board-data []
-  (when-not (router/current-activity-id)
-    (let [board-slug (router/current-board-slug)
+  (when-not (dis/current-activity-id)
+    (let [board-slug (dis/current-board-slug)
           org-data (dis/org-data)
           board-data (current-container-data)]
        (cond
@@ -102,30 +101,30 @@
         (activity-actions/replies-get org-data true nil)
 
         (and (= board-slug "all-posts")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (activity-actions/all-posts-get org-data)
 
         (and (= board-slug "all-posts")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (activity-actions/recent-all-posts-get org-data)
 
         (= board-slug "bookmarks")
         (activity-actions/bookmarks-get org-data)
 
         (and (= board-slug "following")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (activity-actions/following-get org-data true nil)
 
         (and (= board-slug "following")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (activity-actions/recent-following-get org-data)
 
         (and (= board-slug "unfollowing")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (activity-actions/unfollowing-get org-data)
 
         (and (= board-slug "unfollowing")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (activity-actions/recent-unfollowing-get org-data)
 
         :default
@@ -136,8 +135,8 @@
             (section-actions/section-get (:slug fixed-board-data) board-link)))))))
 
 (defn- refresh-board-data []
-  (when-not (router/current-activity-id)
-    (let [current-board-slug (router/current-board-slug)
+  (when-not (dis/current-activity-id)
+    (let [current-board-slug (dis/current-board-slug)
           org-data (dis/org-data)
           container-data (current-container-data)]
        (if (#{:replies :following} (:container-slug container-data))
@@ -148,7 +147,7 @@
 
 (defn nav-to-url!
   ([e board-slug url]
-  (nav-to-url! e board-slug url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+  (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
 
   ([e board-slug url back-y refresh?]
   (when (and e
@@ -158,25 +157,25 @@
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (router/current-org-slug)
+         org-slug (dis/current-org-slug)
          sort-type (activity-actions/saved-sort-type org-slug board-slug)
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          is-container? (dis/is-container? board-slug)
          org-data (dis/org-data)
-         current-activity-id (router/current-activity-id)]
+         current-activity-id (dis/current-activity-id)]
      (if (= current-path url)
        (do ;; In case user clicked on the current location let's refresh it
-         (routing-actions/routing @router/path)
+         (routing-actions/post-routing)
          (user-actions/initial-loading refresh?))
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug (if is-container? "dashboard" board-slug) sort-type]
-          {:org org-slug
-           :board board-slug
-           :sort-type sort-type
-           :scroll-y back-y
-           :query-params (router/query-params)})
+         (dis/dispatch! [:routing {:org org-slug
+                                   :board board-slug
+                                   :sort-type sort-type
+                                   :scroll-y back-y
+                                   :query-params (dis/query-params)
+                                   :route [org-slug (if is-container? "dashboard" board-slug) sort-type]}])
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
            (reload-board-data))
@@ -194,9 +193,9 @@
 
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)
-        route @router/path
-        board (router/current-board-slug)
-        contributions-id (router/current-contributions-id)
+        route (dis/route)
+        board (dis/current-board-slug)
+        contributions-id (dis/current-contributions-id)
         is-contributions? (seq contributions-id)
         to-url (or (:back-to route) (oc-urls/following))
         cont-data (current-container-data)
@@ -204,7 +203,7 @@
                                  (:refresh route)
                                  (not cont-data))
         ;; Get the previous scroll top position
-        default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
+        default-back-y (or (:back-y route) (utils/page-scroll-top))
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
         back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
@@ -219,11 +218,11 @@
    (open-post-modal entry-data dont-scroll nil))
 
   ([entry-data dont-scroll comment-uuid]
-  (let [org (router/current-org-slug)
+  (let [org (dis/current-org-slug)
         entry-board-slug (:board-slug entry-data)
-        current-sort-type (router/current-sort-type)
-        current-contributions-id (router/current-contributions-id)
-        current-board-slug (router/current-board-slug)
+        current-sort-type (dis/current-sort-type)
+        current-contributions-id (dis/current-contributions-id)
+        current-board-slug (dis/current-board-slug)
         back-to (cond
                   (and (seq current-contributions-id)
                        (not current-board-slug))
@@ -240,20 +239,21 @@
         post-url (if comment-uuid
                    (oc-urls/comment-url org entry-board-slug entry-uuid comment-uuid)
                    (oc-urls/entry org entry-board-slug entry-uuid))
-        query-params (router/query-params)
+        query-params (dis/query-params)
         route (vec (remove nil? [org current-board-slug current-contributions-id current-sort-type entry-uuid "activity"]))
         route-path* {:org org
                      :board current-board-slug
                      :entry-board entry-board-slug
-                     :contributions (router/current-contributions-id)
+                     :contributions (dis/current-contributions-id)
                      :sort-type current-sort-type
                      :activity entry-uuid
                      :back-to back-to
-                     :query-params query-params}
+                     :query-params query-params
+                     :route route}
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)
                      route-path*)]
-    (router/set-route! route route-path)
+    (dis/dispatch! [:routing route-path])
     (cmail-actions/cmail-hide)
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url))))
 

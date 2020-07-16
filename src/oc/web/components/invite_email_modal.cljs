@@ -3,7 +3,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nux :as nux-actions]

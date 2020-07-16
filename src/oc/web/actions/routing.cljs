@@ -7,8 +7,8 @@
             [oc.shared.useragent :as ua]
             [oc.web.actions.cmail :as cmail-actions]))
 
-(defn routing [route-path]
-  (dis/dispatch! [:routing route-path])
+(defn post-routing []
+  ;; Re-dispatch the current change data
   (dis/dispatch! [:container/status (dis/change-data) true]))
 
 (defn maybe-404

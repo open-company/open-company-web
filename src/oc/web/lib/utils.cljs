@@ -5,8 +5,8 @@
             [goog.object :as gobj]
             [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
-            [oc.web.urls :as oc-urls]
+            [oc.web.utils.drafts :as du]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
@@ -570,19 +570,6 @@
         _ (.remove $hidden-div)]
     body-without-preview))
 
-(defn newest-org [orgs]
-  (first (sort-by :created-at orgs)))
-
-(defn get-default-org [orgs]
-  (if-let [last-org-slug (cook/get-cookie (router/last-org-cookie))]
-    (let [last-org (first (filter #(= (:slug %) last-org-slug) orgs))]
-      (or
-        ; Get the last accessed board from the saved cookie
-        last-org
-        ; Fallback to the newest board if the saved board was not found
-        (newest-org orgs)))
-    (newest-org orgs)))
-
 (defn- remove-elements [$container el-selector re-check]
   (loop [$el (.find $container el-selector)]
     (when (and (pos? (.-length $el))
@@ -599,15 +586,6 @@
         _ (remove-elements $container "> p:last-child" re-check)
         _ (remove-elements $container "> p:first-child" re-check)]
     (.html $container)))
-
-(defn your-digest-url []
-  (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
-    (if-let [board-slug "all-posts"]
-      ;; Repalce all-posts above with the following to go back to the last visited board
-      ;; (cook/get-cookie (router/last-board-cookie org-slug))]
-      (oc-urls/board org-slug board-slug)
-      (oc-urls/org org-slug))
-    oc-urls/login))
 
 (defn url-org-slug [storage-url]
   (let [parts (s/split storage-url "/")]
@@ -635,21 +613,13 @@
 
 (def max-abstract-length 280)
 
-(def default-drafts-board-name "Drafts")
+(def default-drafts-board-name du/default-drafts-board-name)
 
-(def default-drafts-board-slug "drafts")
+(def default-drafts-board-slug du/default-drafts-board-slug)
 
-(def default-draft-status "draft")
+(def default-draft-status du/default-draft-status)
 
-(def default-drafts-board
-  {:uuid "0000-0000-0000"
-   :created-at "2000-01-01T00:00:00.000Z"
-   :updated-at "2000-01-01T00:00:00.000Z"
-   :slug default-drafts-board-slug
-   :name default-drafts-board-name
-   :entries []
-   :access "private"
-   :read-only true})
+(def default-drafts-board du/default-drafts-board)
 
 (def default-section-slug "--default-section-slug")
 (def default-section-access "team")
@@ -739,8 +709,8 @@
 
 (defn page-scroll-top []
   (let [is-mobile? (responsive/is-mobile-size?)
-        board-slug (router/current-board-slug)
-        activity-id (router/current-activity-id)]
+        board-slug (dis/current-board-slug)
+        activity-id (dis/current-activity-id)]
     (if (and (not activity-id)
              board-slug
              (not= (keyword board-slug) (keyword default-drafts-board-slug))

@@ -3,7 +3,6 @@
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
@@ -13,7 +12,7 @@
 (defn react-from-picker [activity-data emoji]
   (dis/dispatch! [:handle-reaction-to-entry activity-data
    {:reaction emoji :count 1 :reacted true :links [] :authors []}
-   (dis/activity-key (router/current-org-slug) (:uuid activity-data))])
+   (dis/activity-key (dis/current-org-slug) (:uuid activity-data))])
   ;; Some times emoji.native coming from EmojiMart is null
   ;; so we need to avoid posting empty emojis
   (when (and emoji
@@ -26,7 +25,7 @@
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
-  (let [activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
+  (let [activity-key (dis/activity-key (dis/current-org-slug) (:uuid activity-data))
         link-method (if reacting? "PUT" "DELETE")
         reaction-link (utils/link-for (:links reaction-data) "react" link-method)
         fixed-count (if reacting?
@@ -42,7 +41,7 @@
         (activity-actions/get-entry activity-data)))))
 
 (defn is-activity-reaction? [org-slug board-slug interaction-data]
-  (let [activity-uuid (router/current-activity-id)
+  (let [activity-uuid (dis/current-activity-id)
         item-uuid (:resource-uuid interaction-data)
         reaction-data (:interaction interaction-data)
         comments-key (dis/activity-comments-key org-slug activity-uuid)
@@ -64,15 +63,15 @@
       (activity-actions/get-entry entry-data))))
 
 (defn ws-interaction-reaction-add [interaction-data]
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)]
+  (let [org-slug (dis/current-org-slug)
+        board-slug (dis/current-board-slug)]
     (when (is-activity-reaction? org-slug board-slug interaction-data)
       (refresh-if-needed org-slug board-slug interaction-data)))
   (dis/dispatch! [:ws-interaction/reaction-add interaction-data]))
 
 (defn ws-interaction-reaction-delete [interaction-data]
-  (let [org-slug (router/current-org-slug)
-        board-slug (router/current-board-slug)]
+  (let [org-slug (dis/current-org-slug)
+        board-slug (dis/current-board-slug)]
     (when (is-activity-reaction? org-slug board-slug interaction-data)
       (refresh-if-needed org-slug board-slug interaction-data)))
   (dis/dispatch! [:ws-interaction/reaction-delete interaction-data]))

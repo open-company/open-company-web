@@ -4,7 +4,6 @@
             [clojure.data :as clj-data]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]

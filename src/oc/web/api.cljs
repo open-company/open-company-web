@@ -74,7 +74,7 @@
                                notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))
         jwt-or-id-token (or (j/jwt)
                             (j/id-token))
-        ; invite-token (-> @router/path :query-params :invite-token)
+        ; invite-token (dispatcher/invite-token)
         ]
     (cond
       jwt-or-id-token
@@ -275,7 +275,7 @@
         (callback success fixed-body)))))
 
 (defn get-auth-settings [callback]
-  (let [invite-token (-> @router/path :query-params :invite-token)
+  (let [invite-token (dispatcher/invite-token)
         default-headers (headers-for-link {:access-control-allow-headers nil
                                            :content-type "application/json"})
         with-auth-token (if invite-token
@@ -494,7 +494,7 @@
 ;; Signup
 
 (defn signup-with-email [auth-link first-name last-name email pswd timezone callback]
-  (let [invite-token (-> @router/path :query-params :invite-token)
+  (let [invite-token (dispatcher/invite-token)
         default-headers (headers-for-link auth-link)
         with-auth-token (if invite-token
                           (merge default-headers {"Authorization" (str "Bearer " invite-token)})

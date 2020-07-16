@@ -1,6 +1,5 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.web.router :as router]
             [oc.web.lib.responsive :as responsive]))
 
 (defonce _lock-counter (atom 0))

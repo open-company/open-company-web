@@ -4,7 +4,6 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
@@ -67,6 +66,7 @@
   (let [{:keys [orgs
                 org-data
                 jwt-data
+                current-org-slug
                 current-board-slug
                 current-contributions-id
                 current-activity-id
@@ -105,7 +105,7 @@
                      (and (not is-mobile?)
                           (not (map? active-users))))
         org-not-found (and (not (nil? orgs))
-                           (not ((set (map :slug orgs)) (router/current-org-slug))))
+                           (not ((set (map :slug orgs)) current-org-slug)))
         section-not-found (and (not org-not-found)
                                org-data
                                (not current-contributions-id)

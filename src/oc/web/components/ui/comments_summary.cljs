@@ -3,7 +3,6 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -39,7 +38,8 @@
            new-comments-count
            publisher?
            add-comment-focus-prefix
-           show-bubble-icon?]}]
+           show-bubble-icon?
+           current-activity-id]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -68,7 +68,7 @@
          :on-click (fn [e]
                      ;; To avoid navigating to the post again and lose the coming from data
                      ;; nav only when not in the expanded post
-                     (if (seq (router/current-activity-id))
+                     (if (seq current-activity-id)
                        (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
                          (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
                        (nav-actions/open-post-modal entry-data true))

@@ -57,7 +57,7 @@
                                                       :expire 5
                                                       :id :slack-bot-added}))
     (when (and (= bot-access "team")
-               (not= (:new (router/query-params)) "true"))
+               (not= (:new (dis/query-params)) "true"))
       (notification-actions/show-notification {:title "Integration added"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
@@ -75,7 +75,7 @@
      (fn [{:keys [status success body]}]
        (if success
          (let [resp (when success (json->cljs body))]
-           (dis/dispatch! [:active-users (router/current-org-slug) resp]))
+           (dis/dispatch! [:active-users (dis/current-org-slug) resp]))
          (when (< retry max-retry-count)
            (utils/after 1000 #(load-active-users active-users-link (inc (or retry 0))))))))))
 
@@ -112,23 +112,6 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(defn- redirect-to-ap? [org-data]
-  (when-not (router/ap-redirect)
-    (let [following-count (int (:following-count org-data))
-          is-following? (= (router/current-board-slug) "following")]
-      (when (and is-following?
-                 (zero? following-count)
-                 (not (router/current-activity-id))
-                 (not (router/current-secure-activity-id))
-                 (not (router/ap-redirect)))
-        (timbre/info "Redirect to all-posts for empty following:" (:following-count org-data))
-        (router/set-route! [(:slug org-data) "all-posts" "dashboard"]
-         {:org (:slug org-data)
-          :board "all-posts"
-          :query-params (router/query-params)})
-        (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/all-posts (:slug org-data)))))
-    (router/ap-redirect-done!)))
-
 (def other-resources-delay 1500)
 
 (defn org-loaded
@@ -139,12 +122,11 @@
   [org-data & [saved? email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
-             (= (router/current-org-slug) (:slug org-data)))
-    ; (redirect-to-ap? org-data)
+             (= (dis/current-org-slug) (:slug org-data)))
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [boards (:boards org-data)
-        current-board-slug (router/current-board-slug)
+        current-board-slug (dis/current-board-slug)
         ; inbox-link (utils/link-for (:links org-data) "following-inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
@@ -162,9 +144,9 @@
         is-bookmarks? (= current-board-slug "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         is-topics? (= current-board-slug "topics")
-        is-contributions? (seq (router/current-contributions-id))
+        is-contributions? (seq (dis/current-contributions-id))
         ; is-unfollowing? (= current-board-slug "unfollowing")
-        sort-type (router/current-sort-type)
+        sort-type (dis/current-sort-type)
         delay-count (atom 1)
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         ; all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
@@ -173,23 +155,24 @@
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))]
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
+        route (dis/route-param :route)]
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
     (when is-drafts?
       (dis/dispatch! [:drafts-nav/show (:slug org-data)]))
     (when complete-refresh?
       ;; Load secure activity
-      (if (router/current-secure-activity-id)
+      (if (dis/current-secure-activity-id)
         (aa/secure-activity-get)
         (do
           ;; Load the active users
           (when active-users-link
             (load-active-users active-users-link))
           ;; Load the current activity
-          (when (and (router/current-activity-id)
-                     (router/current-entry-board-slug))
-            (cmail-actions/get-entry-with-uuid (router/current-entry-board-slug) (router/current-activity-id)))
+          (when (and (dis/current-activity-id)
+                     (dis/current-entry-board-slug))
+            (cmail-actions/get-entry-with-uuid (dis/current-entry-board-slug) (dis/current-activity-id)))
           ;; Load inbox data
           ; (when (and ls/wut?
           ;            inbox-link)
@@ -211,8 +194,8 @@
             (utils/maybe-after drafts-delay #(sa/section-get utils/default-drafts-board-slug drafts-link)))
           ;; contributions data
           (when (and contrib-link
-                     (router/current-contributions-id))
-            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (router/current-contributions-id))))
+                     (dis/current-contributions-id))
+            (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
           ;; Preload unfollowing data with recently posted sort
           ; (when unfollowing-link
           ;   (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
@@ -259,18 +242,18 @@
         ; The board wasn't found, showing a 404 page
         (if is-drafts?
           (utils/after 100 #(sa/section-get-finish (:slug org-data) utils/default-drafts-board-slug dis/recently-posted-sort utils/default-drafts-board))
-          (when-not (router/current-activity-id) ;; user is not asking for a specific post
+          (when-not (dis/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
-      (and (not (utils/in? (:route @router/path) "org-settings-invite"))
-           (not (utils/in? (:route @router/path) "org-settings-team"))
-           (not (utils/in? (:route @router/path) "org-settings"))
-           (not (utils/in? (:route @router/path) "email-verification"))
-           (not (utils/in? (:route @router/path) "sign-up"))
-           (not (utils/in? (:route @router/path) "email-wall"))
-           (not (utils/in? (:route @router/path) "confirm-invitation"))
-           (not (utils/in? (:route @router/path) "secure-activity"))
-           (not (router/current-contributions-id)))
+      (and (not (dis/in-route? :org-settings-invite))
+           (not (dis/in-route? :org-settings-team))
+           (not (dis/in-route? :org-settings))
+           (not (dis/in-route? :email-verification))
+           (not (dis/in-route? :sign-up))
+           (not (dis/in-route? :email-wall))
+           (not (dis/in-route? :confirm-invitation))
+           (not (dis/in-route? :secure-activity))
+           (not (dis/current-contributions-id)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]
         (router/nav!

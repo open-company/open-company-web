@@ -65,7 +65,7 @@
                 (oc-urls/comment-url (:board-slug activity-data) (:uuid activity-data) interaction-uuid)
                 (oc-urls/entry (:board-slug activity-data) (:uuid activity-data))))]
     (cond
-      (and (= (router/current-board-slug) "replies")
+      (and (= (dis/current-board-slug) "replies")
            (seq activity-data))
       #(oc.web.actions.nav-sidebar/open-post-modal activity-data false interaction-uuid)
       (seq activity-data)
@@ -92,9 +92,9 @@
 (defn- load-item-if-needed [db board-slug entry-uuid interaction-uuid]
   (when (and board-slug
              entry-uuid)
-    (let [activity-data (dis/activity-data (router/current-org-slug) entry-uuid db)]
+    (let [activity-data (dis/activity-data (dis/current-org-slug db) entry-uuid db)]
       (when-not (map? activity-data)
-        (load-item db (router/current-org-slug) board-slug entry-uuid interaction-uuid))
+        (load-item db (dis/current-org-slug db) board-slug entry-uuid interaction-uuid))
       (when (and (map? activity-data)
                  (:uuid activity-data)
                  (:board-slug activity-data))
@@ -162,11 +162,11 @@
         excluded-ns (filter #(-> % :notify-at included-notify-at not) ns)
         all-ns (remove nil? (concat all-roots all-comments excluded-ns))
         with-notify-at (map #(assoc % :latest-notify-at (latest-notify-at %)) all-ns)
-        activity-data (dis/activity-data (router/current-org-slug) entry-id db)
+        activity-data (dis/activity-data (dis/current-org-slug db) entry-id db)
         board-id (or (:board-slug activity-data) (:board-id (first ns)))]
     {:entry-id  entry-id
      :notifications (sort-by :latest-notify-at with-notify-at)
-     :activity-data (dis/activity-data (router/current-org-slug) entry-id db)
+     :activity-data (dis/activity-data (dis/current-org-slug db) entry-id db)
      :current-user-id (or (get-in db [:current-user-data :user-id]) (get-in db [:jwt :user-id]))
      :latest-notify-at (latest-notify-at with-notify-at)
      :click (load-item-if-needed db board-id entry-id nil)}))

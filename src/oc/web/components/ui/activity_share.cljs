@@ -3,7 +3,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -143,8 +142,8 @@
                       [:div.checkbox-label "Public (anyone with this link)"]]]])
               [:div.medium-row.group
                 (let [url-protocol (str "http" (when ls/jwt-cookie-secure "s") "://")
-                      secure-url (oc-urls/secure-activity (router/current-org-slug) secure-uuid)
-                      post-url (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
+                      secure-url (oc-urls/secure-activity (:slug org-data) secure-uuid)
+                      post-url (oc-urls/entry (:slug org-data) (:board-slug activity-data) (:uuid activity-data))
                       share-url (str url-protocol ls/web-server
                                   (if (= @(::url-audience s) :team)
                                     post-url

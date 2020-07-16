@@ -25,7 +25,7 @@
           (ws-ic/boards-watch board-uuids)))))))
 
 (defn- is-currently-shown? [author-uuid]
-  (= (router/current-contributions-id) author-uuid))
+  (= (dis/current-contributions-id) author-uuid))
 
 (defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
@@ -44,7 +44,7 @@
     (when is-currently-shown
       (when member?
         ;; only watch the boards of the posts of the contributor
-        (when (= (router/current-contributions-id) (:author-id (:collection contrib-data)))
+        (when (= (dis/current-contributions-id) (:author-id (:collection contrib-data)))
           ; (request-reads-count (->> contrib-data :collection :items (map :uuid)))
           (watch-boards (:items (:collection contrib-data))))
         ;; Retrieve reads count if there are items in the loaded section
@@ -72,7 +72,7 @@
 (defn- contributions-more-finish [org-slug author-uuid sort-type direction {:keys [success body]}]
   (let [contrib-data (when success (json->cljs body))]
     (when success
-      (when (= (router/current-contributions-id) (:author-id (:collection contrib-data)))
+      (when (= (dis/current-contributions-id) (:author-id (:collection contrib-data)))
         ;; only watch the boards of the posts of the contributor
         (watch-boards (:items (:collection contrib-data))))
       ;; Retrieve reads count if there are items in the loaded section
@@ -81,8 +81,8 @@
      direction (when success (:collection contrib-data))])))
 
 (defn contributions-more [more-link direction]
-  (let [org-slug (router/current-org-slug)
-        author-uuid (router/current-contributions-id)]
+  (let [org-slug (dis/current-org-slug)
+        author-uuid (dis/current-contributions-id)]
     (api/load-more-items more-link direction (partial contributions-more-finish org-slug author-uuid dis/recently-posted-sort direction))
     (dis/dispatch! [:contributions-more org-slug author-uuid dis/recently-posted-sort])))
 
@@ -91,14 +91,14 @@
 (defn subscribe []
   (ws-cc/subscribe :item/change
     (fn [data]
-      (when (router/current-contributions-id)
+      (when (dis/current-contributions-id)
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
               change-type (:change-type change-data)
-              activity-data (dis/activity-data (router/current-org-slug) activity-uuid)]
+              activity-data (dis/activity-data (dis/current-org-slug) activity-uuid)]
           ;; On update or delete of a post from the currently shown user
           (when (or (= change-type :add)
                     (and (#{:update :delete} change-type)
-                         (= (router/current-contributions-id)
+                         (= (dis/current-contributions-id)
                             (-> activity-data :publisher :user-id))))
-            (contributions-get (router/current-contributions-id))))))))
+            (contributions-get (dis/current-contributions-id))))))))

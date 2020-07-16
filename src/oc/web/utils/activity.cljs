@@ -26,7 +26,7 @@
 
 (defn show-separators?
 
-  ([container-slug] (show-separators? container-slug (router/current-sort-type)))
+  ([container-slug] (show-separators? container-slug (dis/current-sort-type)))
 
   ([container-slug sort-type]
    (and ;; only on board/containers/contributions pages
@@ -443,9 +443,9 @@
                                           :comments-key comments-key
                                           :body (when (seq body) (json->cljs body))
                                           :activity-uuid (:uuid activity-data)
-                                          :secure-activity-uuid (router/current-secure-activity-id)}])
+                                          :secure-activity-uuid (dis/current-secure-activity-id)}])
     (let [replies-data (dis/replies-data org-slug @dis/app-state)
-          current-board-slug (router/current-board-slug)
+          current-board-slug (dis/current-board-slug)
           is-replies? (= (keyword current-board-slug) :replies)
           entry-is-in-replies? (some #(when (= (:uuid %) (:uuid activity-data)) %) (:posts-list replies-data))]
       (when (and is-replies?
@@ -454,7 +454,7 @@
 
 (defn get-comments [activity-data]
   (when activity-data
-    (let [org-slug (router/current-org-slug)
+    (let [org-slug (dis/current-org-slug)
           comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
           comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
@@ -779,16 +779,16 @@
 (defn parse-container
   "Parse container data coming from the API, like Following or Replies (AP, Bookmarks etc)."
   ([container-data]
-   (parse-container container-data {} (dis/org-data) (dis/active-users) (router/current-sort-type) nil))
+   (parse-container container-data {} (dis/org-data) (dis/active-users) (dis/current-sort-type) nil))
 
   ([container-data change-data]
-   (parse-container container-data change-data (dis/org-data) (dis/active-users) (router/current-sort-type) nil))
+   (parse-container container-data change-data (dis/org-data) (dis/active-users) (dis/current-sort-type) nil))
 
   ([container-data change-data org-data]
-   (parse-container container-data change-data org-data (dis/active-users) (router/current-sort-type) nil))
+   (parse-container container-data change-data org-data (dis/active-users) (dis/current-sort-type) nil))
 
   ([container-data change-data org-data active-users]
-   (parse-container container-data change-data org-data active-users (router/current-sort-type) nil))
+   (parse-container container-data change-data org-data active-users (dis/current-sort-type) nil))
 
   ([container-data change-data org-data active-users sort-type]
    (parse-container container-data change-data org-data active-users sort-type nil))
@@ -914,12 +914,12 @@
 ;; Last used section
 
 (defn last-used-section []
-  (when-let [org-slug (router/current-org-slug)]
+  (when-let [org-slug (dis/current-org-slug)]
     (let [cookie-name (router/last-used-board-slug-cookie org-slug)]
       (cook/get-cookie cookie-name))))
 
 (defn save-last-used-section [section-slug]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (dis/current-org-slug)
         last-board-cookie (router/last-used-board-slug-cookie org-slug)]
     (if section-slug
       (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))

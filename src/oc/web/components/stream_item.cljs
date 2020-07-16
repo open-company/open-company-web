@@ -7,7 +7,6 @@
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.images :as img]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
@@ -83,9 +82,10 @@
     (when (and (fn? disabled)
                (not (disabled s)))
       (let [el (rum/dom-node s)
-            hr (js/Hammer. el)]
+            hr (js/Hammer. el)
+            current-board-slug @(drv/get-ref s :board-slug)]
         (when (and (fn? swipe-left)
-                   (= (router/current-board-slug) "inbox"))
+                   (= current-board-slug "inbox"))
           (.on hr "swipeleft" (partial swipe-left s)))
         (when (fn? swipe-right)
           (.on hr "swiperight" (partial swipe-right s)))
@@ -110,6 +110,8 @@
                          ;; Derivatives
                          (drv/drv :activity-share-container)
                          (drv/drv :mobile-swipe-menu)
+                         (drv/drv :board-slug)
+                         (drv/drv :activity-uuid)
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
@@ -152,7 +154,8 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
-        is-inbox? (= (router/current-board-slug) "inbox")
+        current-board-slug (drv/react s :board-slug)
+        current-activity-id (drv/react s :activity-uuid)
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -243,14 +246,13 @@
         [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
-          {:class (when is-inbox? "has-inbox")}
           (post-authorship {:activity-data activity-data
                             :user-avatar? true
                             :user-hover? true
                             :board-hover? true
                             ; :show-board? foc-board
                             :activity-board? (and (not (:publisher-board activity-data))
-                                                  (not= (:board-slug activity-data) (router/current-board-slug))
+                                                  (not= (:board-slug activity-data) current-board-slug)
                                                   (> boards-count 1))
                             :current-user-id current-user-id})
           [:div.separator-dot]
@@ -320,7 +322,8 @@
                                        :publisher? publisher?
                                        ; :show-new-tag? (pos? (:new-comments-count activity-data))
                                        ; :new-comments-count (:new-comments-count activity-data)
-                                       :add-comment-focus-prefix "main-comment"})])
+                                       :add-comment-focus-prefix "main-comment"
+                                       :current-activity-id current-activity-id})])
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

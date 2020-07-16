@@ -3,7 +3,6 @@
             [dommy.core :as dom]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
@@ -286,7 +285,8 @@
                                      :show-bubble-icon? true
                                      :hide-label? true
                                      :publisher? is-publisher?
-                                     :add-comment-focus-prefix "main-comment"}))]
+                                     :add-comment-focus-prefix "main-comment"
+                                     :current-activity-id (:uuid activity-data)}))]
               (when user-is-part-of-the-team
                 (wrt-count {:activity-data activity-data
                             :read-data read-data}))]

@@ -1,6 +1,6 @@
 (ns oc.web.mixins.section
   (:require [taoensso.timbre :as timbre]
-            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.activity :as activity-actions])
   (:import [goog.async Throttle]))
@@ -11,8 +11,8 @@
    s)})
 
 (defn focus-reload []
-  (when-let [slug (or (router/current-board-slug)
-                      (router/current-contributions-id))]
+  (when-let [slug (or (dis/current-board-slug)
+                      (dis/current-contributions-id))]
     (timbre/info "Reloading data for:" slug)
     (activity-actions/refresh-board-data slug)))
 

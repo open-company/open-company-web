@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.empty-board
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -13,16 +12,19 @@
                          (drv/drv :org-data)
                          (drv/drv :current-user-data)
                          (drv/drv :contributions-user-data)
+                         (drv/drv :board-slug)
+                         (drv/drv :contributions-id)
                          section-mixins/container-nav-in
   [s]
-  (let [current-board-kw (keyword (router/current-board-slug))
+  (let [current-board-kw (keyword (drv/react s :board-slug))
+        current-contributions-id (drv/react s :contributions-id)
         is-all? (= current-board-kw :all-posts)
         is-replies? (= current-board-kw :replies)
         is-bookmarks? (= current-board-kw :bookmarks)
         is-following? (= current-board-kw :following)
         is-unfollowing? (= current-board-kw :unfollowing)
         is-drafts-board? (= current-board-kw (keyword utils/default-drafts-board-slug))
-        is-contributions? (seq (router/current-contributions-id))
+        is-contributions? (seq current-contributions-id)
         org-data (drv/react s :org-data)
         current-user-data (drv/react s :current-user-data)
         contrib-user-data (drv/react s :contributions-user-data)

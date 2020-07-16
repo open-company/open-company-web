@@ -64,12 +64,12 @@
 
 (defn drv-root [component target]
   (ru/drv-root {:state dis/app-state
-                :drv-spec (dis/drv-spec dis/app-state router/path)
+                :drv-spec (dis/drv-spec dis/app-state)
                 :component component
                 :target target})
   (when-let [notifications-mount-point (sel1 [:div#oc-notifications-container])]
     (ru/drv-root {:state dis/app-state
-                  :drv-spec (dis/drv-spec dis/app-state router/path)
+                  :drv-spec (dis/drv-spec dis/app-state)
                   :component notifications
                   :target notifications-mount-point})))
 
@@ -122,7 +122,7 @@
     (when (not= pathname (s/lower pathname))
       (let [lower-location (str (s/lower pathname) (.. js/window -location -search) (.. js/window -location -hash))]
         (set! (.-location js/window) lower-location))))
-  (swap! router/path {})
+  (dis/dispatch! [:routing {}])
   (when (and (contains? (:query-params params) :jwt)
              (map? (js->clj (jwt/decode (-> params :query-params :jwt)))))
     ; contains :jwt, so saving it
@@ -142,7 +142,7 @@
   (inject-loading))
 
 (defn post-routing []
-  (routing-actions/routing @router/path)
+  (routing-actions/post-routing)
   (user-actions/initial-loading true))
 
 (defn check-nux [query-params]
@@ -192,7 +192,6 @@
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (or (:board params) "following")
-        entry-board (::entry-board params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
@@ -211,7 +210,11 @@
       (do
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :entry-board entry-board :board board :sort-type sort-type :query-params (:query-params params)})
+        (dis/dispatch! [:routing {:org org
+                                  :board board
+                                  :sort-type sort-type
+                                  :query-params (:query-params params)
+                                  :route [org route]}])
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -223,8 +226,9 @@
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing params rewrite-url)
   ;; save route
-  (let [org (:org params)]
-    (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
+  (let [org (:org params)
+        route (vec (remove nil? [route-name org]))]
+    (dis/dispatch! [:routing {:org org :query-params (:query-params params) :route route}]))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     ; remove rum component if mounted to the same node
@@ -244,18 +248,15 @@
         has-at-param (contains? query-params :at)]
     (pre-routing params true {:query-params query-params :keep-params [:at]})
     ;; save the route
-    (router/set-route!
-     (vec
-      (remove
-       nil?
-       [org board (when entry entry) (when comment comment) route]))
-     {:org org
-      :board board
-      :sort-type sort-type
-      :entry-board entry-board
-      :activity entry
-      :comment comment
-      :query-params query-params})
+    (dis/dispatch! [:routing {:org org
+                              :board board
+                              :sort-type sort-type
+                              :entry-board entry-board
+                              :activity entry
+                              :comment comment
+                              :query-params query-params
+                              :route (vec (remove nil?
+                                      [org board (when entry entry) (when comment comment) route]))}])
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -269,12 +270,11 @@
         query-params (:query-params params)]
     (pre-routing params true {:query-params query-params})
     ;; save the route
-    (router/set-route!
-     [org contributions route]
-     {:org org
-      :contributions contributions
-      :sort-type sort-type
-      :query-params query-params})
+    (dis/dispatch! [:routing {:org org
+                              :contributions contributions
+                              :sort-type sort-type
+                              :query-params query-params
+                              :route [org contributions route]}])
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -288,16 +288,13 @@
     (when pre-routing?
       (pre-routing params true))
     ;; save the route
-    (router/set-route!
-     (vec
-      (remove
-       nil?
-       [org route secure-id]))
-     {:org org
-      :activity (:entry params)
-      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
-      :comment (:comment params)
-      :query-params query-params})
+    (dis/dispatch! [:routing {:org org
+                              :activity (:entry params)
+                              :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+                              :comment (:comment params)
+                              :query-params query-params
+                              :route (vec (remove nil?
+                                      [org route secure-id]))}])
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
               (not (dis/board-data))
@@ -445,7 +442,7 @@
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (when-not (seq (:token (:query-params params)))
-        (router/redirect! (if (jwt/jwt) (utils/your-digest-url) urls/home)))
+        (router/redirect! (if (jwt/jwt) (urls/your-digest-url) urls/home)))
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
       (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
@@ -698,7 +695,7 @@
 
 (defn init []
   ;; Setup timbre log level
-  (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
+  (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
   ;; Setup API requests
   (api/config-request
    #(ja/update-jwt %) ;; success jwt refresh after expire

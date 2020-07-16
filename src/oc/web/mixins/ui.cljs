@@ -3,7 +3,6 @@
             [dommy.core :as dommy]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]

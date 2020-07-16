@@ -4,7 +4,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -109,6 +108,7 @@
                  (drv/drv :wrt-read-data)
                  (drv/drv :wrt-activity-data)
                  (drv/drv :current-user-data)
+                 (drv/drv :org-slug)
                  ;; Locals
                  (rum/local false ::search-active)
                  (rum/local false ::search-focused)
@@ -134,6 +134,7 @@
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
         current-user-data (drv/react s :current-user-data)
+        current-org-slug (drv/react s :org-slug)
         is-author? (:publisher? activity-data)
         read-data* (drv/react s :wrt-read-data)
         read-data (as-> read-data* rd
@@ -235,7 +236,7 @@
                      "private ")
                    "post."))
                 (when (and (:private-access? read-data)
-                           (dis/board-data (router/current-org-slug) (:board-slug activity-data)))
+                           (dis/board-data current-org-slug (:board-slug activity-data)))
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
                     "Manage team members?"])

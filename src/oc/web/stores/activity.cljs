@@ -3,7 +3,6 @@
             [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.notification :as notif-util]
             [oc.web.utils.org :as ou]
@@ -14,7 +13,7 @@
   ([current-value] (force-list-update-value current-value nil))
   ([current-value container-slug]
    (if (or (nil? container-slug)
-           (= container-slug (router/current-board-slug)))
+           (= container-slug (dispatcher/current-board-slug)))
      (utils/activity-uuid)
      current-value)))
 

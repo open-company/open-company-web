@@ -5,7 +5,6 @@
             [cuerdas.core :as string]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.mention :as mention-utils]))

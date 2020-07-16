@@ -6,7 +6,6 @@
             [oc.web.utils.activity :as activity-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.router :as router]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.stores.user :as user-store]))
 
@@ -35,7 +34,7 @@
                           (dissoc :has-changes))
         editable-boards (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
                          (:boards org-data))
-        current-board-slug (:board (:route @router/path))
+        current-board-slug (dispatcher/current-board-slug)
         editing-board (when (seq editable-boards)
                         (cmail-actions/get-board-for-edit (when-not (dispatcher/is-container? current-board-slug) current-board-slug) editable-boards))
         next-db (if (and (not (contains? db :cmail-state))

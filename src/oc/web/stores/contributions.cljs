@@ -2,7 +2,6 @@
   (:require [cuerdas.core :as str]
             [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.router :as router]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
@@ -11,7 +10,7 @@
   ([current-value] (force-list-update-value current-value nil))
   ([current-value author-uuid]
    (if (or (nil? author-uuid)
-           (= author-uuid (router/current-contributions-id)))
+           (= author-uuid (dispatcher/current-contributions-id)))
      (utils/activity-uuid)
      current-value)))
 

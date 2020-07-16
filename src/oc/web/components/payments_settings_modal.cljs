@@ -4,7 +4,6 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]

@@ -61,7 +61,7 @@
   (when body
     (let [posts-data-key (dis/posts-data-key org-slug)
           bookmarks-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "bookmarks")
+      (when (= (dis/current-board-slug) "bookmarks")
         (cook/set-cookie! (router/last-board-cookie org-slug) "bookmarks" (* 60 60 24 365))
         (request-reads-count (->> bookmarks-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection bookmarks-data))))
@@ -84,8 +84,8 @@
   (dis/dispatch! [:bookmarks-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn bookmarks-more [more-link direction]
-  (api/load-more-items more-link direction (partial bookmarks-more-finish (router/current-org-slug) dis/recently-posted-sort direction))
-  (dis/dispatch! [:bookmarks-more (router/current-org-slug) dis/recently-posted-sort]))
+  (api/load-more-items more-link direction (partial bookmarks-more-finish (dis/current-org-slug) dis/recently-posted-sort direction))
+  (dis/dispatch! [:bookmarks-more (dis/current-org-slug) dis/recently-posted-sort]))
 
 ;; All Posts
 
@@ -94,7 +94,7 @@
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
           all-posts-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "all-posts")
+      (when (= (dis/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org-slug) "all-posts" (* 60 60 24 365))
         (request-reads-count (->> all-posts-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection all-posts-data))))
@@ -121,8 +121,8 @@
   (dis/dispatch! [:all-posts-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
-  (api/load-more-items more-link direction (partial all-posts-more-finish (router/current-org-slug) (router/current-sort-type) direction))
-  (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
+  (api/load-more-items more-link direction (partial all-posts-more-finish (dis/current-org-slug) (dis/current-sort-type) direction))
+  (dis/dispatch! [:all-posts-more (dis/current-org-slug)]))
 
 ;; Inbox
 
@@ -130,7 +130,7 @@
   (when body
     (let [posts-data-key (dis/posts-data-key org-slug)
           inbox-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "inbox")
+      (when (= (dis/current-board-slug) "inbox")
         (cook/set-cookie! (router/last-board-cookie org-slug) "inbox" (* 60 60 24 365))
         (request-reads-count (->> inbox-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection inbox-data))))
@@ -150,8 +150,8 @@
   (dis/dispatch! [:inbox-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn inbox-more [more-link direction]
-  (api/load-more-items more-link direction (partial inbox-more-finish (router/current-org-slug) dis/recently-posted-sort direction))
-  (dis/dispatch! [:inbox-more (router/current-org-slug) dis/recently-posted-sort]))
+  (api/load-more-items more-link direction (partial inbox-more-finish (dis/current-org-slug) dis/recently-posted-sort direction))
+  (dis/dispatch! [:inbox-more (dis/current-org-slug) dis/recently-posted-sort]))
 
 ;; Following stream
 
@@ -160,7 +160,7 @@
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
           following-data (when success (json->cljs body))
-          current-board-slug (router/current-board-slug)]
+          current-board-slug (dis/current-board-slug)]
       (when (= current-board-slug "following")
         (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
         (request-reads-count (->> following-data :collection :items (map :uuid)))
@@ -194,7 +194,7 @@
     (following-get org-data keep-seen-at? nil))))
 
 (defn following-did-change []
-  (let [current-board-slug (keyword (router/current-board-slug))
+  (let [current-board-slug (keyword (dis/current-board-slug))
         org-data (dis/org-data)]
     (if (= current-board-slug :following)
       (following-refresh org-data true)
@@ -213,8 +213,8 @@
   (dis/dispatch! [:following-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn following-more [more-link direction]
-  (api/load-more-items more-link direction (partial following-more-finish (router/current-org-slug) (router/current-sort-type) direction))
-  (dis/dispatch! [:following-more (router/current-org-slug) (router/current-sort-type)]))
+  (api/load-more-items more-link direction (partial following-more-finish (dis/current-org-slug) (dis/current-sort-type) direction))
+  (dis/dispatch! [:following-more (dis/current-org-slug) (dis/current-sort-type)]))
 
 ;; Replies stream
 
@@ -223,7 +223,7 @@
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
           replies-data (when success (json->cljs body))
-          current-board-slug (router/current-board-slug)]
+          current-board-slug (dis/current-board-slug)]
       (when (= current-board-slug "replies")
         (cook/set-cookie! (router/last-board-cookie org-slug) "replies" (* 60 60 24 365))
         (request-reads-count (->> replies-data :collection :items (map :uuid)))
@@ -260,8 +260,8 @@
   (dis/dispatch! [:replies-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn replies-more [more-link direction]
-  (api/load-more-items more-link direction (partial replies-more-finish (router/current-org-slug) (router/current-sort-type) direction))
-  (dis/dispatch! [:replies-more (router/current-org-slug) (router/current-sort-type)]))
+  (api/load-more-items more-link direction (partial replies-more-finish (dis/current-org-slug) (dis/current-sort-type) direction))
+  (dis/dispatch! [:replies-more (dis/current-org-slug) (dis/current-sort-type)]))
 
 ;; Unfollowing stream
 
@@ -270,7 +270,7 @@
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
           unfollowing-data (when success (json->cljs body))]
-      (when (= (router/current-board-slug) "unfollowing")
+      (when (= (dis/current-board-slug) "unfollowing")
         (cook/set-cookie! (router/last-board-cookie org-slug) "unfollowing" (* 60 60 24 365))
         (request-reads-count (->> unfollowing-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection unfollowing-data))))
@@ -297,23 +297,24 @@
   (dis/dispatch! [:unfollowing-more/finish org-slug sort-type direction (when success (json->cljs body))]))
 
 (defn unfollowing-more [more-link direction]
-  (api/load-more-items more-link direction (partial unfollowing-more-finish (router/current-org-slug) (router/current-sort-type) direction))
-  (dis/dispatch! [:unfollowing-more (router/current-org-slug) (router/current-sort-type)]))
+  (api/load-more-items more-link direction (partial unfollowing-more-finish (dis/current-org-slug) (dis/current-sort-type) direction))
+  (dis/dispatch! [:unfollowing-more (dis/current-org-slug) (dis/current-sort-type)]))
 
 ;; Referesh org when needed
 (defn- refresh-org-data-cb
 
   ([resp]
-   (refresh-org-data-cb (router/current-board-slug) (router/current-sort-type) resp))
+   (refresh-org-data-cb (dis/current-board-slug) (dis/current-sort-type) resp))
 
   ([board-slug sort-type {:keys [status body success]}]
   (let [org-data (json->cljs body)
-        is-all-posts (= board-slug "all-posts")
-        is-bookmarks (= board-slug "bookmarks")
-        is-inbox (= board-slug "inbox")
-        is-following (= board-slug "following")
-        is-unfollowing (= board-slug "unfollowing")
-        is-replies (= board-slug "replies")
+        board-kw (keyword board-slug)
+        is-all-posts (= board-kw :all-posts)
+        is-bookmarks (= board-kw :bookmarks)
+        is-inbox (= board-kw :inbox)
+        is-following (= board-kw :following)
+        is-unfollowing (= board-kw :unfollowing)
+        is-replies (= board-kw :replies)
         is-drafts (= board-slug utils/default-drafts-board-slug)
         active-users (dis/active-users)
         is-contributions? (get active-users board-slug)
@@ -376,17 +377,17 @@
 (defn entry-edit-dismiss
   []
   ;; If the user was looking at the modal, dismiss it too
-  (when (router/current-activity-id)
-    (utils/after 1 #(let [is-all-posts (= (router/current-board-slug) "all-posts")
-                          is-must-see (= (router/current-board-slug) "must-see")]
+  (when (dis/current-activity-id)
+    (utils/after 1 #(let [is-all-posts (= (dis/current-board-slug) "all-posts")
+                          is-must-see (= (dis/current-board-slug) "must-see")]
                       (router/nav!
                         (cond
                           is-all-posts ; AP
-                          (oc-urls/all-posts (router/current-org-slug))
+                          (oc-urls/all-posts (dis/current-org-slug))
                           is-must-see
-                          (oc-urls/must-see (router/current-org-slug))
+                          (oc-urls/must-see (dis/current-org-slug))
                           :else
-                          (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
+                          (oc-urls/board (dis/current-org-slug) (dis/current-board-slug)))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
   (dis/dispatch! [:entry-edit/dismiss]))
@@ -434,7 +435,7 @@
                      (swap! initial-revision assoc (:uuid entry-saved)
                             (or (:revision-id entry-map) -1)))
                    (when board-data
-                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
+                     (dis/dispatch! [:entry-save-with-board/finish (dis/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
                    (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
@@ -447,10 +448,10 @@
 (declare send-item-read)
 
 (defn entry-save-finish [board-slug entry-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)
+  (let [org-slug (dis/current-org-slug)
         is-published? (= (:status entry-data) "published")]
-    (when (and (router/current-activity-id)
-               (not= board-slug (router/current-board-slug)))
+    (when (and (dis/current-activity-id)
+               (not= board-slug (dis/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid entry-data))))
     (au/save-last-used-section board-slug)
     (when-not is-published?
@@ -492,20 +493,20 @@
 (declare secure-activity-get)
 
 (defn get-entry [entry-data]
-  (if (router/current-secure-activity-id)
+  (if (dis/current-secure-activity-id)
     (secure-activity-get)
     (let [entry-link (utils/link-for (:links entry-data) "self")]
-      (dis/dispatch! [:activity-get {:org-slug (router/current-org-slug)
+      (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug)
                                      :board-slug (:board-slug entry-data)
                                      :activity-uuid (:uuid entry-data)}])
       (api/get-entry entry-link
         (fn [{:keys [status success body]}]
           (if (and (= status 404)
-                   (= (:uuid entry-data) (router/current-activity-id)))
+                   (= (:uuid entry-data) (dis/current-activity-id)))
             (do
-              (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid entry-data) nil])
+              (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid entry-data) nil])
               (routing-actions/maybe-404))
-            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])))))))
+            (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil])))))))
 
 (declare entry-revert)
 
@@ -581,7 +582,7 @@
                                                                         :board-uuid (:uuid response-board-data)})]
                        (entry-save-cb updated-entry-data fixed-edit-key response))))))
              ;; Save new post to existing board
-             (let [org-slug (router/current-org-slug)
+             (let [org-slug (dis/current-org-slug)
                    entry-board-data (first (filter #(= (:slug %) (:board-slug fixed-edited-data)) (:boards org-data)))
                    entry-create-link (utils/link-for (:links entry-board-data) "create")]
                (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))))))
@@ -609,7 +610,7 @@
 
 (defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
-    (entry-publish-finish entry-uuid edit-key (router/current-org-slug) posted-to-board-slug (when success (json->cljs body)))
+    (entry-publish-finish entry-uuid edit-key (dis/current-org-slug) posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed edit-key])))
 
 (defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
@@ -621,7 +622,7 @@
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc entry-uuid)
     ; (refresh-org-data)
-    (when-not (= (:slug new-board-data) (router/current-board-slug))
+    (when-not (= (:slug new-board-data) (dis/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
@@ -662,13 +663,13 @@
 
 (defn- activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
-  (when (= (router/current-board-slug) utils/default-drafts-board-slug)
+  (when (= (dis/current-board-slug) utils/default-drafts-board-slug)
     (sa/drafts-get)))
 
 (defn- real-activity-delete [activity-data]
   (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
     (api/delete-entry activity-delete-link activity-delete-finish)
-    (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data])))
+    (dis/dispatch! [:activity-delete (dis/current-org-slug) activity-data])))
 
 (defn activity-delete [activity-data]
   ;; Make sure the WRT sample is dismissed
@@ -683,7 +684,7 @@
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
     (api/patch-entry patch-entry-link fixed-activity-data nil create-update-entry-cb)
-    (dis/dispatch! [:activity-move activity-data (router/current-org-slug) board-data])))
+    (dis/dispatch! [:activity-move activity-data (dis/current-org-slug) board-data])))
 
 (defn activity-share-show [activity-data & [element-id share-medium]]
   (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
@@ -707,7 +708,7 @@
   (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
-          org-slug (router/current-org-slug)
+          org-slug (dis/current-org-slug)
           board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
           revert-entry-link (when entry-exists?
                               ;; If the entry already exists use the publish link in it
@@ -728,22 +729,22 @@
    ;; that don't exists, the secure activity are always visible
    (routing-actions/maybe-404 (and (not (jwt/jwt))
                                    (not (jwt/id-token))
-                                   (some? (router/current-secure-activity-id))))
+                                   (some? (dis/current-secure-activity-id))))
 
    ;; The id token will have a current activity id, shared urls will not.
    ;; if the ids don't match return a 404
-   (and (some? (router/current-activity-id))
+   (and (some? (dis/current-activity-id))
         (not= (:uuid activity-data)
-              (router/current-activity-id)))
+              (dis/current-activity-id)))
    (routing-actions/maybe-404)
 
    (and secure-uuid
         (jwt/jwt)
         (:member? (dis/org-data)))
-   (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
+   (router/redirect! (oc-urls/entry (dis/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
 
    :default
-   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
+   (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) activity-data secure-uuid])))
 
 (defn- org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
@@ -760,7 +761,7 @@
 (defn- secure-activity-get-finish [{:keys [status success body]}]
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
-    (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
+    (activity-get-finish status secure-activity-data (dis/current-secure-activity-id))
     (dis/dispatch! [:org-loaded org-data])))
 
 (defn get-org [org-data cb]
@@ -778,13 +779,13 @@
    :accept "application/vnd.open-company.entry.v1+json"})
 
 (defn secure-activity-get
-  ([] (secure-activity-get nil (router/current-secure-activity-id)))
-  ([cb] (secure-activity-get cb (router/current-secure-activity-id)))
+  ([] (secure-activity-get nil (dis/current-secure-activity-id)))
+  ([cb] (secure-activity-get cb (dis/current-secure-activity-id)))
   ([cb secure-uuid]
    (let [partial-secure-link (utils/link-for (:links (dis/api-entry-point)) "partial-secure")
          secure-link (if partial-secure-link
-                       (utils/link-replace-href partial-secure-link {:org-slug (router/current-org-slug) :secure-uuid secure-uuid})
-                       (build-secure-activity-link (router/current-org-slug) secure-uuid))]
+                       (utils/link-replace-href partial-secure-link {:org-slug (dis/current-org-slug) :secure-uuid secure-uuid})
+                       (build-secure-activity-link (dis/current-org-slug) secure-uuid))]
      (api/get-secure-entry secure-link
       (fn [resp]
         (secure-activity-get-finish resp)
@@ -805,8 +806,8 @@
 
 (defn check-entry-for-badges [container-id entry-uuid]
   ;; Reload the entry from the server and check if we need to turn on the badge for home
-  (let [org-slug (router/current-org-slug)
-        current-board-slug (router/current-board-slug)
+  (let [org-slug (dis/current-org-slug)
+        current-board-slug (dis/current-board-slug)
         board-data (au/board-by-uuid container-id)]
     (when (not= (:slug board-data) utils/default-drafts-board-slug)
       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
@@ -856,15 +857,15 @@
             container-id (:item-id change-data)
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
-        ; (when (= (router/current-board-slug) "all-posts")
+        ; (when (= (dis/current-board-slug) "all-posts")
         ;   (all-posts-get (dis/org-data)))
-        (when (= (router/current-board-slug) "bookmarks")
+        (when (= (dis/current-board-slug) "bookmarks")
           (bookmarks-get (dis/org-data)))
-        ; (when (= (router/current-board-slug) "following")
+        ; (when (= (dis/current-board-slug) "following")
         ;   (following-get (dis/org-data)))
-        (when (= (router/current-board-slug) "unfollowing")
+        (when (= (dis/current-board-slug) "unfollowing")
           (unfollowing-get (dis/org-data)))
-        ; (when (= (router/current-board-slug) "inbox")
+        ; (when (= (dis/current-board-slug) "inbox")
         ;   (inbox-get (dis/org-data)))
         )))
   (ws-cc/subscribe :entry/inbox-action
@@ -873,13 +874,13 @@
       (when (and (#{:dismiss :unread :follow :unfollow :comment-add} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
-              org-slug (router/current-org-slug)
+              org-slug (dis/current-org-slug)
               container-id (:container-id change-data)
               board-data (au/board-by-uuid container-id)
               entry-uuid (:item-id change-data)
               change-type (:change-type change-data)
               inbox-action (:inbox-action change-data)
-              current-board-slug (router/current-board-slug)
+              current-board-slug (dis/current-board-slug)
               org-data (dis/org-data)]
           (cond
             ; (= change-type :dismiss)
@@ -922,7 +923,7 @@
               change-type (:change-type change-data)
               inbox-action (:inbox-action change-data)
               org-data (dis/org-data)
-              current-board-slug (router/current-board-slug)]
+              current-board-slug (dis/current-board-slug)]
           (timbre/debug "Comment added for" entry-uuid)
           ;; Reload the entry from the server and check if we need to turn on the badge for home
           (check-entry-for-badges container-id entry-uuid)
@@ -948,9 +949,9 @@
                                        (not= (:user-id change-data) (jwt/user-id)))
                               (fn [{:keys [success]}]
                                 (when success
-                                  (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid entry-uuid
+                                  (dis/dispatch! [:mark-unread (dis/current-org-slug) {:uuid entry-uuid
                                                                                           :board-uuid container-id}]))))
-            current-board-slug (router/current-board-slug)]
+            current-board-slug (dis/current-board-slug)]
         (if-not (au/is-published? item-status)
           ;; Refresh the count of drafts and bookmarks
           (sa/drafts-get)
@@ -980,20 +981,20 @@
                 ;; If it's not one of the previous containers then load
                 ;; a real board if needed
                 (and (not (dis/is-container? current-board-slug))
-                     (not (router/current-contributions-id)))
+                     (not (dis/current-contributions-id)))
                 (sa/section-change container-id dispatch-unread)))
             (when (= change-type :delete)
-              (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid entry-uuid}]))
+              (dis/dispatch! [:activity-delete (dis/current-org-slug) {:uuid entry-uuid}]))
             ;; Refresh the entry in case of an item update
             (when (= change-type :update)
               (entry-change container-id entry-uuid)))))))
   (ws-cc/subscribe :item/counts
     (fn [data]
-      (dis/dispatch! [:activities-count (router/current-org-slug) (:data data)])))
+      (dis/dispatch! [:activities-count (dis/current-org-slug) (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
       (let [read-data (:data data)]
-        (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id read-data) (count (:reads read-data)) (:reads read-data)])))))
+        (dis/dispatch! [:activity-reads (dis/current-org-slug) (:item-id read-data) (count (:reads read-data)) (:reads read-data)])))))
 
 ;; AP Seen
 
@@ -1001,7 +1002,7 @@
   "Actually send the seen. Needs to get the entry data from the app-state
   to read the published-at."
   [entry-uuid]
-  (when-let* [entry-data (dis/entry-data (router/current-org-slug) entry-uuid)
+  (when-let* [entry-data (dis/entry-data (dis/current-org-slug) entry-uuid)
               publisher-id (:user-id (:publisher entry-data))
               container-id (:board-uuid entry-data)
               org-id (:org-uuid entry-data)]
@@ -1022,17 +1023,17 @@
 (defonce last-sent-seen (atom nil))
 
 (defn container-nav-in [container-slug sort-type]
-  (let [container-data (dis/container-data @dis/app-state (router/current-org-slug) container-slug sort-type)
+  (let [container-data (dis/container-data @dis/app-state (dis/current-org-slug) container-slug sort-type)
         next-sent-seen (str "last-sent-seen-" (:container-slug container-data) "-" (:next-seen-at container-data))]
     (when (and (:container-id container-data)
                (not= @last-sent-seen next-sent-seen))
       (send-container-seen (:container-id container-data) (:next-seen-at container-data))
       (reset! last-sent-seen next-sent-seen)
-      (dis/dispatch! [:container-nav-in (router/current-org-slug) container-slug sort-type]))))
+      (dis/dispatch! [:container-nav-in (dis/current-org-slug) container-slug sort-type]))))
 
 (defn container-nav-out [container-slug sort-type]
   ;; No-op
-  (dis/dispatch! [:container-nav-out (router/current-org-slug) container-slug sort-type]))
+  (dis/dispatch! [:container-nav-out (dis/current-org-slug) container-slug sort-type]))
   
 ;; WRT read
 
@@ -1052,7 +1053,7 @@
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
   [activity-id]
-  (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
+  (when-let* [activity-key (dis/activity-key (dis/current-org-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
               container-id (:board-uuid activity-data)
@@ -1072,7 +1073,7 @@
               (= (:resource-type activity-data) :entry)
               (not (:loading activity-data)))
      (send-item-read (:uuid activity-data))
-     (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
+     (dis/dispatch! [:mark-read (dis/current-org-slug) activity-data (utils/as-of-now)])
      (inbox-dismiss (:uuid activity-data))
      true)))
 
@@ -1129,7 +1130,7 @@
       (activity-edit next-cmail-data)))
   ([activity-data]
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
-                                (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
+                                (assoc activity-data :must-see (= (dis/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")
           cmail-state {:key (utils/activity-uuid)
@@ -1139,7 +1140,7 @@
 
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
-    (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) true])
+    (dis/dispatch! [:bookmark-toggle (dis/current-org-slug) (:uuid activity-data) true])
     (api/toggle-bookmark add-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]
@@ -1147,7 +1148,7 @@
 
 (defn remove-bookmark [activity-data remove-bookmark-link]
   (when remove-bookmark-link
-    (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) false])
+    (dis/dispatch! [:bookmark-toggle (dis/current-org-slug) (:uuid activity-data) false])
     (api/toggle-bookmark remove-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]
@@ -1165,13 +1166,13 @@
         dis/recently-posted-sort))))
 
 (defn change-sort-type [type]
-  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
-  (swap! router/path merge {:sort-type type}))
+  (cook/set-cookie! (router/last-sort-cookie (dis/current-org-slug)) (name type) cook/default-cookie-expire)
+  (dis/dispatch! [:route/rewrite :sort-type type]))
 
 ;; Refresh data
 
 (defn refresh-board-data [to-slug]
-  (when (and (not (router/current-activity-id))
+  (when (and (not (dis/current-activity-id))
              to-slug)
     (let [org-data (dis/org-data)
           active-users (dis/active-users)
@@ -1180,7 +1181,7 @@
           is-contributions? (get active-users to-slug)
           board-data (cond
                        is-container?
-                       (dis/container-data @dis/app-state (router/current-org-slug) to-slug)
+                       (dis/container-data @dis/app-state (dis/current-org-slug) to-slug)
                        is-board?
                        (dis/board-data to-slug))]
        (cond
@@ -1192,30 +1193,30 @@
         (replies-get org-data)
 
         (and (= to-slug "all-posts")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (all-posts-get org-data)
 
         (and (= to-slug "all-posts")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-all-posts-get org-data)
 
         (= to-slug "bookmarks")
         (bookmarks-get org-data)
 
         (and (= to-slug "following")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (following-get org-data)
 
         (and (= to-slug "following")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-following-get org-data)
 
         (and (= to-slug "unfollowing")
-             (= (router/current-sort-type) dis/recently-posted-sort))
+             (= (dis/current-sort-type) dis/recently-posted-sort))
         (unfollowing-get org-data)
 
         (and (= to-slug "unfollowing")
-             (= (router/current-sort-type) dis/recent-activity-sort))
+             (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-unfollowing-get org-data)
 
         (and (not board-data)
@@ -1238,7 +1239,7 @@
 (defn toggle-foc-layout []
   (let [current-value (:foc-layout @dis/app-state)
         next-value (if (= current-value dis/default-foc-layout) dis/other-foc-layout dis/default-foc-layout)]
-    (cook/set-cookie! (router/last-foc-layout-cookie (router/current-org-slug)) (name next-value) cook/default-cookie-expire)
+    (cook/set-cookie! (router/last-foc-layout-cookie (dis/current-org-slug)) (name next-value) cook/default-cookie-expire)
     (dis/dispatch! [:input [:foc-layout] next-value])))
 
 ;; Inbox actions
@@ -1249,11 +1250,11 @@
     (api/inbox-follow follow-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
-                (= (:uuid activity-data) (router/current-activity-id)))
+                (= (:uuid activity-data) (dis/current-activity-id)))
          (do
-           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
+         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-unfollow [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
@@ -1261,26 +1262,26 @@
     (api/inbox-unfollow unfollow-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
-                (= (:uuid activity-data) (router/current-activity-id)))
+                (= (:uuid activity-data) (dis/current-activity-id)))
          (do
-           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
+         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-dismiss [entry-uuid]
   (let [dismiss-at (utils/as-of-now)
         activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
     (when dismiss-link
-      (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid dismiss-at])
+      (dis/dispatch! [:inbox/dismiss (dis/current-org-slug) entry-uuid dismiss-at])
       (api/inbox-dismiss dismiss-link dismiss-at
        (fn [{:keys [status success body]}]
          (if (and (= status 404)
-                  (= (:uuid activity-data) (router/current-activity-id)))
+                  (= (:uuid activity-data) (dis/current-activity-id)))
            (do
-             (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+             (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
              (routing-actions/maybe-404))
-           (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+           (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))
           ; (inbox-get (dis/org-data))
           )))))
 
@@ -1289,7 +1290,7 @@
 (defn mark-unread [activity-data]
   (inbox-unread activity-data)
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
-    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (dis/dispatch! [:mark-unread (dis/current-org-slug) activity-data])
     (api/mark-unread mark-unread-link (:board-uuid activity-data)
      (fn [{:keys [success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
@@ -1300,23 +1301,23 @@
 
 (defn inbox-unread [activity-data]
   (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
-    (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
+    (dis/dispatch! [:inbox/unread (dis/current-org-slug) (dis/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
-                (= (:uuid activity-data) (router/current-activity-id)))
+                (= (:uuid activity-data) (dis/current-activity-id)))
          (do
-           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))
        ; (inbox-get (dis/org-data))
        ))))
 
 (defn- inbox-real-dismiss-all []
   (let [dismiss-at (utils/as-of-now)
-        inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
+        inbox-data (dis/container-data @dis/app-state (dis/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
-    (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
+    (dis/dispatch! [:inbox/dismiss-all (dis/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link dismiss-at
      (fn [{:keys [status success body]}]
        ; (inbox-get (dis/org-data))

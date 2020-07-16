@@ -3,7 +3,7 @@
             [oops.core :refer (oget oset!)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.lib.user :as user-lib]
-            [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.sentry :as sentry]))
@@ -89,7 +89,7 @@
                                                :activity-uuid (:uuid activity-data)
                                                :revision-id (:revision-id activity-data)
                                                :poll-updated-at (:updated-at poll-data)
-                                               :org-slug (router/current-org-slug)
+                                               :org-slug (dis/current-org-slug)
                                                :container-selector container-selector
                                                :win-url (.. js/window -location -href)}
    "Failed creating portal for poll"))

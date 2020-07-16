@@ -1,5 +1,5 @@
 (ns oc.web.urls
-  (:require [oc.web.router :as router]
+  (:require [oc.web.dispatcher :as dis]
             [clojure.string :as clj-str]))
 
 (defn params->query-string [m]
@@ -41,13 +41,13 @@
 
 (defn sign-up-update-team
   ([]
-    (sign-up-update-team (router/current-org-slug)))
+    (sign-up-update-team (dis/current-org-slug)))
   ([org-slug]
     (str sign-up "/" (name org-slug) "/team")))
 
 (defn sign-up-invite
   ([]
-    (sign-up-invite (router/current-org-slug)))
+    (sign-up-invite (dis/current-org-slug)))
   ([org-slug]
     (str sign-up "/" (name org-slug) "/invite")))
 
@@ -85,70 +85,70 @@
 (defn org
   "Org url"
   ([]
-    (org (router/current-org-slug)))
+    (org (dis/current-org-slug)))
   ([org-slug]
     (str "/" (name org-slug))))
 
 (defn inbox
   "Org inbox url"
   ([]
-    (inbox (router/current-org-slug)))
+    (inbox (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/inbox")))
 
 (defn all-posts
   "Org all posts url"
   ([]
-    (all-posts (router/current-org-slug)))
+    (all-posts (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
 (defn following
   "Org following url"
   ([]
-    (following (router/current-org-slug)))
+    (following (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/home")))
 
 (defn unfollowing
   "Org unfollowing url"
   ([]
-    (unfollowing (router/current-org-slug)))
+    (unfollowing (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/unfollowing")))
 
 (defn follow-ups
   "Org follow-ups url"
   ([]
-    (follow-ups (router/current-org-slug)))
+    (follow-ups (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/follow-ups")))
 
 (defn bookmarks
   "Org bookmarks url"
   ([]
-    (bookmarks (router/current-org-slug)))
+    (bookmarks (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/bookmarks")))
 
 (defn must-see
   "Org must see url"
   ([]
-    (must-see (router/current-org-slug)))
+    (must-see (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/must-see")))
 
 (defn replies
   "Org replies url"
   ([]
-    (replies (router/current-org-slug)))
+    (replies (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/replies")))
 
 (defn topics
   "Org topics url"
   ([]
-    (topics (router/current-org-slug)))
+    (topics (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/topics")))
 
@@ -157,9 +157,9 @@
 (defn board
   "Board url"
   ([]
-    (board (router/current-org-slug) (router/current-board-slug)))
+    (board (dis/current-org-slug) (dis/current-board-slug)))
   ([board-slug]
-    (board (router/current-org-slug) board-slug))
+    (board (dis/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
 
@@ -169,7 +169,7 @@
 (def default-board-slug "following")
 
 (defn default-landing
-  ([] (default-landing (router/current-org-slug)))
+  ([] (default-landing (dis/current-org-slug)))
   ([org-slug]
    (if (fn? default-url-fn)
     (default-url-fn org-slug)
@@ -180,7 +180,7 @@
 (defn first-ever-landing
   "Org all posts url for the first ever land"
   ([]
-    (first-ever-landing (router/current-org-slug)))
+    (first-ever-landing (dis/current-org-slug)))
   ([org-slug]
     (str (default-landing org-slug) "/hello")))
 
@@ -188,7 +188,7 @@
 
 (defn drafts
   ([]
-    (drafts (router/current-org-slug)))
+    (drafts (dis/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/drafts")))
 
@@ -196,32 +196,39 @@
 
 (defn entry
   "Entry url"
-  ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
-  ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
+  ([] (entry (dis/current-org-slug) (dis/current-board-slug) (dis/current-activity-id)))
+  ([entry-uuid] (entry (dis/current-org-slug) (dis/current-board-slug) entry-uuid))
+  ([board-slug entry-uuid] (entry (dis/current-org-slug) board-slug entry-uuid))
   ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/post/" (name entry-uuid))))
 
 ;; Commennts
 
 (defn comment-url
   "Comment url"
-  ([comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([entry-uuid comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) entry-uuid comment-uuid))
-  ([board-slug entry-uuid comment-uuid] (comment-url (router/current-org-slug) board-slug entry-uuid comment-uuid))
+  ([comment-uuid] (comment-url (dis/current-org-slug) (dis/current-board-slug) (dis/current-activity-id)))
+  ([entry-uuid comment-uuid] (comment-url (dis/current-org-slug) (dis/current-board-slug) entry-uuid comment-uuid))
+  ([board-slug entry-uuid comment-uuid] (comment-url (dis/current-org-slug) board-slug entry-uuid comment-uuid))
   ([org-slug board-slug entry-uuid comment-uuid] (str (entry org-slug board-slug entry-uuid) "/comment/" comment-uuid)))
 
 ;; Secure activities
 
 (defn secure-activity
   "Secure url for activity to show read only view."
-  ([] (secure-activity (router/current-org-slug) (router/current-secure-activity-id)))
-  ([secure-id] (secure-activity (router/current-org-slug) secure-id))
+  ([] (secure-activity (dis/current-org-slug) (dis/current-secure-activity-id)))
+  ([secure-id] (secure-activity (dis/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))
 
 ;; contributions
 
 (defn contributions
   "contributions url"
-  ([] (contributions (router/current-org-slug) (router/current-contributions-id)))
-  ([author-uuid] (contributions (router/current-org-slug) author-uuid))
+  ([] (contributions (dis/current-org-slug) (dis/current-contributions-id)))
+  ([author-uuid] (contributions (dis/current-org-slug) author-uuid))
   ([org-slug author-uuid] (str (org org-slug) "/u/" author-uuid)))
+
+;; Your digest
+
+(defn your-digest-url []
+  (if-let [org-slug (dis/current-org-slug)]
+    (following org-slug)
+    login))

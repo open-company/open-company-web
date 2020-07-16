@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
@@ -12,7 +13,7 @@
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn is-currently-shown? [section]
-  (= (router/current-board-slug)
+  (= (dis/current-board-slug)
      (:slug section)))
 
 (defn watch-single-section [section]
@@ -41,7 +42,7 @@
       (when user-is-part-of-the-team
         ;; only watch the currently visible board.
         ; only for logged in users and if the board is currently shown
-        (when (= (router/current-board-slug) section-slug)
+        (when (= (dis/current-board-slug) section-slug)
           (watch-single-section section)
           ;; Retrieve reads count if there are items in the loaded section
           (request-reads-count section))))
@@ -98,17 +99,17 @@
   (dispatcher/dispatch! [:section-change section-uuid]))
 
 (defn section-delete [section-slug & callback]
-  (let [section-data (dispatcher/board-data (router/current-org-slug) section-slug)
+  (let [section-data (dispatcher/board-data (dis/current-org-slug) section-slug)
         delete-section-link (utils/link-for (:links section-data) "delete")]
     (api/delete-board delete-section-link section-slug (fn [status success body]
       (if success
-        (let [org-slug (router/current-org-slug)
+        (let [org-slug (dis/current-org-slug)
               last-used-section-slug (au/last-used-section)]
           (when (= last-used-section-slug section-slug)
             (au/save-last-used-section nil))
           (when (fn? callback)
            (callback section-slug))
-          (if (= section-slug (router/current-board-slug))
+          (if (= section-slug (dis/current-board-slug))
             (do
               (router/nav! (oc-urls/default-landing org-slug))
               (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
@@ -189,11 +190,11 @@
         ;; Redirect to the first available board
         (let [org-data (dispatcher/org-data)
               all-boards (:boards org-data)
-              current-board-slug (router/current-board-slug)
+              current-board-slug (dis/current-board-slug)
               except-this-boards (remove #(#{current-board-slug "drafts"} (:slug %)) all-boards)
               redirect-url (if-let [next-board (first except-this-boards)]
                              (oc-urls/board (:slug next-board))
-                             (oc-urls/org (router/current-org-slug)))]
+                             (oc-urls/org (dis/current-org-slug)))]
           (refresh-org-data)
           (utils/after 0 #(router/nav! redirect-url))
           (dispatcher/dispatch! [:private-section-kick-out-self/finish success])))))))
@@ -222,7 +223,7 @@
       (let [change-data (:data data)
             section-uuid (:container-id change-data)
             change-type (:change-type change-data)
-            org-slug (router/current-org-slug)
+            org-slug (dis/current-org-slug)
             item-id (:item-id change-data)]
         ;; Refresh the section only in case of items added or removed
         ;; let the activity handle the item update case
@@ -234,11 +235,11 @@
         ;; the specified container to make sure it's marked as seen
         (when (and (= change-type :add)
                    (not= (:user-id change-data) (jwt/user-id)))
-          (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
+          (dispatcher/dispatch! [:item-add/unseen (dis/current-org-slug) change-data]))
         (when (= change-type :delete)
-          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))
+          (dispatcher/dispatch! [:item-delete/unseen (dis/current-org-slug) change-data]))
         (when (= change-type :move)
-          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data]))))))
+          (dispatcher/dispatch! [:item-move (dis/current-org-slug) change-data]))))))
 
 ;; Section editing
 
@@ -271,10 +272,10 @@
 
 (defn section-more [more-link direction]
   (let [org-data (dispatcher/org-data)
-        board-slug (router/current-board-slug)]
+        board-slug (dis/current-board-slug)]
     (api/load-more-items more-link direction (partial section-more-finish (:slug org-data) board-slug dispatcher/recently-posted-sort direction))
     (dispatcher/dispatch! [:section-more (:slug org-data) board-slug dispatcher/recently-posted-sort])))
 
 (defn setup-section-editing [section-slug]
-  (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]
+  (when-let [board-data (dispatcher/board-data (dis/current-org-slug) section-slug)]
     (dispatcher/dispatch! [:setup-section-editing board-data])))

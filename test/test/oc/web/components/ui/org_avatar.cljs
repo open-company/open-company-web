@@ -4,7 +4,6 @@
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [cljs.test :refer-macros [deftest async testing is are use-fixtures]]
             [oc.web.rum-utils :as ru]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]))
 
@@ -34,7 +33,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge empty-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) true)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
@@ -46,7 +45,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge with-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) false)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
@@ -58,7 +57,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge with-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) false :always)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
@@ -70,7 +69,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge empty-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) false :always)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
@@ -82,7 +81,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge with-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) false :never)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))
@@ -94,7 +93,7 @@
       (let [c (tu/new-container!)
             test-atom (update-in org-data [:org-data] merge empty-logo)]
         (ru/drv-root {:state test-atom
-                      :drv-spec (dis/drv-spec test-atom (atom {}))
+                      :drv-spec (dis/drv-spec test-atom)
                       :target c
                       :component #(org-avatar (:org-data test-atom) false :never)})
         (is (not (nil? (sel1 c [:div.org-avatar]))))

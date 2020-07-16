@@ -934,14 +934,7 @@
       [:div.onboard-email-container
         "Thanks for verifying"
         [:button.mlb-reset.continue
-          {:on-click #(let [org (utils/get-default-org orgs)]
-                        (router/nav!
-                         (if org
-                           (if (and (empty? (jwt/get-key :first-name))
-                                    (empty? (jwt/get-key :last-name)))
-                             oc-urls/confirm-invitation-profile
-                             (oc-urls/org (:slug org)))
-                          oc-urls/sign-up-profile)))
+          {:on-click #(user-actions/verify-continue orgs)
            :on-touch-start identity}
           "Get Started"]]
       :else

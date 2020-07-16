@@ -3,7 +3,6 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.user :as user-actions]

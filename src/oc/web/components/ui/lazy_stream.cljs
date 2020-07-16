@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.lazy-stream
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
@@ -12,7 +11,7 @@
                          (drv/drv :activity-data)
                          (drv/drv :foc-layout)
                          {:did-mount (fn [s]
-                           (utils/scroll-to-y (:scroll-y @router/path) 0)
+                           (utils/scroll-to-y (dis/route-param :scroll-y) 0)
                            (utils/after 100 #(reset! (::delayed s) true))
                            s)}
   [s stream-comp]
@@ -26,7 +25,7 @@
         (stream-comp)
         [:div.lazy-stream-interstitial
           {:class (when (= foc-layout dis/other-foc-layout) "collapsed")
-           :style {:height (str (+ (:scroll-y @router/path)
+           :style {:height (str (+ (dis/route-param :scroll-y)
                                    (or (.. js/document -documentElement -clientHeight)
                                        (.-innerHeight js/window)))
                              "px")}}])]))

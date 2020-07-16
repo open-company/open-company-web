@@ -20,11 +20,11 @@
                fixed-roster-data {:team-id (:team-id fixed-body)
                                   :links (-> fixed-body :collection :links)
                                   :users users}]
-           (dis/dispatch! [:team-roster-loaded (router/current-org-slug) fixed-roster-data])
+           (dis/dispatch! [:team-roster-loaded (dis/current-org-slug) fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]
              (doseq [[activity-uuid read-data] activities-read]
-               (dis/dispatch! [:activity-reads (router/current-org-slug) activity-uuid (:count read-data) (:reads read-data) fixed-roster-data])))))))))
+               (dis/dispatch! [:activity-reads (dis/current-org-slug) activity-uuid (:count read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))
@@ -45,7 +45,7 @@
     (fn [{:keys [success body status]}]
       (let [team-data (when success (json->cljs body))]
         (when success
-          (dis/dispatch! [:team-loaded (router/current-org-slug) team-data])
+          (dis/dispatch! [:team-loaded (dis/current-org-slug) team-data])
           (utils/after 100 org-actions/maybe-show-integration-added-notification?)
           (enumerate-channels team-data))))))
 
@@ -363,7 +363,7 @@
     (api/handle-invite-link create-token-link
      (fn [{:keys [body success status]}]
       (when success
-        (dis/dispatch! [:team-loaded (router/current-org-slug) (json->cljs body)])
+        (dis/dispatch! [:team-loaded (dis/current-org-slug) (json->cljs body)])
         (when (fn? cb)
           (cb success)))))))
 
@@ -372,6 +372,6 @@
     (api/handle-invite-link delete-invite-link
      (fn [{:keys [body success status]}]
       (when success
-        (dis/dispatch! [:team-loaded (router/current-org-slug) (json->cljs body)])
+        (dis/dispatch! [:team-loaded (dis/current-org-slug) (json->cljs body)])
         (when (fn? cb)
           (cb success)))))))

@@ -65,43 +65,45 @@
                 orgs-dropdown-visible
                 search-active
                 show-whats-new-green-dot
-                panel-stack]
+                panel-stack
+                current-org-slug
+                current-board-slug
+                current-contributions-id]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
-                       (= (router/current-board-slug) "replies")
+                       (= (keyword current-board-slug) :replies)
                        "Replies"
-                       (= (router/current-board-slug) "inbox")
+                       (= (keyword current-board-slug) :inbox)
                        "Unread"
-                       (= (router/current-board-slug) "all-posts")
+                       (= (keyword current-board-slug) :all-posts)
                        "All"
-                       (= (router/current-board-slug) "bookmarks")
+                       (= (keyword current-board-slug) :bookmarks)
                        "Bookmarks"
-                       (= (router/current-board-slug) "following")
+                       (= (keyword current-board-slug) :following)
                        "Home"
-                       (= (router/current-board-slug) "topics")
+                       (= (keyword current-board-slug) :topics)
                        "Topics"
-                       (and (router/current-contributions-id) (:self? contributions-user-data))
+                       (and current-contributions-id (:self? contributions-user-data))
                        "You"
-                       (and (router/current-contributions-id) (map? contributions-user-data))
+                       (and current-contributions-id (map? contributions-user-data))
                        (:name contributions-user-data)
                        :else
                        (:name board-data))
-         search-active? (drv/react s search/search-active?)
-         org-slug (router/current-org-slug)]
+         search-active? (drv/react s search/search-active?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
-                                :has-prior-updates (and org-slug
+                                :has-prior-updates (and current-org-slug
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
                                 :showing-orgs-dropdown orgs-dropdown-visible
 
-                                :can-edit-board (and org-slug
+                                :can-edit-board (and current-org-slug
                                                      (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))

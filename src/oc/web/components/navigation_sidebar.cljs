@@ -5,7 +5,6 @@
             [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -32,6 +31,8 @@
                                 ;; Derivatives
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
+                                (drv/drv :org-slug)
+                                (drv/drv :board-slug)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :replies-badge)
@@ -70,26 +71,21 @@
         board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
         change-data (drv/react s :change-data)
+        org-slug (drv/react s :org-slug)
+        current-board-slug (drv/react s :board-slug)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
-        selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         user-is-part-of-the-team? (:member? org-data)
-        is-replies (or (:replies (:back-to @router/path))
-                        (= selected-slug "replies"))
-        is-following (or (:following (:back-to @router/path))
-                         (= selected-slug "following"))
-        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
-        is-topics (or (:topics (:back-to @router/path))
-                       (= selected-slug "topics")
-                       (and (router/current-board-slug)
-                            (not (dis/is-container? (router/current-board-slug)))
-                            (not is-drafts-board)))
-        ; is-my-posts (and user-is-part-of-the-team?
-        ;                  (or (= (:contributions (:back-to @router/path)) (:user-id current-user-data))
-        ;                      (= (router/current-contributions-id) (:user-id current-user-data))))
-        is-bookmarks (= selected-slug "bookmarks")
+        is-replies (= (keyword current-board-slug) :replies)
+        is-following (= (keyword current-board-slug) :following)
+        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
+        is-topics (or (= (keyword current-board-slug) :topics)
+                      (and current-board-slug
+                           (not (dis/is-container? current-board-slug))
+                           (not is-drafts-board)))
+        is-bookmarks (= (keyword current-board-slug) :bookmarks)
         create-link (utils/link-for (:links org-data) "create")
         ; show-boards (or create-link (pos? (count boards)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
@@ -102,7 +98,6 @@
                          drafts-link)
         show-replies (and user-is-part-of-the-team?
                           (utils/link-for (:links org-data) "replies"))
-        org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -221,7 +216,7 @@
                 {:class (utils/class-set {:item-selected (and (not is-following)
                                                               (not is-topics)
                                                               (not is-bookmarks)
-                                                              (= (router/current-board-slug) (:slug drafts-board)))})
+                                                              (= current-board-slug (:slug drafts-board)))})
                  :data-board (name (:slug drafts-board))
                  :key (str "board-list-" (name (:slug drafts-board)))
                  :href board-url

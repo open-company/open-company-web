@@ -129,7 +129,7 @@
                               :container-selector "div.secure-activity-container"}))
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (comments-summary {:activity-data activity-data :comments-data comments-drv})
+              (comments-summary {:activity-data activity-data :comments-data comments-drv :current-activity-id (:uuid activity-data)})
               (reactions {:entity-data activity-data})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))

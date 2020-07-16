@@ -8,7 +8,6 @@
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -324,6 +323,7 @@
                    (drv/drv :payments)
                    (drv/drv :follow-boards-list)
                    (drv/drv :editable-boards)
+                   (drv/drv :board-slug)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -443,7 +443,8 @@
                             (utils/after 180 (fn []
                              (let [follow-boards-list @(drv/get-ref s :follow-boards-list)
                                    following-board? (some #(when (= (:slug %) (:board-slug cmail-data)) %) follow-boards-list)
-                                   posting-to-current-board? (= (keyword (router/current-board-slug)) (keyword (:board-slug cmail-data)))
+                                   current-board-slug @(drv/get-ref s :board-slug)
+                                   posting-to-current-board? (= (keyword current-board-slug) (keyword (:board-slug cmail-data)))
                                    to-url (if (and following-board?
                                                    (not posting-to-current-board?))
                                             ;; If user is following the board they posted to
@@ -470,6 +471,7 @@
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        _current-board-slug (drv/react s :board-slug)
         cmail-state (drv/react s :cmail-state)
         cmail-data* (drv/react s :cmail-data)
         cmail-data (update cmail-data* :board-name

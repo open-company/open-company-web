@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
@@ -31,10 +30,14 @@
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
                                    (drv/drv :activity-share-container)
+                                   (drv/drv :board-slug)
+                                   (drv/drv :activity-uuid)
   [s {:keys [activity-data read-data comments-data editable-boards :member? member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
-        is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-inbox? (= (router/current-board-slug) "inbox")
+        current-board-slug (drv/react s :board-slug)
+        current-activity-id (drv/react s :activity-uuid)
+        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
+        is-inbox? (= current-board-slug "inbox")
         dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
         dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
         current-user-id (jwt/user-id)
@@ -101,7 +104,8 @@
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
                              :new-comments-count (:new-comments-count activity-data)
-                             :hide-label? is-mobile?}))
+                             :hide-label? is-mobile?
+                             :current-activity-id current-activity-id}))
         [:div.collapsed-time
           (let [t (or (:published-at activity-data) (:created-at activity-data))]
             [:time

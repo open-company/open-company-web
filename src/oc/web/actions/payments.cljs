@@ -25,7 +25,7 @@
 
 (defn get-payments [payments-link]
   (when ls/payments-enabled
-    (api/get-payments payments-link (partial get-payments-cb (router/current-org-slug)))))
+    (api/get-payments payments-link (partial get-payments-cb (dis/current-org-slug)))))
 
 (defn maybe-load-payments-data [org-data & [force-refresh?]]
   (when ls/payments-enabled
@@ -40,7 +40,7 @@
 
 (defn create-plan-subscription [payments-data plan-id & [callback]]
   (let [create-subscription-link (utils/link-for (:links payments-data) "create")
-        org-slug (router/current-org-slug)]
+        org-slug (dis/current-org-slug)]
     (when create-subscription-link
       (api/update-plan-subscription create-subscription-link plan-id
        (fn [{:keys [status body success] :as resp}]
@@ -49,7 +49,7 @@
 
 (defn delete-plan-subscription [payments-data & [callback]]
   (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")
-        org-slug (router/current-org-slug)]
+        org-slug (dis/current-org-slug)]
     (when delete-subscription-link
       (api/update-plan-subscription delete-subscription-link nil
        (fn [{:keys [status body success] :as resp}]

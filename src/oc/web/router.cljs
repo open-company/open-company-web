@@ -6,18 +6,9 @@
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
             [oc.web.lib.sentry :as sentry]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
             [clojure.string :as cstr]))
-
-(def ^{:export true} path (atom {}))
-
-(defn set-route! [route parts]
-  (timbre/info "set-route!" route parts)
-  ;; Switch the path all together to avoid middle renders btw route changes
-  ;; but keep the ap-redirect-done flag
-  (reset! path (merge {:ap-redirect-done (:ap-redirect-done @path)
-                       :route route}
-                       parts)))
 
 (defn get-token []
   (when (or (not js/window.location.pathname)
@@ -71,7 +62,8 @@
   [board-uuid board-slug]
   (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
   (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
-    (swap! path assoc :board board-slug)
+    ; (swap! path assoc :board board-slug)
+    (dis/dispatch! [:route/rewrite :board board-slug])
     (.replaceState js/window.history #js {} js/window.title new-path)))
 
 (defn redirect! [loc]
@@ -109,46 +101,6 @@
               cb-fn)
             (.setEnabled true))]
     (reset! history h)))
-
-;; Path components retrieve
-(defn current-org-slug []
-  (:org @path))
-
-(defn current-board-slug []
-  (:board @path))
-
-(defn current-posts-filter []
-  (:board @path))
-
-(defn current-sort-type []
-  (:sort-type @path))
-
-(defn current-activity-id []
-  (:activity @path))
-
-(defn current-entry-board-slug []
-  (:entry-board @path))
-
-(defn current-secure-activity-id []
-  (:secure-id @path))
-
-(defn current-comment-id []
-  (:comment @path))
-
-(defn current-contributions-id []
-  (:contributions @path))
-
-(defn query-params []
-  (:query-params @path))
-
-(defn query-param [k]
-  (get (:query-params @path) k nil))
-
-(defn ap-redirect []
-  (:ap-redirect-done @path))
-
-(defn ap-redirect-done! []
-  (swap! path merge {:ap-redirect-done true}))
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"
@@ -218,10 +170,3 @@
 (def login-redirect-cookie "login-redirect")
 
 (def expo-push-token-cookie "expo-push-token")
-
-;; Debug
-
-(defn print-router-path []
-  @path)
-
-(set! (.-OCWebPrintRouterPath js/window) print-router-path)

@@ -27,7 +27,7 @@
 
 ;; Delete handling
 
-(defn delete-clicked [e activity-data]
+(defn delete-clicked [e current-org-slug current-board-slug current-contributions-id activity-data]
   (let [alert-data {:action "delete-entry"
                     :title "Delete this post?"
                     :message "This action cannot be undone."
@@ -36,9 +36,20 @@
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
                     :solid-button-title "Yes, delete it"
-                    :solid-button-cb #(let [org-slug (router/current-org-slug)
-                                            board-slug (router/current-board-slug)
-                                            board-url (oc-urls/board org-slug board-slug)]
+                    :solid-button-cb #(let [board-url (cond (= (keyword current-board-slug) :following)
+                                                            (oc-urls/following current-org-slug)
+                                                            (= (keyword current-board-slug) :replies)
+                                                            (oc-urls/replies current-org-slug)
+                                                            (= (keyword current-board-slug) :all-posts)
+                                                            (oc-urls/all-posts current-org-slug)
+                                                            (= (keyword current-board-slug) :inbox)
+                                                            (oc-urls/inbox current-org-slug)
+                                                            (= (keyword current-board-slug) :unfollowing)
+                                                            (oc-urls/unfollowing current-org-slug)
+                                                            (seq current-contributions-id)
+                                                            (oc-urls/contributions current-org-slug current-contributions-id)
+                                                            :else
+                                                            (oc-urls/board current-org-slug current-board-slug))]
                                        (router/nav! board-url)
                                        (activity-actions/activity-delete activity-data)
                                        (alert-modal/hide-alert))
@@ -54,6 +65,7 @@
 
 (rum/defcs more-menu < rum/reactive
                        rum/static
+                       (drv/drv :route)
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (rum/local false ::can-unmount)
@@ -87,7 +99,11 @@
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
              mark-unread-cb]}]
-  (let [delete-link (utils/link-for (:links entity-data) "delete")
+  (let [{current-org-slug :org
+         current-board-slug :board
+         current-contributions-id :contributions
+         current-activity-id :activity}          (drv/react s :route)
+        delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
         inbox-unread-link (utils/link-for (:links entity-data) "unread")
@@ -169,7 +185,7 @@
                               (if (fn? edit-cb)
                                 (edit-cb entity-data)
                                 (do
-                                  (when (router/current-activity-id)
+                                  (when current-activity-id
                                     (nav-actions/dismiss-post-modal %))
                                   (activity-actions/activity-edit entity-data))))}
                 "Edit"])
@@ -182,7 +198,7 @@
                                 (will-close))
                               (if (fn? delete-cb)
                                 (delete-cb entity-data)
-                                (delete-clicked % entity-data)))}
+                                (delete-clicked % current-org-slug current-board-slug current-contributions-id entity-data)))}
                 "Delete"])
             (when (and edit-link
                        show-move?)
@@ -305,7 +321,7 @@
                               (when (fn? will-close)
                                 (will-close))
                               (activity-actions/inbox-dismiss (:uuid entity-data))
-                              (when (seq (router/current-activity-id))
+                              (when (seq current-activity-id)
                                 (nav-actions/dismiss-post-modal %)))}
                 "Dismiss"])])
         (when (and external-share
@@ -406,7 +422,7 @@
                           (when (fn? will-close)
                             (will-close))
                           (activity-actions/inbox-dismiss (:uuid entity-data))
-                          (when (seq (router/current-activity-id))
+                          (when (seq current-activity-id)
                             (nav-actions/dismiss-post-modal %)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")

@@ -3,7 +3,6 @@
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -20,7 +19,7 @@
   [entry-uuid]
   (str (or
         entry-uuid
-        (router/current-org-slug))
+        (dis/current-org-slug))
    "-entry-edit"))
 
 (defn remove-cached-item
@@ -49,7 +48,7 @@
 ;; Last used and default section for editing
 
 (defn get-default-section [& [editable-boards]]
-  (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (router/current-org-slug))))
+  (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (dis/current-org-slug))))
         cookie-value (au/last-used-section)
         board-from-cookie (when cookie-value
                             (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
@@ -70,7 +69,7 @@
   (let [sorted-editable-boards (sort-by :name editable-boards)
         board-data (or
                     (some #(when (= (:slug %) board-slug) %) sorted-editable-boards)
-                    (some #(when (= (:slug %) (router/current-board-slug)) %) sorted-editable-boards)
+                    (some #(when (= (:slug %) (dis/current-board-slug)) %) sorted-editable-boards)
                     (first sorted-editable-boards))]
     (if (or (not board-data)
             (= (:slug board-data) utils/default-drafts-board-slug)
@@ -85,16 +84,16 @@
 
 (defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
   (when (not= (dis/activity-data activity-uuid) :404)
-    (dis/dispatch! [:activity-get {:org-slug (router/current-org-slug) :board-slug board-slug :activity-uuid activity-uuid}])
-    (api/get-entry-with-uuid (router/current-org-slug) board-slug activity-uuid
+    (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug) :board-slug board-slug :activity-uuid activity-uuid}])
+    (api/get-entry-with-uuid (dis/current-org-slug) board-slug activity-uuid
      (fn [{:keys [status success body]}]
       (cond
         (= status 404)
-        (dis/dispatch! [:activity-get/not-found (router/current-org-slug) activity-uuid nil])
+        (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) activity-uuid nil])
         (not success)
-        (dis/dispatch! [:activity-get/failed (router/current-org-slug) activity-uuid nil])
+        (dis/dispatch! [:activity-get/failed (dis/current-org-slug) activity-uuid nil])
         :else
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (when success (json->cljs body)) nil]))
+        (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (when success (json->cljs body)) nil]))
       (when (fn? loaded-cb)
         (utils/after 100 #(loaded-cb success status)))))))
 
@@ -170,17 +169,17 @@
                              :fullscreen (not (responsive/is-mobile-size?))
                              :collapsed false
                              :key (utils/activity-uuid)}]
-            (if (and (contains? (router/query-params) :new)
-                     (not (contains? (router/query-params) :access)))
+            (if (and (contains? (dis/query-params) :new)
+                     (not (contains? (dis/query-params) :access)))
               ;; We have the new GET parameter, let's open a new post with the specified headline if any
-              (let [new-data (get-board-for-edit (router/query-param :new))
-                    with-headline (if (router/query-param :headline)
-                                   (assoc new-data :headline (router/query-param :headline))
+              (let [new-data (get-board-for-edit (dis/query-param :new))
+                    with-headline (if (dis/query-param :headline)
+                                   (assoc new-data :headline (dis/query-param :headline))
                                    new-data)]
                 (when new-data
                   (cmail-show with-headline cmail-state)))
               ;; We have the edit paramter or the edit cookie saved
-              (when-let [edit-activity-param (or (router/query-param :edit) (cook/get-cookie (edit-open-cookie)))]
+              (when-let [edit-activity-param (or (dis/query-param :edit) (cook/get-cookie (edit-open-cookie)))]
                 (if (= edit-activity-param "true")
                   ;; If it's simply true open a new post with the data saved in the local DB
                   (cmail-show {} cmail-state)
