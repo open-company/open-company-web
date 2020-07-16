@@ -448,16 +448,15 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :route :board-slug :sort-type]
-                         (fn [base org-slug route board-slug sort-type]
+   :container-data      [[:base :org-slug :board-slug :contributions-id :activity-uuid :sort-type]
+                         (fn [base org-slug board-slug contributions-id activity-uuid sort-type]
                            (when (and org-slug
-                                      board-slug)
-                             (let [activity? (seq (:activity route))
-                                   is-contributions? (or (:contributions route)
-                                                         (contains? (:back-to route) :contributions))
+                                      (or board-slug
+                                          contributions-id))
+                             (let [is-contributions? (seq contributions-id)
                                    container-key (cond
                                                    is-contributions?
-                                                   (contributions-data-key org-slug board-slug)
+                                                   (contributions-data-key org-slug contributions-id)
                                                    (is-container? board-slug)
                                                    (container-key org-slug board-slug sort-type)
                                                    :else
@@ -881,6 +880,17 @@
   ([data org-slug board-slug sort-type]
     (get-in data (container-key org-slug board-slug sort-type))))
 
+(defn ^:export all-posts-data
+  "Get all-posts container data."
+  ([]
+    (all-posts-data (current-org-slug) recently-posted-sort @app-state))
+  ([org-slug]
+    (all-posts-data org-slug recently-posted-sort @app-state))
+  ([org-slug data]
+    (all-posts-data org-slug recently-posted-sort data))
+  ([org-slug sort-type data]
+    (container-data data org-slug :all-posts sort-type)))
+
 (defn ^:export replies-data
   "Get replies container data."
   ([]
@@ -898,6 +908,24 @@
     (following-data org-slug @app-state))
   ([org-slug data]
     (container-data data org-slug :following recently-posted-sort)))
+
+(defn ^:export unfollowing-data
+  "Get following container data."
+  ([]
+    (unfollowing-data (current-org-slug) @app-state))
+  ([org-slug]
+    (unfollowing-data org-slug @app-state))
+  ([org-slug data]
+    (container-data data org-slug :unfollowing recently-posted-sort)))
+
+(defn ^:export bookmarks-data
+  "Get following container data."
+  ([]
+    (bookmarks-data (current-org-slug) @app-state))
+  ([org-slug]
+    (bookmarks-data org-slug @app-state))
+  ([org-slug data]
+    (container-data data org-slug :bookmarks recently-posted-sort)))
 
 (defn ^:export filtered-posts-data
   ([]

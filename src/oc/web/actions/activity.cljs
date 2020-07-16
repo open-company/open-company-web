@@ -78,6 +78,16 @@
   (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
     (bookmarks-real-get bookmarks-link (:slug org-data) dis/recently-posted-sort finish-cb)))
 
+(defn bookmarks-refresh
+ "If the user is looking at the bookmarks view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+ ([] (bookmarks-refresh (dis/org-data)))
+ ([org-data]
+  (if-let* [bookmarks-data (dis/bookmarks-data)
+              refresh-link (utils/link-for (:links bookmarks-data) "refresh")]
+    (bookmarks-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (bookmarks-get org-data))))
+
 (defn- bookmarks-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (->> body json->cljs :collection :items (map :uuid))))
@@ -114,6 +124,16 @@
 (defn recent-all-posts-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "activity" "GET")]
     (activity-real-get activity-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+
+(defn all-posts-refresh
+ "If the user is looking at the all-posts view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+ ([] (all-posts-refresh (dis/org-data)))
+ ([org-data]
+  (if-let* [all-posts-data (dis/all-posts-data)
+              refresh-link (utils/link-for (:links all-posts-data) "refresh")]
+    (activity-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (all-posts-get org-data))))
 
 (defn- all-posts-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success
@@ -290,6 +310,17 @@
 (defn recent-unfollowing-get [org-data & [finish-cb]]
   (when-let [recent-unfollowing-link (utils/link-for (:links org-data) "recent-unfollowing")]
     (unfollowing-real-get recent-unfollowing-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+
+(defn unfollowing-refresh
+ "If the user is looking at the unfollowing view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+ ([] (unfollowing-refresh (dis/org-data) true))
+ ([org-data] (unfollowing-refresh org-data true))
+ ([org-data keep-seen-at?]
+  (if-let* [unfollowing-data (dis/unfollowing-data)
+            refresh-link (utils/link-for (:links unfollowing-data) "refresh")]
+    (unfollowing-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (unfollowing-get org-data keep-seen-at? nil))))
 
 (defn- unfollowing-more-finish [org-slug sort-type direction {:keys [success body]}]
   (when success

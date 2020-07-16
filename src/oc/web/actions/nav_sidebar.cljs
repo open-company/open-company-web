@@ -137,13 +137,26 @@
 (defn- refresh-board-data []
   (when-not (dis/current-activity-id)
     (let [current-board-slug (dis/current-board-slug)
+          current-contrib-id (dis/current-contributions-id)
           org-data (dis/org-data)
-          container-data (current-container-data)]
-       (if (#{:replies :following} (:container-slug container-data))
-         (if (= :replies (:container-slug container-data))
-           (activity-actions/replies-refresh org-data true)
-           (activity-actions/following-refresh org-data true))
-         (reload-board-data)))))
+          container-data (current-container-data)
+          board-kw (keyword current-board-slug)]
+       (cond (= board-kw :all-posts)
+             (activity-actions/all-posts-refresh org-data)
+             (= board-kw :bookmarks)
+             (activity-actions/bookmarks-refresh org-data)
+             (= board-kw :replies)
+             (activity-actions/replies-refresh org-data true)
+             (= board-kw :following)
+             (activity-actions/following-refresh org-data true)
+             (= board-kw :unfollowing)
+             (activity-actions/unfollowing-refresh org-data true)
+             (seq current-contrib-id)
+             (contributions-actions/contributions-refresh org-data current-contrib-id)
+             (not (dis/is-container? current-board-slug))
+             (section-actions/section-refresh current-board-slug)
+             :else
+             (reload-board-data)))))
 
 (defn nav-to-url!
   ([e board-slug url]

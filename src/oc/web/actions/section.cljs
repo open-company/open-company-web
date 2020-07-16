@@ -1,4 +1,5 @@
 (ns oc.web.actions.section
+  (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.api :as api]
@@ -58,14 +59,27 @@
         (when success
           (section-get-finish (:slug (dispatcher/org-data)) (:slug section) dispatcher/recently-posted-sort (json->cljs body)))))))
 
-(defn section-get [board-slug link & [finish-cb]]
+(defn section-get
+  ([board-slug]
+    (when-let* [org-data (dis/org-data)
+                section-data (some #(= board-slug (:slug %)) (:boards org-data))
+                section-link (utils/link-for (:links section-data) ["item" "self"] "GET")]
+      (section-get board-slug section-link)))
+  ([board-slug link & [finish-cb]]
   (api/get-board link
     (fn [{:keys [status body success] :as resp}]
       (when success
         (section-get-finish (:slug (dispatcher/org-data)) board-slug
          dispatcher/recently-posted-sort (json->cljs body)))
       (when (fn? finish-cb)
-        (finish-cb resp)))))
+        (finish-cb resp))))))
+
+(defn section-refresh
+  [board-slug]
+  (if-let* [section-data (dis/board-data board-slug)
+            refresh-link (utils/link-for (:links section-data) "refresh")]
+    (section-get board-slug refresh-link)
+    (section-get board-slug)))
 
 (defn drafts-get []
   (let [org-data (dispatcher/org-data)

@@ -1,5 +1,5 @@
 (ns oc.web.actions.contributions
-  (:require-macros [if-let.core :refer (when-let*)])
+  (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [clojure.string :as s]
             [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
@@ -56,6 +56,11 @@
     (router/redirect-404!)
     (contributions-get-success org-slug author-uuid sort-type (if success (json->cljs body) {}))))
 
+(defn- contributions-real-get [org-data author-uuid contrib-link]
+  (api/get-contributions contrib-link
+   (fn [{:keys [status body success] :as resp}]
+     (contributions-get-finish (:slug org-data) author-uuid dis/recently-posted-sort resp))))
+
 (defn- contributions-link [org-data author-uuid]
   (when-let [partial-link (utils/link-for (:links org-data) "partial-contributions")]
     (utils/link-replace-href partial-link {:author-uuid author-uuid})))
@@ -65,9 +70,17 @@
 
   ([org-data author-uuid]
   (when-let [contrib-link (contributions-link org-data author-uuid)]
-    (api/get-contributions contrib-link
-     (fn [{:keys [status body success] :as resp}]
-       (contributions-get-finish (:slug org-data) author-uuid dis/recently-posted-sort resp))))))
+    (contributions-real-get org-data author-uuid contrib-link))))
+
+(defn contributions-refresh
+ "If the user is looking at a contributions view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+ ([author-uuid] (contributions-refresh (dis/org-data) author-uuid))
+ ([org-data author-uuid]
+  (if-let* [contrib-data (dis/contributions-data author-uuid)
+            refresh-link (utils/link-for (:links contrib-data) "refresh")]
+    (contributions-real-get org-data author-uuid refresh-link)
+    (contributions-get org-data author-uuid))))
 
 (defn- contributions-more-finish [org-slug author-uuid sort-type direction {:keys [success body]}]
   (let [contrib-data (when success (json->cljs body))]
