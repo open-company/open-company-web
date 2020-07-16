@@ -28,23 +28,17 @@
 (def cell-measurer (partial rutils/build js/ReactVirtualized.CellMeasurer))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
-(def scroll-card-threshold 1)
-(def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
-(def closing-item-height 60)
 (def foc-height 204)
 (def mobile-foc-height 166)
-(def foc-separators-height 58)
-(def caught-up-line-height 64)
 
 (defn- calc-card-height [mobile? foc-layout]
-  (cond
-    mobile?
-    mobile-foc-height
-    (= foc-layout dis/other-foc-layout)
-    collapsed-foc-height
-    :else
-    foc-height))
+  (cond mobile?
+        mobile-foc-height
+        (= foc-layout dis/other-foc-layout)
+        collapsed-foc-height
+        :else
+        foc-height))
 
 (rum/defc wrapped-stream-item < rum/static
   [{:keys [item
@@ -173,11 +167,11 @@
                                 mixins/mounted-flag
                                 {:will-mount (fn [s]
                                    (let [props (-> s :rum/args s first)
-                                        replies? (-> props :container-data :container-slug (= :replies))
-                                        next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
+                                         replies? (-> props :container-data :container-slug (= :replies))
+                                         next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
                                      (reset! (::cache s)
                                       (js/ReactVirtualized.CellMeasurerCache.
-                                       (clj->js {:defaultHeight (if (:is-mobile? props) mobile-foc-height foc-height)
+                                       (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (:foc-layout props))
                                                  :minHeight 1
                                                  :fixedWidth true})))
                                      (reset! (::resource-types s) next-resource-types))
@@ -237,21 +231,36 @@
 
 (defonce last-scroll-top (atom 0))
 
+; (def scroll-card-threshold 1)
+; (def scroll-card-threshold-collapsed 5)
+
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
-  [s e]
+  ([s] (did-scroll s (responsive/is-mobile-size?) nil))
+  ([s mobile?] (did-scroll s mobile? nil))
+  ([s mobile? e]
   (let [scroll-top (or (.-pageYOffset js/window) (.. js/document -scrollingElement -scrollTop))
         direction (if (> @last-scroll-top scroll-top)
                     :up
                     (if (< @last-scroll-top scroll-top)
                       :down
                       :stale))
-        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
-        card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
-        scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
+        win-height (dom-utils/viewport-height)
+        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) win-height)
+        is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
+
+        ;; Calculate the Point of No Return based on the card height
+        ; card-height (calc-card-height is-mobile? @(drv/get-ref s :foc-layout))
+        ; scroll-threshold* (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
+        ; scroll-threshold (* scroll-threshold* card-height)
+        ; pnr (- max-scroll scroll-threshold)
+
+        ;; Let's use the viewport height as point of no return
+        pnr (- max-scroll (* win-height 2))
         current-board-slug @(drv/get-ref s :board-slug)
         current-contributions-id @(drv/get-ref s :contributions-id)
-        current-contributions-id @(drv/get-ref s :contributions-id)]
+        current-contributions-id @(drv/get-ref s :contributions-id)
+        board-kw (keyword current-board-slug)]
     ;; scrolling down
     (when (and ;; not already loading more
                (not @(::bottom-loading s))
@@ -261,35 +270,35 @@
                (or (= direction :down)
                    (= direction :stale))
                ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
+               (>= scroll-top pnr))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
-        (= current-board-slug "replies")
+        (= board-kw :replies)
         (activity-actions/replies-more @(::has-next s) :down)
-        (= current-board-slug "following")
+        (= board-kw :following)
         (activity-actions/following-more @(::has-next s) :down)
         (seq current-contributions-id)
         (contributions-actions/contributions-more @(::has-next s) :down)
-        (= current-board-slug "inbox")
+        (= board-kw :inbox)
         (activity-actions/inbox-more @(::has-next s) :down)
-        (= current-board-slug "all-posts")
+        (= board-kw :all-posts)
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= current-board-slug "bookmarks")
+        (= board-kw :bookmarks)
         (activity-actions/bookmarks-more @(::has-next s) :down)
-        (= current-board-slug "unfollowing")
+        (= board-kw :unfollowing)
         (activity-actions/unfollowing-more @(::has-next s) :down)
         (not (dis/is-container? current-board-slug))
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
-    (reset! last-scroll-top (max 0 scroll-top))))
+    (reset! last-scroll-top (max 0 scroll-top)))))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
         next-link (utils/link-for (:links container-data) "next")]
     (reset! (::has-next s) next-link)
-    (did-scroll s nil)))
+    (did-scroll s)))
 
 (rum/defcs paginated-stream  <
                         rum/static
@@ -320,7 +329,7 @@
                           (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL #(did-scroll s %)))
+                           (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
@@ -362,7 +371,6 @@
         force-list-update (drv/react s :force-list-update)
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
-        card-height (calc-card-height is-mobile? foc-layout)
         member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)]
     [:div.paginated-stream.group
