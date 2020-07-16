@@ -28,17 +28,12 @@
   [sort-type item]
   (update item :sort-value
    (fn [v]
-    (if v
-      v
-      (let [activity-data (dispatcher/activity-data (:uuid item))
-            sort-field (cond
-                        (= sort-type dispatcher/recent-activity-sort)
-                        (or (:last-activity-at activity-data) (:published-at activity-data) (:created-at activity-data))
-                        (= sort-type :bookmarked-at)
-                        (or (:bookmarked-at activity-data) (:published-at activity-data) (:created-at activity-data))
-                        :else
-                        (or (:published-at activity-data) (:created-at activity-data)))]
-        (.getTime (utils/js-date sort-field)))))))
+    (let [sort-key (case sort-type
+                    dispatcher/recent-activity-sort :last-activity-at
+                    :bookmarked-at :bookmarked-at
+                    :published-at)
+          activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))]
+      (.getTime (utils/js-date (get activity-data sort-key)))))))
 
 (defn- add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
@@ -142,13 +137,19 @@
           bm-key (dispatcher/container-key org-slug :bookmarks)
           old-bm-data (get-in db bm-key)
           old-bm-data-posts (get old-bm-data :posts-list)
-          bm-without-uuid (filterv #(not= (:uuid %) (:uuid activity-data)) old-bm-data-posts)
-          new-bm-uuids (vec
+          bm-without-item (filter #(not= (:uuid %) (:uuid activity-data)) old-bm-data-posts)
+          new-bm-items (vec
                         (if is-bookmark?
-                          (conj bm-without-uuid (item-from-entity activity-data))
-                          bm-without-uuid))
-          new-bm-with-sort-value (map (partial sort-value :bookmarked-at) new-bm-uuids)
-          sorted-new-bm-posts (reverse (sort-by :sort-value new-bm-with-sort-value))
+                          (conj bm-without-item (item-from-entity activity-data))
+                          bm-without-item))
+          with-bookmarked-at (map #(as-> % item
+                                    (assoc item :bookmarked-at (if (= (:uuid item) (:uuid activity-data))
+                                                                 (:bookmarked-at activity-data)
+                                                                 (-> item :uuid dispatcher/activity-data :bookmarked-at)))
+                                    (sort-value :bookmarked-at item)
+                                    (dissoc item :bookmarked-at))
+                              new-bm-items)
+          sorted-new-bm-posts (vec (reverse (sort-by :sort-value with-bookmarked-at)))
           org-data (dispatcher/org-data db org-slug)
           change-data (dispatcher/change-data db org-slug)
           active-users (dispatcher/active-users org-slug db)
@@ -591,7 +592,7 @@
                               (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
         next-activity-data* (when activity-data
                              (if bookmark?
-                              (update activity-data :bookmarked-at #(or % (utils/as-of-now)))
+                              (update activity-data :bookmarked-at #(utils/as-of-now))
                               (dissoc activity-data :bookmarked-at)))
         next-activity-data (when (and activity-data
                                       bookmark-link-index)
@@ -608,7 +609,9 @@
                                     (:bookmarked-at activity-data))
                                (dec current-bookmarks-count)
                                :else
-                               current-bookmarks-count)]
+                               current-bookmarks-count)
+        tmp (add-remove-item-from-bookmarks next-db org-slug next-activity-data)
+        bk-key (dispatcher/container-key org-slug :bookmarks)]
       (-> next-db
        (add-remove-item-from-bookmarks org-slug next-activity-data)
        (assoc-in bookmarks-count-key next-bookmarks-count))))
