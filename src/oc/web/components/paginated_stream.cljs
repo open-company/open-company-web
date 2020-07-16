@@ -256,7 +256,7 @@
         ; pnr (- max-scroll scroll-threshold)
 
         ;; Let's use the viewport height as point of no return
-        pnr (- max-scroll (* win-height 2))
+        pnr (- max-scroll win-height)
         current-board-slug @(drv/get-ref s :board-slug)
         current-contributions-id @(drv/get-ref s :contributions-id)
         current-contributions-id @(drv/get-ref s :contributions-id)
