@@ -288,6 +288,8 @@
             [:div.expanded-post-comments.group
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
+                                :loading-comments-count (when-not (seq (get-in comments-drv [(:uuid activity-data) :sorted-comments]))
+                                                          (- (:count comments-link) (count comments-data)))
                                 :member? user-is-part-of-the-team
                                 :last-read-at @(::initial-last-read-at s)
                                 :reply-add-comment-prefix add-comment-prefix

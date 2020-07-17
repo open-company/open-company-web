@@ -22,6 +22,24 @@ div.stream-comments {
 
   div.stream-comments-list {
 
+    div.stream-comments-list-loading {
+      height: 30px;
+      margin-left: 8px;
+
+      div.small-loading {
+        margin-top: 6px;
+        margin-right: 6px;
+        float: left;
+      }
+
+      span.stream-comments-loading-inner {
+        font-size: 13px;
+        @include OC_Body_Book();
+        line-height: 30px;
+        float: left;
+      }
+    }
+
     div.stream-comment-thread {
       position: relative;
 

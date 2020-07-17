@@ -23,6 +23,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
 
@@ -325,7 +326,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix loading-comments-count]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _current-user-data (drv/react s :current-user-data)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -339,6 +340,11 @@
       {:class (when (seq @(::editing? s)) "editing")}
       (if (pos? (count threads))
         [:div.stream-comments-list
+          (when (pos? loading-comments-count)
+            [:div.stream-comments-list-loading
+              (small-loading)
+              [:span.span.stream-comments-loading-inner
+                "Loading " loading-comments-count " more comments..."]])
           (for [idx (range (count threads))
                 :let [root-comment-data (nth threads idx)
                       is-editing? (and (seq @(::editing? s))
