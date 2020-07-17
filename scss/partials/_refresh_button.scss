@@ -8,6 +8,7 @@ div.refresh-button-container {
   opacity: 0;
   pointer-events: none;
   transition: .18ms opacity .5s ease-in-out;
+  z-index: 2;
 
   &.visible {
     pointer-events: initial;

@@ -24,7 +24,7 @@ div.replies-list {
   }
 }
 
-div.replies-refresh-button-container {
+div.refresh-button-container.replies-refresh-button-container {
   position: fixed;
   bottom: 24px;
   width: #{$board_container_width}px;
