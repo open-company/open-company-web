@@ -113,3 +113,39 @@
                    (str " new comment" (when (not= new-comments-count 1) "s")))
                  (when-not hide-label?
                    (str " comment" (when (not= comments-count 1) "s")))))]])])))
+
+
+
+(rum/defc foc-comments-summary < rum/static
+  [{:keys [entry-data
+           add-comment-focus-prefix
+           current-activity-id]}]
+  (let [sorted-comments (dis/activity-sorted-comments-data (:uuid entry-data))
+        comments-link (utils/link-for (:links entry-data) "comments")
+        comments-loaded? (seq sorted-comments)
+        comments-count (max 0 (if sorted-comments
+                                (count sorted-comments)
+                                (:count comments-link)))
+        is-mobile? (responsive/is-mobile-size?)]
+    (when comments-count
+      [:div.is-comments
+        {:on-click (fn [e]
+                     ;; To avoid navigating to the post again and lose the coming from data
+                     ;; nav only when not in the expanded post
+                     (if (seq current-activity-id)
+                       (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
+                         (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
+                       (nav-actions/open-post-modal entry-data true))
+                     (comment-actions/add-comment-focus (cu/add-comment-focus-value add-comment-focus-prefix (:uuid entry-data))))
+         :data-placement "top"
+         :data-toggle (when-not is-mobile? "tooltip")
+         :data-container "body"
+         :title (str comments-count " comment" (when (not= comments-count 1) "s"))}
+        ; Comments authors heads
+        [:div.is-comments-bubble]
+        ; Comments count
+        [:div.is-comments-summary
+          {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
+                                    :add-a-comment (zero? comments-count)})}
+          [:div.is-comments-summary-inner.group
+            comments-count]]])))

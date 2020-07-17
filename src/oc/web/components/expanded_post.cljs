@@ -24,7 +24,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn close-expanded-post [e]
@@ -279,14 +279,9 @@
                           :only-thumb? true})
               [:div.expanded-post-footer-mobile-group
                 (when user-is-part-of-the-team
-                  (comments-summary {:entry-data activity-data
-                                     :comments-data comments-data
-                                     :hide-face-pile? true
-                                     :show-bubble-icon? true
-                                     :hide-label? true
-                                     :publisher? is-publisher?
-                                     :add-comment-focus-prefix "main-comment"
-                                     :current-activity-id (:uuid activity-data)}))]
+                  (foc-comments-summary {:entry-data activity-data
+                                         :add-comment-focus-prefix "main-comment"
+                                         :current-activity-id (:uuid activity-data)}))]
               (when user-is-part-of-the-team
                 (wrt-count {:activity-data activity-data
                             :read-data read-data}))]

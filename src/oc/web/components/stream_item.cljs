@@ -21,7 +21,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]
             [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
@@ -150,7 +150,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member? publisher? boards-count foc-board]}]
+  [s {:keys [activity-data read-data show-wrt? editable-boards member? publisher? boards-count foc-board]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -314,16 +314,9 @@
                 (when member?
                   [:div.stream-item-comments-summary
                     ; {:on-click #(expand s true true)}
-                    (comments-summary {:entry-data activity-data
-                                       :comments-data comments-data
-                                       :hide-face-pile? true
-                                       :show-bubble-icon? true
-                                       :hide-label? true
-                                       :publisher? publisher?
-                                       ; :show-new-tag? (pos? (:new-comments-count activity-data))
-                                       ; :new-comments-count (:new-comments-count activity-data)
-                                       :add-comment-focus-prefix "main-comment"
-                                       :current-activity-id current-activity-id})])
+                    (foc-comments-summary {:entry-data activity-data
+                                           :add-comment-focus-prefix "main-comment"
+                                           :current-activity-id current-activity-id})])
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

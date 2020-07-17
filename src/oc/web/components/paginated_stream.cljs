@@ -45,7 +45,6 @@
            read-data
            org-data
            container-data
-           comments-data
            editable-boards
            foc-layout
            is-mobile] :as props}]
@@ -63,14 +62,12 @@
        (reply-item item)
        collapsed-item?
        (stream-collapsed-item {:activity-data item
-                               :comments-data comments-data
                                :read-data read-data
                                :show-wrt? show-wrt?
                                :member? member?
                                :editable-boards editable-boards})
        :else
        (stream-item {:activity-data item
-                     :comments-data comments-data
                      :read-data read-data
                      :show-wrt? show-wrt?
                      :member? member?
@@ -308,7 +305,6 @@
                         (drv/drv :items-to-render)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
-                        (drv/drv :comments-data)
                         (drv/drv :editable-boards)
                         (drv/drv :foc-layout)
                         (drv/drv :current-user-data)
@@ -361,7 +357,6 @@
   (let [org-data (drv/react s :org-data)
         _board-slug (drv/react s :board-slug)
         _contributions-id (drv/react s :contributions-id)
-        comments-data (drv/react s :comments-data)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
@@ -382,7 +377,6 @@
           (window-scroller
            {}
            (partial virtualized-stream {:org-data org-data
-                                        :comments-data comments-data
                                         :items items
                                         :container-data container-data
                                         :is-mobile? is-mobile?
