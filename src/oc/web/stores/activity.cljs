@@ -767,15 +767,17 @@
                           (:item-id %)]) items-count)
         new-items-count (zipmap ks vs)
         last-read-at-map (zipmap ks (map :last-read-at items-count))
-        activities-key (dispatcher/posts-data-key org-slug)
-        next-db (reduce
-                 (fn [tdb [activity-uuid activity-last-read-at]]
-                   (assoc-in tdb
-                    (dispatcher/activity-last-read-at-key org-slug activity-uuid)
-                    activity-last-read-at))
-                 db
-                 last-read-at-map)]
-    (update-in next-db dispatcher/activities-read-key merge new-items-count)))
+        activities-key (dispatcher/posts-data-key org-slug)]
+    (as-> db tdb
+     (reduce (fn [tdb [activity-uuid activity-last-read-at]]
+               (let [entry-data (dispatcher/entry-data org-slug activity-uuid tdb)]
+                 ;; Avoid setting the last-read-at if the entry is not loaded yet
+                 (if (map? entry-data)
+                   (assoc-in tdb (dispatcher/activity-last-read-at-key org-slug activity-uuid) activity-last-read-at)
+                   tdb)))
+      tdb
+      last-read-at-map)
+     (update-in tdb dispatcher/activities-read-key merge new-items-count))))
 
 (defmethod dispatcher/action :activity-reads
   [db [_ org-slug item-id read-data-count read-data team-roster]]
@@ -803,17 +805,18 @@
         ;; In case the reads we loaded are for one of the posts in the current stream
         ;; let's force a refresh of the list key
         should-force-list-update? ((set current-posts-uuids) item-id)]
-    (-> db
-     (assoc-in (conj dispatcher/activities-read-key item-id) {:count read-data-count
-                                                              :reads fixed-read-data
-                                                              :item-id item-id
-                                                              :unreads unseen-users
-                                                              :private-access? private-access?})
-     (as-> tdb
-      (if should-force-list-update?
-        (update-in tdb dispatcher/force-list-update-key force-list-update-value)
-        tdb))
-     (assoc-in (dispatcher/activity-last-read-at-key org-slug item-id) last-read-at))))
+    (as-> db tdb
+     (assoc-in tdb (conj dispatcher/activities-read-key item-id) {:count read-data-count
+                                                                  :reads fixed-read-data
+                                                                  :item-id item-id
+                                                                  :unreads unseen-users
+                                                                  :private-access? private-access?})
+     (if should-force-list-update?
+       (update-in tdb dispatcher/force-list-update-key force-list-update-value)
+       tdb)
+     (if (map? activity-data)
+       (assoc-in tdb (dispatcher/activity-last-read-at-key org-slug item-id) last-read-at)
+       tdb))))
 
 (defmethod dispatcher/action :uploading-video
   [db [_ org-slug video-id]]
@@ -1104,7 +1107,7 @@
                               :collection
                               (assoc :container-slug :replies)
                               (update :last-seen-at #(if (and keep-seen-at? (map? old-container-data)) (:last-seen-at old-container-data) %)))
-        fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type {:load-comments? true})
+        fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)
         badge-replies? (some :unseen-comments (:posts-list fixed-replies-data))]
@@ -1139,7 +1142,7 @@
                                                                   :last-seen-at (:last-seen-at container-data)
                                                                   :next-seen-at (:next-seen-at container-data)})
           active-users (dispatcher/active-users org db)
-          fixed-replies-data (au/parse-container prepare-replies-data (dispatcher/change-data db org) org-data active-users sort-type {:load-comments? true :direction direction})
+          fixed-replies-data (au/parse-container prepare-replies-data (dispatcher/change-data db org) org-data active-users sort-type {:direction direction})
           new-posts-map (merge old-posts (:fixed-items fixed-replies-data))
           new-container-data (-> fixed-replies-data
                               (assoc :direction direction)

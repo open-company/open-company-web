@@ -141,16 +141,17 @@
          (concat (collapse-comments seen-comments container-seen-at true)
                  unseen-comments))
        (collapse-comments comments container-seen-at true))))
-  ;; When we have less than 4 comments we always show all of them
+  ;; When we have at most 3 comments we always show all of them
   ([comments :guard #(and (coll? %)
                           (<= (count %) 3))
     container-seen-at :guard #(or (nil? %) (string? %))
-    true]
+    collapse? :guard true?]
    (map #(assoc % :collapsed false) comments))
+  ;; When we have more than 3 comments we always show the last 3 plus all the unseen
   ([comments :guard (fn [cs] (and (coll? cs)
                                   (> (count cs) 3)))
-     container-seen-at :guard #(or (nil? %) (string? %))
-    true]
+    container-seen-at :guard #(or (nil? %) (string? %))
+    collapse? :guard true?]
    (let [comments-count (count comments)
          expanded-comments (subvec (vec comments) (- comments-count 3) comments-count)
          collapsed-comments (subvec (vec comments) 0 (- comments-count 3))

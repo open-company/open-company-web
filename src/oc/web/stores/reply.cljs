@@ -113,3 +113,7 @@
     ;; Add the new comment as last comment
     (add-reply db replies-key (:uuid entry-data) parsed-reply-data)))
 
+(defmethod dispatcher/action :reply-comments-loaded
+  [db [_ org-slug entry-data]]
+  (let [replies-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)]
+    (update-replies db replies-key (:uuid entry-data) :comments-loaded? true)))

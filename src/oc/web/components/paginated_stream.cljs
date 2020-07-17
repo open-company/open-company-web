@@ -17,7 +17,6 @@
             [oc.web.components.replies-list :refer (replies-refresh-button reply-item)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
-            [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -140,7 +139,7 @@
 
 (defn- unique-row-string [replies? item]
   (if replies?
-    (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:loading-comments? item) "done" "load")))
+    (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:comments-loaded? item) "final" "temp")))
     (:resource-type item)))
 
 (defn- clear-changed-rows-cache [s next-resource-types]
@@ -236,7 +235,7 @@
   ([s] (did-scroll s (responsive/is-mobile-size?) nil))
   ([s mobile?] (did-scroll s mobile? nil))
   ([s mobile? e]
-  (let [scroll-top (or (.-pageYOffset js/window) (.. js/document -scrollingElement -scrollTop))
+  (let [scroll-top (or (.. js/document -scrollingElement -scrollTop) (.-pageYOffset js/window))
         direction (if (> @last-scroll-top scroll-top)
                     :up
                     (if (< @last-scroll-top scroll-top)
@@ -320,21 +319,23 @@
                         mixins/first-render-mixin
                         section-mixins/container-nav-in
                         ; section-mixins/window-focus-auto-loader
-
+                        (section-mixins/load-entry-comments (fn [s]
+                          (let [container-data @(drv/get-ref s :container-data)]
+                            (when (= (:container-slug container-data) :replies)
+                              container-data))))
                         {:will-mount (fn [s]
                           (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
+                          s)
+                         :did-mount (fn [s]
+                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
                           (check-pagination s)
                          s)
-                         :did-mount (fn [s]
-                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-                          (check-pagination s)
-                          s)
                          :before-render (fn [s]
                           (let [container-data @(drv/get-ref s :container-data)]
                             (when (and (not (:loading-more container-data))

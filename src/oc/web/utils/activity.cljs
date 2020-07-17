@@ -80,7 +80,7 @@
 
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug
-   :container-seen-at :publisher? :published-at :loading-comments? :expanded-replies])
+   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded?])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -458,12 +458,13 @@
           comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
           comments-link (utils/link-for (:links activity-data) "comments")]
       (when comments-link
-        (dis/dispatch! [:comments-get
-                        comments-key
-                        activity-data])
+        (dis/dispatch! [:comments-get comments-key activity-data])
+        (dis/dispatch! [:reply-comments-loaded org-slug activity-data])
         (api/get-comments comments-link #(get-comments-finished org-slug comments-key activity-data %))))))
 
-(defn get-comments-if-needed [activity-data all-comments-data]
+(defn get-comments-if-needed
+  ([activity-data] (get-comments-if-needed activity-data (dis/comments-data)))
+  ([activity-data all-comments-data]
   (let [comments-link (utils/link-for (:links activity-data) "comments")
         activity-uuid (:uuid activity-data)
         comments-data (get all-comments-data activity-uuid)
@@ -477,7 +478,7 @@
                                    (not (contains? comments-data :sorted-comments)))]
     ;; Load the whole list of comments if..
     (when should-load-comments?
-      (get-comments activity-data))))
+      (get-comments activity-data)))))
 
 (defn- is-emoji
   [body]
@@ -534,9 +535,8 @@
         (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
-(defn parse-comments [org-data entry-data new-comments container-seen-at]
+(defn parse-comments [org-data entry-data new-comments container-seen-at reset-collapse-comments?]
   (let [old-comments (:replies-data entry-data)
-        expanded-replies? (:expanded-replies entry-data)
         old-comments-keep (map #(select-keys % [:uuid :collapsed :unseen :unwrapped-body]) old-comments)
         keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
         new-parsed-comments (mapv #(as-> % c
@@ -546,23 +546,26 @@
         new-sorted-comments (cu/sort-comments new-parsed-comments)]
     ;; Collapse the comments only the first time or when the expanded replies
     ;; are not already required explicitly
-    (if (or expanded-replies?
-           (contains? entry-data :replies-data))
-      new-sorted-comments
-      (cu/collapse-comments new-sorted-comments container-seen-at))))
+    (if reset-collapse-comments?
+      (cu/collapse-comments new-sorted-comments container-seen-at)
+      new-sorted-comments)))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
         full-entry (get fixed-items (:uuid entry-data))
-        fallback-to-inline? (and (empty? comments)
-                                 (not (empty? (:comments full-entry))))
-        loaded-complete? (and (:loading-comments? entry-data)
-                              (not fallback-to-inline?))]
+        comments-count (:count (utils/link-for (:links full-entry) "comments"))
+        fallback-to-inline? (and (pos? comments-count)
+                                 (empty? comments))
+        temp-comments (if (seq comments) comments (:comments full-entry))
+        comments-loaded? (or (zero? comments-count) (seq comments))
+        ;; Let's force a collapse recalc if user didn't expand the replies yet
+        ;; and the full list of comments has been loaded from the server 
+        reset-collapse-comments? (and (not (:expanded-replies? entry-data))
+                                      comments-loaded?
+                                      (not (:comments-loaded? entry-data)))]
     (as-> entry-data e
-     (assoc e :loading-comments? fallback-to-inline?)
-     (if (seq comments)
-       (assoc e :replies-data (parse-comments org-data e comments container-seen-at))
-       e)
+     (assoc e :comments-loaded? comments-loaded?)
+     (assoc e :replies-data (parse-comments org-data e temp-comments container-seen-at reset-collapse-comments?))
      (if (seq (:replies-data e))
        (update e :unseen-comments #(if-not (seq comments)
                                      %
@@ -861,17 +864,12 @@
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
                                (vec (remove nil? (concat before [caught-up-item] after))))
                              (#{:following :replies} (:container-slug container-data))
-                             (insert-caught-up grouped-items check-item-fn ignore-item-fn (assoc opts :xxx replies?))
+                             (insert-caught-up grouped-items check-item-fn ignore-item-fn opts)
                              :else
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
-        (when load-comments?
-          (doseq [e items-list
-                  :let [entry-data (or (get-in with-fixed-activities [:fixed-items (:uuid e)]) (dis/activity-data (:uuid e)))]]
-           (utils/after 0 #(get-comments entry-data))))
         (-> with-fixed-activities
-         (assoc :no-virtualized-steam replies?)
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)

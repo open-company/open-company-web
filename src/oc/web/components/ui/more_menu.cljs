@@ -95,7 +95,7 @@
                        s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
-             can-comment-share? comment-share-cb can-react? react-cb can-reply?
+             can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
              mark-unread-cb]}]
@@ -293,8 +293,9 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (when (fn? comment-share-cb)
-                                (react-cb)))}
+                              (when (fn? react-cb)
+                                (react-cb)))
+                 :disabled react-disabled?}
                 "React"])
             (when can-reply?
               [:li.reply
@@ -302,7 +303,7 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (when (fn? comment-share-cb)
+                              (when (fn? reply-cb)
                                 (reply-cb)))}
                 "Reply"])
             (when can-comment-share?

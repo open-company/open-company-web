@@ -1,6 +1,8 @@
 (ns oc.web.mixins.section
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
+            [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.activity :as activity-actions])
   (:import [goog.async Throttle]))
@@ -29,3 +31,26 @@
        (.stop throttled-refresh)
        (.dispose throttled-refresh)
        s)}))
+
+(def ^:private default-get-comments-delay 0)
+
+(defn load-entry-comments
+  ([container-data-get] (load-entry-comments container-data-get default-get-comments-delay))
+  ([container-data-get delay]
+  (let [loaded-uuids (atom #{})
+        load-comments (fn [s]
+                        (when-let [container-data (container-data-get s)]
+                          (doseq [entry (:posts-list container-data)
+                                  :when (and (= (:resource-type entry) :entry)
+                                             (not (@loaded-uuids (:uuid entry)))
+                                             (not (:comments-loaded? entry)))
+                                  :let [full-entry (dis/activity-data (:uuid entry))]]
+                            (swap! loaded-uuids conj (:uuid entry))
+                            (utils/after delay
+                              #(au/get-comments-if-needed full-entry)))))]
+    {:did-mount (fn [s]
+     (load-comments s)
+     s)
+     :did-remount (fn [_ s]
+     (load-comments s)
+     s)})))

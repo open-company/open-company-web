@@ -228,7 +228,7 @@
 
 (defn- comment-item
   [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member?
-             current-user-id reply-focus-value]}]
+             current-user-id reply-focus-value comments-loaded?]}]
   (let [showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid reply-data)))
         replying-to (@(::replying s) (:uuid reply-data))]
@@ -238,7 +238,9 @@
                       :comment-data reply-data
                       :reply-focus-value reply-focus-value
                       :is-mobile? is-mobile?
-                      :react-cb #(reset! (::show-picker s) (:uuid reply-data))
+                      :react-cb #(when comments-loaded?
+                                   (reset! (::show-picker s) (:uuid reply-data)))
+                      :react-disabled? (not comments-loaded?)
                       :reply-cb #(reply-to reply-data reply-focus-value)
                       :did-react-cb #(seen-reply-cb (:uuid reply-data))
                       :emoji-picker (when showing-picker?
@@ -291,7 +293,7 @@
       member?           :member?
       replies-data      :replies-data
       expanded-replies  :expanded-replies
-      loading-comments? :loading-comments?
+      comments-loaded?  :comments-loaded?
       :as entry-data}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -301,7 +303,10 @@
         reply-item-class (reply-item-unique-class entry-data)
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
         show-expand-replies? (and (not expanded-replies)
-                                  (seq (filter :collapsed replies-data)))]
+                                  (seq (filter :collapsed replies-data)))
+        comments-count (if (:comments-loaded? entry-data)
+                         (count replies-data)
+                         (:count (utils/link-for (:links entry-data) "comments")))]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
                                 :open-item true
@@ -320,18 +325,19 @@
                                 (not (dom-utils/event-cotainer-has-class e "reply-comment-body")))
                        (nav-actions/open-post-modal entry-data false))))}
       (reply-top (assoc entry-data :current-user-id (:user-id current-user-data)))
-      (when loading-comments?
+      (when (and (not comments-loaded?)
+                 expanded-replies)
         [:div.reply-item-blocks.group
           [:div.reply-item-loading.group
             (small-loading)
             [:span.reply-item-loading-inner
-              "Loading replies..."]]])
+              "Loading more replies..."]]])
       [:div.reply-item-blocks.group
         (when show-expand-replies?
           (rum/with-key
            (collapsed-comments-button {:expand-cb #(replies-expand entry-data)
-                                       :message (str "View all " (count replies-data) " comments")})
-           (str "collapsed-comments-bt-" uuid "-" (count replies-data))))
+                                       :message (str "View all " comments-count " comments")})
+           (str "collapsed-comments-bt-" uuid "-" comments-count)))
         (for [reply replies-data
               :when (or expanded-replies
                         (not (:collapsed reply)))]
@@ -341,6 +347,7 @@
                            :seen-reply-cb #(reply-mark-seen entry-data reply)
                            :member? member?
                            :reply-focus-value add-comment-focus-value
+                           :comments-loaded? comments-loaded?
                            :current-user-id (:user-id current-user-data)}))
         (rum/with-key
          (add-comment {:activity-data entry-data
