@@ -191,7 +191,7 @@
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
-        board (or (:board params) "following")
+        board (:board params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
@@ -239,7 +239,7 @@
 ;; Component specific to a board
 (defn board-handler [route target component params]
   (let [org (:org params)
-        board (or (:board params) "following")
+        board (:board params)
         entry-board (:entry-board params)
         sort-type (read-sort-type-from-cookie params)
         entry (:entry params)
@@ -308,11 +308,12 @@
     (drv-root component target)))
 
 (defn entry-handler [target params]
-  (pre-routing params true)
-  (if (and (not (jwt/jwt))
-           (:secure-uuid (jwt/get-id-token-contents)))
-    (secure-activity-handler secure-activity "secure-activity" target params false)
-    (board-handler "activity" target org-dashboard params)))
+  (let [with-default-board (update params :board #(or % "following"))]
+    (pre-routing with-default-board true)
+    (if (and (not (jwt/jwt))
+             (:secure-uuid (jwt/get-id-token-contents)))
+      (secure-activity-handler secure-activity "secure-activity" target with-default-board false)
+      (board-handler "activity" target org-dashboard with-default-board))))
 
 (defn slack-lander-check [params]
   (pre-routing params true)

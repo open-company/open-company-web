@@ -102,7 +102,7 @@
                    (routing-actions/maybe-404)))))
            ;; If user is on login page and he's logged in redirect to the org page
            (when (and (jwt/jwt)
-                      (utils/in? (dis/route) "login")
+                      (dis/in-route? :login)
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
 
@@ -537,8 +537,8 @@
 
 (defn initial-loading [& [force-refresh]]
   (let [force-refresh (or force-refresh
-                          (utils/in? (dis/route-param :route) "org")
-                          (utils/in? (dis/route-param :route) "login"))
+                          (dis/in-route? :org)
+                          (dis/in-route? :login))
         latest-entry-point (if (or force-refresh
                                    (nil? (:latest-entry-point @dis/app-state)))
                              0
