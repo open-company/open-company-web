@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.images :as img]
+            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
 (def default-max-logo-height 96) ;; 32 * 3 for retina

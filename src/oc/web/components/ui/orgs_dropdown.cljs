@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -11,13 +12,14 @@
 (rum/defc org-dropdown-item < rum/static
   [current-slug org is-mobile?]
   [:li
-    {:class (when (= (:slug org) current-slug) "active")
-     :on-click (fn [e]
-                 (.stopPropagation e)
-                 (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                 (dis/dispatch! [:input [:orgs-dropdown-visible] false]))}
+    {:class (when (= (:slug org) current-slug) "active")}
     [:a
-      {:href (oc-urls/default-landing (:slug org))}
+      {:href (oc-urls/default-landing (:slug org))
+       :on-click (fn [e]
+                   (utils/event-stop e)
+                   (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                   (dis/dispatch! [:input [:orgs-dropdown-visible] false])
+                   (router/nav! (oc-urls/default-landing (:slug org))))}
       (org-avatar org false :always)]])
 
 (rum/defcs orgs-dropdown < rum/static
