@@ -71,6 +71,11 @@ div.empty-board {
           background-size: 24px 24px;
         }
 
+        &.replies {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+          background-size: 24px 24px;
+        }
+
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
 
@@ -88,6 +93,10 @@ div.empty-board {
 
           &.following {
             background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+          }
+
+          &.replies {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
           }
         }
       }
