@@ -9,6 +9,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.comment :as cu]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
@@ -298,5 +299,6 @@
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :scroll-after-posting? true
                                             :collapse? true
+                                            :internal-max-width (if is-mobile? (- (dom-utils/viewport-width) (* (+ 24 1) 2)) 606) ;; On mobile is screen width less the padding and border on both sides
                                             :add-comment-focus-prefix "main-comment"})
                  (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]])]]))

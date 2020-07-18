@@ -32,7 +32,7 @@
                                    (drv/drv :activity-share-container)
                                    (drv/drv :board-slug)
                                    (drv/drv :activity-uuid)
-  [s {:keys [activity-data read-data comments-data editable-boards :member? member?]}]
+  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
@@ -40,7 +40,6 @@
         is-inbox? (= current-board-slug "inbox")
         dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
         dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
-        current-user-id (jwt/user-id)
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
                     (:publisher activity-data)
@@ -87,7 +86,7 @@
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
         [:div.stream-collapsed-item-avatar-container
-          (user-info-hover {:user-data publisher :current-user-id current-user-id})
+          (user-info-hover {:user-data publisher :current-user-id (:user-id current-user-data)})
           [:div.stream-collapsed-item-avatar
             (user-avatar-image publisher)]]
         [:div.stream-collapsed-item-fill

@@ -1,6 +1,9 @@
-(ns oc.web.components.replies-list
+(ns oc.web.components.stream-reply-item
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [goog.object :as gobj]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [clojure.data :as clj-data]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
@@ -228,7 +231,7 @@
 
 (defn- comment-item
   [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member?
-             current-user-id reply-focus-value comments-loaded?]}]
+             current-user-id reply-focus-value comments-loaded? clear-cell-measure-cb]}]
   (let [showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid reply-data)))
         replying-to (@(::replying s) (:uuid reply-data))]
@@ -239,10 +242,18 @@
                       :reply-focus-value reply-focus-value
                       :is-mobile? is-mobile?
                       :react-cb #(when comments-loaded?
+                                   (when (fn? clear-cell-measure-cb)
+                                     (clear-cell-measure-cb))
                                    (reset! (::show-picker s) (:uuid reply-data)))
                       :react-disabled? (not comments-loaded?)
-                      :reply-cb #(reply-to reply-data reply-focus-value)
-                      :did-react-cb #(seen-reply-cb (:uuid reply-data))
+                      :reply-cb #(do
+                                   (reply-to reply-data reply-focus-value)
+                                   (when (fn? clear-cell-measure-cb)
+                                     (clear-cell-measure-cb)))
+                      :did-react-cb #(do
+                                      (seen-reply-cb (:uuid reply-data))
+                                      (when (fn? clear-cell-measure-cb)
+                                        (clear-cell-measure-cb)))
                       :emoji-picker (when showing-picker?
                                       (emoji-picker-container s entry-data reply-data seen-reply-cb))
                       :showing-picker? showing-picker?
@@ -258,47 +269,66 @@
     {:on-click expand-cb}
     message])
 
-(rum/defcs reply-item < rum/static
-                        rum/reactive
-                        (rum/local nil ::show-picker)
-                        (rum/local #{} ::replying)
-                        (rum/local nil ::add-comment-focus-prefix)
-                        ui-mixins/refresh-tooltips-mixin
-                        (ui-mixins/interactive-images-mixin "div.reply-comment-body")
-                        (ui-mixins/on-window-click-mixin (fn [s e]
-                         (when (and @(::show-picker s)
-                                    (not (utils/event-inside? e
-                                     (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
-                           (reset! (::show-picker s) nil))))
-                        ;; Mentions:
-                        (drv/drv :users-info-hover)
-                        (drv/drv :current-user-data)
-                        (drv/drv :follow-publishers-list)
-                        (drv/drv :followers-publishers-count)
-                        (mention-mixins/oc-mentions-hover {:click? true})
-                        {:will-mount (fn [s]
-                           (reset! (::add-comment-focus-prefix s) (add-comment-focus-prefix))
-                         s)
-                         :did-remount (fn [o s]
-                           ; (let [items (-> s :rum/args first :replies-data)
-                           ;       items-changed (clj-data/diff (-> o :rum/args first :replies-data) items)]
-                           ;    (when (or (seq (first items-changed))
-                           ;              (seq (second items-changed)))
-                           ;      (update-replies s)))
-                            s)}
-  [s {uuid              :uuid
-      publisher         :publisher
-      unseen            :unseen
-      published-at      :published-at
-      member?           :member?
-      replies-data      :replies-data
-      expanded-replies  :expanded-replies
-      comments-loaded?  :comments-loaded?
-      :as entry-data}]
+(defn- setup-add-comment-focus-listener [s]
+  (when @(::add-comment-focus-listener s)
+    (events/unlistenByKey @(::add-comment-focus-listener s)))
+  (when-let* [el (rum/dom-node s)
+              add-comment-element (.querySelector el (str "div.add-comment-box-" @(::add-comment-focus-prefix s) " div.add-comment"))]
+    (reset! (::add-comment-focus-listener s)
+     (events/listen add-comment-element #js [EventType/BLUR EventType/FOCUS]
+      #(reset! (::add-comment-focused s) (= (.-type %) EventType/FOCUS))))))
+
+(rum/defcs stream-reply-item <
+  rum/static
+  rum/reactive
+  (rum/local nil ::show-picker)
+  (rum/local #{} ::replying)
+  (rum/local nil ::add-comment-focus-prefix)
+  (rum/local nil ::add-comment-focus-listener)
+  (rum/local false ::add-comment-focused)
+  ui-mixins/refresh-tooltips-mixin
+  (ui-mixins/interactive-images-mixin "div.reply-comment-body")
+  (ui-mixins/on-window-click-mixin (fn [s e]
+   (when (and @(::show-picker s)
+              (not (utils/event-inside? e
+               (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
+     (reset! (::show-picker s) nil))))
+  ;; Mentions:
+  (drv/drv :users-info-hover)
+  (drv/drv :follow-publishers-list)
+  (drv/drv :followers-publishers-count)
+  (mention-mixins/oc-mentions-hover {:click? true})
+  ;; Component life cycle
+  {:will-mount (fn [s]
+     (reset! (::add-comment-focus-prefix s) (add-comment-focus-prefix))
+   s)
+   :did-mount (fn [s]
+    (setup-add-comment-focus-listener s)
+   s)
+   :did-remount (fn [_ s]
+    (setup-add-comment-focus-listener s)
+   s)
+   :will-unmount (fn [s]
+    (when-let [add-comment-focus-listener @(::add-comment-focus-listener s)]
+      (events/unlistenByKey add-comment-focus-listener)
+      (reset! (::add-comment-focused s) false))
+   s)}
+  ;; Render
+  [s {member?               :member?
+      reply-data            :reply-data
+      current-user-data     :current-user-data
+      clear-cell-measure-cb :clear-cell-measure-cb}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
-        current-user-data (drv/react s :current-user-data)
+        {uuid             :uuid
+         publisher        :publisher
+         unseen           :unseen
+         published-at     :published-at
+         replies-data     :replies-data
+         expanded-replies :expanded-replies
+         comments-loaded? :comments-loaded?
+         :as              entry-data}           reply-data
         is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class entry-data)
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
@@ -311,6 +341,7 @@
       {:class (utils/class-set {:unseen unseen
                                 :open-item true
                                 :close-item true
+                                :reply-item-add-comment-focus @(::add-comment-focused s)
                                 reply-item-class true})
        :data-activity-uuid uuid
        :ref :reply-item
@@ -335,7 +366,10 @@
       [:div.reply-item-blocks.group
         (when show-expand-replies?
           (rum/with-key
-           (collapsed-comments-button {:expand-cb #(replies-expand entry-data)
+           (collapsed-comments-button {:expand-cb #(do
+                                                    (replies-expand entry-data)
+                                                    (when (fn? clear-cell-measure-cb)
+                                                      (clear-cell-measure-cb)))
                                        :message (str "View all " comments-count " comments")})
            (str "collapsed-comments-bt-" uuid "-" comments-count)))
         (for [reply replies-data
@@ -344,7 +378,11 @@
           (comment-item s {:entry-data entry-data
                            :reply-data reply
                            :is-mobile? is-mobile?
-                           :seen-reply-cb #(reply-mark-seen entry-data reply)
+                           :seen-reply-cb #(do
+                                            (reply-mark-seen entry-data reply)
+                                            (when (fn? clear-cell-measure-cb)
+                                              (clear-cell-measure-cb)))
+                           :clear-cell-measure-cb clear-cell-measure-cb
                            :member? member?
                            :reply-focus-value add-comment-focus-value
                            :comments-loaded? comments-loaded?
@@ -353,8 +391,13 @@
          (add-comment {:activity-data entry-data
                        :collapse? true
                        :add-comment-placeholder "Reply..."
+                       :internal-max-width (if is-mobile? (- (dom-utils/viewport-width) (* (+ 24 1) 2)) 524) ;; On mobile is screen width less the padding and border on both sides
+                       :add-comment-did-change #(when (fn? clear-cell-measure-cb)
+                                                  (clear-cell-measure-cb))
                        :add-comment-cb (fn [new-comment-data]
-                                          (reply-actions/replies-add entry-data new-comment-data))
+                                         (reply-actions/replies-add entry-data new-comment-data)
+                                         (when (fn? clear-cell-measure-cb)
+                                           (clear-cell-measure-cb)))
                        :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
          (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 
@@ -388,10 +431,3 @@
                                   "New replies available")
                        :visible show-refresh-button?
                        :class-name :replies-refresh-button-container}))))
-
-(def replies-empty-message "When someone replies to you, or mentions your name, you'll see it here.")
-
-(rum/defc replies-empty-list < rum/static
-  []
-  [:div.replies-list-empty
-    (all-caught-up replies-empty-message)])

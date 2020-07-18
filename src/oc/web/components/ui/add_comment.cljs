@@ -1,8 +1,6 @@
 (ns oc.web.components.ui.add-comment
   (:require [rum.core :as rum]
-            [goog.events :as events]
             [dommy.core :refer-macros (sel1)]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -22,7 +20,8 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)])
+  (:import [goog.async Throttle]))
 
 (defn- focus-value [s]
   (let [{:keys [activity-data parent-comment-uuid
@@ -96,6 +95,7 @@
                           :dismiss true
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
+    (swap! (::initial-add-comment s) #(if edit-comment-data % au/empty-body-html))
     (when add-comment-div
       (set! (.-innerHTML add-comment-div) @(::initial-add-comment s)))
     (let [updated-comment (if edit-comment-data
@@ -131,7 +131,9 @@
         {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)]
     (multiple-lines? s)
     (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
-    (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)))
+    (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)
+    (when-let [throttled-did-change @(::did-change-throttled s)]
+      (.fire throttled-did-change))))
 
 (defn- should-focus? [s]
   (let [add-comment-focus @(drv/get-ref s :add-comment-focus)
@@ -206,6 +208,7 @@
                          ; (rum/local false ::did-change)
                          (rum/local false ::last-add-comment-focus)
                          (rum/local 10000 ::inline-reply-max-width)
+                         (rum/local nil ::did-change-throttled)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -223,7 +226,7 @@
                             (reset! (:me/showing-gif-selector s) false))))
                          {:will-mount (fn [s]
                           (reset! (::add-comment-id s) (utils/activity-uuid))
-                          (let [{:keys [activity-data parent-comment-uuid edit-comment-data collapse?]} (first (:rum/args s))
+                          (let [{:keys [activity-data parent-comment-uuid edit-comment-data collapse? add-comment-did-change]} (first (:rum/args s))
                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
                                 activity-add-comment-data (add-comment-data s add-comment-key)
                                 initial-body (or activity-add-comment-data
@@ -235,22 +238,18 @@
                                                          (au/empty-body? initial-body)))
                             (reset! (::post-enabled s) (boolean (and (seq activity-add-comment-data)
                                                                      (not= activity-add-comment-data (:body edit-comment-data))
-                                                                     (not (au/empty-body? activity-add-comment-data))))))
+                                                                     (not (au/empty-body? activity-add-comment-data)))))
+                            (when (fn? add-comment-did-change)
+                              (reset! (::did-change-throttled s) (Throttle. add-comment-did-change 2000))))
                           s)
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))
-                                 me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
-                             (me-media-utils/setup-editor s did-change me-opts))
-                           (let [add-comment-internal (rum/ref-node s :add-comment-internal)
+                                 me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))
+                                 add-comment-internal (rum/ref-node s :add-comment-internal)
                                  bounding-box (.getBoundingClientRect add-comment-internal)
                                  computed-style (.getComputedStyle js/window add-comment-internal)
-                                 v #(.parseInt js/window % 10)
-                                 max-width (- (.-clientWidth add-comment-internal)
-                                              (v (.-borderLeftWidth computed-style))
-                                              (v (.-paddingLeft computed-style))
-                                              (v (.-paddingRight computed-style))
-                                              (v (.-borderRightWidth computed-style))
-                                              132)] ;; Width of the buttons on the right
+                                 max-width (- (:internal-max-width props) 132)]
+                             (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
                            (multiple-lines? s)
@@ -318,9 +317,11 @@
                            (when @(:me/editor s)
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
+                           (when-let [throttled-did-change @(::did-change-throttled s)]
+                             (.dispose throttled-did-change))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix
-             edit-comment-data scroll-after-posting? add-comment-cb collapse?]}]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix internal-max-width
+             edit-comment-data scroll-after-posting? add-comment-cb collapse? add-comment-did-change]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _mention-users (drv/react s :mention-users)
@@ -329,7 +330,6 @@
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
         _reply-to (drv/react s :comment-reply-to)
-        add-comment-focus (str add-comment-focus-prefix (drv/react s :add-comment-focus))
         current-user-data (drv/react s :current-user-data)
         container-class (add-comment-unique-class s)
         is-mobile? (responsive/is-mobile-size?)
@@ -339,6 +339,7 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
+                                (str "add-comment-box-" add-comment-focus-prefix) true
                                 :collapsed-box @(::collapsed s)
                                 :inline-reply (not @(::multiple-lines s))})
        :on-click (when @(::collapsed s)

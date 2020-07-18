@@ -66,4 +66,4 @@
              ;   {:on-click #(nav-actions/show-follow-picker)}
              ;   "Curate your feed"]
                ]
-           :else "This team has no updates")]]]))
+           :else "This topic has no updates")]]]))

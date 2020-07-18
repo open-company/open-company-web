@@ -150,9 +150,9 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data show-wrt? editable-boards member? publisher? boards-count foc-board]}]
+  [s {:keys [activity-data read-data show-wrt? editable-boards member? publisher? boards-count foc-board current-user-data]}]
   (let [is-mobile? (responsive/is-mobile-size?)
-        current-user-id (jwt/user-id)
+        current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)

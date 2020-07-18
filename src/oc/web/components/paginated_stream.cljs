@@ -1,5 +1,6 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
+            [defun.core :refer (defun-)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -14,17 +15,18 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.replies-list :refer (replies-refresh-button reply-item)]
+            [oc.web.components.stream-reply-item :refer (replies-refresh-button stream-reply-item)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            cljsjs.react-virtualized))
+            [cljsjs.react-virtualized]))
 
 (def virtualized-grid (partial rutils/build js/ReactVirtualized.Grid))
 (def window-scroller (partial rutils/build js/ReactVirtualized.WindowScroller))
 (def cell-measurer (partial rutils/build js/ReactVirtualized.CellMeasurer))
+(def RVCellMeasurerCache js/ReactVirtualized.CellMeasurerCache)
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def collapsed-foc-height 56)
@@ -46,7 +48,9 @@
            container-data
            editable-boards
            foc-layout
-           is-mobile] :as props}]
+           is-mobile
+           clear-cell-measure-cb
+           current-user-data] :as props}]
   (let [member? (:member? org-data)
         publisher? (:publisher? item)
         show-wrt? member?
@@ -58,13 +62,17 @@
                                :close-item (:close-item item)})}
      (cond
        (= (:container-slug container-data) :replies)
-       (reply-item item)
+       (stream-reply-item {:reply-data            item
+                           :member?               member?
+                           :current-user-data     current-user-data
+                           :clear-cell-measure-cb clear-cell-measure-cb})
        collapsed-item?
-       (stream-collapsed-item {:activity-data item
-                               :read-data read-data
-                               :show-wrt? show-wrt?
-                               :member? member?
-                               :editable-boards editable-boards})
+       (stream-collapsed-item {:activity-data     item
+                               :member?           member?
+                               :read-data         read-data
+                               :show-wrt?         show-wrt?
+                               :editable-boards   editable-boards
+                               :current-user-data current-user-data})
        :else
        (stream-item {:activity-data item
                      :read-data read-data
@@ -73,6 +81,7 @@
                      :publisher? publisher?
                      :editable-boards editable-boards
                      :foc-board (not= (:resource-type container-data) :board)
+                     :current-user-data     current-user-data
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
@@ -88,7 +97,7 @@
 (rum/defc separator-item < rum/static
   [{:keys [foc-layout item] :as props}]
   [:div.virtualized-list-separator
-    {:class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
+    {:class (when (not= foc-layout dis/other-foc-layout) "expanded-list")}
     (:label item)])
 
 (rum/defc caught-up-wrapper < rum/static
@@ -101,7 +110,9 @@
              activities-read
              foc-layout
              is-mobile?
-             container-data]
+             container-data
+             current-user-data
+             clear-cell-measure-cb]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -132,17 +143,27 @@
         ; [:div.virtualized-list-placeholder]
         :else
         (wrapped-stream-item (merge derivatives {:item item
-                                                 :container-data container-data
                                                  :read-data read-data
+                                                 :is-mobile is-mobile?
                                                  :foc-layout foc-layout
-                                                 :is-mobile is-mobile?})))]))
+                                                 :container-data container-data
+                                                 :clear-cell-measure-cb clear-cell-measure-cb})))]))
 
 (defn- unique-row-string [replies? item]
   (if replies?
     (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:comments-loaded? item) "final" "temp")))
     (:resource-type item)))
 
-(defn- clear-changed-rows-cache [s next-resource-types]
+(defun- clear-cell-measure
+
+  ([rum-state row-index] (clear-cell-measure rum-state row-index 0))
+
+  ([rum-state :guard :rum/react-component row-index column-index]
+   (when-let [cache @(::cache rum-state)]
+     (.clear cache row-index column-index)
+     (reset! (::force-re-render rum-state) (utils/activity-uuid)))))
+
+(defn- clear-changed-cells-cache [s next-resource-types]
   (let [props (-> s :rum/args first)
         container-data (:container-data props)
         items (:items props)
@@ -152,7 +173,7 @@
             :let [old-resource-type (get @resource-types idx)
                   new-resource-type (get next-resource-types idx)]
             :when (not= old-resource-type new-resource-type)]
-      (.clear cache idx 0))
+      (clear-cell-measure s idx 0))
     (reset! resource-types next-resource-types)))
 
 (rum/defcs virtualized-stream < rum/static
@@ -160,13 +181,15 @@
                                 (seen-mixins/container-nav-mixin)
                                 (rum/local nil ::resource-types)
                                 (rum/local nil ::cache)
+                                (rum/local nil ::force-re-render)
                                 mixins/mounted-flag
                                 {:will-mount (fn [s]
                                    (let [props (-> s :rum/args s first)
                                          replies? (-> props :container-data :container-slug (= :replies))
                                          next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
+                                     (reset! (::force-re-render s) (utils/activity-uuid))
                                      (reset! (::cache s)
-                                      (js/ReactVirtualized.CellMeasurerCache.
+                                      (RVCellMeasurerCache.
                                        (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (:foc-layout props))
                                                  :minHeight 1
                                                  :fixedWidth true})))
@@ -177,14 +200,15 @@
                                         replies? (-> props :container-data :container-slug (= :replies))
                                         next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
                                     (when-not (= @(::resource-types s) next-resource-types)
-                                      (clear-changed-rows-cache s next-resource-types)))
+                                      (clear-changed-cells-cache s next-resource-types)))
                                   s)}
   [s {:keys [items
              activities-read
              foc-layout
              is-mobile?
              ; force-list-update
-             container-data]
+             container-data
+             current-user-data]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -195,18 +219,20 @@
         key-prefix (if is-mobile? "mobile" foc-layout)
         cell-measurer-renderer (fn [{:keys [cache]} props]
                                  (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
-                                   (cell-measurer (clj->js {:cache cache
-                                                            :columnIndex columnIndex
-                                                            :rowIndex rowIndex
-                                                            :index rowIndex
-                                                            :key key
-                                                            :parent parent})
-                                    (partial list-item derivatives row-props))))
+                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex))]
+                                     (cell-measurer (clj->js {:cache cache
+                                                              :columnIndex columnIndex
+                                                              :rowIndex rowIndex
+                                                              :index rowIndex
+                                                              :key key
+                                                              :parent parent})
+                                      (partial list-item derived-props row-props)))))
         width (if is-mobile?
                 js/window.innerWidth
                 620)]
     [:div.virtualized-list-container
       {:ref registerChild
+       :data-render-key @(::force-re-render s)
        :key (str "virtualized-list-" key-prefix)}
       (virtualized-grid {:autoHeight true
                          :ref :virtualized-list-comp
@@ -305,7 +331,6 @@
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
                         (drv/drv :editable-boards)
-                        (drv/drv :foc-layout)
                         (drv/drv :current-user-data)
                         (drv/drv :force-list-update)
                         (drv/drv :board-slug)
@@ -314,7 +339,6 @@
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
                         (rum/local nil ::bottom-loading)
-                        (rum/local nil ::last-foc-layout)
                         ;; Mixins
                         mixins/first-render-mixin
                         section-mixins/container-nav-in
@@ -324,7 +348,6 @@
                             (when (= (:container-slug container-data) :replies)
                               container-data))))
                         {:will-mount (fn [s]
-                          (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
@@ -343,12 +366,6 @@
                               (reset! (::bottom-loading s) false)
                               (check-pagination s)))
                           s)
-                         :after-render (fn [s]
-                          (let [foc-layout @(drv/get-ref s :foc-layout)]
-                            (when (not= @(::last-foc-layout s) foc-layout)
-                              (reset! (::last-foc-layout s) foc-layout)
-                              (check-pagination s)))
-                          s)
                          :will-unmount (fn [s]
                           (when @(::scroll-listener s)
                             (events/unlistenByKey @(::scroll-listener s))
@@ -362,7 +379,6 @@
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
-        foc-layout (drv/react s :foc-layout)
         current-user-data (drv/react s :current-user-data)
         force-list-update (drv/react s :force-list-update)
         viewport-height (dom-utils/viewport-height)
@@ -381,6 +397,6 @@
                                         :items items
                                         :container-data container-data
                                         :is-mobile? is-mobile?
+                                        :current-user-data current-user-data
                                         :activities-read activities-read
-                                        :editable-boards editable-boards
-                                        :foc-layout foc-layout}))]]]));)]]]))
+                                        :editable-boards editable-boards}))]]]));)]]]))

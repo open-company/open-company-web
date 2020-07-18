@@ -1,29 +1,3 @@
-div.replies-list {
-  width: 100%;
-
-  @include mobile() {
-    width: 100%;
-  }
-
-  div.replies-list-container {
-    position: relative;
-
-    div.loading-updates {
-      text-align: center;
-      height: 60px;
-      padding: 24px 0 16px;
-      font-size: 14px;
-      @include OC_Body_Book();
-      color: var(--light-color);
-
-      @include mobile() {
-        height: 44px;
-        padding: 16px 0 8px;
-      }
-    }
-  }
-}
-
 div.refresh-button-container.replies-refresh-button-container {
   position: fixed;
   bottom: 24px;
@@ -84,6 +58,16 @@ div.reply-item {
     border-left: none;
     border-radius: 0;
     padding: 16px 24px;
+  }
+
+  &.reply-item-add-comment-focus {
+    z-index: 2;
+  }
+
+  @include big_web() {
+    &:hover {
+      z-index: 2;
+    }
   }
 
   &.unread {
