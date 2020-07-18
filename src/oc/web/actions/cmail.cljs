@@ -82,20 +82,23 @@
 
 ;; Entry
 
-(defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
-  (when (not= (dis/activity-data activity-uuid) :404)
-    (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug) :board-slug board-slug :activity-uuid activity-uuid}])
-    (api/get-entry-with-uuid (dis/current-org-slug) board-slug activity-uuid
-     (fn [{:keys [status success body]}]
-      (cond
-        (= status 404)
-        (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) activity-uuid nil])
-        (not success)
-        (dis/dispatch! [:activity-get/failed (dis/current-org-slug) activity-uuid nil])
-        :else
-        (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (when success (json->cljs body)) nil]))
-      (when (fn? loaded-cb)
-        (utils/after 100 #(loaded-cb success status)))))))
+(defn get-entry-with-uuid [board-slug entry-uuid & [loaded-cb]]
+  (let [entry-data (dis/activity-data entry-uuid)]
+    (when (and (not= entry-data :404)
+               (or board-slug
+                   (:board-slug entry-data)))
+      (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug) :board-slug (or board-slug (:board-slug entry-data)) :activity-uuid entry-uuid}])
+      (api/get-entry-with-uuid (dis/current-org-slug) board-slug entry-uuid
+       (fn [{:keys [status success body]}]
+        (cond
+          (= status 404)
+          (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) entry-uuid nil])
+          (not success)
+          (dis/dispatch! [:activity-get/failed (dis/current-org-slug) entry-uuid nil])
+          :else
+          (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (when success (json->cljs body)) nil]))
+        (when (fn? loaded-cb)
+          (utils/after 100 #(loaded-cb success status))))))))
 
 ;; Cmail
 

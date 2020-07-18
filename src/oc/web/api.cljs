@@ -858,7 +858,7 @@
       (storage-http (method-for-link activity-link) (relative-href activity-link)
        {:headers (headers-for-link activity-link)}
        callback)
-      (handle-missing-link "get-current-entry" activity-link callback
+      (handle-missing-link "get-entry-with-uuid" activity-link callback
        {:org-slug org-slug :board-slug board-slug :activity-uuid activity-uuid}))))
 
 ;; Search

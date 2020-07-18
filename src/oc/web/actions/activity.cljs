@@ -840,7 +840,7 @@
   (let [org-slug (dis/current-org-slug)
         current-board-slug (dis/current-board-slug)
         board-data (au/board-by-uuid container-id)]
-    (when (not= (:slug board-data) utils/default-drafts-board-slug)
+    (when-not (= (:slug board-data) utils/default-drafts-board-slug)
       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
        (fn [success status]
          (when success
