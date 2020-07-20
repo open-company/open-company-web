@@ -544,13 +544,10 @@ div.reply-item {
             height: 32px;
             z-index: 2;
             display: none;
-            border-radius: 4px;
-            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-            background-color: var(--color);
-
-            @include dark_mode() {
-              box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
-            }
+            border-radius: 6px;
+            box-shadow: var(--comments-floating-bt-shadow);
+            background-color: var(--comments-floating-bt-background);
+            border: 1px solid var(--comments-floating-bt-border);
 
             div.react-bt-container {
               // width: 30px;
@@ -576,47 +573,48 @@ div.reply-item {
               width: 86px;
             }
 
-            .separator-bt {
-              border-left: 1px solid rgba(white, 0.1);
+            & > button.floating-bt:last-child, & > div:last-child > button.floating-bt {
+              padding-right: 11px;
+              width: 31px;
+              background-position: left 6px top 50%;
+            }
+
+            & > button.floating-bt:first-child, & > div:first-child > button.floating-bt {
+              padding-left: 11px;
+              width: 31px;
+              background-position: left 11px top 50%;
             }
 
             button.floating-bt {
               padding: 0;
               height: 32px;
-              min-width: 20px;
+              width: 24px;
               background-position: center;
               background-repeat: no-repeat;
-              padding: 0 8px;
+              padding: 10px 6px;
               float: left;
               @include OC_Body_Bold();
               font-size: 12px;
               line-height: 32px;
-              color: var(--overlay-background-color);
+              color: var(--color);
               text-transform: uppercase;
+              background-position: center;
 
               @include big_web() {
                 opacity: 0.5;
                 &:hover {
                   opacity: 1;
-
-                  &:before {
-                    opacity: 0.5;
-                  }
                 }
               }
 
               &.reply-bt {
-                padding-left: 24px;
-                background-image: cdnUrl("/img/ML/comment_reply.svg");
-                background-size: 12px 12px;
-                background-position: left 8px top 10px;
+                background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                background-size: 14px 12px;
               }
 
               &.react-bt {
-                padding-left: 26px;
-                background-image: cdnUrl("/img/ML/comment_react.svg");
+                background-image: cdnUrl("/img/ML/comment_react@dark.svg");
                 background-size: 14px 14px;
-                background-position: left 8px top 9px;
                 border-right: none;
 
                 div.emoji-mart {
@@ -629,11 +627,11 @@ div.reply-item {
 
               @include dark_mode() {
                 &.reply-bt {
-                  background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+                  background-image: cdnUrl("/img/ML/comment_reply.svg");
                 }
 
                 &.react-bt {
-                  background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+                  background-image: cdnUrl("/img/ML/comment_react.svg");
                 }
               }
             }
@@ -715,21 +713,15 @@ div.reply-item {
               margin-left: 32px;
             }
 
-            @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
+            @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
 
             @include dark_mode() {
-              @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
+              @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
             }
           }
 
           div.reply-comment-header {
             height: 24px;
-
-            @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
-
-            @include dark_mode() {
-              @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
-            }
 
             div.reply-comment-author-right {
               float: left;
@@ -742,10 +734,10 @@ div.reply-item {
               align-items: center;
               justify-content: flex-start;
 
-              @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
+              @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
 
               @include dark_mode() {
-                @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
+                @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
               }
 
               div.reply-comment-author-name {
@@ -761,12 +753,6 @@ div.reply-item {
 
                 &.clickable-name {
                   cursor: pointer;
-                }
-
-                @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
-
-                @include dark_mode() {
-                  @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
                 }
               }
 

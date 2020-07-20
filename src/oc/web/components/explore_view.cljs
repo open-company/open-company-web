@@ -38,7 +38,7 @@
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
       [:div.explore-view-header
-        "Browse topics"]
+        "Explore"]
       [:div.explore-view-blocks
         (when can-create-topic?
           [:button.mlb-reset.explore-view-block.create-topic-bt

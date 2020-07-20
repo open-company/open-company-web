@@ -41,7 +41,7 @@ $dark_mode: "dark";
   --reaction-bt-background: #{rgba($deep_navy, 0.1)};
 
   // Stream-item
-  --foc-background-color: white;; // #{rgba($deep_navy, 0.05)};
+  --foc-background-color: white; // #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: white; // #{rgba($deep_navy, 0.05)};
   --foc-hover-color: white; // #F1F0F0; // rgb(241, 240, 240)
   --foc-hover-border-color: #{rgba($deep_navy, 0.32)};
@@ -74,7 +74,9 @@ $dark_mode: "dark";
   --search-background-color: #{rgba($light_ui_grey, 0.2)};
 
   // Comments
-  --comments-floating-bt-background: #{rgba($deep_navy, 0.05)};
+  --comments-floating-bt-background: white;
+  --comments-floating-bt-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
+  --comments-floating-bt-border: #DCDDE1;
   --add-comment-background: white;
   --add-comment-border-color: --divider-line;
   --add-comment-box-shadow: rgba(0, 0, 0, 0.07);
@@ -195,7 +197,9 @@ $dark_mode: "dark";
   --search-background-color: #{rgba(white, 0.09)};
 
   // Comments
-  --comments-floating-bt-background: #{rgba(white, 0.05)};
+  --comments-floating-bt-background: #{$deep_navy};
+  --comments-floating-bt-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+  --comments-floating-bt-border: #{rgba(white, 0.08)};
   --add-comment-background: rgb(27, 32, 42);
   --add-comment-border-color: --divider-line;
   --add-comment-box-shadow: rgba(255, 255, 255, 0.07);

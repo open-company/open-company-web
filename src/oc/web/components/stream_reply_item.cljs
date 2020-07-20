@@ -143,16 +143,14 @@
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :on-click reply-cb
-                       :title "Reply"}
-                      "Reply"]
+                       :title "Reply"}]
                     ;; React container
-                    [:div.react-bt-container.separator-bt
+                    [:div.react-bt-container
                       [:button.mlb-reset.floating-bt.react-bt
                         {:data-toggle "tooltip"
                          :data-placement "top"
                          :title "Add reaction"
-                         :on-click react-cb}
-                        "React"]
+                         :on-click react-cb}]
                       emoji-picker]])]]
             [:div.reply-comment-content
               [:div.reply-comment-body.oc-mentions.oc-mentions-hover

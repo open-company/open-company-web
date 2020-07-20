@@ -80,14 +80,6 @@
     (utils/copy-to-clipboard input-field)
     (.removeChild (.-body js/document) input-field)))
 
-(defn share-clicked [comment-data]
-  (copy-comment-url (:url comment-data))
-  (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                           :dismiss true
-                                           :expire 3
-                                           :id (keyword (str "comment-url-copied-"
-                                            (:uuid comment-data)))}))
-
 (defn- comment-mark-read [s comment-uuid]
   (let [threads @(::threads s)
         idx (utils/index-of threads #(= (:uuid %) comment-uuid))]
@@ -139,7 +131,7 @@
 (rum/defc read-comment < rum/static
   [{:keys [activity-data comment-data editing?
            edit-comment-key mouse-leave-cb
-           edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
+           edit-cb delete-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt? member?
            show-more-menu showing-picker? did-react-cb
            current-user-id]}]
@@ -156,14 +148,11 @@
         (when is-mobile?
           [:div.stream-comment-mobile-menu
             (more-menu {:entity-data comment-data
-                        :external-share false
                         :entity-type "comment"
                         :show-edit? true
                         :edit-cb edit-cb
                         :show-delete? true
                         :delete-cb delete-cb
-                        :can-comment-share? true
-                        :comment-share-cb share-cb
                         :can-react? true
                         :react-cb react-cb
                         :can-reply? true
@@ -194,14 +183,11 @@
                 [:div.new-comment-tag])
               (if (responsive/is-mobile-size?)
                 [:div.stream-comment-mobile-menu
-                  (more-menu comment-data nil {:external-share false
-                                               :entity-type "comment"
+                  (more-menu comment-data nil {:entity-type "comment"
                                                :show-edit? true
                                                :edit-cb edit-cb
                                                :show-delete? true
                                                :delete-cb delete-cb
-                                               :can-comment-share? true
-                                               :comment-share-cb share-cb
                                                :can-react? true
                                                :react-cb react-cb
                                                :can-reply? true
@@ -213,17 +199,13 @@
                            "-edit")
                          (when can-show-delete-bt?
                            "-delete"))}
-                  (if (or can-show-delete-bt?
-                          can-show-edit-bt?)
-                    [:div.more-bt-container.separator-bt
-                      [:button.mlb-reset.floating-bt.more-bt.separator-bt
-                        {:on-click #(reset! show-more-menu (:uuid comment-data))}
-                        "More"]
+                  (when (or can-show-delete-bt?
+                            can-show-edit-bt?)
+                    [:div.more-bt-container
+                      [:button.mlb-reset.floating-bt.more-bt
+                        {:on-click #(reset! show-more-menu (:uuid comment-data))}]
                       (when (= @show-more-menu (:uuid comment-data))
                         [:div.comment-more-menu-container
-                          [:button.mlb-reset.share-bt
-                            {:on-click share-cb}
-                            "Share"]
                           (when can-show-delete-bt?
                             [:button.mlb-reset.delete-bt
                               {:on-click #(delete-cb comment-data)}
@@ -231,29 +213,21 @@
                           (when can-show-edit-bt?
                             [:button.mlb-reset.edit-bt
                               {:on-click #(edit-cb comment-data)}
-                              "Edit"])])]
-                    [:button.mlb-reset.floating-bt.share-bt.separator-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click share-cb
-                       :title "Copy link"}
-                      "Share"])
+                              "Edit"])])])
                   ;; Reply to comment
                   (when (:reply-parent comment-data)
-                    [:button.mlb-reset.floating-bt.reply-bt.separator-bt
+                    [:button.mlb-reset.floating-bt.reply-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :on-click reply-cb
-                       :title "Reply"}
-                      "Reply"])
+                       :title "Reply"}])
                   ;; React container
-                  [:div.react-bt-container.separator-bt
+                  [:div.react-bt-container
                     [:button.mlb-reset.floating-bt.react-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
                        :title "Add reaction"
-                       :on-click react-cb}
-                      "React"]
+                       :on-click react-cb}]
                     emoji-picker]])]]
           [:div.stream-comment-content
             [:div.stream-comment-body.oc-mentions.oc-mentions-hover
@@ -371,7 +345,6 @@
                                :can-show-delete-bt? (:can-delete root-comment-data)
                                :edit-cb (partial start-editing s)
                                :delete-cb (partial delete-clicked s activity-data)
-                               :share-cb #(share-clicked root-comment-data)
                                :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
                                :reply-cb #(comment-actions/reply-to reply-focus-value (:body root-comment-data) true)
                                :did-react-cb #(comment-mark-read s (:uuid root-comment-data))
