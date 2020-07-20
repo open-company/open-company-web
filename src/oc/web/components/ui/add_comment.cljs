@@ -174,20 +174,19 @@
 (rum/defcs add-comment < rum/static
                          rum/reactive
                          ;; Locals
-                         (rum/local nil :me/editor)
-                         (rum/local nil :me/media-picker-ext)
-                         (rum/local false :me/media-photo)
-                         (rum/local false :me/media-video)
-                         (rum/local false :me/media-attachment)
-                         (rum/local false :me/media-photo-did-success)
-                         (rum/local false :me/media-attachment-did-success)
-                         (rum/local false :me/showing-media-video-modal)
-                         (rum/local false :me/showing-gif-selector)
+                         (rum/local nil ::me-media-utils/editor)
+                         (rum/local nil ::me-media-utils/media-picker-ext)
+                         (rum/local false ::me-media-utils/media-photo)
+                         (rum/local false ::me-media-utils/media-video)
+                         (rum/local false ::me-media-utils/media-attachment)
+                         (rum/local false ::me-media-utils/media-photo-did-success)
+                         (rum/local false ::me-media-utils/media-attachment-did-success)
+                         (rum/local false ::me-media-utils/showing-media-video-modal)
+                         (rum/local false ::me-media-utils/showing-gif-selector)
                          ;; Image upload lock
-                         (rum/local false :me/upload-lock)
+                         (rum/local false ::me-media-utils/upload-lock)
                          (rum/local "" ::add-comment-id)
                          (rum/local false ::comment-reply-to-reset)
-
                          ;; Derivatives
                          (drv/drv :media-input)
                          (drv/drv :add-comment-focus)
@@ -214,16 +213,16 @@
                          (mention-mixins/oc-mentions-hover)
 
                          (ui-mixins/on-window-click-mixin (fn [s e]
-                          (when (and @(:me/showing-media-video-modal s)
+                          (when (and @(::me-media-utils/showing-media-video-modal s)
                                      (not (.contains (.-classList (.-target e)) "media-video"))
                                      (not (utils/event-inside? e (rum/ref-node s :video-container))))
-                            (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)
-                            (reset! (:me/showing-media-video-modal s) false))
-                          (when (and @(:me/showing-gif-selector s)
+                            (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
+                            (reset! (::me-media-utils/showing-media-video-modal s) false))
+                          (when (and @(::me-media-utils/showing-gif-selector s)
                                      (not (.contains (.-classList (.-target e)) "media-gif"))
                                      (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
-                            (me-media-utils/media-gif-add s @(:me/media-picker-ext s) nil)
-                            (reset! (:me/showing-gif-selector s) false))))
+                            (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) nil)
+                            (reset! (::me-media-utils/showing-gif-selector s) false))))
                          {:will-mount (fn [s]
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [{:keys [activity-data parent-comment-uuid edit-comment-data collapse? add-comment-did-change]} (first (:rum/args s))
@@ -291,16 +290,16 @@
                            (let [props (first (:rum/args s))]
                              (let [data @(drv/get-ref s :media-input)
                                    video-data (:media-video data)]
-                                (when (and @(:me/media-video s)
+                                (when (and @(::me-media-utils/media-video s)
                                            (or (= video-data :dismiss)
                                                (map? video-data)))
                                   (when (or (= video-data :dismiss)
                                             (map? video-data))
-                                    (reset! (:me/media-video s) false)
+                                    (reset! (::me-media-utils/media-video s) false)
                                     (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
                                   (if (map? video-data)
-                                    (me-media-utils/media-video-add s @(:me/media-picker-ext s) video-data)
-                                    (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)))))
+                                    (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) video-data)
+                                    (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)))))
                            s)
                           :did-update (fn [s]
                            (let [add-comment-focus @(drv/get-ref s :add-comment-focus)]
@@ -314,9 +313,9 @@
                              (me-media-utils/setup-editor s did-change me-opts))
                            s)
                           :will-unmount (fn [s]
-                           (when @(:me/editor s)
-                             (.destroy @(:me/editor s))
-                             (reset! (:me/editor s) nil))
+                           (when @(::me-media-utils/editor s)
+                             (.destroy @(::me-media-utils/editor s))
+                             (reset! (::me-media-utils/editor s) nil))
                            (when-let [throttled-did-change @(::did-change-throttled s)]
                              (.dispose throttled-did-change))
                            s)}
@@ -398,19 +397,19 @@
               (if edit-comment-data
                 "Save"
                 "Reply")]]]
-        (when @(:me/showing-media-video-modal s)
+        (when @(::me-media-utils/showing-media-video-modal s)
           [:div.video-container
             {:ref :video-container}
             (media-video-modal {:fullscreen false
                                 :dismiss-cb #(do
-                                              (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)
-                                              (reset! (:me/showing-media-video-modal s) false))
+                                              (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
+                                              (reset! (::me-media-utils/showing-media-video-modal s) false))
                                 :offset-element-selector [(keyword (str "div." container-class))]
                                 :outer-container-selector [(keyword (str "div." container-class))]})])
-        (when @(:me/showing-gif-selector s)
+        (when @(::me-media-utils/showing-gif-selector s)
           (giphy-picker {:fullscreen false
                          :pick-emoji-cb (fn [gif-obj]
-                                         (reset! (:me/showing-gif-selector s) false)
-                                         (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))
+                                         (reset! (::me-media-utils/showing-gif-selector s) false)
+                                         (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) gif-obj))
                          :offset-element-selector [(keyword (str "div." container-class))]
                          :outer-container-selector [(keyword (str "div." container-class))]}))]]))

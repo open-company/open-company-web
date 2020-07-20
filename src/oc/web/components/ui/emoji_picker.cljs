@@ -130,7 +130,7 @@
         caret-pos (::caret-pos s)
         last-active-element (::last-active-element s)
         disabled (::disabled s)]
-    [:div.emoji-picker
+    [:div.emoji-picker.group
       {:ref "emoji-picker"
        :style {:width (str width "px")
                :height (str height "px")}}

@@ -44,7 +44,7 @@
 ;; Gif handling
 
 (defn add-gif [s editable]
-  (reset! (:me/showing-gif-selector s) true))
+  (reset! (::showing-gif-selector s) true))
 
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
@@ -69,8 +69,8 @@
 (defn media-attachment-dismiss-picker
   "Called every time the image picke close, reset to inital state."
   [s editable]
-  (when-not @(:me/media-attachment-did-success s)
-    (reset! (:me/media-attachment s) false)))
+  (when-not @(::media-attachment-did-success s)
+    (reset! (::media-attachment s) false)))
 
 (defn attachment-upload-failed-cb [state editable]
   (let [alert-data {:icon "/img/ML/error_icon.png"
@@ -81,11 +81,11 @@
                     :solid-button-cb #(alert-modal/hide-alert)}]
     (alert-modal/show-alert alert-data)
     (utils/after 10 #(do
-                       (reset! (:me/media-attachment-did-success state) false)
+                       (reset! (::media-attachment-did-success state) false)
                        (media-attachment-dismiss-picker state editable)))))
 
 (defn attachment-upload-success-cb [state options editable res]
-  (reset! (:me/media-attachment-did-success state) true)
+  (reset! (::media-attachment-did-success state) true)
   (let [url (oget res :url)]
     (if-not url
       (attachment-upload-failed-cb state editable)
@@ -101,9 +101,9 @@
                              :file-size size
                              :file-url url}
             dispatch-input-key (:dispatch-input-key options)]
-        (reset! (:me/media-attachment state) false)
+        (reset! (::media-attachment state) false)
         (activity-actions/add-attachment dispatch-input-key attachment-data)
-        (utils/after 1000 #(reset! (:me/media-attachment-did-success state) false))))))
+        (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
 
 (defn attachment-upload-error-cb [state editable res error]
   (attachment-upload-failed-cb state editable))
@@ -111,7 +111,7 @@
 (defn add-attachment [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
     (.saveSelection editable)
-    (reset! (:me/media-attachment s) true)
+    (reset! (::media-attachment s) true)
     (iu/upload!
      nil
      (partial attachment-upload-success-cb s options editable)
@@ -127,9 +127,9 @@
     (let [editable (or editable (get-media-picker-extension s))]
       (.saveSelection editable)))
   (dis/dispatch! [:input [:media-input :media-video] true])
-  (reset! (:me/media-video s) true)
+  (reset! (::media-video s) true)
   (when (:use-inline-media-picker options)
-    (reset! (:me/showing-media-video-modal s) true)))
+    (reset! (::showing-media-video-modal s) true)))
 
 (defn get-video-thumbnail [video]
   (cond
@@ -173,27 +173,27 @@
         upload-progress-cb (:upload-progress-cb options)]
     (when (fn? upload-progress-cb)
       (upload-progress-cb false))
-    (reset! (:me/upload-lock s) false)
+    (reset! (::upload-lock s) false)
     (alert-modal/show-alert alert-data)))
 
 (defn media-photo-add-if-finished [s options editable]
-  (let [image @(:me/media-photo s)
+  (let [image @(::media-photo s)
         upload-progress-cb (:upload-progress-cb options)]
     (when (and (contains? image :url)
                (contains? image :width)
                (contains? image :height)
                (contains? image :thumbnail))
       (.addPhoto editable (:url image) (:thumbnail image) (:width image) (:height image))
-      (reset! (:me/media-photo s) nil)
-      (reset! (:me/media-photo-did-success s) false)
-      (reset! (:me/upload-lock s) false)
+      (reset! (::media-photo s) nil)
+      (reset! (::media-photo-did-success s) false)
+      (reset! (::upload-lock s) false)
       (when (fn? upload-progress-cb)
         (upload-progress-cb false)))))
 
 (defn img-on-load [s options editable url img]
   (if (and url img)
     (do
-      (reset! (:me/media-photo s) (merge @(:me/media-photo s) {:width (.-width img) :height (.-height img)}))
+      (reset! (::media-photo s) (merge @(::media-photo s) {:width (.-width img) :height (.-height img)}))
       (gdom/removeNode img)
       (media-photo-add-if-finished s options editable))
     (media-photo-add-error s options)))
@@ -201,19 +201,19 @@
 (defn media-photo-dismiss-picker
   "Called every time the image picke close, reset to inital state."
   [s editable]
-  (when-not @(:me/media-photo-did-success s)
-    (reset! (:me/media-photo s) false)
+  (when-not @(::media-photo-did-success s)
+    (reset! (::media-photo s) false)
     (.addPhoto editable nil nil nil nil)))
 
 (defn add-photo [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
     (.saveSelection editable)
-    (reset! (:me/media-photo s) true)
+    (reset! (::media-photo s) true)
     (let [upload-progress-cb (:upload-progress-cb options)]
       (iu/upload! {:accept "image/*"}
        ;; success-cb
        (fn [res]
-         (reset! (:me/media-photo-did-success s) true)
+         (reset! (::media-photo-did-success s) true)
          (let [url (oget res :url)
                img   (gdom/createDom "img")]
            (set! (.-onload img) #(img-on-load s options editable url img))
@@ -221,18 +221,18 @@
            (set! (.-className img) "hidden")
            (gdom/append (.-body js/document) img)
            (set! (.-src img) url)
-           (reset! (:me/media-photo s) {:res res :url url})
+           (reset! (::media-photo s) {:res res :url url})
            ;; if the image is a vector image
            (if (or (= (string/lower (oget res :mimetype)) "image/svg+xml")
                    (string/ends-with? (string/lower (oget res :filename)) ".svg"))
              ;l use the same url for the thumbnail since the size doesn't matter
              (do
-               (reset! (:me/media-photo s) (assoc @(:me/media-photo s) :thumbnail url))
+               (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
                (media-photo-add-if-finished s options editable))
              ;; else create the thumbnail
              (iu/thumbnail! url
               (fn [thumbnail-url]
-                (reset! (:me/media-photo s) (assoc @(:me/media-photo s) :thumbnail thumbnail-url))
+                (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail thumbnail-url))
                 (media-photo-add-if-finished s options editable))
               (fn [res progress])
               (fn [res err]
@@ -250,12 +250,12 @@
        (fn [res])
        ;; selected-cb
        (fn [res]
-         (reset! (:me/upload-lock s) true)
+         (reset! (::upload-lock s) true)
          (when (fn? upload-progress-cb)
            (upload-progress-cb true)))
        ;; started-cb
        (fn [res]
-         (reset! (:me/upload-lock s) true)
+         (reset! (::upload-lock s) true)
          (when (fn? upload-progress-cb)
            (upload-progress-cb true)))))))
 
@@ -294,7 +294,7 @@
                                                                         :key (:key cmail-state)}))
         (if (.match (.-type file) "image")
           (do
-            (.hide @(:me/media-picker-ext s))
+            (.hide @(::media-picker-ext s))
             (dis/dispatch! [:input [:attachment-uploading]
              {:progress "0"
               :comment-parent-uuid (:comment-parent-uuid options)}])
@@ -305,7 +305,7 @@
                  (fn []
                    (dis/dispatch! [:input [:attachment-uploading] nil])
                    (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
-                   (utils/after 500 #(.togglePicker @(:me/media-picker-ext s))))))
+                   (utils/after 500 #(.togglePicker @(::media-picker-ext s))))))
               (fn []
                (dis/dispatch! [:input [:attachment-uploading] nil])
                (let [alert-data {:icon "/img/ML/error_icon.png"
@@ -366,7 +366,7 @@
 (defn setup-editor [s body-on-change options]
   (let [users-list @(drv/get-ref s :mention-users)]
     (when (and (seq users-list)
-               (nil? @(:me/editor s)))
+               (nil? @(::editor s)))
       (let [mobile-editor (responsive/is-tablet-or-mobile?)
             media-config (:media-config options)
             placeholder (or (:placeholder options) "What would you like to share?")
@@ -459,7 +459,7 @@
                                           :alt false
                                         }]}}
             body-editor  (new js/MediumEditor body-el (clj->js options))]
-        (reset! (:me/media-picker-ext s) media-picker-ext)
+        (reset! (::media-picker-ext s) media-picker-ext)
         (.subscribe body-editor
                     "editableInput"
                     (fn [event editable]
@@ -471,7 +471,7 @@
                                    (.-metaKey e)
                                    (= "Enter" (.-key e)))
                           ((:cmd-enter-cb options) e))))
-        (reset! (:me/editor s) body-editor)
+        (reset! (::editor s) body-editor)
         ;; Setup autocomplete
         (let [classes (:classes options)]
           (when (and (string/includes? classes "emoji-autocomplete")
