@@ -1,3 +1,5 @@
+const carrotContact = "hello@carrot.io";
+
 function OCWebHelp(){
   console.log("OpenCompany Web console functions:\n\n" +
               "OCWebConfigLogLevel(\"debug\"): to change log level\n" +
@@ -30,7 +32,7 @@ function OCWebHelp(){
 }
 
 function printArt(){
-  console.group();
+  console.group(carrotContact);
   console.log("%c\n" +
 " ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄ \n" +
 "▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌\n" +
@@ -45,9 +47,9 @@ function printArt(){
 " ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀         ▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀      "
                                                                               
 , "font-family:monospace; color:#FA6452;");
-  console.log("Say hi! hello@carrot.io");
+  console.log(`Say hi! ${carrotContact}`);
   OCWebHelp();
-  console.groupEnd();
+  console.groupEnd(carrotContact);
 }
 
 window.OCWebPrintAsciiArt = printArt;
