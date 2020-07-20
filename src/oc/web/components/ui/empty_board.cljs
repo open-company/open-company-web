@@ -49,7 +49,7 @@
            current-user-contrib? "You haven't published any posts yet"
            is-replies? 
            [:div.empty-replies
-             "When someone replies to you, " [:br] "or mentions your name, you'll see it here."]
+             "When people reply to your updates and comments or mention your name, you’ll see it here."]
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"
