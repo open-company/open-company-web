@@ -57,7 +57,8 @@
 
 ;; bookmarks stream
 
-(defn- bookmarks-get-finish [org-slug sort-type {:keys [body success]}]
+(defn- bookmarks-get-finish
+  [org-slug sort-type refresh? {:keys [body success]}]
   (when body
     (let [posts-data-key (dis/posts-data-key org-slug)
           bookmarks-data (when success (json->cljs body))]
@@ -65,18 +66,22 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "bookmarks" (* 60 60 24 365))
         (request-reads-count (->> bookmarks-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection bookmarks-data))))
-      (dis/dispatch! [:bookmarks-get/finish org-slug sort-type bookmarks-data]))))
+      (if refresh?
+        (dis/dispatch! [:bookmarks-refresh/finish org-slug sort-type bookmarks-data])
+        (dis/dispatch! [:bookmarks-get/finish org-slug sort-type bookmarks-data])))))
 
-(defn- bookmarks-real-get [bookmarks-link org-slug sort-type finish-cb]
+(defn- bookmarks-real-get
+  ([bookmarks-link org-slug sort-type finish-cb] (bookmarks-real-get bookmarks-link org-slug sort-type false finish-cb))
+  ([bookmarks-link org-slug sort-type refresh? finish-cb]
   (api/get-all-posts bookmarks-link
    (fn [resp]
-     (bookmarks-get-finish org-slug sort-type resp)
+     (bookmarks-get-finish org-slug sort-type refresh? resp)
      (when (fn? finish-cb)
-       (finish-cb resp)))))
+       (finish-cb resp))))))
 
 (defn bookmarks-get [org-data & [finish-cb]]
   (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
-    (bookmarks-real-get bookmarks-link (:slug org-data) dis/recently-posted-sort finish-cb)))
+    (bookmarks-real-get bookmarks-link (:slug org-data) dis/recently-posted-sort false finish-cb)))
 
 (defn bookmarks-refresh
  "If the user is looking at the bookmarks view we need to reload all the items that are visible right now.
@@ -85,7 +90,7 @@
  ([org-data]
   (if-let* [bookmarks-data (dis/bookmarks-data)
               refresh-link (utils/link-for (:links bookmarks-data) "refresh")]
-    (bookmarks-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (bookmarks-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil)
     (bookmarks-get org-data))))
 
 (defn- bookmarks-more-finish [org-slug sort-type direction {:keys [success body]}]
@@ -99,7 +104,7 @@
 
 ;; All Posts
 
-(defn- all-posts-get-finish [org-slug sort-type {:keys [body success]}]
+(defn- all-posts-get-finish [org-slug sort-type refresh? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -108,14 +113,19 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "all-posts" (* 60 60 24 365))
         (request-reads-count (->> all-posts-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection all-posts-data))))
-      (dis/dispatch! [:all-posts-get/finish org-slug sort-type all-posts-data]))))
+      (if refresh?
+        (dis/dispatch! [:all-posts-refresh/finish org-slug sort-type all-posts-data])
+        (dis/dispatch! [:all-posts-get/finish org-slug sort-type all-posts-data])))))
 
-(defn- activity-real-get [activity-link org-slug sort-type finish-cb]
+(defn- activity-real-get
+  ([activity-link org-slug sort-type finish-cb]
+   (activity-real-get org-slug sort-type false finish-cb))
+  ([activity-link org-slug sort-type refresh? finish-cb]
   (api/get-all-posts activity-link
    (fn [resp]
-     (all-posts-get-finish org-slug sort-type resp)
+     (all-posts-get-finish org-slug sort-type refresh? resp)
      (when (fn? finish-cb)
-       (finish-cb resp)))))
+       (finish-cb resp))))))
 
 (defn all-posts-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "entries" "GET")]
@@ -123,7 +133,7 @@
 
 (defn recent-all-posts-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "activity" "GET")]
-    (activity-real-get activity-link (:slug org-data) dis/recent-activity-sort finish-cb)))
+    (activity-real-get activity-link (:slug org-data) dis/recent-activity-sort  finish-cb)))
 
 (defn all-posts-refresh
  "If the user is looking at the all-posts view we need to reload all the items that are visible right now.
@@ -132,7 +142,7 @@
  ([org-data]
   (if-let* [all-posts-data (dis/all-posts-data)
               refresh-link (utils/link-for (:links all-posts-data) "refresh")]
-    (activity-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (activity-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil)
     (all-posts-get org-data))))
 
 (defn- all-posts-more-finish [org-slug sort-type direction {:keys [success body]}]
@@ -175,7 +185,7 @@
 
 ;; Following stream
 
-(defn- following-get-finish [org-slug sort-type keep-seen-at? {:keys [body success]}]
+(defn- following-get-finish [org-slug sort-type keep-seen-at? refresh? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -185,14 +195,19 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
         (request-reads-count (->> following-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection following-data))))
-      (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug keep-seen-at? following-data]))))
+      (if refresh?
+        (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug keep-seen-at? following-data])
+        (dis/dispatch! [:following-get/finish org-slug sort-type current-board-slug keep-seen-at? following-data])))))
 
-(defn- following-real-get [following-link org-slug sort-type keep-seen-at? finish-cb]
+(defn- following-real-get
+  ([following-link org-slug sort-type keep-seen-at? finish-cb]
+   (following-real-get following-link org-slug sort-type keep-seen-at? false finish-cb))
+  ([following-link org-slug sort-type keep-seen-at? refresh? finish-cb]
   (api/get-all-posts following-link
    (fn [resp]
-     (following-get-finish org-slug sort-type keep-seen-at? resp)
+     (following-get-finish org-slug sort-type keep-seen-at? refresh? resp)
      (when (fn? finish-cb)
-       (finish-cb resp)))))
+       (finish-cb resp))))))
 
 (defn following-get
  ([] (following-get (dis/org-data) false nil))
@@ -210,7 +225,7 @@
  ([org-data keep-seen-at?]
   (if-let* [following-data (dis/following-data)
               refresh-link (utils/link-for (:links following-data) "refresh")]
-    (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? nil)
+    (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? true nil)
     (following-get org-data keep-seen-at? nil))))
 
 (defn following-did-change []
@@ -238,7 +253,7 @@
 
 ;; Replies stream
 
-(defn- replies-get-finish [org-slug sort-type keep-seen-at? {:keys [body success]}]
+(defn- replies-get-finish [org-slug sort-type keep-seen-at? refresh? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -248,14 +263,19 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "replies" (* 60 60 24 365))
         (request-reads-count (->> replies-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection replies-data))))
-      (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug keep-seen-at? replies-data]))))
+      (if refresh? 
+        (dis/dispatch! [:replies-refresh/finish org-slug sort-type current-board-slug keep-seen-at? replies-data])
+        (dis/dispatch! [:replies-get/finish org-slug sort-type current-board-slug keep-seen-at? replies-data])))))
 
-(defn- replies-real-get [replies-link org-slug sort-type keep-seen-at? finish-cb]
+(defn- replies-real-get
+  ([replies-link org-slug sort-type keep-seen-at? finish-cb]
+   (replies-real-get replies-link org-slug sort-type keep-seen-at? false finish-cb))
+  ([replies-link org-slug sort-type keep-seen-at? refresh? finish-cb]
   (api/get-all-posts replies-link
    (fn [resp]
-     (replies-get-finish org-slug sort-type keep-seen-at? resp)
+     (replies-get-finish org-slug sort-type keep-seen-at? refresh? resp)
      (when (fn? finish-cb)
-       (finish-cb resp)))))
+       (finish-cb resp))))))
 
 (defn replies-get
   ([] (replies-get (dis/org-data) false nil))
@@ -271,7 +291,7 @@
  ([org-data keep-seen-at?]
   (if-let* [replies-data (dis/following-data)
             refresh-link (utils/link-for (:links replies-data) "refresh")]
-    (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? nil)
+    (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? true nil)
     (replies-get org-data keep-seen-at? nil))))
 
 (defn- replies-more-finish [org-slug sort-type direction {:keys [success body]}]
@@ -285,7 +305,7 @@
 
 ;; Unfollowing stream
 
-(defn- unfollowing-get-finish [org-slug sort-type {:keys [body success]}]
+(defn- unfollowing-get-finish [org-slug sort-type refresh? {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           posts-data-key (dis/posts-data-key org-slug)
@@ -294,14 +314,19 @@
         (cook/set-cookie! (router/last-board-cookie org-slug) "unfollowing" (* 60 60 24 365))
         (request-reads-count (->> unfollowing-data :collection :items (map :uuid)))
         (watch-boards (:items (:collection unfollowing-data))))
-      (dis/dispatch! [:unfollowing-get/finish org-slug sort-type unfollowing-data]))))
+      (if refresh?
+        (dis/dispatch! [:unfollowing-refresh/finish org-slug sort-type unfollowing-data])
+        (dis/dispatch! [:unfollowing-get/finish org-slug sort-type unfollowing-data])))))
 
-(defn- unfollowing-real-get [unfollowing-link org-slug sort-type finish-cb]
+(defn- unfollowing-real-get
+  ([unfollowing-link org-slug sort-type finish-cb]
+   (unfollowing-real-get org-slug sort-type false finish-cb))
+  ([unfollowing-link org-slug sort-type refresh? finish-cb]
   (api/get-all-posts unfollowing-link
    (fn [resp]
-     (unfollowing-get-finish org-slug sort-type resp)
+     (unfollowing-get-finish org-slug sort-type refresh? resp)
      (when (fn? finish-cb)
-       (finish-cb resp)))))
+       (finish-cb resp))))))
 
 (defn unfollowing-get [org-data & [finish-cb]]
   (when-let [unfollowing-link (utils/link-for (:links org-data) "unfollowing")]
@@ -319,7 +344,7 @@
  ([org-data keep-seen-at?]
   (if-let* [unfollowing-data (dis/unfollowing-data)
             refresh-link (utils/link-for (:links unfollowing-data) "refresh")]
-    (unfollowing-real-get refresh-link (:slug org-data) dis/recently-posted-sort nil)
+    (unfollowing-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil)
     (unfollowing-get org-data keep-seen-at? nil))))
 
 (defn- unfollowing-more-finish [org-slug sort-type direction {:keys [success body]}]

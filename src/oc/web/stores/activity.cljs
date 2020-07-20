@@ -627,8 +627,8 @@
     (dissoc :section-editing)
     (dissoc :entry-toggle-save-on-exit))))
 
-(defmethod dispatcher/action :all-posts-get/finish
-  [db [_ org-slug sort-type all-posts-data]]
+(defn- all-posts-get-finish
+  [db org-slug sort-type all-posts-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -645,6 +645,14 @@
      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :all-posts))
      (update-in ndb (dispatcher/user-notifications-key org-slug)
       #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :all-posts-get/finish
+  [db [_ org-slug sort-type all-posts-data]]
+  (all-posts-get-finish db org-slug sort-type all-posts-data))
+
+(defmethod dispatcher/action :all-posts-refresh/finish
+  [db [_ org-slug sort-type all-posts-data]]
+  (all-posts-get-finish db org-slug sort-type all-posts-data))
 
 (defmethod dispatcher/action :all-posts-more
   [db [_ org-slug sort-type]]
@@ -681,8 +689,7 @@
 
 ;; Bookmarks
 
-(defmethod dispatcher/action :bookmarks-get/finish
-  [db [_ org-slug sort-type bookmarks-data]]
+(defn- bookmarks-get-finish [db org-slug sort-type bookmarks-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -700,6 +707,14 @@
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :bookmarks))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :bookmarks-get/finish
+  [db [_ org-slug sort-type bookmarks-data]]
+  (bookmarks-get-finish db org-slug sort-type bookmarks-data))
+
+(defmethod dispatcher/action :bookmarks-refresh/finish
+  [db [_ org-slug sort-type bookmarks-data]]
+  (bookmarks-get-finish db org-slug sort-type bookmarks-data))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug sort-type]]
@@ -1028,8 +1043,8 @@
 (defn- latest-seen-at [new-seen-at old-seen-at]
   (if (pos? (compare new-seen-at old-seen-at)) new-seen-at old-seen-at))
 
-(defmethod dispatcher/action :following-get/finish
-  [db [_ org-slug sort-type current-container-slug keep-seen-at? following-data]]
+(defn- following-get-finish
+  [db org-slug sort-type current-container-slug keep-seen-at? following-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -1054,6 +1069,14 @@
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :following-get/finish
+  [db [_ org-slug sort-type current-container-slug keep-seen-at? following-data]]
+  (following-get-finish db org-slug sort-type current-container-slug keep-seen-at? following-data))
+
+(defmethod dispatcher/action :following-refresh/finish
+  [db [_ org-slug sort-type current-container-slug keep-seen-at? following-data]]
+  (following-get-finish db org-slug sort-type current-container-slug keep-seen-at? following-data))
 
 (defmethod dispatcher/action :following-more
   [db [_ org-slug sort-type]]
@@ -1093,8 +1116,8 @@
 
 ;; Replies
 
-(defmethod dispatcher/action :replies-get/finish
-  [db [_ org-slug sort-type current-container-slug keep-seen-at? replies-data]]
+(defn- replies-get-finish
+  [db org-slug sort-type current-container-slug keep-seen-at? replies-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -1119,6 +1142,14 @@
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :replies-get/finish
+  [db [_ org-slug sort-type current-container-slug keep-seen-at? replies-data]]
+  (replies-get-finish db org-slug sort-type current-container-slug keep-seen-at? replies-data))
+
+(defmethod dispatcher/action :replies-refresh/finish
+  [db [_ org-slug sort-type current-container-slug keep-seen-at? replies-data]]
+  (replies-get-finish db org-slug sort-type current-container-slug keep-seen-at? replies-data))
 
 (defmethod dispatcher/action :replies-more
   [db [_ org-slug sort-type]]
@@ -1158,8 +1189,8 @@
 
 ;; Unfollowing
 
-(defmethod dispatcher/action :unfollowing-get/finish
-  [db [_ org-slug sort-type unfollowing-data]]
+(defn- unfollowing-get-finish
+  [db org-slug sort-type unfollowing-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -1177,6 +1208,14 @@
       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :unfollowing))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
+
+(defmethod dispatcher/action :unfollowing-get/finish
+  [db [_ org-slug sort-type unfollowing-data]]
+  (unfollowing-get-finish db org-slug sort-type unfollowing-data))
+
+(defmethod dispatcher/action :unfollowing-refresh/finish
+  [db [_ org-slug sort-type unfollowing-data]]
+  (unfollowing-get-finish db org-slug sort-type unfollowing-data))
 
 (defmethod dispatcher/action :unfollowing-more
   [db [_ org-slug sort-type]]
