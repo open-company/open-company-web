@@ -559,18 +559,18 @@
         temp-comments (if (seq comments) comments (:comments full-entry))
         comments-loaded? (or (zero? comments-count) (seq comments))
         ;; Let's force a collapse recalc if user didn't expand the replies yet
-        ;; and the full list of comments has been loaded from the server 
+        ;; and or is the first render of the comments (using inline comments most probably)
+        ;; or the full list of comments has just been loaded for the first time from server
         reset-collapse-comments? (and (not (:expanded-replies? entry-data))
-                                      comments-loaded?
-                                      (not (:comments-loaded? entry-data)))]
+                                      (or (not (contains? entry-data :replies-data))
+                                          (and comments-loaded?
+                                               (not (:comments-loaded? entry-data)))))]
     (as-> entry-data e
      (assoc e :comments-loaded? comments-loaded?)
-     (assoc e :replies-data (parse-comments org-data e temp-comments container-seen-at reset-collapse-comments?))
-     (if (seq (:replies-data e))
-       (update e :unseen-comments #(if-not (seq comments)
-                                     %
-                                     (comments-unseen? e)))
-       e))))
+     (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
+     (update e :unseen-comments #(if-not (seq comments)
+                                   %
+                                   (comments-unseen? e))))))
 
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
