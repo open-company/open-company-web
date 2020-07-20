@@ -2,11 +2,11 @@ div.add-comment-box-container {
   position: relative;
   width: 100%;
 
-  &.collapsed-box div.add-comment-box {
-    div.add-comment p:first-child {
-      display: none;
-    }
-  }
+  // &.collapsed-box div.add-comment-box {
+  //   div.add-comment p:first-child {
+  //     display: none;
+  //   }
+  // }
 
   &:not(.collapsed-box) div.add-comment-box div.add-comment-internal {
     div.add-comment:after {
@@ -134,7 +134,7 @@ div.add-comment-box-container {
       div.add-comment-footer {
         display: flex;
         flex-flow: row nowrap;
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
         margin-top: 8px;
 

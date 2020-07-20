@@ -202,7 +202,7 @@
                          ;; Locals
                          (rum/local nil ::add-comment-key)
                          (rum/local true ::collapsed)
-                         (rum/local true ::multiple-lines)
+                         (rum/local false ::multiple-lines)
                          (rum/local false ::post-enabled)
                          (rum/local au/empty-body-html ::initial-add-comment)
                          ; (rum/local false ::did-change)
