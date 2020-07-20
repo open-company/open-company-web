@@ -151,7 +151,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "Topics"]
+                "Explore"]
               ; (when (pos? (count all-unread-items))
               ;   [:span.count (count all-unread-items)])
               ]])
@@ -232,7 +232,7 @@
              :disabled (not (:collapsed cmail-state))}
             [:span.plus-icon]
             [:span.copy-text
-              "New update"]])
+              "Wut"]])
         (when (and show-invite-people?
                    @(::show-invite-people? s))
           [:div.invite-people-box

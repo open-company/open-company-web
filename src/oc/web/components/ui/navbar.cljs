@@ -86,7 +86,7 @@
                        (= (keyword current-board-slug) :following)
                        "Home"
                        (= (keyword current-board-slug) :topics)
-                       "Topics"
+                       "Explore"
                        (and current-contributions-id (:self? contributions-user-data))
                        "You"
                        (and current-contributions-id (map? contributions-user-data))

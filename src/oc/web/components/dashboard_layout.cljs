@@ -176,7 +176,7 @@
                  :class (when is-topics
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Topics"]]
+                [:span.tab-label "Explore"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
