@@ -397,10 +397,6 @@ div.reply-item {
         left: 13px;
       }
 
-      &.no-replies.vertical-line:before {
-        height: calc(100% - 24px);
-      }
-
       div.reply-comment-outer {
         padding: 0;
         position: relative;

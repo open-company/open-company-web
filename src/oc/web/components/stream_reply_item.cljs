@@ -78,15 +78,14 @@
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
              did-react-cb current-user-id reply-focus-value
-             replies-count replying-to]}]
+             replying-to]}]
   (let [show-new-comment-tag (:unseen comment-data)]
     [:div.reply-comment-outer.open-reply
       {:key (str "reply-comment-" (:created-at comment-data))
        :data-comment-uuid (:uuid comment-data)
        :data-unseen (:unseen comment-data)
        :class (utils/class-set {:new-comment (:unseen comment-data)
-                                :showing-picker showing-picker?
-                                :no-replies (zero? replies-count)})}
+                                :showing-picker showing-picker?})}
       [:div.reply-comment
         {:ref (str "reply-comment-" (:uuid comment-data))
          :on-mouse-leave mouse-leave-cb}
@@ -258,7 +257,6 @@
                                       (emoji-picker-container s entry-data reply-data seen-reply-cb))
                       :showing-picker? showing-picker?
                       :member? member?
-                      :replies-count (:replies-count reply-data)
                       :current-user-id current-user-id
                       :replying-to replying-to})]))
 
@@ -328,15 +326,13 @@
          replies-data     :replies-data
          expanded-replies :expanded-replies
          comments-loaded? :comments-loaded?
+         comments-count   :comments-count
          :as              entry-data}           reply-data
         is-mobile? (responsive/is-mobile-size?)
         reply-item-class (reply-item-unique-class entry-data)
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
         show-expand-replies? (and (not expanded-replies)
-                                  (seq (filter :collapsed replies-data)))
-        comments-count (if (:comments-loaded? entry-data)
-                         (count replies-data)
-                         (:count (utils/link-for (:links entry-data) "comments")))]
+                                  (seq (filter :collapsed replies-data)))]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
                                 :open-item true

@@ -80,7 +80,7 @@
 
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug
-   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded?])
+   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -568,6 +568,7 @@
     (as-> entry-data e
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
+     (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
      (update e :unseen-comments #(if-not (seq comments)
                                    %
                                    (comments-unseen? e))))))
