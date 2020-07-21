@@ -520,14 +520,16 @@
           unread? (and (not author?)
                        (cu/comment-unread? comment-map (:last-read-at activity-data)))
           unseen? (and (not author?)
-                       (cu/comment-unseen? comment-map container-seen-at))]
+                       (cu/comment-unseen? comment-map container-seen-at))
+          is-emoji-comment? (is-emoji (:body comment-map))]
       (-> comment-map
         (assoc :resource-type :comment)
         (assoc :author? author?)
         (assoc :unread unread?)
         (assoc :unseen unseen?)
-        (assoc :is-emoji (is-emoji (:body comment-map)))
-        (assoc :can-edit (boolean edit-comment-link))
+        (assoc :is-emoji is-emoji-comment?)
+        (assoc :can-edit (and (boolean edit-comment-link))
+                              (not is-emoji-comment?))
         (assoc :can-delete (boolean delete-comment-link))
         (assoc :can-react can-react?)
         (assoc :reply-parent reply-parent)

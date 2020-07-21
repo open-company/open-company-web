@@ -114,7 +114,7 @@
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data dismiss-reply-cb
-           edit-comment-key]}]
+           edit-comment-key add-comment-cb add-comment-did-change]}]
   [:div.stream-comment-outer.open-thread
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)}
@@ -123,6 +123,8 @@
        (add-comment {:activity-data activity-data
                      :parent-comment-uuid (:reply-parent comment-data)
                      :dismiss-reply-cb dismiss-reply-cb
+                     :add-comment-cb add-comment-cb
+                     :add-comment-did-change add-comment-did-change
                      :edit-comment-data comment-data
                      :add-comment-focus-prefix add-comment-prefix})
        (str "edit-comment-" edit-comment-key))]])
@@ -323,7 +325,7 @@
                 :let [root-comment-data (nth threads idx)
                       is-editing? (and (seq @(::editing? s))
                                        (= @(::editing? s) (:uuid root-comment-data)))
-                      add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent root-comment-data)
+                      add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:reply-parent root-comment-data)
                                               (:uuid root-comment-data))
                       edit-comment-key (get-in add-comment-force-update* add-comment-string-key)
                       showing-picker? (and (seq @(::show-picker s))

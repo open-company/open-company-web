@@ -49,7 +49,8 @@
            foc-layout
            is-mobile
            clear-cell-measure-cb
-           current-user-data] :as props}]
+           current-user-data
+           add-comment-force-update] :as props}]
   (let [member? (:member? org-data)
         publisher? (:publisher? item)
         show-wrt? member?
@@ -64,7 +65,8 @@
        (stream-reply-item {:reply-data            item
                            :member?               member?
                            :current-user-data     current-user-data
-                           :clear-cell-measure-cb clear-cell-measure-cb})
+                           :clear-cell-measure-cb clear-cell-measure-cb
+                           :add-comment-force-update add-comment-force-update})
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
                                :member?           member?
@@ -111,7 +113,8 @@
              is-mobile?
              container-data
              current-user-data
-             clear-cell-measure-cb]
+             clear-cell-measure-cb
+             add-comment-force-update]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -146,6 +149,7 @@
                                                  :is-mobile is-mobile?
                                                  :foc-layout foc-layout
                                                  :container-data container-data
+                                                 :add-comment-force-update add-comment-force-update
                                                  :clear-cell-measure-cb clear-cell-measure-cb})))]))
 
 (defn- unique-row-string [replies? item]
@@ -333,6 +337,7 @@
                         (drv/drv :force-list-update)
                         (drv/drv :board-slug)
                         (drv/drv :contributions-id)
+                        (drv/drv :add-comment-force-update)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -379,6 +384,7 @@
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
         force-list-update (drv/react s :force-list-update)
+        add-comment-force-update (drv/react s :add-comment-force-update)
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         member? (:member? org-data)

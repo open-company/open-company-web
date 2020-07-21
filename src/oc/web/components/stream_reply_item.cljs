@@ -28,11 +28,43 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.components.stream-comments :refer (edit-comment)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
+
+;; Comment delete
+
+(defn delete-clicked [e entry-data comment-data clear-cell-measure-cb]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-comment"
+                    :message "Delete this comment?"
+                    :link-button-title "No"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb (fn [_]
+                                       (comment-actions/delete-comment entry-data comment-data)
+                                       (alert-modal/hide-alert)
+                                       (clear-cell-measure-cb))
+                    }]
+    (alert-modal/show-alert alert-data)))
+
+;; Comment edit
+
+(defn finish-edit [s clear-cell-measure-cb]
+  (reset! (::editing? s) false)
+  (clear-cell-measure-cb))
+
+(defn- start-edit [s entry-data comment-data clear-cell-measure-cb]
+  (comment-actions/edit-comment (:uuid entry-data) comment-data)
+  (reset! (::show-more-menu s) nil)
+  (reset! (::editing? s) true)
+  (clear-cell-measure-cb))
+
+;; Comment reply
 
 (defn- quoted-reply-header [comment-data]
   (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>"))
@@ -40,14 +72,7 @@
 (defn- reply-to [comment-data add-comment-focus-key]
   (comment-actions/reply-to add-comment-focus-key (str (quoted-reply-header comment-data) (:body comment-data)) true))
 
-(defn- copy-comment-url [comment-url]
-  (let [input-field (.createElement js/document "input")]
-    (set! (.-style input-field) "position:absolute;top:-999999px;left:-999999px;")
-    (set! (.-value input-field) comment-url)
-    (.appendChild (.-body js/document) input-field)
-    (.select input-field)
-    (utils/copy-to-clipboard input-field)
-    (.removeChild (.-body js/document) input-field)))
+;; Comment react
 
 (rum/defc emoji-picker < rum/static
                          (when (responsive/is-mobile-size?)
@@ -75,98 +100,134 @@
                                         (gobj/get emoji "native")))
                                      (reset! (::show-picker s) nil))}))))
 
+;; Comment row
+
 (rum/defcs reply-comment <
   rum/static
+  (ui-mixins/on-click-out :more-bt-container
+   #(compare-and-set! (::show-more-menu %1) true false))
+  (rum/local false ::show-more-menu)
+  (rum/local false ::editing?)
   [s {:keys [entry-data comment-data mouse-leave-cb
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
              did-react-cb current-user-id reply-focus-value
-             replying-to]}]
-  (let [show-new-comment-tag (:unseen comment-data)]
-    [:div.reply-comment-outer.open-reply
-      {:key (str "reply-comment-" (:created-at comment-data))
-       :data-comment-uuid (:uuid comment-data)
-       :data-unseen (:unseen comment-data)
-       :class (utils/class-set {:new-comment (:unseen comment-data)
-                                :showing-picker showing-picker?})}
-      [:div.reply-comment
-        {:ref (str "reply-comment-" (:uuid comment-data))
-         :on-mouse-leave mouse-leave-cb}
-        [:div.reply-comment-inner
-          (when is-mobile?
-            [:div.reply-comment-mobile-menu
-              (more-menu {:entity-data comment-data
-                          :external-share false
-                          :entity-type "comment"
-                          :can-react? true
-                          :react-cb react-cb
-                          :can-reply? true
-                          :reply-cb reply-cb})
-              emoji-picker])
-          [:div.reply-comment-right
-            [:div.reply-comment-header.group
-              {:class utils/hide-class}
-              [:div.reply-comment-author-right
-                [:div.reply-comment-author-right-group
-                  {:class (when (:unseen comment-data) "new-comment")}
-                  [:div.reply-comment-author-name-container
-                    (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
-                    [:div.reply-comment-author-avatar
-                      (user-avatar-image (:author comment-data))]
-                    [:div.reply-comment-author-name
-                      {:class (when (:user-id (:author comment-data)) "clickable-name")}
-                      (:name (:author comment-data))]]
-                  [:div.separator-dot]
-                  [:div.reply-comment-author-timestamp
-                    [:time
-                      {:date-time (:created-at comment-data)
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                       :data-title (utils/activity-date-tooltip comment-data)}
-                      (utils/foc-date-time (:created-at comment-data))]]]
-                (when show-new-comment-tag
-                  [:div.separator-dot])
-                (when show-new-comment-tag
-                  [:div.new-comment-tag])
-                (if (responsive/is-mobile-size?)
-                  [:div.reply-comment-mobile-menu
-                    (more-menu comment-data nil {:external-share false
-                                                 :entity-type "comment"
-                                                 :can-react? true
-                                                 :react-cb react-cb
-                                                 :can-reply? true
-                                                 :reply-cb reply-cb})
-                    emoji-picker]
-                  [:div.reply-comment-floating-buttons
-                    {:key "reply-comment-floating-buttons"}
-                    ;; Reply to comment
-                    [:button.mlb-reset.floating-bt.reply-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click reply-cb
-                       :title "Reply"}]
-                    ;; React container
-                    [:div.react-bt-container
-                      [:button.mlb-reset.floating-bt.react-bt
+             replying-to add-comment-force-update clear-cell-measure-cb]}]
+  (if @(::editing? s)
+    (let [add-comment-string-key (dis/add-comment-string-key (:uuid entry-data)
+                                  (:reply-parent comment-data) (:uuid comment-data))]
+      (edit-comment {:activity-data entry-data
+                     :comment-data comment-data
+                     :dismiss-reply-cb #(finish-edit s clear-cell-measure-cb)
+                     :add-comment-did-change clear-cell-measure-cb
+                     :add-comment-cb clear-cell-measure-cb
+                     :edit-comment-key (get add-comment-force-update add-comment-string-key)}))
+    (let [show-new-comment-tag (:unseen comment-data)]
+      [:div.reply-comment-outer.open-reply
+        {:key (str "reply-comment-" (:created-at comment-data))
+         :data-comment-uuid (:uuid comment-data)
+         :data-unseen (:unseen comment-data)
+         :class (utils/class-set {:new-comment (:unseen comment-data)
+                                  :showing-picker showing-picker?})}
+        [:div.reply-comment
+          {:ref (str "reply-comment-" (:uuid comment-data))
+           :on-mouse-leave (fn [e]
+                             (compare-and-set! (::show-more-menu s) true false)
+                             (when (fn? mouse-leave-cb)
+                               (mouse-leave-cb e)))}
+          [:div.reply-comment-inner
+            (when is-mobile?
+              [:div.reply-comment-mobile-menu
+                (more-menu {:entity-data comment-data
+                            :external-share false
+                            :entity-type "comment"
+                            :can-react? true
+                            :react-cb react-cb
+                            :can-reply? true
+                            :reply-cb reply-cb})
+                emoji-picker])
+            [:div.reply-comment-right
+              [:div.reply-comment-header.group
+                {:class utils/hide-class}
+                [:div.reply-comment-author-right
+                  [:div.reply-comment-author-right-group
+                    {:class (when (:unseen comment-data) "new-comment")}
+                    [:div.reply-comment-author-name-container
+                      (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
+                      [:div.reply-comment-author-avatar
+                        (user-avatar-image (:author comment-data))]
+                      [:div.reply-comment-author-name
+                        {:class (when (:user-id (:author comment-data)) "clickable-name")}
+                        (:name (:author comment-data))]]
+                    [:div.separator-dot]
+                    [:div.reply-comment-author-timestamp
+                      [:time
+                        {:date-time (:created-at comment-data)
+                         :data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                         :data-title (utils/activity-date-tooltip comment-data)}
+                        (utils/foc-date-time (:created-at comment-data))]]]
+                  (when show-new-comment-tag
+                    [:div.separator-dot])
+                  (when show-new-comment-tag
+                    [:div.new-comment-tag])
+                  (if (responsive/is-mobile-size?)
+                    [:div.reply-comment-mobile-menu
+                      (more-menu comment-data nil {:external-share false
+                                                   :entity-type "comment"
+                                                   :can-react? true
+                                                   :react-cb react-cb
+                                                   :can-reply? true
+                                                   :reply-cb reply-cb})
+                      emoji-picker]
+                    [:div.reply-comment-floating-buttons
+                      {:key "reply-comment-floating-buttons"}
+                      (when (or (:can-edit comment-data)
+                                (:can-delete comment-data))
+                        [:div.more-bt-container
+                          {:ref :more-bt-container}
+                          [:button.mlb-reset.floating-bt.more-bt
+                            {:on-click #(swap! (::show-more-menu s) not)}]
+                          (when @(::show-more-menu s)
+                            [:div.comment-more-menu-container
+                              (when (:can-delete comment-data)
+                                [:button.mlb-reset.delete-bt
+                                  {:on-click #(delete-clicked % entry-data comment-data clear-cell-measure-cb)}
+                                  "Delete"])
+                              (when (:can-edit comment-data)
+                                [:button.mlb-reset.edit-bt
+                                  {:on-click #(start-edit s entry-data comment-data clear-cell-measure-cb)}
+                                  "Edit"])])])
+                      ;; Reply to comment
+                      [:button.mlb-reset.floating-bt.reply-bt
                         {:data-toggle "tooltip"
                          :data-placement "top"
-                         :title "Add reaction"
-                         :on-click react-cb}]
-                      emoji-picker]])]]
-            [:div.reply-comment-content
-              [:div.reply-comment-body.oc-mentions.oc-mentions-hover
-                {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-                 :ref :reply-comment-body
-                 :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                          utils/hide-class true})}]]
-            (when (seq (:reactions comment-data))
-              [:div.reply-comment-reactions-footer.group
-                (reactions {:entity-data comment-data
-                            :hide-picker (zero? (count (:reactions comment-data)))
-                            :did-react-cb did-react-cb
-                            :optional-activity-data entry-data})])]]]]))
+                         :on-click reply-cb
+                         :title "Reply"}]
+                      ;; React container
+                      [:div.react-bt-container
+                        [:button.mlb-reset.floating-bt.react-bt
+                          {:data-toggle "tooltip"
+                           :data-placement "top"
+                           :title "Add reaction"
+                           :on-click react-cb}]
+                        emoji-picker]])]]
+              [:div.reply-comment-content
+                [:div.reply-comment-body.oc-mentions.oc-mentions-hover
+                  {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+                   :ref :reply-comment-body
+                   :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                            utils/hide-class true})}]]
+              (when (seq (:reactions comment-data))
+                [:div.reply-comment-reactions-footer.group
+                  (reactions {:entity-data comment-data
+                              :hide-picker (zero? (count (:reactions comment-data)))
+                              :did-react-cb did-react-cb
+                              :optional-activity-data entry-data})])]]]])))
+
+;; Reply header
 
 (rum/defc reply-top <
   rum/static
@@ -230,7 +291,7 @@
   (reply-actions/replies-expand entry-data))
 
 (defn- comment-item
-  [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member?
+  [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member? add-comment-force-update
              current-user-id reply-focus-value comments-loaded? clear-cell-measure-cb]}]
   (let [showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid reply-data)))
@@ -241,25 +302,24 @@
                       :comment-data reply-data
                       :reply-focus-value reply-focus-value
                       :is-mobile? is-mobile?
+                      :clear-cell-measure-cb clear-cell-measure-cb
                       :react-cb #(when comments-loaded?
-                                   (when (fn? clear-cell-measure-cb)
-                                     (clear-cell-measure-cb))
+                                   (clear-cell-measure-cb)
                                    (reset! (::show-picker s) (:uuid reply-data)))
                       :react-disabled? (not comments-loaded?)
                       :reply-cb #(do
                                    (reply-to reply-data reply-focus-value)
-                                   (when (fn? clear-cell-measure-cb)
-                                     (clear-cell-measure-cb)))
+                                   (clear-cell-measure-cb))
                       :did-react-cb #(do
                                       (seen-reply-cb (:uuid reply-data))
-                                      (when (fn? clear-cell-measure-cb)
-                                        (clear-cell-measure-cb)))
+                                      (clear-cell-measure-cb))
                       :emoji-picker (when showing-picker?
                                       (emoji-picker-container s entry-data reply-data seen-reply-cb))
                       :showing-picker? showing-picker?
                       :member? member?
                       :current-user-id current-user-id
-                      :replying-to replying-to})]))
+                      :replying-to replying-to
+                      :add-comment-force-update add-comment-force-update})]))
 
 (rum/defc collapsed-comments-button <
   rum/static
@@ -316,7 +376,8 @@
   [s {member?               :member?
       reply-data            :reply-data
       current-user-data     :current-user-data
-      clear-cell-measure-cb :clear-cell-measure-cb}]
+      clear-cell-measure-cb* :clear-cell-measure-cb
+      add-comment-force-update :add-comment-force-update}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
@@ -333,7 +394,8 @@
         reply-item-class (reply-item-unique-class entry-data)
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
         show-expand-replies? (and (not expanded-replies)
-                                  (seq (filter :collapsed replies-data)))]
+                                  (seq (filter :collapsed replies-data)))
+        clear-cell-measure-cb (utils/after 10 clear-cell-measure-cb*)]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
                                 :open-item true
@@ -365,8 +427,7 @@
           (rum/with-key
            (collapsed-comments-button {:expand-cb #(do
                                                     (replies-expand entry-data)
-                                                    (when (fn? clear-cell-measure-cb)
-                                                      (clear-cell-measure-cb)))
+                                                    (clear-cell-measure-cb))
                                        :message (str "View all " comments-count " comments")})
            (str "collapsed-comments-bt-" uuid "-" comments-count)))
         (for [reply replies-data
@@ -377,9 +438,9 @@
                            :is-mobile? is-mobile?
                            :seen-reply-cb #(do
                                             (reply-mark-seen entry-data reply)
-                                            (when (fn? clear-cell-measure-cb)
-                                              (clear-cell-measure-cb)))
+                                            (clear-cell-measure-cb))
                            :clear-cell-measure-cb clear-cell-measure-cb
+                           :add-comment-force-update add-comment-force-update
                            :member? member?
                            :reply-focus-value add-comment-focus-value
                            :comments-loaded? comments-loaded?
@@ -389,12 +450,10 @@
                        :collapse? true
                        :add-comment-placeholder "Reply..."
                        :internal-max-width (if is-mobile? (- (dom-utils/viewport-width) (* (+ 24 1) 2)) 524) ;; On mobile is screen width less the padding and border on both sides
-                       :add-comment-did-change #(when (fn? clear-cell-measure-cb)
-                                                  (clear-cell-measure-cb))
+                       :add-comment-did-change #(clear-cell-measure-cb)
                        :add-comment-cb (fn [new-comment-data]
                                          (reply-actions/replies-add entry-data new-comment-data)
-                                         (when (fn? clear-cell-measure-cb)
-                                           (clear-cell-measure-cb)))
+                                         (clear-cell-measure-cb))
                        :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
          (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 

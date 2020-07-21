@@ -314,7 +314,9 @@
        s)})))
 
 (defn on-click-out
- "C"
+ "Mixin used to listen for every click outside of a certain node.
+  If only the callback is provided it uses the main node of the component,
+  it uses the ref instead."
  ([callback] (on-click-out nil callback))
  ([optional-ref callback]
   (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
