@@ -1,6 +1,5 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
-            [defun.core :refer (defun-)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -105,7 +104,7 @@
   [:div.caught-up-wrapper
     (caught-up-line item)])
 
-(rum/defcs list-item
+(rum/defcs list-item < rum/static
   [s {:keys [items
              activities-read
              foc-layout
@@ -154,11 +153,11 @@
     (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:comments-loaded? item) "final" "temp")))
     (:resource-type item)))
 
-(defun- clear-cell-measure
+(defn- clear-cell-measure
 
   ([rum-state row-index] (clear-cell-measure rum-state row-index 0))
 
-  ([rum-state :guard :rum/react-component row-index column-index]
+  ([rum-state row-index column-index]
    (when-let [cache @(::cache rum-state)]
      (.clear cache row-index column-index)
      (reset! (::force-re-render rum-state) (utils/activity-uuid)))))
@@ -177,7 +176,6 @@
     (reset! resource-types next-resource-types)))
 
 (rum/defcs virtualized-stream < rum/static
-                                rum/reactive
                                 (seen-mixins/container-nav-mixin)
                                 (rum/local nil ::resource-types)
                                 (rum/local nil ::cache)
