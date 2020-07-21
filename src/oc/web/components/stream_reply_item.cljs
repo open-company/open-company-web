@@ -242,11 +242,11 @@
           (user-avatar-image publisher)
           [:span.author-name
             (:name publisher)]]
-        ; [:span.in "in"]
-        ; [:div.reply-item-board-container
-        ;   (board-info-hover {:activity-data entry-data})
-        ;   [:span.board-name
-        ;     board-name]]
+        [:span.in "in"]
+        [:div.reply-item-board-container
+          (board-info-hover {:activity-data entry-data})
+          [:span.board-name
+            board-name]]
         [:div.separator-dot]
         [:span.time-since
           [:time
