@@ -861,10 +861,10 @@ div.reply-item {
             position: relative;
 
             div.reply-comment-body {
-              @include activity-comment(15, 18, 18);
+              @include activity-comment(16, 22, 12);
 
               @include mobile() {
-                @include activity-comment(18, 24, 24);
+                @include activity-comment(18, 24, 12);
               }
 
               .interactive-image {

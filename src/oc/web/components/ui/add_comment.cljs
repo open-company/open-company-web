@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.shared.useragent :as ua]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -65,9 +66,24 @@
              (not @(::multiple-lines s)))
     (when-let [f (add-comment-field s)]
       (reset! (::multiple-lines s) (or (> (.-scrollWidth f) @(::inline-reply-max-width s))
-                                       (> (.-scrollHeight f) 18))))))
+                                       (> (.-scrollHeight f) 20))))))
+
+(defn- fix-selection [s]
+  (let [el (add-comment-field s)
+        sel (js/OCStaticTextareaSaveSelection)]
+    (when (and el sel
+               (= (.-anchorTarget sel) el)
+               (.-firstElementChild el)
+               (.. el -firstElementChild -firstElementChild)
+               (au/empty-body? (.-innerHTML el)))
+      (.removeAllRanges sel)
+      (.addRange sel (js/Range. (.-firstElementChild el) 0)))))
 
 (defn- focus [s]
+  ; (when (and @(::collapsed s)
+  ;            ua/safari?)
+  ;   ; (utils/after 10 #)
+  ;   (fix-selection s))
   (maybe-expand s)
   (multiple-lines? s)
   (toggle-post-button s))
@@ -78,10 +94,12 @@
     ;; In case post button is being disabled let's collapse
     (when (and (not toggle)
                (-> s :rum/args first :collapse?))
-      (reset! (::collapsed s) true))))
+      (reset! (::collapsed s) true)
+      (reset! (::multiple-lines s) false))))
 
 (defn- send-clicked [event s]
   (reset! (::collapsed s) true)
+  (reset! (::multiple-lines s) false)
   (let [add-comment-div (add-comment-field s)
         comment-body (cu/add-comment-content add-comment-div)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
@@ -156,6 +174,7 @@
                       (set! (.-innerHTML el)
                        (or (-> s :rum/args first :edit-comment-data :body) au/empty-body-html)))
                     (reset! (::collapsed s) true)
+                    (reset! (::multiple-lines s) false)
                     (when (fn? dismiss-reply-cb)
                       (dismiss-reply-cb true)))]
     (if @(::post-enabled s)
@@ -340,7 +359,8 @@
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
                                 (str "add-comment-box-" add-comment-focus-prefix) true
-                                :collapsed-box @(::collapsed s)
+                                :collapsed-box (and @(::collapsed s)
+                                                    (not @(::multiple-lines s)))
                                 :inline-reply (not @(::multiple-lines s))})
        :on-click (when @(::collapsed s)
                    #(.focus (rum/ref-node s "editor-node")))}
