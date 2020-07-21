@@ -34,8 +34,11 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
+(defn- quoted-reply-header [comment-data]
+  (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>"))
+
 (defn- reply-to [comment-data add-comment-focus-key]
-  (comment-actions/reply-to add-comment-focus-key (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>" (:body comment-data)) true))
+  (comment-actions/reply-to add-comment-focus-key (str (quoted-reply-header comment-data) (:body comment-data)) true))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]

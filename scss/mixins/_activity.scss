@@ -1141,9 +1141,20 @@ $header_top_margin: 24;
   }
 
   blockquote {
-    padding: 10px 20px;
-    min-height: 44px;
+    padding: 0 8px;
+    min-height: #{$line_height}px;
     border-left: 4px solid $ultra_light_grey;
+
+    span.oc-replying-to {
+      @include OC_Body_Book();
+      font-size: 12px;
+      line-height: 14px;
+      color: var(--light-color);
+
+      & + * {
+        margin-top: 4px;
+      }
+    }
   }
 
   b, strong {
