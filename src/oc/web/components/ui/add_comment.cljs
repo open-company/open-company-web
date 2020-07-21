@@ -61,7 +61,8 @@
       (compare-and-set! (::collapsed s) true false))))
 
 (defn- multiple-lines? [s]
-  (when-not @(::collapsed s)
+  (when (and (not @(::collapsed s))
+             (not @(::multiple-lines s)))
     (when-let [f (add-comment-field s)]
       (reset! (::multiple-lines s) (or (> (.-scrollWidth f) @(::inline-reply-max-width s))
                                        (> (.-scrollHeight f) 18))))))
