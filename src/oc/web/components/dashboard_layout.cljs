@@ -60,6 +60,7 @@
                               (drv/drv :foc-layout)
                               (drv/drv :activities-read)
                               (drv/drv :followers-boards-count)
+                              (drv/drv :comment-reply-to)
                               (drv/drv search/search-active?)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
@@ -84,6 +85,7 @@
         _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
+        _comment-reply-to (drv/react s :comment-reply-to)
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
         current-activity-id (drv/react s :activity-uuid)
