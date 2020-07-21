@@ -23,6 +23,7 @@ $dark_mode: "dark";
   --overlay-background-color: white;
   --highlighter-bg-color: #FEDF95;
 
+  --opac-background-color-04: #{rgba($deep_navy, 0.04)};
   --opac-background-color-05: #{rgba($deep_navy, 0.05)};
   --opac-background-color-08: #{rgba($deep_navy, 0.08)};
   --opac-background-color-1: #{rgba($deep_navy, 0.1)};
@@ -147,6 +148,7 @@ $dark_mode: "dark";
   --overlay-background-color: #1B202A;
   --highlighter-bg-color: #FEDF95;
 
+  --opac-background-color-04: #{rgba(white, 0.04)};
   --opac-background-color-05: #{rgba(white, 0.05)};
   --opac-background-color-08: #{rgba(white, 0.08)};
   --opac-background-color-1: #{rgba(white, 0.1)};
