@@ -1,0 +1,178 @@
+div.user-profile-container {
+  background-color: var(--overlay-background-color);
+  border-radius: 8px;
+  border: 1px solid var(--divider-line);
+  padding: 22px 24px 24px;
+
+  div.user-profile {
+    div.user-profile-header {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: flex-start;
+      max-width: 100%;
+
+      div.user-profile-header-avatar {
+        width: 80px;
+        flex: 0 0 80px;
+        dispay: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+
+        @include user-profile(80) {
+          flex: 0 0 80px;
+        }
+      }
+
+      div.user-profile-header-info {
+        margin-left: 24px;
+        width: calc(100% - 80px - 24px);
+        flex: 0 0 auto;
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+        div.user-profile-header-info-name {
+          // width: 100%;
+          flex: 0 0 22px;
+          height: 22px;
+          display: flex;
+          flex-flow: row nowrap;
+          align-items: flex-start;
+          justify-content: space-between;
+
+          span.name {
+            @include OC_Body_Bold();
+            color: var(--color);
+            font-size: 22px;
+            line-height: 24px;
+            flex: 0 1 auto;
+            max-width: 100%;
+            overflow-y: visible;
+            overflow-x: hidden;
+            text-overflow: ellipsis;
+          }
+
+          button.edit-profile-bt {
+            @include OC_Body_Book();
+            color: var(--light-color);
+            font-size: 14px;
+            line-height: 18px;
+            flex: 0 0 auto;
+            text-decoration: underline;
+            padding: 0;
+            margin-left: auto;
+          }
+        }
+
+        div.user-profile-header-info-title {
+          flex: 0 0 auto;
+          @include OC_Body_Book();
+          color: var(--light-color);
+          font-size: 16px;
+          line-height: 18px;
+          margin-top: 4px;
+        }
+
+        div.user-profile-header-info-description {
+          flex: 0 0 auto;
+          @include OC_Body_Book();
+          color: var(--color);
+          font-size: 16px;
+          line-height: 20px;
+          margin-top: 8px;
+        }
+
+        div.user-profile-header-info-locale {
+          flex: 0 0 auto;
+          @include OC_Body_Book();
+          color: var(--light-color);
+          font-size: 16px;
+          line-height: 18px;
+          margin-top: 8px;
+        }
+      }
+    }
+
+    div.user-profile-footer {
+      display: flex;
+      flex-flow: row wrap;
+      margin-top: 24px;
+      border-top: 1px solid var(--divider-line);
+      padding-top: 24px;
+
+      .profile-link {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: underline;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+        padding-left: 24px;
+        position: relative;
+        background-position: top 50% left 0px;
+        background-repeat: no-repeat;
+        margin-right: 16px;
+        opacity: 0.5;
+
+        &.email {
+          background-size: 16px 12px;
+          background-image: cdnUrl("/img/ML/profile_icon_em.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_em@dark.svg");
+          }
+        }
+
+        &.slack {
+          background-size: 16px 16px;
+          background-image: cdnUrl("/img/ML/profile_icon_sl.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_sl@dark.svg");
+          }
+        }
+
+        &.twitter {
+          padding-left: 22px;
+          background-size: 14px 12px;
+          background-image: cdnUrl("/img/ML/profile_icon_tw.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_tw@dark.svg");
+          }
+        }
+
+        &.linked-in {
+          background-size: 16px 16px;
+          background-image: cdnUrl("/img/ML/profile_icon_li.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_li@dark.svg");
+          }
+        }
+
+        &.facebook {
+          background-size: 16px 16px;
+          background-image: cdnUrl("/img/ML/profile_icon_fb.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_fb@dark.svg");
+          }
+        }
+
+        &.instagram {
+          background-size: 16px 16px;
+          background-image: cdnUrl("/img/ML/profile_icon_in.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/profile_icon_in@dark.svg");
+          }
+        }
+      }
+    }
+  }
+}

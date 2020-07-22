@@ -24,6 +24,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.search :refer (search-box)]
+            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
             [oc.web.components.expanded-post :refer (expanded-post)]
@@ -146,7 +147,8 @@
                                  (false? (:following container-data)))
         followers-boards-count (drv/react s :followers-boards-count)
         show-desktop-cmail? (and (not is-mobile?)
-                                 can-compose?)]
+                                 can-compose?
+                                 (not is-contributions))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:search-active search-active?})}
@@ -228,6 +230,8 @@
             ;           {:class (when is-second-user "second-user")}]]]))
             (when show-desktop-cmail?
               (cmail))
+            (when is-contributions
+              (user-profile contributions-user-data))
             (when (and show-desktop-cmail?
                        (not (:collapsed cmail-state))
                        (:fullscreen cmail-state))
@@ -245,11 +249,10 @@
                     current-contributions-id
                     [:div.board-name-with-icon.contributions
                       [:div.board-name-with-icon-internal
-                        (if is-own-contributions
-                          "You"
-                          (lib-user/name-for contributions-user-data))
-                        ; (when (pos? (:total-count contributions-data))
-                        ;   [:span.count (:total-count contributions-data)])
+                        (str (:total-count container-data) " posts")
+                        ; (if is-own-contributions
+                        ;   "You"
+                        ;   (lib-user/name-for contributions-user-data))
                         ]]
                     :else
                     [:div.board-name-with-icon
@@ -271,7 +274,7 @@
                                                    "All"
 
                                                    is-topics
-                                                   "<div class=\"explore-icon-in\"></div> Topics"
+                                                   "<div class=\"explore-icon-in\"></div> Explore"
 
                                                    is-bookmarks
                                                    "Bookmarks"

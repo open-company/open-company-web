@@ -421,10 +421,13 @@ div.dashboard-layout {
         background-color: var(--mobile-background-color);
       }
 
+      div.user-profile-container {
+        margin-bottom: 24px;
+      }
+
       div.board-name-container {
-        padding: 0px 0px 8px;
+        padding: 0px 0px 16px;
         position: relative;
-        height: 40px;
 
         @include mobile() {
           height: 64px;
@@ -440,7 +443,7 @@ div.dashboard-layout {
         div.board-name {
           float: left;
           position: relative;
-          height: 32px;
+          height: 24px;
 
           @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
           @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
@@ -452,7 +455,7 @@ div.dashboard-layout {
           div.board-name-with-icon {
             @include OC_Body_Bold();
             font-size: 18px;
-            line-height: 32px;
+            line-height: 24px;
             color: var(--color);
             float: left;
             max-width: 350px;
@@ -491,13 +494,13 @@ div.dashboard-layout {
                 display: block;
                 content: "";
                 width: 14px;
-                height: 32px;
+                height: 24px;
                 background-image: cdnUrl("/img/ML/section_chevron.svg");
                 background-size: 14px 8px;
                 background-repeat: no-repeat;
                 background-position: center;
                 position: absolute;
-                top: 6px;
+                top: 2px;
                 left: 0px;
 
                 @include dark_mode() {
@@ -514,7 +517,7 @@ div.dashboard-layout {
               @include OC_Body_Bold();
               font-size: 18px;
               color: var(--color);
-              line-height: 32px;
+              line-height: 24px;
               position: relative;
               padding-left: 24px;
 
@@ -524,7 +527,7 @@ div.dashboard-layout {
                 left: 0;
                 top: 0;
                 width: 24px;
-                height: 32px;
+                height: 24px;
                 background-repeat: no-repeat;
                 background-position: 0 7px;
                 background-size: 16px 16px;
@@ -720,7 +723,7 @@ div.dashboard-layout {
 
         div.board-name-right {
           float: right;
-          height: 32px;
+          height: 24px;
           position: relative;
 
           & > div.search-box {
@@ -740,8 +743,8 @@ div.dashboard-layout {
           div.followers-count {
             float: right;
             @include OC_Body_Book();
-            height: 32px;
-            line-height: 32px;
+            height: 24px;
+            line-height: 24px;
             font-size: 16px;
             color: var(--light-color);
             margin-right: 3px;
@@ -750,7 +753,7 @@ div.dashboard-layout {
           div.board-settings-container {
             float: right;
             position: relative;
-            height: 32px;
+            height: 24px;
             margin-right: -12px;
 
             button.board-settings-bt {
@@ -759,8 +762,8 @@ div.dashboard-layout {
               background-repeat: no-repeat;
               background-position: center;
               background-color: transparent;
-              width: 32px;
-              height: 32px;
+              width: 24px;
+              height: 24px;
               padding: 0;
               position: relative;
               opacity: 0.5;
@@ -808,7 +811,7 @@ div.dashboard-layout {
 
           button.complete-all-bt {
             float: left;
-            height: 32px;
+            height: 24px;
             width: 24px;
             padding: 0;
             margin: 0;

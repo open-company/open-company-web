@@ -304,7 +304,6 @@
                       :is-mobile? is-mobile?
                       :clear-cell-measure-cb clear-cell-measure-cb
                       :react-cb #(when comments-loaded?
-                                   (clear-cell-measure-cb)
                                    (reset! (::show-picker s) (:uuid reply-data)))
                       :react-disabled? (not comments-loaded?)
                       :reply-cb #(do
@@ -395,7 +394,8 @@
         add-comment-focus-value (cu/add-comment-focus-value @(::add-comment-focus-prefix s) uuid)
         show-expand-replies? (and (not expanded-replies)
                                   (seq (filter :collapsed replies-data)))
-        clear-cell-measure-cb (utils/after 10 clear-cell-measure-cb*)]
+        clear-cell-measure-cb #(when (fn? clear-cell-measure-cb*)
+                                 (utils/after 10 clear-cell-measure-cb*))]
     [:div.reply-item.group
       {:class (utils/class-set {:unseen unseen
                                 :open-item true

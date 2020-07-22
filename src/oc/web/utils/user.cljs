@@ -1,5 +1,6 @@
 (ns oc.web.utils.user
   (:require [defun.core :refer (defun)]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.oauth :as oauth]
             [oc.web.lib.utils :as utils]))
@@ -38,32 +39,46 @@
     (.. parsed-url -searchParams (set "state" new-state-string))
     (str parsed-url)))
 
-(defn- localized-time [tz]
+(defn- localized-time
+  ([tz] (localized-time tz {}))
+  ([tz {:keys [suffix] :as opts}]
   (try
-   (.toLocaleTimeString (js/Date.)
-    (.. js/window -navigator -language)
-    #js {:hour "2-digit"
-         :minute "2-digit"
-         :format "hour:minute"
-         :timeZone tz})
+   (str
+    (.toLocaleTimeString (js/Date.)
+     (.. js/window -navigator -language)
+     #js {:hour "2-digit"
+          :minute "2-digit"
+          :format "hour:minute"
+          :timeZone tz})
+     (when (seq suffix)
+       (str " " (string/trim suffix))))
    (catch :default e
-    nil)))
+    nil))))
 
-(defn time-with-timezone [timezone]
-  (when-let [localized-time (localized-time timezone)]
-    (utils/time-without-leading-zeros localized-time)))
+(defn time-with-timezone
+  ([timezone] (time-with-timezone timezone {}))
+  ([timezone {:keys [suffix] :as opts}]
+  (when-let [lt (localized-time timezone suffix)]
+    (utils/time-without-leading-zeros lt))))
 
 (defn timezone-location-string [user-data & [local-time-string?]]
-  (let [twt (time-with-timezone (:timezone user-data))]
+  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})]
+    (str twt
+         (if (seq (:location user-data))
+           (if (seq twt)
+             (str " (" (:location user-data) ")")
+             (:location user-data))
+           (when (seq (:timezone user-data))
+             (if (seq twt)
+               (str " (" (:timezone user-data) ")")
+               (str (:timezone user-data))))))))
+
+(defn location-timezone-string [user-data & [local-time-string?]]
+  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})]
     (str
-     (when (seq twt)
-       (str
-        twt
-        (when local-time-string?
-          " local time")))
      (if (seq (:location user-data))
        (if (seq twt)
-         (str " (" (:location user-data) ")")
+         (str (:location user-data) " (" twt ")")
          (:location user-data))
        (when (seq (:timezone user-data))
          (if (seq twt)
