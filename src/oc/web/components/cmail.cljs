@@ -77,7 +77,7 @@
                              :file-size size
                              :file-url url}]
         (reset! (::media-attachment state) false)
-        (activity-actions/add-attachment :cmail-data attachment-data)
+        (activity-actions/add-attachment (first dis/cmail-data-key) attachment-data)
         (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
 
 (defn attachment-upload-error-cb [state res error]
@@ -113,14 +113,14 @@
 
 (defn- clean-body [s]
   (when (body-element)
-    (dis/dispatch! [:input [:cmail-data :body] (cleaned-body)])))
+    (dis/dispatch! [:input (conj dis/cmail-data-key :body) (cleaned-body)])))
 
 ;; Local cache for outstanding edits
 
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
+    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body) section-editing)))
 
 (defn debounced-autosave!
   [s]
@@ -135,7 +135,7 @@
 (defn cancel-clicked [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         clean-fn (fn [dismiss-modal?]
-                    (activity-actions/entry-clear-local-cache (:uuid cmail-data) :cmail-data cmail-data)
+                    (activity-actions/entry-clear-local-cache (:uuid cmail-data) (first dis/cmail-data-key) cmail-data)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
                     (real-close))]
@@ -164,7 +164,7 @@
 ;; Data change handling
 
 (defn body-on-change [state]
-  (dis/dispatch! [:input [:cmail-data :has-changes] true])
+  (dis/dispatch! [:input (conj dis/cmail-data-key :has-changes) true])
   (debounced-autosave! state)
   (when-let [body-el (body-element)]
     (reset! (::last-body state) (.-innerHTML body-el))))
@@ -178,8 +178,8 @@
   (when-let [headline (headline-element state)]
     (let [clean-headline (fix-headline (.-innerText headline))
           post-button-title (when-not (seq clean-headline) :title)]
-      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline clean-headline
-                                                       :has-changes true})])
+      (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline clean-headline
+                                                            :has-changes true})])
       (reset! (::post-tt-kw state) post-button-title)
       (debounced-autosave! state))
     (setup-top-padding state)))
@@ -222,16 +222,16 @@
         fixed-headline (fix-headline (:headline cmail-data))
         published? (= (:status cmail-data) "published")]
       (if (is-publishable? cmail-data)
-        (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline})])
+        (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
           (if published?
             (do
               (reset! (::saving s) true)
-              (activity-actions/entry-save :cmail-data updated-cmail-data section-editing))
+              (activity-actions/entry-save (first dis/cmail-data-key) updated-cmail-data section-editing))
             (do
               (reset! (::publishing s) true)
-              (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
+              (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing (first dis/cmail-data-key)))))
         (do
           (reset! (::show-post-tooltip s) true)
           (utils/after 3000 #(reset! (::show-post-tooltip s) false))
@@ -275,7 +275,7 @@
       ;; In case the data are queued up to be saved but the request didn't started yet
       (when (:has-changes activity-data)
         ;; Remove them
-        (dis/dispatch! [:update [:cmail-data] #(dissoc % :has-changes)]))
+        (dis/dispatch! [:update dis/cmail-data-key #(dissoc % :has-changes)]))
       (cmail-actions/cmail-hide))))
 
 (defn win-width []
@@ -512,7 +512,7 @@
                             (let [has-changes (or (:has-changes cmail-data)
                                                   (seq (:uuid cmail-data))
                                                   (:auto-saving cmail-data))]
-                              (dis/dispatch! [:input [:cmail-data]
+                              (dis/dispatch! [:input dis/cmail-data-key
                                (merge cmail-data {:board-slug (:slug board-data)
                                                   :board-name (:name board-data)
                                                   :board-access (:access board-data)
@@ -626,7 +626,7 @@
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
                                :placeholder (str utils/default-body-placeholder "...")
-                               :dispatch-input-key :cmail-data
+                               :dispatch-input-key (first dis/cmail-data-key)
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
@@ -636,13 +636,13 @@
                                :attachments-enabled true})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))
+             #(activity-actions/remove-attachment (first dis/cmail-data-key) %))
             (when (seq (:polls cmail-data))
               (polls-wrapper {:polls-data (:polls cmail-data)
                               :editing? true
                               :current-user-id (jwt/user-id)
                               :container-selector "div.cmail-content"
-                              :dispatch-key :cmail-data
+                              :dispatch-key (first dis/cmail-data-key)
                               :activity-data cmail-data}))]]
       [:div.cmail-footer
         [:div.post-button-container.group

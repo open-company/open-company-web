@@ -121,19 +121,19 @@
     (when (and (not (:auto cmail-state))
                (not (:collapsed cmail-state)))
       (save-edit-open-cookie initial-entry-data))
-    (load-cached-item initial-entry-data :cmail-data
-     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
+    (load-cached-item initial-entry-data (first dis/cmail-data-key)
+     #(dis/dispatch! [:input dis/cmail-state-key fixed-cmail-state]))))
 
 (defn cmail-expand [initial-entry-data cmail-state]
   (cook/remove-cookie! (cmail-fullscreen-cookie))
   (save-edit-open-cookie initial-entry-data)
-  (load-cached-item initial-entry-data :cmail-data
-   #(dis/dispatch! [:input [:cmail-state] (merge cmail-state {:collapsed false})])))
+  (load-cached-item initial-entry-data (first dis/cmail-data-key)
+   #(dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed false})])))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
-  (dis/dispatch! [:input [:cmail-data] (get-default-section)])
-  (dis/dispatch! [:input [:cmail-state] {:collapsed true :key (utils/activity-uuid)}])
+  (dis/dispatch! [:input dis/cmail-data-key (get-default-section)])
+  (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}])
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-fullscreen []
@@ -141,7 +141,7 @@
     (cmail-fullscreen-save true)
     (utils/scroll-to-y 0 0)
     (dom-utils/lock-page-scroll)
-    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen true :collapsed false})])))
+    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen true :collapsed false})])))
 
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (dis/cmail-state)))]
@@ -151,11 +151,11 @@
     (if next-fullscreen-value
       (dom-utils/lock-page-scroll)
       (dom-utils/unlock-page-scroll))
-    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])))
+    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen next-fullscreen-value})])))
 
 (defn cmail-toggle-must-see []
-  (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
-                                                   :has-changes true})]))
+  (dis/dispatch! [:update dis/cmail-data-key #(merge % {:must-see (not (:must-see %))
+                                                        :has-changes true})]))
 
 (defonce cmail-reopen-only-one (atom false))
 
@@ -165,8 +165,8 @@
       ;; it was adding a slack team or bot
       (utils/after 100
        ;; If cmail is already open let's not reopen it
-       #(when (or (not (:cmail-state @dis/app-state))
-                  (:collapsed (:cmail-state @dis/app-state)))
+       #(when (or (not (dis/cmail-state))
+                  (:collapsed (dis/cmail-state)))
           (let [cmail-state {:auto true
                              ;; reopen fullscreen on desktop, mobile doesn't use it
                              :fullscreen (not (responsive/is-mobile-size?))

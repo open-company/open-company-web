@@ -37,13 +37,13 @@
         current-board-slug (dispatcher/current-board-slug)
         editing-board (when (seq editable-boards)
                         (cmail-actions/get-board-for-edit (when-not (dispatcher/is-container? current-board-slug) current-board-slug) editable-boards))
-        next-db (if (and (not (contains? db :cmail-state))
+        next-db (if (and (not (contains? db (first dispatcher/cmail-state-key)))
                          editing-board)
                   (-> db
-                    (assoc :cmail-state {:key (utils/activity-uuid)
-                                         :fullscreen false
-                                         :collapsed true})
-                    (update :cmail-data merge editing-board))
+                    (assoc-in dispatcher/cmail-state-key {:key (utils/activity-uuid)
+                                                          :fullscreen false
+                                                          :collapsed true})
+                    (update-in dispatcher/cmail-data-key merge editing-board))
                   db)
         active-users (dispatcher/active-users (:slug org-data) db)
         follow-boards-list-key (dispatcher/follow-boards-list-key (:slug org-data))

@@ -480,10 +480,10 @@
                            with-fixed-contribs
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
-    (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
+    (if (= (get-in db (conj dispatcher/cmail-data-key :uuid)) (:uuid activity-data))
       (-> with-fixed-boards
           (update-in contributions-count-key dec)
-          (assoc-in [:cmail-data] {:delete true})
+          (assoc-in dispatcher/cmail-data-key {:delete true})
           (assoc-in posts-key next-posts))
       (assoc-in with-fixed-boards posts-key next-posts))))
 
@@ -571,12 +571,12 @@
         fixed-activity-data (-> activity-data
                              (au/parse-entry board-data (dispatcher/change-data db org-slug))
                              (dissoc :loading))
-        update-cmail? (and (= (get-in db [:cmail-data :uuid]) activity-uuid)
+        update-cmail? (and (= (get-in db (conj dispatcher/cmail-data-key :uuid)) activity-uuid)
                            (pos? (compare (:updated-at fixed-activity-data)
-                                          (get-in db [:cmail-data :updated-at]))))]
+                                          (get-in db (conj dispatcher/cmail-data-key :updated-at)))))]
     (cond-> db
-     update-cmail? (update-in [:cmail-data] #(merge % fixed-activity-data))
-     update-cmail? (update :cmail-state assoc :key (utils/activity-uuid))
+     update-cmail? (update-in dispatcher/cmail-data-key #(merge % fixed-activity-data))
+     update-cmail? (update-in dispatcher/cmail-state-key assoc :key (utils/activity-uuid))
      true          (assoc-in activity-key fixed-activity-data)
      true          (as-> ndb
                     (update-in ndb (dispatcher/user-notifications-key org-slug)

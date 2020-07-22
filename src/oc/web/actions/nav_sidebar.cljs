@@ -196,13 +196,13 @@
          ;; Let's change the QP section if it's not active and going to an editable section
          (when (and (not is-container?)
                     (not is-drafts-board?)
-                    (-> @dis/app-state :cmail-state :collapsed))
+                    (:collapsed (dis/cmail-state)))
            (when-let* [nav-to-board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
-             (dis/dispatch! [:input [:cmail-data] {:board-slug (:slug nav-to-board-data)
-                                                   :board-name (:name nav-to-board-data)
-                                                   :publisher-board (:publisher-board nav-to-board-data)}])
-             (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)]))))))))))
+             (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
+                                                        :board-name (:name nav-to-board-data)
+                                                        :publisher-board (:publisher-board nav-to-board-data)}])
+             (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))))))))
 
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)

@@ -734,7 +734,7 @@
   (if (:links activity-data)
     (real-activity-delete activity-data)
     (when (:auto-saving activity-data)
-      (utils/after 1000 #(real-activity-delete (:cmail-data @dis/app-state))))))
+      (utils/after 1000 #(real-activity-delete (dis/cmail-data))))))
 
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
@@ -854,7 +854,7 @@
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) container-id) (:boards org-data)))
         entry-data (dis/activity-data (:slug org-data) entry-uuid)
-        editing-entry-data (:cmail-data @dis/app-state)]
+        editing-entry-data (dis/cmail-data)]
     (when entry-data ;; if we have the entry in the app-state
       (get-entry entry-data))))
 
@@ -1177,22 +1177,19 @@
 
 (defn activity-edit
   ([]
-    (let [cmail-state (:cmail-state @dis/app-state)
-          cmail-data (:cmail-data @dis/app-state)
+    (let [cmail-state (dis/cmail-state)
+          cmail-data (dis/cmail-data)
           next-cmail-data (if (and cmail-data
                                    cmail-state)
                              cmail-data
                              (cmail-actions/get-board-for-edit))]
       (activity-edit next-cmail-data)))
   ([activity-data]
-    (let [fixed-activity-data (if-not (seq (:uuid activity-data))
-                                (assoc activity-data :must-see (= (dis/current-board-slug) "must-see"))
-                                activity-data)
-          is-published? (= (:status fixed-activity-data) "published")
+    (let [is-published? (= (:status activity-data) "published")
           cmail-state {:key (utils/activity-uuid)
                        :fullscreen true
                        :collapsed false}]
-      (cmail-actions/cmail-show fixed-activity-data cmail-state))))
+      (cmail-actions/cmail-show activity-data cmail-state))))
 
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link

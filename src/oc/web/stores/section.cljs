@@ -126,17 +126,17 @@
         old-posts (get-in db posts-key)
         removed-posts (filterv (fn [p] (not= (:board-slug p) section-slug))
                                (vals old-posts))
-        cmail-state (:cmail-state db)
+        cmail-state (get-in db dispatcher/cmail-state-key)
         first-editable-section (first
                                 (filter #(and (not (:draft %)) (utils/link-for (:links %) "create"))
                                  (sort-by :name remaining-sections)))
         next-db (if (and (:collapsed cmail-state)
                          first-editable-section)
                   (-> db
-                   (assoc-in [:cmail-state :key] (utils/activity-uuid))
-                   (assoc :cmail-data {:board-name (:name first-editable-section)
-                                       :board-slug (:slug first-editable-section)
-                                       :publisher-board (:publisher-board first-editable-section)}))
+                   (assoc-in (conj dispatcher/cmail-state-key :key) (utils/activity-uuid))
+                   (assoc-in dispatcher/cmail-data-key {:board-name (:name first-editable-section)
+                                                        :board-slug (:slug first-editable-section)
+                                                        :publisher-board (:publisher-board first-editable-section)}))
                   db)]
     (-> next-db
       (update-in (butlast section-key) dissoc (last section-key))

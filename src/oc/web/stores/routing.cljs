@@ -1,5 +1,6 @@
 (ns oc.web.stores.routing
-  (:require [oc.web.dispatcher :as dispatcher]))
+  (:require [oc.web.lib.utils :as utils]
+            [oc.web.dispatcher :as dispatcher]))
 
 (defn- clean-route [route-map]
   (update route-map :route #(set (map keyword (remove nil? %)))))
@@ -21,4 +22,5 @@
   (-> db
    (assoc :orgs-dropdown-visible false)
    (assoc :mobile-navigation-sidebar false)
-   (dissoc :cmail-state :cmail-data)))
+   (assoc dispatcher/cmail-state-key {:collapsed true :key (utils/activity-uuid)})
+   (dissoc dispatcher/cmail-data-key)))

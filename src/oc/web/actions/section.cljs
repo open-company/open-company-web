@@ -166,11 +166,11 @@
                   (utils/after 100
                    #(do
                      (when (and editable-board?
-                                (-> @dispatcher/app-state :cmail-state :collapsed))
-                        (dispatcher/dispatch! [:input [:cmail-data] {:board-slug (:slug section-data)
-                                                                     :board-name (:name section-data)
-                                                                     :publisher-board (:publisher-board section-data)}])
-                        (dispatcher/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)]))))
+                                (:collapsed (dis/cmail-state)))
+                        (dispatcher/dispatch! [:input dis/cmail-data-key {:board-slug (:slug section-data)
+                                                                          :board-name (:name section-data)
+                                                                          :publisher-board (:publisher-board section-data)}])
+                        (dispatcher/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))
                   (utils/after 500 refresh-org-data)
                   (ws-cc/container-watch (:uuid section-data))
                   (dispatcher/dispatch! [:section-edit-save/finish section-data])
