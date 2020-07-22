@@ -15,3 +15,10 @@
 (defmethod dispatcher/action :route/rewrite
   [db [_ k v]]
   (assoc-in db [dispatcher/router-key k] v))
+
+(defmethod dispatcher/action :org-nav-out
+  [db [_ from-org to-org]]
+  (-> db
+   (assoc :orgs-dropdown-visible false)
+   (assoc :mobile-navigation-sidebar false)
+   (dissoc :cmail-state :cmail-data)))

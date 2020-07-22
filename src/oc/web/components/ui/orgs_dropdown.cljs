@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (on-click-out)]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]))
 
 (rum/defc org-dropdown-item < rum/static
@@ -17,9 +18,7 @@
       {:href (oc-urls/default-landing (:slug org))
        :on-click (fn [e]
                    (utils/event-stop e)
-                   (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                   (dis/dispatch! [:input [:orgs-dropdown-visible] false])
-                   (router/nav! (oc-urls/default-landing (:slug org))))}
+                   (routing-actions/switch-org-dashboard org))}
       (org-avatar org false :always)]])
 
 (rum/defcs orgs-dropdown < rum/static

@@ -19,3 +19,7 @@
           force-404?)
     (router/redirect-404!)
     (dis/dispatch! [:show-login-wall]))))
+
+(defn switch-org-dashboard [org]
+  (dis/dispatch! [:org-nav-out (dis/current-org-slug) (:slug org)])
+  (router/nav! (oc-urls/default-landing (:slug org))))
