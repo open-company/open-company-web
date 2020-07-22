@@ -267,7 +267,7 @@
                                  add-comment-internal (rum/ref-node s :add-comment-internal)
                                  bounding-box (.getBoundingClientRect add-comment-internal)
                                  computed-style (.getComputedStyle js/window add-comment-internal)
-                                 max-width (- (:internal-max-width props) 132)]
+                                 max-width (- (:internal-max-width props) 140)]
                              (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)

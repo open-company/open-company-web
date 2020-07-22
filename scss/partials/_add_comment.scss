@@ -9,7 +9,9 @@ div.add-comment-box-container {
   }
 
   &:not(.collapsed-box), &.collapsed-box:hover {
-    box-shadow: 0 2px 4px 0 var(--add-comment-box-shadow);
+    div.add-comment {
+      box-shadow: 0 2px 4px 0 var(--add-comment-box-shadow);
+    }
   }
 
   &:not(.collapsed-box) div.add-comment-box div.add-comment-internal {
@@ -234,7 +236,7 @@ div.add-comment-box-container {
         button.send-btn {
           height: 24px;
           padding: 3px 12px;
-          margin: 0 0 0 8px;
+          margin: 0 0 0 16px;
           background-color: $wut_purple;
           color: white;
           @include OC_Body_Bold();
