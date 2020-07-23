@@ -155,7 +155,7 @@ div.user-info-view {
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 18px;
-        min-height: 18px;
+        // min-height: 18px;
         color: var(--color);
         opacity: 0.5;
         overflow: hidden;

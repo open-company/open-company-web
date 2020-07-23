@@ -486,6 +486,17 @@ div.left-navigation-sidebar {
       }
     }
 
+    &.profile {
+      div.nav-link-icon {
+        background-size: 12px 14px;
+        background-image: cdnUrl("/img/ML/nav_profile.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/nav_profile@dark.svg");
+        }
+      }
+    }
+
     &.my-posts {
       div.nav-link-icon {
         background-size: 14px 14px;

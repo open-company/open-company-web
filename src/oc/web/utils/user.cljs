@@ -57,8 +57,8 @@
 
 (defn time-with-timezone
   ([timezone] (time-with-timezone timezone {}))
-  ([timezone {:keys [suffix] :as opts}]
-  (when-let [lt (localized-time timezone suffix)]
+  ([timezone opts]
+  (when-let [lt (localized-time timezone opts)]
     (utils/time-without-leading-zeros lt))))
 
 (defn timezone-location-string [user-data & [local-time-string?]]

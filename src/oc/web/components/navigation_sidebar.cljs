@@ -33,6 +33,7 @@
                                 (drv/drv :board-data)
                                 (drv/drv :org-slug)
                                 (drv/drv :board-slug)
+                                (drv/drv :contributions-id)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :replies-badge)
@@ -73,6 +74,7 @@
         change-data (drv/react s :change-data)
         org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
+        current-contributions-id (drv/react s :contributions-id)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
@@ -86,6 +88,9 @@
                            (not (dis/is-container? current-board-slug))
                            (not is-drafts-board)))
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
+        is-contributions (seq current-contributions-id)
+        is-profile (and is-contributions
+                        (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
         ; show-boards (or create-link (pos? (count boards)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
@@ -98,6 +103,7 @@
                          drafts-link)
         show-replies (and user-is-part-of-the-team?
                           (utils/link-for (:links org-data) "replies"))
+        show-profile user-is-part-of-the-team?
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -172,6 +178,21 @@
                 "Replies"]
                 (when replies-badge
                   [:span.unread-dot])]])
+        (when user-is-part-of-the-team?
+          [:div.left-navigation-sidebar-top
+            {:class (when (and (or show-following show-topics)
+                               (not show-replies))
+                      "top-border")}
+            [:a.nav-link.profile.hover-item.group
+              {:class (utils/class-set {:item-selected is-profile})
+               :href (oc-urls/contributions (:user-id current-user-data))
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                ; {:class (utils/class-set {:new (seq all-unread-items)})}
+                "Profile"]]])
         ;; You
         ; (when show-you
         ;   [:div.left-navigation-sidebar-top.top-border
@@ -191,8 +212,9 @@
         ;; Bookmarks
         (when show-bookmarks
           [:div.left-navigation-sidebar-top
-            {:class (when (and (or show-following show-topics)
-                               (not show-replies))
+            {:class (when (and (or show-following show-topics show-replies)
+                               (not show-replies)
+                               (not show-profile))
                         "top-border")}
             [:a.nav-link.bookmarks.hover-item.group
               {:class (utils/class-set {:item-selected is-bookmarks})
@@ -210,6 +232,7 @@
             [:div.left-navigation-sidebar-top
               {:class (when (and (or show-following show-topics)
                                  (not show-replies)
+                                 (not show-profile)
                                  (not show-bookmarks))
                         "top-border")}
               [:a.nav-link.drafts.hover-item.group
