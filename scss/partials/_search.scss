@@ -64,7 +64,7 @@ div.search-box {
         opacity: 0.4;
       }
 
-      &::placeholder {
+      @include placeholder(){
         color: var(--light-color);
       }
     }
@@ -119,10 +119,10 @@ div.search-box {
     font-size: 14px;
     line-height: 24px;
     color: var(--color);
-    width: 68px;
+    width: 72px;
     height: 24px;
 
-    &:placeholder, &::placeholder {
+    @include placeholder() {
       color: var(--light-color);
     }
 
