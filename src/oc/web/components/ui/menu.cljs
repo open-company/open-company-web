@@ -30,7 +30,7 @@
 
 (defn my-profile-click [s user-id e]
   (.preventDefault e)
-  (nav-actions/show-user-info user-id))
+  (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
 
 (defn my-posts-click [s cur-user-id e]
   (.preventDefault e)
@@ -148,24 +148,24 @@
           (when-not is-mobile?
             (user-avatar-image current-user-data))]
         ;; Profile
-        (when (jwt/jwt)
-          [:a
-            {:href "#"
-             :on-click (partial my-profile-click s (:user-id current-user-data))}
-            [:div.oc-menu-item.personal-profile
-              "My profile"]])
+        ; (when (jwt/jwt)
+        ;   [:a
+        ;     {:href "#"
+        ;      :on-click (partial my-profile-click s (:user-id current-user-data))}
+        ;     [:div.oc-menu-item.personal-profile
+        ;       "My profile"]])
         ;; Show user's posts link
-        (when (and (jwt/jwt)
-                   current-user-data
-                   (pos? (:contributions-count org-data)))
-          [:a
-            {:href (oc-urls/contributions (:user-id current-user-data))
-             :on-click (partial my-posts-click s (:user-id current-user-data))}
-            [:div.oc-menu-item.my-posts.group
-              [:span.oc-menu-item-label
-                "My updates"]
-              [:span.count
-                (:contributions-count org-data)]]])
+        ; (when (and (jwt/jwt)
+        ;            current-user-data
+        ;            (pos? (:contributions-count org-data)))
+        ;   [:a
+        ;     {:href (oc-urls/contributions (:user-id current-user-data))
+        ;      :on-click (partial my-posts-click s (:user-id current-user-data))}
+        ;     [:div.oc-menu-item.my-posts.group
+        ;       [:span.oc-menu-item-label
+        ;         "My updates"]
+        ;       [:span.count
+        ;         (:contributions-count org-data)]]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))

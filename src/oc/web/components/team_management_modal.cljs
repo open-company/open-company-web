@@ -202,7 +202,7 @@
                                               :removing removing?})
                      :on-click #(when (uu/active? user)
                                   (utils/event-stop %)
-                                  (nav-actions/show-user-info (:user-id user)))
+                                  (nav-actions/nav-to-author! % (:user-id user) (oc-urls/contributions (:user-id user))))
                      :data-toggle "tooltip"
                      :data-html "true"
                      :data-placement "top"}

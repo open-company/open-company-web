@@ -68,7 +68,7 @@
               (str followers-count " follower" (when (not= followers-count 1) "s")))]
           (when-not hide-buttons
             [:button.mlb-reset.profile-bt
-              {:on-click #(nav-actions/show-user-info (:user-id user-data))}
+              {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
               "View profile and posts"])]]
       ; (when-not hide-buttons
       ;   [:div.user-info-buttons.group
@@ -144,8 +144,8 @@
       (leave! s))))
 
 (defn- click [s e]
-  (utils/event-stop e)
-  (nav-actions/show-user-info (-> s :rum/args first :user-data :user-id)))
+  (let [user-id (-> s :rum/args first :user-data :user-id)]
+    (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))))
 
 (rum/defcs user-info-hover <
   rum/static
