@@ -17,8 +17,8 @@
   (let [scrolling-element (if fullscreen (sel1 outer-container-selector) (.-scrollingElement js/document))
         win-height (or (.-clientHeight (.-documentElement js/document))
                        (.-innerHeight js/window))
-        top-offset-limit (.-offsetTop (sel1 offset-element-selector))
-        scroll-top (.-scrollTop scrolling-element)
+        top-offset-limit (if offset-element-selector (.-offsetTop (sel1 offset-element-selector)) 0)
+        scroll-top (if offset-element-selector (.-scrollTop scrolling-element) 0)
         top-position (max 0 @(::offset-top s))
         relative-position (+ top-position
                              top-offset-limit
