@@ -9,7 +9,7 @@ div.add-comment-box-container {
   }
 
   &:not(.collapsed-box), &.collapsed-box:hover {
-    div.add-comment {
+    div.add-comment-box {
       box-shadow: 0 2px 4px 0 var(--add-comment-box-shadow);
     }
   }
