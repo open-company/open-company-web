@@ -47,14 +47,6 @@ div.caught-up-line {
     content: "";
   }
 
-  &:first-child {
-    padding-top: #{(($caught_up_line_height - 32) / 2) - 8}px;
-
-    &:before {
-      top: #{($caught_up_line_height / 2) - 8}px;
-    }
-  }
-
   @include mobile() {
     height: #{$mobile_caught_up_line_height}px;
     padding: #{($mobile_caught_up_line_height - 32) / 2}px 0;
@@ -63,14 +55,6 @@ div.caught-up-line {
     // Line besides caught up
     &:before {
       top: #{$mobile_caught_up_line_height / 2}px;
-    }
-
-    &:first-child {
-      padding-top: #{(($mobile_caught_up_line_height - 32) / 2) - 8}px;
-
-      &:before {
-        top: #{($mobile_caught_up_line_height / 2) - 8}px;
-      }
     }
   }
 
@@ -135,6 +119,24 @@ div.caught-up-line {
 
       div.message {
         color: var(--light-color);
+      }
+    }
+  }
+}
+
+div.virtualized-list-item:first-child {
+  div.caught-up-line {
+    padding-top: #{(($caught_up_line_height - 32) / 2) - 8}px;
+
+    &:before {
+      top: #{($caught_up_line_height / 2) - 8}px;
+    }
+
+    @include mobile() {
+      padding-top: #{(($mobile_caught_up_line_height - 32) / 2) - 8}px;
+
+      &:before {
+        top: #{($mobile_caught_up_line_height / 2) - 8}px;
       }
     }
   }
