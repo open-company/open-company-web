@@ -79,7 +79,7 @@
 (defn upload-user-profile-pictuer-clicked []
   (iu/upload! user-utils/user-avatar-filestack-config success-cb progress-cb error-cb))
 
-(defn change! [s kc v]
+(defn- change! [s kc v]
   (reset! (::name-error s) false)
   (reset! (::email-error s) false)
   (reset! (::password-error s) false)
@@ -87,7 +87,7 @@
   (dis/dispatch! [:input (vec (concat [:edit-user-profile] kc)) v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
-(defn save-clicked [s]
+(defn- save-clicked [s]
   (when (compare-and-set! (::loading s) false true)
     (reset! (::name-error s) false)
     (reset! (::email-error s) false)
