@@ -466,15 +466,9 @@
 (rum/defcs replies-refresh-button < rum/reactive
   (drv/drv :replies-badge)
   (rum/local 0 ::initial-unseen-comments)
-  (rum/local nil ::last-force-list-update)
-  {:will-update (fn [s]
-    (let [props (-> s :rum/args first)
-          initial-unseen-comments (::initial-unseen-comments s)
-          last-force-list-update (::last-force-list-update s)
-          force-list-update (:force-list-update s)]
-      (when-not (= @last-force-list-update force-list-update)
-        (reset! initial-unseen-comments (count-unseen-comments (:items-to-render props)))
-        (reset! (::last-force-list-update s) force-list-update)))
+  {:will-mount (fn [s]
+    (let [props (-> s :rum/args first)]
+        (reset! (::initial-unseen-comments s) (count-unseen-comments (:items-to-render props))))
     s)}
   [s {:keys [items-to-render]}]
   (let [replies-badge (drv/react s :replies-badge)

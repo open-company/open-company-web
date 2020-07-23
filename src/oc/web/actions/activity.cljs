@@ -661,8 +661,7 @@
   (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
-      (sa/section-get utils/default-drafts-board-slug drafts-link)))
-  (dis/dispatch! [:force-list-update]))
+      (sa/section-get utils/default-drafts-board-slug drafts-link))))
 
 (defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success

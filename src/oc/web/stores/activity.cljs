@@ -9,14 +9,6 @@
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]))
 
-(defn- force-list-update-value
-  ([current-value] (force-list-update-value current-value nil))
-  ([current-value container-slug]
-   (if (or (nil? container-slug)
-           (= container-slug (dispatcher/current-board-slug)))
-     (utils/activity-uuid)
-     current-value)))
-
 (defn- item-from-entity [entry]
   (select-keys entry au/preserved-keys))
 
@@ -377,7 +369,6 @@
       (update-in [edit-key] dissoc :publishing)
       (assoc-in [edit-key :board-slug] (:slug fixed-board-data))
       (assoc-in [edit-key :new-section] true)
-      (update-in dispatcher/force-list-update-key force-list-update-value)
       (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :entry-publish/finish
@@ -399,7 +390,6 @@
       (add-remove-item-from-follow org-slug fixed-activity-data false)
       (add-remove-item-from-board org-slug fixed-activity-data)
       (add-remove-item-from-contributions org-slug fixed-activity-data)
-      (update-in dispatcher/force-list-update-key force-list-update-value)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -623,7 +613,6 @@
   (-> db
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
     (update-in posts-key merge (get fixed-board-data :fixed-items))
-    (update-in dispatcher/force-list-update-key force-list-update-value)
     (dissoc :section-editing)
     (dissoc :entry-toggle-save-on-exit))))
 
@@ -642,7 +631,6 @@
     (as-> db ndb
      (assoc-in ndb container-key (dissoc fixed-all-posts-data :fixed-items))
      (assoc-in ndb posts-key merged-items)
-     (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :all-posts))
      (update-in ndb (dispatcher/user-notifications-key org-slug)
       #(notif-util/fix-notifications ndb %)))))
 
@@ -681,8 +669,6 @@
       (as-> db ndb
        (assoc-in ndb container-key new-container-data)
        (assoc-in ndb posts-data-key new-items-map)
-       (assoc-in ndb dispatcher/force-list-update-key (utils/activity-uuid))
-       (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :all-posts))
        (update-in ndb (dispatcher/user-notifications-key org)
         #(notif-util/fix-notifications ndb %))))
     db))
@@ -704,7 +690,6 @@
       (assoc-in ndb container-key (dissoc fixed-bookmarks-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (update-in ndb (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data)))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :bookmarks))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
@@ -748,7 +733,6 @@
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
         (update-in ndb (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (:total-count fixed-bookmarks-data)))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :bookmarks))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
@@ -762,15 +746,12 @@
     (-> db
       (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (dec %)))
       (assoc-in activity-key entry-data)
-      (update-in dispatcher/force-list-update-key force-list-update-value)
       (add-remove-item-from-bookmarks org-slug entry-data))))
 
 (defmethod dispatcher/action :add-bookmark
   [db [_ org-slug activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)]
-    (-> db
-     (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (inc %)))
-     (update-in dispatcher/force-list-update-key force-list-update-value))))
+    (update-in db (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (inc %)))))
 
 (defmethod dispatcher/action :activities-count
   [db [_ org-slug items-count]]
@@ -816,19 +797,13 @@
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))
-        current-posts-uuids (map :uuid (dispatcher/filtered-posts-data db))
-        ;; In case the reads we loaded are for one of the posts in the current stream
-        ;; let's force a refresh of the list key
-        should-force-list-update? ((set current-posts-uuids) item-id)]
+        current-posts-uuids (map :uuid (dispatcher/filtered-posts-data db))]
     (as-> db tdb
      (assoc-in tdb (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                   :reads fixed-read-data
                                                                   :item-id item-id
                                                                   :unreads unseen-users
                                                                   :private-access? private-access?})
-     (if should-force-list-update?
-       (update-in tdb dispatcher/force-list-update-key force-list-update-value)
-       tdb)
      (if (map? activity-data)
        (assoc-in tdb (dispatcher/activity-last-read-at-key org-slug item-id) last-read-at)
        tdb))))
@@ -895,7 +870,6 @@
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
-      (update-in dispatcher/force-list-update-key force-list-update-value)
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
@@ -920,7 +894,6 @@
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
-      (update-in dispatcher/force-list-update-key force-list-update-value)
       (assoc-in activity-key next-activity-data))))
 
 ;; Inbox
@@ -941,7 +914,6 @@
       (assoc-in ndb container-key (dissoc fixed-inbox-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :inbox))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
@@ -974,7 +946,6 @@
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
         (assoc-in ndb (conj org-data-key :following-inbox-count) (:total-count fixed-inbox-data))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :inbox))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
@@ -991,7 +962,6 @@
           update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
       (-> db
         (assoc-in inbox-key without-item)
-        (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
         (update-in (conj org-data-key :following-inbox-count) (if update-count? dec identity))))
     db))
 
@@ -1021,7 +991,6 @@
                              (not= (count (get-in db posts-list-key)) (count (get-in next-db posts-list-key))))]
       (-> next-db
        (update-in (conj org-data-key :following-inbox-count) (if update-count? inc identity))
-       (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
        (assoc-in activity-key fixed-activity-data)))
     db))
 
@@ -1035,7 +1004,6 @@
         org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
       (assoc-in inbox-key without-items)
-      (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (assoc-in (conj org-data-key :following-inbox-count) 0))))
 
 ;; Following
@@ -1066,7 +1034,6 @@
       (update-in ndb following-badge-key #(if (= (keyword current-container-slug) :following) false (boolean badge-following?)))
       (assoc-in ndb posts-key merged-items)
       (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
@@ -1109,7 +1076,6 @@
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
         (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :following))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
@@ -1139,7 +1105,6 @@
       (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false (boolean badge-replies?)))
       (assoc-in ndb posts-data-key merged-items)
       (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
@@ -1182,7 +1147,6 @@
         (assoc-in ndb replies-container-key new-container-data)
         (assoc-in ndb posts-data-key new-posts-map)
         (assoc-in ndb (conj org-data-key :replies-count) (:total-count fixed-replies-data))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :replies))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
@@ -1205,7 +1169,6 @@
       (assoc-in ndb container-key (dissoc fixed-unfollowing-data :fixed-items))
       (assoc-in ndb posts-key merged-items)
       (update-in ndb (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data)))
-      (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :unfollowing))
       (update-in ndb (dispatcher/user-notifications-key org-slug)
        #(notif-util/fix-notifications ndb %)))))
 
@@ -1246,14 +1209,9 @@
         (assoc-in ndb container-key new-container-data)
         (assoc-in ndb posts-data-key new-items-map)
         (update-in ndb (conj org-data-key :unfollowing-count) #(ou/disappearing-count-value % (:total-count fixed-unfollowing-data)))
-        (update-in ndb dispatcher/force-list-update-key #(force-list-update-value % :unfollowing))
         (update-in ndb (dispatcher/user-notifications-key org)
          #(notif-util/fix-notifications ndb %))))
     db))
-
-(defmethod dispatcher/action :force-list-update
-  [db [_]]
-  (assoc-in db dispatcher/force-list-update-key (utils/activity-uuid)))
 
 (defmethod dispatcher/action :following-badge/on
   [db [_ org-slug]]

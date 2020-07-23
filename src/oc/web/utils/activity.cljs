@@ -1041,5 +1041,4 @@
    (update-posts org-data change-data active-users)
    (update-boards org-data change-data active-users)
    (update-containers org-data change-data active-users)
-   (update-contributions org-data change-data active-users follow-publishers-list)
-   (assoc-in dis/force-list-update-key (utils/activity-uuid))))
+   (update-contributions org-data change-data active-users follow-publishers-list)))

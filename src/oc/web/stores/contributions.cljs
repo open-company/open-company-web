@@ -6,14 +6,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defn- force-list-update-value
-  ([current-value] (force-list-update-value current-value nil))
-  ([current-value author-uuid]
-   (if (or (nil? author-uuid)
-           (= author-uuid (dispatcher/current-contributions-id)))
-     (utils/activity-uuid)
-     current-value)))
-
 (defmethod dispatcher/action :contributions-get/finish
   [db [_ org-slug author-uuid sort-type contrib-data]]
   (let [org-data (dispatcher/org-data db org-slug)
@@ -25,7 +17,6 @@
                             (:fixed-items fixed-contrib-data))]
     (-> db
      (update-in posts-key merge (:fixed-items fixed-contrib-data))
-     (update-in dispatcher/force-list-update-key #(force-list-update-value % (:author-uuid contrib-data)))
      (assoc-in contrib-data-key (dissoc fixed-contrib-data :fixed-items)))))
 
 (defmethod dispatcher/action :contributions-more
@@ -53,6 +44,5 @@
                             (dissoc :loading-more))]
       (-> db
         (assoc-in contrib-data-key new-contrib-data)
-        (update-in dispatcher/force-list-update-key #(force-list-update-value % (:author-uuid contrib-data)))
         (assoc-in posts-data-key new-items-map)))
     db))

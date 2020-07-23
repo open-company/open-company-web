@@ -208,7 +208,6 @@
              activities-read
              foc-layout
              is-mobile?
-             ; force-list-update
              container-data
              current-user-data]
       :as derivatives}
@@ -334,7 +333,6 @@
                         (drv/drv :activities-read)
                         (drv/drv :editable-boards)
                         (drv/drv :current-user-data)
-                        (drv/drv :force-list-update)
                         (drv/drv :board-slug)
                         (drv/drv :contributions-id)
                         (drv/drv :add-comment-force-update)
@@ -383,7 +381,6 @@
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
-        force-list-update (drv/react s :force-list-update)
         add-comment-force-update (drv/react s :add-comment-force-update)
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
@@ -393,8 +390,9 @@
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
           (when replies?
-            (replies-refresh-button {:items-to-render items
-                                     :force-list-update force-list-update}))
+            (rum/with-key
+             (replies-refresh-button {:items-to-render items})
+             (str "replies-refresh-button-" (:last-seen-at container-data))))
           (window-scroller
            {}
            (partial virtualized-stream {:org-data org-data

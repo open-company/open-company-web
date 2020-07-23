@@ -192,7 +192,6 @@
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
            (reload-board-data))
-         (dis/dispatch! [:force-list-update])
          ;; Let's change the QP section if it's not active and going to an editable section
          (when (and (not is-container?)
                     (not is-drafts-board?)
