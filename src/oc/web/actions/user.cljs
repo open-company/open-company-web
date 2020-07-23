@@ -416,9 +416,7 @@
      (user-profile-patch user-data user-profile-link
       (fn [success resp]
         (when success
-          (utils/after 100 (fn []
-            (jwt-actions/jwt-refresh (fn []
-              (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data)))))))))))
+          (utils/after 100 #(jwt-actions/jwt-refresh)))
         (when (fn? save-cb)
           (utils/after 280 #(save-cb success resp))))))))
 
