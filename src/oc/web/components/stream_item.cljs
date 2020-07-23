@@ -25,14 +25,10 @@
             [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
-  (if (seq (:abstract activity-data))
-    [:div.stream-item-body.oc-mentions
-      {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
-    [:div.stream-item-body.no-abstract.oc-mentions
-      {:data-itemuuid (:uuid activity-data)
-       :ref :item-body
-       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
+  [:div.stream-item-body.oc-mentions
+    {:data-itemuuid (:uuid activity-data)
+     :ref :item-body
+     :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))

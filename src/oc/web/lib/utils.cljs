@@ -609,10 +609,6 @@
 
 (def default-body-placeholder "Wut's happening")
 
-(def default-abstract "Quick summary (optional)")
-
-(def max-abstract-length 280)
-
 (def default-drafts-board-name du/default-drafts-board-name)
 
 (def default-drafts-board-slug du/default-drafts-board-slug)

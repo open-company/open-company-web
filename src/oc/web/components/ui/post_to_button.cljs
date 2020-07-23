@@ -5,7 +5,6 @@
             [oc.web.lib.utils :as utils]))
 
 (def missing-title-tooltip "Please add a title before sharing")
-(def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 (rum/defcs post-to-button < rum/reactive
   [s {:keys [on-submit disabled title post-tt-kw force-show-tooltip]}]
@@ -22,8 +21,5 @@
         [:div.post-bt-tooltip
           [:div.tooltip-arrow]
           [:div.tooltip-inner
-            (cond
-              (= post-tt-kw :title)
-              missing-title-tooltip
-              (= post-tt-kw :abstract)
-              abstract-max-length-exceeded-tooltip)]])]])
+            (when (= post-tt-kw :title)
+              missing-title-tooltip)]])]])

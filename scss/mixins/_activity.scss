@@ -179,48 +179,6 @@ $header_top_margin: 24;
   }
 }
 
-@mixin activity-abstract($font_size: 14px, $line_height: 18px){
-  @include OC_Body_Bold();
-  font-size: $font_size;
-  color: var(--color);
-  line-height: $line_height;
-  white-space: normal;
-  overflow-wrap: break-word;
-
-  i {
-    @include OC_Body_Bold_Italic();
-  }
-
-  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener, a i, a strong, a b {
-    text-decoration: none;
-    color: $wut_purple;
-    background-color: transparent !important;
-  }
-
-  &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-    @include OC_Body_Bold();
-    font-size: $font_size;
-    line-height: $line_height;
-    color: var(--light-color);
-    opacity: 1;
-    font-style: normal;
-    text-transform: none;
-  }
-
-  p, ul > li, i {
-    min-height: $line_height;
-  }
-
-  i:empty {
-    display: grid;
-    min-width: 1px;
-  }
-
-  p:only-child {
-    margin-bottom: 0;
-  }
-}
-
 @mixin activity-headline(){
   @include OC_Title();
   font-size: 22px;

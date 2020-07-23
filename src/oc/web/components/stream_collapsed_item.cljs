@@ -19,13 +19,9 @@
   (str "<div class=\"hide-tooltip\"></div>" html-string))
 
 (defn- stream-item-summary [activity-data]
-  (if (seq (:abstract activity-data))
-    [:div.stream-item-body.oc-mentions
-      {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (prefixed-html (:abstract activity-data))}}]
-    [:div.stream-item-body.no-abstract.oc-mentions
-      {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (prefixed-html (:body activity-data))}}]))
+  [:div.stream-item-body.oc-mentions
+    {:data-itemuuid (:uuid activity-data)
+     :dangerouslySetInnerHTML {:__html (prefixed-html (:body activity-data))}}])
 
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
