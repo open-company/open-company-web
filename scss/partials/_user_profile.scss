@@ -35,13 +35,13 @@ div.user-profile-container {
         justify-content: flex-start;
 
         div.user-profile-header-info-name {
-          // width: 100%;
+          width: 100%;
           flex: 0 0 22px;
           height: 22px;
           display: flex;
           flex-flow: row nowrap;
-          align-items: flex-start;
-          justify-content: space-between;
+          align-items: center;
+          justify-content: flex-start;
 
           span.name {
             @include OC_Body_Bold();

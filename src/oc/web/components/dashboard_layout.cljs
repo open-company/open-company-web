@@ -249,7 +249,8 @@
                     current-contributions-id
                     [:div.board-name-with-icon.contributions
                       [:div.board-name-with-icon-internal
-                        (str (:total-count container-data) " posts")
+                        ; (str (:total-count container-data) " posts")
+                        (str "Lastest from " (:short-name contributions-user-data))
                         ; (if is-own-contributions
                         ;   "You"
                         ;   (lib-user/name-for contributions-user-data))
