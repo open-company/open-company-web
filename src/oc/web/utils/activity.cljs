@@ -363,17 +363,18 @@
    (utils/as-of-now)))
 
 (defn- caught-up-map
-  ([] (caught-up-map nil false default-caught-up-message))
-  ([n] (caught-up-map n false default-caught-up-message))
-  ([n gray-scale?] (caught-up-map n gray-scale? default-caught-up-message))
-  ([n gray-scale? message]
-   (let [t (next-activity-timestamp n)]
+  ([] (caught-up-map [] default-caught-up-message))
+  ([prev-items] (caught-up-map prev-items default-caught-up-message))
+  ; ([prev-items] (caught-up-map n gray-scale? default-caught-up-message))
+  ([prev-items message] ; ([n gray-scale? message]
+   (let [t (next-activity-timestamp (last prev-items))]
      {:resource-type :caught-up
       :last-activity-at t
       :message message
-      :gray-style gray-scale?})))
+      :gray-style (or (not (seq prev-items))
+                      (every? :publisher? prev-items))})))
 
-(defn- insert-caught-up [items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
+(defn- insert-caught-up [items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
   (let [index (loop [last-valid-idx 0
                      current-idx 0]
                 (let [item (get items-list current-idx)]
@@ -384,10 +385,6 @@
                    ;; Found the first truthy item, return last index
                    (check-fn item)
                    last-valid-idx
-                   ;; Check if element needs to be ignored
-                   (ignore-fn item)
-                   (recur last-valid-idx
-                          (inc current-idx))
                    :else
                    (recur (inc current-idx)
                           (inc current-idx)))))
@@ -397,13 +394,13 @@
            (= index (count items-list)))
       (vec items-list)
       (= index (count items-list))
-      (vec (concat items-list [(caught-up-map (last items-list) (zero? index))]))
+      (vec (concat items-list [(caught-up-map items-list)]))
       (and hide-top-line
            (zero? index))
       (vec items-list)
       :else
       (vec (remove nil? (concat before
-                                [(caught-up-map (last before) (zero? index))]
+                                [(caught-up-map before)]
                                 after))))))
 
 (defn- insert-open-close-item [items-list check-fn]
@@ -818,7 +815,7 @@
                                                (when app-state-entry
                                                  (let [parsed-entry (-> app-state-entry
                                                                      (merge item)
-                                                                     (parse-entry  entry-board-data change-data active-users (:last-seen-at container-data)))]
+                                                                     (parse-entry entry-board-data change-data active-users (:last-seen-at container-data)))]
                                                    (assoc-in ret [:fixed-items (:uuid item)] parsed-entry))))))
                                    with-fixed-activities*
                                    (:posts-list container-data))
@@ -848,18 +845,18 @@
                             (grouped-posts full-items-list (:fixed-items with-fixed-activities))
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
-            ignore-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
-                             #(or (not= (:resource-type %) :entry)
-                                  (:publisher? %))
-                             #(not= (:resource-type %) :entry))
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
+                            ;; Find first item that is an entry and is unseen or it's published by
+                            ;; the user but after the last seen-at of the container
                             #(and (= (:resource-type %) :entry)
-                                  (not (:unseen %)))
+                                  (not (:unseen %))
+                                  (or (not (:publisher? %))
+                                      (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
                             #(and (= (:resource-type %) :entry)
                                   (not (:unseen-comments %))))
             opts {:has-next next-link}
             caught-up-item (when (and keep-caught-up?
-                                          (seq (:items-to-render container-data)))
+                                      (seq (:items-to-render container-data)))
                              (some #(when (= (:resource-type %) :caught-up) %) (:items-to-render container-data)))
             caught-up-index (when caught-up-item
                               (utils/index-of (vec (:items-to-render container-data)) #(= (:resource-type %) :caught-up)))
@@ -868,7 +865,7 @@
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
                                (vec (remove nil? (concat before [caught-up-item] after))))
                              (#{:following :replies} (:container-slug container-data))
-                             (insert-caught-up grouped-items check-item-fn ignore-item-fn opts)
+                             (insert-caught-up grouped-items check-item-fn opts)
                              :else
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
