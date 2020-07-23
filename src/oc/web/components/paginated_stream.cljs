@@ -121,15 +121,17 @@
   (let [{:keys [registerChild measure] :as clj-props} (js->clj props :keywordize-keys true)
         item (get items rowIndex)
         read-data (when (= (:resource-type item) :entry)
-                    (get activities-read (:uuid item)))]
+                    (get activities-read (:uuid item)))
+        replies? (= (:container-slug container-data) :replies)]
     [:div.virtualized-list-item
-      {:key (str (name (:resource-type item)) "-" key "-" (or (:uuid item)
-                                                              (:sort-value item)
-                                                              (:last-activity-at item)
-                                                              (:published-at item)
-                                                              (:created-at item)
-                                                              (:updated-at item)
-                                                              (count (keys item))))
+      {:key (str (name (:resource-type item)) "-" key "-" (if (= (:resource-type item) :entry)
+                                                            (cond replies?
+                                                                  (str (:uuid item) "-" (:last-activity-at item) "-" (count (:replies-data item)))
+                                                                  :else
+                                                                  (clojure.string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
+                                                            (str (:uuid item)
+                                                                 (:sort-value item)
+                                                                 (:last-activity-at item))))
        :ref registerChild
        :style style}
       (cond

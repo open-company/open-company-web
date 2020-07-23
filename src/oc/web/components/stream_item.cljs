@@ -276,6 +276,7 @@
         [:div.activity-share-container]]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
+          {:class (when (:body-thumbnail activity-data) "has-preview")}
           (when (:body-thumbnail activity-data)
             [:div.body-thumbnail-wrapper
               {:class (:type (:body-thumbnail activity-data))}

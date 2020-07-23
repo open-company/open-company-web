@@ -90,13 +90,13 @@ div.virtualized-list-row:not(.collapsed-item) {
 
 div.stream-item {
   width: #{$board_container_width}px;
-  height: #{$foc_height}px;
+  max-height: #{$foc_height}px;
   margin: 0;
   border-top: 1px solid transparent;
   border-right: 1px solid var(--foc-divider-line-color);
   border-bottom: 1px solid var(--foc-divider-line-color);
   border-left: 1px solid var(--foc-divider-line-color);
-  padding: 24px 32px;
+  padding: 24px 32px 18px;
   background-color: var(--foc-background-color);
   overflow: visible;
   border-radius: 0;
@@ -111,7 +111,7 @@ div.stream-item {
     border-left: none;
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px;
-    height: #{$mobile_foc_height}px;
+    max-height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -373,12 +373,15 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      height: #{$thumbnail_height}px;
       position: relative;
       cursor: pointer;
 
-      @include mobile() {
-        height: 71px;
+      &.has-preview {
+        height: #{$thumbnail_height}px;
+
+        @include mobile() {
+          height: 71px;
+        }
       }
 
       div.body-thumbnail-wrapper {
@@ -492,6 +495,7 @@ div.stream-item {
     }
 
     div.stream-item-footer {
+      margin-top: 10px;
       min-height: 26px;
       position: relative;
 

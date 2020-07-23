@@ -55,28 +55,33 @@
       (> d last-monday)
       {:label "Recent"
        :resource-type :separator
+       :last-activity-at last-monday
        :date last-monday}
       (> d two-weeks-ago)
       {:label "Last week"
        :resource-type :separator
-       :date two-weeks-ago}
+       :date two-weeks-ago
+       :last-activity-at two-weeks-ago}
       (> d first-month)
       {:label "2 weeks ago"
        :resource-type :separator
-       :date first-month}
+       :date first-month
+       :last-activity-at first-month}
       (and (= (.getMonth now) (.getMonth d))
            (= (.getFullYear now) (.getFullYear d)))
       {:label "This month"
        :resource-type :separator
-       :date (post-month-date-from-date d)}
+       :date (post-month-date-from-date d)
+       :last-activity-at (post-month-date-from-date d)}
       (= (.getFullYear now) (.getFullYear d))
       {:label month-string
        :resource-type :separator
-       :date (post-month-date-from-date d)}
+       :last-activity-at (post-month-date-from-date d)}
       :else
       {:label (str month-string ", " (.getFullYear d))
        :resource-type :separator
-       :date (post-month-date-from-date d)})))
+       :date (post-month-date-from-date d)
+       :last-activity-at (post-month-date-from-date d)})))
 
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug
