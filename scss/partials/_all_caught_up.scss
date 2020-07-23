@@ -126,6 +126,7 @@ div.caught-up-line {
 
 div.virtualized-list-item:first-child {
   div.caught-up-line {
+    height: #{$caught_up_line_height - 8}px;
     padding-top: #{(($caught_up_line_height - 32) / 2) - 8}px;
 
     &:before {
@@ -133,6 +134,7 @@ div.virtualized-list-item:first-child {
     }
 
     @include mobile() {
+      height: #{$mobile_caught_up_line_height - 8}px;
       padding-top: #{(($mobile_caught_up_line_height - 32) / 2) - 8}px;
 
       &:before {
