@@ -200,13 +200,13 @@
       (get-comments entry-data))))
 
 (defn ws-comment-add [interaction-data]
-  (let [org-slug   (dis/current-org-slug)
+  (let [current-org-slug (dis/current-org-slug)
         container-id (:container-id interaction-data)
         entry-uuid (:resource-uuid interaction-data)
-        entry-data (dis/activity-data org-slug entry-uuid)
+        entry-data (dis/activity-data current-org-slug entry-uuid)
         board-data (activity-utils/board-by-uuid container-id)
         new-comment-uuid (:uuid (:interaction interaction-data))
-        comments-data (get-in @dis/app-state (dis/activity-comments-key org-slug entry-uuid))
+        comments-data (get-in @dis/app-state (dis/activity-comments-key current-org-slug entry-uuid))
         comment-exists? (seq (filterv #(= (:uuid %) new-comment-uuid) comments-data))
         current-board-slug (dis/current-board-slug)]
     (cond
@@ -220,11 +220,11 @@
 
       (not comment-exists?)
       (do
-        (dis/dispatch! [:ws-interaction/comment-add org-slug entry-data interaction-data])
+        (dis/dispatch! [:ws-interaction/comment-add current-org-slug entry-data interaction-data])
         ;; If we are not on replies we can refresh the container to load the latest data
         (if (not= (keyword current-board-slug) :replies)
           (activity-actions/replies-get (dis/org-data))
-          (dis/dispatch! [:update-replies-comments org-slug current-board-slug]))))
+          (dis/dispatch! [:update-replies-comments current-org-slug current-board-slug]))))
     (when entry-data
       (get-comments entry-data))))
 
