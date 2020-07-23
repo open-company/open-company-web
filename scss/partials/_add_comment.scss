@@ -53,7 +53,7 @@ div.add-comment-box-container {
           overflow: hidden;
           height: 20px;
           margin-right: auto;
-          min-width: 120px;
+          min-width: 128px;
           min-height: 20px;
 
           @include mobile() {
@@ -223,6 +223,7 @@ div.add-comment-box-container {
           flex: 0 0 auto;
           margin-right: auto;
           order: 1;
+          margin-left: -6px;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");

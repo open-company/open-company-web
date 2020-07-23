@@ -159,11 +159,14 @@
         component-focus-id (focus-value s)]
     (= add-comment-focus component-focus-id)))
 
+(defn- focus! [s]
+  (when-let [field (add-comment-field s)]
+    (.focus field)
+    (utils/after 0 #(utils/to-end-of-content-editable field))))
+
 (defn- maybe-focus [s]
   (when (should-focus? s)
-    (when-let [field (add-comment-field s)]
-      (.focus field)
-      (utils/after 0 #(utils/to-end-of-content-editable field)))))
+    (focus! s)))
 
 (defn- close-reply-clicked [s]
   (let [{:keys [activity-data parent-comment-uuid add-comment-focus-prefix
@@ -355,23 +358,28 @@
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
-        add-comment-class (str "add-comment-" @(::add-comment-id s))]
+        add-comment-class (str "add-comment-" @(::add-comment-id s))
+        multiple-lines @(::multiple-lines s)
+        collapsed? (and @(::collapsed s)
+                        (not multiple-lines))]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
                                 (str "add-comment-box-" add-comment-focus-prefix) true
-                                :collapsed-box (and @(::collapsed s)
-                                                    (not @(::multiple-lines s)))
-                                :inline-reply (not @(::multiple-lines s))})
-       :on-click (when @(::collapsed s)
-                   #(.focus (rum/ref-node s "editor-node")))}
+                                :collapsed-box collapsed?
+                                :inline-reply (not multiple-lines)})
+       :on-click (when (or collapsed?
+                           (not multiple-lines))
+                   #(when-not (= (rum/ref-node s "editor-node") (.-activeElement js/document))
+                      (focus! s)))}
       [:div.add-comment-box
         [:div.add-comment-internal
-          {:ref :add-comment-internal}
+          {:ref :add-comment-internal
+           :on-click #(when ())}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden (and collapse?
-                                                                            (not @(::collapsed s)))
+                                                                            (not collapsed?))
                                      :medium-editor-placeholder-relative true
                                      :medium-editor-element true
                                      utils/hide-class true})
