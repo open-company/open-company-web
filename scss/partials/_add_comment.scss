@@ -141,6 +141,7 @@ div.add-comment-box-container {
         justify-content: flex-end;
         align-items: center;
         margin-top: 8px;
+        position: relative;
 
         div.upload-progress {
           margin-right: 16px;
@@ -160,19 +161,12 @@ div.add-comment-box-container {
           }
         }
 
-        div.giphy-picker {
-          position: absolute;
-          top: unset;
-          bottom: 0;
-          right: 0;
-        }
-
         div.emoji-picker {
           flex: 0 0 auto;
           order: 3;
           width: 24px;
           height: 24px;
-          position: relative;
+          position: unset;
 
           button.emoji-button {
             width: 24px;
@@ -194,6 +188,18 @@ div.add-comment-box-container {
               opacity: 1;
             }
           }
+
+          div.picker-container.bottom {
+            top: 32px;
+            left: unset;
+            right: 0;
+          }
+        }
+
+        div.giphy-picker {
+          position: absolute;
+          right: 0;
+          top: 32px !important;
         }
 
         div.add-comment-footer-media-picker {
