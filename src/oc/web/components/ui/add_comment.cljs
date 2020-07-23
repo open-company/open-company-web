@@ -415,9 +415,23 @@
             (emoji-picker {:add-emoji-cb #(did-change s)
                            :width 24
                            :height 24
-                           :position "top"
+                           :position "bottom"
                            :default-field-selector (str "div." add-comment-class)
                            :container-selector (str "div." add-comment-class)})
+            (when @(::me-media-utils/showing-gif-selector s)
+              (giphy-picker {:fullscreen false
+                             :pick-emoji-cb (fn [gif-obj]
+                                             (reset! (::me-media-utils/showing-gif-selector s) false)
+                                             (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) gif-obj))}))
+            (when @(::me-media-utils/showing-media-video-modal s)
+              [:div.video-container
+                {:ref :video-container}
+                (media-video-modal {:fullscreen false
+                                    :dismiss-cb #(do
+                                                  (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
+                                                  (reset! (::me-media-utils/showing-media-video-modal s) false))
+                                    :offset-element-selector [(keyword (str "div." container-class " div.add-comment-box"))]
+                                    :outer-container-selector [(keyword (str "div." container-class))]})])
             [:div.add-comment-footer-media-picker.group]
             [:button.mlb-reset.send-btn
               {:on-click #(send-clicked % s)
@@ -425,20 +439,4 @@
                :class (when uploading? "separator-line")}
               (if edit-comment-data
                 "Save"
-                "Reply")]]]
-        (when @(::me-media-utils/showing-media-video-modal s)
-          [:div.video-container
-            {:ref :video-container}
-            (media-video-modal {:fullscreen false
-                                :dismiss-cb #(do
-                                              (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
-                                              (reset! (::me-media-utils/showing-media-video-modal s) false))
-                                :offset-element-selector [(keyword (str "div." container-class))]
-                                :outer-container-selector [(keyword (str "div." container-class))]})])
-        (when @(::me-media-utils/showing-gif-selector s)
-          (giphy-picker {:fullscreen false
-                         :pick-emoji-cb (fn [gif-obj]
-                                         (reset! (::me-media-utils/showing-gif-selector s) false)
-                                         (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) gif-obj))
-                         :offset-element-selector [(keyword (str "div." container-class))]
-                         :outer-container-selector [(keyword (str "div." container-class))]}))]]))
+                "Reply")]]]]]))
