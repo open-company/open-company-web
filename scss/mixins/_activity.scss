@@ -1231,7 +1231,7 @@ $header_top_margin: 24;
   line-height: #{$line_height}px;
   font-size: #{$font_size}px;
 
-  height: #{$line_height * $preview_lines}px;
+  max-height: #{$line_height * $preview_lines}px;
 
   & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2, & > img, & > iframe {
     margin-top: 0!important;
