@@ -82,7 +82,7 @@
          (:location user-data))
        (when (seq (:timezone user-data))
          (if (seq twt)
-           (str " (" (:timezone user-data) ")")
+           (str twt " (" (:timezone user-data) ")")
            (str (:timezone user-data))))))))
 
 (defun active?
