@@ -89,8 +89,6 @@
                            (not is-drafts-board)))
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
         is-contributions (seq current-contributions-id)
-        is-profile (and is-contributions
-                        (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
         ; show-boards (or create-link (pos? (count boards)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
@@ -103,7 +101,8 @@
                          drafts-link)
         show-replies (and user-is-part-of-the-team?
                           (utils/link-for (:links org-data) "replies"))
-        show-profile user-is-part-of-the-team?
+        show-profile (or user-is-part-of-the-team?
+                         is-contributions)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -184,7 +183,7 @@
                                (not show-replies))
                       "top-border")}
             [:a.nav-link.profile.hover-item.group
-              {:class (utils/class-set {:item-selected is-profile})
+              {:class (utils/class-set {:item-selected is-contributions})
                :href (oc-urls/contributions (:user-id current-user-data))
                :on-click (fn [e]
                            (utils/event-stop e)
