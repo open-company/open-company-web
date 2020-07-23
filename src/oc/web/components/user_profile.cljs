@@ -25,9 +25,9 @@
           (when (seq (:title user-data))
             [:div.user-profile-header-info-title
               (:title user-data)])
-          (when (seq (:description user-data))
-            [:div.user-profile-header-info-description
-              (:description user-data)])
+          (when (seq (:blurb user-data))
+            [:div.user-profile-header-info-blurb
+              (:blurb user-data)])
           (let [lts (user-utils/location-timezone-string user-data true)]
             (when (seq lts)
               [:div.user-profile-header-info-locale

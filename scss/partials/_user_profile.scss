@@ -76,7 +76,7 @@ div.user-profile-container {
           margin-top: 4px;
         }
 
-        div.user-profile-header-info-description {
+        div.user-profile-header-info-blurb {
           flex: 0 0 auto;
           @include OC_Body_Book();
           color: var(--color);
