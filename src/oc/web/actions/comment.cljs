@@ -9,6 +9,7 @@
             [oc.web.utils.comment :as comment-utils]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.stores.comment :as comment-store]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -181,38 +182,51 @@
           (activity-actions/replies-get (dis/org-data)))))
     updated-comment-map))
 
-(defn ws-comment-update
-  [interaction-data]
-  (let [comments-key (dis/activity-comments-key
-                      (dis/current-org-slug)
-                      (:resource-uuid interaction-data))]
-    (dis/dispatch! [:ws-interaction/comment-update
-                    comments-key
-                    interaction-data])))
+(defn ws-comment-update [interaction-data]
+  (let [current-org-slug (dis/current-org-slug)
+        entry-uuid (:resource-uuid interaction-data)
+        comments-key (dis/activity-comments-key current-org-slug entry-uuid)
+        entry-data (dis/activity-data current-org-slug entry-uuid)]
+    (dis/dispatch! [:ws-interaction/comment-update comments-key interaction-data])
+    (when entry-data
+      (get-comments entry-data))))
 
-(defn ws-comment-delete [comment-data]
-  (dis/dispatch! [:ws-interaction/comment-delete (dis/current-org-slug) comment-data]))
+(defn ws-comment-delete [interaction-data]
+  (let [current-org-slug (dis/current-org-slug)
+        entry-uuid (:resource-uuid interaction-data)
+        entry-data (dis/activity-data current-org-slug entry-uuid)]
+    (dis/dispatch! [:ws-interaction/comment-delete current-org-slug interaction-data])
+    (when entry-data
+      (get-comments entry-data))))
 
 (defn ws-comment-add [interaction-data]
   (let [org-slug   (dis/current-org-slug)
-        activity-uuid (:resource-uuid interaction-data)
-        entry-data (dis/activity-data org-slug activity-uuid)
+        container-id (:container-id interaction-data)
+        entry-uuid (:resource-uuid interaction-data)
+        entry-data (dis/activity-data org-slug entry-uuid)
+        board-data (activity-utils/board-by-uuid container-id)
         new-comment-uuid (:uuid (:interaction interaction-data))
-        comments-data (get-in @dis/app-state (dis/activity-comments-key org-slug activity-uuid))
+        comments-data (get-in @dis/app-state (dis/activity-comments-key org-slug entry-uuid))
         comment-exists? (seq (filterv #(= (:uuid %) new-comment-uuid) comments-data))
         current-board-slug (dis/current-board-slug)]
-    (when (and entry-data
-               (not comment-exists?))
-      ;; Refresh the entry data to get the new links to interact with
-      (activity-actions/get-entry entry-data)
-      (dis/dispatch! [:ws-interaction/comment-add
-                      org-slug
-                      entry-data
-                      interaction-data])
-      ;; If we are not on replies we can refresh the container to load the latest data
-      (if (not= (keyword current-board-slug) :replies)
-        (activity-actions/replies-get (dis/org-data))
-        (dis/dispatch! [:update-replies-comments org-slug current-board-slug])))))
+    (cond
+      ;; In case the entry is not loaded let's load it
+      (not entry-data)
+      (cmail-actions/get-entry-with-uuid (or (:board-slug board-data) container-id) entry-uuid
+       (fn [success status]
+         ;; And if the entry was loaded w/o problems let's load the comments
+         (when success
+           (get-comments (dis/activity-data current-org-slug entry-uuid)))))
+
+      (not comment-exists?)
+      (do
+        (dis/dispatch! [:ws-interaction/comment-add org-slug entry-data interaction-data])
+        ;; If we are not on replies we can refresh the container to load the latest data
+        (if (not= (keyword current-board-slug) :replies)
+          (activity-actions/replies-get (dis/org-data))
+          (dis/dispatch! [:update-replies-comments org-slug current-board-slug]))))
+    (when entry-data
+      (get-comments entry-data))))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add

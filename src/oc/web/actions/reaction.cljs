@@ -5,8 +5,9 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn react-from-picker [activity-data emoji]
@@ -40,41 +41,46 @@
         ;; Refresh the full entry to make sure it's up to date
         (activity-actions/get-entry activity-data)))))
 
-(defn is-activity-reaction? [org-slug board-slug interaction-data]
-  (let [activity-uuid (dis/current-activity-id)
-        item-uuid (:resource-uuid interaction-data)
-        reaction-data (:interaction interaction-data)
-        comments-key (dis/activity-comments-key org-slug activity-uuid)
-        comments-data (get-in @dis/app-state comments-key)
-        comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
-    (nil? comment-idx)))
+(defn reaction-resource [org-slug item-uuid]
+  (let [entry-data (dis/activity-data org-slug item-uuid)
+        comment-data (dis/comment-data org-slug item-uuid)]
+    (or entry-data comment-data)))
 
-(defn refresh-if-needed [org-slug board-slug interaction-data]
-  (let [; Get the current router data
-        activity-uuid (:resource-uuid interaction-data)
+(defn refresh-entry-if-needed [org-slug board-slug resource-uuid entry-data]
+  ;; Refresh entry if necessary
+  (if entry-data
+    (activity-actions/get-entry entry-data)
+    (cmail-actions/get-entry-with-uuid board-slug resource-uuid)))
+
+(defn refresh-comments-if-needed [org-slug board-slug comment-data]
+  (let [entry-uuid (:resource-uuid comment-data)
         ; Entry data
-        entry-data (dis/activity-data org-slug activity-uuid)
-        reaction-data (:interaction interaction-data)
-        is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))]
+        entry-data (dis/activity-data org-slug entry-uuid)]
     ;; Refresh entry if necessary
-    (when (and entry-data
-             (seq (:reactions entry-data))
-             is-current-user)
-      (activity-actions/get-entry entry-data))))
+    (if entry-data
+      (activity-utils/get-comments entry-data)
+      (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+       (fn [success status]
+         (when success
+           (activity-utils/get-comments (dis/activity-data org-slug entry-uuid))))))))
+
+(defn refresh-resource [org-slug board-slug item-uuid]
+  (let [resource-data (reaction-resource org-slug item-uuid)]
+    (if (= (:resource-type resource-data) :comment)
+      (refresh-comments-if-needed org-slug board-slug resource-data)
+      (refresh-entry-if-needed org-slug board-slug item-uuid resource-data))))
 
 (defn ws-interaction-reaction-add [interaction-data]
   (let [org-slug (dis/current-org-slug)
-        board-slug (dis/current-board-slug)]
-    (when (is-activity-reaction? org-slug board-slug interaction-data)
-      (refresh-if-needed org-slug board-slug interaction-data)))
-  (dis/dispatch! [:ws-interaction/reaction-add interaction-data]))
+        board-uuid (:container-id interaction-data)]
+    (dis/dispatch! [:ws-interaction/reaction-add interaction-data])
+    (refresh-resource org-slug board-uuid (:resource-uuid interaction-data))))
 
 (defn ws-interaction-reaction-delete [interaction-data]
   (let [org-slug (dis/current-org-slug)
-        board-slug (dis/current-board-slug)]
-    (when (is-activity-reaction? org-slug board-slug interaction-data)
-      (refresh-if-needed org-slug board-slug interaction-data)))
-  (dis/dispatch! [:ws-interaction/reaction-delete interaction-data]))
+        board-uuid (:container-id interaction-data)]
+    (dis/dispatch! [:ws-interaction/reaction-delete interaction-data])
+    (refresh-resource org-slug board-uuid (:resource-uuid interaction-data))))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-reaction/add

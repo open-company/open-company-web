@@ -1014,6 +1014,16 @@
   ([org-slug data]
     (get-in data (comments-key org-slug))))
 
+(defn ^:export comment-data
+  ([comment-uuid]
+    (comment-data (current-org-slug) comment-uuid @app-state))
+  ([org-slug comment-uuid]
+    (comment-data org-slug comment-uuid @app-state))
+  ([org-slug comment-uuid data]
+    (let [all-entry-comments (get-in data (comments-key org-slug))
+          all-comments (flatten (map :sorted-comments (vals all-entry-comments)))]
+      (some #(when (= (:uuid %) comment-uuid) %) all-comments))))
+
 (defn ^:export activity-comments-data
   ([]
     (activity-comments-data
