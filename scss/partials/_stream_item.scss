@@ -5,7 +5,7 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 
 $thumbnail_width: 128;
-$thumbnail_height: 103;
+$thumbnail_height: 98;
 
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
@@ -96,7 +96,7 @@ div.stream-item {
   border-right: 1px solid var(--foc-divider-line-color);
   border-bottom: 1px solid var(--foc-divider-line-color);
   border-left: 1px solid var(--foc-divider-line-color);
-  padding: 24px 32px;
+  padding: 24px 32px 18px;
   background-color: var(--foc-background-color);
   overflow: visible;
   border-radius: 0;
@@ -483,7 +483,8 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body-preview(16, 20, var(--color), 3);
+        margin-top: 4px;
+        @include activity-body-preview(16, 22, var(--color), 3);
 
         @include mobile() {
           @include activity-body-preview(16, 20, var(--color), 2);
@@ -492,6 +493,7 @@ div.stream-item {
     }
 
     div.stream-item-footer {
+      margin-top: 10px;
       min-height: 26px;
       position: relative;
 
