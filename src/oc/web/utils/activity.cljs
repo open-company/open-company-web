@@ -363,18 +363,18 @@
    (utils/as-of-now)))
 
 (defn- caught-up-map
-  ([] (caught-up-map [] default-caught-up-message))
-  ([prev-items] (caught-up-map prev-items default-caught-up-message))
-  ; ([prev-items] (caught-up-map n gray-scale? default-caught-up-message))
-  ([prev-items message] ; ([n gray-scale? message]
+  ([container-slug prev-items] (caught-up-map container-slug prev-items default-caught-up-message))
+  ([container-slug prev-items message] ; ([n gray-scale? message]
    (let [t (next-activity-timestamp (last prev-items))]
      {:resource-type :caught-up
       :last-activity-at t
       :message message
-      :gray-style (or (not (seq prev-items))
-                      (every? :publisher? prev-items))})))
+      :gray-style (if (= container-slug :following)
+                    (or (not (seq prev-items))
+                        (every? :publisher? prev-items))
+                    (not (seq prev-items)))})))
 
-(defn- insert-caught-up [items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
+(defn- insert-caught-up [container-slug items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
   (let [index (loop [last-valid-idx 0
                      current-idx 0]
                 (let [item (get items-list current-idx)]
@@ -394,13 +394,13 @@
            (= index (count items-list)))
       (vec items-list)
       (= index (count items-list))
-      (vec (concat items-list [(caught-up-map items-list)]))
+      (vec (concat items-list [(caught-up-map container-slug items-list)]))
       (and hide-top-line
            (zero? index))
       (vec items-list)
       :else
       (vec (remove nil? (concat before
-                                [(caught-up-map before)]
+                                [(caught-up-map container-slug before)]
                                 after))))))
 
 (defn- insert-open-close-item [items-list check-fn]
@@ -865,7 +865,7 @@
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
                                (vec (remove nil? (concat before [caught-up-item] after))))
                              (#{:following :replies} (:container-slug container-data))
-                             (insert-caught-up grouped-items check-item-fn opts)
+                             (insert-caught-up (:container-slug container-data) grouped-items check-item-fn opts)
                              :else
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
