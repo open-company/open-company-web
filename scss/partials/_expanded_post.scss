@@ -401,25 +401,6 @@ div.expanded-post {
         }
       }
 
-      div.expanded-post-abstract {
-        @include activity-abstract(17px, 22px);
-        margin: 16px 0 24px;
-        @include OC_Body_Bold();
-        white-space: normal;
-        overflow-wrap: break-word;
-
-        // Abstract is bold only in expanded post view
-        // we need to make sure italic doesn't override
-        // the font weight only here
-        i, i strong, i b, b i, strong i {
-          @include OC_Body_Bold_Italic();
-        }
-
-        @include mobile() {
-          margin: 8px 0 16px;
-        }
-      }
-
       div.expanded-post-body {
         @include activity-body(17, 22, var(--color), 16);
 

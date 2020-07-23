@@ -248,10 +248,6 @@
             [:div.expanded-post-headline
               {:class utils/hide-class}
               (:headline activity-data)]
-            (when (seq (:abstract activity-data))
-              [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
-                {:class utils/hide-class
-                 :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
             [:div.expanded-post-body.oc-mentions.oc-mentions-hover
               {:ref "post-body"
                :on-click (when @(::collapse-post s)

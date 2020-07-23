@@ -78,10 +78,6 @@ div.cmail-outer {
             display: none;
           }
 
-          div.cmail-content-abstract-container-outer {
-            display: none;
-          }
-
           div.rich-body-editor-outer-container {
             display: none;
           }
@@ -331,33 +327,6 @@ div.cmail-outer {
         }
       }
 
-      div.cmail-content-abstract-bt-container {
-        border-bottom: 1px solid var(--divider-line);
-        padding: 6px 0 12px;
-        margin-bottom: 16px;
-        display: block;
-
-        button.show-abstract-bt {
-          float: left;
-          color: $wut_purple;
-          padding: 0;
-          margin: 0;
-          height: 24px;
-          text-align: left;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 24px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        .tooltip {
-          width: 172px;
-        }
-      }
-
       div.cmail-content-headline-container {
         display: block;
         padding: 0 0 16px;
@@ -403,38 +372,6 @@ div.cmail-outer {
 
       div.cmail-content-collapsed-placeholder {
         display: none;
-      }
-
-      div.cmail-content-abstract-container-outer {
-        background-color: var(--opac-background-color-1);
-        padding: 16px 24px;
-        position: relative;
-        margin-top: 24px;
-        margin-bottom: 16px;
-        border-radius: 4px;
-        display: block;
-
-        @include mobile() {
-          padding: 8px 16px;
-          margin-top: 40px;
-          margin-bottom: 32px;
-        }
-
-        button.remove-abstract-bt {
-          width: 24px;
-          height: 24px;
-          position: absolute;
-          top: 4px;
-          right: 4px;
-          background-image: cdnUrl("/img/ML/black_close.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-
-        div.cmail-content-abstract-container {
-          @include activity-abstract(17px, 22px);
-        }
       }
 
       div.rich-body-editor-outer-container {
