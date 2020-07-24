@@ -124,6 +124,8 @@
   ([created-at container-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare created-at container-seen-at))))
 
+(def default-expanded-comments-count 3)
+
 (defun collapse-comments
   "Add a collapsed flag to every comment that is a reply and is not unseen.
    Also add unseen? flag to every unseen one. Add a count of the collapsed
@@ -132,33 +134,23 @@
    ([_comments :guard empty?
      _container-seen-at]
     [])
-  ;; Add :unseen info to each comment before entering the recursion
-  ([comments :guard coll?
-    container-seen-at :guard #(or (nil? %) (string? %))]
-   (let [first-unseen-comment-index (utils/index-of comments :unseen)]
-     (if first-unseen-comment-index
-       (let [[seen-comments unseen-comments] (split-at first-unseen-comment-index (vec comments))]
-         (concat (collapse-comments seen-comments container-seen-at true)
-                 unseen-comments))
-       (collapse-comments comments container-seen-at true))))
-  ;; When we have at most 3 comments we always show all of them
   ([comments :guard #(and (coll? %)
-                          (<= (count %) 3))
-    container-seen-at :guard #(or (nil? %) (string? %))
-    collapse? :guard true?]
+                          (<= (count %) default-expanded-comments-count))
+    container-seen-at :guard #(or (nil? %) (string? %))]
    (map #(assoc % :collapsed false) comments))
-  ;; When we have more than 3 comments we always show the last 3 plus all the unseen
+  ;; When we have more than default-expanded-comments-count comments we always show the last default-expanded-comments-count plus all the unseen
   ([comments :guard (fn [cs] (and (coll? cs)
-                                  (> (count cs) 3)))
-    container-seen-at :guard #(or (nil? %) (string? %))
-    collapse? :guard true?]
+                                  (> (count cs) default-expanded-comments-count)))
+    container-seen-at :guard #(or (nil? %) (string? %))]
    (let [comments-count (count comments)
-         expanded-comments (subvec (vec comments) (- comments-count 3) comments-count)
-         collapsed-comments (subvec (vec comments) 0 (- comments-count 3))
-         unseen-collapsed (filter :unseen collapsed-comments)]
+         min-expanded-index (- comments-count default-expanded-comments-count)
+         min-unseen-index (utils/index-of comments :unseen)
+         first-expanded-index (min min-unseen-index min-expanded-index)
+         collapsed-comments (subvec (vec comments) 0 first-expanded-index)
+         expanded-comments (subvec (vec comments) first-expanded-index comments-count)]
      (vec (concat
       (map #(assoc % :collapsed true) collapsed-comments)
-      expanded-comments)))))
+      (map #(assoc % :collapsed false) expanded-comments))))))
 
 (defun add-comment-focus-value
   ([prefix :guard string? comment-data :guard map?]
