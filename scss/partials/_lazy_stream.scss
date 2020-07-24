@@ -15,6 +15,7 @@ div.lazy-stream {
     background-position: 0 0;
 
     @include big_web() {
+      margin-top: 16px;
       min-height: calc(100vh - 140px);
       background-image: cdnUrl("/img/ML/interstitial.svg");
       background-size: #{$board_container_width}px #{$foc_height + 1}px;

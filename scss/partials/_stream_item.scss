@@ -15,6 +15,7 @@ div.virtualized-list-row:not(.collapsed-item) {
       border-top: 1px solid var(--foc-divider-line-color);
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
+      margin-top: 16px;
     }
 
     &.close-item div.stream-item {

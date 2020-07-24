@@ -107,6 +107,7 @@ div.reply-item {
   &.open-item {
     border-top: 1px solid var(--foc-divider-line-color);
     padding-top: 24px;
+    margin-top: 16px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
@@ -114,7 +115,6 @@ div.reply-item {
   &.close-item {
     border-bottom: 1px solid var(--foc-divider-line-color);
     padding-bottom: 24px;
-    margin-bottom: 16px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }

@@ -426,7 +426,7 @@ div.dashboard-layout {
       }
 
       div.board-name-container {
-        padding: 0px 0px 16px;
+        padding: 0;
         position: relative;
 
         @include mobile() {
