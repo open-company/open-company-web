@@ -445,9 +445,6 @@ div.dashboard-layout {
           position: relative;
           height: 24px;
 
-          @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
-          @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
-
           @include mobile() {
             display: none;
           }
@@ -529,8 +526,12 @@ div.dashboard-layout {
                 width: 24px;
                 height: 24px;
                 background-repeat: no-repeat;
-                background-position: 0px 0px;
+                background-position: left 0px top 50%;
                 background-size: 16px 16px;
+                opacity: 1;
+              }
+
+              &.board-icon:before {
                 background-image: cdnUrl("/img/ML/number_sign.svg");
                 opacity: 0.24;
 
@@ -541,8 +542,6 @@ div.dashboard-layout {
 
               &.home-icon:before {
                 background-image: cdnUrl("/img/ML/nav_home.svg");
-                background-size: 16px 16px;
-                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_home@dark.svg");
@@ -550,19 +549,15 @@ div.dashboard-layout {
               }
 
               &.topics-icon:before {
-                background-image: cdnUrl("/img/ML/nav_all.svg");
-                background-size: 16px 16px;
-                opacity: 1;
+                background-image: cdnUrl("/img/ML/nav_explore.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/nav_all@dark.svg");
+                  background-image: cdnUrl("/img/ML/nav_explore@dark.svg");
                 }
               }
 
               &.all-icon:before {
                 background-image: cdnUrl("/img/ML/nav_all.svg");
-                background-size: 16px 16px;
-                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_all@dark.svg");
@@ -571,8 +566,6 @@ div.dashboard-layout {
 
               &.saved-icon:before {
                 background-image: cdnUrl("/img/ML/nav_bookmarks.svg");
-                background-size: 16px 16px;
-                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_bookmarks@dark.svg");
@@ -581,8 +574,6 @@ div.dashboard-layout {
 
               &.drafts-icon:before {
                 background-image: cdnUrl("/img/ML/nav_drafts.svg");
-                background-size: 16px 16px;
-                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
@@ -591,8 +582,6 @@ div.dashboard-layout {
 
               &.replies-icon:before {
                 background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
-                background-size: 16px 16px;
-                opacity: 1;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
