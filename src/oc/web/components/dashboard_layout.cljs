@@ -151,7 +151,14 @@
         followers-boards-count (drv/react s :followers-boards-count)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?
-                                 (not is-contributions))]
+                                 (not is-contributions))
+        paginated-stream-key (str "paginated-posts-component-"
+                              (cond is-contributions
+                                    current-contributions-id
+                                    current-board-slug
+                                    (name current-board-slug))
+                              (when (:last-seen-at container-data)
+                                (str "-" (:last-seen-at container-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:search-active search-active?})}
@@ -356,8 +363,4 @@
               (empty-board)
               ;; Paginated board/container
               :else
-              (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-contributions
-                                                       current-contributions-id
-                                                       current-board-slug
-                                                       (name current-board-slug)))))]]]))
+              (rum/with-key (lazy-stream paginated-stream) paginated-stream-key))]]]))
