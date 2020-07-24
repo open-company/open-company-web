@@ -145,7 +145,9 @@
    (let [comments-count (count comments)
          min-expanded-index (- comments-count default-expanded-comments-count)
          min-unseen-index (utils/index-of comments :unseen)
-         first-expanded-index (min min-unseen-index min-expanded-index)
+         first-expanded-index (if (number? min-unseen-index)
+                                (min min-unseen-index min-expanded-index)
+                                min-expanded-index)
          collapsed-comments (subvec (vec comments) 0 first-expanded-index)
          expanded-comments (subvec (vec comments) first-expanded-index comments-count)]
      (vec (concat
