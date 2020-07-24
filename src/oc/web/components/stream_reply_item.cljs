@@ -32,7 +32,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.all-caught-up :refer (all-caught-up caught-up-line)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
 
 ;; Comment delete
