@@ -27,10 +27,10 @@ div.all-caught-up {
 }
 
 div.caught-up-line {
-  height: #{$caught_up_line_height}px;
+  height: 48px;
   width: 100%;
   position: relative;
-  padding: #{($caught_up_line_height - 32) / 2}px 0;
+  padding: 16px 0 0;
   margin: 0;
   display: flex;
   flex-direction: row;
@@ -38,7 +38,7 @@ div.caught-up-line {
   // Line besides caught up
   &:before {
     position: absolute;
-    top: #{$caught_up_line_height / 2}px;
+    top: 32px;
     left: 0;
     height: 1px;
     width: 100%;
@@ -48,13 +48,12 @@ div.caught-up-line {
   }
 
   @include mobile() {
-    height: #{$mobile_caught_up_line_height}px;
-    padding: #{($mobile_caught_up_line_height - 32) / 2}px 0;
-
+    height: 36px;
+    padding: 4px 0 0;
 
     // Line besides caught up
     &:before {
-      top: #{$mobile_caught_up_line_height / 2}px;
+      top: 20px;
     }
   }
 
@@ -119,26 +118,6 @@ div.caught-up-line {
 
       div.message {
         color: var(--light-color);
-      }
-    }
-  }
-}
-
-div.virtualized-list-item:first-child {
-  div.caught-up-line {
-    height: #{$caught_up_line_height - 8}px;
-    padding-top: #{(($caught_up_line_height - 32) / 2) - 8}px;
-
-    &:before {
-      top: #{($caught_up_line_height / 2) - 8}px;
-    }
-
-    @include mobile() {
-      height: #{$mobile_caught_up_line_height - 8}px;
-      padding-top: #{(($mobile_caught_up_line_height - 32) / 2) - 8}px;
-
-      &:before {
-        top: #{($mobile_caught_up_line_height / 2) - 8}px;
       }
     }
   }
