@@ -13,7 +13,7 @@
     [:div.user-profile
       [:div.user-profile-header
         [:div.user-profile-header-avatar
-          (user-avatar-image user-data)]
+          (user-avatar-image user-data {:preferred-avatar-size 512})]
         [:div.user-profile-header-info
           [:div.user-profile-header-info-name
             [:span.name
