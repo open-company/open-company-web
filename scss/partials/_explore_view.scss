@@ -7,24 +7,6 @@ div.explore-view {
     width: 100%;
   }
 
-  div.explore-view-header {
-    height: 32px;
-    padding-left: 24px;
-    margin-bottom: 4px;
-    background-image: cdnUrl("/img/ML/nav_explore.svg");
-    background-size: 16px 16px;
-    background-position: left 0px top 8px;
-    background-repeat: no-repeat;
-    @include OC_Body_Bold();
-    font-size: 18px;
-    line-height: 32px;
-    color: var(--color);
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/nav_explore@dark.svg");
-    }
-  }
-
   div.explore-view-blocks {
     width: 100%;
     display: flex;

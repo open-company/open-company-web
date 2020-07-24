@@ -76,7 +76,7 @@
                                        ;; Never if they have polls
                                        (not (seq (:polls activity-data)))
                                        ;; Only for users we can know if they read it or not
-                                       (:member? (dis/org-data))
+                                       (:member? @(drv/get-ref s :org-data))
                                        ;; Only when they are read
                                        (not (:unread activity-data))
                                        ;; And only when there is at least a comment
@@ -87,6 +87,7 @@
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
+  (drv/drv :org-data)
   (drv/drv :activity-data)
   (drv/drv :comments-data)
   (drv/drv :add-comment-focus)
@@ -146,7 +147,7 @@
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         route (drv/react s :route)
-        org-data (dis/org-data)
+        org-data (drv/react s :org-data)
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         current-user-data (drv/react s :current-user-data)
@@ -159,7 +160,6 @@
                         :height @(::mobile-video-height s)}
                        {:width 638
                         :height (utils/calc-video-height 638)}))
-        user-is-part-of-the-team (:member? org-data)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)
@@ -275,11 +275,11 @@
               (reactions {:entity-data activity-data
                           :only-thumb? true})
               [:div.expanded-post-footer-mobile-group
-                (when user-is-part-of-the-team
+                (when (:member? org-data)
                   (foc-comments-summary {:entry-data activity-data
                                          :add-comment-focus-prefix "main-comment"
                                          :current-activity-id (:uuid activity-data)}))]
-              (when user-is-part-of-the-team
+              (when (:member? org-data)
                 (wrt-count {:activity-data activity-data
                             :read-data read-data}))]
             [:div.expanded-post-comments.group
@@ -287,7 +287,7 @@
                                 :comments-data comments-data
                                 :loading-comments-count (when-not (seq (get-in comments-drv [(:uuid activity-data) :sorted-comments]))
                                                           (- (:count comments-link) (count comments-data)))
-                                :member? user-is-part-of-the-team
+                                :member? (:member? org-data)
                                 :last-read-at @(::initial-last-read-at s)
                                 :reply-add-comment-prefix add-comment-prefix
                                 :current-user-id current-user-id})

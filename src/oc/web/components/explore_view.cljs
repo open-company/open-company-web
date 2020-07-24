@@ -37,8 +37,6 @@
         is-mobile? (responsive/is-mobile-size?)
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
-      [:div.explore-view-header
-        "Explore"]
       [:div.explore-view-blocks
         (when can-create-topic?
           [:button.mlb-reset.explore-view-block.create-topic-bt

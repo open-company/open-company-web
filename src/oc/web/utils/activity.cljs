@@ -886,7 +886,7 @@
   (or (-> comments-data
           (get (:uuid activity-data))
           :sorted-comments)
-      (:comments activity-data)))
+      (sort-by :created-at (:comments activity-data))))
 
 (defn is-element-visible?
    "Given a DOM element return true if it's actually visible in the viewport."
