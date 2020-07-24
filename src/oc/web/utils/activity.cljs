@@ -303,11 +303,8 @@
       (utils/in? board-unread (:uuid entry))
       (nil? (:last-read-at entry)))))
 
-(defn comments-unseen?
-  ([entry-data]
-   (some :unseen (:replies-data entry-data)))
-  ([entry-data last-seen-at]
-   (some #(cu/comment-unseen? % last-seen-at) (:replies-data entry-data))))
+(defn comments-unseen? [entry-data last-seen-at]
+  (some #(cu/comment-unseen? % last-seen-at) (:replies-data entry-data)))
 
 (defn has-attachments? [data]
   (seq (:attachments data)))
@@ -573,9 +570,9 @@
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
-     (update e :unseen-comments #(if-not (seq comments)
-                                   %
-                                   (comments-unseen? e))))))
+     (update e :unseen-comments #(if fallback-to-inline?
+                                   (pos? (compare (:last-activity-at e) container-seen-at))
+                                   (comments-unseen? e container-seen-at))))))
 
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
