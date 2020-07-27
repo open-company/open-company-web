@@ -137,18 +137,19 @@
             (orgs-dropdown)])
         ;; All posts
         (when show-following
-          [:a.nav-link.home.hover-item.group
-            {:class (utils/class-set {:item-selected is-following
-                                      :new following-badge})
-             :href (oc-urls/following)
-             :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
-            [:div.nav-link-icon]
-            [:div.nav-link-label
-              ; {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Home"]
-            (when following-badge
-              ; [:span.count (count all-unread-items)]
-              [:span.unread-dot])])
+          [:div.left-navigation-sidebar-top
+            [:a.nav-link.home.hover-item.group
+              {:class (utils/class-set {:item-selected is-following
+                                        :new following-badge})
+               :href (oc-urls/following)
+               :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                ; {:class (utils/class-set {:new (seq all-unread-items)})}
+                "Home"]
+              (when following-badge
+                ; [:span.count (count all-unread-items)]
+                [:span.unread-dot])]])
         (when show-topics
           [:div.left-navigation-sidebar-top
             [:a.nav-link.topics.hover-item.group
