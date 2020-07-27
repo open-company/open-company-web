@@ -107,7 +107,7 @@
    #(compare-and-set! (::show-more-menu %1) true false))
   (rum/local false ::show-more-menu)
   (rum/local false ::editing?)
-  [s {:keys [entry-data comment-data mouse-leave-cb
+  [s {:keys [entry-data comment-data row-index mouse-leave-cb
              react-cb reply-cb emoji-picker
              is-mobile? member? showing-picker?
              did-react-cb current-user-id reply-focus-value
@@ -217,8 +217,10 @@
                 [:div.reply-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref :reply-comment-body
+                   :data-row-index row-index
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                            utils/hide-class true})}]]
+                                            utils/hide-class true
+                                            dom-utils/onload-recalc-measure-class true})}]]
               (when (seq (:reactions comment-data))
                 [:div.reply-comment-reactions-footer.group
                   (reactions {:entity-data comment-data
@@ -291,7 +293,7 @@
 
 (defn- comment-item
   [s {:keys [entry-data reply-data is-mobile? seen-reply-cb member? add-comment-force-update
-             current-user-id reply-focus-value comments-loaded? clear-cell-measure-cb]}]
+             current-user-id reply-focus-value comments-loaded? clear-cell-measure-cb row-index]}]
   (let [showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid reply-data)))
         replying-to (@(::replying s) (:uuid reply-data))]
@@ -299,6 +301,7 @@
       {:key (str "reply-thread-item-" (:uuid reply-data))}
       (reply-comment {:entry-data entry-data
                       :comment-data reply-data
+                      :row-index row-index
                       :reply-focus-value reply-focus-value
                       :is-mobile? is-mobile?
                       :clear-cell-measure-cb clear-cell-measure-cb
@@ -373,6 +376,7 @@
   ;; Render
   [s {member?               :member?
       reply-data            :reply-data
+      row-index             :row-index
       current-user-data     :current-user-data
       clear-cell-measure-cb* :clear-cell-measure-cb
       add-comment-force-update :add-comment-force-update}]
@@ -434,6 +438,7 @@
                         (not (:collapsed reply)))]
           (comment-item s {:entry-data entry-data
                            :reply-data reply
+                           :row-index row-index
                            :is-mobile? is-mobile?
                            :seen-reply-cb #(do
                                             (reply-mark-seen entry-data reply)
@@ -453,6 +458,7 @@
                        :add-comment-cb (fn [new-comment-data]
                                          (reply-actions/replies-add entry-data new-comment-data)
                                          (clear-cell-measure-cb))
+                       :row-index row-index
                        :add-comment-focus-prefix @(::add-comment-focus-prefix s)})
          (str "add-comment-" @(::add-comment-focus-prefix s) "-" uuid))]]))
 
