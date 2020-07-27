@@ -154,10 +154,17 @@
                                                  :add-comment-force-update add-comment-force-update
                                                  :clear-cell-measure-cb clear-cell-measure-cb})))]))
 
-(defn- unique-row-string [replies? item]
-  (if replies?
-    (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:comments-loaded? item) "final" "temp")))
-    (:resource-type item)))
+ (defn- unique-row-string [replies? item]
+  (let [entry? (= (:resource-type item) :entry)
+        static-part (str (name (:resource-type item)) "-" (:uuid item))
+        variable-part (cond
+                        (and entry? replies?)
+                        (str (-> item :replies-data last :updated-at) "-" (count (:replies-data item)))
+                        entry?
+                        (or (:updated-at item) (:created-at item))
+                        :else
+                        (:last-activity-at item))]
+    (str static-part "-" variable-part)))
 
 (defn- clear-cell-measure
 
