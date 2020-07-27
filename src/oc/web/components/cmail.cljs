@@ -186,10 +186,17 @@
 
 ;; Headline setup and paste handler
 
+(defn- fullscreen-focus-headline [state]
+  (let [headline-el  (headline-element state)]
+    (when (and (-> state (drv/get-ref :cmail-state) deref :fullscreen)
+               headline-el)
+      (utils/to-end-of-content-editable headline-el))))
+
 (defn- setup-headline [state]
   (when-let [headline-el  (headline-element state)]
-    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state))))
-  (js/emojiAutocomplete))
+    (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
+    (js/emojiAutocomplete)
+    (fullscreen-focus-headline state)))
 
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
@@ -313,6 +320,31 @@
       (cancel-clicked s)
       (cmail-actions/cmail-hide))))
 
+(defn- reset-cmail [s]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        cmail-state @(drv/get-ref s :cmail-state)
+        initial-body (if (seq (:body cmail-data))
+                       (:body cmail-data)
+                       au/empty-body-html)
+        initial-headline (utils/emojify
+                           (if (seq (:headline cmail-data))
+                             (:headline cmail-data)
+                             ""))
+        body-text (.text (.html (js/$ "<div/>") initial-body))]
+    (when-not (seq (:uuid cmail-data))
+      (nux-actions/dismiss-add-post-tooltip))
+    (reset! (::last-body s) initial-body)
+    (reset! (::initial-body s) initial-body)
+    (reset! (::initial-headline s) initial-headline)
+    (reset! (::initial-uuid s) (:uuid cmail-data))
+    (reset! (::publishing s) (:publishing cmail-data))
+    (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+    (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
+    (reset! (::latest-key s) (:key cmail-state))
+    (utils/after 300 #(setup-headline s))
+    (when (responsive/is-mobile-size?)
+      (dom-utils/lock-page-scroll))))
+
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -344,6 +376,7 @@
                    (rum/local nil ::last-body)
                    (rum/local nil ::post-tt-kw)
                    (rum/local 68 ::top-padding)
+                   (rum/local false ::last-fullscreen-state)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -363,33 +396,11 @@
                                                             (close-cmail %1 %2)))
 
                    {:will-mount (fn [s]
-                    (let [cmail-data @(drv/get-ref s :cmail-data)
-                          cmail-state @(drv/get-ref s :cmail-state)
-                          initial-body (if (seq (:body cmail-data))
-                                         (:body cmail-data)
-                                         au/empty-body-html)
-                          initial-headline (utils/emojify
-                                             (if (seq (:headline cmail-data))
-                                               (:headline cmail-data)
-                                               ""))
-                          body-text (.text (.html (js/$ "<div/>") initial-body))]
-                      (when-not (seq (:uuid cmail-data))
-                        (nux-actions/dismiss-add-post-tooltip))
-                      (reset! (::last-body s) initial-body)
-                      (reset! (::initial-body s) initial-body)
-                      (reset! (::initial-headline s) initial-headline)
-                      (reset! (::initial-uuid s) (:uuid cmail-data))
-                      (reset! (::saving s) (:loading cmail-data))
-                      (reset! (::publishing s) (:publishing cmail-data))
-                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
-                      (reset! (::latest-key s) (:key cmail-state))
-                      (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title)))
-                    (when (responsive/is-mobile-size?)
-                      (dom-utils/lock-page-scroll))
+                    (reset-cmail s)
+                    (reset! (::last-fullscreen-state s) (-> s (drv/get-ref :cmail-state) deref :fullscreen))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
-                    (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
                     (setup-top-padding s)
                     s)
@@ -398,25 +409,16 @@
                       ;; If the state key changed let's reset the initial values
                       (when (not= @(::latest-key s) (:key cmail-state))
                         (when @(::latest-key s)
-                          (let [cmail-data @(drv/get-ref s :cmail-data)
-                                cmail-state @(drv/get-ref s :cmail-state)
-                                initial-body (if (seq (:body cmail-data))
-                                               (:body cmail-data)
-                                               au/empty-body-html)
-                                initial-headline (utils/emojify
-                                                   (if (seq (:headline cmail-data))
-                                                     (:headline cmail-data)
-                                                     ""))
-                                body-text (.text (.html (js/$ "<div/>") initial-body))]
-                            (when-not (seq (:uuid cmail-data))
-                              (nux-actions/dismiss-add-post-tooltip))
-                            (reset! (::last-body s) initial-body)
-                            (reset! (::initial-body s) initial-body)
-                            (reset! (::initial-headline s) initial-headline)
-                            (reset! (::initial-uuid s) (:uuid cmail-data))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
-                            (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))))
-                        (reset! (::latest-key s) (:key cmail-state))))
+                          (reset-cmail s))
+                        (when-not @(::latest-key s)
+                          (reset! (::latest-key s) (:key cmail-state)))))
+                    s)
+                   :did-update (fn [s]
+                    (when-let [cmail-state @(drv/get-ref s :cmail-state)]
+                      (when-not (= (:fullscreen cmail-state) @(::last-fullscreen-state s))
+                        (when (:fullscreen cmail-state)
+                          (fullscreen-focus-headline s))
+                        (reset! (::last-fullscreen-state s) (:fullscreen cmail-state))))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -544,7 +546,7 @@
                       (cmail-actions/cmail-expand cmail-data cmail-state)
                       (utils/after 280
                        #(when-let [el (headline-element s)]
-                          (.focus el)))))}
+                          (utils/to-end-of-content-editable el)))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state))
         (trial-expired-alert {:top "48px" :left "50%"}))
