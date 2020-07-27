@@ -6,7 +6,6 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-
 (rum/defc user-profile
   [user-data]
   [:div.user-profile-container
@@ -56,7 +55,8 @@
                     (str "@" (:display-name slack-user)))]))
             (when has-profile-links?
               (for [[k v] (:profiles user-data)
-                    :when (seq v)]
+                    :when (not (string/blank? v))
+                    :let [un (last (string/split v #"/"))]]
                 [:a.profile-link
                   {:class (name k)
                    :key (str "profile-" (name k))
@@ -64,4 +64,5 @@
                    :href (if (or (string/starts-with? v "http")
                                  (string/starts-with? v "//"))
                            v
-                           (str "https://" v))}]))]))]])
+                           (str "https://" v))}
+                  un]))]))]])

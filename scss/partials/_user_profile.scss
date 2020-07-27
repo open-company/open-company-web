@@ -50,8 +50,7 @@ div.user-profile-container {
             line-height: 24px;
             flex: 0 1 auto;
             max-width: 100%;
-            overflow-y: visible;
-            overflow-x: hidden;
+            overflow: hidden;
             text-overflow: ellipsis;
           }
 
@@ -101,7 +100,7 @@ div.user-profile-container {
       flex-flow: row wrap;
       margin-top: 24px;
       border-top: 1px solid var(--divider-line);
-      padding-top: 24px;
+      padding-top: 16px;
 
       .profile-link {
         overflow: hidden;
@@ -117,6 +116,7 @@ div.user-profile-container {
         background-repeat: no-repeat;
         margin-right: 16px;
         opacity: 0.5;
+        margin-top: 8px;
 
         &.email {
           background-size: 16px 12px;
