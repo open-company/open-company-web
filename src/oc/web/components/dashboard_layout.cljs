@@ -279,6 +279,7 @@
                                                 :board-icon (and (not is-container?)
                                                                  (not is-contributions)
                                                                  (not is-topics)
+                                                                 (not is-drafts-board)
                                                                  (not current-activity-id))})
                        :dangerouslySetInnerHTML (utils/emojify (cond
                                                  is-inbox

@@ -157,6 +157,11 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
+(defn show-invite-box-cookie
+  "Cookie to check if the invite people tooltip shuold be visible."
+  [user-id]
+  (str "invite-box-" user-id))
+
 (defn collapse-boards-list-cookie
   "Cookie used to remember if the sections list was collapsed or not."
   []

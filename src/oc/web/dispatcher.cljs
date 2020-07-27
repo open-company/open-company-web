@@ -42,6 +42,8 @@
 (def expo-app-version-key (vec (conj expo-key :app-version)))
 (def expo-push-token-key (vec (conj expo-key :push-token)))
 
+(def show-invite-box-key :show-invite-box)
+
 (def api-entry-point-key [:api-entry-point])
 
 (def auth-settings-key [:auth-settings])
@@ -666,6 +668,7 @@
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
+   :show-invite-box      [[:base] (fn [base] (get base show-invite-box-key))]
    })
 
 ;; Action Loop =================================================================

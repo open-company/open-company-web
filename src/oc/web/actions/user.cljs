@@ -27,7 +27,21 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
+;; Invite box
+
+(defn dismiss-invite-box
+
+  ([] (dismiss-invite-box (jwt/user-id) false))
+
+  ([user-id] (dismiss-invite-box user-id false))
+
+  ([user-id remove-now?]
+  (cook/remove-cookie! (router/show-invite-box-cookie user-id))
+  (when remove-now?
+    (dis/dispatch! [:input [dis/show-invite-box-key] false]))))
+
 ;;User walls
+
 (defn- check-user-walls
   "Check if one of the following is present and redirect to the proper wall if needed:
   :password-required redirect to password collect
