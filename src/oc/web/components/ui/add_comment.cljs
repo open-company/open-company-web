@@ -343,7 +343,7 @@
                              (.dispose throttled-did-change))
                            s)}
   [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix internal-max-width
-             edit-comment-data scroll-after-posting? add-comment-cb collapse? add-comment-did-change]}]
+             edit-comment-data scroll-after-posting? add-comment-cb collapse? add-comment-did-change row-index]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _mention-users (drv/react s :mention-users)
@@ -377,12 +377,14 @@
            :on-click #(when ())}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
+            :data-row-index row-index
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden (and collapse?
                                                                             (not collapsed?))
                                      :medium-editor-placeholder-relative true
                                      :medium-editor-element true
-                                     utils/hide-class true})
+                                     utils/hide-class true
+                                     dom-utils/onload-recalc-measure-class true})
             :on-focus #(focus s)
             :on-blur #(blur s)
             :on-key-down (fn [e]

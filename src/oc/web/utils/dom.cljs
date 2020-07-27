@@ -2,6 +2,8 @@
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.responsive :as responsive]))
 
+(defonce onload-recalc-measure-class "onload-reaclc-measure")
+
 (defonce _lock-counter (atom 0))
 
 (defn lock-page-scroll

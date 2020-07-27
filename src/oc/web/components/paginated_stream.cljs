@@ -50,7 +50,8 @@
            is-mobile
            clear-cell-measure-cb
            current-user-data
-           add-comment-force-update] :as props}]
+           add-comment-force-update
+           row-index] :as props}]
   (let [member? (:member? org-data)
         publisher? (:publisher? item)
         show-wrt? member?
@@ -64,6 +65,7 @@
        (= (:container-slug container-data) :replies)
        (stream-reply-item {:reply-data            item
                            :member?               member?
+                           :row-index             row-index
                            :current-user-data     current-user-data
                            :clear-cell-measure-cb clear-cell-measure-cb
                            :add-comment-force-update add-comment-force-update})
@@ -114,7 +116,8 @@
              container-data
              current-user-data
              clear-cell-measure-cb
-             add-comment-force-update]
+             add-comment-force-update
+             row-index]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -150,7 +153,8 @@
                                                  :foc-layout foc-layout
                                                  :container-data container-data
                                                  :add-comment-force-update add-comment-force-update
-                                                 :clear-cell-measure-cb clear-cell-measure-cb})))]))
+                                                 :clear-cell-measure-cb clear-cell-measure-cb
+                                                 :row-index row-index})))]))
 
 (defn- unique-row-string [replies? item]
   (if replies?
@@ -166,43 +170,59 @@
      (.clear cache row-index column-index)
      (reset! (::force-re-render rum-state) (utils/activity-uuid)))))
 
-(defn- clear-changed-cells-cache [s next-resource-types]
+(defn- clear-changed-cells-cache [s next-row-keys]
   (let [props (-> s :rum/args first)
         container-data (:container-data props)
         items (:items props)
-        resource-types (::resource-types s)
+        resource-types (::row-keys s)
         cache @(::cache s)]
     (doseq [idx (range (count items))
             :let [old-resource-type (get @resource-types idx)
-                  new-resource-type (get next-resource-types idx)]
+                  new-resource-type (get next-row-keys idx)]
             :when (not= old-resource-type new-resource-type)]
       (clear-cell-measure s idx 0))
-    (reset! resource-types next-resource-types)))
+    (reset! resource-types next-row-keys)))
+
+(defn- setup-onload-recalc [s]
+  (when (-> s :rum/args first :container-data :container-slug (= :replies))
+    (let [dom-node (rum/dom-node s)]
+      (when dom-node
+        (let [parent-sel (str "div." dom-utils/onload-recalc-measure-class)
+              nodes (array-seq (.querySelectorAll dom-node (str parent-sel " img, " parent-sel " iframe")))]
+          (doseq [el nodes]
+             (let [comment-node (.closest el parent-sel)
+                   row-index (.. comment-node -dataset -rowIndex)]
+               (clear-cell-measure s row-index 0)
+               (set! (.-onload el) #(clear-cell-measure s row-index 0)))))))))
 
 (rum/defcs virtualized-stream < rum/static
                                 (seen-mixins/container-nav-mixin)
-                                (rum/local nil ::resource-types)
+                                (rum/local nil ::row-keys)
                                 (rum/local nil ::cache)
                                 (rum/local nil ::force-re-render)
                                 mixins/mounted-flag
                                 {:will-mount (fn [s]
-                                   (let [props (-> s :rum/args s first)
-                                         replies? (-> props :container-data :container-slug (= :replies))
-                                         next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
-                                     (reset! (::force-re-render s) (utils/activity-uuid))
-                                     (reset! (::cache s)
-                                      (RVCellMeasurerCache.
-                                       (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (:foc-layout props))
-                                                 :minHeight 1
-                                                 :fixedWidth true})))
-                                     (reset! (::resource-types s) next-resource-types))
-                                   s)
-                                 :will-update (fn [s]
+                                  (let [props (-> s :rum/args s first)
+                                        replies? (-> props :container-data :container-slug (= :replies))
+                                        next-row-keys (mapv (partial unique-row-string replies?) (:items props))]
+                                    (reset! (::force-re-render s) (utils/activity-uuid))
+                                    (reset! (::cache s)
+                                     (RVCellMeasurerCache.
+                                      (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (:foc-layout props))
+                                                :minHeight 1
+                                                :fixedWidth true})))
+                                    (reset! (::row-keys s) next-row-keys))
+                                  s)
+                                 :did-mount (fn [s]
+                                  (setup-onload-recalc s)
+                                  s)
+                                 :did-remount (fn [_ s]
                                   (let [props (-> s :rum/args first)
                                         replies? (-> props :container-data :container-slug (= :replies))
-                                        next-resource-types (mapv (partial unique-row-string replies?) (:items props))]
-                                    (when-not (= @(::resource-types s) next-resource-types)
-                                      (clear-changed-cells-cache s next-resource-types)))
+                                        next-row-keys (mapv (partial unique-row-string replies?) (:items props))]
+                                    (when-not (= @(::row-keys s) next-row-keys)
+                                      (clear-changed-cells-cache s next-row-keys))
+                                    (setup-onload-recalc s))
                                   s)}
   [s {:keys [items
              activities-read
@@ -220,7 +240,7 @@
         key-prefix (if is-mobile? "mobile" foc-layout)
         cell-measurer-renderer (fn [{:keys [cache]} props]
                                  (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
-                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex))]
+                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
                                      (cell-measurer (clj->js {:cache cache
                                                               :columnIndex columnIndex
                                                               :rowIndex rowIndex
