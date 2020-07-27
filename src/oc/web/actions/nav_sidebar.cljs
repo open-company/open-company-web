@@ -276,6 +276,8 @@
   [panel]
   (when (zero? (count (get @dis/app-state :panel-stack [])))
     (dom-utils/lock-page-scroll))
+  (when (#{:invite-picker :invite-email :invite-slack} panel)
+    (user-actions/dismiss-invite-box))
   (dis/dispatch! [:update [:panel-stack] #(vec (conj (or % []) panel))]))
 
 (defn- pop-panel

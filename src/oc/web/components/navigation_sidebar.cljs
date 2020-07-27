@@ -43,6 +43,7 @@
                                 (drv/drv :editable-boards)
                                 (drv/drv :cmail-state)
                                 (drv/drv :show-add-post-tooltip)
+                                (drv/drv :show-invite-box)
                                 ;; Locals
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local true ::show-invite-people?)
@@ -75,6 +76,7 @@
         org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
+        show-invite-box (drv/react s :show-invite-box)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
@@ -115,7 +117,8 @@
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)
+                                 is-admin-or-author?
+                                 show-invite-box)
         show-topics user-is-part-of-the-team?
         show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         editable-boards (drv/react s :editable-boards)
@@ -259,11 +262,10 @@
             ; [:span.plus-icon]
             [:span.copy-text
               "New update"]])
-        (when (and show-invite-people?
-                   @(::show-invite-people? s))
+        (when show-invite-people?
           [:div.invite-people-box
             [:button.mlb-reset.invite-people-close
-              {:on-click #(reset! (::show-invite-people? s) false)}]
+              {:on-click #(user-actions/dismiss-invite-box (:user-id current-user-data) true)}]
             [:label.explore-label
               "Explore Wut together"]
             [:button.mlb-reset.invite-people-bt
