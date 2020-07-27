@@ -256,9 +256,9 @@
           [:button.mlb-reset.create-bt
             {:on-click #(cmail-actions/cmail-fullscreen)
              :disabled (not (:collapsed cmail-state))}
-            [:span.plus-icon]
+            ; [:span.plus-icon]
             [:span.copy-text
-              "Wut"]])
+              "New update"]])
         (when (and show-invite-people?
                    @(::show-invite-people? s))
           [:div.invite-people-box
