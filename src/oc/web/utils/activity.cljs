@@ -377,19 +377,17 @@
                     (not (seq prev-items)))})))
 
 (defn- insert-caught-up [container-slug items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
-  (let [index (loop [last-valid-idx 0
-                     current-idx 0]
+  (let [index (loop [current-idx 0]
                 (let [item (get items-list current-idx)]
                   (cond
                    ;; We reached the end, no more items, return last index
                    (nil? item)
-                   last-valid-idx
+                   current-idx
                    ;; Found the first truthy item, return last index
                    (check-fn item)
-                   last-valid-idx
+                   current-idx
                    :else
-                   (recur (inc current-idx)
-                          (inc current-idx)))))
+                   (recur (inc current-idx)))))
         [before after] (split-at index items-list)]
     (cond
       (and has-next
@@ -570,9 +568,7 @@
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
-     (update e :unseen-comments #(if fallback-to-inline?
-                                   (pos? (compare (:last-activity-at e) container-seen-at))
-                                   (comments-unseen? e container-seen-at))))))
+     (update e :unseen-comments #(comments-unseen? e container-seen-at)))))
 
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
