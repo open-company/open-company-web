@@ -213,9 +213,8 @@ nav.oc-navbar {
         text-align: right;
 
         &.anonymous-user {
-          position: relative;
-          left: unset;
-          float: right;
+          width: auto;
+          flex: 0 0 auto;
         }
 
         @include mobile() {
