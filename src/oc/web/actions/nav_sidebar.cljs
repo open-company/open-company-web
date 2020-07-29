@@ -417,5 +417,7 @@
 (defn hide-follow-picker []
   (pop-panel))
 
-(defn ^:export open-invite-picker []
+(defn ^:export open-invite-picker [e]
+  (when e
+    (utils/event-stop e))
   (push-panel :invite-picker))
