@@ -52,20 +52,28 @@
              "When people reply to you or mention your name you’ll see it here."]
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
-           is-drafts-board? "Nothing in drafts"
-           is-bookmarks? "No updates are bookmarked"
-           is-following?
-           [:div.empty-following
-             "Home is where you'll find updates from the people and topics you're following."
+           is-drafts-board?
+           [:div.empty-drafts
+             "Nothing in drafts"
              (when (:can-compose? org-data)
                [:button.mlb-reset.create-bt
                  {:on-click #(nav-actions/show-follow-picker)}
                  "New update"])]
+           is-bookmarks? "No updates are bookmarked"
+           is-following?
+           [:div.empty-following
+             "Home is where you'll find updates from the people and topics you're following."
+             ; (when (:can-compose? org-data)
+             ;   [:button.mlb-reset.create-bt
+             ;     {:on-click #(nav-actions/show-follow-picker)}
+             ;     "New update"])
+             ]
            is-unfollowing?
            [:div.empty-following
              "Here is where you'll find updates that you decided to not follow."
-             (when (:can-compose? org-data)
-               [:button.mlb-reset.create-bt
-                 {:on-click #(nav-actions/show-follow-picker)}
-                 "Create update"])]
+             ; (when (:can-compose? org-data)
+             ;   [:button.mlb-reset.create-bt
+             ;     {:on-click #(nav-actions/show-follow-picker)}
+             ;     "Create update"])
+             ]
            :else "This topic has no updates")]]]))
