@@ -55,6 +55,7 @@ div.add-comment-box-container {
           margin-right: auto;
           min-width: 128px;
           min-height: 20px;
+          padding: 0;
 
           @include mobile() {
             height: 24px;
@@ -66,6 +67,7 @@ div.add-comment-box-container {
           flex: 0 0 auto;
           margin-top: 0;
           margin-left: 8px;
+          padding: 0;
 
           button.close-reply-bt {
             display: none;
@@ -89,7 +91,7 @@ div.add-comment-box-container {
       position: relative;
       border-radius: 4px;
       border: 1px solid var(--add-comment-border-color);
-      padding: 12px 12px 12px 16px;
+      padding: 12px 0 12px 0;
       background-color: var(--add-comment-background);
       flex-flow: column nowrap;
       width: 100%;
@@ -113,12 +115,13 @@ div.add-comment-box-container {
         min-height: 24px;
         outline: none;
         flex: 0 1 auto;
-        max-height: 526px;
+        max-height: 80vh;
         overflow-y: auto;
+        padding: 0 12px 0 16px;
 
-        // @include mobile(){
-        //   min-height: 24px;
-        // }
+        @include mobile(){
+          padding: 0;
+        }
 
         &.medium-editor-placeholder-hidden:after {
           display: none !important;
@@ -142,6 +145,7 @@ div.add-comment-box-container {
         align-items: center;
         margin-top: 8px;
         position: relative;
+        padding: 0 12px 0 16px;
 
         div.upload-progress {
           margin-right: 16px;
