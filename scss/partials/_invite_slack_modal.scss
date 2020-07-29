@@ -53,7 +53,7 @@ div.invite-slack-modal {
 
       button.cancel-bt {
         height: 32px;
-        padding: 0 8px;
+        padding: 0 0 0 16px;
         @include OC_Body_Book();
         font-size: 14px;
         color: var(--light-color);
