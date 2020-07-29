@@ -416,3 +416,6 @@
 
 (defn hide-follow-picker []
   (pop-panel))
+
+(defn ^:export open-invite-picker []
+  (push-panel :invite-picker))
