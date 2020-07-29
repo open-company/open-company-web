@@ -632,7 +632,8 @@
           drafts-link (when drafts-board
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
           previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
-          previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))]
+          previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))
+          can-compose? (boolean (seq (some #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST")) (:boards org-data))))]
       (-> org-data
        (assoc :read-only (readonly-org? (:links org-data)))
        (assoc :boards fixed-boards)
@@ -640,7 +641,8 @@
        (assoc :member? (jwt/user-is-part-of-the-team (:team-id org-data)))
        (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
        (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
-       (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data)))))))
+       (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data)))
+       (assoc :can-compose? can-compose?)))))
 
 (defn parse-board
   "Parse board data coming from the API."

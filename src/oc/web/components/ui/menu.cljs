@@ -28,9 +28,14 @@
   (menu-close s)
   (jwt-actions/logout))
 
-(defn my-profile-click [s user-id e]
+(defn profile-edit-click [s e]
   (.preventDefault e)
-  (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
+  ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
+  (nav-actions/show-user-settings :profile))
+
+(defn my-profile [s cur-user-id e]
+  (.preventDefault e)
+  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn my-posts-click [s cur-user-id e]
   (.preventDefault e)
@@ -98,7 +103,6 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
-                  (drv/drv :editable-boards)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
@@ -127,8 +131,7 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           current-org-slug)
-        can-compose? (pos? (count (drv/react s :editable-boards)))]
+                           current-org-slug)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -148,26 +151,27 @@
           (when-not is-mobile?
             (user-avatar-image current-user-data))]
         ;; Profile
-        ; (when (jwt/jwt)
-        ;   [:a
-        ;     {:href "#"
-        ;      :on-click (partial my-profile-click s (:user-id current-user-data))}
-        ;     [:div.oc-menu-item.personal-profile
-        ;       "My profile"]])
-        ;; Show user's posts link
         (when (and (jwt/jwt)
                    current-user-data)
           [:a
-            {:href (oc-urls/contributions (:user-id current-user-data))
-             :on-click (partial my-posts-click s (:user-id current-user-data))}
-            [:div.oc-menu-item.my-posts.group
-              [:span.oc-menu-item-label
-                (if (pos? (:contributions-count org-data))
-                  "My updates"
-                  "My profile")]
-              (when (pos? (:contributions-count org-data))
-                [:span.count
-                  (:contributions-count org-data)])]])
+            {:href "#"
+             :on-click (partial profile-edit-click s (:user-id current-user-data))}
+            [:div.oc-menu-item.personal-profile
+              "My profile"]])
+        ;; Show user's posts link
+        ; (when (and (jwt/jwt)
+        ;            current-user-data)
+        ;   [:a
+        ;     {:href (oc-urls/contributions (:user-id current-user-data))
+        ;      :on-click (partial my-posts-click s (:user-id current-user-data))}
+        ;     [:div.oc-menu-item.my-posts.group
+        ;       [:span.oc-menu-item-label
+        ;         (if (pos? (:contributions-count org-data))
+        ;           "My updates"
+        ;           "My profile")]
+        ;       (when (pos? (:contributions-count org-data))
+        ;         [:span.count
+        ;           (:contributions-count org-data)])]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))

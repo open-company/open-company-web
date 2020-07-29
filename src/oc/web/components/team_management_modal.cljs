@@ -1,6 +1,6 @@
 (ns oc.web.components.team-management-modal
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -184,7 +184,7 @@
                         ;; Add @ in front of the slack display name if it's not there already
                         fixed-display-name (if (and (seq slack-display-name)
                                                     (not= slack-display-name "-")
-                                                    (not (clojure.string/starts-with? slack-display-name "@")))
+                                                    (not (s/starts-with? slack-display-name "@")))
                                              (str "@" slack-display-name)
                                              slack-display-name)]]
               [:div.team-management-users-item.group

@@ -5,6 +5,20 @@
             [oc.lib.oauth :as oauth]
             [oc.web.lib.utils :as utils]))
 
+(def default-avatar "/img/ML/happy_face_purple.svg")
+(def other-default-avatars
+ ["/img/ML/happy_face_green.svg"
+  "/img/ML/happy_face_blue.svg"
+  "/img/ML/happy_face_purple.svg"
+  "/img/ML/happy_face_yellow.svg"])
+
+(defn default-avatar? [image-url]
+  (let [images-set (conj (set other-default-avatars) default-avatar)]
+    (images-set image-url)))
+
+(defn random-avatar []
+  (first (shuffle (vec (conj other-default-avatars default-avatar)))))
+
 (def publisher-board-slug-prefix "publisher-board-")
 
 (def user-avatar-filestack-config

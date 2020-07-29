@@ -9,7 +9,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.user :as user-utils]
-            [oc.web.stores.user :as user-stores]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -23,8 +23,6 @@
   (dismiss-action)
   (when mobile-back-bt
     (nav-actions/menu-toggle)))
-
-(def default-user-profile (oc.web.stores.user/random-user-image))
 
 (defn- update-tooltip [s]
   (utils/after 100

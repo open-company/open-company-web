@@ -301,8 +301,10 @@
              :ref "user-profile-avatar"
              :data-toggle (when-not is-mobile? "tooltip")
              :title "Change avatar"
-             :data-placement "top"}
-            (user-avatar-image user-data)]
+             :data-placement "top"
+             :class (when (user-utils/default-avatar? (:avatar-url user-data)) "default-avatar")}
+            (user-avatar-image user-data)
+            [:div.plus-icon]]
           [:div.field-label.name-fields
               "First name"]
           [:input.field.oc-input
