@@ -35,7 +35,7 @@ div.dropdown {
     box-shadow: 0 0 1px 0 var(--user-dropdown-shadow-start), 0 5px 12.5px 0.5px var(--user-dropdown-shadow-end);
     border-radius: 4px;
     padding: 8px 0;
-    border: 1px solid (--divider-line);
+    border: 1px solid var(--divider-line);
 
     li {
       cursor: pointer;
