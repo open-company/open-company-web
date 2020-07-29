@@ -48,7 +48,7 @@
             "Back"]]
         [:div.invite-picker-body
           [:div.invite-picker-body-description
-            "Ready for better team discussions? Invite your team!"]
+            "Ready to share your updates? Invite your team!"]
           [:button.mlb-reset.invite-email-bt
             {:on-click #(nav-actions/show-org-settings :invite-email)}
             "Invite via email"]
