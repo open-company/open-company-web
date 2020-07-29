@@ -84,7 +84,7 @@
        :last-activity-at (post-month-date-from-date d)})))
 
 (def preserved-keys
-  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
    :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
@@ -304,7 +304,12 @@
       (nil? (:last-read-at entry)))))
 
 (defn comments-unseen? [entry-data last-seen-at]
-  (some #(cu/comment-unseen? % last-seen-at) (:replies-data entry-data)))
+  (let [not-self-comments (filter (comp not :self?) (:replies-data entry-data))]
+    (some #(cu/comment-unseen? % last-seen-at) not-self-comments)))
+
+(defn comments-ignore? [entry-data last-seen-at]
+  (let [all-unseen (filter #(cu/comment-unseen? % last-seen-at) (:replies-data entry-data))]
+    (boolean (and (seq all-unseen) (every? :author? all-unseen)))))
 
 (defn has-attachments? [data]
   (seq (:attachments data)))
@@ -376,28 +381,38 @@
                         (every? :publisher? prev-items))
                     (not (seq prev-items)))})))
 
-(defn- insert-caught-up [container-slug items-list check-fn & [{:keys [hide-top-line has-next] :as opts}]]
-  (let [index (loop [current-idx 0]
+(defn- insert-caught-up [container-slug items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
+  (let [index (loop [last-valid-idx 0
+                     current-idx 0]
                 (let [item (get items-list current-idx)]
                   (cond
                    ;; We reached the end, no more items, return last index
                    (nil? item)
-                   current-idx
+                   last-valid-idx
+                   ;; If it's an element to ginore, return the last valid index
+                   (and (fn? ignore-fn)
+                        (ignore-fn item))
+                   (recur last-valid-idx
+                          (inc current-idx))
                    ;; Found the first truthy item, return last index
                    (check-fn item)
-                   current-idx
+                   last-valid-idx
                    :else
-                   (recur (inc current-idx)))))
+                   (recur (inc current-idx)
+                          (inc current-idx)))))
         [before after] (split-at index items-list)]
     (cond
       (and has-next
            (= index (count items-list)))
       (vec items-list)
+
       (= index (count items-list))
       (vec (concat items-list [(caught-up-map container-slug items-list)]))
+
       (and hide-top-line
            (zero? index))
       (vec items-list)
+
       :else
       (vec (remove nil? (concat before
                                 [(caught-up-map container-slug before)]
@@ -516,12 +531,16 @@
           author? (is-author? comment-map)
           unread? (and (not author?)
                        (cu/comment-unread? comment-map (:last-read-at activity-data)))
+          unseen?* (cu/comment-unseen? comment-map container-seen-at)
+          ingore? (and author?
+                       unseen?*)
           unseen? (and (not author?)
-                       (cu/comment-unseen? comment-map container-seen-at))
+                       unseen?*)
           is-emoji-comment? (is-emoji (:body comment-map))]
       (-> comment-map
         (assoc :resource-type :comment)
         (assoc :author? author?)
+        (assoc :ingore? ingore?)
         (assoc :unread unread?)
         (assoc :unseen unseen?)
         (assoc :is-emoji is-emoji-comment?)
@@ -556,7 +575,7 @@
         fallback-to-inline? (and (pos? comments-count)
                                  (empty? comments))
         temp-comments (if (seq comments) comments (:comments full-entry))
-        comments-loaded? (or (zero? comments-count) (seq comments))
+        comments-loaded? (boolean (or (zero? comments-count) (seq comments)))
         ;; Let's force a collapse recalc if user didn't expand the replies yet
         ;; and or is the first render of the comments (using inline comments most probably)
         ;; or the full list of comments has just been loaded for the first time from server
@@ -568,7 +587,10 @@
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
-     (update e :unseen-comments #(comments-unseen? e container-seen-at)))))
+     (update e :unseen-comments #(boolean (if-not (seq comments)
+                                            %
+                                            (seq (filter :unseen (:replies-data e))))))
+     (assoc e :ignore-comments (comments-ignore? e container-seen-at)))))
 
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
@@ -854,6 +876,9 @@
                                       (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
                             #(and (= (:resource-type %) :entry)
                                   (not (:unseen-comments %))))
+            ignore-item-fn (when replies?
+                             #(or (not= (:resource-type %) :entry)
+                                  (:ignore-comments %)))
             opts {:has-next next-link}
             caught-up-item (when (and keep-caught-up?
                                       (seq (:items-to-render container-data)))
@@ -865,7 +890,7 @@
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
                                (vec (remove nil? (concat before [caught-up-item] after))))
                              (#{:following :replies} (:container-slug container-data))
-                             (insert-caught-up (:container-slug container-data) grouped-items check-item-fn opts)
+                             (insert-caught-up (:container-slug container-data) grouped-items check-item-fn ignore-item-fn opts)
                              :else
                              grouped-items)
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
