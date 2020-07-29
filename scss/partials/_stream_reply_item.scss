@@ -508,11 +508,11 @@ div.reply-item {
                   margin: 0;
                   @include OC_Body_Book();
                   font-size: 14px;
-                  color: var(--overlay-background-color);
+                  color: var(--tooltip-color);
                   line-height: 18px;
                   cursor: pointer;
                   padding: 8px 16px;
-                  background-color: var(--color);
+                  background-color: var(--tooltip-background-color);
                   position: relative;
                 }
               }
