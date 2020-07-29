@@ -108,22 +108,45 @@ div.empty-board {
       line-height: 20px;
       margin: 16px auto 0;
 
-      div.empty-follow {
+      div.empty-following {
         text-align: center;
         max-width: 300px;
         margin: 0 auto;
 
-        button {
+        button.create-bt {
           margin: 16px auto 0;
-          width: auto;
+          border-radius: 4px;
+          width: #{$left_navigation_sidebar_width}px;
+          height: 34px;
+          padding: 0;
           display: block;
-          @include OC_Body_Bold();
-          font-size: 16px;
-          color: $wut_purple;
+          position: relative;
+          background-color: var(--navigation-sidebar-create-bt-background);
+          color: var(--navigation-sidebar-create-bt-color);
+          transition: background-color 180ms ease-in;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
 
-          &:hover {
-            text-decoration: underline;
-            opacity: 1;
+          @include mobile() {
+            display: none;
+          }
+
+          span.plus-icon {
+            width: 11px;
+            height: 11px;
+            background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+            background-size: 11px 11px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-left: auto;
+            margin-right: 10px;
+            flex: 0 0 auto;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
+            }
           }
         }
       }

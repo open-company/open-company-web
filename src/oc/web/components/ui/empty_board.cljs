@@ -46,26 +46,26 @@
               (user-avatar-image contrib-user-data))]]
         [:div.empty-board-title
           (cond
-           current-user-contrib? "You haven't published any posts yet"
+           current-user-contrib? "You haven't posted any update yet"
            is-replies? 
            [:div.empty-replies
-             "When people reply to your updates and comments or mention your name, you’ll see it here."]
+             "When people reply to you or mention your name you’ll see it here."]
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board? "Nothing in drafts"
            is-bookmarks? "No updates are bookmarked"
            is-following?
-           [:div.empty-follow
+           [:div.empty-following
              "Home is where you'll find updates from the people and topics you're following."
-             ; [:button.mlb-reset.follow-picker-bt
-             ;   {:on-click #(nav-actions/show-follow-picker)}
-             ;   "Curate your Home feed"]
-               ]
+             (when (:can-compose? org-data)
+               [:button.mlb-reset.create-bt
+                 {:on-click #(nav-actions/show-follow-picker)}
+                 "New update"])]
            is-unfollowing?
-           [:div.empty-follow
+           [:div.empty-following
              "Here is where you'll find updates that you decided to not follow."
-             ; [:button.mlb-reset.follow-picker-bt
-             ;   {:on-click #(nav-actions/show-follow-picker)}
-             ;   "Curate your feed"]
-               ]
+             (when (:can-compose? org-data)
+               [:button.mlb-reset.create-bt
+                 {:on-click #(nav-actions/show-follow-picker)}
+                 "Create update"])]
            :else "This topic has no updates")]]]))
