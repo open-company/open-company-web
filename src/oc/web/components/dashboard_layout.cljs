@@ -52,7 +52,6 @@
                               (drv/drv :activity-uuid)
                               (drv/drv :filtered-posts)
                               (drv/drv :items-to-render)
-                              (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
@@ -71,8 +70,8 @@
                                 s)
                                :did-mount (fn [s]
                                 ;; Reopen cmail if it was open
-                                (when-let [editable-boards @(drv/get-ref s :editable-boards)]
-                                  (when (pos? (count editable-boards))
+                                (when-let [org-data @(drv/get-ref s :org-data)]
+                                  (when (:can-compose? org-data)
                                     (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
@@ -117,8 +116,6 @@
         empty-container? (and (not loading-container?)
                               (not (seq (:posts-list container-data*))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
-        all-boards (drv/react s :editable-boards)
-        can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie current-org-slug)
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -149,6 +146,7 @@
                                  (map? container-data)
                                  (false? (:following container-data)))
         followers-boards-count (drv/react s :followers-boards-count)
+        can-compose? (:can-compose? org-data)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?
                                  (not is-contributions))

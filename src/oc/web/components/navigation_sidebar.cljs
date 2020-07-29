@@ -40,7 +40,6 @@
                                 (drv/drv :following-badge)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
-                                (drv/drv :editable-boards)
                                 (drv/drv :cmail-state)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :show-invite-box)
@@ -121,11 +120,9 @@
                                  show-invite-box)
         show-topics user-is-part-of-the-team?
         show-add-post-tooltip (drv/react s :show-add-post-tooltip)
-        editable-boards (drv/react s :editable-boards)
         cmail-state (drv/react s :cmail-state)
-        can-compose? (pos? (count editable-boards))
         show-plus-button? (and (not is-mobile?)
-                                can-compose?)]
+                               (:can-compose? org-data))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))

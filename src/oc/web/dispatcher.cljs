@@ -220,6 +220,14 @@
         board-slug (current-board-slug)]
      (board-data-key org-slug board-slug)))
 
+(def can-compose-key :can-copmose?)
+
+(defn org-can-compose-key
+  "Key for a boolean value: true if the user has at least one board
+   he can publish updates in."
+  [org-slug]
+  (vec (conj (org-data-key org-slug) can-compose-key)))
+
 ;; User notifications
 
 (defn user-notifications-key [org-slug]
@@ -669,6 +677,7 @@
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box      [[:base] (fn [base] (get base show-invite-box-key))]
+   :can-compose         [[:org-data] (fn [org-data] (get org-data can-compose-key))]
    })
 
 ;; Action Loop =================================================================
