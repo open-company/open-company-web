@@ -63,6 +63,17 @@ div.explore-view {
       align-items: flex-start;
       justify-content: center;
 
+      &:focus, &:active, &:hover {
+        text-decoration: none;
+        border: 1px solid var(--opac-background-color-2);
+      }
+
+      &:hover {
+        div.explore-view-block-title {
+          text-decoration: underline;
+        }
+      }
+
       div.explore-view-block-title {
         flex: 0 0 auto;
         display: flex;
