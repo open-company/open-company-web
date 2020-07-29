@@ -5,28 +5,19 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
             [oc.web.utils.notification :as notif-utils]
             [cljsjs.moment-timezone]))
 
-(def default-user-image "/img/ML/happy_face_purple.svg")
-(def other-user-images
- ["/img/ML/happy_face_green.svg"
-  "/img/ML/happy_face_blue.svg"
-  "/img/ML/happy_face_purple.svg"
-  "/img/ML/happy_face_yellow.svg"])
-
-(defn random-user-image []
-  (first (shuffle (vec (conj other-user-images default-user-image)))))
-
-(def default-avatar-url (random-user-image))
+(defonce default-avatar-url (uu/random-avatar))
 
 (defn user-icon [user-id]
   (if (= user-id (j/get-key :user-id))
     ;; If the user id is the same of the current JWT use the red icon
-    default-user-image
+    uu/default-avatar
     ;; if not get a random icon from the rest of the images vector
-    (first other-user-images)))
+    (first uu/other-default-avatars)))
 
 (defonce show-login-overlay? dispatcher/show-login-overlay-key)
 
