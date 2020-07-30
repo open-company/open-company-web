@@ -296,7 +296,7 @@
 (defn- collapse-if-needed [s & [e]]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
-        showing-section-picker? @(::show-sections-picker s)
+        showing-section-picker? @(::show-section-picker s)
         event-in? (if e
                     (utils/event-inside? e (rum/dom-node s))
                     false)]
@@ -345,31 +345,33 @@
     (when (responsive/is-mobile-size?)
       (dom-utils/lock-page-scroll))))
 
-(defn- hide-sections-picker [s]
-  (js/console.log "DBG hide-sections-picker" @(::show-sections-picker s))
-  (reset! (::show-sections-picker s) false))
+(defn- hide-section-picker [s]
+  (reset! (::show-section-picker s) false))
 
-(defn- maybe-hide-sections-picker [s]
-  (js/console.log "DBG maybe-hide-sections-picker" @(::show-sections-picker s))
-  (let [delayed-show-sections-picker (::delayed-show-sections-picker s)]
-    (js/console.log "DBG   delayed-show-sections-picker" @delayed-show-sections-picker)
-    (when @delayed-show-sections-picker
-      (js/console.log "DBG    reset timeout" @delayed-show-sections-picker)
-      (.clearTimeout js/window @delayed-show-sections-picker)
-      (reset! delayed-show-sections-picker nil)))
-  (when (= @(::show-sections-picker s) :hover)
-    (hide-sections-picker s)))
+(defn- clear-delayed-show-section-picker [s]
+  (let [delayed-show-section-picker (::delayed-show-section-picker s)]
+    (when @delayed-show-section-picker
+      (.clearTimeout js/window @delayed-show-section-picker)
+      (reset! delayed-show-section-picker nil))))
 
-(defn- show-sections-picker [s v]
-  (js/console.log "DBG show-sections-picker" v)
-  (reset! (::show-sections-picker s) v)
-  (reset! (::delayed-show-sections-picker s) nil))
+(defn- maybe-hide-section-picker [s]
+  (clear-delayed-show-section-picker s)
+  (when (= @(::show-section-picker s) :hover)
+    (hide-section-picker s)))
+
+(defn- show-section-picker [s v]
+  (reset! (::show-section-picker s) v)
+  (reset! (::delayed-show-section-picker s) nil))
 
 (defn- maybe-show-section-picker [s]
-  (js/console.log "DBG maybe-show-sections-picker")
-  (let [delayed-show-sections-picker (::delayed-show-sections-picker s)]
-    (when-not @delayed-show-sections-picker
-      (reset! delayed-show-sections-picker (utils/after 520 #(show-sections-picker s :hover))))))
+  (when-not @(::show-section-picker s)
+    (clear-delayed-show-section-picker s)
+    (reset! (::delayed-show-section-picker s) (utils/after 720 #(show-section-picker s :hover)))))
+
+(defn- toggle-section-picker [s]
+  (if (= @(::show-section-picker s) :click)
+    (hide-section-picker s)
+    (show-section-picker s :click)))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -398,8 +400,8 @@
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
                    (rum/local false ::show-post-tooltip)
-                   (rum/local false ::show-sections-picker)
-                   (rum/local nil ::delayed-show-sections-picker)
+                   (rum/local false ::show-section-picker)
+                   (rum/local nil ::delayed-show-section-picker)
                    (rum/local nil ::last-body)
                    (rum/local nil ::post-tt-kw)
                    (rum/local 68 ::top-padding)
@@ -412,11 +414,7 @@
                      (mixins/on-window-click-mixin collapse-if-needed))
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
-                   (mixins/on-click-out :sections-picker-container (fn [s e]
-                    (let [showing-section-picker? @(::show-sections-picker s)]
-                      (utils/after 100
-                       #(when showing-section-picker?
-                         (hide-sections-picker s))))))
+                   (mixins/on-click-out :section-picker-container (fn [s e] (hide-section-picker s)))
 
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
                                                                      (-> %1 (drv/get-ref :cmail-state) deref :fullscreen))
@@ -534,7 +532,7 @@
                             "Save"
                             "Share update")
         did-pick-section (fn [board-data note dismiss-action]
-                           (hide-sections-picker s)
+                           (hide-section-picker s)
                            (when (and board-data
                                       (seq (:name board-data)))
                             (let [has-changes (or (:has-changes cmail-data)
@@ -608,13 +606,13 @@
             {:class (when show-section-picker? "section-picker-visible")}
             (when is-mobile?
               [:div.section-picker-bt-container
+                {:ref :section-picker-container}
                 [:span.post-to "Post to"]
                 [:button.mlb-reset.section-picker-bt
-                  {:on-click #(show-sections-picker s :click)}
+                  {:on-click #(toggle-section-picker s)}
                   (:board-name cmail-data)]
-                (when @(::show-sections-picker s)
-                  [:div.sections-picker-container
-                    {:ref :sections-picker-container}
+                (when @(::show-section-picker s)
+                  [:div.section-picker-container
                     (sections-picker {:active-slug (:board-slug cmail-data)
                                       :on-change did-pick-section
                                       :current-user-data current-user-data})])])
@@ -682,17 +680,17 @@
                            :show-on-hover true})]
         [:div.section-picker-bt-container
           {:class (when-not show-section-picker? "hidden")
-           :on-mouse-leave #(maybe-hide-sections-picker s)}
+           :on-mouse-leave #(maybe-hide-section-picker s)
+           :on-mouse-enter #(maybe-show-section-picker s)
+           :ref :section-picker-container}
           [:button.mlb-reset.section-picker-bt
-            {:on-click #(show-sections-picker s :click)
+            {:on-click #(toggle-section-picker s)
              :data-placement "top"
              :data-toggle "tooltip"
-             :on-mouse-over #(maybe-show-section-picker s)
              :title board-tooltip}
             (:board-name cmail-data)]
-          (when @(::show-sections-picker s)
-            [:div.sections-picker-container
-              {:ref :sections-picker-container}
+          (when @(::show-section-picker s)
+            [:div.section-picker-container
               (sections-picker {:active-slug (:board-slug cmail-data)
                                 :on-change did-pick-section
                                 :current-user-data current-user-data})])]
