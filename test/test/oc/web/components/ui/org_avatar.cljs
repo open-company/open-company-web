@@ -13,14 +13,10 @@
 (def ^:dynamic c)
 
 (def empty-logo
-  {:logo-url nil
-   :logo-width 0
-   :logo-height 0})
+  {:logo-url nil})
 
 (def with-logo
-  {:logo-url "http://example.com/image.png"
-   :logo-width 100
-   :logo-height 100})
+  {:logo-url "http://example.com/image.png"})
 
 (def org-data {
   :org-data {

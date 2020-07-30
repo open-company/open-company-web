@@ -51,14 +51,14 @@
     (-> next-db
      (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
      (assoc :org-editing next-org-editing)
-     (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
+     (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url]))
      (assoc-in boards-key next-boards)
      (update-in follow-boards-list-key #(user-store/enrich-boards-list unfollow-board-uuids (:boards fixed-org-data))))))
 
 (defmethod dispatcher/action :org-avatar-update/failed
   [db [_]]
   (let [org-data (dispatcher/org-data db)]
-    (assoc db :org-avatar-editing (select-keys org-data [:logo-url :logo-width :logo-height]))))
+    (assoc db :org-avatar-editing (select-keys org-data [:logo-url]))))
 
 (defmethod dispatcher/action :org-create
   [db [_]]

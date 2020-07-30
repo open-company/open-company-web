@@ -502,9 +502,6 @@
    :section-editing     [[:base]
                           (fn [base]
                             (:section-editing base))]
-   :show-sections-picker [[:base]
-                          (fn [base]
-                            (:show-sections-picker base))]
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
@@ -615,10 +612,10 @@
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
+                            :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :activity-uuid]
                             (fn [base orgs org-data contributions-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data
+                                 entry-editing jwt wrt-show loading payments search-active user-info-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
@@ -638,7 +635,6 @@
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :show-section-add-cb (:show-section-add-cb base)
-                               :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (get-in base cmail-state-key)

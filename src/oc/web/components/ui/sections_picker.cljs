@@ -5,8 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (on-click-out)]))
+            [oc.web.lib.responsive :as responsive]))
 
 (def self-board-name "All")
 
@@ -31,8 +30,6 @@
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
-                             (on-click-out (fn [s e]
-                              (dis/dispatch! [:input [:show-sections-picker] false])))
                              ;; Derivatives
                              (drv/drv :org-data)
                              (drv/drv :editable-boards)

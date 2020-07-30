@@ -840,25 +840,41 @@ div.onboard-lander {
   }
 
   &.invitee-lander {
-    div.invite-container {
-      position: absolute;
-      left: 50%;
-      top: calc(50% - 32px);
-      transform: translate(-50%, -50%);
 
-      div.title {
-        width: 400px;
-        font-size: 32px;
+    div.subtitle {
+      width: 379px;
+      margin: 56px auto 0;
+      padding: 72px 0 0;
+      font-size: 16px;
+      color: $deep_navy;
+      position: relative;
+      text-align: center;
+
+      &.token-error {
+        &:before {
+          position: absolute;
+          top: 24px;
+          text-align: center;
+          width: 100%;
+          content: "❌";
+          font-size: 32px;
+          margin: 0 auto;
+        }
       }
 
-      div.subtitle {
-        width: 379px;
-        margin: 16px auto 0;
-        font-size: 18px;
+      &.checking-invitation {
+        width: 186px;
+        text-align: left;
 
-        &.checking-invitation {
-          width: 264px;
-          text-align: left;
+        div.small-loading {
+          float: unset;
+          margin: 0 auto;
+          display: block;
+          width: 20px;
+          position: absolute;
+          top: 24px;
+          left: 50%;
+          transform: translateX(-50%);
         }
       }
     }

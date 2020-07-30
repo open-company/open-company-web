@@ -510,12 +510,12 @@ div.cmail-outer {
       }
 
       div.section-picker-bt-container {
-        margin: 0 28px 0 4px;
+        margin: 0 28px 0 0;
         position: relative;
         display: block;
         float: left;
         height: 32px;
-
+        
         &:after {
           width: 1px;
           height: 16px;
@@ -547,19 +547,21 @@ div.cmail-outer {
 
         button.section-picker-bt {
           height: 32px;
-          width: 106px;
-          padding: 0 12px 0 0;
+          max-width: 156px;
+          padding: 0 20px 0 8px;
           position: relative;
           text-align: left;
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 32px;
-          color: $wut_purple;
+          // color: $wut_purple;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: super;
           white-space: nowrap;
-          max-width: 100%;
+          color: var(--purple-primary-color);
+          border-radius: 4px;
+          background-color: var(--purple-secondary-color);
 
           @include mobile() {
             height: 28px;
@@ -576,11 +578,15 @@ div.cmail-outer {
             height: 32px;
             position: absolute;
             top: 0;
-            right: 0;
+            right: 8px;
             background-image: cdnUrl("/img/ML/purple_arrow.svg");
             background-size: 8px 4px;
             background-repeat: no-repeat;
             background-position: center;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/section_chevron@dark.svg");
+            }
           }
         }
       }
