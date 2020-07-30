@@ -269,6 +269,7 @@
                                                               (not is-drafts-board))
                                                 :public (= (:access container-data) "public")
                                                 :home-icon is-following
+                                                :unfollowing-icon is-unfollowing
                                                 :all-icon is-all-posts
                                                 :topics-icon is-topics
                                                 :saved-icon is-bookmarks

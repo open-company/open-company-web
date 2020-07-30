@@ -588,6 +588,14 @@ div.dashboard-layout {
                 }
               }
 
+              &.unfollowing-icon:before {
+                background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+                }
+              }
+
               span.count {
                 @include OC_Body_Book();
                 font-size: 14px;
