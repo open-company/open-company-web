@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.org-avatar
   (:require [rum.core :as rum]
+            [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.images :as img]
@@ -16,7 +17,7 @@
     (when show-org-avatar?
       [:img.org-avatar-img
        {:src (-> org-data :logo-url (img/optimize-org-avatar-url default-max-logo-height))
-         :on-error #(reset! (::img-load-failed s) true)}])
+        :on-error #(reset! (::img-load-failed s) true)}])
     (when show-org-name?
       [:span.org-name
         {:dangerouslySetInnerHTML (utils/emojify (:name org-data))}])])
@@ -34,7 +35,7 @@
   [s org-data should-show-link & [show-org-name]]
   (let [org-logo (:logo-url org-data)]
     [:div.org-avatar
-      {:class (when (empty? org-logo) "missing-logo")}
+      {:class (when (string/blank? org-logo) "missing-logo")}
       (when org-data
         (let [org-slug (:slug org-data)
               has-name (seq (:name org-data))
@@ -43,9 +44,7 @@
                           (utils/camel-case-str org-slug))
               img-load-failed @(::img-load-failed s)
               show-org-avatar? (and (not img-load-failed)
-                                    (not (clojure.string/blank? org-logo))
-                                    (pos? (:logo-height org-data))
-                                    (pos? (:logo-width org-data)))
+                                    (not (string/blank? org-logo)))
               show-org-name? (case show-org-name
                                :always
                                true

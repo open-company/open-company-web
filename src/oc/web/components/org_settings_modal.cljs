@@ -54,9 +54,7 @@
                                                       :content-visibility new-content-visibility})])))
 
 (defn logo-on-load [org-avatar-editing url img]
-  (org-actions/org-avatar-edit-save {:logo-url url
-                                     :logo-width (.-width img)
-                                     :logo-height (.-height img)})
+  (org-actions/org-avatar-edit-save {:logo-url url})
   (gdom/removeNode img))
 
 (defn logo-add-error

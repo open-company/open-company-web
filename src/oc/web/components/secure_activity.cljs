@@ -58,12 +58,10 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         id-token (drv/react s :id-token)
         org-data (-> activity-data
-                  (select-keys [:org-slug :org-name :org-logo-url :org-logo-width :org-logo-height])
+                  (select-keys [:org-slug :org-name :org-logo-url])
                   (clojure.set/rename-keys {:org-slug :slug
                                             :org-name :name
-                                            :org-logo-url :logo-url
-                                            :org-logo-width :logo-width
-                                            :org-logo-height :logo-height}))
+                                            :org-logo-url :logo-url}))
         comments-drv (drv/react s :comments-data)
         comments-data (au/activity-comments activity-data comments-drv)
         activity-link (utils/link-for (:links org-data) "entries")]

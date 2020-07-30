@@ -804,13 +804,11 @@
 (defn- org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
     (-> secure-activity-data
-      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height :team-id])
+      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :team-id])
       (clojure.set/rename-keys {:org-uuid :uuid
                                 :org-name :name
                                 :org-slug :slug
-                                :org-logo-url :logo-url
-                                :org-logo-width :logo-width
-                                :org-logo-height :logo-height})
+                                :org-logo-url :logo-url})
       (merge old-org-data))))
 
 (defn- secure-activity-get-finish [{:keys [status success body]}]
