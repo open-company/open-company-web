@@ -661,7 +661,7 @@
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            (str "→ " (:board-name cmail-data))]
+            (:board-name cmail-data)]
           (when @(::show-sections-picker s)
             [:div.sections-picker-container
               {:ref :sections-picker-container}
