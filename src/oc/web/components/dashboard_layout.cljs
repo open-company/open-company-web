@@ -295,6 +295,9 @@
                                                  is-following
                                                  "Home"
 
+                                                 is-unfollowing
+                                                 "Unfollowing"
+
                                                  is-replies
                                                  "Replies"
 

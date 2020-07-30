@@ -119,7 +119,7 @@
 
 (defn- activity-real-get
   ([activity-link org-slug sort-type finish-cb]
-   (activity-real-get org-slug sort-type false finish-cb))
+   (activity-real-get activity-link org-slug sort-type false finish-cb))
   ([activity-link org-slug sort-type refresh? finish-cb]
   (api/get-all-posts activity-link
    (fn [resp]
@@ -320,7 +320,7 @@
 
 (defn- unfollowing-real-get
   ([unfollowing-link org-slug sort-type finish-cb]
-   (unfollowing-real-get org-slug sort-type false finish-cb))
+   (unfollowing-real-get unfollowing-link org-slug sort-type false finish-cb))
   ([unfollowing-link org-slug sort-type refresh? finish-cb]
   (api/get-all-posts unfollowing-link
    (fn [resp]
