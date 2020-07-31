@@ -114,12 +114,10 @@ div.empty-board {
         margin: 0 auto;
 
         button.create-bt {
-          margin: 16px auto 0;
           border-radius: 4px;
           width: #{$left_navigation_sidebar_width}px;
           height: 34px;
           padding: 0;
-          display: block;
           position: relative;
           background-color: var(--navigation-sidebar-create-bt-background);
           color: var(--navigation-sidebar-create-bt-color);
@@ -128,6 +126,7 @@ div.empty-board {
           flex-flow: row nowrap;
           justify-content: center;
           align-items: center;
+          margin: 16px auto 0;
 
           @include mobile() {
             display: none;
@@ -147,6 +146,16 @@ div.empty-board {
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
             }
+          }
+
+          span.copy-text {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: var(--navigation-sidebar-create-bt-color);
+            flex: 0 0 auto;
+            margin-right: auto;
+            margin-left: auto;
           }
         }
       }

@@ -6,7 +6,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.mixins.section :as section-mixins]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.actions.cmail :as cmail-actions]))
 
 (rum/defcs empty-board < rum/reactive
                          (drv/drv :org-data)
@@ -57,8 +57,8 @@
              "Nothing in drafts"
              (when (:can-compose? org-data)
                [:button.mlb-reset.create-bt
-                 {:on-click #(nav-actions/show-follow-picker)}
-                 "New update"])]
+                 {:on-click #(cmail-actions/cmail-fullscreen)}
+                 [:span.copy-text "New update"]])]
            is-bookmarks? "No updates are bookmarked"
            is-following?
            [:div.empty-following
