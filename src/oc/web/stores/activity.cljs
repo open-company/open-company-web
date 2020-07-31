@@ -460,7 +460,7 @@
                                    posts-list-key (conj base-board-key :posts-list)
                                    next-ndb (update-in ndb posts-list-key
                                              (fn [posts-list]
-                                               (filterv #(not= % (:uuid activity-data)) posts-list)))
+                                               (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
                                    items-to-render-key (conj base-board-key :items-to-render)
                                    posts-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
                                 (assoc-in next-ndb items-to-render-key
