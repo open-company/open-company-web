@@ -156,10 +156,26 @@
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index})))]))
 
-(defn- unique-row-string [replies? item]
-  (if replies?
-    (keyword (str (:resource-type item) "-" (count (:replies-data item)) "-" (if (:comments-loaded? item) "final" "temp")))
-    (:resource-type item)))
+(defn- replies-unique-key [entry-data]
+  (let [replies-data (vec (:replies-data entry-data))]
+    (reduce (fn [n idx]
+              (let [item (get replies-data idx)]
+                (+ n (* (inc idx) 100) (if (seq (:reactions item)) 1 0))))
+     0
+     (range (count replies-data)))))
+
+ (defn- unique-row-string [replies? item]
+  (let [entry? (activity-utils/entry? item)
+        static-part (str (name (:resource-type item)) "-" (:uuid item))
+        rep-key (replies-unique-key item)
+        variable-part (cond
+                        (and entry? replies?)
+                        (str (-> item :replies-data last :updated-at) "-" rep-key)
+                        entry?
+                        (or (:updated-at item) (:created-at item))
+                        :else
+                        (:last-activity-at item))]
+    (str static-part "-" variable-part)))
 
 (defn- clear-cell-measure
 
