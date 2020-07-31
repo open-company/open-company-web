@@ -224,25 +224,37 @@
   (and (seq (fix-headline (:headline cmail-data)))
        (seq (:board-slug cmail-data))))
 
-(defn real-post-action [s]
-  (let [cmail-data @(drv/get-ref s :cmail-data)
-        fixed-headline (fix-headline (:headline cmail-data))
-        published? (= (:status cmail-data) "published")]
-      (if (is-publishable? cmail-data)
-        (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
-              updated-cmail-data @(drv/get-ref s :cmail-data)
-              section-editing @(drv/get-ref s :section-editing)]
-          (if published?
-            (do
-              (reset! (::saving s) true)
-              (activity-actions/entry-save (first dis/cmail-data-key) updated-cmail-data section-editing))
-            (do
-              (reset! (::publishing s) true)
-              (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing (first dis/cmail-data-key)))))
+(declare real-post-action)
+
+(defn- maybe-publish [s retry]
+  (let [latest-cmail-data @(drv/get-ref s :cmail-data)
+        section-editing @(drv/get-ref s :section-editing)]
+    (if (and (:auto-saving latest-cmail-data)
+             (< retry 10))
+      (utils/after 250 #(real-post-action s (inc retry)))
+      (do
+        (reset! (::publishing s) true)
+        (activity-actions/entry-publish (dissoc latest-cmail-data :status) section-editing (first dis/cmail-data-key))))))
+
+(defn- real-post-action
+  ([s] (real-post-action s 0))
+  ([s retry]
+   (let [cmail-data @(drv/get-ref s :cmail-data)
+         fixed-headline (fix-headline (:headline cmail-data))
+         published? (= (:status cmail-data) "published")]
+     (if (is-publishable? cmail-data)
+       (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
+             updated-cmail-data @(drv/get-ref s :cmail-data)
+             section-editing @(drv/get-ref s :section-editing)]
+         (if published?
+           (do
+             (reset! (::saving s) true)
+             (activity-actions/entry-save (first dis/cmail-data-key) updated-cmail-data section-editing))
+           (maybe-publish s retry)))
         (do
           (reset! (::show-post-tooltip s) true)
           (utils/after 3000 #(reset! (::show-post-tooltip s) false))
-          (reset! (::disable-post s) false)))))
+          (reset! (::disable-post s) false))))))
 
 (defn post-clicked [s]
   (clean-body s)

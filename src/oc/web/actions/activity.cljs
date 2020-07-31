@@ -694,7 +694,7 @@
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
     (let [fixed-edit-key (or edit-key :entry-editing)]
-      (if (get-in dis/app-state [:auto-saving edit-key])
+      (if (get-in dis/app-state [edit-key :auto-saving])
         (utils/after 1000 #(entry-publish entry-editing section-editing edit-key))
         (let [org-data (dis/org-data)
               fixed-entry-editing (assoc entry-editing :status "published")]
