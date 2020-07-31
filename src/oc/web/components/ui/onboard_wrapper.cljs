@@ -620,9 +620,8 @@
                 {:on-submit (fn [e]
                               (.preventDefault e))}
                 [:div.title-container
-                  (when (seq (:logo-url team-data))
-                    [:div.team-logo-container
-                      (org-avatar team-data false :never)])
+                  [:div.team-logo-container
+                    (org-avatar team-data false :never)]
                   [:div.title.main-lander
                     "Join " (:name team-data) " on Wut"]]
                 [:div.field-label.email-field
@@ -826,7 +825,8 @@
              :data-toggle (when-not is-mobile? "tooltip")
              :title "Change avatar"
              :data-placement "top"}
-            (user-avatar-image user-data)]
+            (user-avatar-image user-data)
+            [:div.plus-icon]]
           [:div.field-label
             "First name"]
           [:input.field.oc-input
