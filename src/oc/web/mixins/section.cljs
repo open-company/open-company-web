@@ -41,7 +41,7 @@
         load-comments (fn [s]
                         (when-let [container-data (container-data-get s)]
                           (doseq [entry (:posts-list container-data)
-                                  :when (and (= (:resource-type entry) :entry)
+                                  :when (and (au/entry? entry)
                                              (not (@loaded-uuids (:uuid entry)))
                                              (not (:comments-loaded? entry)))
                                   :let [full-entry (dis/activity-data (:uuid entry))]]

@@ -367,10 +367,10 @@
 
 (defmethod dispatcher/action :followers-count/finish
   [db [_ org-slug data]]
-  (let [publisher-uuids (filter #(= (:resource-type %) :user) data)
+  (let [publisher-uuids (filter au/user? data)
         publishers-map (zipmap (map :resource-uuid publisher-uuids) publisher-uuids)
 
-        unfollow-boards (filter #(= (:resource-type %) :board) data)
+        unfollow-boards (filter au/board? data)
         unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
         active-users-count (count (dispatcher/active-users org-slug db))
         all-board-uuids (->> (dispatcher/org-data db org-slug) :boards filter-org-boards (map :uuid))

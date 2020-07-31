@@ -166,12 +166,12 @@
                           (assoc :unseen false)
                           (assoc :unread false)
                           (assoc :open-item true)
-                          (assoc :close-item (not= (:resource-type first-rp-item) :entry)))
+                          (assoc :close-item (not (au/entry? first-rp-item))))
         ra-activity-item (-> activity-item
                            (assoc :container-seen-at (:last-seen-at old-fl-ra-data))
                            (assoc :unseen false)
                            (assoc :open-item true)
-                           (assoc :close-item (not= (:resource-type first-ra-item) :entry)))
+                           (assoc :close-item (not (au/entry? first-ra-item))))
         new-fl-rp-data (when old-fl-rp-data
                          (-> old-fl-rp-data
                           (update :sort-value (partial sort-value dispatcher/recently-posted-sort))

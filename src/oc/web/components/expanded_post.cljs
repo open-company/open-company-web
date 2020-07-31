@@ -173,10 +173,9 @@
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
-                                    :show-edit? is-publisher?
-                                    :show-delete? is-publisher?
-                                    :show-move? (and (not is-mobile?)
-                                                     is-publisher?)
+                                    :show-edit? true
+                                    :show-delete? true
+                                    :show-move? (not is-mobile?)
                                     :tooltip-position "top"
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?

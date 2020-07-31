@@ -1,6 +1,7 @@
 (ns oc.web.stores.reply
   (:require [oc.web.dispatcher :as dispatcher]
-            [oc.web.utils.comment :as cu]))
+            [oc.web.utils.comment :as cu]
+            [oc.web.utils.activity :as au]))
 
 ;; Reply actions
 
@@ -9,7 +10,7 @@
          (if (= (:uuid entry-data) entry-uuid)
            (update entry-data :replies-data
             (fn [replies-data]
-              (filterv #(not= (:resource-type %) :collapsed-comments) replies-data)))
+              (filterv #(not (au/resource-type? % :collapsed-comments)) replies-data)))
            entry-data))
    entries))
 

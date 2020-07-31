@@ -133,6 +133,7 @@
             (when comments-data
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
+                                :reply-add-comment-prefix "secure-activity"
                                 :current-user-id (:user-id id-token)}))]])
       [:div.secure-activity-footer
         (if id-token

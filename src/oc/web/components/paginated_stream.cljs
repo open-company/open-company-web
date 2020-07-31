@@ -83,7 +83,7 @@
                      :member? member?
                      :publisher? publisher?
                      :editable-boards editable-boards
-                     :foc-board (not= (:resource-type container-data) :board)
+                     :foc-board (not (activity-utils/board? container-data))
                      :current-user-data     current-user-data
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
@@ -123,11 +123,12 @@
    props]
   (let [{:keys [registerChild measure] :as clj-props} (js->clj props :keywordize-keys true)
         item (get items rowIndex)
-        read-data (when (= (:resource-type item) :entry)
+        entry? (activity-utils/entry? item)
+        read-data (when entry?
                     (get activities-read (:uuid item)))
         replies? (= (:container-slug container-data) :replies)]
     [:div.virtualized-list-item
-      {:key (str (name (:resource-type item)) "-" key "-" (if (= (:resource-type item) :entry)
+      {:key (str (name (:resource-type item)) "-" key "-" (if entry?
                                                             (cond replies?
                                                                   (str (:uuid item) "-" (:last-activity-at item) "-" (count (:replies-data item)))
                                                                   :else
@@ -138,13 +139,13 @@
        :ref registerChild
        :style style}
       (cond
-        (= (:resource-type item) :caught-up)
+        (activity-utils/resource-type? item :caught-up)
         (caught-up-wrapper {:item item})
-        (= (:resource-type item) :closing-item)
+        (activity-utils/resource-type? item :closing-item)
         (closing-item {:item item})
-        (= (:resource-type item) :loading-more)
+        (activity-utils/resource-type? item :loading-more)
         (load-more {:item item})
-        (= (:resource-type item) :separator)
+        (activity-utils/resource-type? item :separator)
         (separator-item {:item item :foc-layout foc-layout})
         ; isScrolling
         ; [:div.virtualized-list-placeholder]
@@ -159,7 +160,7 @@
                                                  :row-index row-index})))]))
 
  (defn- unique-row-string [replies? item]
-  (let [entry? (= (:resource-type item) :entry)
+  (let [entry? (activity-utils/entry? item)
         static-part (str (name (:resource-type item)) "-" (:uuid item))
         variable-part (cond
                         (and entry? replies?)

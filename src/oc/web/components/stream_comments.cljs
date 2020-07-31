@@ -281,7 +281,7 @@
                              :will-mount (fn [s]
                               (let [{:keys [last-read-at comments-data]} (-> s :rum/args first)
                                     threads (cu/collapse-comments comments-data last-read-at)
-                                    fixed-threads (filterv #(not= (:resource-type %) :collapsed-comments) threads)]
+                                    fixed-threads (filterv #(not (au/resource-type? % :collapsed-comments)) threads)]
                                 (reset! (::threads s) fixed-threads))
                               s)
                              :did-mount (fn [s]
@@ -297,7 +297,7 @@
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
                                         collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :unread]) all-comments))
                                         updated-threads (cu/collapse-comments comments-data last-read-at)
-                                        fixed-updated-threads (filterv #(not= (:resource-type %) :collapsed-comments) updated-threads)]
+                                        fixed-updated-threads (filterv #(not (au/resource-type? % :collapsed-comments)) updated-threads)]
                                     (reset! (::threads s) fixed-updated-threads))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
@@ -309,7 +309,7 @@
         _followers-publishers-count (drv/react s :followers-publishers-count)
         add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
-        threads (filter #(= (:resource-type %) :comment) @(::threads s))
+        threads (filter au/comment? @(::threads s))
         all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))
         reply-focus-value (cu/add-comment-focus-value reply-add-comment-prefix (:uuid activity-data))]
     [:div.stream-comments

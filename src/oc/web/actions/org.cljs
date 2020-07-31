@@ -145,7 +145,7 @@
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         is-topics? (= current-board-slug "topics")
         is-contributions? (seq (dis/current-contributions-id))
-        ; is-unfollowing? (= current-board-slug "unfollowing")
+        is-unfollowing? (= current-board-slug "unfollowing")
         sort-type (dis/current-sort-type)
         delay-count (atom 1)
         ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
@@ -197,8 +197,8 @@
                      (dis/current-contributions-id))
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
           ;; Preload unfollowing data with recently posted sort
-          ; (when unfollowing-link
-          ;   (utils/maybe-after unfollowing-delay #(aa/unfollowing-get org-data)))
+          (when (and is-unfollowing? unfollowing-link)
+            (aa/unfollowing-get org-data))
           ))
       (when (:badge-following org-data)
         (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
@@ -222,9 +222,8 @@
                      (not following-link))
                 (and is-drafts?
                      (not drafts-link))
-                ; (and is-unfollowing?
-                ;      (not unfollowing-link))
-                )
+                (and is-unfollowing?
+                     (not unfollowing-link)))
         (check-org-404))
 
       ; If there is a board slug let's load the board data
