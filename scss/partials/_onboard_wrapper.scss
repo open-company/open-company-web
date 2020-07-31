@@ -295,7 +295,7 @@ div.onboard-lander {
       &:hover {
         div.plus-icon {
           opacity: 1;
-          transform: rotate(45deg);
+          transform: rotate(0deg);
         }
       }
 
@@ -312,7 +312,7 @@ div.onboard-lander {
         background-position: center;
         background-repeat: no-repeat;
         background-color: rgba(white, 0.56);
-        transform: rotate(0deg);
+        transform: rotate(45deg);
         transition: 180ms transform ease-in, 180ms opacity ease-in;
       }
     }
