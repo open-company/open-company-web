@@ -83,7 +83,7 @@
                      :member? member?
                      :publisher? publisher?
                      :editable-boards editable-boards
-                     :foc-board (not= (:resource-type container-data) :board)
+                     :foc-board (not (activity-utils/board? container-data))
                      :current-user-data     current-user-data
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
@@ -123,7 +123,7 @@
    props]
   (let [{:keys [registerChild measure] :as clj-props} (js->clj props :keywordize-keys true)
         item (get items rowIndex)
-        read-data (when (= (:resource-type item) :entry)
+        read-data (when (activity-utils/entry? item)
                     (get activities-read (:uuid item)))]
     [:div.virtualized-list-item
       {:key (str (name (:resource-type item)) "-" key "-" (or (:uuid item)
@@ -136,13 +136,13 @@
        :ref registerChild
        :style style}
       (cond
-        (= (:resource-type item) :caught-up)
+        (activity-utils/resource-type? item :caught-up)
         (caught-up-wrapper {:item item})
-        (= (:resource-type item) :closing-item)
+        (activity-utils/resource-type? item :closing-item)
         (closing-item {:item item})
-        (= (:resource-type item) :loading-more)
+        (activity-utils/resource-type? item :loading-more)
         (load-more {:item item})
-        (= (:resource-type item) :separator)
+        (activity-utils/resource-type? item :separator)
         (separator-item {:item item :foc-layout foc-layout})
         ; isScrolling
         ; [:div.virtualized-list-placeholder]

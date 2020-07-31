@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -189,7 +190,7 @@
           [:div.user-notifications-tray-empty
             (all-caught-up)]
           (for [n user-notifications-data
-                :let [caught-up? (= (:resource-type n) :caught-up)]]
+                :let [caught-up? (activity-utils/resource-type? n :caught-up)]]
             (if caught-up?
               [:div.user-notification-caught-up
                 {:key (str "uni-caught-up-" (:latest-notify-at n))}

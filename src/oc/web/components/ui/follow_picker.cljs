@@ -7,6 +7,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.actions.notifications :as notification-actions]
@@ -15,13 +16,10 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- is-user? [item]
-  (= (:resource-type item) :user))
-
-(defn- is-board? [item]
-  (= (:resource-type item) :board))
+  (activity-utils/resource-type? item :user))
 
 (defn- sort-items [items]
-  (sort-by #(if (is-board? %)
+  (sort-by #(if (activity-utils/board? %)
               (:name %)
               (:short-name %))
    items))
@@ -41,7 +39,7 @@
 (defn- filter-item [s current-user-id item q]
   (and (or (and (is-user? item)
                 (not= current-user-id (:user-id item)))
-           (and (is-board? item)
+           (and (activity-utils/board? item)
                 (not= (:slug item) utils/default-drafts-board-slug)
                 (not (:publisher-board item))))
         (or (not (seq q))
@@ -93,7 +91,7 @@
         followers-publishers-count (drv/react state :followers-publishers-count)
         is-mobile? (responsive/is-mobile-size?)]
     (for [i items
-          :let [board? (is-board? i)]]
+          :let [board? (activity-utils/board? i)]]
       [:div.follow-picker-item-row.group
         {:key (str prefix "-picker-" (if board? (:uuid i) (:user-id i)))
          :class (when (:follow i) "selected")}
@@ -171,7 +169,7 @@
                    (concat all-boards all-authors))
         with-follow (map #(assoc % :follow (or (and (is-user? %)
                                                     (utils/in? follow-publishers-list (:user-id %)))
-                                               (and (is-board? %)
+                                               (and (activity-utils/board? %)
                                                     (utils/in? follow-boards-list (:uuid %)))))
                       all-items)
         sorted-items (filter-sort-items s (:user-id current-user-data) with-follow @(::query s))

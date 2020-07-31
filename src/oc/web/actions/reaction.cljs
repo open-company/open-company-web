@@ -66,7 +66,7 @@
 
 (defn refresh-resource [org-slug board-slug item-uuid]
   (let [resource-data (reaction-resource org-slug item-uuid)]
-    (if (= (:resource-type resource-data) :comment)
+    (if (activity-utils/comment? resource-data)
       (refresh-comments-if-needed org-slug board-slug resource-data)
       (refresh-entry-if-needed org-slug board-slug item-uuid resource-data))))
 

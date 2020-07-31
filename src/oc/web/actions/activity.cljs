@@ -1123,7 +1123,7 @@
   ([activity-data]
    (when (and activity-data
               (not= activity-data :404)
-              (= (:resource-type activity-data) :entry)
+              (au/entry? activity-data)
               (not (:loading activity-data)))
      (send-item-read (:uuid activity-data))
      (dis/dispatch! [:mark-read (dis/current-org-slug) activity-data (utils/as-of-now)])

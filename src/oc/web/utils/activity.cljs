@@ -176,18 +176,22 @@
 
 (defun is-author?
   "Check if current user is the author of the entry/comment."
-  ([entity-data :guard :author]
-   (when (jwt/jwt)
-     (is-author? entity-data (jwt/user-id))))
+  ([nil] false)
+  ([_ nil] false)
+  ([nil _] false)
 
-  ([entity-data :guard :author user-data :guard :user-id]
+  ([entity-data :guard map?]
+   (is-author? entity-data (jwt/user-id)))
+
+  ([entity-data :guard map? user-data :guard :user-id]
    (is-author? (-> entity-data :author :user-id) (:user-id user-data)))
 
-  ([entity-data :guard :author user-id :guard string?]
+  ([entity-data :guard map? user-id :guard string?]
    (is-author? (-> entity-data :author :user-id) user-id))
 
   ([author-id :guard string? user-id :guard string?]
-   (= user-id author-id)))
+   (and (seq user-id)
+        (= user-id author-id))))
 
 (defn board-by-uuid [board-uuid]
   (let [org-data (dis/org-data)
@@ -271,6 +275,35 @@
 (defn readonly-org? [links]
   (let [update-link (utils/link-for links "partial-update")]
     (nil? update-link)))
+
+(defun resource-type?
+  ([resource-data resource-types :guard coll?]
+   (some (partial resource-type? resource-data) resource-types))
+
+  ([resource-data resource-type :guard string?]
+   (when-not (s/blank? resource-type)
+     (resource-type? resource-data resource-type)))
+
+  ([resource-data resource-type :guard keyword?]
+   (-> resource-data :resource-type keyword (= (keyword resource-type)))))
+
+(defn user? [user-data]
+  (resource-type? user-data :user))
+
+(defn board? [board-data]
+  (resource-type? board-data :board))
+
+(defn container? [container-data]
+  (resource-type? container-data :container))
+
+(defn contributions? [contrib-data]
+  (resource-type? contrib-data :contributions))
+
+(defn entry? [entry-data]
+  (resource-type? entry-data :entry))
+
+(defn comment? [comment-data]
+  (resource-type? comment-data :comment))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")
@@ -525,7 +558,7 @@
   ([org-data :guard map? activity-data :guard map? comment-map :guard map? container-seen-at :guard #(or (nil? %) (string? %))]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
-          can-react? (utils/link-for (:links comment-map) "react"  "POST")
+          can-react? (boolean (utils/link-for (:links comment-map) "react" "POST"))
           reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
           is-root-comment (empty? (:parent-uuid comment-map))
           author? (is-author? comment-map)
@@ -544,8 +577,8 @@
         (assoc :unread unread?)
         (assoc :unseen unseen?)
         (assoc :is-emoji is-emoji-comment?)
-        (assoc :can-edit (and (boolean edit-comment-link))
-                              (not is-emoji-comment?))
+        (assoc :can-edit (boolean (and edit-comment-link
+                                       (not is-emoji-comment?))))
         (assoc :can-delete (boolean delete-comment-link))
         (assoc :can-react can-react?)
         (assoc :reply-parent reply-parent)
@@ -796,7 +829,7 @@
         (-> with-fixed-activities
           (dissoc :old-links :items)
           (assoc :links fixed-next-links)
-          (assoc :self? (is-author? (:author-uuid contributions-data) (jwt/user-id)))
+          (assoc :self? (is-author? (:author-uuid contributions-data)))
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
           (assoc :resource-type :contributions)
@@ -870,21 +903,21 @@
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
                             ;; Find first item that is an entry and is unseen or it's published by
                             ;; the user but after the last seen-at of the container
-                            #(and (= (:resource-type %) :entry)
+                            #(and (entry? %)
                                   (not (:unseen %))
                                   (or (not (:publisher? %))
                                       (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
-                            #(and (= (:resource-type %) :entry)
+                            #(and (entry? %)
                                   (not (:unseen-comments %))))
             ignore-item-fn (when replies?
-                             #(or (not= (:resource-type %) :entry)
+                             #(or (not (entry? %))
                                   (:ignore-comments %)))
             opts {:has-next next-link}
             caught-up-item (when (and keep-caught-up?
                                       (seq (:items-to-render container-data)))
-                             (some #(when (= (:resource-type %) :caught-up) %) (:items-to-render container-data)))
+                             (some #(when (resource-type? % :caught-up) %) (:items-to-render container-data)))
             caught-up-index (when caught-up-item
-                              (utils/index-of (vec (:items-to-render container-data)) #(= (:resource-type %) :caught-up)))
+                              (utils/index-of (vec (:items-to-render container-data)) #(resource-type? % :caught-up)))
             with-caught-up (cond
                              (number? caught-up-index)
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
