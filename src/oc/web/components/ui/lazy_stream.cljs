@@ -20,6 +20,8 @@
         foc-layout (drv/react s :foc-layout)
         ready? (and @(::delayed s)
                     (map? container-data))]
+    (js/console.log "DBG lazy-stream/render ready?" ready?)
+    (js/console.log "DBG    container-data" container-data)
     [:div.lazy-stream
       (if ready?
         (stream-comp)
