@@ -462,14 +462,13 @@
                                       (or board-slug
                                           contributions-id))
                              (let [is-contributions? (seq contributions-id)
-                                   container-key (cond
-                                                   is-contributions?
-                                                   (contributions-data-key org-slug contributions-id)
-                                                   (is-container? board-slug)
-                                                   (container-key org-slug board-slug sort-type)
-                                                   :else
-                                                   (board-data-key org-slug board-slug))]
-                               (get-in base container-key))))]
+                                   cnt-key (cond is-contributions?
+                                                 (contributions-data-key org-slug contributions-id)
+                                                 (is-container? board-slug)
+                                                 (container-key org-slug board-slug sort-type)
+                                                 :else
+                                                 (board-data-key org-slug board-slug))]
+                               (get-in base cnt-key))))]
    :contributions-data    [[:base :org-slug :contributions-id]
                          (fn [base org-slug contributions-id]
                            (when (and org-slug contributions-id)
