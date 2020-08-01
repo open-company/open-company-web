@@ -679,14 +679,14 @@
                                     (reset! (::password-error s) true)))
                                 (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
                   (str "Join " (:name team-data))]]]
-            [:div.invite-token-container.token-error
+            [:div.subtitle.token-error
               [:div.title
                 (str "The invite link you’re trying to access "
                      "has been deactivated by your account admin "
                      "and is no longer valid.")]])
-          [:div.invite-token-container
-            [:div.subtitle.checking-invitation
-              "Checking invitation link" [:span.dots {:ref :dots} "."]]])]))
+          [:div.subtitle.checking-invitation
+            (small-loading)
+            "Checking invitation link" [:span.dots {:ref :dots} "."]])]))
 
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
