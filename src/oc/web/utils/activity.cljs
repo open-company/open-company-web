@@ -145,6 +145,35 @@
          (vec (rest ;; Always remove the first label
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
 
+(defun resource-type?
+  ([resource-data resource-types :guard coll?]
+   (some (partial resource-type? resource-data) resource-types))
+
+  ([resource-data resource-type :guard string?]
+   (when-not (s/blank? resource-type)
+     (resource-type? resource-data resource-type)))
+
+  ([resource-data resource-type :guard keyword?]
+   (-> resource-data :resource-type keyword (= (keyword resource-type)))))
+
+(defn user? [user-data]
+  (resource-type? user-data :user))
+
+(defn board? [board-data]
+  (resource-type? board-data :board))
+
+(defn container? [container-data]
+  (resource-type? container-data :container))
+
+(defn contributions? [contrib-data]
+  (resource-type? contrib-data :contributions))
+
+(defn entry? [entry-data]
+  (resource-type? entry-data :entry))
+
+(defn comment? [comment-data]
+  (resource-type? comment-data :comment))
+
 (defun is-published?
   ([entry-data :guard map?]
   (is-published? (:status entry-data)))
@@ -153,26 +182,27 @@
         (= (keyword entry-status) :published))))
 
 (defun is-publisher?
+  ([nil] false)
+  ([_ nil] false)
+  ([nil _] false)
 
   ([entry-data :guard map?]
-   (when (and (jwt/jwt)
-              (or (:published? entry-data)
-                  (is-published? entry-data))
-              (contains? entry-data :publisher))
-     (is-publisher? (-> entry-data :publisher :user-id) (jwt/user-id))))
+   (is-publisher? entry-data (jwt/user-id)))
 
   ([entry-author-id :guard string?]
-   (when (jwt/jwt)
-     (is-publisher? entry-author-id (jwt/user-id))))
+   (is-publisher? entry-author-id (jwt/user-id)))
 
   ([entry-data :guard map? user-data :guard :user-id]
    (is-publisher? entry-data (:user-id user-data)))
 
   ([entry-data :guard map? user-id :guard string?]
-   (is-publisher? (-> entry-data :publisher :user-id)  user-id))
+   (when (or (:published? entry-data)
+             (is-published? entry-data))
+     (is-publisher? (-> entry-data :publisher :user-id) user-id)))
 
   ([entry-author-id :guard string? user-id :guard string?]
-   (= user-id entry-author-id)))
+   (and (seq entry-author-id)
+        (= user-id entry-author-id))))
 
 (defun is-author?
   "Check if current user is the author of the entry/comment."
@@ -184,10 +214,19 @@
    (is-author? entity-data (jwt/user-id)))
 
   ([entity-data :guard map? user-data :guard :user-id]
-   (is-author? (-> entity-data :author :user-id) (:user-id user-data)))
+   (is-author? entity-data (:user-id user-data)))
+
+  ([contrib-data :guard contributions? user-id :guard string?]
+   (is-author? (:author-uuid contrib-data) user-id))
+
+  ([entity-data :guard entry? user-id :guard string?]
+   (is-author? (-> entity-data :author first :user-id) user-id))
 
   ([entity-data :guard map? user-id :guard string?]
    (is-author? (-> entity-data :author :user-id) user-id))
+
+  ([author-id :guard string?]
+   (is-author? author-id (jwt/user-id)))
 
   ([author-id :guard string? user-id :guard string?]
    (and (seq user-id)
@@ -275,35 +314,6 @@
 (defn readonly-org? [links]
   (let [update-link (utils/link-for links "partial-update")]
     (nil? update-link)))
-
-(defun resource-type?
-  ([resource-data resource-types :guard coll?]
-   (some (partial resource-type? resource-data) resource-types))
-
-  ([resource-data resource-type :guard string?]
-   (when-not (s/blank? resource-type)
-     (resource-type? resource-data resource-type)))
-
-  ([resource-data resource-type :guard keyword?]
-   (-> resource-data :resource-type keyword (= (keyword resource-type)))))
-
-(defn user? [user-data]
-  (resource-type? user-data :user))
-
-(defn board? [board-data]
-  (resource-type? board-data :board))
-
-(defn container? [container-data]
-  (resource-type? container-data :container))
-
-(defn contributions? [contrib-data]
-  (resource-type? contrib-data :contributions))
-
-(defn entry? [entry-data]
-  (resource-type? entry-data :entry))
-
-(defn comment? [comment-data]
-  (resource-type? comment-data :comment))
 
 (defn readonly-board? [links]
   (let [new-link (utils/link-for links "create")
@@ -829,7 +839,7 @@
         (-> with-fixed-activities
           (dissoc :old-links :items)
           (assoc :links fixed-next-links)
-          (assoc :self? (is-author? (:author-uuid contributions-data)))
+          (assoc :self? (is-author? contributions-data))
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
           (assoc :resource-type :contributions)

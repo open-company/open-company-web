@@ -797,28 +797,6 @@ div.onboard-lander {
   }
 
   &.invitee-team-lander {
-    div.invite-token-container {
-      position: absolute;
-      left: 50%;
-      top: calc(50% - 32px);
-      transform: translate(-50%, -50%);
-
-      div.title {
-        font-size: 32px;
-      }
-
-      div.subtitle {
-        width: 379px;
-        margin: 16px auto 0;
-        font-size: 18px;
-
-        &.checking-invitation {
-          width: 264px;
-          text-align: left;
-        }
-      }
-    }
-
     div.title-container {
       div.team-logo-container {
         width: 100%;
@@ -839,7 +817,7 @@ div.onboard-lander {
     }
   }
 
-  &.invitee-lander {
+  &.invitee-lander, &.invitee-team-lander {
 
     div.subtitle {
       width: 379px;
@@ -852,13 +830,16 @@ div.onboard-lander {
 
       &.token-error {
         &:before {
+          top: 0;
+          left: 0;
           position: absolute;
-          top: 24px;
-          text-align: center;
           width: 100%;
-          content: "❌";
-          font-size: 32px;
-          margin: 0 auto;
+          height: 72px;
+          content: "";
+          background-image: cdnUrl("/img/ML/error_icon.png");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
         }
       }
 
