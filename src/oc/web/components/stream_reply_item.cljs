@@ -266,7 +266,7 @@
              :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
              :data-placement "top"
              :data-container "body"
-             :on-click #(activity-actions/inbox-unfollow (:uuid entry-data))}])]
+             :on-click #(activity-actions/entry-unfollow (:uuid entry-data))}])]
       [:div.reply-item-title
         headline]]))
 

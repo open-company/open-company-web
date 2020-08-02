@@ -140,6 +140,10 @@ div.stream-item {
     }
   }
 
+  &.muted-item div.muted-activity {
+    display: inline-block;
+  }
+
   div.activity-share-container {
     display: none;
 
@@ -306,6 +310,29 @@ div.stream-item {
         overflow: hidden;
       }
 
+      div.new-item-tag {
+        flex: 0 0 auto;
+        width: 35px;
+        height: 16px;
+        position: relative;
+        background-color: $feint_emerald;
+        border-radius: 8px;
+
+        &:before {
+          width: 35px;
+          height: 16px;
+          @include OC_Body_Bold();
+          font-size: 11px;
+          line-height: 16px;
+          content: "NEW";
+          color: $carrot_green;
+          position: absolute;
+          top: 0;
+          left: 0;
+          text-align: center;
+        }
+      }
+
       div.bookmark-tag-small {
         margin-right: 0;
         flex: 0 0 auto;
@@ -320,6 +347,17 @@ div.stream-item {
 
       div.bookmark-tag {
         flex: 0 0 auto;
+        align-self: center;
+      }
+
+      div.muted-activity {
+        align-self: center;
+        opacity: 0.5;
+        flex: 0 0 auto;
+
+        @include mobile() {
+          margin-right: 8px;
+        }
       }
     }
 
@@ -344,8 +382,9 @@ div.stream-item {
 
   @include bookmark-tag();
 
+  @include muted-activity();
 
-  div.bookmark-tag, div.bookmark-tag-small {
+  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;
     margin-right: 0;
     margin-left: 8px;

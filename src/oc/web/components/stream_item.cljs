@@ -146,7 +146,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data show-wrt? editable-boards member? publisher? boards-count foc-board current-user-data]}]
+  [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board current-user-data container-slug]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -160,7 +160,7 @@
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        video-player-show (and publisher? uploading-video)
+        video-player-show (and (:publisher? activity-data) uploading-video)
         video-size (when has-video
                      (if is-mobile?
                        {:width (win-width)
@@ -179,19 +179,25 @@
                            :editable-boards editable-boards
                            :external-share (not is-mobile?)
                            :external-bookmark (not is-mobile?)
+                           :external-follow (not is-mobile?)
                            :show-edit? true
                            :show-delete? true
                            :show-move? (not is-mobile?)
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
-        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
+        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
+        is-home? (-> container-slug keyword (= :following))
+        show-new-item-tag (and is-home?
+                               (:unseen activity-data)
+                               (not (:publisher? activity-data)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :expandable is-published?
+                                :muted-item (utils/link-for (:links activity-data) "follow")
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
@@ -261,6 +267,12 @@
               [:time
                 {:date-time t}
                 (utils/time-since t [:short :lower-case])]])
+          [:div.muted-activity
+            {:data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :title "Muted"}]
+          (when show-new-item-tag
+            [:div.new-item-tag])
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
         (when is-published?

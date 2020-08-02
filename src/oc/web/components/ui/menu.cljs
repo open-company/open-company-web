@@ -155,7 +155,7 @@
                    current-user-data)
           [:a
             {:href "#"
-             :on-click (partial profile-edit-click s (:user-id current-user-data))}
+             :on-click (partial profile-edit-click s)}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
         ;; Show user's posts link

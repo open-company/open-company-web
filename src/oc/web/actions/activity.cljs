@@ -1294,7 +1294,7 @@
 
 ;; Inbox actions
 
-(defn inbox-follow [entry-uuid]
+(defn entry-follow [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
         follow-link (utils/link-for (:links activity-data) "follow")]
     (api/inbox-follow follow-link
@@ -1306,7 +1306,7 @@
            (routing-actions/maybe-404))
          (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))))))
 
-(defn inbox-unfollow [entry-uuid]
+(defn entry-unfollow [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
         unfollow-link (utils/link-for (:links activity-data) "unfollow")]
     (api/inbox-unfollow unfollow-link

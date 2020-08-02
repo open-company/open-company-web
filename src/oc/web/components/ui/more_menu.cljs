@@ -122,8 +122,8 @@
                                      share-link)
                                 (and inbox-unread-link
                                      show-unread))
-        inbox-follow-link (utils/link-for (:links entity-data) "follow")
-        inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")
+        follow-link (utils/link-for (:links entity-data) "follow")
+        unfollow-link (utils/link-for (:links entity-data) "unfollow")
         show-menu (or @(::showing-menu s) force-show-menu)]
     (when (or edit-link
               share-link
@@ -245,26 +245,25 @@
                               (when (fn? mark-unread-cb)
                                 (mark-unread-cb)))}
                 "Mark as unread"])
-            (when (and show-inbox?
-                       (or is-mobile?
-                           (not external-follow)))
-              (if inbox-follow-link
+            (when (or is-mobile?
+                      (not external-follow))
+              (if follow-link
                 [:li.follow
                   {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/inbox-follow (:uuid entity-data)))}
+                                (activity-actions/entry-follow (:uuid entity-data)))}
                   "Follow"]
-                (when inbox-unfollow-link
+                (when unfollow-link
                   [:li.unfollow
                     {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                      :on-click #(do
                                   (reset! (::showing-menu s) false)
                                   (when (fn? will-close)
                                     (will-close))
-                                  (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                                  (activity-actions/entry-unfollow (:uuid entity-data)))}
                     "Mute"])))
             (when (or is-mobile?
                       (not external-bookmark))
@@ -330,9 +329,8 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
-             :class (when (or inbox-follow-link
-                              inbox-unfollow-link
-                              show-inbox?
+             :class (when (or follow-link
+                              unfollow-link
                               (and external-bookmark
                                    (or add-bookmark-link
                                        remove-bookmark-link))) "has-next-bt")
@@ -347,38 +345,36 @@
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
         (when external-follow
-          (if inbox-follow-link
-            [:button.mlb-reset.more-menu-inbox-follow-bt
+          (if follow-link
+            [:button.mlb-reset.more-menu-entry-follow-bt
             {:type "button"
-             :ref "more-menu-inbox-follow-bt"
-             :key "more-menu-inbox-follow-bt"
-             :class (when (or show-inbox?
-                              (and external-bookmark
-                                   (or add-bookmark-link
-                                       remove-bookmark-link))) "has-next-bt")
+             :ref "more-menu-entry-follow-bt"
+             :key "more-menu-entry-follow-bt"
+             :class (when (and external-bookmark
+                               (or add-bookmark-link
+                                   remove-bookmark-link)) "has-next-bt")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/inbox-follow (:uuid entity-data)))
+                          (activity-actions/entry-follow (:uuid entity-data)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
              :title "Get notified about new post activity"}]
-            (when inbox-unfollow-link
-              [:button.mlb-reset.more-menu-inbox-unfollow-bt
+            (when unfollow-link
+              [:button.mlb-reset.more-menu-entry-unfollow-bt
                 {:type "button"
-                 :ref "more-menu-inbox-unfollow-bt"
-                 :key "more-menu-inbox-unfollow-bt"
-                 :class (when (or show-inbox?
-                                (and external-bookmark
-                                     (or add-bookmark-link
-                                         remove-bookmark-link))) "has-next-bt")
+                 :ref "more-menu-entry-unfollow-bt"
+                 :key "more-menu-entry-unfollow-bt"
+                 :class (when (and external-bookmark
+                                   (or add-bookmark-link
+                                       remove-bookmark-link)) "has-next-bt")
                  :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/inbox-unfollow (:uuid entity-data)))
+                              (activity-actions/entry-unfollow (:uuid entity-data)))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
