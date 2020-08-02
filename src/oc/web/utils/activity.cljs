@@ -918,9 +918,10 @@
                                       (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
                             #(and (entry? %)
                                   (not (:unseen-comments %))))
-            ignore-item-fn (when replies?
+            ignore-item-fn (if replies?
                              #(or (not (entry? %))
-                                  (:ignore-comments %)))
+                                  (:ignore-comments %))
+                             (comp entry? not))
             opts {:has-next next-link
                   :hide-bottom-line true}
             caught-up-item (when (and keep-caught-up?
