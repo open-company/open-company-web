@@ -53,7 +53,6 @@
            add-comment-force-update
            row-index] :as props}]
   (let [member? (:member? org-data)
-        publisher? (:publisher? item)
         show-wrt? member?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -81,8 +80,8 @@
                      :read-data read-data
                      :show-wrt? show-wrt?
                      :member? member?
-                     :publisher? publisher?
                      :editable-boards editable-boards
+                     :container-slug (:container-slug container-data)
                      :foc-board (not (activity-utils/board? container-data))
                      :current-user-data     current-user-data
                      :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))

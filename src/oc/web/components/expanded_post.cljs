@@ -173,6 +173,7 @@
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
+                                    :external-follow (not is-mobile?)
                                     :show-edit? true
                                     :show-delete? true
                                     :show-move? (not is-mobile?)
