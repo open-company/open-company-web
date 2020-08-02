@@ -424,42 +424,41 @@
                         (every? :publisher? prev-items))
                     (not (seq prev-items)))})))
 
-(defn- insert-caught-up [container-slug items-list check-fn ignore-fn & [{:keys [hide-top-line has-next] :as opts}]]
-  (let [index (loop [last-valid-idx 0
-                     current-idx 0]
-                (let [item (get items-list current-idx)]
-                  (cond
-                   ;; We reached the end, no more items, return last index
-                   (nil? item)
-                   last-valid-idx
-                   ;; If it's an element to ginore, return the last valid index
-                   (and (fn? ignore-fn)
-                        (ignore-fn item))
-                   (recur last-valid-idx
-                          (inc current-idx))
-                   ;; Found the first truthy item, return last index
-                   (check-fn item)
-                   last-valid-idx
-                   :else
-                   (recur (inc current-idx)
-                          (inc current-idx)))))
-        [before after] (split-at index items-list)]
-    (cond
-      (and has-next
-           (= index (count items-list)))
-      (vec items-list)
+(defn- insert-caught-up [container-slug items-list check-fn ignore-fn & [{:keys [hide-top-line hide-bottom-line has-next] :as opts}]]
+  (when (seq items-list)
+    (let [index (loop [last-valid-idx 0
+                       current-idx 0]
+                  (let [item (get items-list current-idx)]
+                    (cond
+                     ;; We reached the end, no more items, return last index
+                     (nil? item)
+                     last-valid-idx
+                     ;; If it's an element to ginore, return the last valid index
+                     (and (fn? ignore-fn)
+                          (ignore-fn item))
+                     (recur last-valid-idx
+                            (inc current-idx))
+                     ;; Found the first truthy item, return last index
+                     (check-fn item)
+                     last-valid-idx
+                     :else
+                     (recur (inc current-idx)
+                            (inc current-idx)))))
+          [before after] (split-at index items-list)]
+      (cond
+        (and (= index (count items-list))
+             (or has-next
+                 hide-bottom-line))
+        (vec items-list)
 
-      (= index (count items-list))
-      (vec (concat items-list [(caught-up-map container-slug items-list)]))
+        (and hide-top-line
+             (zero? index))
+        (vec items-list)
 
-      (and hide-top-line
-           (zero? index))
-      (vec items-list)
-
-      :else
-      (vec (remove nil? (concat before
-                                [(caught-up-map container-slug before)]
-                                after))))))
+        :else
+        (vec (remove nil? (concat before
+                                  [(caught-up-map container-slug before)]
+                                  after)))))))
 
 (defn- insert-open-close-item [items-list check-fn]
   (vec
@@ -475,7 +474,7 @@
      (range (count items-list))))))
 
 (defn- insert-ending-item [items-list has-next]
-  (let [closing-item? (> (count items-list) 3)
+  (let [closing-item? (> (count items-list) 10)
         last-item (last items-list)]
     (cond
      (and (seq items-list) has-next)
@@ -922,7 +921,8 @@
             ignore-item-fn (when replies?
                              #(or (not (entry? %))
                                   (:ignore-comments %)))
-            opts {:has-next next-link}
+            opts {:has-next next-link
+                  :hide-bottom-line true}
             caught-up-item (when (and keep-caught-up?
                                       (seq (:items-to-render container-data)))
                              (some #(when (resource-type? % :caught-up) %) (:items-to-render container-data)))
