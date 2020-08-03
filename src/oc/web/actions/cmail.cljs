@@ -130,10 +130,13 @@
   (load-cached-item initial-entry-data (first dis/cmail-data-key)
    #(dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed false})])))
 
+(defn cmail-reset []
+  (dis/dispatch! [:input dis/cmail-data-key (get-default-section)])
+  (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}]))
+
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
-  (dis/dispatch! [:input dis/cmail-data-key (get-default-section)])
-  (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}])
+  (cmail-reset)
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-fullscreen []

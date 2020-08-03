@@ -149,7 +149,8 @@
         can-compose? (:can-compose? org-data)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?
-                                 (not is-contributions))
+                                 (or (not is-contributions)
+                                     (not (:collapsed cmail-state))))
         paginated-stream-key (str "paginated-posts-component-"
                               (cond is-contributions
                                     current-contributions-id
