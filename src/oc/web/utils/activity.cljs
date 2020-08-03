@@ -691,7 +691,14 @@
   "Fix org data coming from the API."
   [db org-data]
   (when org-data
-    (let [fixed-boards (map #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
+    (let [unfollow-boards-set (set (dis/unfollow-board-uuids))
+          follow-lists-loaded? (map? (dis/follow-list))
+          fixed-boards (map #(as-> % b
+                              (assoc b :read-only (-> % :links readonly-board?))
+                              (if follow-lists-loaded?
+                                (assoc b :following (not (unfollow-boards-set (:uuid %))))
+                                b))
+                        (:boards org-data))
           drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
           drafts-link (when drafts-board
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))

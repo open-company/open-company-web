@@ -1115,6 +1115,11 @@
   ([org-slug] (follow-boards-list org-slug @app-state))
   ([org-slug data] (get-in data (follow-boards-list-key org-slug))))
 
+(defn ^:export unfollow-board-uuids
+  ([] (unfollow-board-uuids (:slug (org-data)) @app-state))
+  ([org-slug] (unfollow-board-uuids org-slug @app-state))
+  ([org-slug data] (get-in data (unfollow-board-uuids-key org-slug))))
+
 (defn uploading-video-data
   ([video-id] (uploading-video-data (current-org-slug) video-id @app-state))
   ([org-slug video-id] (uploading-video-data org-slug video-id @app-state))
