@@ -17,10 +17,19 @@
           [:div.user-profile-header-info-name
             [:span.name
               (:name user-data)]
+            [:span.role
+              (str "(" (string/capital (:role-string user-data)) ")")]
             (when (:self? user-data)
               [:button.mlb-reset.edit-profile-bt
                 {:on-click #(nav-actions/show-user-settings :profile)}
                 "Edit profile"])]
+          ; (when (seq (or (:title user-data) (:role-string user-data)))
+          ;   [:div.user-profile-header-info-title
+          ;     (if (seq (:title user-data))
+          ;       [:div.title
+          ;         (:title user-data)
+          ;         [:span.role (str "(" (:role-string user-data) ")")]]
+          ;       [:div.title (string/capital (:role-string user-data))])])
           (when (seq (:title user-data))
             [:div.user-profile-header-info-title
               (:title user-data)])

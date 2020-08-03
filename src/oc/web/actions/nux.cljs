@@ -63,7 +63,7 @@
   (when-let* [nv (get-nux-cookie)
               org-data (dis/org-data)]
     (let [team-data (dis/team-data)
-          can-edit? (utils/is-admin-or-author? org-data)
+          ; can-edit? (utils/is-admin-or-author? org-data)
           is-admin? (jwt/is-admin? (:team-id org-data))
           add-post-tooltip (:show-add-post-tooltip nv)
           post-added-tooltip (:show-post-added-tooltip nv)
@@ -77,24 +77,25 @@
                                       ;; we are not showing the next tooltip (post added)
                                       (not (true? post-added-tooltip)))
           ;; Show the tooltip inside editing
-          fixed-edit-tooltip (and ;; has not been done already
-                                  (not= edit-tooltip default-tooltip-done)
-                                  ;; user is not a viewer
-                                  can-edit?)]
+          ; fixed-edit-tooltip (and ;; has not been done already
+          ;                         (not= edit-tooltip default-tooltip-done)
+          ;                         ;; user is not a viewer
+          ;                         can-edit?)
+          ]
       ;; If we don't need to show the first tooltip but it's
       ;; not marked as done let's mark it to remember
       (when (and (not fixed-add-post-tooltip)
                  (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
-      (when (and (not fixed-post-added-tooltip)
-                 (not can-edit?))
-        (mark-nux-step-done :show-post-added-tooltip))
-      (when (and (not fixed-edit-tooltip)
-                 (not can-edit?))
-        (mark-nux-step-done :show-edit-tooltip))
-      (when (and (not fixed-edit-tooltip)
-                 (not can-edit?))
-        (mark-nux-step-done :show-edit-tooltip))
+      ; (when (and (not fixed-post-added-tooltip)
+      ;            (not can-edit?))
+      ;   (mark-nux-step-done :show-post-added-tooltip))
+      ; (when (and (not fixed-edit-tooltip)
+      ;            (not can-edit?))
+      ;   (mark-nux-step-done :show-edit-tooltip))
+      ; (when (and (not fixed-edit-tooltip)
+      ;            (not can-edit?))
+      ;   (mark-nux-step-done :show-edit-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
                                  (if (:author? org-data)
@@ -102,7 +103,7 @@
                                   :is-second-user)
                                  false)
         :show-post-added-tooltip fixed-post-added-tooltip
-        :show-edit-tooltip fixed-edit-tooltip
+        ; :show-edit-tooltip fixed-edit-tooltip
         :user-type user-type}])
 
       ;; Check if we need to remove the nux cookie

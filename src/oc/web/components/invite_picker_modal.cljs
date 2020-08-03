@@ -4,7 +4,6 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -34,8 +33,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)
-        current-user-data (drv/react s :current-user-data)
-        user-role (user-store/user-role org-data current-user-data)]
+        current-user-data (drv/react s :current-user-data)]
     [:div.invite-picker-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
@@ -68,5 +66,5 @@
                 {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
                 [:span.disabled "Invite via Slack"]
                 [:span.enabled "(add Slack)"]]))
-          (when (= user-role :admin)
+          (when (= (:role current-user-data) :admin)
             (email-domains))]]]))

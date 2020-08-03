@@ -47,12 +47,17 @@
 
 (def default-invite-type "email")
 
-(defn parse-user-data [user-data]
-  (-> user-data
-    (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
-    (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))
-    (assoc :name (user-lib/name-for user-data))
-    (assoc :short-name (user-lib/short-name-for user-data))))
+(defn- parse-user-data [user-data org-data active-users]
+  (let [active-user-data (get active-users (:user-id user-data))
+        updated-user-data (merge active-user-data user-data)]
+    (-> updated-user-data
+      (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
+      (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))
+      (assoc :name (user-lib/name-for user-data))
+      (as-> u
+       (assoc u :role (uu/get-user-type u org-data))
+       (assoc u :role-string (uu/user-role-string (:role u))))
+      (assoc :short-name (user-lib/short-name-for user-data)))))
 
 (defn- fix-user-values [user-data]
   (cond-> user-data
@@ -70,10 +75,10 @@
    (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
 
 (defn update-user-data [db user-data]
-  (let [fixed-user-data (parse-user-data user-data)
-        org-data (dispatcher/org-data db)
-        active-user-key (when org-data
-                          (conj (dispatcher/active-users-key (:slug org-data)) (:user-id user-data)))
+  (let [org-data (dispatcher/org-data db)
+        active-users (dispatcher/active-users (:slug org-data) db)
+        fixed-user-data (parse-user-data user-data org-data active-users)
+        active-user-key (conj (dispatcher/active-users-key (:slug org-data)) (:user-id user-data))
         next-db (if org-data
                   (update-in db active-user-key merge fixed-user-data)
                   db)]
@@ -230,14 +235,6 @@
   (-> db
       (assoc :email-confirmed confirmed)
       (dissoc :latest-entry-point :latest-auth-settings)))
-
-(defn user-role [org-data user-data]
-  (let [is-admin? (j/is-admin? (:team-id org-data))
-        is-author? (utils/link-for (:links org-data) "create")]
-    (cond
-      is-admin? :admin
-      is-author? :author
-      :else :viewer)))
 
 (defn has-slack-bot? [org-data]
   (j/team-has-bot? (:team-id org-data)))

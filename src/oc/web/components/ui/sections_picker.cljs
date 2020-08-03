@@ -45,7 +45,7 @@
   [s {:keys [active-slug on-change moving? current-user-data]}]
   (let [org-data (drv/react s :org-data)
         editable-boards (vals (drv/react s :editable-boards))
-        author? (not= (utils/get-user-type current-user-data org-data) :viewer)
+        author? (not= (:role current-user-data) :viewer)
         user-publisher-board (some #(when (and (:publisher-board %)
                                                (= (-> % :author :user-id) (:user-id current-user-data)))
                                       %)

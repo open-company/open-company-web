@@ -22,7 +22,7 @@
                :org_slug (:slug org-data)
                ;; FIXME: add back user role here if we start using FS seriously
                ;; removed for circular dependency problem
-               ;; (user-store/user-role org-data (dis/current-user-data))
+               ;; (user-store/get-user-type (dis/current-user-data) org-data)
                :role "-"}))))
 
 (defn session-url []

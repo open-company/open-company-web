@@ -157,7 +157,7 @@
   (when (not= old-user-type new-user-type)
     (let [org-data           (dis/org-data)
           fixed-author-data  (or author-data
-                              (utils/get-author (:user-id user) (:authors org-data)))
+                                 (uu/get-author (:user-id user) (:authors org-data)))
           add-admin?         (= new-user-type :admin)
           remove-admin?      (= old-user-type :admin)
           add-author?        (or (= new-user-type :author)
@@ -201,7 +201,7 @@
         ;; from slack is not possible to select a user already invited since they are filtered by status before
         user (when (= invite-from "email")
                (first (filter #(= (:email %) email-address) (:users team-data))))
-        old-user-type (when user (utils/get-user-type user org-data))]
+        old-user-type (when user (uu/get-user-type user org-data))]
     ;; Send the invitation only if the user is not part of the team already
     ;; or if it's still pending, ie resend the invitation email
     (if (or (not user)

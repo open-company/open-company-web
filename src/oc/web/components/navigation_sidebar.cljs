@@ -12,7 +12,6 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.user :as user-utils]
-            [oc.web.stores.user :as user-store]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.menu :as menu]
@@ -113,8 +112,7 @@
         replies-badge (drv/react s :replies-badge)
         ; show-you (and user-is-part-of-the-team?
         ;               (pos? (:contributions-count org-data)))
-        user-role (user-store/user-role org-data current-user-data)
-        is-admin-or-author? (#{:admin :author} user-role)
+        is-admin-or-author? (#{:admin :author} (:role current-user-data))
         show-invite-people? (and org-slug
                                  is-admin-or-author?
                                  show-invite-box)
@@ -188,10 +186,10 @@
                         "top-border")}
               [:a.nav-link.profile.hover-item.group
                 {:class (utils/class-set {:item-selected is-contributions})
-                 :href (oc-urls/contributions contrib-user-id)
+                 :href (oc-urls/contributions (:user-id current-user-data))
                  :on-click (fn [e]
                              (utils/event-stop e)
-                             (nav-actions/nav-to-author! e contrib-user-id (oc-urls/contributions contrib-user-id)))}
+                             (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label
                   ; {:class (utils/class-set {:new (seq all-unread-items)})}

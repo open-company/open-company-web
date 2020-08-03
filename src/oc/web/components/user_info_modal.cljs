@@ -17,7 +17,7 @@
   (let [my-profile? (and (jwt/jwt)
                          (:self? user-data))
         member? (:member? org-data)
-        team-role (when member? (utils/get-user-type user-data org-data))
+        team-role (when member? (user-utils/get-user-type user-data org-data))
         panel-stack (drv/react s :panel-stack)
         followers-publishers-count (drv/react s :followers-publishers-count)
         followers-count (get followers-publishers-count (:user-id user-data))]
