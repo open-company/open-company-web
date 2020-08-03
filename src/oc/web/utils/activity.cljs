@@ -773,11 +773,11 @@
             with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
             follow-board-uuids (set (map :uuid follow-boards-list))]
         (-> with-fixed-activities
+          (assoc :resource-type :board)
           (assoc :read-only (readonly-board? (:links board-data)))
           (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
-          (assoc :resource-type :board)
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions
@@ -831,8 +831,8 @@
             items-list (when (contains? contributions-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
-                                (select-keys preserved-keys)
-                                (assoc :resource-type :entry))
+                                (assoc :resource-type :entry)
+                                (select-keys preserved-keys))
                           (:items contributions-data)))
             full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
             grouped-items (if (show-separators? :contributions sort-type)
@@ -843,12 +843,12 @@
             with-ending-item (insert-ending-item with-open-close-items next-link)
             follow-publishers-ids (set (map :user-id follow-publishers-list))]
         (-> with-fixed-activities
+          (assoc :resource-type :contributions)
           (dissoc :old-links :items)
           (assoc :links fixed-next-links)
           (assoc :self? (is-author? contributions-data))
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
-          (assoc :resource-type :contributions)
           (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
 
 (defn parse-container
@@ -904,9 +904,9 @@
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
+                                (assoc :resource-type :entry)
                                 (merge (get-in with-fixed-activities [:fixed-items (:uuid %)]))
-                                (select-keys preserved-keys)
-                                (assoc :resource-type :entry))
+                                (select-keys preserved-keys))
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction)
             full-items-list (if replies?
@@ -947,10 +947,10 @@
             with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
         (-> with-fixed-activities
+         (assoc :resource-type :container)
          (dissoc :old-links :items)
          (assoc :links fixed-next-links)
          (assoc :posts-list full-items-list)
-         (assoc :resource-type :container)
          (assoc :items-to-render with-ending-item))))))
 
 (defn activity-comments [activity-data comments-data]

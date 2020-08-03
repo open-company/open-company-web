@@ -1,8 +1,9 @@
 (ns oc.web.components.ui.user-type-dropdown
   ""
   (:require [rum.core :as rum]
+            [cuerdas.core :as string]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.utils.user :as user-utils]))
 
 (rum/defc user-type-dropdown < rum/static
   [{:keys [user-id user-type on-change hide-admin on-remove disabled?]}]
@@ -14,12 +15,7 @@
          :aria-haspopup true
          :aria-expanded false
          :disabled disabled?}
-        (case user-type
-          :admin
-          "Admin"
-          :author
-          "Contributor"
-          "Viewer")]
+        (string/capital (user-utils/user-role-string user-type))]
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
         [:li

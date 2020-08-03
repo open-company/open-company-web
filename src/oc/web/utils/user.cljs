@@ -108,3 +108,50 @@
 
 (defn filter-active-users [users-list]
   (filter active? users-list))
+
+; (defn user-role [org-data user-data]
+;   (let [is-admin? (j/is-admin? (:team-id org-data))
+;         is-author? (utils/link-for (:links org-data) "create")]
+;     (cond
+;       is-admin? :admin
+;       is-author? :author
+;       :else :viewer)))
+
+(defn user-role-string [role-kw]
+  (case role-kw
+   :admin
+   "admin"
+   :author
+   "contributor"
+   "viewer"))
+
+(defn get-author
+  "Get the author data from the org list of authors"
+  [user-id authors]
+  (when (and (seq authors)
+             (seq user-id))
+    ((set (map :user-id authors)) user-id)))
+
+(defun get-user-type
+  "Calculate the user type, return admin if it's an admin,
+  check if it's in the authors list if not admin
+  return viewer else."
+  ([user-data org-data]
+  (cond
+    ;; if :admin is present and it's true
+    (true? (:admin? user-data))
+    :admin
+    ;; if :admin is present and it's a list of teams
+    ;; and it contains the actual org team
+    ((set (:admin user-data)) (:team-id org-data))
+    :admin
+    ;; if the user is in the list of authors of the org data
+    ;; or if a board is passed and the authors list contains the user-id
+    (get-author (:user-id user-data) (:authors org-data))
+    :author
+    ;; viewer in all other cases
+    :else
+    :viewer))
+  ([user-data org-data board-data :guard map?]
+   (if (get-author (:user-id user-data) (:authors board-data))
+     :viewer)))

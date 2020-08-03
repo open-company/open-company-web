@@ -220,7 +220,7 @@
             (if is-jelly-head-avatar
               [:div.empty-user-avatar-placeholder]
               (user-avatar-image user-for-avatar))
-            [:div.user-profile-avatar-label "Edit profile photo"]]
+            [:div.user-profile-avatar-label "Select profile photo"]]
           [:div.user-profile-modal-fields
             [:form
               {:action "."

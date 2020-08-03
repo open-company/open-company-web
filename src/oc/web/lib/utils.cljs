@@ -350,47 +350,6 @@
   (let [parsed-email (email/parse email-address)]
     {:name (.getName parsed-email) :address (.getAddress parsed-email)}))
 
-(defn get-author
-  "Get the author data from the org list of authors"
-  [user-id authors]
-  (some #(when (= (:user-id %) user-id) %) authors))
-
-(defn get-user-type
-  "Calculate the user type, return admin if it's an admin,
-  check if it's in the authors list if not admin
-  return viewer else."
-  [user-data org-data & [board-data]]
-  (cond
-    ;; if :admin is present and it's true
-    (true? (:admin? user-data))
-    :admin
-    ;; if :admin is present and it's a list of teams
-    ;; and it contains the actual org team
-    (in? (:admin user-data) (:team-id org-data))
-    :admin
-    ;; if the user is in the list of authors of the org data
-    ;; or if a board is passed and the authors list contains the user-id
-    (or (get-author (:user-id user-data) (:authors org-data))
-        (and board-data
-             (get-author (:user-id user-data) (:authors board-data))))
-    :author
-    ;; viewer in all other cases
-    :else
-    :viewer))
-
-(defn is-admin?
-  [org-data]
-  (let [user-data (jwt/get-contents)
-        user-type (get-user-type user-data org-data)]
-    (= :admin user-type)))
-
-(defn is-admin-or-author?
-  [org-data & [board-data]]
-  (let [user-data (jwt/get-contents)
-        user-type (get-user-type user-data org-data board-data)]
-    (or (= :admin user-type)
-        (= :author user-type))))
-
 (defn index-of
   "Given a collection and a function return the index that make the function truely."
   [s f]

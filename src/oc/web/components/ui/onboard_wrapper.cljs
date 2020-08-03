@@ -608,7 +608,7 @@
         (if auth-settings
           (if (:team auth-settings)
             [:div.title
-              "Join Wut"]
+              "Your team is using Wut to share updates"]
             [:div.title
               "Oh oh..."])
           [:div.title

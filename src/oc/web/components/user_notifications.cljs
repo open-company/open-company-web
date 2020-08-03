@@ -13,8 +13,7 @@
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.info-hover-views :refer (board-info-hover)]))
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]))
 
 (rum/defc user-notification-timestamp
   [{:keys [timestamp is-mobile?]}]
@@ -32,7 +31,7 @@
   [{latest-notify-at :latest-notify-at {:keys [board-name] :as activity-data} :activity-data}]
   [:div.user-notification-header
     [:div.user-notification-board-name-container
-      (board-info-hover {:activity-data activity-data})
+      ; (board-info-hover {:activity-data activity-data})
       [:span.board-name
         board-name]]
     [:div.separator-dot]

@@ -32,7 +32,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
 
 ;; Comment delete
 
@@ -245,7 +245,7 @@
             (:name publisher)]]
         [:span.in "in"]
         [:div.reply-item-board-container
-          (board-info-hover {:activity-data entry-data})
+          ; (board-info-hover {:activity-data entry-data})
           [:span.board-name
             board-name]]
         [:div.separator-dot]

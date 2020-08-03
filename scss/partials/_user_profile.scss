@@ -42,6 +42,8 @@ div.user-profile-container {
           flex-flow: row nowrap;
           align-items: center;
           justify-content: flex-start;
+          max-width: 100%;
+          overflow: hidden;
 
           span.name {
             @include OC_Body_Bold();
@@ -49,9 +51,19 @@ div.user-profile-container {
             font-size: 22px;
             line-height: 24px;
             flex: 0 1 auto;
-            max-width: 100%;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+          }
+
+          span.role {
+            @include OC_Body_Book();
+            color: var(--light-color);
+            font-size: 16px;
+            line-height: 20px;
+            flex: 0 0 auto;
+            margin-left: 6px;
+            margin-right: 24px;
           }
 
           button.edit-profile-bt {
@@ -68,11 +80,21 @@ div.user-profile-container {
 
         div.user-profile-header-info-title {
           flex: 0 0 auto;
-          @include OC_Body_Book();
-          color: var(--light-color);
-          font-size: 16px;
-          line-height: 18px;
           margin-top: 4px;
+
+          div.title {
+            display: inline-block;
+            @include OC_Body_Book();
+            color: var(--light-color);
+            font-size: 16px;
+            line-height: 18px;
+
+            span.role {
+              margin-left: 6px;
+              font-size: 12px;
+              line-height: 18px;
+            }
+          }
         }
 
         div.user-profile-header-info-blurb {

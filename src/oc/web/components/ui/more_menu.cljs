@@ -378,7 +378,8 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title "Ignore future activity unless mentioned"}])))
+                 :title "Don't show replies to this update" ; "Ignore future activity unless mentioned"
+                 }])))
         (when external-bookmark
           (if remove-bookmark-link
             [:button.mlb-reset.more-menu-remove-bookmark-bt

@@ -11,7 +11,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
-            [oc.web.stores.user :as user-store]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
@@ -115,12 +114,11 @@
   [s]
   (let [{:keys [panel-stack org-data board-data current-org-slug]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
-        user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
-        is-admin-or-author? (#{:admin :author} user-role)
+        is-admin-or-author? (#{:admin :author} (:role current-user-data))
         expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?)
@@ -130,7 +128,7 @@
                       ua/desktop-app? (get-desktop-version)
                       :else "")
         show-billing? (and ls/payments-enabled
-                           (= user-role :admin)
+                           (= (:role current-user-data) :admin)
                            current-org-slug)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
@@ -208,7 +206,7 @@
           [:div.oc-menu-separator])
         ;; Admin settings
         (when (and (not is-mobile?)
-                   (= user-role :admin)
+                   (= (:role current-user-data) :admin)
                    current-org-slug)
           [:a
             {:href "#"
@@ -230,13 +228,13 @@
             {:href "#"
              :on-click #(manage-team-click s %)}
             [:div.oc-menu-item.manage-team
-              (if (= user-role :admin)
+              (if (= (:role current-user-data) :admin)
                 "Manage team"
                 "View team")]])
         ;; Integrations
         (when (and (not is-mobile?)
                    current-org-slug
-                   (= user-role :admin))
+                   (= (:role current-user-data) :admin))
           [:a
             {:href "#"
              :on-click #(integrations-click s %)}

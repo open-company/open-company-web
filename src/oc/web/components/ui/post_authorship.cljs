@@ -4,7 +4,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.info-hover-views :refer (user-info-hover board-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover)])); board-info-hover)]))
 
 (rum/defc post-authorship < rum/static
   [{{:keys [publisher author status board-name board-slug board-access board-uuid] :as activity-data} :activity-data
@@ -39,8 +39,8 @@
         [:span.in "in "])
       (when show-board?
         [:div.board-hover-container
-          (when board-hover?
-            (board-info-hover {:activity-data activity-data}))
+          ; (when board-hover?
+          ;   (board-info-hover {:activity-data activity-data}))
           [:a.board-name
             {:class utils/hide-class
              :href (oc-urls/board board-slug)

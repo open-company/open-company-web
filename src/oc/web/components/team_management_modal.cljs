@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
-            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -85,8 +84,7 @@
         sorted-users (if self-user
                        (concat [self-user] other-sorted-users)
                        other-sorted-users)
-        user-role (user-store/user-role org-data cur-user-data)
-        is-admin-or-author? (#{:admin :author} user-role)
+        is-admin-or-author? (#{:admin :author} (:role cur-user-data))
         is-admin? (jwt/is-admin? (:team-id org-data))]
     [:div.team-management-modal
       [:button.mlb-reset.modal-close-bt
@@ -114,7 +112,7 @@
                :on-change #(reset! (::query s) (.. % -target -value))}]]
           [:div.team-management-users-list
             (for [user sorted-users
-                  :let [user-type (utils/get-user-type user (dis/org-data))
+                  :let [user-type (:role user)
                         author (some #(when (= (:user-id %) (:user-id user)) %) org-authors)
                         pending? (and (= "pending" (:status user))
                                       (or (contains? user :email)
@@ -172,7 +170,7 @@
                                       (dis/dispatch! [:input [:invite-users]
                                                        [{:user inviting-user
                                                          :type invitation-type
-                                                         :role user-type
+                                                         :role (:role user)
                                                          :error nil}]])
                                       (reset! (::resending-invite s) true)
                                       (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data)) "")))
@@ -235,11 +233,11 @@
                 [:div.user-role
                   (if (or current-user
                           (not is-admin?))
-                    [:span.self-user-type (name user-type)]
+                    [:span.self-user-type (s/capitalize (:role-string user))]
                     (user-type-dropdown {:user-id (:user-id user)
-                                         :user-type user-type
+                                         :user-type (:role user)
                                          :disabled? removing?
-                                         :on-change #(team-actions/switch-user-type user user-type % user author)
+                                         :on-change #(team-actions/switch-user-type user (:role user) % user author)
                                          :hide-admin (not is-admin?)
                                          :on-remove (if (and (not= "pending" (:status user))
                                                              (not= (:user-id user) (:user-id cur-user-data)))
