@@ -382,7 +382,7 @@
    return a single list without duplicates depending on the direction.
    This is necessary since the lists could contain duplicates because they are loaded in 2 different
    moments and new activity could lead to changes in the sort."
-  [new-items-list old-items-list direction & [x]]
+  [new-items-list old-items-list direction]
   (cond
     (and direction
          (seq old-items-list)
@@ -691,7 +691,14 @@
   "Fix org data coming from the API."
   [db org-data]
   (when org-data
-    (let [fixed-boards (map #(assoc % :read-only (-> % :links readonly-board?)) (:boards org-data))
+    (let [unfollow-boards-set (set (dis/unfollow-board-uuids))
+          follow-lists-loaded? (map? (dis/follow-list))
+          fixed-boards (map #(as-> % b
+                              (assoc b :read-only (-> % :links readonly-board?))
+                              (if follow-lists-loaded?
+                                (assoc b :following (not (unfollow-boards-set (:uuid %))))
+                                b))
+                        (:boards org-data))
           drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
           drafts-link (when drafts-board
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
@@ -901,7 +908,7 @@
                                 (select-keys preserved-keys)
                                 (assoc :resource-type :entry))
                           (:items container-data)))
-            items-list* (merge-items-lists items-list (:posts-list container-data) direction (:container-slug container-data))
+            items-list* (merge-items-lists items-list (:posts-list container-data) direction)
             full-items-list (if replies?
                               (mapv #(entry-replies-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
                               items-list*)
@@ -921,7 +928,7 @@
             ignore-item-fn (if replies?
                              #(or (not (entry? %))
                                   (:ignore-comments %))
-                             (comp entry? not))
+                             #(not (entry? %)))
             opts {:has-next next-link
                   :hide-bottom-line true}
             caught-up-item (when (and keep-caught-up?

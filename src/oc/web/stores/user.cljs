@@ -351,7 +351,10 @@
 (defmethod dispatcher/action :follow/loaded
   [db [_ org-slug {:keys [follow-publisher-uuids unfollow-board-uuids user-id] :as resp}]]
   (if (= org-slug (:org-slug resp))
-    (let [org-data (dispatcher/org-data db)
+    (let [org-data-key (dispatcher/org-data-key org-slug)
+          org-data (get-in db org-data-key)
+          unfollow-boards-uuids-set (set unfollow-board-uuids)
+          updated-org-data (update org-data :boards (fn [boards] (map #(assoc % :following (not (unfollow-boards-uuids-set (:uuid %)))) boards)))
           follow-publisher-uuids-set (set follow-publisher-uuids)
           active-users (dispatcher/active-users org-slug db)
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
@@ -359,6 +362,7 @@
           next-follow-boards-data (enrich-boards-list unfollow-board-uuids (:boards org-data))
           next-follow-publishers-data (enrich-publishers-list follow-publisher-uuids active-users)]
       (-> db
+       (assoc-in org-data-key updated-org-data)
        (assoc-in follow-publishers-list-key next-follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)
        (assoc-in (dispatcher/unfollow-board-uuids-key org-slug) unfollow-board-uuids)
@@ -410,9 +414,12 @@
   [db [_ org-slug {:keys [board-uuids follow? board-uuid] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
-          org-boards (:boards (dispatcher/org-data db org-slug))
+          org-data-key (dispatcher/org-data-key org-slug)
+          org-data (get-in db org-data-key)
+          org-boards (:boards org-data)
           unfollow-board-uuids-key (dispatcher/unfollow-board-uuids-key org-slug)
           all-board-uuids (set (map :uuid org-boards))
+          updated-org-data (update org-data :boards (fn [boards] (map #(assoc % :following (if (= (:uuid %) board-uuid) follow? (:following %))) boards)))
           next-unfollow-uuids (clojure.set/difference all-board-uuids (set board-uuids))
           next-follow-boards-data (enrich-boards-list next-unfollow-uuids org-boards)
           followers-count-key (dispatcher/followers-boards-count-key org-slug)
@@ -422,6 +429,7 @@
       (-> db
        (assoc-in follow-boards-list-key next-follow-boards-data)
        (assoc-in unfollow-board-uuids-key next-unfollow-uuids)
+       (assoc-in org-data-key updated-org-data)
        (update-in board-count-key #(if %
                                      (update % :count fn)
                                      {:org-slug org-slug

@@ -492,11 +492,13 @@
                                             ;; If user is following the board they posted to
                                             ;; and they are in home
                                             {:slug "following"
-                                             :url (oc-urls/following)}
+                                             :url (oc-urls/following)
+                                             :refresh false}
                                             ;; Redirect to the posting board in every other case
                                             {:slug (:board-slug cmail-data)
-                                             :url (oc-urls/board (:board-slug cmail-data))})]
-                               (nav-actions/nav-to-url! nil (:slug to-url) (:url to-url) 0 false))))))))
+                                             :url (oc-urls/board (:board-slug cmail-data))
+                                             :refresh true})]
+                               (nav-actions/nav-to-url! nil (:slug to-url) (:url to-url) 0 (:refresh to-url)))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
