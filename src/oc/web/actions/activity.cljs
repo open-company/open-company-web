@@ -451,7 +451,10 @@
 (declare entry-save)
 
 (defn entry-save-on-exit
-  [edit-key entry-data entry-body section-editing]
+  ([edit-key entry-data entry-body section-editing]
+   (entry-save-on-exit edit-key entry-data entry-body section-editing nil))
+
+  ([edit-key entry-data entry-body section-editing callback]
   (let [entry-map (assoc entry-data :body entry-body)
         cache-key (cmail-actions/get-entry-cache-key (:uuid entry-data))]
     ;; Save the entry in the local cache without auto-saving or
@@ -494,8 +497,10 @@
                      (dis/dispatch! [:entry-save-with-board/finish (dis/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
-           (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))
+               (when (fn? callback)
+                 (callback success))))
+           (dis/dispatch! [:entry-toggle-save-on-exit false]))))))))
 
 (defn entry-toggle-save-on-exit
   [enable?]

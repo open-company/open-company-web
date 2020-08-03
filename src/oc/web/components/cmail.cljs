@@ -117,10 +117,13 @@
 
 ;; Local cache for outstanding edits
 
-(defn autosave [s]
+(defn autosave
+  ([s] (autosave s false))
+  ([s reset-cmail?]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body) section-editing)))
+    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body) section-editing
+     (when reset-cmail? #(when % (cmail-actions/cmail-reset)))))))
 
 (defn debounced-autosave!
   [s]
@@ -325,9 +328,9 @@
 (defn close-cmail [s e]
   (let [cmail-data (-> s (drv/get-ref :cmail-data) deref)]
     (if (au/has-content? (assoc cmail-data :body (cleaned-body)))
-      (autosave s)
+      (autosave s true)
       (activity-actions/activity-delete cmail-data))
-    (if (and (= (:status cmail-data) "published")
+    (if (and (-> cmail-data :status keyword (= :published))
              (:has-changes cmail-data))
       (cancel-clicked s)
       (cmail-actions/cmail-hide))))
@@ -438,7 +441,7 @@
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
-                    (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
+                    (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (setup-top-padding s)
                     s)
                    :will-update (fn [s]
