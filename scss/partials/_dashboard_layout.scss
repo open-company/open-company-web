@@ -43,6 +43,7 @@ div.dashboard-layout {
     left: 0;
     right: 0;
     height: #{$navbar_height}px;
+    z-index: 2;
   }
 
   div.dashboard-layout-cmail-placeholder {
