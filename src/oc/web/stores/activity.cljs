@@ -386,7 +386,10 @@
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
       (add-remove-item-from-all-posts org-slug fixed-activity-data)
       (add-remove-item-from-bookmarks org-slug fixed-activity-data)
-      (add-published-post-to-home org-slug fixed-activity-data)
+      (as-> ndb
+       (if (:following board-data)
+         (add-published-post-to-home ndb org-slug fixed-activity-data)
+         ndb))
       (add-remove-item-from-follow org-slug fixed-activity-data false)
       (add-remove-item-from-board org-slug fixed-activity-data)
       (add-remove-item-from-contributions org-slug fixed-activity-data)
@@ -408,65 +411,61 @@
         next-posts (dissoc posts-data (:uuid activity-data))
         ;; Remove the post from all the containers posts list
         containers-key (dispatcher/containers-key org-slug)
+        change-data (dispatcher/change-data db org-slug)
+        org-data (get-in db org-data-key)
+        active-users (dispatcher/active-users org-slug db)
+        follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
+        follow-boards-list (dispatcher/follow-boards-list org-slug db)
         with-fixed-containers (reduce
                                (fn [ndb ckey]
                                  (let [container-rp-key (dispatcher/container-key org-slug ckey dispatcher/recently-posted-sort)
                                        container-ra-key (dispatcher/container-key org-slug ckey dispatcher/recent-activity-sort)
-                                       next-ndb (-> ndb
-                                                 (update-in (conj container-rp-key :posts-list)
-                                                  (fn [items-list]
-                                                    (filterv #(not= (:uuid %) (:uuid activity-data)) items-list)))
-                                                 (update-in (conj container-ra-key :posts-list)
-                                                  (fn [items-list]
-                                                    (filterv #(not= (:uuid %) (:uuid activity-data)) items-list))))
-                                       items-to-render-rp-key (conj container-rp-key :items-to-render)
-                                       items-list-rp-key (conj container-rp-key :posts-list)
-                                       items-to-render-ra-key (conj container-ra-key :items-to-render)
-                                       items-list-ra-key (conj container-ra-key :posts-list)
-                                       items-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
-                                    (-> next-ndb
-                                     (assoc-in items-to-render-rp-key
-                                      (if (au/show-separators? ckey dispatcher/recently-posted-sort)
-                                        (au/grouped-posts (get-in next-ndb items-list-rp-key) items-data-map)
-                                        (get-in next-ndb items-list-rp-key)))
-                                     (assoc-in items-to-render-rp-key
-                                      (if (au/show-separators? ckey dispatcher/recent-activity-sort)
-                                        (au/grouped-posts (get-in next-ndb items-list-ra-key) items-data-map)
-                                        (get-in next-ndb items-list-ra-key))))))
+                                       rp-data (get-in ndb container-rp-key)
+                                       ra-data (get-in ndb container-ra-key)
+                                       rp? (map? rp-data)
+                                       ra? (map? ra-data)
+                                       updated-rp-data (when rp?
+                                                         (update rp-data :posts-list (fn [items-list]
+                                                                                      (filterv #(not= (:uuid %) (:uuid activity-data)) items-list))))
+                                       updated-ra-data (when ra?
+                                                         (update ra-data :posts-list (fn [items-list]
+                                                                                    (filterv #(not= (:uuid %) (:uuid activity-data)) items-list))))
+                                       parsed-rp-data (au/parse-container updated-rp-data change-data org-data active-users dispatcher/recently-posted-sort)
+                                       parsed-ra-data (au/parse-container updated-ra-data change-data org-data active-users dispatcher/recent-activity-sort)]
+                                    (as-> ndb tndb
+                                     (if rp?
+                                       (assoc-in tndb container-rp-key (dissoc parsed-rp-data :fixed-items))
+                                       tndb)
+                                     (if ra?
+                                       (assoc-in tndb container-ra-key (dissoc parsed-ra-data :fixed-items))
+                                       tndb))))
                                db
                                (keys (get-in db containers-key)))
         ;; Remove the post from contributors lists
         contributions-list-key (dispatcher/contributions-list-key org-slug)
         with-fixed-contribs (reduce
                              (fn [ndb ckey]
-                               (let [base-contributions-key (dispatcher/contributions-key org-slug ckey)
-                                     posts-list-key (conj base-contributions-key :posts-list)
-                                     next-ndb (update-in ndb posts-list-key
-                                               (fn [posts-list]
-                                                 (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
-                                     items-to-render-key (conj base-contributions-key :items-to-render)
-                                     posts-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
-                                  (assoc-in next-ndb items-to-render-key
-                                   (if (au/show-separators? ckey)
-                                     (au/grouped-posts (get-in next-ndb posts-list-key) posts-data-map)
-                                     (get-in next-ndb posts-list-key)))))
-                             db
-                             (keys (get-in with-fixed-containers contributions-list-key)))
+                               (let [contrib-data-key (dispatcher/contributions-key org-slug ckey)
+                                     contrib-posts-list-key (conj contrib-data-key :posts-list)
+                                     contrib-data (get-in ndb contrib-data-key)
+                                     updated-contrib-data (update contrib-data :posts-list (fn [posts-list]
+                                                                                            (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
+                                     parsed-contrib-data (au/parse-contributions updated-contrib-data change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort)]
+                                  (assoc-in ndb contrib-data-key
+                                   (dissoc parsed-contrib-data :fixed-items))))
+                             with-fixed-containers
+                             (keys (get-in db contributions-list-key)))
         ;; Remove the post from all the boards posts list too
         boards-key (dispatcher/boards-key org-slug)
         with-fixed-boards (reduce
                            (fn [ndb ckey]
-                             (let [base-board-key (dispatcher/board-data-key org-slug ckey)
-                                   posts-list-key (conj base-board-key :posts-list)
-                                   next-ndb (update-in ndb posts-list-key
-                                             (fn [posts-list]
-                                               (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
-                                   items-to-render-key (conj base-board-key :items-to-render)
-                                   posts-data-map (get-in next-ndb (dispatcher/posts-data-key org-slug))]
-                                (assoc-in next-ndb items-to-render-key
-                                 (if (au/show-separators? ckey)
-                                   (au/grouped-posts (get-in next-ndb posts-list-key) posts-data-map)
-                                   (get-in next-ndb posts-list-key)))))
+                             (let [board-data-key (dispatcher/board-data-key org-slug ckey)
+                                   posts-list-key (conj board-data-key :posts-list)
+                                   board-data (get-in ndb board-data-key)
+                                   updated-board-data (update board-data :posts-list (fn [posts-list]
+                                                                                      (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
+                                   parsed-board-data (au/parse-board updated-board-data change-data active-users follow-boards-list dispatcher/recently-posted-sort)]
+                                (assoc-in ndb board-data-key (dissoc parsed-board-data :fixed-items))))
                            with-fixed-contribs
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
