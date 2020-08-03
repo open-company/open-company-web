@@ -290,10 +290,13 @@
   (let [org-data (json->cljs body)]
     (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
-(defn get-org [& [org-data prevent-complete-refresh?]]
-  (let [fixed-org-data (or org-data (dis/org-data))
-        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (partial get-org-cb prevent-complete-refresh?))))
+(defn get-org
+  ([] (get-org (dis/org-data) false))
+  ([org-data] (get-org org-data false))
+  ([org-data prevent-complete-refresh?]
+   (let [fixed-org-data (or org-data (dis/org-data))
+         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+     (api/get-org org-link (partial get-org-cb prevent-complete-refresh?)))))
 
 ;; Org redirect
 
@@ -472,7 +475,7 @@
 (defn subscribe []
   (ws-cc/subscribe :org/status
     (fn [data]
-      (get-org)))
+      (get-org (dis/org-data) true)))
   (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)
