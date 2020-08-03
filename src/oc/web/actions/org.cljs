@@ -290,10 +290,13 @@
   (let [org-data (json->cljs body)]
     (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
-(defn get-org [& [org-data prevent-complete-refresh?]]
-  (let [fixed-org-data (or org-data (dis/org-data))
-        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (partial get-org-cb prevent-complete-refresh?))))
+(defn get-org
+  ([] (get-org (dis/org-data) false))
+  ([org-data] (get-org org-data false))
+  ([org-data prevent-complete-refresh?]
+   (let [fixed-org-data (or org-data (dis/org-data))
+         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+     (api/get-org org-link (partial get-org-cb prevent-complete-refresh?)))))
 
 ;; Org redirect
 
@@ -466,13 +469,13 @@
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
       (when (= container-id (:uuid org-data))
-        (utils/after 1000 get-org)))))
+        (utils/after 1000 #(get-org org-data true))))))
 
 ;; subscribe to websocket events
 (defn subscribe []
   (ws-cc/subscribe :org/status
     (fn [data]
-      (get-org)))
+      (get-org (dis/org-data) true)))
   (ws-cc/subscribe :container/change
     (fn [data]
       (let [change-data (:data data)
