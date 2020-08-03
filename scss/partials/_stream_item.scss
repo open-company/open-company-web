@@ -317,6 +317,7 @@ div.stream-item {
         position: relative;
         background-color: $feint_emerald;
         border-radius: 8px;
+        margin-left: 8px;
 
         &:before {
           width: 35px;
@@ -354,6 +355,7 @@ div.stream-item {
         align-self: center;
         opacity: 0.5;
         flex: 0 0 auto;
+
 
         @include mobile() {
           margin-right: 8px;
