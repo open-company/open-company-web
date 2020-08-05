@@ -762,7 +762,7 @@
              :class utils/hide-class
              :value (:email jwt)
              :read-only true}]
-          [:div.field-description "Invite email address, you can change it once you are signed up"]
+          [:div.field-description "You were invited to join your team using this email."]
           [:div.field-label
             "Password"
             (when collect-pswd-error
