@@ -17,8 +17,9 @@
           [:div.user-profile-header-info-name
             [:span.name
               (:name user-data)]
-            [:span.role
-              (str "(" (string/capital (:role-string user-data)) ")")]
+            (when-not (string/blank? (:role-string user-data))
+              [:span.role
+                (str "(" (string/capital (:role-string user-data)) ")")])
             (when (:self? user-data)
               [:button.mlb-reset.edit-profile-bt
                 {:on-click #(nav-actions/show-user-settings :profile)}

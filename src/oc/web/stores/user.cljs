@@ -47,17 +47,34 @@
 
 (def default-invite-type "email")
 
-(defn- parse-user-data [user-data org-data active-users]
-  (let [active-user-data (get active-users (:user-id user-data))
-        updated-user-data (merge active-user-data user-data)]
-    (-> updated-user-data
-      (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
-      (assoc :auth-source (or (j/get-key :auth-source) default-invite-type))
-      (assoc :name (user-lib/name-for user-data))
-      (as-> u
-       (assoc u :role (uu/get-user-type u org-data))
-       (assoc u :role-string (uu/user-role-string (:role u))))
-      (assoc :short-name (user-lib/short-name-for user-data)))))
+(defn parse-users [users-list org-data follow-publishers-list]
+  (let [follow-publishers-set (if (every? map? follow-publishers-list)
+                                (set (map :user-id follow-publishers-list))
+                                (set follow-publishers-list))]
+    (map (fn [u] (-> u
+                  (update :name #(or % (user-lib/name-for u)))
+                  (update :short-name #(or % (user-lib/short-name-for u)))
+                  (update :follow (comp follow-publishers-set :user-id))
+                  (as-> user
+                   (if (map? org-data)
+                     (assoc user :role (uu/get-user-type user org-data))
+                     user)
+                   (if (map? org-data)
+                     (assoc user :role-string (uu/user-role-string (:role user)))
+                     user))
+                  (assoc :self? (= (:user-id u) (j/user-id)))))
+     users-list)))
+
+(defn parse-user-data [user-data org-data active-users]
+  (let [active-user-data (get active-users (:user-id user-data))]
+    (as-> user-data u
+      (merge active-user-data u)
+      (assoc u :role (uu/get-user-type u org-data))
+      (assoc u :role-string (uu/user-role-string (:role u)))
+      (update u :avatar-url fixed-avatar-url)
+      (assoc u :auth-source (or (j/get-key :auth-source) default-invite-type))
+      (assoc u :name (user-lib/name-for user-data))
+      (assoc u :short-name (user-lib/short-name-for user-data)))))
 
 (defn- fix-user-values [user-data]
   (cond-> user-data

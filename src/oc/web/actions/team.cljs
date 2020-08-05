@@ -79,7 +79,7 @@
   (let [fixed-body (when success (json->cljs body))]
     (if success
       (let [teams (-> fixed-body :collection :items)]
-        (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
+        (dis/dispatch! [:teams-loaded teams])
         (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
       (when (<= 500 status 599)
@@ -100,13 +100,18 @@
                (not teams-data-requested))
       (teams-get))))
 
+;; Team management view
+
+(defn refresh-team-data [org-data]
+  (org-actions/get-org org-data true #(teams-get)))
+
 ;; Invite users
 
 ;; Authors
 
 (defn author-change-cb [{:keys [success]}]
   (when success
-    (org-actions/get-org nil true)))
+    (refresh-team-data (dis/org-data))))
 
 (defn remove-author [author]
   (let [remove-author-link (utils/link-for (:links author) "remove")]
