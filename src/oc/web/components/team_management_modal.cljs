@@ -51,8 +51,7 @@
   (rum/local #{} ::removing)
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
-      (org-actions/get-org org-data true)
-      (team-actions/teams-get))
+      (team-actions/refresh-team-data org-data))
     s)
    :after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")

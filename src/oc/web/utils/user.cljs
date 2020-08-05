@@ -1,7 +1,6 @@
 (ns oc.web.utils.user
   (:require [defun.core :refer (defun)]
             [cuerdas.core :as string]
-            [oc.web.lib.jwt :as jwt]
             [oc.lib.oauth :as oauth]
             [oc.web.lib.utils :as utils]))
 

@@ -2,45 +2,90 @@ div.invite-email-container {
   div.invite-email {
 
     div.invite-email-item-outer {
+      margin-top: 16px;
+
+      &:not(:first-child) {
+        border-top: 1px solid var(--divider-line);
+        padding-top: 16px;
+      }
 
       div.invite-email-item {
-        margin-top: 8px;
         position: relative;
+        display: flex;
+        flex-flow: row no-wrap;
+        justify-content: flex-start;
+        align-items: center;
 
-        &:not(:first-child) {
-          margin-top: 16px;
-        }
+        div.invite-email-item-left {
+          flex: 0 0 calc(100% - 24px);
 
-        input.org-settings-field:focus {
-          background-color: var(--opac-background-color-15);
-        }
-
-        input.org-settings-field {
-          width: calc(100% - 24px);
-          border-radius: 4px;
-          background-color: var(--opac-background-color-1);
-          border: none;
-          outline: none;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          border: none;
-          outline: none;
-          padding: 7px 8px;
-
-          &:focus, &:active {
+          input.org-settings-field {
+            width: 100%;
+            border-radius: 4px;
+            background-color: var(--opac-background-color-1);
             border: none;
             outline: none;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: var(--color);
+            border: none;
+            outline: none;
+            padding: 7px 8px;
+
+            &:focus, &:active {
+              border: none;
+              outline: none;
+              background-color: var(--opac-background-color-15);
+            }
+          }
+
+          div.user-type-dropdown {
+            width: 100%;
+
+            div.dropdown {
+              margin-top: 8px;
+              height: 32px;
+              text-align: left;
+              border-radius: 4px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: var(--color);
+              background-color: var(--opac-background-color-1);
+
+              button.user-type-btn {
+                width: 100%;
+                text-align: left;
+                height: 32px;
+                padding: 7px 8px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: var(--color);
+                line-height: 18px;
+              }
+
+              ul.user-type-dropdown-menu {
+                left: 0px;
+                top: 40px;
+                width: 100%;
+
+                li {
+                  color: var(--color);
+                  text-align: left;
+                  padding: 7px 12px;
+                  @include OC_Body_Book();
+                  font-size: 14px;
+                  line-height: 18px;
+                }
+              }
+            }
           }
         }
 
         button.remove-user {
-          position: absolute;
-          top: 16px;
-          right: 0;
+          flex: 0 0 auto;
           width: 24px;
           height: 24px;
-          margin-top: 4px;
           padding: 0;
           background-image: cdnUrl("/img/ML/remove_user.svg");
           background-size: 12px 14px;
@@ -51,57 +96,6 @@ div.invite-email-container {
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/remove_user@dark.svg");
           }
-        }
-
-        div.user-type-dropdown {
-          width: calc(100% - 24px);
-
-          div.dropdown {
-            margin-top: 8px;
-            height: 32px;
-            text-align: left;
-            border-radius: 4px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--color);
-            background-color: var(--opac-background-color-1);
-
-            button.user-type-btn {
-              width: 100%;
-              text-align: left;
-              height: 32px;
-              padding: 7px 8px;
-              @include OC_Body_Book();
-              font-size: 14px;
-              color: var(--color);
-              line-height: 18px;
-            }
-
-            ul.user-type-dropdown-menu {
-              left: 0px;
-              top: 40px;
-              width: 100%;
-
-              li {
-                color: var(--color);
-                text-align: left;
-                padding: 7px 12px;
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 18px;
-              }
-            }
-          }
-        }
-
-        button.remove-user {
-          margin-top: 8px;
-          margin-left: 0;
-          padding: 0;
-          @include OC_Body_Book();
-          font-size: 12px;
-          color: var(--light-color);
         }
       }
     }
