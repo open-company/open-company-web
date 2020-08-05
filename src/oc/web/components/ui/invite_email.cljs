@@ -101,22 +101,23 @@
           [:div.invite-email-item-outer
             {:key key-string}
             [:div.invite-email-item.group
-              [:input.org-settings-field.email-field.oc-input
-                {:type "text"
-                 :class (when (:error user-data) "error")
-                 :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-                 :placeholder "name@domain.com"
-                 :on-change #(dis/dispatch! [:input [:invite-users]
-                               (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
-                 :value (or (:user user-data) "")}]
-              (when-not hide-user-role
-                [:div.user-type-dropdown
-                  (user-type-dropdown {:user-id (utils/guid)
-                                       :user-type (:role user-data)
-                                       :hide-admin (not is-admin?)
-                                       :on-change
-                                        #(dis/dispatch! [:input [:invite-users]
-                                           (assoc invite-users i (merge user-data {:role % :error nil}))])})])
+              [:div.invite-email-item-left
+                [:input.org-settings-field.email-field.oc-input
+                  {:type "text"
+                   :class (when (:error user-data) "error")
+                   :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+                   :placeholder "name@domain.com"
+                   :on-change #(dis/dispatch! [:input [:invite-users]
+                                 (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
+                   :value (or (:user user-data) "")}]
+                (when-not hide-user-role
+                  [:div.user-type-dropdown
+                    (user-type-dropdown {:user-id (utils/guid)
+                                         :user-type (:role user-data)
+                                         :hide-admin (not is-admin?)
+                                         :on-change
+                                          #(dis/dispatch! [:input [:invite-users]
+                                             (assoc invite-users i (merge user-data {:role % :error nil}))])})])]
               (when-not hide-user-role
                 [:button.mlb-reset.remove-user
                   {:on-click #(let [before (subvec invite-users 0 i)
