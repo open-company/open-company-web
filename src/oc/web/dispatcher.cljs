@@ -544,8 +544,7 @@
                                :jwt jwt})]
    :collect-password      [[:base :jwt]
                             (fn [base jwt]
-                              {:invitation-confirmed (:email-confirmed base)
-                               :collect-pswd (:collect-pswd base)
+                              {:collect-pswd (:collect-pswd base)
                                :collect-pswd-error (:collect-password-error base)
                                :jwt jwt})]
    :password-reset        [[:base :auth-settings]
