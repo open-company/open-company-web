@@ -239,6 +239,7 @@
                             (drv/drv :org-editing)
                             (drv/drv :orgs)
                             (rum/local false ::saving)
+                            ui-mixins/refresh-tooltips-mixin
                             {:will-mount (fn [s]
                               (dis/dispatch! [:input [:org-editing :name] ""])
                               (user-actions/user-profile-reset)
@@ -523,9 +524,9 @@
     [:div.onboard-lander.lander-invite
       [:header.main-cta
         [:div.title
-          "Invite your team"]
-        [:div.subtitle
-          "Invite some colleagues to explore Wut with you."]]
+          "Invite your team"]]
+      [:div.subtitle
+        "Invite some colleagues to explore Wut with you."]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -613,80 +614,79 @@
               "Oh oh..."])
           [:div.title
             "Please wait"])]
-        (if auth-settings
-          (if (:team auth-settings)
-            [:div.onboard-form
-              [:form
-                {:on-submit (fn [e]
-                              (.preventDefault e))}
-                [:div.title-container
-                  [:div.team-logo-container
-                    (org-avatar team-data false :never)]
-                  [:div.title.main-lander
-                    "Join " (:name team-data) " on Wut"]]
-                [:div.field-label.email-field
-                  "Work email"
-                  (cond
-                    (= (:error signup-with-email) 409)
-                    [:span.error "Email already exists"]
-                    @(::email-error s)
-                    [:span.error "Email is not valid"])]
-                [:input.field.oc-input
-                  {:type "email"
-                   :class (utils/class-set {:error (= (:error signup-with-email) 409)
-                                            utils/hide-class true})
-                   :pattern utils/valid-email-pattern
-                   :value @(::email s)
-                   :on-change #(let [v (.. % -target -value)]
-                                 (reset! (::password-error s) false)
-                                 (reset! (::email-error s) false)
-                                 (reset! (::email s) v))}]
-                [:div.field-label
-                  "Password"
-                  (when @(::password-error s)
-                    [:span.error
-                      "Minimum 8 characters"])]
-                [:input.field.oc-input
-                  {:type "password"
-                   :pattern ".{8,}"
-                   :value @(::pswd s)
-                   :placeholder "Minimum 8 characters"
-                   :on-change #(let [v (.. % -target -value)]
-                                 (reset! (::password-error s) false)
-                                 (reset! (::email-error s) false)
-                                 (reset! (::pswd s) v))}]
-                [:div.field-description
-                  "By signing up you are agreeing to our "
-                  [:a
-                    {:href oc-urls/terms}
-                    "terms of service"]
-                  " and "
-                  [:a
-                    {:href oc-urls/privacy}
-                    "privacy policy"]
-                  "."]
-                [:button.continue
-                  {:class (when (or (not (utils/valid-email? @(::email s)))
+      (if auth-settings
+        (if (:team auth-settings)
+          [:div.onboard-form
+            [:form
+              {:on-submit (fn [e]
+                            (.preventDefault e))}
+              [:div.title-container
+                [:div.team-logo-container
+                  (org-avatar team-data false :never)]
+                [:div.title.main-lander
+                  "Join " (:name team-data) " on Wut"]]
+              [:div.field-label.email-field
+                "Work email"
+                (cond
+                  (= (:error signup-with-email) 409)
+                  [:span.error "Email already exists"]
+                  @(::email-error s)
+                  [:span.error "Email is not valid"])]
+              [:input.field.oc-input
+                {:type "email"
+                 :class (utils/class-set {:error (= (:error signup-with-email) 409)
+                                          utils/hide-class true})
+                 :pattern utils/valid-email-pattern
+                 :value @(::email s)
+                 :on-change #(let [v (.. % -target -value)]
+                               (reset! (::password-error s) false)
+                               (reset! (::email-error s) false)
+                               (reset! (::email s) v))}]
+              [:div.field-label
+                "Password"
+                (when @(::password-error s)
+                  [:span.error
+                    "Minimum 8 characters"])]
+              [:input.field.oc-input
+                {:type "password"
+                 :pattern ".{8,}"
+                 :value @(::pswd s)
+                 :placeholder "Minimum 8 characters"
+                 :on-change #(let [v (.. % -target -value)]
+                               (reset! (::password-error s) false)
+                               (reset! (::email-error s) false)
+                               (reset! (::pswd s) v))}]
+              [:div.field-description
+                "By signing up you are agreeing to our "
+                [:a
+                  {:href oc-urls/terms}
+                  "terms of service"]
+                " and "
+                [:a
+                  {:href oc-urls/privacy}
+                  "privacy policy"]
+                "."]
+              [:button.continue
+                {:class (when (or (not (utils/valid-email? @(::email s)))
+                                  (<= (count @(::pswd s)) 7))
+                          "disabled")
+                 :on-touch-start identity
+                 :on-click #(if (or (not (utils/valid-email? @(::email s)))
                                     (<= (count @(::pswd s)) 7))
-                            "disabled")
-                   :on-touch-start identity
-                   :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                                      (<= (count @(::pswd s)) 7))
-                                (do
-                                  (when-not (utils/valid-email? @(::email s))
-                                    (reset! (::email-error s) true))
-                                  (when (<= (count @(::pswd s)) 7)
-                                    (reset! (::password-error s) true)))
-                                (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
-                  (str "Join " (:name team-data))]]]
-            [:div.subtitle.token-error
-              [:div.title
-                (str "The invite link you’re trying to access "
-                     "has been deactivated by your account admin "
-                     "and is no longer valid.")]])
-          [:div.subtitle.checking-invitation
-            (small-loading)
-            "Checking invitation link" [:span.dots {:ref :dots} "."]])]))
+                              (do
+                                (when-not (utils/valid-email? @(::email s))
+                                  (reset! (::email-error s) true))
+                                (when (<= (count @(::pswd s)) 7)
+                                  (reset! (::password-error s) true)))
+                              (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
+                (str "Join " (:name team-data))]]]
+          [:div.subtitle.token-error
+            (str "The invite link you’re trying to access "
+                 "has been deactivated by your account admin "
+                 "and is no longer valid.")])
+        [:div.subtitle.checking-invitation
+          (small-loading)
+          "Checking invitation link" [:span.dots {:ref :dots} "."]])]))
 
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
@@ -726,28 +726,43 @@
 (rum/defcs invitee-lander-password < rum/reactive
                                      (drv/drv :collect-password)
                                      (rum/local false ::password-error)
+                                     ui-mixins/refresh-tooltips-mixin
                                      {:did-mount (fn [s]
                                        (delay-focus-field-with-ref s "password")
                                        s)}
   [s]
-  (let [collect-password (drv/react s :collect-password)
-        jwt (:jwt collect-password)
-        collect-pswd (:collect-pswd collect-password)
-        collect-pswd-error (:collect-pswd-error collect-password)
-        invitation-confirmed (:invitation-confirmed collect-password)]
+  (let [collect-password-drv (drv/react s :collect-password)
+        jwt (:jwt collect-password-drv)
+        collect-pswd (:collect-pswd collect-password-drv)
+        collect-pswd-error (:collect-pswd-error collect-password-drv)
+        continue-disabled? (<= (count (:pswd collect-pswd)) 7)
+        continue-fn #(if continue-disabled?
+                      (reset! (::password-error s) true)
+                      (user-actions/pswd-collect collect-pswd false))
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.onboard-lander.invitee-lander-password
       [:header.main-cta
         [:div.title
-          "Set a password"]
-        [:div.subtitle
-          "Joining as: "
-          [:span.email-address
-            {:class utils/hide-class}
-            (:email jwt)]]]
+          "Join your team on Wut"]
+        [:button.mlb-reset.top-continue
+          {:class (when continue-disabled? "disabled")
+           :on-click continue-fn}
+          "Continue"]]
       [:div.onboard-form
+        [:div.form-title
+          "Set a password to get started"]
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
+          [:div.field-label.email-field
+            "Work email"]
+          [:div.email-field-tooltip-container]
+          [:input.field.oc-input.email-field
+            {:type "email"
+             :class utils/hide-class
+             :value (:email jwt)
+             :read-only true}]
+          [:div.field-description "Invite email address, you can change it once you are signed up"]
           [:div.field-label
             "Password"
             (when collect-pswd-error
@@ -764,6 +779,11 @@
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
              :placeholder "Minimum 8 characters"
              :pattern ".{8,}"}]
+          [:button.continue
+            {:class (when continue-disabled? "disabled")
+             :on-touch-start identity
+             :on-click continue-fn}
+            "Continue"]
           [:div.field-description
             "By signing up you are agreeing to our "
             [:a
@@ -773,14 +793,7 @@
             [:a
               {:href oc-urls/privacy}
               "privacy policy"]
-            "."]
-          [:button.continue
-            {:class (when (< (count (:pswd collect-pswd)) 8) "disabled")
-             :on-click #(if (< (count (:pswd collect-pswd)) 8)
-                          (reset! (::password-error s) true)
-                          (user-actions/pswd-collect collect-pswd false))
-             :on-touch-start identity}
-            "Continue"]]]]))
+            "."]]]]))
 
 (rum/defcs invitee-lander-profile < rum/reactive
                                     (drv/drv :edit-user-profile)
@@ -809,10 +822,10 @@
     [:div.onboard-lander.invitee-lander-profile
       [:header.main-cta
         [:div.title.about-yourself
-          "Tell us about you"]
-        (when (:error edit-user-profile)
-            [:div.subtitle.error
-              "An error occurred while saving your data, please try again"])]
+          "Tell us about you"]]
+      (when (:error edit-user-profile)
+        [:div.subtitle.error
+          "An error occurred while saving your data, please try again"])
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]

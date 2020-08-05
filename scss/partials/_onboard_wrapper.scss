@@ -861,6 +861,32 @@ div.onboard-lander {
     }
   }
 
+  &.invitee-lander-password {
+    div.onboard-form {
+      input.field.email-field {
+        cursor: not-allowed;
+      }
+
+      div.email-field-tooltip-container {
+        div.tooltip {
+          width: 240px;
+        }
+      }
+
+      span.field-label-description {
+        font-size: 12px;
+        line-height: 18px;
+        color: $ui_grey;
+      }
+
+      input.email-field + div.field-description {
+        text-align: left;
+        margin: 8px 0 0;
+        width: 100%;
+      }
+    }
+  }
+
   &.invitee-lander-password, &.invitee-lander-profile {
     div.onboard-form {
       div.field-label:first-child {
