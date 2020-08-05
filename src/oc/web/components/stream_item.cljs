@@ -186,7 +186,11 @@
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
                            :mobile-tray-menu show-mobile-menu?})
-        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
+        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
+        is-home? (-> container-slug keyword (= :following))
+        show-new-item-tag (and is-home?
+                               (:unseen activity-data)
+                               (not (:publisher? activity-data)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -267,6 +271,8 @@
             {:data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :title "Muted"}]
+          (when show-new-item-tag
+            [:div.new-item-tag])
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
         (when is-published?
