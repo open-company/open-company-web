@@ -471,7 +471,8 @@
              :dismiss true}))
          (do
            (utils/after 1000 jwt-actions/jwt-refresh)
-           (dis/dispatch! [:user-data (json->cljs body)])
+           ; (dis/dispatch! [:user-data (json->cljs body)])
+           (dis/dispatch! [:user-profile-avatar-update/success (json->cljs body)])
            (notification-actions/show-notification
             {:title "Image update succeeded"
              :description "Your image was succesfully updated."

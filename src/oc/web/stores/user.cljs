@@ -76,22 +76,38 @@
       (assoc u :name (user-lib/name-for user-data))
       (assoc u :short-name (user-lib/short-name-for user-data)))))
 
-(defn- fix-user-values [user-data]
-  (cond-> user-data
-   true (assoc :has-changes false)
-   true (assoc :avatar-url (fixed-avatar-url (:avatar-url user-data)))
-   (empty? (:first-name user-data)) (merge {:first-name ""})
-   (empty? (:last-name user-data)) (merge {:last-name ""})
-   (empty? (:current-password user-data)) (merge {:current-password ""})
-   (empty? (:password user-data)) (merge {:password ""})
-   (empty? (:email user-data)) (merge {:email ""})
-   (empty? (:timezone user-data)) (merge {:timezone (or (.. js/moment -tz guess) "")})
-   (empty? (:blurb user-data)) (merge {:blurb ""})
-   (empty? (:location user-data)) (merge {:location ""})
-   (empty? (:title user-data)) (merge {:title ""})
-   (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
+(def ^:private empty-user*
+ {:first-name ""
+  :last-name ""
+  :password ""
+  :email ""
+  :blurb ""
+  :location ""
+  :title ""
+  :profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})
 
-(defn update-user-data [db user-data]
+(defn- empty-user-data
+ "This is a function to call the timezone guess when needed and not only one time on page load."
+  [edit?]
+  (cond-> empty-user*
+   true (assoc :timezone (or (.. js/moment -tz guess) ""))
+   edit? (assoc :has-changes false)))
+
+(defn- editable-user-data
+  [edit-user-data new-user-data]
+  (let [changed? (:has-changes edit-user-data)
+        changed-user-data (select-keys edit-user-data [:first-name :last-name :avatar-url :password :timezone :blurb :location :title :profiles :has-changes])]
+    (cond-> (empty-user-data true) ;; Start with the empty user map
+     ;; Merge in the new user data
+     true (merge new-user-data)
+     ;; If user is editing the profile let's merge in all the editable keys
+     changed? (merge changed-user-data)
+     ;; Merge in the fixed avatar url
+     true (assoc :avatar-url (fixed-avatar-url (:avatar-url new-user-data))))))
+
+(defn update-user-data
+  ([db user-data] (update-user-data db user-data false))
+  ([db user-data force-edit-reset?]
   (let [org-data (dispatcher/org-data db)
         active-users (dispatcher/active-users (:slug org-data) db)
         fixed-user-data (parse-user-data user-data org-data active-users)
@@ -100,16 +116,20 @@
                   (update-in db active-user-key merge fixed-user-data)
                   db)]
     (-> next-db
-        (assoc :current-user-data fixed-user-data)
-        (assoc :edit-user-profile (fix-user-values fixed-user-data))
-        (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
-        (dissoc :edit-user-profile-failed))))
+     (assoc :current-user-data fixed-user-data)
+     (update :edit-user-profile #(editable-user-data (if force-edit-reset? nil %) fixed-user-data))
+     (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
+     (dissoc :edit-user-profile-failed)))))
 
 (defmethod dispatcher/action :user-profile-avatar-update/failed
   [db [_]]
   (assoc db :edit-user-profile-avatar (:avatar-url (:current-user-data db))))
 
 (defmethod dispatcher/action :user-data
+  [db [_ user-data]]
+  (update-user-data db user-data))
+
+(defmethod dispatcher/action :user-profile-avatar-update/success
   [db [_ user-data]]
   (update-user-data db user-data))
 
@@ -195,7 +215,7 @@
 
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
-  (update-user-data db (:current-user-data db)))
+  (update-user-data db (:current-user-data db) true))
 
 (defmethod dispatcher/action :user-profile-save
   [db [_]]
