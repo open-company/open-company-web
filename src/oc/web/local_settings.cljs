@@ -101,3 +101,6 @@
 ;; Fake container ids for seen table
 (def seen-home-container-id "1111-1111-1111")
 (def seen-replies-container-id "2222-2222-2222")
+
+;; Digest times
+(def digest-times #{:700 :1200 :1700})

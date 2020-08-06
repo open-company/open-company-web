@@ -98,6 +98,30 @@ div.user-notifications-modal-container {
           font-size: 14px;
         }
 
+        div.digest-time {
+          width: 100%;
+          margin-top: 4px;
+
+          div.carrot-checkbox {
+            float: left;
+          }
+        }
+
+        span.field-value {
+          float: left;
+          height: 16px;
+          margin-left: 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          cursor: pointer;
+
+          &.not-allowed, &.disabled {
+            cursor: not-allowed;
+          }
+        }
+
         input.field-value {
           width: 100%;
           height: 32px;
@@ -146,7 +170,7 @@ div.user-notifications-modal-container {
           background-size: 8px 10px;
           background-position: top 11px right 8px;
           background-repeat: no-repeat;
-        
+
           &::-ms-expand {
             display: none;
           }
@@ -174,6 +198,15 @@ div.user-notifications-modal-container {
           @include OC_Body_Book();
           font-size: 14px;
           color: var(--color);
+
+          a {
+            color: var(--color);
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }
