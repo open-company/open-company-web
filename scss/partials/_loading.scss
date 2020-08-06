@@ -7,38 +7,89 @@ div.oc-loading {
   left: 0px;
   width: 100%;
   height: 100%;
-  display: none;
-  background-color: white;
+  min-width: 100vw;
+  min-height: 110vh;
+  background-color: var(--background-color);
   z-index: #{$navbar_zindex + 3001};
+  display: none;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  justify-content: flex-start;
 
   @include dark_mode() {
     background-color: $wut_purple;
   }
 
   &.active {
-    display: inline;
+    display: flex;
   }
 
-  div.setup-cta {
-    display: none;
+  div.oc-loading-navbar {
+    height: #{$navbar_height}px;
+    width: 100%;
+    background-color: var(--opac-background-color-08);
+    flex: 0 0 auto;
   }
 
-  div.oc-loading-inner {
-    position: relative;
-    width: 100vw;
-    height: 50vh;
-    font-size: 120px;
-    text-align: center;
-    vertical-align: middle;
-    margin-top: 25vh;
-    line-height: 50vh;
-    color: $wut_purple;
-    @include OC_Body_Bold();
+  div.oc-loading-page {
+    width: 100%;
+    height: calc(100% - #{$navbar_height}px);
+    margin-top: 24px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
 
-    @include no-user-select();
+    div.oc-loading-navigation-sidebar {
+      margin-left: auto;
+      width: #{$left_navigation_sidebar_width}px;
+      height: 192px;
 
-    @include dark_mode() {
-      color: white;
+      div.oc-loading-navigation-sidebar-row {
+        height: 32px;
+        width: 100%;
+        maring-top: 8px;
+        background-color: var(--opac-background-color-08);
+        border-radius: 4px;
+        margin-top: 8px;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+    }
+
+    div.oc-loading-dashboard {
+      margin-right: auto;
+      width: #{$board_container_width}px;
+      height: calc(100% - #{$navbar_height}px - 40px);
+      margin-left: #{$left_navigation_sidebar_minimum_right_margin}px;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      div.oc-loading-qp {
+        width: 100%;
+        height: 56px;
+        background-color: var(--opac-background-color-08);
+        border-radius: 6px;
+      }
+
+      div.oc-loading-feed {
+        margin-top: 27px;
+        width: 100%;
+        height: calc(100% - 56px - 27px);
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard.svg");
+        background-position: top 0px left 0px;
+        background-size: #{$board_container_width}px 664px;
+        background-repeat: repeat-y;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard@dark.svg");
+        }
+      }
     }
   }
 }

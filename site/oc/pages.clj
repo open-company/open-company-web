@@ -10,10 +10,19 @@
             [oc.pages.about :as about]
             [oc.pages.press-kit :as press-kit]))
 
-(defn oc-loading []
+(def oc-loading
   [:div.oc-loading.active
-    [:div.oc-loading-inner
-      "Wut!"]])
+    [:div.oc-loading-navbar]
+    [:div.oc-loading-page
+      [:div.oc-loading-navigation-sidebar
+        [:div.oc-loading-navigation-sidebar-row]
+        [:div.oc-loading-navigation-sidebar-row]
+        [:div.oc-loading-navigation-sidebar-row]
+        [:div.oc-loading-navigation-sidebar-row]
+        [:div.oc-loading-navigation-sidebar-row]]
+      [:div.oc-loading-dashboard
+        [:div.oc-loading-qp]
+        [:div.oc-loading-feed]]]])
 
 (def tag-manager-head
   [:script"
@@ -204,7 +213,7 @@
    :body [:body
           tag-manager-body
           [:div#app
-            (oc-loading)]
+            oc-loading]
           [:div#oc-notifications-container]
           [:div#oc-loading]
           [:div.preload-interstitial]
@@ -300,7 +309,7 @@
    :body [:body
           tag-manager-body
           [:div#app
-            (oc-loading)]
+            oc-loading]
           [:div#oc-notifications-container]
           [:div#oc-loading]
           [:div.preload-interstitial]
