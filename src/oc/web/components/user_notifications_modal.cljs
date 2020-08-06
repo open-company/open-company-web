@@ -124,18 +124,18 @@
           ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Digest times:"]
-
-            (for [t ls/digest-times
-                  :let [selected? (digest-delivery-set t)
-                        change-cb #(change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t)))]]
-              [:div.digest-time.group
-                {:key (name t)}
-                (carrot-checkbox {:selected selected?
-                                  :disabled false
-                                  :did-change-cb change-cb})
-                [:span.field-value
-                  {:on-click change-cb}
-                  (digest-time-label t)]])
+            [:div.field-value-group
+              (for [t ls/digest-times
+                    :let [selected? (digest-delivery-set t)
+                          change-cb #(change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t)))]]
+                [:div.field-value.group
+                  {:key (name t)}
+                  (carrot-checkbox {:selected selected?
+                                    :disabled false
+                                    :did-change-cb change-cb})
+                  [:span.digest-time
+                    {:on-click change-cb}
+                    (digest-time-label t)]])]
             [:div.field-description
               "(relative to your timezone that is: " (:timezone current-user-data) ", you can "
               [:a
