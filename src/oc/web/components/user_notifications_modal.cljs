@@ -13,7 +13,8 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.small-loading :refer (small-loading)]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn change! [s k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -40,6 +41,13 @@
                                         (dismiss-action))}]
       (alert-modal/show-alert alert-data))
     (dismiss-action)))
+
+(defn- digest-time-label [t]
+  (let [time-string (name t)
+        minutes (subs time-string (- (count time-string) 2) (count time-string))
+        hours* (.parseInt js/window (subs time-string 0 (- (count time-string) 2)) 10)
+        hours (if (> hours* 12) (- hours* 12) hours*)]
+    (str  hours ":" minutes (if (> hours* 11) " pm" " am"))))
 
 (rum/defcs user-notifications-modal <
   rum/reactive
@@ -72,7 +80,8 @@
         team-data (drv/react s :team-data)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
-        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
+        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)
+        digest-delivery-set (set (map keyword (:digest-delivery current-user-data)))]
     [:div.user-notifications-modal-container
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked current-user-data nav-actions/close-all-panels)}]
@@ -113,6 +122,27 @@
           ;         "Via Slack"])]
           ;   [:div.field-description
           ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
+          [:div.user-profile-modal-fields
+            [:div.field-label "Digest times:"]
+
+            (for [t ls/digest-times
+                  :let [selected? (digest-delivery-set t)
+                        change-cb #(change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t)))]]
+              [:div.digest-time.group
+                {:key (name t)}
+                (carrot-checkbox {:selected selected?
+                                  :disabled false
+                                  :did-change-cb change-cb})
+                [:span.field-value
+                  {:on-click change-cb}
+                  (digest-time-label t)]])
+            [:div.field-description
+              "(relative to your timezone that is: " (:timezone current-user-data) ", you can "
+              [:a
+                {:href "?user-settings=profile"
+                 :on-click #(nav-actions/show-user-settings :profile)}
+                "change it"]
+              " from your profile settings panel)"]]
           [:div.user-profile-modal-fields
             [:div.field-label "Comments and mentions."]
             [:select.field-value.oc-input

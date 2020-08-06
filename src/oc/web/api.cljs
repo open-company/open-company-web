@@ -237,7 +237,7 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :publisher-board :description])
 
-(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles])
+(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles :digest-delivery])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
 
