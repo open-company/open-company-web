@@ -98,27 +98,31 @@ div.user-notifications-modal-container {
           font-size: 14px;
         }
 
-        div.digest-time {
-          width: 100%;
-          margin-top: 4px;
+        div.field-value-group {
+          margin-top: 16px;
 
-          div.carrot-checkbox {
-            float: left;
+          div.field-value {
+            width: 100%;
+            margin-top: 4px;
+
+            div.carrot-checkbox {
+              float: left;
+            }
           }
-        }
 
-        span.field-value {
-          float: left;
-          height: 16px;
-          margin-left: 8px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 16px;
-          color: var(--color);
-          cursor: pointer;
+          span.digest-time {
+            float: left;
+            height: 16px;
+            margin-left: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 16px;
+            color: var(--color);
+            cursor: pointer;
 
-          &.not-allowed, &.disabled {
-            cursor: not-allowed;
+            &.not-allowed, &.disabled {
+              cursor: not-allowed;
+            }
           }
         }
 
