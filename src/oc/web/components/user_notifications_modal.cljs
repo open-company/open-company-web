@@ -127,9 +127,7 @@
 
             (for [t ls/digest-times
                   :let [selected? (digest-delivery-set t)
-                        change-cb #(do
-                                    (js/console.log "DBG did-change-cb" % digest-delivery-set t)
-                                    (change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t))))]]
+                        change-cb #(change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t)))]]
               [:div.digest-time.group
                 {:key (name t)}
                 (carrot-checkbox {:selected selected?
