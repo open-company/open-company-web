@@ -363,7 +363,7 @@
                    :id "profile-password"
                    :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                    :placeholder (placeholder :password)
-                   :on-change #(change! s :current-password (.. % -target -value))
+                   :on-change #(change! s [:current-password] (.. % -target -value))
                    :value (:current-password current-user-data)}])
               (when show-password?
                 [:label.field-label
@@ -377,5 +377,5 @@
                    :id "profile-new-password"
                    :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                    :placeholder (placeholder :new-password)
-                   :on-change #(change! s :password (.. % -target -value))
+                   :on-change #(change! s [:password] (.. % -target -value))
                    :value (:password current-user-data)}])]]]]]))

@@ -27,8 +27,8 @@ div.carrot-checkbox {
 }
 
 
-@include dark_mode() {
-  div.carrot-checkbox.selected {
-    background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
-  }
-}
+// @include dark_mode() {
+//   div.carrot-checkbox.selected {
+//     background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
+//   }
+// }
