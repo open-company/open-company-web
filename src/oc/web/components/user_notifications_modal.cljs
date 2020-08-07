@@ -80,8 +80,7 @@
         team-data (drv/react s :team-data)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
-        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)
-        digest-delivery-set (set (map keyword (:digest-delivery current-user-data)))]
+        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-notifications-modal-container
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked current-user-data nav-actions/close-all-panels)}]
@@ -126,8 +125,8 @@
             [:div.field-label "Digest times:"]
             [:div.field-value-group
               (for [t ls/digest-times
-                    :let [selected? (digest-delivery-set t)
-                          change-cb #(change! s :digest-delivery (if selected? (disj digest-delivery-set t) (conj digest-delivery-set t)))]]
+                    :let [selected? ((:digest-delivery current-user-data) t)
+                          change-cb #(change! s :digest-delivery (if selected? (disj (:digest-delivery current-user-data) t) (conj (:digest-delivery current-user-data) t)))]]
                 [:div.field-value.group
                   {:key (name t)}
                   (carrot-checkbox {:selected selected?
@@ -137,14 +136,14 @@
                     {:on-click change-cb}
                     (digest-time-label t)]])]
             [:div.field-description
-              "(relative to your timezone that is: " (:timezone current-user-data) ", you can "
+              "Relative to your timezone that is: " (:timezone current-user-data) ", you can "
               [:a
                 {:href "?user-settings=profile"
                  :on-click #(nav-actions/show-user-settings :profile)}
                 "change it"]
-              " from your profile settings panel)"]]
+              " from your profile settings panel"]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Comments and mentions."]
+            [:div.field-label "Mentions:"]
             [:select.field-value.oc-input
               {:value (:notification-medium current-user-data)
                :on-change #(change! s :notification-medium (.. % -target -value))}
@@ -159,7 +158,9 @@
                   "Via Slack"])
               [:option
                 {:value "in-app"}
-                "In-app only"]]]
+                "In-app only"]]
+            [:div.field-description
+              "Notifications will be sent to you in real-time if someone mentions your name"]]
           (when ls/reminders-enabled?
             [:div.user-profile-modal-fields
               [:div.field-label "Recurring update reminders"]

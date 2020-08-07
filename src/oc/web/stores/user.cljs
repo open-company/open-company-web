@@ -74,7 +74,8 @@
       (update u :avatar-url fixed-avatar-url)
       (assoc u :auth-source (or (j/get-key :auth-source) default-invite-type))
       (assoc u :name (user-lib/name-for user-data))
-      (assoc u :short-name (user-lib/short-name-for user-data)))))
+      (assoc u :short-name (user-lib/short-name-for user-data))
+      (assoc u :digest-delivery (set (map keyword (or (:digest-delivery user-data) [])))))))
 
 (def ^:private empty-user*
  {:first-name ""
