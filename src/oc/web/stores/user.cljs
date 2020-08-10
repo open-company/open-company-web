@@ -54,12 +54,12 @@
     (map (fn [u] (-> u
                   (update :name #(or % (user-lib/name-for u)))
                   (update :short-name #(or % (user-lib/short-name-for u)))
-                  (update :follow (comp follow-publishers-set :user-id))
+                  (assoc :follow (follow-publishers-set (:user-id u)))
                   (as-> user
                    (if (map? org-data)
                      (assoc user :role (uu/get-user-type user org-data))
                      user)
-                   (if (map? org-data)
+                   (if (:role user)
                      (assoc user :role-string (uu/user-role-string (:role user)))
                      user))
                   (assoc :self? (= (:user-id u) (j/user-id)))))
