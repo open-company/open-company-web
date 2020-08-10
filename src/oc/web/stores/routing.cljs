@@ -22,5 +22,5 @@
   (-> db
    (assoc :orgs-dropdown-visible false)
    (assoc :mobile-navigation-sidebar false)
-   (assoc dispatcher/cmail-state-key {:collapsed true :key (utils/activity-uuid)})
-   (dissoc dispatcher/cmail-data-key)))
+   (assoc-in dispatcher/cmail-state-key {:collapsed true :key (utils/activity-uuid)})
+   (dissoc (first dispatcher/cmail-data-key))))
