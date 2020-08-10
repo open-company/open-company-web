@@ -1,5 +1,5 @@
 (ns oc.web.stores.activity
-  (:require [cuerdas.core :as str]
+  (:require [cuerdas.core :as string]
             [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
@@ -981,7 +981,7 @@
           fixed-activity-data (update activity-data :links (fn [links]
                                (mapv (fn [link]
                                 (if (= (:rel link) "follow")
-                                  (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
+                                  (merge link {:href (string/replace (:href link) #"/follow/?$" "/unfollow/")
                                                :rel "unfollow"})
                                   link))
                                  links)))

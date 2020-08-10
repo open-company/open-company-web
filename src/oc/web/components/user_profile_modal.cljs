@@ -1,6 +1,6 @@
 (ns oc.web.components.user-profile-modal
   (:require [rum.core :as rum]
-            [cuerdas.core :as str]
+            [cuerdas.core :as string]
             [goog.object :as googobj]
             [cljsjs.moment-timezone]
             [org.martinklepsch.derivatives :as drv]
@@ -184,7 +184,7 @@
      s)}
   [s]
   (let [edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
-        is-jelly-head-avatar (str/includes? edit-user-profile-avatar "/img/ML/happy_face_")
+        is-jelly-head-avatar (string/includes? edit-user-profile-avatar "/img/ML/happy_face_")
         user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
@@ -318,7 +318,8 @@
                 (for [t (remove nil? ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific" guessed-timezone])]
                   [:option
                     {:key (str "timezone-" t "-promoted")
-                     :value t} t])
+                     :value t}
+                    (user-utils/readable-tz t)])
                 ;; Divider line option
                 [:option
                   {:disabled true
@@ -329,7 +330,7 @@
                   [:option
                     {:key (str "timezone-" t)
                      :value t}
-                    t])]
+                    (user-utils/readable-tz t)])]
               (for [[k v] (:profiles current-user-data)
                     :let [field-name (str "profile-profiles-" (name k))
                           tab-index (swap! links-tab-index inc)]]
@@ -337,7 +338,7 @@
                   {:key field-name}
                   [:label.field-label
                     {:for field-name}
-                    (str/capital (str/camel k))]
+                    (string/capital (string/camel k))]
                   [:input.field-value.oc-input
                     {:value (get (:profiles current-user-data) k)
                      :placeholder (placeholder k)
