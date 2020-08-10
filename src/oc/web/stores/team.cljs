@@ -29,10 +29,11 @@
           old-follow-publishers-list (get-in db follow-publishers-list-key)
           next-follow-publishers-list (user-store/enrich-publishers-list old-follow-publishers-list users-map)]
       (-> db
-       (au/update-all-containers org-data change-data users-map next-follow-publishers-list)
        (assoc-in (dispatcher/active-users-key org-slug) users-map)
        (assoc-in (dispatcher/mention-users-key org-slug) (mu/users-for-mentions users-map))
-       (assoc-in follow-publishers-list-key next-follow-publishers-list)))
+       (assoc-in follow-publishers-list-key next-follow-publishers-list)
+       (au/update-all-containers org-data change-data users-map next-follow-publishers-list)
+       (update :current-user-data #(user-store/parse-user-data % org-data users-map))))
     db))
 
 (defmethod dispatcher/action :teams-get
