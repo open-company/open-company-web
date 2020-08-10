@@ -12,6 +12,7 @@
             [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
             [defun.core :refer (defun)]
+            [oc.lib.hateoas :as hateoas]
             [cljs.reader :as reader]))
 
 (def oc-animation-duration 300)
@@ -175,33 +176,8 @@
   [classes]
   (clojure.string/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
 
-(defun link-for
-
-  ([links rel]
-   (some #(when (= (:rel %) rel) %) links))
-
-  ([links rel :guard string? method :guard string?]
-   (some #(when (and (= (:method %) method) (= (:rel %) rel)) %) links))
-
-  ([links rels :guard sequential? method :guard string?]
-   (some #(when (and (= (:method %) method) (in? rels (:rel %))) %) links))
-
-  ([links rel :guard string? methods :guard sequential?]
-   (some #(when (and (in? methods (:method %)) (= (:rel %) rel)) %) links))
-
-  ([links rels :guard sequential? methods :guard sequential?]
-   (some #(when (and (in? methods (:method %)) (in? rels (:rel %))) %) links))
-
-  ([links rel method params]
-   (some (fn [link]
-          (when (and (= (:method link) method)
-                        (= (:rel link) rel)
-                        (every? #(= (% params) (% link)) (keys params)))
-            link)) links)))
-
-(defn link-replace-href [link replacements]
-  (update link :href
-   #(reduce (fn [href [k v]] (s/replace href v (get replacements k))) % (:replace link))))
+(defn link-for [& args]
+  (apply hateoas/link-for args))
 
 (defn as-of-now []
   (let [date (js-date)]

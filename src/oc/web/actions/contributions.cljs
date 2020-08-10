@@ -62,8 +62,7 @@
      (contributions-get-finish (:slug org-data) author-uuid dis/recently-posted-sort resp))))
 
 (defn- contributions-link [org-data author-uuid]
-  (when-let [partial-link (utils/link-for (:links org-data) "partial-contributions")]
-    (utils/link-replace-href partial-link {:author-uuid author-uuid})))
+  (utils/link-for (:links org-data) "partial-contributions" {} {:author-uuid author-uuid}))
 
 (defn contributions-get
   ([author-uuid] (contributions-get (dis/org-data) author-uuid))

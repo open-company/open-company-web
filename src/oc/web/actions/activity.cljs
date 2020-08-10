@@ -840,10 +840,8 @@
   ([] (secure-activity-get nil (dis/current-secure-activity-id)))
   ([cb] (secure-activity-get cb (dis/current-secure-activity-id)))
   ([cb secure-uuid]
-   (let [partial-secure-link (utils/link-for (:links (dis/api-entry-point)) "partial-secure")
-         secure-link (if partial-secure-link
-                       (utils/link-replace-href partial-secure-link {:org-slug (dis/current-org-slug) :secure-uuid secure-uuid})
-                       (build-secure-activity-link (dis/current-org-slug) secure-uuid))]
+   (let [link-with-replacements (utils/link-for (:links (dis/api-entry-point)) "partial-secure" {} {:org-slug (dis/current-org-slug) :secure-uuid secure-uuid})
+         secure-link (or link-with-replacements (build-secure-activity-link (dis/current-org-slug) secure-uuid))]
      (api/get-secure-entry secure-link
       (fn [resp]
         (secure-activity-get-finish resp)
