@@ -68,7 +68,8 @@
                 panel-stack
                 current-org-slug
                 current-board-slug
-                current-contributions-id]
+                current-contributions-id
+                current-user-data]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
