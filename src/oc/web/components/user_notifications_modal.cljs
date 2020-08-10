@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
@@ -122,7 +123,9 @@
           ;   [:div.field-description
           ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Digest times:"]
+            [:div.field-label
+              "Wut will collect all the updates you should see and "
+              "deliver them to you in a digest at your selected times."]
             [:div.field-value-group
               (for [t ls/digest-times
                     :let [selected? ((:digest-delivery current-user-data) t)
@@ -136,12 +139,16 @@
                     {:on-click change-cb}
                     (digest-time-label t)]])]
             [:div.field-description
-              "Relative to your timezone that is: " (:timezone current-user-data) ", you can "
+              "(your timezone is set to "
               [:a
                 {:href "?user-settings=profile"
-                 :on-click #(nav-actions/show-user-settings :profile)}
-                "change it"]
-              " from your profile settings panel"]]
+                 :on-click #(nav-actions/show-user-settings :profile)
+                 :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :title "Click to change"}
+                (user-utils/readable-tz (:timezone current-user-data))]
+              ")"]]
           [:div.user-profile-modal-fields
             [:div.field-label "Mentions:"]
             [:select.field-value.oc-input

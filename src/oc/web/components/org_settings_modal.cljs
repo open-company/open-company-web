@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [goog.dom :as gdom]
             [goog.object :as gobj]
-            [clojure.string :as str]
+            [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -153,7 +153,7 @@
              :disabled (or @(::saving s)
                            (:saved org-editing)
                            (not (seq (:name org-editing)))
-                           (< (count (str/trim (:name org-editing))) 3))
+                           (< (count (string/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt

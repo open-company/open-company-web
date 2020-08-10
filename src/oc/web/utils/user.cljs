@@ -68,6 +68,9 @@
    (catch :default e
     nil))))
 
+(defn readable-tz [tz]
+  (string/collapse-whitespace (string/replace tz #"(_|-)" " ")))
+
 (defn time-with-timezone
   ([timezone] (time-with-timezone timezone {}))
   ([timezone opts]
@@ -75,28 +78,30 @@
     (utils/time-without-leading-zeros lt))))
 
 (defn timezone-location-string [user-data & [local-time-string?]]
-  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})]
+  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})
+        tz (readable-tz (:timezone user-data))]
     (str twt
          (if (seq (:location user-data))
            (if (seq twt)
              (str " (" (:location user-data) ")")
              (:location user-data))
-           (when (seq (:timezone user-data))
+           (when (seq tz)
              (if (seq twt)
-               (str " (" (:timezone user-data) ")")
-               (str (:timezone user-data))))))))
+               (str " (" tz ")")
+               tz))))))
 
 (defn location-timezone-string [user-data & [local-time-string?]]
-  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})]
+  (let [twt (time-with-timezone (:timezone user-data) {:suffix (when local-time-string? "local time")})
+        tz (readable-tz (:timezone user-data))]
     (str
      (if (seq (:location user-data))
        (if (seq twt)
          (str (:location user-data) " (" twt ")")
          (:location user-data))
-       (when (seq (:timezone user-data))
+       (when (seq tz)
          (if (seq twt)
-           (str twt " (" (:timezone user-data) ")")
-           (str (:timezone user-data))))))))
+           (str twt " (" tz ")")
+           tz))))))
 
 (defun active?
   ([user :guard map?] (active? (:status user)))

@@ -1,7 +1,7 @@
 (ns oc.web.stores.comment
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
-            [cuerdas.core :as str]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
@@ -67,7 +67,7 @@
      (update-in (conj activity-key :links) (fn [links]
                                              (mapv (fn [link]
                                               (if (= (:rel link) "follow")
-                                                (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
+                                                (merge link {:href (string/replace (:href link) #"/follow/?$" "/unfollow/")
                                                              :rel "unfollow"})
                                                 link))
                                                links))))))

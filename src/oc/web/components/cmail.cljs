@@ -1,6 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
-            [cuerdas.core :as str]
+            [cuerdas.core :as string]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -109,7 +109,7 @@
   (rum/ref-node s "headline"))
 
 (defn- fix-headline [headline]
-  (utils/trim (str/replace (or headline "") #"\n" "")))
+  (utils/trim (string/replace (or headline "") #"\n" "")))
 
 (defn- clean-body [s]
   (when (body-element)
