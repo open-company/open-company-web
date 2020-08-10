@@ -146,7 +146,7 @@
                  :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
                  :data-placement "top"
                  :data-container "body"
-                 :title "Click to change"}
+                 :title "Change your timezone"}
                 (user-utils/readable-tz (:timezone current-user-data))]
               ")"]]
           [:div.user-profile-modal-fields
