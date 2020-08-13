@@ -415,7 +415,7 @@
       is-contributions?
       (contrib-actions/contributions-get board-slug)
 
-      (seq board-link)
+      (map? board-link)
       (sa/section-get board-slug board-link)))))
 
 (defn refresh-org-data []

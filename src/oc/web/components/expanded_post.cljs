@@ -182,7 +182,7 @@
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))}))
-        muted-post? (seq (utils/link-for (:links activity-data) "follow"))
+        muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")
         bookmarked? (or (:must-see activity-data)
                         (:bookmarked-at activity-data))]
