@@ -643,7 +643,8 @@
    (parse-entry entry-data board-data changes active-users nil))
 
   ([entry-data board-data changes active-users container-seen-at :guard #(or (nil? %) (string? %))]
-  (if (= entry-data :404)
+  (if (or (= entry-data :404)
+          (:loading entry-data))
     entry-data
     (let [comments-link (utils/link-for (:links entry-data) "comments")
           add-comment-link (utils/link-for (:links entry-data) "create" "POST")
@@ -1105,7 +1106,7 @@
              (let [post-data-key (concat posts-key [post-uuid])
                    old-post-data (get-in tdb post-data-key)
                    board-data (get-in tdb (dis/board-data-key org-slug (:board-slug old-post-data)))]
-              (assoc-in tdb post-data-key (parse-entry old-post-data board-data change-data active-users))))
+               (assoc-in tdb post-data-key (parse-entry old-post-data board-data change-data active-users))))
      db
      (keys (get-in db posts-key)))))
 
