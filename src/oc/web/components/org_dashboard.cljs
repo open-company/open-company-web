@@ -86,7 +86,9 @@
                 payments-data
                 user-info-data
                 active-users
-                current-user-data]} (drv/react s :org-dashboard-data)
+                current-user-data
+                search-active
+                search-results]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
                      app-loading
