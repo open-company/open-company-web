@@ -125,7 +125,9 @@
                              ;; post wasn't found
                              (or (= current-activity-data :404)
                                  ;; route has wrong board slug/uuid for the current post
-                                 (and (not= (:board-slug current-activity-data) current-board-slug)
+                                 (and (map? current-activity-data)
+                                      (not (:loading current-activity-data))
+                                      (not= (:board-slug current-activity-data) current-board-slug)
                                       (not= (:board-uuid current-activity-data) current-board-slug))))
         show-login-wall (and (not jwt-data)
                              (or force-login-wall
