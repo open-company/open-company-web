@@ -612,10 +612,12 @@
                                   (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
                             :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data :current-user-data
-                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :activity-uuid]
+                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :activity-uuid
+                            :search-results]
                             (fn [base orgs org-data contributions-data container-data posts-data activity-data
                                  entry-editing jwt wrt-show loading payments search-active user-info-data current-user-data
-                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id activity-uuid]
+                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id activity-uuid
+                                 search-results]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -640,6 +642,7 @@
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
                                :search-active search-active
+                               :search-results search-results
                                :user-info-data user-info-data
                                :current-user-data current-user-data
                                :active-users active-users
