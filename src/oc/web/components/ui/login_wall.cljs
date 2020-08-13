@@ -26,7 +26,7 @@
         deep-link-origin (drv/react s :expo-deep-link-origin)
         email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
         login-enabled (and auth-settings
-                           (seq email-auth-link)
+                           (map? email-auth-link)
                            (seq @(::email s))
                            (seq @(::pswd s)))
         login-action #(when login-enabled
