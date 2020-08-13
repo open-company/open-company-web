@@ -64,7 +64,9 @@
 
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body query]}]]
-  (let [total-hits (:total body)
+  (let [total-hits (if (map? (:total body))
+                     (-> body :total :value)
+                     (:total body))
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (when success
       (reset! savedsearch query))
