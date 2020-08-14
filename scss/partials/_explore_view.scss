@@ -92,6 +92,12 @@ div.explore-view {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
+
+          @include big_web() {
+            &:hover {
+              color: $wut_purple;
+            }
+          }
         }
 
         &.short-name {

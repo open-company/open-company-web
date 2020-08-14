@@ -75,6 +75,12 @@ div.user-profile-container {
             text-decoration: underline;
             padding: 0;
             margin-left: auto;
+
+            @include big_web() {
+              &:hover {
+                color: var(--color);
+              }
+            }
           }
         }
 
@@ -139,6 +145,12 @@ div.user-profile-container {
         margin-right: 16px;
         opacity: 0.5;
         margin-top: 8px;
+
+        @include big_web(){
+          &:hover {
+            opacity: 1;
+          }
+        }
 
         &.email {
           background-size: 16px 12px;
