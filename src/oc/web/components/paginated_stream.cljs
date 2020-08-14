@@ -65,6 +65,8 @@
        (stream-reply-item {:reply-data            item
                            :member?               member?
                            :row-index             row-index
+                           :read-data             read-data
+                           :show-wrt?             show-wrt?
                            :current-user-data     current-user-data
                            :clear-cell-measure-cb clear-cell-measure-cb
                            :add-comment-force-update add-comment-force-update})
