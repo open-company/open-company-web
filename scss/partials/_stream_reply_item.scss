@@ -240,6 +240,120 @@ div.reply-item {
 
       @include truncate (2, 20px);
     }
+
+    div.reply-item-body {
+      margin-top: 4px;
+      @include activity-body-preview(16, 22, var(--color), 3);
+
+      @include mobile() {
+        @include activity-body-preview(16, 20, var(--color), 2);
+      }
+
+      height: auto;
+      min-height: initial;
+    }
+
+    div.reply-item-footer {
+      margin-top: 10px;
+      min-height: 26px;
+      position: relative;
+
+      @include mobile() {
+        height: auto;
+        overflow: hidden;
+        height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.reply-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          padding-top: 4px;
+          height: 32px;
+        }
+      }
+
+      div.reply-body-draft-edit {
+        float: left;
+
+        button.edit-draft-bt {
+          text-align: left;
+          padding: 0px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $wut_purple;
+        }
+      }
+
+      div.reply-body-draft-delete {
+        float: right;
+        button.delete-draft-bt {
+          text-align: right;
+          padding: 0px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: var(--light-color);
+        }
+      }
+
+      div.reply-item-comments-summary {
+        float: left;
+        margin-right: 32px;
+        // position: absolute;
+        // left: 150px;
+        // top: 0;
+
+        // div.is-comments:not(:empty) {
+        //   margin-left: 36px;
+        // }
+
+        @include mobile() {
+          margin-top: 1px;
+          position: relative;
+          top: initial;
+          left: initial;
+        }
+      }
+
+      div.reactions {
+        float: left;
+        margin-right: 32px;
+
+        div.reactions-picker-container {
+
+          div.emoji-mart {
+            bottom: unset;
+            top: 0;
+            left: calc(100% + 8px);
+
+            @include mobile(){
+              bottom: unset;
+              right: unset;
+              top: unset;
+              left: unset;
+            }
+          }
+        }
+      }
+
+      div.reply-item-wrt {
+        float: left;
+        position: relative;
+        margin-right: 32px;
+        // position: absolute;
+        // left: 274px;
+        // top: 0;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
   }
 
   div.separator-dot {

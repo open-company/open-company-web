@@ -23,6 +23,7 @@
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -33,7 +34,8 @@
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
+            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]
+            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]))
 
 ;; Comment delete
 
@@ -154,7 +156,9 @@
                     [:div.reply-comment-author-right-group
                       {:class (when (:unseen comment-data) "new-comment")}
                       [:div.reply-comment-author-name-container
-                        (user-info-hover {:user-data comment-author :current-user-id current-user-id :leave-delay? true})
+                        (user-info-hover {:user-data comment-author
+                                          :current-user-id current-user-id
+                                          :leave-delay? true})
                         [:div.reply-comment-author-avatar
                           (user-avatar-image comment-author)]
                         [:a.reply-comment-author-name
@@ -240,7 +244,9 @@
 (rum/defc reply-top <
   rum/static
   ui-mixins/refresh-tooltips-mixin
-  [{:keys [current-user-id publisher board-name published-at headline links] :as entry-data}]
+  [{{:keys [publisher board-name published-at headline links] :as entry-data} :entry-data
+    current-user-id :current-user-id add-comment-focus-prefix :add-comment-focus-prefix
+    read-data :read-data member? :member? show-wrt? :show-wrt?}]
   (let [follow-link (utils/link-for links "follow")
         unfollow-link (utils/link-for links "unfollow")]
     [:div.reply-item-top
@@ -272,7 +278,24 @@
              :data-container "body"
              :on-click #(activity-actions/entry-unfollow (:uuid entry-data))}])]
       [:div.reply-item-title
-        headline]]))
+        headline]
+      [:div.reply-item-body.oc-mentions
+        {:data-itemuuid (:uuid entry-data)
+         :dangerouslySetInnerHTML {:__html (:body entry-data)}}]
+      [:div.reply-item-footer.group
+        (when member?
+          (reactions {:entity-data entry-data
+                      :only-thumb? true}))
+        [:div.reply-item-footer-mobile-group
+          (when member?
+            [:div.reply-item-comments-summary
+              ; {:on-click #(expand s true true)}
+              (foc-comments-summary {:entry-data entry-data
+                                     :add-comment-focus-prefix add-comment-focus-prefix})])
+          (when show-wrt?
+            [:div.reply-item-wrt
+              (wrt-count {:activity-data entry-data
+                          :read-data read-data})])]]]))
 
 (defn- reply-item-unique-class [{:keys [uuid]}]
   (str "reply-item-" uuid))
@@ -361,6 +384,7 @@
   (drv/drv :users-info-hover)
   (drv/drv :follow-publishers-list)
   (drv/drv :followers-publishers-count)
+  (drv/drv :current-user-data)
   (mention-mixins/oc-mentions-hover {:click? true})
   ;; Component life cycle
   {:will-mount (fn [s]
@@ -380,7 +404,9 @@
   ;; Render
   [s {member?               :member?
       reply-data            :reply-data
+      show-wrt?             :show-wrt?
       row-index             :row-index
+      read-data             :read-data
       current-user-data     :current-user-data
       clear-cell-measure-cb* :clear-cell-measure-cb
       add-comment-force-update :add-comment-force-update}]
@@ -421,7 +447,12 @@
                                 (not (dom-utils/event-inside? e (.querySelector reply-el "div.add-comment-box-container")))
                                 (not (dom-utils/event-cotainer-has-class e "reply-comment-body")))
                        (nav-actions/open-post-modal entry-data false))))}
-      (reply-top (assoc entry-data :current-user-id (:user-id current-user-data)))
+      (reply-top {:entry-data entry-data
+                  :current-user-id (:user-id current-user-data)
+                  :member? member?
+                  :show-wrt? show-wrt?
+                  :add-comment-focus-prefix @(::add-comment-focus-prefix s)
+                  :read-data read-data})
       (when (and (not comments-loaded?)
                  expanded-replies)
         [:div.reply-item-blocks.group
