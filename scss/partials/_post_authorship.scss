@@ -25,6 +25,12 @@ div.post-authorship {
         line-height: 24px;
         margin-right: 4px;
         text-decoration: underline;
+
+        @include big_web() {
+          &:hover {
+            color: $wut_purple;
+          }
+        }
       }
     }
   }
@@ -59,7 +65,7 @@ div.post-authorship {
 
       @include big_web() {
         &:hover {
-          color: var(--color);
+          color: $wut_purple;
         }
       }
     }
