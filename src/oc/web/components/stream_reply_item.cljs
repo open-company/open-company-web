@@ -361,6 +361,7 @@
   (drv/drv :users-info-hover)
   (drv/drv :follow-publishers-list)
   (drv/drv :followers-publishers-count)
+  (drv/drv :current-user-data)
   (mention-mixins/oc-mentions-hover {:click? true})
   ;; Component life cycle
   {:will-mount (fn [s]
