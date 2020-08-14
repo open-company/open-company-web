@@ -77,7 +77,7 @@
          cmail-state (drv/react s :cmail-state)
          mobile-title (cond
                        (= (keyword current-board-slug) :replies)
-                       "Replies"
+                       "Comments"
                        (= (keyword current-board-slug) :inbox)
                        "Unread"
                        (= (keyword current-board-slug) :all-posts)
