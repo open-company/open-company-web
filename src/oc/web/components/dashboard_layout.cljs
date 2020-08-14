@@ -203,7 +203,7 @@
                  :class (when is-replies
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Replies"]]
+                [:span.tab-label "Comments"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -308,7 +308,7 @@
                                                    "Unfollowing"
 
                                                    is-replies
-                                                   "Replies"
+                                                   "Comments"
 
                                                    :default
                                                    ;; Fallback to the org board data

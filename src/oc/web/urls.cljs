@@ -143,7 +143,7 @@
   ([]
     (replies (dis/current-org-slug)))
   ([org-slug]
-    (str (org org-slug) "/replies")))
+    (str (org org-slug) "/comments")))
 
 (defn topics
   "Org topics url"
