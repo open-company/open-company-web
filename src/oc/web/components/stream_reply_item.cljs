@@ -32,6 +32,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.refresh-button :refer (refresh-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
 
 ;; Comment delete
@@ -149,25 +150,31 @@
               [:div.reply-comment-header.group
                 {:class utils/hide-class}
                 [:div.reply-comment-author-right
-                  [:div.reply-comment-author-right-group
-                    {:class (when (:unseen comment-data) "new-comment")}
-                    [:div.reply-comment-author-name-container
-                      (user-info-hover {:user-data (:author comment-data) :current-user-id current-user-id :leave-delay? true})
-                      [:div.reply-comment-author-avatar
-                        (user-avatar-image (:author comment-data))]
-                      [:div.reply-comment-author-name
-                        {:class (when (:user-id (:author comment-data)) "clickable-name")}
-                        (:name (:author comment-data))]]
-                    [:div.separator-dot]
-                    [:div.reply-comment-author-timestamp
-                      [:time
-                        {:date-time (:created-at comment-data)
-                         :data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                         :data-title (utils/activity-date-tooltip comment-data)}
-                        (utils/foc-date-time (:created-at comment-data))]]]
+                  (let [comment-author (:author comment-data)]
+                    [:div.reply-comment-author-right-group
+                      {:class (when (:unseen comment-data) "new-comment")}
+                      [:div.reply-comment-author-name-container
+                        (user-info-hover {:user-data comment-author :current-user-id current-user-id :leave-delay? true})
+                        [:div.reply-comment-author-avatar
+                          (user-avatar-image comment-author)]
+                        [:a.reply-comment-author-name
+                          {:class (when (:user-id comment-author) "clickable-name")
+                           :href (when (:user-id comment-author)
+                                   (oc-urls/contributions (:user-id comment-author)))
+                           :on-click #(do
+                                        (utils/event-stop %)
+                                        (nav-actions/nav-to-author! % (:user-id comment-author) (oc-urls/contributions (:user-id comment-author))))}
+                          (:name comment-author)]]
+                      [:div.separator-dot]
+                      [:div.reply-comment-author-timestamp
+                        [:time
+                          {:date-time (:created-at comment-data)
+                           :data-toggle (when-not is-mobile? "tooltip")
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                           :data-title (utils/activity-date-tooltip comment-data)}
+                          (utils/foc-date-time (:created-at comment-data))]]])
                   (when show-new-comment-tag
                     [:div.separator-dot])
                   (when show-new-comment-tag
@@ -238,16 +245,13 @@
         unfollow-link (utils/link-for links "unfollow")]
     [:div.reply-item-top
       [:div.reply-item-header
-        [:div.reply-item-author-container
-          (user-info-hover {:user-data publisher :current-user-id current-user-id :leave-delay? true})
-          (user-avatar-image publisher)
-          [:span.author-name
-            (:name publisher)]]
-        [:span.in "in"]
-        [:div.reply-item-board-container
-          ; (board-info-hover {:activity-data entry-data})
-          [:span.board-name
-            board-name]]
+        (post-authorship {:activity-data entry-data
+                          :user-avatar? true
+                          :user-hover? true
+                          :board-hover? false
+                          :activity-board? true
+                          :leave-delay? true
+                          :current-user-id current-user-id})
         [:div.separator-dot]
         [:span.time-since
           [:time

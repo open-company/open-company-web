@@ -8,7 +8,7 @@
 
 (rum/defc post-authorship < rum/static
   [{{:keys [publisher author status board-name board-slug board-access board-uuid] :as activity-data} :activity-data
-    user-avatar? :user-avatar? user-hover? :user-hover? board-hover? :board-hover?
+    user-avatar? :user-avatar? user-hover? :user-hover? board-hover? :board-hover? leave-delay? :leave-delay?
     activity-board? :activity-board? current-user-id :current-user-id hide-last-name? :hide-last-name?}]
   (let [published? (= status "published")
         author-data (cond
@@ -24,7 +24,7 @@
     [:div.post-authorship
       [:div.user-hover-container
         (when user-hover?
-          (user-info-hover {:user-data author-data :current-user-id current-user-id :hide-last-name? hide-last-name?}))
+          (user-info-hover {:user-data author-data :current-user-id current-user-id :hide-last-name? hide-last-name? :leave-delay? leave-delay?}))
         (when user-avatar?
           (user-avatar-image author-data))
         [:a.publisher-name

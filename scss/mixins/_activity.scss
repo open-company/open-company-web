@@ -42,7 +42,7 @@ $header_top_margin: 24;
 
     @include big_web() {
       &:hover {
-        color: var(--color);
+        color: $wut_purple;
       }
     }
   }
