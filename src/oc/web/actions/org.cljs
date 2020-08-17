@@ -293,7 +293,7 @@
 (defn get-org
   ([] (get-org (dis/org-data) false nil))
   ([org-data] (get-org org-data false nil))
-  ([org-data prevent-complete-refresh?] (get-org org-data false nil))
+  ([org-data prevent-complete-refresh?] (get-org org-data prevent-complete-refresh? nil))
   ([org-data prevent-complete-refresh? callback]
    (let [fixed-org-data (or org-data (dis/org-data))
          org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
