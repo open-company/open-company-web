@@ -548,15 +548,15 @@
 
 ;; Initial loading
 
-(defn initial-loading [& [force-refresh]]
-  (let [force-refresh (or force-refresh
+(defn initial-loading [& [force-refresh?]]
+  (let [force-refresh (or force-refresh?
                           (dis/in-route? :org)
                           (dis/in-route? :login))
-        latest-entry-point (if (or force-refresh
+        latest-entry-point (if (or force-refresh?
                                    (nil? (:latest-entry-point @dis/app-state)))
                              0
                              (:latest-entry-point @dis/app-state))
-        latest-auth-settings (if (or force-refresh
+        latest-auth-settings (if (or force-refresh?
                                      (nil? (:latest-auth-settings @dis/app-state)))
                                0
                                (:latest-auth-settings @dis/app-state))
@@ -565,7 +565,7 @@
     (when (or (> (- now latest-entry-point) reload-time)
               (and (dis/current-org-slug)
                    (nil? (dis/org-data))))
-      (entry-point-get (dis/current-org-slug) force-refresh))
+      (entry-point-get (dis/current-org-slug) force-refresh?))
     (when (> (- now latest-auth-settings) reload-time)
       (auth-settings-get))))
 
