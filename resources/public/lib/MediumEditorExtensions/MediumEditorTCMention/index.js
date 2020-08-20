@@ -312,8 +312,8 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
       this.activatePanel();
       this.wrapWordInMentionAt();
     }
-    this.positionPanel();
     this.updatePanelContent();
+    this.positionPanel();
   },
   activatePanel: function activatePanel() {
     this.mentionPanel.classList.add("medium-editor-mention-panel-active");
@@ -356,6 +356,7 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
   },
   positionPanel: function positionPanel() {
     var _activeMentionAt$getB = this.activeMentionAt.getBoundingClientRect(),
+        top = _activeMentionAt$getB.top,
         bottom = _activeMentionAt$getB.bottom,
         left = _activeMentionAt$getB.left;
 
@@ -363,9 +364,12 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
         pageXOffset = _window.pageXOffset,
         pageYOffset = _window.pageYOffset;
 
+    var winHeight = this.document.documentElement.clientHeight || this.window.innerHeight;
+    var horizontalPosition = pageXOffset + left;
+    var verticalPosition = bottom > winHeight / 2 ? pageYOffset + top - this.mentionPanel.clientHeight : pageYOffset + bottom - this.mentionPanel.clientHeight;
 
-    this.mentionPanel.style.top = pageYOffset + bottom + "px";
-    this.mentionPanel.style.left = pageXOffset + left + "px";
+    this.mentionPanel.style.top = verticalPosition + "px";
+    this.mentionPanel.style.left = horizontalPosition + "px";
   },
   updatePanelContent: function updatePanelContent() {
     this.renderPanelContent(this.mentionPanel, this.word, this.handleSelectMention.bind(this));
