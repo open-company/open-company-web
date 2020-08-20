@@ -84,7 +84,7 @@
           "Continue"]]
       [:div.onboard-form
         [:div.form-title
-          "Sign up"]
+          "Your profile"]
         [:div.signup-buttons.group
           [:button.mlb-reset.signup-with-slack
             {:on-touch-start identity
@@ -292,7 +292,7 @@
           {:on-submit (fn [e]
                         (.preventDefault e))}
           [:div.form-title
-            "Sign up"]
+            "Your profile"]
           [:button.mlb-reset.user-profile-avatar
             {:on-click #(upload-user-profile-picture-clicked s)
              :ref "user-profile-avatar"

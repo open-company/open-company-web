@@ -345,6 +345,7 @@ function PlaceCaretAtEnd(el) {
         this.hidePlaceholder();
         this.saveSelection();
       }
+      event.stopPropagation();
       this.collapse();
       this._waitingCB = true;
       this.delegate("onPickerClick", "gif");
