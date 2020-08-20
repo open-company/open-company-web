@@ -366,7 +366,7 @@ var TCMention = exports.TCMention = _mediumEditor2.default.Extension.extend({
 
     var winHeight = this.document.documentElement.clientHeight || this.window.innerHeight;
     var horizontalPosition = pageXOffset + left;
-    var verticalPosition = bottom > winHeight / 2 ? pageYOffset + top - this.mentionPanel.clientHeight : pageYOffset + bottom - this.mentionPanel.clientHeight;
+    var verticalPosition = bottom > winHeight / 2 ? pageYOffset + top - this.mentionPanel.clientHeight : pageYOffset + bottom;
 
     this.mentionPanel.style.top = verticalPosition + "px";
     this.mentionPanel.style.left = horizontalPosition + "px";
