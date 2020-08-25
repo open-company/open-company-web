@@ -2,19 +2,15 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn change! [s k v]
@@ -24,8 +20,7 @@
 (defn save-clicked [s]
   (when (compare-and-set! (::loading s) false true)
     (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-          current-user-data @(drv/get-ref s :current-user-data)
-          user-data (:user-data edit-user-profile)]
+          current-user-data @(drv/get-ref s :current-user-data)]
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
 (defn close-clicked [current-user-data dismiss-action]
@@ -53,7 +48,6 @@
 (rum/defcs user-notifications-modal <
   rum/reactive
   (drv/drv :org-data)
-  (drv/drv :team-data)
   (drv/drv :team-roster)
   (drv/drv :edit-user-profile)
   (drv/drv :current-user-data)
@@ -65,7 +59,7 @@
   {:will-mount (fn [s]
    (user-actions/get-user nil)
    s)
-  :did-remount (fn [old-state new-state]
+  :did-remount (fn [_ new-state]
    (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
      (when (and @(::loading new-state)
                 (not (:has-changes user-data)))
@@ -75,10 +69,8 @@
    new-state)}
   [s]
   (let [org-data (drv/react s :org-data)
-        user-profile-data (drv/react s :edit-user-profile)
-        current-user-data (:user-data user-profile-data)
-        error (:error user-profile-data)
-        team-data (drv/react s :team-data)
+        user-profile-drv (drv/react s :edit-user-profile)
+        current-user-data (:user-data user-profile-drv)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
         slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
@@ -93,13 +85,15 @@
             {:on-click #(if (:has-changes current-user-data)
                           (save-clicked s)
                           (nav-actions/show-user-settings nil))
-             :class (when @(::show-success s) "no-disable")
-             :disabled @(::loading s)}
-             (when (:loading current-user-data)
-                (small-loading))
-            (if @(::show-success s)
-              "Saved!"
-              "Save")]
+             :class (when (or (not (:has-changes current-user-data))
+                              @(::show-success s)
+                              @(::loading s))
+                      "disabled")}
+           (if (:loading current-user-data)
+             "Saving..."
+             (if @(::show-success s)
+               "Saved!"
+               "Save"))]
           [:button.mlb-reset.cancel-bt
             {:on-click (fn [_] (close-clicked current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]

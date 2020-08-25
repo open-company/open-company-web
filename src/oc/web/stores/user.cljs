@@ -222,7 +222,7 @@
   [db [_]]
   (-> db
       ;; Loading user data
-      (assoc-in [:edit-user-profile :loading] true)
+      (update :edit-user-profile merge {:loading true :has-changes false})
       ;; Force a refresh of entry-point and auth-settings
       (dissoc :latest-entry-point :latest-auth-settings)
       ;; Remove the new-slack-user flag to avoid redirecting to the profile again
@@ -230,7 +230,9 @@
 
 (defmethod dispatcher/action :user-profile-update/failed
   [db [_]]
-  (assoc db :edit-user-profile-failed true))
+  (-> db
+   (assoc :edit-user-profile-failed true)
+   (update :edit-user-profile merge {:loading false :has-changes true})))
 
 ;; Signup actions
 
