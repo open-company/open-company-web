@@ -436,7 +436,7 @@ div.dashboard-layout {
           padding: 0;
           background-color: var(--mobile-background-color);
 
-          &.drafts-board {
+          &.drafts-board, &.topics-view {
             height: 0;
           }
         }

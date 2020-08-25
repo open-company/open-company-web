@@ -57,7 +57,7 @@ div.reply-item {
     border-bottom: none;
     border-left: none;
     border-radius: 0;
-    padding: 16px 24px;
+    padding: 16px 0;
   }
 
   &.reply-item-add-comment-focus {
@@ -153,6 +153,10 @@ div.reply-item {
     padding: 0 32px 16px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--foc-divider-line-color);
+
+    @include mobile() {
+      padding: 0 16px 16px;
+    }
 
     div.reply-item-header {
       display: flex;
@@ -273,8 +277,7 @@ div.reply-item {
       div.reply-item-footer-mobile-group {
         @include mobile() {
           display: inline-block;
-          padding-top: 4px;
-          height: 32px;
+          height: 26px;
         }
       }
 
@@ -394,6 +397,11 @@ div.reply-item {
     & > * {
       padding-left: 32px;
       padding-right: 32px;
+
+      @include mobile() {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
     }
 
     div.reply-item-loading {

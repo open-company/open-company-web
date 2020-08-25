@@ -166,7 +166,7 @@
         add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
-                                      mobile-more-menu-el)
+                               mobile-more-menu-el)
         more-menu-comp (fn []
                         (more-menu {:entity-data activity-data
                                     :share-container-id dom-element-id
@@ -187,8 +187,7 @@
         bookmarked? (or (:must-see activity-data)
                         (:bookmarked-at activity-data))]
     [:div.expanded-post
-      {:class (utils/class-set {dom-node-class true
-                                :android ua/android?})
+      {:class dom-node-class
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
        :data-last-activity-at (:last-activity-at activity-data)
@@ -283,6 +282,7 @@
                 (wrt-count {:activity-data activity-data
                             :read-data read-data}))]
             [:div.expanded-post-comments.group
+              {:class (when ua/android? "android")}
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
                                 :loading-comments-count (when-not (seq (get-in comments-drv [(:uuid activity-data) :sorted-comments]))

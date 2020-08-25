@@ -5,6 +5,7 @@ div.explore-view {
 
   @include mobile() {
     width: 100%;
+    padding: 16px 16px 0;
   }
 
   div.explore-view-blocks {
@@ -21,6 +22,11 @@ div.explore-view {
       border-radius: 8px;
       height: 190px;
       width: calc(50% - 4px);
+
+      @include mobile() {
+        min-height: 190px;
+        height: auto;
+      }
 
       &:nth-child(2n + 1) {
         margin-right: 4px;
@@ -211,9 +217,21 @@ div.explore-view {
         height: 32px;
         margin-top: auto;
         flex: 0 0 auto;
+        display: flex;
+        flex-flow: row wrap;
+
+        @include mobile() {
+          height: auto;
+          min-height: 32px;
+        }
 
         button.follow-button {
           float: left;
+          order: 1;
+
+          @include mobile() {
+            order: 3;
+          }
         }
 
         span.posts-count {
@@ -225,6 +243,13 @@ div.explore-view {
           color: var(--light-color);
           padding-left: 22px;
           position: relative;
+          order: 2;
+
+          @include mobile() {
+            order: 1;
+            margin-left: 0;
+            margin-right: 16px;
+          }
 
           &:before {
             content: "";
@@ -255,6 +280,12 @@ div.explore-view {
           color: var(--light-color);
           padding-left: 22px;
           position: relative;
+          order: 3;
+
+          @include mobile() {
+            order: 2;
+            margin-left: 0;
+          }
 
           &:before {
             content: "";

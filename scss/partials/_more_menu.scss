@@ -386,7 +386,7 @@ div.more-menu {
       top: 100vh;
       background-color: var(--opac-background-color-2);
       opacity: 0;
-      z-index: #{$navbar_zindex + 10};
+      z-index: #{$navbar_zindex + 101};
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 

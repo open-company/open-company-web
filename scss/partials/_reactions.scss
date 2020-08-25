@@ -2,10 +2,10 @@ div.reactions {
   height: 26px;
   float: left;
 
-  @include mobile() {
-    float: unset;
-    height: 32px;
-  }
+  // @include mobile() {
+  //   float: unset;
+  //   height: 32px;
+  // }
 
   div.reactions-list {
 

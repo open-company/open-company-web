@@ -105,7 +105,7 @@
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
                                       :add-a-comment (not (pos? comments-count))})}
-            [:div.is-comments-summary-inner.group
+            [:div.is-comments-summary-inner
               (str
                comments-count
                (if show-new-tag?

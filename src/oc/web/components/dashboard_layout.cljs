@@ -257,7 +257,8 @@
             (when show-feed?
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
-                {:class (when is-drafts-board "drafts-board")}
+                {:class (utils/class-set {:drafts-board is-drafts-board
+                                          :topics-view is-topics})}
                 ;; Board name and settings button
                 [:div.board-name
                   (cond
@@ -359,7 +360,8 @@
                   ;      :data-container "body"
                   ;      :title "Curate your Home feed"}])
                   (when (and (not is-drafts-board)
-                             is-mobile?)
+                             is-mobile?
+                             (not is-topics))
                     (search-box))]])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view

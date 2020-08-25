@@ -557,8 +557,6 @@ div.stream-item {
       div.stream-item-footer-mobile-group {
         @include mobile() {
           display: inline-block;
-          padding-top: 4px;
-          height: 32px;
         }
       }
 
