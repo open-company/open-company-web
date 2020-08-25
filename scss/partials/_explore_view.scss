@@ -106,11 +106,13 @@ div.explore-view {
           }
         }
 
-        &.short-name {
-          div.board-dropdown-container {
-            div.dropdown-list-container {
-              right: unset;
-              left: 4px;
+        @include big_web() {
+          &.short-name {
+            div.board-dropdown-container {
+              div.dropdown-list-container {
+                right: unset;
+                left: 4px;
+              }
             }
           }
         }
