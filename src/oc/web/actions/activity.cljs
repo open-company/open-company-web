@@ -374,7 +374,7 @@
         is-drafts (= board-slug utils/default-drafts-board-slug)
         active-users (dis/active-users)
         is-contributions? (get active-users board-slug)
-        board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
+        board-data (dis/org-board-data org-data board-slug)
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
                      (utils/link-for (:links board-data) ["item" "self"] "GET"))]
     (dis/dispatch! [:org-loaded org-data])
@@ -644,7 +644,7 @@
                        (entry-save-cb updated-entry-data fixed-edit-key response))))))
              ;; Save new post to existing board
              (let [org-slug (dis/current-org-slug)
-                   entry-board-data (first (filter #(= (:slug %) (:board-slug fixed-edited-data)) (:boards org-data)))
+                   entry-board-data (dis/org-board-data org-data (:board-slug fixed-edited-data))
                    entry-create-link (utils/link-for (:links entry-board-data) "create")]
                (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))))))
 
@@ -663,7 +663,7 @@
   ;; Show the first post added tooltip if needed
   (nux-actions/show-post-added-tooltip (:uuid entry-data))
   ;; Refresh the drafts board on publish
-  (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
+  (let [drafts-board (dis/org-board-data utils/default-drafts-board-slug)
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
       (sa/section-get utils/default-drafts-board-slug drafts-link))))
@@ -712,7 +712,7 @@
               (api/create-board create-board-link final-board-data (:invite-note section-editing)
                (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
             (let [entry-exists? (seq (:links fixed-entry-editing))
-                  board-data (some #(when (= (:slug %) (:board-slug fixed-entry-editing)) %) (:boards org-data))
+                  board-data (dis/org-board-data (:slug org-data) (:board-slug fixed-entry-editing))
                   publish-entry-link (if entry-exists?
                                       ;; If the entry already exists use the publish link in it
                                       (utils/link-for (:links fixed-entry-editing) "publish")
@@ -850,13 +850,9 @@
 
 ;; Change reaction
 
-(defn- entry-change [container-id entry-uuid]
-  (let [org-data (dis/org-data)
-        section-data (first (filter #(= (:uuid %) container-id) (:boards org-data)))
-        entry-data (dis/activity-data (:slug org-data) entry-uuid)
-        editing-entry-data (dis/cmail-data)]
-    (when entry-data ;; if we have the entry in the app-state
-      (get-entry entry-data))))
+(defn- entry-change [org-slug entry-uuid]
+  (when-let [entry-data (dis/activity-data org-slug entry-uuid)]
+    (get-entry entry-data)))
 
 ;; Following badge
 
@@ -1043,7 +1039,7 @@
               (dis/dispatch! [:activity-delete (dis/current-org-slug) {:uuid entry-uuid}]))
             ;; Refresh the entry in case of an item update
             (when (= change-type :update)
-              (entry-change container-id entry-uuid)))))))
+              (entry-change (:slug org-data) entry-uuid)))))))
   (ws-cc/subscribe :item/counts
     (fn [data]
       (dis/dispatch! [:activities-count (dis/current-org-slug) (:data data)])))
@@ -1230,7 +1226,7 @@
     (let [org-data (dis/org-data)
           active-users (dis/active-users)
           is-container? (dis/is-container? to-slug)
-          is-board? (some #(when (= (:slug %) to-slug) %) (:boards org-data))
+          is-board? (dis/org-board-data org-data to-slug)
           is-contributions? (get active-users to-slug)
           board-data (cond
                        is-container?
@@ -1278,7 +1274,7 @@
 
         :default
         (when-let* [fixed-board-data (or board-data
-                     (some #(when (= (:slug %) to-slug) %) (:boards org-data)))
+                                         (dis/org-board-data org-data to-slug))
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (sa/section-get (:slug fixed-board-data) board-link))))))
 

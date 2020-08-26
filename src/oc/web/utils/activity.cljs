@@ -700,7 +700,7 @@
                                 (assoc b :following (not (unfollow-boards-set (:uuid %))))
                                 b))
                         (:boards org-data))
-          drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+          drafts-board (dis/org-board-data org-data utils/default-drafts-board-slug)
           drafts-link (when drafts-board
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
           previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))

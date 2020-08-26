@@ -129,7 +129,7 @@
 
         :default
         (let [fixed-board-data (or board-data
-                                   (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+                                   (dis/org-board-data (:slug org-data) board-slug))
               board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (when board-link
             (section-actions/section-get (:slug fixed-board-data) board-link)))))))
@@ -196,7 +196,7 @@
          (when (and (not is-container?)
                     (not is-drafts-board?)
                     (:collapsed (dis/cmail-state)))
-           (when-let* [nav-to-board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
+           (when-let* [nav-to-board-data (dis/org-board-data org-slug board-slug)
                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
              (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
                                                         :board-name (:name nav-to-board-data)

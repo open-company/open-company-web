@@ -827,6 +827,26 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
+(defn- s-or-k? [x]
+  (or (keyword? x) (string? x)))
+
+(defun org-board-data
+  "Get board data from org data map: mostly used to edit the board infos."
+  ([]
+   (org-board-data (org-data) (current-board-slug)))
+  ([board-slug :guard s-or-k?]
+   (org-board-data (org-data) board-slug))
+  ([org-slug :guard #(or (keyword? %) (string? %)) board-slug :guard #(or (keyword? %) (string? %))]
+   (org-board-data (org-data org-slug) board-slug))
+  ([org-data :guard #(and (map? %) (:links %) (:boards %))
+    board-slug :guard #(or (keyword? %) (string? %))]
+   (let [board-slug-kw (keyword board-slug)]
+     (some #(when (-> % :slug keyword (= board-slug-kw)) %) (:boards org-data))))
+  ([data :guard map? org-slug :guard ]
+   (org-board-data @app-state org-slug (current-board-slug data)))
+  ([data :guard map? org-slug board-slug]
+   (org-board-data (org-data data org-slug) board-slug)))
+
 (defun board-data
   "Get board data."
   ([]

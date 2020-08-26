@@ -61,8 +61,7 @@
 
 (defn section-get
   ([board-slug]
-    (when-let* [org-data (dis/org-data)
-                section-data (some #(= board-slug (:slug %)) (:boards org-data))
+    (when-let* [section-data (dis/org-board-data board-slug)
                 section-link (utils/link-for (:links section-data) ["item" "self"] "GET")]
       (section-get board-slug section-link)))
   ([board-slug link & [finish-cb]]
@@ -82,8 +81,7 @@
     (section-get board-slug)))
 
 (defn drafts-get []
-  (let [org-data (dispatcher/org-data)
-        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+  (let [drafts-board (dis/org-board-data utils/default-drafts-board-slug)
         drafts-link (utils/link-for (:links drafts-board) ["item" "self"] "GET")]
     (when drafts-link
       (section-get (:slug drafts-board) drafts-link))))
@@ -92,10 +90,9 @@
   [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
-    (let [org-data (dispatcher/org-data)
-          current-board-data (dispatcher/board-data)
+    (let [current-board-data (dispatcher/board-data)
           current-board-link (utils/link-for (:links current-board-data) ["item" "self"] "GET")
-          drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data))
+          drafts-board (dis/org-board-data utils/default-drafts-board-slug)
           drafts-board-link (utils/link-for (:links drafts-board) ["item" "self"] "GET")
           refresh-slug (cond
                         (= section-uuid (:uuid utils/default-drafts-board))
@@ -291,5 +288,5 @@
     (dispatcher/dispatch! [:section-more (:slug org-data) board-slug dispatcher/recently-posted-sort])))
 
 (defn setup-section-editing [section-slug]
-  (when-let [board-data (dispatcher/board-data (dis/current-org-slug) section-slug)]
+  (when-let [board-data (dispatcher/org-board-data section-slug)]
     (dispatcher/dispatch! [:setup-section-editing board-data])))
