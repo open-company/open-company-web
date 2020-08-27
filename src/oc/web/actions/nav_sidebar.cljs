@@ -196,7 +196,7 @@
          (when (and (not is-container?)
                     (not is-drafts-board?)
                     (:collapsed (dis/cmail-state)))
-           (when-let* [nav-to-board-data (dis/org-board-data org-slug board-slug)
+           (when-let* [nav-to-board-data (dis/org-board-data org-data board-slug)
                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
              (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
                                                         :board-name (:name nav-to-board-data)
