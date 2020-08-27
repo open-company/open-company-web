@@ -43,7 +43,7 @@
         minutes (subs time-string (- (count time-string) 2) (count time-string))
         hours* (.parseInt js/window (subs time-string 0 (- (count time-string) 2)) 10)
         hours (if (> hours* 12) (- hours* 12) hours*)]
-    (str  hours ":" minutes (if (> hours* 11) " pm" " am"))))
+    (str  hours ":" minutes (if (> hours* 11) " PM" " AM"))))
 
 (rum/defcs user-notifications-modal <
   rum/reactive
@@ -118,8 +118,7 @@
           ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label
-              "Wut will collect all the updates you should see and "
-              "deliver them to you in a digest at your selected times."]
+              "The latest updates will be sent to you as a digest at your preferred times."]
             [:div.field-value-group
               (for [t ls/digest-times
                     :let [selected? ((:digest-delivery current-user-data) t)
@@ -133,7 +132,7 @@
                     {:on-click change-cb}
                     (digest-time-label t)]])]
             [:div.field-description
-              "(your timezone is set to "
+              "Your timezone is "
               [:a
                 {:href "?user-settings=profile"
                  :on-click #(nav-actions/show-user-settings :profile)
@@ -141,8 +140,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title "Change your timezone"}
-                (user-utils/readable-tz (:timezone current-user-data))]
-              ")"]]
+                (user-utils/readable-tz (:timezone current-user-data))]]]
           [:div.user-profile-modal-fields
             [:div.field-label "Mentions:"]
             [:select.field-value.oc-input
@@ -161,7 +159,7 @@
                 {:value "in-app"}
                 "In-app only"]]
             [:div.field-description
-              "Notifications will be sent to you in real-time if someone mentions your name"]]
+              "Notifications are sent in real-time if someone mentions you."]]
           (when ls/reminders-enabled?
             [:div.user-profile-modal-fields
               [:div.field-label "Recurring update reminders"]
