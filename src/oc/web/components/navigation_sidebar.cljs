@@ -175,7 +175,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "Comments"]
+                "For you"]
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile

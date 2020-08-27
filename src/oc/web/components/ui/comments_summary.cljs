@@ -140,7 +140,8 @@
          :data-placement "top"
          :data-toggle (when-not is-mobile? "tooltip")
          :data-container "body"
-         :title (str comments-count " comment" (when (not= comments-count 1) "s"))}
+         :title (str comments-count " comment" (when (not= comments-count 1) "s"))
+         :class (when (:unseen-comments entry-data) "has-new-comments")}
         ; Comments authors heads
         [:div.is-comments-bubble]
         ; Comments count

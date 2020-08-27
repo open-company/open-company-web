@@ -61,15 +61,15 @@
                                :open-item (:open-item item)
                                :close-item (:close-item item)})}
      (cond
-       (= (:container-slug container-data) :replies)
-       (stream-reply-item {:reply-data            item
-                           :member?               member?
-                           :row-index             row-index
-                           :read-data             read-data
-                           :show-wrt?             show-wrt?
-                           :current-user-data     current-user-data
-                           :clear-cell-measure-cb clear-cell-measure-cb
-                           :add-comment-force-update add-comment-force-update})
+      ;;  (= (:container-slug container-data) :replies)
+      ;;  (stream-reply-item {:reply-data            item
+      ;;                      :member?               member?
+      ;;                      :row-index             row-index
+      ;;                      :read-data             read-data
+      ;;                      :show-wrt?             show-wrt?
+      ;;                      :current-user-data     current-user-data
+      ;;                      :clear-cell-measure-cb clear-cell-measure-cb
+      ;;                      :add-comment-force-update add-comment-force-update})
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
                                :member?           member?
@@ -160,21 +160,21 @@
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index})))]))
 
-(defn- replies-unique-key [entry-data]
-  (let [replies-data (vec (:replies-data entry-data))]
-    (reduce (fn [n idx]
-              (let [item (get replies-data idx)]
-                (+ n (* (inc idx) 100) (if (seq (:reactions item)) 1 0))))
-     0
-     (range (count replies-data)))))
+;; (defn- replies-unique-key [entry-data]
+;;   (let [replies-data (vec (:replies-data entry-data))]
+;;     (reduce (fn [n idx]
+;;               (let [item (get replies-data idx)]
+;;                 (+ n (* (inc idx) 100) (if (seq (:reactions item)) 1 0))))
+;;      0
+;;      (range (count replies-data)))))
 
  (defn- unique-row-string [replies? item]
   (let [entry? (activity-utils/entry? item)
         static-part (str (name (:resource-type item)) "-" (:uuid item))
-        rep-key (replies-unique-key item)
+        ;; rep-key (replies-unique-key item)
         variable-part (cond
-                        (and entry? replies?)
-                        (str (-> item :replies-data last :updated-at) "-" rep-key)
+                        ;; (and entry? replies?)
+                        ;; (str (-> item :replies-data last :updated-at) "-" rep-key)
                         entry?
                         (or (:updated-at item) (:created-at item))
                         :else
