@@ -129,7 +129,7 @@
 
         :default
         (let [fixed-board-data (or board-data
-                                   (dis/org-board-data (:slug org-data) board-slug))
+                                   (dis/org-board-data org-data board-slug))
               board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (when board-link
             (section-actions/section-get (:slug fixed-board-data) board-link)))))))

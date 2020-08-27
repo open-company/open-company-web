@@ -712,7 +712,7 @@
               (api/create-board create-board-link final-board-data (:invite-note section-editing)
                (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
             (let [entry-exists? (seq (:links fixed-entry-editing))
-                  board-data (dis/org-board-data (:slug org-data) (:board-slug fixed-entry-editing))
+                  board-data (dis/org-board-data org-data (:board-slug fixed-entry-editing))
                   publish-entry-link (if entry-exists?
                                       ;; If the entry already exists use the publish link in it
                                       (utils/link-for (:links fixed-entry-editing) "publish")

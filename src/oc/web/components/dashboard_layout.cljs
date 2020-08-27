@@ -95,7 +95,7 @@
         current-org-slug (drv/react s :org-slug)
         current-user-data (drv/react s :current-user-data)
         ;; Board data used as fallback until the board is completely loaded
-        org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
+        org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         activity-data (drv/react s :activity-data)
