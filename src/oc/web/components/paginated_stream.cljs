@@ -84,6 +84,7 @@
                      :read-data          read-data
                      :show-wrt?          show-wrt?
                      :show-new-comments? show-new-comments?
+                     :replies?           replies?
                      :member?            member?
                      :editable-boards    editable-boards
                      :container-slug     (:container-slug container-data)

@@ -85,7 +85,8 @@
 
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
-   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count])
+   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
+   :for-you-context])
 
 (defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))
@@ -610,6 +611,26 @@
       (cu/collapse-comments new-sorted-comments container-seen-at)
       new-sorted-comments)))
 
+(defn for-you-context [entry-data current-user-id]
+   (let [replies-data (:replies-data entry-data)
+         last-comment (last replies-data)
+         subject (if (:author? last-comment)
+                   "You "
+                   (str (or (:short-name (:author last-comment)) (:first-name (:author last-comment)) (:name (:author last-comment))) " "))
+         mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
+         mentioned? (.match (:body last-comment) mention-regexp)
+         publisher? (:publisher? entry-data)
+         unseen? (:unseen last-comment)
+         verb (if unseen? " left a new comment" " commented")
+         direct-object (cond mentioned?
+                           " mentioned you"
+                           publisher?
+                           " on your update"
+                           :else
+                           " on an update you are watching")]
+     {:label (str subject verb direct-object)
+      :timestamp (:created-at last-comment)}))
+
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
         full-entry (get fixed-items (:uuid entry-data))
@@ -628,6 +649,7 @@
     (as-> entry-data e
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
+     (assoc e :for-you-context (for-you-context e (jwt/user-id)))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
      (update e :unseen-comments #(boolean (if-not (seq comments)
                                             %

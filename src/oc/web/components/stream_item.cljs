@@ -30,6 +30,21 @@
      :ref :item-body
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
+(defn- stream-item-activity-preview [is-mobile? for-you-context]
+  [:div.stream-item-activity-preview
+    [:span.for-you-body-label
+     (:label for-you-context)]
+    [:div.separator-dot]
+    [:span.time-since
+      {:data-toggle (when-not is-mobile? "tooltip")
+       :data-placement "top"
+       :data-container "body"
+       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+       :data-title (utils/activity-date-tooltip (:timestamp for-you-context))}
+      [:time
+        {:date-time (:timestamp for-you-context)}
+        (utils/time-since (:timestamp for-you-context) [:short :lower-case])]]])
+
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
@@ -146,7 +161,8 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board current-user-data container-slug show-new-comments?]}]
+  [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
+             current-user-data container-slug show-new-comments? replies?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -190,7 +206,8 @@
         is-home? (-> container-slug keyword (= :following))
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
-                               (not (:publisher? activity-data)))]
+                               (not (:publisher? activity-data)))
+        show-body-thumbnail? (and (not replies?) (:body-thumbnail activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -283,8 +300,8 @@
         [:div.activity-share-container]]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
-          {:class (when (:body-thumbnail activity-data) "has-preview")}
-          (when (:body-thumbnail activity-data)
+          {:class (when show-body-thumbnail? "has-preview")}
+          (when show-body-thumbnail?
             [:div.body-thumbnail-wrapper
               {:class (:type (:body-thumbnail activity-data))}
               [:img.body-thumbnail
@@ -294,15 +311,18 @@
                           :thumbnail
                           (img/optimize-image-url (* 102 3)))}]])
           [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (and (not (:fixed-video-id activity-data))
-                                                          (seq (:body-thumbnail activity-data)))
-                                      :has-video (:fixed-video-id activity-data)
+            {:class (utils/class-set {:has-thumbnail (and show-body-thumbnail?
+                                                          (not (:fixed-video-id activity-data)))
+                                      :has-video (and show-body-thumbnail?
+                                                      (:fixed-video-id activity-data))
                                       utils/hide-class true})}
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (stream-item-summary activity-data)]]
+            (if replies?
+              (stream-item-activity-preview is-mobile? (:for-you-context activity-data))
+              (stream-item-summary activity-data))]]
           (if-not is-published?
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
