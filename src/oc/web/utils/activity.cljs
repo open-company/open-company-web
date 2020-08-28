@@ -618,16 +618,18 @@
                    "You "
                    (str (or (:short-name (:author last-comment)) (:first-name (:author last-comment)) (:name (:author last-comment))) " "))
          mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
-         mentioned? (.match (:body last-comment) mention-regexp)
+         mention? (.match (:body last-comment) mention-regexp)
          publisher? (:publisher? entry-data)
          unseen? (:unseen last-comment)
-         verb (if unseen? " left a new comment" " commented")
-         direct-object (cond mentioned?
-                           " mentioned you"
-                           publisher?
-                           " on your update"
-                           :else
-                           " on an update you are watching")]
+         verb (cond unseen?
+                    " left a new comment"
+                    mention?
+                    "mentioned you in a comment"
+                    :else
+                    " commented")
+         direct-object (if publisher?
+                         " on your update"
+                         " on an update you are watching")]
      {:label (str subject verb direct-object)
       :timestamp (:created-at last-comment)}))
 
