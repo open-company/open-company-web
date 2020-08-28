@@ -119,7 +119,8 @@
 (rum/defc foc-comments-summary < rum/static
   [{:keys [entry-data
            add-comment-focus-prefix
-           current-activity-id]}]
+           current-activity-id
+           new-comments-count]}]
   (let [sorted-comments (dis/activity-sorted-comments-data (:uuid entry-data))
         comments-link (utils/link-for (:links entry-data) "comments")
         comments-loaded? (seq sorted-comments)
@@ -141,12 +142,14 @@
          :data-toggle (when-not is-mobile? "tooltip")
          :data-container "body"
          :title (str comments-count " comment" (when (not= comments-count 1) "s"))
-         :class (when (:unseen-comments entry-data) "has-new-comments")}
+         :class (when (pos? new-comments-count) "foc-new-comments")}
         ; Comments authors heads
         [:div.is-comments-bubble]
         ; Comments count
         [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
                                     :add-a-comment (zero? comments-count)})}
-          [:div.is-comments-summary-inner.group
-            comments-count]]])))
+          [:div.is-comments-summary-inner
+            comments-count
+            [:span.new-comments-count
+              "(" new-comments-count " NEW)"]]]])))

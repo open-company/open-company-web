@@ -146,7 +146,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board current-user-data container-slug]}]
+  [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board current-user-data container-slug show-new-comments?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -324,7 +324,8 @@
                     ; {:on-click #(expand s true true)}
                     (foc-comments-summary {:entry-data activity-data
                                            :add-comment-focus-prefix "main-comment"
-                                           :current-activity-id current-activity-id})])
+                                           :current-activity-id current-activity-id
+                                           :new-comments-count (when show-new-comments? (count (filter :unseen (:replies-data activity-data))))})])
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

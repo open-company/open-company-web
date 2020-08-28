@@ -128,6 +128,10 @@ div.is-comments {
       }
     }
 
+    &.is-comments-summary-inner span.new-comments-count {
+      display: none;
+    }
+
     @include big_web() {
       cursor: pointer;
 
@@ -146,6 +150,26 @@ div.is-comments {
 
       @include mobile() {
         display: none;
+      }
+    }
+  }
+
+  &.foc-new-comments {
+    div.is-comments-bubble {
+      opacity: 1;
+    }
+
+    div.is-comments-summary {
+      // @include OC_Body_Bold();
+      color: var(--color);
+
+      div.is-comments-summary-inner {
+        span.new-comments-count {
+          display: initial;
+          color: $wut_purple;
+          @include OC_Body_Bold();
+          margin-left: 6px;
+        }
       }
     }
   }

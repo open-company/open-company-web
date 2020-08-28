@@ -53,7 +53,9 @@
            add-comment-force-update
            row-index] :as props}]
   (let [member? (:member? org-data)
-        show-wrt? member?
+        replies? (= (:container-slug container-data) :replies)
+        show-wrt? (and member? (not replies?))
+        show-new-comments? replies?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
    [:div.virtualized-list-row
@@ -79,14 +81,15 @@
                                :current-user-data current-user-data})
        :else
        (stream-item {:activity-data item
-                     :read-data read-data
-                     :show-wrt? show-wrt?
-                     :member? member?
-                     :editable-boards editable-boards
-                     :container-slug (:container-slug container-data)
-                     :foc-board (not (activity-utils/board? container-data))
-                     :current-user-data     current-user-data
-                     :boards-count (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
+                     :read-data          read-data
+                     :show-wrt?          show-wrt?
+                     :show-new-comments? show-new-comments?
+                     :member?            member?
+                     :editable-boards    editable-boards
+                     :container-slug     (:container-slug container-data)
+                     :foc-board          (not (activity-utils/board? container-data))
+                     :current-user-data  current-user-data
+                     :boards-count       (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [item]}]
