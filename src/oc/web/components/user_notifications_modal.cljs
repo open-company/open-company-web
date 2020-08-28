@@ -118,7 +118,7 @@
           ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label
-              "The latest updates will be sent to you as a digest at your preferred times."]
+              "The latest updates will be sent to you in a digest at your preferred times."]
             [:div.field-value-group
               (for [t ls/digest-times
                     :let [selected? ((:digest-delivery current-user-data) t)
@@ -140,7 +140,8 @@
                  :data-placement "top"
                  :data-container "body"
                  :title "Change your timezone"}
-                (user-utils/readable-tz (:timezone current-user-data))]]]
+                (user-utils/readable-tz (:timezone current-user-data))]
+              "."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Mentions:"]
             [:select.field-value.oc-input
