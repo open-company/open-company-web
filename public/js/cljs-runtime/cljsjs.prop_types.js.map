@@ -1,0 +1,1 @@
+{"version":3,"sources":["cljsjs/prop_types.cljs"],"mappings":";;AAGA,AAAA,AAACA,AAAiCC","names":["js/goog.exportSymbol","js/module$node_modules$prop_types$index"],"sourcesContent":["(ns cljsjs.prop-types\n  (:require [\"prop-types\" :as prop-types]))\n\n(js/goog.exportSymbol \"PropTypes\" prop-types)\n"]}

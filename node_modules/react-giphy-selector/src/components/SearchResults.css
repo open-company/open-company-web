@@ -1,0 +1,27 @@
+.searchResults {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.searchResults > li {
+	padding: 0;
+	margin: 0;
+	display: block;
+	min-width: 50px;
+	flex-grow: 1;
+}
+
+.searchResults > li > ul {
+	list-style: none;
+	margin: 0;
+	padding: 0 5px;
+}
+
+.searchResults > li > ul > li {
+	margin-bottom: 5px;
+}

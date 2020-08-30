@@ -1,0 +1,39 @@
+{
+  "name": "oc-web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev:build": "npm run css:copyAssets & npm run scss:build npm run cljs:build",
+    "dev:watch": "npm run css:copyAssets & concurrently --kill-others \"npm run scss:watch\" \"npm run cljs:watch\"",
+    "scss:build": "node-sass --inclde-paths scss scss/app.main.scss public/css/app.main.css",
+    "scss:watch": "nodemon -e scss -x \"npm run scss:build\"",
+    "css:copyAssets": "bin/copy_assets",
+    "cljs:build": "npx shadow-cljs build webapp",
+    "cljs:watch": "npx shadow-cljs watch webapp"
+  },
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
+    "normalize.scss": "^0.1.0",
+    "shadow-cljs": "2.11.1"
+  },
+  "dependencies": {
+    "@sentry/browser": "^5.22.3",
+    "clipboard": "2.0.6",
+    "create-react-class": "15.6.3",
+    "emoji-mart": "2.2.1",
+    "emojione": "4.5.0",
+    "filestack-js": "0.9.9",
+    "hammerjs": "2.0.8",
+    "jwt-decode": "2.2.0",
+    "localforage": "1.5.3",
+    "medium-editor": "5.23.3",
+    "moment-timezone": "0.5.31",
+    "react": "16.11.0",
+    "react-dom": "16.11.0",
+    "react-giphy-selector": "0.0.1",
+    "react-virtualized": "9.21.2",
+    "xregexp": "4.3.0"
+  }
+}

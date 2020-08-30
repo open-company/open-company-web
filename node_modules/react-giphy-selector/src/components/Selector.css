@@ -1,0 +1,21 @@
+.loader {
+	text-align: center;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.searchError {
+	text-align: center;
+	color: red;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.footer {
+	padding: 5px;
+}
+
+.footer .attributionMark {
+	width: 100px;
+	height: 11px;
+}
