@@ -559,9 +559,9 @@ div.cmail-outer {
           text-overflow: ellipsis;
           vertical-align: super;
           white-space: nowrap;
-          color: var(--purple-color);
+          color: var(--primary-color);
           border-radius: 4px;
-          background-color: var(--purple-light-color);
+          background-color: var(--primary-light-color);
 
           @include mobile() {
             height: 28px;
