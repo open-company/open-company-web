@@ -3,6 +3,7 @@
             [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.local-settings :as ls]
+            [oc.web.dispatcher :as dis]
             [oc.web.actions.ui-theme :as theme]))
 
 (def org-avatar-filestack-config
@@ -76,3 +77,9 @@
      (if (map? brand-color)
        (recur brand-color)
        (recur (default-brand-color))))))
+
+(defn current-brand-color
+  ([org-data]
+   (when-let [theme-kw (theme/computed-theme)]
+     (-> org-data :brand-color theme-kw)))
+  ([] (current-brand-color (dis/org-data))))

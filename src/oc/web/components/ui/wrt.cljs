@@ -3,6 +3,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.org :as ou]
             [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -212,7 +213,7 @@
                      :cy "58"
                      :r "50"
                      :fill "transparent"
-                     :stroke "#6833F1"
+                     :stroke (:hex (ou/current-brand-color))
                      :stroke-width "16"
                      :class (when @(:first-render-done s) (str "wrt-donut-segment-" seen-percent))}]
                   [:g.wrt-chart-text
