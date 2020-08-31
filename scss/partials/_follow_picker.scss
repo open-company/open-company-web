@@ -108,8 +108,8 @@ div.follow-picker {
         line-height: 32px;
         height: 32px;
         float: right;
-        color: var(--purple-primary-color);
-        background-color: var(--purple-secondary-color);
+        color: var(--primary-color);
+        background-color: var(--purple-light-color);
         border-radius: 4px;
         padding: 0 8px;
 
@@ -525,13 +525,13 @@ div.follow-picker {
                     border-radius: 0;
 
                     &.select {
-                      background-color: $wut_feint_purple;
+                      background-color: var(--primary-light-color);
                       color: var(--primary-color);
                     }
 
                     @include big_web() {
                       &:hover {
-                        background-color: $wut_feint_purple;
+                        background-color: var(--primary-light-color);
                         color: var(--primary-color);
                       }
                     }

@@ -700,7 +700,7 @@ div.onboard-lander {
         color: white;
 
         &.disabled {
-          background-color: $wut_feint_purple;
+          background-color: var(--primary-light-color);
         }
       }
 

@@ -21,7 +21,7 @@ div.sections-picker {
       cursor: pointer;
 
       &.active, &:hover {
-        background-color: $wut_feint_purple;
+        background-color: var(--primary-light-color);
         color: var(--primary-color);
 
         &.publisher-board {
@@ -34,7 +34,7 @@ div.sections-picker {
         }
 
         @include mobile() {
-          -webkit-tap-highlight-color: $wut_feint_purple;
+          -webkit-tap-highlight-color: var(--primary-light-color);
         }
 
         div.sections-picker-section-name {

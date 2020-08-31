@@ -67,7 +67,7 @@ $dark_mode: "dark";
   --navigation-sidebar-invite-border: 1px solid #DCDDE1;
   --navigation-sidebar-invite-background: white;
   --navigation-sidebar-invite-bt-color: var(--primary-color);
-  --navigation-sidebar-invite-bt-background: #{$wut_feint_purple};
+  --navigation-sidebar-invite-bt-background: var(--primary-light-color);
 
   // Notifications tray
   --notifications-item-background: #848D95;
@@ -128,8 +128,6 @@ $dark_mode: "dark";
 
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.07);
-  --purple-primary-color: var(--primary-color);
-  --purple-secondary-color: #{$wut_feint_purple};
 
   html, body {
     scrollbar-color: light;
@@ -254,8 +252,6 @@ $dark_mode: "dark";
 
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.16);
-  --purple-primary-color: white;
-  --purple-secondary-color: var(--primary-color);
 
   &, body {
     scrollbar-color: dark;
