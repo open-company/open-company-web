@@ -192,7 +192,7 @@
 (deftask dev
   "OC Development build"
   []
-  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"] [djblue/portal "0.4.0"]]))
   (comp (serve :handler 'oc.server/handler
                :port 3559)
         (from-jars)
