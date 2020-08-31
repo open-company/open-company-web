@@ -264,7 +264,7 @@
                     :let [active? (= (:hex current-brand-color) (:hex c))]]
                 [:button.mlb-reset.color-preset-bt
                   {:key (str "color-preset-" (:hex c))
-                   :on-click #((change-brand-color (:hex c) (:rgb c)))
+                   :on-click #(change-brand-color (:hex c) (:rgb c))
                    :class (when active? "active")}
                  [:span.dot
                   {:data-color-hex (:hex c)
