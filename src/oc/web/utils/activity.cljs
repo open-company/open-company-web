@@ -579,9 +579,11 @@
                        unseen?*)
           unseen? (and (not author?)
                        unseen?*)
-          is-emoji-comment? (is-emoji (:body comment-map))]
+          is-emoji-comment? (is-emoji (:body comment-map))
+          active-users (dis/active-users)]
       (-> comment-map
         (assoc :resource-type :comment)
+        (update :author merge (get active-users (:user-id %)))
         (assoc :author? author?)
         (assoc :ingore? ingore?)
         (assoc :unread unread?)
@@ -601,9 +603,9 @@
         old-comments-keep (map #(select-keys % [:uuid :collapsed :unseen :unwrapped-body]) old-comments)
         keep-comments-map (zipmap (map :uuid old-comments-keep) old-comments-keep)
         new-parsed-comments (mapv #(as-> % c
-                                    (parse-comment org-data entry-data c container-seen-at)
-                                    (merge c (get keep-comments-map (:uuid c))))
-                             new-comments)
+                                     (parse-comment org-data entry-data c container-seen-at)
+                                     (merge c (get keep-comments-map (:uuid c))))
+                                  new-comments)
         new-sorted-comments (cu/sort-comments new-parsed-comments)]
     ;; Collapse the comments only the first time or when the expanded replies
     ;; are not already required explicitly
@@ -614,23 +616,32 @@
 (defn for-you-context [entry-data current-user-id]
    (let [replies-data (:replies-data entry-data)
          last-comment (last replies-data)
-         subject (if (:author? last-comment)
-                   "You "
-                   (str (or (:short-name (:author last-comment)) (:first-name (:author last-comment)) (:name (:author last-comment))) " "))
+         last-comment-author (:author last-comment)
+         user-name #(or (:pointed-name %) (:first-name %) (:name %))
          mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
          mention? (.match (:body last-comment) mention-regexp)
          publisher? (:publisher? entry-data)
-         unseen? (:unseen last-comment)
-         verb (cond unseen?
-                    " left a new comment"
+         unseen-commenters (reverse (map (comp user-name :author) (filter :unseen replies-data)))
+         subject (case (count unseen-commenters)
+                   0
+                   (if (:author? last-comment)
+                     "You "
+                     (str (user-name last-comment-author) " "))
+                   1
+                   (:name (first unseen-commenters))
+                   2
+                   (str (:name (first unseen-commenters)) " and " (:name (last unseen-commenters)))
+                   3
+                   (str (:name (first unseen-commenters)) ", " (:name (second unseen-commenters)) " and 1 other")
+                     ;; :else
+                   (str (:name (first unseen-commenters)) ", " (:name (second unseen-commenters)) " and " (- (count unseen-commenters) 2) " others"))
+         verb (cond (seq unseen-commenters)
+                    (str " left a new comment" (when (> (count unseen-commenters) 1) "s"))
                     mention?
-                    "mentioned you in a comment"
+                    " mentioned you"
                     :else
-                    " commented")
-         direct-object (if publisher?
-                         " on your update"
-                         " on an update you are watching")]
-     {:label (str subject verb direct-object)
+                    " left a comment")]
+     {:label (str subject verb)
       :timestamp (:created-at last-comment)}))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
@@ -651,11 +662,9 @@
     (as-> entry-data e
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
-     (assoc e :for-you-context (for-you-context e (jwt/user-id)))
+     (update e :for-you-context #(or % (for-you-context e (jwt/user-id))))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
-     (update e :unseen-comments #(boolean (if-not (seq comments)
-                                            %
-                                            (seq (filter :unseen (:replies-data e))))))
+     (update e :unseen-comments #(count (filter :unseen (:replies-data e))))
      (assoc e :ignore-comments (comments-ignore? e container-seen-at)))))
 
 (defun parse-entry
