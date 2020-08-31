@@ -11,7 +11,7 @@ $dark_mode: "dark";
 
 :root {
   --primary-color: rgb(#{$wut_purple});
-  --primary-light-color: ${$wut_feint_purple};
+  --primary-light-color: #{$wut_feint_purple};
   --background-color: #{$grey_num_2};
   --color: #{$deep_navy};
   --light-color: #{rgba($deep_navy,0.5)};
@@ -138,7 +138,7 @@ $dark_mode: "dark";
 
 @include dark_mode() {
   --primary-color: rgb(#{$wut_purple});
-  --primary-light-color: ${$wut_feint_purple};
+  --primary-light-color: #{$wut_feint_purple};
   --background-color: #1B202A;
   --color: white;
   --light-color: #{rgba(white,0.5)};
