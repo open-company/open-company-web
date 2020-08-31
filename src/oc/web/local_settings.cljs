@@ -104,3 +104,10 @@
 
 ;; Digest times
 (def digest-times #{:700 :1200 :1700})
+
+;; Primary color
+(def default-primary-color
+  {:light {:rgb {:r 104 :g 51 :b 241}
+           :hex "#6833F1"}
+   :dark {:rgb {:r 104 :g 51 :b 241}
+          :hex "#6833F1"}})

@@ -71,7 +71,7 @@
 }
 
 .mlb-link-green {
-  @include mlb-link($wut_purple);
+  @include mlb-link(var(--primary-color));
 }
 
 .btn-reset {

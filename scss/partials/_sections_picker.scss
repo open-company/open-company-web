@@ -22,7 +22,7 @@ div.sections-picker {
 
       &.active, &:hover {
         background-color: $wut_feint_purple;
-        color: $wut_purple;
+        color: var(--primary-color);
 
         &.publisher-board {
           background-color: transparent;
@@ -38,7 +38,7 @@ div.sections-picker {
         }
 
         div.sections-picker-section-name {
-          color: $wut_purple;
+          color: var(--primary-color);
         }
 
         div.public-icon {

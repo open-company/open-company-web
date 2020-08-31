@@ -27,7 +27,7 @@ div.post-to-button {
 
     button.post-to-bt {
       padding: 7px 16px;
-      background-color: $wut_purple;
+      background-color: var(--primary-color);
       height: 32px;
       @include OC_Body_Bold();
       font-size: 14px;

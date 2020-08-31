@@ -1,5 +1,9 @@
 (ns oc.web.utils.org
-  (:require [oc.web.lib.jwt :as jwt]))
+  (:require [cuerdas.core :as s]
+            [defun.core :refer (defun)]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.local-settings :as ls]
+            [oc.web.actions.ui-theme :as theme]))
 
 (def org-avatar-filestack-config
   {:accept "image/*"
@@ -32,3 +36,42 @@
            (pos? next-val))
     next-val
     previous-val))
+
+(defn- rgb-string [rgb]
+  (when (and (map? rgb)
+             (map #(contains? rgb %) [:r :g :b]))
+    (str (:r rgb) "," (:g rgb) "," (:b rgb))))
+
+(defn primary-color-from-rgb [rgb]
+  (when-let [rgbs (rgb-string rgb)]
+    (str "rgb(" rgbs ")")))
+
+(defn primary-light-color-from-rgb [rgb]
+  (when-let [rgbs (rgb-string rgb)]
+    (str "rgba(" rgbs ", 0.16)")))
+
+(defn default-brand-color []
+  (when-let [theme-kw (theme/computed-theme)]
+    (get ls/default-primary-color theme-kw)))
+
+(defun set-brand-color!
+  ([nil])
+
+  ([rgb-string :guard string?]
+   (.. js/document -documentElement -style (setProperty "--primary-color" rgb-string)))
+
+  ([color-rgb :guard #(and (:r %) (:g %) (:b %))]
+   (recur (primary-color-from-rgb color-rgb)))
+
+  ([color-map :guard :rgb]
+   (recur (primary-color-from-rgb (:rgb color-map))))
+
+  ([brand-color-map :guard #(and (:dark %) (:light %))]
+   (when-let [theme-key (theme/computed-theme)]
+     (recur (get brand-color-map theme-key))))
+
+  ([org-data :guard map?]
+   (let [brand-color (:brand-color org-data)]
+     (if (map? brand-color)
+       (recur brand-color)
+       (recur (default-brand-color))))))

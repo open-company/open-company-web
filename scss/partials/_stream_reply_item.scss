@@ -289,7 +289,7 @@ div.reply-item {
           padding: 0px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $wut_purple;
+          color: var(--primary-color);
         }
       }
 
@@ -743,7 +743,7 @@ div.reply-item {
 
                   @include big_web() {
                     &:hover {
-                      color: $wut_purple;
+                      color: var(--primary-color);
                     }
                   }
                 }
@@ -816,7 +816,7 @@ div.reply-item {
 
                 @include big_web() {
                   &.clickable-name:hover {
-                    color: $wut_purple;
+                    color: var(--primary-color);
                   }
                 }
               }

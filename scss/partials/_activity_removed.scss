@@ -116,7 +116,7 @@ div.activity-removed-container {
       height: 32px;
       color: white;
       border-radius: 6px;
-      background-color: $wut_purple;
+      background-color: var(--primary-color);
       @include OC_Body_Bold();
       font-size: 14px;
     }

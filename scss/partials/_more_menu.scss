@@ -361,7 +361,7 @@ div.more-menu {
       @include big_web() {
         &:hover {
           background-color: $wut_feint_purple;
-          color: $wut_purple;
+          color: var(--primary-color);
         }
       }
 

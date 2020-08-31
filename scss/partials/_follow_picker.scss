@@ -204,7 +204,7 @@ div.follow-picker {
             display: inline;
             margin: 0;
             padding: 0;
-            color: $wut_purple;
+            color: var(--primary-color);
             text-decoration: underline;
           }
         }
@@ -448,7 +448,7 @@ div.follow-picker {
             font-size: 14px;
             line-height: 18px;
             color: white;
-            background-color: $wut_purple;
+            background-color: var(--primary-color);
             border-radius: 4px;
             padding: 7px 14px;
             float: right;
@@ -526,13 +526,13 @@ div.follow-picker {
 
                     &.select {
                       background-color: $wut_feint_purple;
-                      color: $wut_purple;
+                      color: var(--primary-color);
                     }
 
                     @include big_web() {
                       &:hover {
                         background-color: $wut_feint_purple;
-                        color: $wut_purple;
+                        color: var(--primary-color);
                       }
                     }
                     span {

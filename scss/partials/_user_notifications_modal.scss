@@ -64,7 +64,7 @@ div.user-notifications-modal-container {
       button.save-bt {
         height: 32px;
         padding: 7px 14px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
         color: white;
@@ -205,7 +205,7 @@ div.user-notifications-modal-container {
           color: var(--color);
 
           a {
-            color: $wut_purple;
+            color: var(--primary-color);
             text-decoration: none;
 
             &:hover {

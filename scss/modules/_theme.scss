@@ -10,6 +10,8 @@ $dark_mode: "dark";
 }
 
 :root {
+  --primary-color: rgb(#{$wut_purple});
+  --primary-light-color: ${$wut_feint_purple};
   --background-color: #{$grey_num_2};
   --color: #{$deep_navy};
   --light-color: #{rgba($deep_navy,0.5)};
@@ -34,7 +36,7 @@ $dark_mode: "dark";
 
   --mobile-background-color: white;
   --mobile-color: #{$deep_navy};
-  --mobile-tabbar-color: #{$wut_purple};
+  --mobile-tabbar-color: var(--primary-color);
 
   --panel-header-background: #{$ultra_light_grey};
 
@@ -59,12 +61,12 @@ $dark_mode: "dark";
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
   --navigation-sidebar-hover-bg: #{rgba($light_navy, 0.16)};
   --navigation-sidebar-badge-color: #21B368;
-  --navigation-sidebar-create-bt-background: #{$wut_purple};
+  --navigation-sidebar-create-bt-background: var(--primary-color);
   --navigation-sidebar-create-bt-color: white;
   --navigation-sidebar-invite-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   --navigation-sidebar-invite-border: 1px solid #DCDDE1;
   --navigation-sidebar-invite-background: white;
-  --navigation-sidebar-invite-bt-color: #{$wut_purple};
+  --navigation-sidebar-invite-bt-color: var(--primary-color);
   --navigation-sidebar-invite-bt-background: #{$wut_feint_purple};
 
   // Notifications tray
@@ -101,7 +103,7 @@ $dark_mode: "dark";
 
   // General settings
   --selected-row-background-color: #EBF8F1;
-  --selected-row-color: #{$wut_purple};
+  --selected-row-color: var(--primary-color);
 
   // Theme settings
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
@@ -126,7 +128,7 @@ $dark_mode: "dark";
 
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.07);
-  --purple-primary-color: #{$wut_purple};
+  --purple-primary-color: var(--primary-color);
   --purple-secondary-color: #{$wut_feint_purple};
 
   html, body {
@@ -135,6 +137,8 @@ $dark_mode: "dark";
 }
 
 @include dark_mode() {
+  --primary-color: rgb(#{$wut_purple});
+  --primary-light-color: ${$wut_feint_purple};
   --background-color: #1B202A;
   --color: white;
   --light-color: #{rgba(white,0.5)};
@@ -184,12 +188,12 @@ $dark_mode: "dark";
   --navigation-sidebar-hover-bg: #{rgba(white, 0.09)};
   --navigation-sidebar-badge-color: #21B368;
   --navigation-sidebar-create-bt-background: white;
-  --navigation-sidebar-create-bt-color: #{$wut_purple};
+  --navigation-sidebar-create-bt-color: var(--primary-color);
   --navigation-sidebar-invite-shadow: 0 2px 4px 0 rgba(255, 255, 255, 0.11);
   --navigation-sidebar-invite-border: 1px solid #{rgba(white, 0.08)};
   --navigation-sidebar-invite-background: #{rgba(white, 0.09)};
   --navigation-sidebar-invite-bt-color: white;
-  --navigation-sidebar-invite-bt-background: #{$wut_purple};
+  --navigation-sidebar-invite-bt-background: var(--primary-color);
 
   // Notifications tray
   --notifications-item-background: #1B202A;
@@ -225,7 +229,7 @@ $dark_mode: "dark";
 
   // General settings
   --selected-row-background-color: #{rgba(white, 0.2)};
-  --selected-row-color: #{$wut_purple};
+  --selected-row-color: var(--primary-color);
 
   // Theme settings
   --ui-theme-border-color: #{rgba(white, 0.22)};
@@ -251,7 +255,7 @@ $dark_mode: "dark";
   // Wut
   --modal-shadow: rgba(0, 0, 0, 0.16);
   --purple-primary-color: white;
-  --purple-secondary-color: #{$wut_purple};
+  --purple-secondary-color: var(--primary-color);
 
   &, body {
     scrollbar-color: dark;

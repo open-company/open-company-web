@@ -554,7 +554,7 @@ div.cmail-outer {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 32px;
-          // color: $wut_purple;
+          // color: var(--primary-color);
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: super;

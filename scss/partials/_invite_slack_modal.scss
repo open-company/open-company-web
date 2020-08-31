@@ -122,7 +122,7 @@ div.invite-slack-modal {
           }
 
           button.invite-token-field-bt {
-            background-color: $wut_purple;
+            background-color: var(--primary-color);
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
             float: right;
@@ -169,7 +169,7 @@ div.invite-slack-modal {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: $wut_purple;
+          color: var(--primary-color);
           margin: 16px 0 0;
           padding: 0;
         }
@@ -303,7 +303,7 @@ div.invite-slack-modal {
       button.save-bt {
         height: 32px;
         padding: 7px 16px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
         color: white;

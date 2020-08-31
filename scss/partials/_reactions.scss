@@ -95,10 +95,10 @@ div.reactions {
           }
 
           div.count {
-            color: $wut_purple;
+            color: var(--primary-color);
 
             @include dark_mode() {
-              color: $wut_purple;
+              color: var(--primary-color);
             }
           }
         }

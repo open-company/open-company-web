@@ -71,8 +71,6 @@
                                                (when e
                                                  (utils/event-stop e))
                                                (reset! (::dropdown-menu s) nil)
-                                               (js/console.log "DBG on-change" i)
-                                               (js/console.log "DBG    item" item)
                                                (cond
                                                  (= (:value i) :edit)
                                                  (nav-actions/show-section-editor (:slug item))

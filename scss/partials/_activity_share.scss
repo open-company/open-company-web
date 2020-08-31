@@ -269,7 +269,7 @@ div.activity-share-modal-container {
 
             &.share-button {
               width: 72px;
-              background-color: $wut_purple;
+              background-color: var(--primary-color);
               color: white;
               border-radius: 6px;
             }
@@ -363,7 +363,7 @@ div.activity-share-modal-container {
         @include OC_Body_Bold();
         font-size: 14px;
         border-radius: 4px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         color: white;
         padding: 0;
       }

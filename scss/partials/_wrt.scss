@@ -253,7 +253,7 @@ div.wrt-popup-container {
             padding: 0;
             margin: 0;
             height: 18px;
-            color: $wut_purple;
+            color: var(--primary-color);
             @include OC_Body_Book();
             font-size: 14px;
             text-align: center;
@@ -264,7 +264,7 @@ div.wrt-popup-container {
             font-size: 14px;
             line-height: 18px;
             color: white;
-            background-color: $wut_purple;
+            background-color: var(--primary-color);
             border-radius: 4px;
             height: 32px;
             padding: 0;
@@ -439,7 +439,7 @@ div.wrt-popup-container {
           button.send-reminder-bt {
             height: 24px;
             float: right;
-            color: $wut_purple;
+            color: var(--primary-color);
             @include OC_Body_Book();
             font-size: 12px;
             padding: 0;

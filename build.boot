@@ -28,7 +28,7 @@
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [funcool/cuerdas "2020.03.26-3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.2.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
-    [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
+    [cljsjs/react-color "2.13.8-0"] ; 13 Different Pickers - Sketch, Photoshop, Chrome and many more http://casesandberg.github.io/react-color/
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
     [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
 

@@ -66,7 +66,7 @@ div.org-settings-modal {
         padding: 7px 12px;
         @include OC_Body_Bold();
         font-size: 14px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         border-radius: 4px;
         color: white;
         line-height: 18px;
@@ -86,7 +86,7 @@ div.org-settings-modal {
           width: 32px;
           height: 32px;
           background-color: #F8FCFA;
-          border: 1px dashed $wut_purple;
+          border: 1px dashed var(--primary-color);
           border-radius: 8px;
           background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
           background-size: 16px 16px;
@@ -106,7 +106,7 @@ div.org-settings-modal {
 
         &:hover {
           div.org-avatar-container img.org-avatar-img {
-            border: 1px solid $wut_purple;
+            border: 1px solid var(--primary-color);
           }
         }
 
@@ -128,7 +128,7 @@ div.org-settings-modal {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: $wut_purple;
+          color: var(--primary-color);
           margin-left: 16px;
           margin-top: 7px;
         }
@@ -138,6 +138,142 @@ div.org-settings-modal {
     div.org-settings-fields {
       margin-top: 16px;
       border-top: 1px solid var(--divider-line);
+
+      div.org-settings-description {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        line-height: 18px;
+        margin-top: 8px;
+      }
+
+      div.color-picker-container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      div.theme-previews {
+        display: flex;
+        flex-flow: column nowrap;
+        margin-top: 8px;
+
+        &.on-dark-theme {
+           div.dark-preview {
+             order: 1;
+           }
+
+           div.light-preview {
+             order: 2;
+           }
+        }
+
+        &.on-light-theme {
+          div.light-preview {
+            order: 1;
+          }
+
+          div.dark-preview {
+            order: 2;
+          }
+        }
+
+        div.theme-preview {
+          display: flex;
+          flex-flow: row nowrap;
+          align-items: center;
+          justify-items: center;
+          height: 80px;
+          width: 100%;
+          border-radius: 6px;
+          margin-top: 8px;
+
+          &.light-preview {
+            background-color: #{$grey_num_2};
+            border: 1px solid rgba($deep_navy, 0.15);
+          }
+
+          &.dark-preview {
+            background-color: #{rgba(white, 0.1)};
+            border: 1px solid rgba(white, 0.16);
+          }
+            
+          div.sample-link {
+            flex: 0 0 auto;
+            margin-left: auto;
+            margin-right: 8px;
+          }
+
+          button.mlb-reset.sample-button {
+            flex: 0 0 auto;
+            margin-right: auto;
+            margin-left: 8px;
+            height: 32px;
+            padding: 9px 8px;
+            font-size: 14px;
+            line-height: 14px;
+            border-radius: 6px;
+            @include OC_Body_Bold();
+            opacity: 1;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      div.colors-preset {
+        height: 20px;
+        text-decoration: none;
+        margin-top: 8px;
+
+        span.color-preset-label {
+          float: left;
+          line-height: 20px;
+        }
+
+        div.colors-list {
+          float: left;
+          margin-left: 4px;
+
+          button.color-preset-bt {
+            width: 16px;
+            height: 16px;
+            border: none;
+            padding: 0;
+            margin: 2px 4px 0;
+            float: left;
+            background-color: var(--overlay-background-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-items: center;
+
+            span.dot {
+              flex: 0 0 auto;
+              margin: auto;
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+            }
+
+            &.active, &:hover {
+              width: 20px;
+              height: 20px;
+              padding: 2px;
+              border: 2px solid var(--color);
+              margin: 0 2px;
+              margin-top: 0;
+
+              span.dot {
+                width: 12px;
+                height: 12px;
+              }
+            }
+          }
+        }
+      }
 
       div.org-settings-field-container {
         margin-top: 8px;
@@ -217,7 +353,7 @@ div.org-settings-modal {
         @include OC_Body_Book();
         font-size: 14px;
         padding: 0;
-        color: $wut_purple;
+        color: var(--primary-color);
       }
 
       div.org-settings-advanced-title {

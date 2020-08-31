@@ -50,7 +50,7 @@ div.user-notifications {
     }
 
     &:hover, &.active {
-      background-color: $wut_purple;
+      background-color: var(--primary-color);
 
       span.bell-icon {
         opacity: 1;
@@ -69,7 +69,7 @@ div.user-notifications {
       height: 12px;
       top: 0px;
       right: 0px;
-      background-color: $wut_purple;
+      background-color: var(--primary-color);
       border-radius: 50%;
       border: 2px solid var(--background-color);
     }
@@ -248,7 +248,7 @@ div.user-notifications-tray {
         height: 2px;
         left: 0;
         width: 30%;
-        background-color: rgba($wut_purple, 0.6);
+        background-color: rgba(var(--primary-color), 0.6);
         content: "";
       }
 
@@ -259,7 +259,7 @@ div.user-notifications-tray {
 
         div.all-caught-up-inner {
           div.message {
-            color: rgba($wut_purple, 0.6);
+            color: rgba(var(--primary-color), 0.6);
           }
         }
       }
@@ -270,7 +270,7 @@ div.user-notifications-tray {
         height: 2px;
         right: 0;
         width: 30%;
-        background-color: rgba($wut_purple, 0.6);
+        background-color: rgba(var(--primary-color), 0.6);
         content: "";
       }
     }

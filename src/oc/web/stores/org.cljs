@@ -1,6 +1,7 @@
 (ns oc.web.stores.org
-  (:require [oc.web.lib.utils :as utils]
-            [taoensso.timbre :as timbre]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.activity :as activity-utils]
@@ -90,7 +91,9 @@
 
 (defmethod dispatcher/action :org-edit-setup
   [db [_ org-data]]
-  (assoc db :org-editing org-data))
+  (assoc db :org-editing (-> org-data
+                             (dissoc :has-changes)
+                             (update :brand-color #(or % {:light ls/default-primary-color :dark ls/default-primary-color})))))
 
 (defmethod dispatcher/action :bookmarks-nav/show
   [db [_ org-slug]]

@@ -318,7 +318,7 @@ div.login-overlay-container {
         a {
           @include OC_Body_Book();
           font-size: 16px;
-          color: $wut_purple;
+          color: var(--primary-color);
           margin-left: 4px;
 
           &:hover {
@@ -339,7 +339,7 @@ div.login-overlay-container {
 
       div.sent-email-copy {
         @include OC_Body_Book();
-        color: $wut_purple;
+        color: var(--primary-color);
         font-size: 14px;
         line-height: 18px;
       }

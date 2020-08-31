@@ -131,7 +131,7 @@ div.user-info-modal {
         padding: 0;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $wut_purple;
+        color: var(--primary-color);
         line-height: 18px;
         float: right;
 
@@ -190,7 +190,7 @@ div.user-info-modal {
       button.view-posts-bt {
         margin: 16px auto 0;
         padding: 7px 12px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         color: white;
         font-size: 14px;
@@ -237,7 +237,7 @@ div.user-info-modal {
           position: relative;
 
           a {
-            color: $wut_purple;
+            color: var(--primary-color);
             text-decoration: none;
 
             @include big_web() {
@@ -267,7 +267,7 @@ div.user-info-modal {
           font-size: 14px;
           height: 20px;
           line-height: 20px;
-          color: $wut_purple;
+          color: var(--primary-color);
           text-align: left;
           padding-left: 24px;
           position: relative;

@@ -202,7 +202,7 @@ div.stream-item {
     height: 48px;
     padding: 14px 0;
     border-radius: 4px;
-    background-color: $wut_purple;
+    background-color: var(--primary-color);
     position: absolute;
     top: 50%;
     margin-top: -24px;
@@ -593,7 +593,7 @@ div.stream-item {
           padding: 0px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $wut_purple;
+          color: var(--primary-color);
         }
       }
 

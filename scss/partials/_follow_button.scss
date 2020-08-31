@@ -1,5 +1,5 @@
 button.follow-button {
-  background-color: $wut_purple;
+  background-color: var(--primary-color);
   height: 32px;
   border-radius: 4px;
   width: auto;
@@ -75,7 +75,7 @@ button.follow-button {
 div.follow-banner {
   width: 100%;
   height: #{$navbar_height}px;
-  background-color: $wut_purple;
+  background-color: var(--primary-color);
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
@@ -99,14 +99,14 @@ div.follow-banner {
     background-color: white;
     
     span.main-title, span.hover-title {
-      color: $wut_purple;
+      color: var(--primary-color);
     }
 
     &.on {
       background-color: white;
 
       span.main-title, span.hover-title {
-        color: $wut_purple;
+        color: var(--primary-color);
       }
 
       @include big_web(){
@@ -115,7 +115,7 @@ div.follow-banner {
           opacity: 0.7;
           
           span.main-title, span.hover-title {
-            color: $wut_purple;
+            color: var(--primary-color);
           }
         }
       }

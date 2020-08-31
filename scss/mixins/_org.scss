@@ -1,7 +1,7 @@
 @mixin carrot-fallback($max_logo_height, $show_border) {
 
   &:before {
-    background-color: $wut_purple;
+    background-color: var(--primary-color);
     content: attr(data-first-letter);
     text-align: center;
     color: white;

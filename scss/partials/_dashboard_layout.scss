@@ -163,7 +163,7 @@ div.dashboard-layout {
 
           &.active {
             span.tab-label {
-              color: $wut_purple;
+              color: var(--primary-color);
             }
           }
 
@@ -266,7 +266,7 @@ div.dashboard-layout {
                 text-align: center;
                 color: white;
                 display: block;
-                background-color: $wut_purple;
+                background-color: var(--primary-color);
                 vertical-align: top;
                 border-radius: 4px;
                 position: absolute;
@@ -314,7 +314,7 @@ div.dashboard-layout {
                 text-align: center;
                 color: white;
                 display: block;
-                background-color: $wut_purple;
+                background-color: var(--primary-color);
                 vertical-align: top;
                 border-radius: 4px;
                 position: absolute;
@@ -361,7 +361,7 @@ div.dashboard-layout {
                 border: 2px solid white;
                 border-radius: 50%;
                 position: absolute;
-                background-color: $wut_purple;
+                background-color: var(--primary-color);
                 top: -1px;
                 right: -1px;
               }
