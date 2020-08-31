@@ -117,8 +117,7 @@
       (logo-add-error nil))))
 
 (defn- change-brand-color [color-hex color-rgb]
-  (let [rgb-str (org-utils/primary-color-from-rgb color-rgb)
-        color-map {:hex color-hex :rgb color-rgb}
+  (let [color-map {:hex color-hex :rgb color-rgb}
         new-brand-color {:light color-map :dark color-map}]
     (dis/dispatch! [:input [:org-editing :brand-color] new-brand-color])
     (org-utils/set-brand-color! color-rgb)))

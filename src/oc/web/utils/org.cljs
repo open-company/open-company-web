@@ -57,11 +57,12 @@
 (defun set-brand-color!
   ([nil])
 
-  ([rgb-string :guard string?]
-   (.. js/document -documentElement -style (setProperty "--primary-color" rgb-string)))
+  ([primary-color :guard string? primary-light-color :guard string?]
+   (.. js/document -documentElement -style (setProperty "--primary-color" primary-color))
+   (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color)))
 
   ([color-rgb :guard #(and (:r %) (:g %) (:b %))]
-   (recur (primary-color-from-rgb color-rgb)))
+   (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb)))
 
   ([color-map :guard :rgb]
    (recur (primary-color-from-rgb (:rgb color-map))))
