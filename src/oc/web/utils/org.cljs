@@ -66,17 +66,14 @@
    (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb)))
 
   ([color-map :guard :rgb]
-   (recur (primary-color-from-rgb (:rgb color-map))))
+   (recur (:rgb color-map)))
 
   ([brand-color-map :guard #(and (:dark %) (:light %))]
    (when-let [theme-key (theme/computed-theme)]
      (recur (get brand-color-map theme-key))))
 
   ([org-data :guard map?]
-   (let [brand-color (:brand-color org-data)]
-     (if (map? brand-color)
-       (recur brand-color)
-       (recur (default-brand-color))))))
+   (recur (or (:brand-color org-data) (default-brand-color)))))
 
 (defn current-brand-color
   ([org-data]
