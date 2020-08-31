@@ -583,7 +583,7 @@
           active-users (dis/active-users)]
       (-> comment-map
         (assoc :resource-type :comment)
-        (update :author merge (get active-users (:user-id %)))
+        (update :author #(merge (get active-users (:user-id %))))
         (assoc :author? author?)
         (assoc :ingore? ingore?)
         (assoc :unread unread?)
