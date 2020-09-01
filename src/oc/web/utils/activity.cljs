@@ -632,13 +632,13 @@
                      "You "
                      (str (user-name last-comment-author) " "))
                    1
-                   (:name (first commenters))
+                   (user-name (first commenters))
                    2
-                   (str (:name (first commenters)) " and " (:name (last commenters)))
+                   (str (user-name (first commenters)) " and " (user-name (last commenters)))
                    3
-                   (str (:name (first commenters)) ", " (:name (second commenters)) " and 1 other")
+                   (str (user-name (first commenters)) ", " (user-name (second commenters)) " and 1 other")
                      ;; :else
-                   (str (:name (first commenters)) ", " (:name (second commenters)) " and " (- (count commenters) 2) " others"))
+                   (str (user-name (first commenters)) ", " (user-name (second commenters)) " and " (- (count commenters) 2) " others"))
          multiple-comments? (> (count comments) 1)
          verb (cond (seq commenters)
                     (if unseen?
