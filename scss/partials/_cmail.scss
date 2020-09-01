@@ -562,9 +562,9 @@ div.cmail-outer {
           text-overflow: ellipsis;
           vertical-align: super;
           white-space: nowrap;
-          color: var(--primary-color);
+          color: var(--secondary-color);
           border-radius: 4px;
-          background-color: var(--primary-light-color);
+          background-color: var(--primary-color);
 
           @include mobile() {
             height: 28px;
@@ -585,7 +585,7 @@ div.cmail-outer {
             background-size: 8px 4px;
             background-repeat: no-repeat;
             background-position: center;
-            @include svgBgColor("/img/ML/purple_arrow.svg");
+            @include svgBgColor("/img/ML/purple_arrow.svg", center, 8px 4px, var(--secondary-color));
           }
         }
       }
