@@ -615,33 +615,37 @@
 
 (defn for-you-context [entry-data current-user-id]
    (let [replies-data (:replies-data entry-data)
-         last-comment (last replies-data)
-         last-comment-author (:author last-comment)
-         user-name #(or (:pointed-name %) (:first-name %) (:name %))
+         unseen-comments (filter :unseen replies-data)
+         comments (if (seq unseen-comments)
+                    unseen-comments
+                    replies-data)
+         user-name #(if (:self? %)
+                      "you"
+                      (or (:pointed-name %) (:first-name %) (:name %)))
+         commenters (->> comments
+                         (map :author)
+                         (group-by :user-id)
+                         vals
+                         (map first)
+                         (map user-name)
+                         (remove s/blank?))
+         last-comment (last comments)
          mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
          mention? (.match (:body last-comment) mention-regexp)
-         publisher? (:publisher? entry-data)
-         unseen? (pos? (:unseen-comments entry-data))
-         comments (if unseen?
-                    (filter :unseen replies-data)
-                    replies-data)
-         commenters (reverse (map (comp user-name :author) comments))
          subject (case (count commenters)
                    0
-                   (if (:author? last-comment)
-                     "You "
-                     (str (user-name last-comment-author) " "))
+                   ""
                    1
-                   (user-name (first commenters))
+                   (first commenters)
                    2
-                   (str (user-name (first commenters)) " and " (user-name (last commenters)))
+                   (str (first commenters) " and " (last commenters))
                    3
-                   (str (user-name (first commenters)) ", " (user-name (second commenters)) " and 1 other")
-                     ;; :else
-                   (str (user-name (first commenters)) ", " (user-name (second commenters)) " and " (- (count commenters) 2) " others"))
+                   (str (first commenters) ", " (second commenters) " and 1 other")
+                   ;; :else
+                   (str (first commenters) ", " (second commenters) " and " (- (count commenters) 2) " others"))
          multiple-comments? (> (count comments) 1)
-         verb (cond (seq commenters)
-                    (if unseen?
+         verb (cond (seq comments)
+                    (if (seq unseen-comments)
                       (if multiple-comments?
                         " left new comments"
                         " left a new comment")
@@ -652,7 +656,7 @@
                     (if multiple-comments?
                       " left comments"
                       " left a comment"))]
-     {:label (str subject verb)
+     {:label (s/capital (str subject verb))
       :timestamp (:created-at last-comment)}))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]

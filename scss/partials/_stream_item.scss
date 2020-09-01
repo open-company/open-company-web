@@ -541,6 +541,20 @@ div.stream-item {
         font-size: 16px;
         line-height: 22px;
 
+        &.unseen-replies {
+          span.for-you-body-label {
+            @include OC_Body_Bold_Italic();
+          }
+
+          div.separator-dot {
+            background-color: var(--color);
+          }
+
+          span.time-since {
+            color: var(--color);
+          }
+        }
+
         span.for-you-body-label {
           color: var(--color);
           @include OC_Body_Book_Italic();

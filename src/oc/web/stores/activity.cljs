@@ -1098,7 +1098,7 @@
         fixed-replies-data (au/parse-container prepare-replies-data change-data org-data active-users sort-type)
         merged-items (merge old-posts (:fixed-items fixed-replies-data))
         replies-badge-key (dispatcher/replies-badge-key org-slug)
-        badge-replies? (some :unseen-comments (:posts-list fixed-replies-data))]
+        badge-replies? (some (comp pos? :unseen-comments) (:posts-list fixed-replies-data))]
     (as-> db ndb
       (assoc-in ndb replies-container-key (dissoc fixed-replies-data :fixed-items))
       (update-in ndb replies-badge-key #(if (= (keyword current-container-slug) :replies) false (boolean badge-replies?)))

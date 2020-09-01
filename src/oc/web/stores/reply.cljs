@@ -58,7 +58,7 @@
                                     ;; Mark all previous comments as unseen when adding a new comment
                                     (let [with-seen (map #(assoc % :unseen false) replies-data)]
                                       (vec (concat with-seen [parsed-reply-data])))))
-            (assoc :unseen-comments false))
+            (assoc :unseen-comments 0))
            entry-data))
    entries))
 

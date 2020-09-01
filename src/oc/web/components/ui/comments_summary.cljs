@@ -45,8 +45,18 @@
         comments-link (utils/link-for (:links entry-data) "comments")
         comments-loaded? (seq sorted-comments)
         unwrapped-comments (vec (mapcat #(concat [%] (:thread-children %)) sorted-comments))
+        show-new-tag? (pos? new-comments-count)
+        comments (if show-new-tag?
+                   (filter :unseen unwrapped-comments)
+                   unwrapped-comments)
         comments-authors (if comments-loaded?
-                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at unwrapped-comments))))))
+                           (->> comments
+                                (sort-by :created-at)
+                                (map :author)
+                                (group-by :user-id)
+                                vals
+                                (map first)
+                                vec)
                            (reverse (:authors comments-link)))
         comments-count (if comments-loaded?
                          (count unwrapped-comments)
