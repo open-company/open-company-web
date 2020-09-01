@@ -295,12 +295,14 @@ div.cmail-outer {
             float: left;
             height: 28px;
             padding: 5px 24px 5px 8px;
-            background-color: var(--cmail-section-bt-background);
+            // background-color: var(--cmail-section-bt-background);
+            background-color: var(--primary-color);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
-            color: var(--cmail-section-bt-color);
+            // color: var(--cmail-section-bt-color);
+            color: var(--secondary-color);
             position: relative;
             text-align: left;
             max-width: 200px;
@@ -316,14 +318,10 @@ div.cmail-outer {
               position: absolute;
               top: calc(50% - 5px);
               right: 8px;
-              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
               background-size: 8px 10px;
               background-repeat: no-repeat;
               background-position: center;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
-              }
+              @include svgBgColor("/img/ML/select_arrows_white.svg", center, 8px 10px, var(--secondary-color));
             }
           }
         }
