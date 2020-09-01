@@ -81,7 +81,7 @@ div.invite-picker-modal {
       }
 
       & > button {
-        color: $wut_purple;
+        color: var(--primary-color);
         text-decoration: none;
         @include OC_Body_Book();
         font-size: 14px;
@@ -103,7 +103,7 @@ div.invite-picker-modal {
 
         span.enabled {
           margin-left: 6px;
-          color: $wut_purple;
+          color: var(--primary-color);
         }
       }
 

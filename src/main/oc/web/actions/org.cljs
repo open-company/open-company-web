@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.org :as ou]
             [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -157,6 +158,7 @@
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
         route (dis/route-param :route)]
+    (ou/set-brand-color! org-data)
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
     (when is-drafts?

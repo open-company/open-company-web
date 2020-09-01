@@ -104,7 +104,7 @@ div.stream-comments {
         }
 
         &.new-comment {
-          background-color: rgba($wut_purple, 0.16);
+          background-color: rgba(var(--primary-color), 0.16);
           border-radius: 8px;
           margin-bottom: 1px;
         }
@@ -464,7 +464,7 @@ div.stream-comments {
                   font-size: 12px;
                   line-height: 18px;
                   content: "(NEW)";
-                  color: $wut_purple;
+                  color: var(--primary-color);
                   position: absolute;
                   top: 0;
                   left: 0;
@@ -606,7 +606,7 @@ div.stream-comments {
               }
 
               &.save-bt {
-                color: $wut_purple;
+                color: var(--primary-color);
               }
             }
           }

@@ -66,9 +66,9 @@ div.section-editor-container {
         padding: 7px 12px;
         @include OC_Body_Bold();
         font-size: 14px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         border-radius: 4px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
 
@@ -148,7 +148,7 @@ div.section-editor-container {
         }
 
         &.preflight-ok {
-          border: 1px solid $wut_purple;
+          border: 1px solid var(--primary-color);
         }
 
         @include placeholder() {
@@ -237,7 +237,7 @@ div.section-editor-container {
                 color: var(--light-color);
 
                 a {
-                  color: $wut_purple;
+                  color: var(--primary-color);
                 }
               }
             }
@@ -275,7 +275,7 @@ div.section-editor-container {
         line-height: 24px;
 
         button.enable-slack-bot-bt {
-          color: $wut_purple;
+          color: var(--primary-color);
           display: inline;
           padding: 0;
 
@@ -544,8 +544,8 @@ div.section-editor-container {
           height: 32px;
           text-align: center;
           float: right;
-          color: white;
-          background-color: $wut_purple;
+          color: var(--secondary-color);
+          background-color: var(--primary-color);
           border-radius: 6px;
           @include OC_Body_Bold();
           font-size: 14px;

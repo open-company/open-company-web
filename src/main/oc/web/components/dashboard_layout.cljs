@@ -188,14 +188,14 @@
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
-              [:button.mlb-reset.tab-button.topics-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
-                 :class (when is-topics
-                          "active")}
-                [:span.tab-icon]
-                [:span.tab-label "Explore"]]
+              ;; [:button.mlb-reset.tab-button.topics-tab
+              ;;   {:on-click #(do
+              ;;                 (.stopPropagation %)
+              ;;                 (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
+              ;;    :class (when is-topics
+              ;;             "active")}
+              ;;   [:span.tab-icon]
+              ;;   [:span.tab-label "Explore"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -359,10 +359,12 @@
                   ;      :data-placement "top"
                   ;      :data-container "body"
                   ;      :title "Curate your Home feed"}])
-                  (when (and (not is-drafts-board)
-                             is-mobile?
-                             (not is-topics))
-                    (search-box))]])
+                  ;; Remove search from mobile for now
+                  ;; (when (and (not is-drafts-board)
+                  ;;            is-mobile?
+                  ;;            (not is-topics))
+                  ;;   (search-box))
+                  ]])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view
                 (cond

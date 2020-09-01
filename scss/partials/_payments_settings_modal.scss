@@ -115,9 +115,9 @@ div.payments-settings-modal {
         padding: 7px 12px;
         @include OC_Body_Bold();
         font-size: 14px;
-        background-color: $wut_purple;
+        background-color: var(--primary-color);
         border-radius: 4px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         margin-left: 8px;
         float: right;
@@ -170,7 +170,7 @@ div.payments-settings-modal {
           }
 
           button, a {
-            color: $wut_purple;
+            color: var(--primary-color);
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
@@ -348,7 +348,7 @@ div.payments-settings-modal {
           }
 
           button, a {
-            color: $wut_purple;
+            color: var(--primary-color);
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
@@ -382,10 +382,10 @@ div.payments-settings-modal {
 
         button.payment-info-bt {
           height: 32px;
-          background-color: $wut_purple;
+          background-color: var(--primary-color);
           border-radius: 4px;
           @include OC_Body_Bold();
-          color: white;
+          color: var(--secondary-color);
           padding: 7px 16px;
           font-size: 14px;
           line-height: 18px;

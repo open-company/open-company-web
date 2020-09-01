@@ -45,8 +45,18 @@
         comments-link (utils/link-for (:links entry-data) "comments")
         comments-loaded? (seq sorted-comments)
         unwrapped-comments (vec (mapcat #(concat [%] (:thread-children %)) sorted-comments))
+        show-new-tag? (pos? new-comments-count)
+        comments (if show-new-tag?
+                   (filter :unseen unwrapped-comments)
+                   unwrapped-comments)
         comments-authors (if comments-loaded?
-                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at unwrapped-comments))))))
+                           (->> comments
+                                (sort-by :created-at)
+                                (map :author)
+                                (group-by :user-id)
+                                vals
+                                (map first)
+                                vec)
                            (reverse (:authors comments-link)))
         comments-count (if comments-loaded?
                          (count unwrapped-comments)
@@ -107,12 +117,11 @@
                                       :add-a-comment (not (pos? comments-count))})}
             [:div.is-comments-summary-inner
               (str
-               comments-count
                (if show-new-tag?
                  (when-not hide-label?
-                   (str " new comment" (when (not= new-comments-count 1) "s")))
+                   (str new-comments-count " new comment" (when (not= new-comments-count 1) "s")))
                  (when-not hide-label?
-                   (str " comment" (when (not= comments-count 1) "s")))))]])])))
+                   (str comments-count " comment" (when (not= comments-count 1) "s")))))]])])))
 
 
 

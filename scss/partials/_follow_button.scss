@@ -1,5 +1,5 @@
 button.follow-button {
-  background-color: $wut_purple;
+  background-color: var(--primary-color);
   height: 32px;
   border-radius: 4px;
   width: auto;
@@ -23,7 +23,7 @@ button.follow-button {
     @include OC_Body_Book();
     font-size: 14px;
     line-height: 18px;
-    color: white;
+    color: var(--secondary-color);
     width: 100%;
     text-align: center;
     overflow: hidden;
@@ -75,7 +75,7 @@ button.follow-button {
 div.follow-banner {
   width: 100%;
   height: #{$navbar_height}px;
-  background-color: $wut_purple;
+  background-color: var(--primary-color);
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
@@ -86,7 +86,7 @@ div.follow-banner {
     margin-right: 8px;
     flex: 0 0 auto;
     @include OC_Body_Bold();
-    color: white;
+    color: var(--secondary-color);
     font-size: 16px;
     line-height: 24px;
   }
@@ -99,14 +99,14 @@ div.follow-banner {
     background-color: white;
     
     span.main-title, span.hover-title {
-      color: $wut_purple;
+      color: var(--primary-color);
     }
 
     &.on {
       background-color: white;
 
       span.main-title, span.hover-title {
-        color: $wut_purple;
+        color: var(--primary-color);
       }
 
       @include big_web(){
@@ -115,7 +115,7 @@ div.follow-banner {
           opacity: 0.7;
           
           span.main-title, span.hover-title {
-            color: $wut_purple;
+            color: var(--primary-color);
           }
         }
       }

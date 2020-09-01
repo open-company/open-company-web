@@ -202,7 +202,7 @@ div.stream-item {
     height: 48px;
     padding: 14px 0;
     border-radius: 4px;
-    background-color: $wut_purple;
+    background-color: var(--primary-color);
     position: absolute;
     top: 50%;
     margin-top: -24px;
@@ -218,7 +218,7 @@ div.stream-item {
     }
 
     span {
-      color: white;
+      color: var(--secondary-color);
       @include OC_Body_Bold();
       font-size: 16px;
       line-height: 20px;
@@ -541,6 +541,20 @@ div.stream-item {
         font-size: 16px;
         line-height: 22px;
 
+        &.unseen-replies {
+          span.for-you-body-label {
+            @include OC_Body_Bold_Italic();
+          }
+
+          div.separator-dot {
+            background-color: var(--color);
+          }
+
+          span.time-since {
+            color: var(--color);
+          }
+        }
+
         span.for-you-body-label {
           color: var(--color);
           @include OC_Body_Book_Italic();
@@ -593,7 +607,7 @@ div.stream-item {
           padding: 0px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $wut_purple;
+          color: var(--primary-color);
         }
       }
 

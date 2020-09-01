@@ -73,6 +73,9 @@
   (let [current-mode (read-ui-theme-cookie)]
     (or current-mode ui-theme-default-value)))
 
+(defn computed-theme []
+  (computed-value (get-ui-theme-setting)))
+
 (defn ^:export set-ui-theme [v]
   (let [fixed-value (or v :auto)]
     (timbre/debug "Saving theme:" (name fixed-value) "(" v ")")

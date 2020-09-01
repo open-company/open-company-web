@@ -21,7 +21,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]
+            [oc.web.components.ui.comments-summary :refer (foc-comments-summary comments-summary)]
             ["hammerjs" :as hammer]))
 
 (defn- stream-item-summary [activity-data]
@@ -30,7 +30,7 @@
      :ref :item-body
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
-(defn- stream-item-activity-preview [is-mobile? for-you-context]
+(defn- stream-item-activity-preview [is-mobile? for-you-context unseen?]
   [:div.stream-item-activity-preview
     [:span.for-you-body-label
      (:label for-you-context)]
@@ -207,7 +207,8 @@
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
-        show-body-thumbnail? (and (not replies?) (:body-thumbnail activity-data))]
+        show-body-thumbnail? (and (not replies?) (:body-thumbnail activity-data))
+        unseen? (pos? (:unseen-comments activity-data))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -321,7 +322,7 @@
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (if replies?
-              (stream-item-activity-preview is-mobile? (:for-you-context activity-data))
+              (stream-item-activity-preview is-mobile? (:for-you-context activity-data) unseen?)
               (stream-item-summary activity-data))]]
           (if-not is-published?
             [:div.stream-item-footer.group
@@ -335,18 +336,23 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (when member?
+              (when (and member? (not unseen?))
                 (reactions {:entity-data activity-data
                             :only-thumb? true}))
               [:div.stream-item-footer-mobile-group
                 (when member?
                   [:div.stream-item-comments-summary
                     ; {:on-click #(expand s true true)}
-                    (foc-comments-summary {:entry-data activity-data
-                                           :add-comment-focus-prefix "main-comment"
-                                           :current-activity-id current-activity-id
-                                           :new-comments-count (when show-new-comments? (count (filter :unseen (:replies-data activity-data))))})])
-                (when show-wrt?
+                    (if unseen?
+                       (comments-summary {:entry-data activity-data
+                                          :add-comment-focus-prefix "main-comment"
+                                          :current-activity-id current-activity-id
+                                          :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})
+                       (foc-comments-summary {:entry-data activity-data
+                                              :add-comment-focus-prefix "main-comment"
+                                              :current-activity-id current-activity-id
+                                              :new-comments-count (when show-new-comments? (count (filter :unseen (:replies-data activity-data))))}))])
+                (when (and show-wrt? (not unseen?))
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
                     ; (when show-post-added-tooltip?
@@ -362,7 +368,7 @@
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :read-data read-data})])
-                (when (seq activity-attachments)
+                (when (and (not unseen?) (seq activity-attachments))
                   (if-not is-mobile?
                     [:div.stream-item-attachments
                       {:ref :stream-item-attachments}

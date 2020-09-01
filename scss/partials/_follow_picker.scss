@@ -108,8 +108,8 @@ div.follow-picker {
         line-height: 32px;
         height: 32px;
         float: right;
-        color: var(--purple-primary-color);
-        background-color: var(--purple-secondary-color);
+        color: var(--primary-color);
+        background-color: var(--primary-light-color);
         border-radius: 4px;
         padding: 0 8px;
 
@@ -204,7 +204,7 @@ div.follow-picker {
             display: inline;
             margin: 0;
             padding: 0;
-            color: $wut_purple;
+            color: var(--primary-color);
             text-decoration: underline;
           }
         }
@@ -447,8 +447,8 @@ div.follow-picker {
             @include OC_Body_Bold();
             font-size: 14px;
             line-height: 18px;
-            color: white;
-            background-color: $wut_purple;
+            color: var(--secondary-color);
+            background-color: var(--primary-color);
             border-radius: 4px;
             padding: 7px 14px;
             float: right;
@@ -525,14 +525,14 @@ div.follow-picker {
                     border-radius: 0;
 
                     &.select {
-                      background-color: $wut_feint_purple;
-                      color: $wut_purple;
+                      background-color: var(--primary-light-color);
+                      color: var(--primary-color);
                     }
 
                     @include big_web() {
                       &:hover {
-                        background-color: $wut_feint_purple;
-                        color: $wut_purple;
+                        background-color: var(--primary-light-color);
+                        color: var(--primary-color);
                       }
                     }
                     span {

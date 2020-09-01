@@ -276,3 +276,16 @@
     white-space: normal;
   }
 }
+
+@mixin svgBgColor($svgUrl, $position: "center", $size: "contain", $bgColor: var(--primary-color)) {
+  background-color: #{$bgColor};
+  background-image: unset;
+  -webkit-mask-image: cdnUrl(#{$svgUrl});
+  mask-image: cdnUrl(#{$svgUrl});
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: #{$position};
+  mask-position: #{$position};
+  mask-size: #{$size};
+  -webkit-mask-size: #{$size};
+}

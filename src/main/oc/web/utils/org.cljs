@@ -1,5 +1,10 @@
 (ns oc.web.utils.org
-  (:require [oc.web.lib.jwt :as jwt]))
+  (:require [cuerdas.core :as s]
+            [defun.core :refer (defun)]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.local-settings :as ls]
+            [oc.web.dispatcher :as dis]
+            [oc.web.actions.ui-theme :as theme]))
 
 (def org-avatar-filestack-config
   {:accept "image/*"
@@ -32,3 +37,47 @@
            (pos? next-val))
     next-val
     previous-val))
+
+(defn- rgb-string [rgb]
+  (when (and (map? rgb)
+             (map #(contains? rgb %) [:r :g :b]))
+    (str (:r rgb) "," (:g rgb) "," (:b rgb))))
+
+(defn primary-color-from-rgb [rgb]
+  (when-let [rgbs (rgb-string rgb)]
+    (str "rgb(" rgbs ")")))
+
+(defn primary-light-color-from-rgb [rgb]
+  (when-let [rgbs (rgb-string rgb)]
+    (str "rgba(" rgbs ", 0.16)")))
+
+(defn default-brand-color []
+  (when-let [theme-kw (theme/computed-theme)]
+    (get ls/default-brand-color theme-kw)))
+
+(defun set-brand-color!
+  ([nil])
+
+  ([primary-color :guard string? primary-light-color :guard string? secondary-color :guard string?]
+   (.. js/document -documentElement -style (setProperty "--primary-color" primary-color))
+   (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color))
+   (.. js/document -documentElement -style (setProperty "--secondary-color" secondary-color)))
+
+  ([color-rgb :guard #(and (:r %) (:g %) (:b %)) button-color :guard string?]
+   (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb) button-color))
+
+  ([color-map :guard #(and (:rgb %) (:button-color %))]
+   (recur (:rgb color-map) (:button-color color-map)))
+
+  ([brand-color-map :guard #(and (:dark %) (:light %))]
+   (when-let [theme-key (theme/computed-theme)]
+     (recur (get brand-color-map theme-key))))
+
+  ([org-data :guard map?]
+   (recur (or (:brand-color org-data) (default-brand-color)))))
+
+(defn current-brand-color
+  ([org-data]
+   (when-let [theme-kw (theme/computed-theme)]
+     (-> org-data :brand-color theme-kw)))
+  ([] (current-brand-color (dis/org-data))))

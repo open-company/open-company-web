@@ -7,8 +7,8 @@ div.carrot-checkbox {
   background-color: transparent;
 
   &.selected {
-    border: 1.5px solid $wut_purple;
-    background-color: $wut_purple;
+    border: 1.5px solid var(--primary-color);
+    background-color: var(--primary-color);
     background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
     background-size: 10px 8px;
     background-repeat: no-repeat;

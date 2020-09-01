@@ -360,8 +360,8 @@ div.more-menu {
 
       @include big_web() {
         &:hover {
-          background-color: $wut_feint_purple;
-          color: $wut_purple;
+          background-color: var(--primary-light-color);
+          color: var(--primary-color);
         }
       }
 

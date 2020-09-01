@@ -19,22 +19,22 @@ div.is-comments {
   &.has-new-comments {
     div.is-comments-bubble {
       opacity: 1;
-      background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+      @include svgBgColor("/img/ML/foc_bubble_new.svg");
 
       @include dark_mode() {
-        background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+        @include svgBgColor("/img/ML/foc_bubble_new.svg");
       }
     }
 
     div.is-comments-summary {
-      color: $wut_purple;
+      color: var(--primary-color);
       @include OC_Body_Bold();
 
       @include big_web() {
         cursor: pointer;
 
         &:hover {
-          color: $wut_purple;
+          color: var(--primary-color);
 
           span.add-a-comment {
             color: var(--color);
@@ -113,7 +113,7 @@ div.is-comments {
     text-overflow: ellipsis;
 
     &.has-new-comments {
-      color: $wut_purple;
+      color: var(--primary-color);
       @include OC_Body_Bold();
 
       @include mobile() {
@@ -166,7 +166,7 @@ div.is-comments {
       div.is-comments-summary-inner {
         span.new-comments-count {
           display: initial;
-          color: $wut_purple;
+          color: var(--primary-color);
           @include OC_Body_Bold();
           margin-left: 6px;
         }

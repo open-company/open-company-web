@@ -59,7 +59,7 @@
            row-index] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
-        show-wrt? (and member? (not replies?))
+        show-wrt? member?
         show-new-comments? replies?
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]

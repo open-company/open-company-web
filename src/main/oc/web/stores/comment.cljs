@@ -58,12 +58,15 @@
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         new-comment-data (au/parse-comment (dispatcher/org-data db org-slug) activity-data comment-data)
         all-comments (concat comments-data [new-comment-data])
-        sorted-comments (cu/sort-comments all-comments)]
+        sorted-comments (cu/sort-comments all-comments)
+        current-user-id (jwt/user-id)
+        for-you-copy (au/for-you-context (assoc activity-data :replies-data sorted-comments) current-user-id)]
     (-> db
      (assoc-in sorted-comments-key sorted-comments)
      ;; Reset new comments count
      (assoc-in (conj activity-key :new-comments-count) 0)
-     (assoc-in (conj activity-key :unseen-comments) false)
+     (assoc-in (conj activity-key :unseen-comments) 0)
+     (assoc-in (conj activity-key :for-you-context) for-you-copy)
      (update-in (conj activity-key :links) (fn [links]
                                              (mapv (fn [link]
                                               (if (= (:rel link) "follow")

@@ -839,10 +839,11 @@
   ([org-slug :guard #(or (keyword? %) (string? %)) board-slug :guard #(or (keyword? %) (string? %))]
    (org-board-data (org-data @app-state org-slug) board-slug))
   ([org-data :guard #(and (map? %) (:links %) (:boards %))
-    board-slug :guard #(or (keyword? %) (string? %))]
-   (let [board-slug-kw (keyword board-slug)]
-     (some #(when (-> % :slug keyword (= board-slug-kw)) %) (:boards org-data))))
-  ([data :guard map? org-slug :guard ]
+    board-slug]
+   (when board-slug
+    (let [board-slug-kw (keyword board-slug)]
+      (some #(when (-> % :slug keyword (= board-slug-kw)) %) (:boards org-data)))))
+  ([data :guard map? org-slug]
    (org-board-data (org-data data org-slug) (current-board-slug data)))
   ([data :guard map? org-slug board-slug]
    (org-board-data (org-data data org-slug) board-slug)))

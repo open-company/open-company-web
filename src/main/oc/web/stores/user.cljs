@@ -47,6 +47,9 @@
 
 (def default-invite-type "email")
 
+(defn- pointed-name [{:keys [first-name last-name] :as user}]
+  (str first-name " " (first last-name) "."))
+
 (defn parse-users [users-list org-data follow-publishers-list]
   (let [follow-publishers-set (if (every? map? follow-publishers-list)
                                 (set (map :user-id follow-publishers-list))
@@ -54,6 +57,7 @@
     (map (fn [u] (-> u
                   (update :name #(or % (user-lib/name-for u)))
                   (update :short-name #(or % (user-lib/short-name-for u)))
+                  (update :pointed-name #(or % (pointed-name u)))
                   (assoc :follow (follow-publishers-set (:user-id u)))
                   (as-> user
                    (if (map? org-data)

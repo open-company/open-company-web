@@ -1,6 +1,7 @@
 (ns oc.web.stores.org
-  (:require [oc.web.lib.utils :as utils]
-            [taoensso.timbre :as timbre]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.activity :as activity-utils]
@@ -24,9 +25,9 @@
         next-boards (into {} (filter filter-board old-boards))
         with-saved? (if (nil? saved?)
                       ;; If saved? is nil it means no save happened, so we keep the old saved? value
-                      org-data
+                      fixed-org-data
                       ;; If save actually happened let's update the saved value
-                      (assoc org-data :saved saved?))
+                      (assoc fixed-org-data :saved saved?))
         next-org-editing (-> with-saved?
                           (assoc :email-domain email-domain)
                           (dissoc :has-changes))
@@ -90,7 +91,9 @@
 
 (defmethod dispatcher/action :org-edit-setup
   [db [_ org-data]]
-  (assoc db :org-editing org-data))
+  (assoc db :org-editing (-> org-data
+                             (dissoc :has-changes)
+                             (update :brand-color #(or % ls/default-brand-color)))))
 
 (defmethod dispatcher/action :bookmarks-nav/show
   [db [_ org-slug]]

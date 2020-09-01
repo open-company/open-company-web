@@ -132,6 +132,10 @@ div.cmail-outer {
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
         z-index: 2;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-items: center;
+        align-items: center;
 
         button.mobile-close-bt {
           background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
@@ -141,11 +145,9 @@ div.cmail-outer {
           width: 32px;
           height: 32px;
           padding: 0;
-          position: absolute;
-          top: 11px;
-          left: 16px;
           background-color: var(--opac-background-color-1);
           border-radius: 4px;
+          flex: 0 0 auto;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -153,9 +155,9 @@ div.cmail-outer {
         }
 
         div.cmail-mobile-header-right {
-          position: absolute;
-          top: 32px;
-          right: -16px;
+          margin-left: auto;
+          flex: 0 0 auto;
+          height: 32px;
 
           button.mobile-attachment-button {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
@@ -235,7 +237,7 @@ div.cmail-outer {
 
       @include mobile() {
         background-color: transparent;
-        padding: 24px 0;
+        padding: 0;
         border: none;
         box-shadow: none;
         border-radius: 0;
@@ -250,8 +252,8 @@ div.cmail-outer {
       height: auto;
 
       @include mobile() {
-        padding: 4px 16px 24px;
-        min-height: calc(100vh - 112px);
+        padding: 24px 16px;
+        min-height: calc(100vh - #{$mobile_navbar_height}px);
         max-height: initial;
         overflow-x: visible;
         overflow-y: visible;
@@ -265,7 +267,7 @@ div.cmail-outer {
           position: relative;
           margin: 0;
           width: 100%;
-          height: 40px;
+          height: 44px;
           border-bottom: 1px solid var(--divider-line);
           padding-bottom: 16px;
           margin-bottom: 16px;
@@ -293,12 +295,14 @@ div.cmail-outer {
             float: left;
             height: 28px;
             padding: 5px 24px 5px 8px;
-            background-color: var(--cmail-section-bt-background);
+            // background-color: var(--cmail-section-bt-background);
+            background-color: var(--primary-color);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
-            color: var(--cmail-section-bt-color);
+            // color: var(--cmail-section-bt-color);
+            color: var(--secondary-color);
             position: relative;
             text-align: left;
             max-width: 200px;
@@ -314,14 +318,10 @@ div.cmail-outer {
               position: absolute;
               top: calc(50% - 5px);
               right: 8px;
-              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
               background-size: 8px 10px;
               background-repeat: no-repeat;
               background-position: center;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
-              }
+              @include svgBgColor("/img/ML/select_arrows_white.svg", center, 8px 10px, var(--secondary-color));
             }
           }
         }
@@ -330,6 +330,10 @@ div.cmail-outer {
       div.cmail-content-headline-container {
         display: block;
         padding: 0 0 16px;
+
+        @include mobile() {
+          padding: 0;
+        }
 
         div.cmail-content-headline {
           border: none;
@@ -385,7 +389,6 @@ div.cmail-outer {
 
         @include mobile() {
           min-height: calc(100vh - 334px);
-          padding-top: 16px;
         }
       }
 
@@ -554,14 +557,14 @@ div.cmail-outer {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 32px;
-          // color: $wut_purple;
+          // color: var(--primary-color);
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: super;
           white-space: nowrap;
-          color: var(--purple-primary-color);
+          color: var(--secondary-color);
           border-radius: 4px;
-          background-color: var(--purple-secondary-color);
+          background-color: var(--primary-color);
 
           @include mobile() {
             height: 28px;
@@ -579,14 +582,10 @@ div.cmail-outer {
             position: absolute;
             top: 0;
             right: 8px;
-            background-image: cdnUrl("/img/ML/purple_arrow.svg");
             background-size: 8px 4px;
             background-repeat: no-repeat;
             background-position: center;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/section_chevron@dark.svg");
-            }
+            @include svgBgColor("/img/ML/purple_arrow.svg", center, 8px 4px, var(--secondary-color));
           }
         }
       }
@@ -704,6 +703,10 @@ div.cmail-outer {
     z-index: #{$navbar_zindex + 100};
     background-color: $carrot_modal_bg;
 
+    @include mobile() {
+      background-color: var(--mobile-background-color);
+    }
+
     div.cmail-container {
       width: #{$modal_width}px;
       // min-height: 318px;
@@ -716,6 +719,7 @@ div.cmail-outer {
       margin: 96px auto;
 
       @include mobile() {
+        width: 100vw;
         box-shadow: none;
         overflow-x: hidden;
         overflow-y: auto;
@@ -723,6 +727,8 @@ div.cmail-outer {
         margin-bottom: 0;
         z-index: #{$navbar_zindex + 20};
         min-height: initial;
+        margin: 0 auto;
+        border: none;
       }
 
       div.cmail-content-outer {
@@ -734,6 +740,9 @@ div.cmail-outer {
         max-height: calc(100vh - (96px * 2) - 64px); // Window height less top and bottom margin and the footer
 
         @include mobile() {
+          padding: 0;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
           max-height: initial;
           overflow-x: initial;
           overflow-y: initial;
@@ -747,6 +756,14 @@ div.cmail-outer {
         overflow: initial;
         height: initial;
 
+        @include mobile() {
+          padding: 16px 16px 24px;
+          min-height: calc(100vh - #{$mobile_navbar_height}px - 1px);
+          max-height: initial;
+          overflow-x: visible;
+          overflow-y: visible;
+        }
+
         div.cmail-content-headline-container {
           position: absolute;
           top: 0;
@@ -759,12 +776,15 @@ div.cmail-outer {
           @include mobile() {
             position: initial;
             top: unset;
+            padding: 0;
+            width: 100%;
           }
         }
 
         div.rich-body-editor-outer-container {
           @include mobile() {
             margin-top: 16px;
+            padding-top: 0;
           }
         }
 

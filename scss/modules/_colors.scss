@@ -117,9 +117,9 @@ $light_lilac: #F5EDFF;
 
 // Wut
 
-$wut_purple: #6833F1;
-$wut_feint_purple: rgba($wut_purple, 0.16);
+$wut_purple: 104,51,241; // #6833F1
+$wut_feint_purple: rgba(104,51,241, 0.16);
 
-$wut_green: #21B368;
+$wut_green: rgb(33,179,104); // #21B368;
 
 $carrot_modal_bg: rgba($deep_navy, 0.64);

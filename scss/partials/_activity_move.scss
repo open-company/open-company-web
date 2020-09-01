@@ -82,8 +82,8 @@ div.activity-move {
       margin-top: 8px;
       border-radius: 4px;
       height: 32px;
-      background-color: $wut_purple;
-      color: white;
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
       @include OC_Body_Bold;
       font-size: 14px;
       width: 100%;

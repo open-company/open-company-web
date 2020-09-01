@@ -248,8 +248,8 @@ div.add-comment-box-container {
           height: 24px;
           padding: 3px 12px;
           margin: 0 0 0 16px;
-          background-color: $wut_purple;
-          color: white;
+          background-color: var(--primary-color);
+          color: var(--secondary-color);
           @include OC_Body_Bold();
           font-size: 14px;
           line-height: 18px;

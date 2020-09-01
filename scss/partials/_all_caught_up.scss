@@ -89,7 +89,8 @@ div.caught-up-line {
     div.all-caught-up-inner {
       height: 32px;
       width: 100%;
-      background-color: $wut_green;
+      // background-color: $wut_green;
+      background-color: var(--primary-color);
       border-radius: 4px;
       padding: 4px 16px;
       position: relative;
@@ -98,7 +99,7 @@ div.caught-up-line {
       background-image: none;
 
       div.message {
-        color: white;
+        color: var(--secondary-color);
         line-height: 24px;
         font-size: 14px;
         text-align: center;

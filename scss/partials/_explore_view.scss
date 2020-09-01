@@ -46,10 +46,10 @@ div.explore-view {
       span.plus {
         width: 11px;
         height: 11px;
-        background-image: cdnUrl("/img/ML/purple_plus.svg");
         background-size: 11px 11px;
         background-repeat: no-repeat;
         background-position: center;
+        @include svgBgColor("/img/ML/purple_plus.svg");
         margin-left: auto;
         margin-right: 4px;
       }
@@ -57,7 +57,7 @@ div.explore-view {
       span.new-topic {
         @include OC_Body_Bold();
         font-size: 18px;
-        color: $wut_purple;
+        color: var(--primary-color);
         margin-left: 4px;
         margin-right: auto;
       }
@@ -101,7 +101,7 @@ div.explore-view {
 
           @include big_web() {
             &:hover {
-              color: $wut_purple;
+              color: var(--primary-color);
             }
           }
         }

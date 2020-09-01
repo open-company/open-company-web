@@ -86,19 +86,19 @@ div.reactions {
             opacity: 1;
 
             span.thumb-up-icon {
-              background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
+              @include svgBgColor("/img/ML/reaction_thumb_reacted.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/reaction_thumb_reacted.svg");
+                @include svgBgColor("/img/ML/reaction_thumb_reacted.svg");
               }
             }
           }
 
           div.count {
-            color: $wut_purple;
+            color: var(--primary-color);
 
             @include dark_mode() {
-              color: $wut_purple;
+              color: var(--primary-color);
             }
           }
         }
