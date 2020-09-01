@@ -107,12 +107,11 @@
                                       :add-a-comment (not (pos? comments-count))})}
             [:div.is-comments-summary-inner
               (str
-               comments-count
                (if show-new-tag?
                  (when-not hide-label?
-                   (str " new comment" (when (not= new-comments-count 1) "s")))
+                   (str new-comments-count " new comment" (when (not= new-comments-count 1) "s")))
                  (when-not hide-label?
-                   (str " comment" (when (not= comments-count 1) "s")))))]])])))
+                   (str comments-count " comment" (when (not= comments-count 1) "s")))))]])])))
 
 
 
