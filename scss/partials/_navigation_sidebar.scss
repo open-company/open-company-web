@@ -497,17 +497,13 @@ div.left-navigation-sidebar {
     span.plus-icon {
       width: 11px;
       height: 11px;
-      background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
       background-size: 11px 11px;
       background-repeat: no-repeat;
       background-position: center;
+      @include svgBgColor("/img/ML/add_to_board_plus_white.svg");
       margin-left: auto;
       margin-right: 10px;
       flex: 0 0 auto;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/add_to_board_plus@dark.svg");
-      }
     }
 
     span.copy-text {

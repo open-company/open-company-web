@@ -46,10 +46,10 @@ div.explore-view {
       span.plus {
         width: 11px;
         height: 11px;
-        background-image: cdnUrl("/img/ML/purple_plus.svg");
         background-size: 11px 11px;
         background-repeat: no-repeat;
         background-position: center;
+        @include svgBgColor("/img/ML/purple_plus.svg");
         margin-left: auto;
         margin-right: 4px;
       }

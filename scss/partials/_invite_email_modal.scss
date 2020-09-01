@@ -95,7 +95,7 @@ div.invite-email-modal {
           padding: 7px 16px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: white;
+          color: var(--secondary-color);
           line-height: 18px;
           margin-top: 16px;
           border-radius: 4px;
@@ -145,7 +145,7 @@ div.invite-email-modal {
             width: 64px;
             @include OC_Body_Bold();
             font-size: 14px;
-            color: white;
+            color: var(--secondary-color);
           }
         }
       }

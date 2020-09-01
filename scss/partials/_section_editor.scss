@@ -68,7 +68,7 @@ div.section-editor-container {
         font-size: 14px;
         background-color: var(--primary-color);
         border-radius: 4px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
 
@@ -544,7 +544,7 @@ div.section-editor-container {
           height: 32px;
           text-align: center;
           float: right;
-          color: white;
+          color: var(--secondary-color);
           background-color: var(--primary-color);
           border-radius: 6px;
           @include OC_Body_Bold();

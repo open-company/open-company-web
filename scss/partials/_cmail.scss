@@ -579,14 +579,10 @@ div.cmail-outer {
             position: absolute;
             top: 0;
             right: 8px;
-            background-image: cdnUrl("/img/ML/purple_arrow.svg");
             background-size: 8px 4px;
             background-repeat: no-repeat;
             background-position: center;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/section_chevron@dark.svg");
-            }
+            @include svgBgColor("/img/ML/purple_arrow.svg");
           }
         }
       }

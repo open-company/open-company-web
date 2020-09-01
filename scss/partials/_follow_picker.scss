@@ -447,7 +447,7 @@ div.follow-picker {
             @include OC_Body_Bold();
             font-size: 14px;
             line-height: 18px;
-            color: white;
+            color: var(--secondary-color);
             background-color: var(--primary-color);
             border-radius: 4px;
             padding: 7px 14px;

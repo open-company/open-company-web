@@ -114,7 +114,7 @@ div.activity-removed-container {
       margin-top: 16px;
       width: 152px;
       height: 32px;
-      color: white;
+      color: var(--secondary-color);
       border-radius: 6px;
       background-color: var(--primary-color);
       @include OC_Body_Bold();

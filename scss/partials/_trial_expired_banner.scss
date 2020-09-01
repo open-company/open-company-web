@@ -93,7 +93,7 @@ div.trial-expired-alert-container {
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
-      color: white;
+      color: var(--secondary-color);
       margin-top: 16px;
       cursor: pointer;
     }

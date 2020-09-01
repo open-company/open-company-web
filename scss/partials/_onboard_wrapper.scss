@@ -59,9 +59,9 @@ div.onboard-email-container {
     @incldude OC_Body_Bold();
 
     div.email-wall-icon {
-      background-image: cdnUrl("/img/ML/wut_email_wall.svg");
       background-size: 48px 36px;
       background-position: center;
+      @include svgBgColor("/img/ML/wut_email_wall.svg", center, 48px 36px);
       width: 48px;
       height: 36px;
       margin: 0 auto 32px;
@@ -307,11 +307,11 @@ div.onboard-lander {
         top: 0;
         left: 0;
         position: absolute;
-        background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
         background-size: 40px 40px;
         background-position: center;
         background-repeat: no-repeat;
         background-color: rgba(white, 0.56);
+        @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 40px 40px);
         transform: rotate(45deg);
         transition: 180ms transform ease-in, 180ms opacity ease-in;
       }
@@ -444,10 +444,10 @@ div.onboard-lander {
           background-color: #F8FCFA;
           border: 1px dashed var(--primary-color);
           border-radius: 8px;
-          background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
+          @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 16px 16px);
         }
 
         div.org-avatar {
@@ -509,10 +509,10 @@ div.onboard-lander {
         border-radius: 50%;
         background-color: #F8FCFA;
         border: 1px dashed var(--primary-color);
-        background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
+        @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 16px 16px);
       }
 
       div.add-picture-link {

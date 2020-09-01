@@ -25,9 +25,9 @@
         next-boards (into {} (filter filter-board old-boards))
         with-saved? (if (nil? saved?)
                       ;; If saved? is nil it means no save happened, so we keep the old saved? value
-                      org-data
+                      fixed-org-data
                       ;; If save actually happened let's update the saved value
-                      (assoc org-data :saved saved?))
+                      (assoc fixed-org-data :saved saved?))
         next-org-editing (-> with-saved?
                           (assoc :email-domain email-domain)
                           (dissoc :has-changes))
@@ -93,7 +93,7 @@
   [db [_ org-data]]
   (assoc db :org-editing (-> org-data
                              (dissoc :has-changes)
-                             (update :brand-color #(or % {:light ls/default-primary-color :dark ls/default-primary-color})))))
+                             (update :brand-color #(or % ls/default-brand-color)))))
 
 (defmethod dispatcher/action :bookmarks-nav/show
   [db [_ org-slug]]

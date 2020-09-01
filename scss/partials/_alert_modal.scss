@@ -160,17 +160,17 @@ div.alert-modal-container {
 
           &.mlb-default.green {
             background-color: var(--primary-color);
-            color: white;
+            color: var(--secondary-color);
             padding: 7px 8px;
 
             &:hover, &:focus {
               background-color: var(--primary-color);
-              color: white;
+              color: var(--secondary-color);
             }
 
             &:active, &.active {
               background-color: var(--primary-color);
-              color: white;
+              color: var(--secondary-color);
             }
           }
         }

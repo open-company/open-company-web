@@ -130,7 +130,7 @@ div.invite-slack-modal {
             width: 64px;
             @include OC_Body_Bold();
             font-size: 14px;
-            color: white;
+            color: var(--secondary-color);
           }
         }
       }
@@ -306,7 +306,7 @@ div.invite-slack-modal {
         background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
         border-radius: 4px;

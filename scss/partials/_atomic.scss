@@ -23,8 +23,8 @@
 }
 
 .mlb-default {
-  background-color: $carrot_orange;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   border-radius: 4px;
   height: 40px;
   font-size: 16px;

@@ -68,7 +68,7 @@ div.integrations-settings-modal {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 18px;
-        color: white;
+        color: var(--secondary-color);
         float: right;
         border-radius: 4px;
       }

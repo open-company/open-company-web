@@ -263,7 +263,7 @@ div.wrt-popup-container {
             @include OC_Body_Bold();
             font-size: 14px;
             line-height: 18px;
-            color: white;
+            color: var(--secondary-color);
             background-color: var(--primary-color);
             border-radius: 4px;
             height: 32px;

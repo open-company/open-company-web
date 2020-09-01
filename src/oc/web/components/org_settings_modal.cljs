@@ -3,7 +3,7 @@
             [goog.dom :as gdom]
             [cljsjs.react-color]
             [oops.core :refer (oget oset!)]
-            [clojure.string :as string]
+            [cuerdas.core :as string]
             [oc.web.lib.react-utils :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -36,6 +36,12 @@
                      :hex "#6187F8"}
                     {:rgb {:r 104 :g 51 :b 241}
                      :hex "#6833F1"}])
+
+(def brand-colors-list [{:label "White (default)" :value "#FFFFFF"}
+                        {:label "Deep navy" :value "#34414F"}
+                        {:label "Blue" :value "#0000FF"}
+                        {:label "Green" :value "#00FF00"}
+                        {:label "Red" :value "#FF0000"}])
 
 (defn close-clicked [s dismiss-action]
   (let [org-data @(drv/get-ref s :org-data)
@@ -116,18 +122,19 @@
     (fn [err]
       (logo-add-error nil))))
 
-(defn- change-brand-color [color-hex color-rgb]
-  (let [color-map {:hex color-hex :rgb color-rgb}
+(defn- change-brand-color [color-hex color-rgb button-color]
+  (let [color-map {:hex color-hex :rgb color-rgb :button-color button-color}
         new-brand-color {:light color-map :dark color-map}]
     (dis/dispatch! [:input [:org-editing :brand-color] new-brand-color])
-    (org-utils/set-brand-color! color-rgb)))
+    (org-utils/set-brand-color! color-map)))
 
 (defn- theme-preview [brand-color theme]
   (let [color-map (get brand-color theme)
         hex (:hex color-map)
-        text-color (if (= theme :light) "#34414F" "#FFFFFF")]
+        text-color (:button-color color-map)]
     [:div.theme-preview
      {:class (str (name theme) "-preview")}
+     [:div.theme-background]
      [:div.sample-link
       {:style {:color hex}}
       "Sample text link"]
@@ -255,7 +262,7 @@
                                                    (when color
                                                      (let [hex-color (oget color "?hex")
                                                            rgb-colors (-> color (oget "?rgb") (js->clj :keywordize-keys true) (select-keys [:r :g :b]))]
-                                                       (change-brand-color hex-color rgb-colors))))})])
+                                                       (change-brand-color hex-color rgb-colors (:button-color current-brand-color)))))})])
             [:div.field-description.colors-preset.group
              [:span.color-preset-label "Presets:"]
              [:div.colors-list.group
@@ -263,13 +270,23 @@
                     :let [active? (= (:hex current-brand-color) (:hex c))]]
                 [:button.mlb-reset.color-preset-bt
                   {:key (str "color-preset-" (:hex c))
-                   :on-click #(change-brand-color (:hex c) (:rgb c))
+                   :on-click #(change-brand-color (:hex c) (:rgb c) (:button-color current-brand-color))
                    :class (when active? "active")}
                  [:span.dot
                   {:data-color-hex (:hex c)
                    :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
                    :style {:background-color (:hex c)}
                    }]])]]
+            [:div.field-label
+             "Button text color"]
+            [:select.oc-input.field-value.button-text-color
+             {:value (:button-color current-brand-color)
+              :on-change #(change-brand-color (:hex current-brand-color) (:rgb current-brand-color) (.. % -target -value))}
+             (for [c brand-colors-list]
+               [:option
+                {:key (str "button-text-color-" (:value c))
+                 :value (:value c)}
+                (:label c)])]
             [:div.theme-previews
              {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
              (theme-preview (:brand-color org-editing) :light)

@@ -68,7 +68,7 @@ div.org-settings-modal {
         font-size: 14px;
         background-color: var(--primary-color);
         border-radius: 4px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
       }
@@ -88,7 +88,7 @@ div.org-settings-modal {
           background-color: #F8FCFA;
           border: 1px dashed var(--primary-color);
           border-radius: 8px;
-          background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
+          @include svgBgColor("/img/ML/company_avatar_purple_plus.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
@@ -185,23 +185,41 @@ div.org-settings-modal {
           justify-items: center;
           height: 80px;
           width: 100%;
-          border-radius: 6px;
           margin-top: 8px;
+          position: relative;
+          border-radius: 4px;
+
+          div.theme-background {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 1;
+            border-radius: 4px;
+          }
 
           &.light-preview {
-            background-color: #{$grey_num_2};
-            border: 1px solid rgba($deep_navy, 0.15);
+            background-color: transparent;
+
+            div.theme-background {
+              background-color: #{$grey_num_2};
+              border: 1px solid rgba($deep_navy, 0.15);
+            }
           }
 
           &.dark-preview {
-            background-color: #{rgba(white, 0.1)};
-            border: 1px solid rgba(white, 0.16);
+            background-color: #1B202A;
+
+            div.theme-background {
+              background-color: #{rgba(white, 0.1)};
+              border: 1px solid rgba(white, 0.16);
+            }
           }
             
           div.sample-link {
             flex: 0 0 auto;
             margin-left: auto;
             margin-right: 8px;
+            z-index: 2;
           }
 
           button.mlb-reset.sample-button {
@@ -212,9 +230,10 @@ div.org-settings-modal {
             padding: 9px 8px;
             font-size: 14px;
             line-height: 14px;
-            border-radius: 6px;
+            border-radius: 4px;
             @include OC_Body_Bold();
             opacity: 1;
+            z-index: 2;
 
             &:hover {
               opacity: 1;

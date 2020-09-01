@@ -168,10 +168,10 @@ div.theme-settings-modal {
 
             &.active {
               span.theme-icon {
-                background-image: cdnUrl("/img/ML/wut_dark_mode_light_active.svg");
+                @include svgBgColor("/img/ML/wut_dark_mode_light_active.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/wut_dark_mode_light_active.svg");
+                  @include svgBgColor("/img/ML/wut_dark_mode_light_active.svg");
                 }
               }
 
@@ -197,10 +197,10 @@ div.theme-settings-modal {
 
             &.active {
               span.theme-icon {
-                background-image: cdnUrl("/img/ML/wut_dark_mode_dark_active.svg");
+                @include svgBgColor("/img/ML/wut_dark_mode_dark_active.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/wut_dark_mode_dark_active.svg");
+                  @include svgBgColor("/img/ML/wut_dark_mode_dark_active.svg");
                 }
               }
 
@@ -231,10 +231,10 @@ div.theme-settings-modal {
 
             &.selected {
               opacity: 1;
-              background-image: cdnUrl("/img/ML/carrot_option_button_purple.svg");
+              @include svgBgColor("/img/ML/carrot_option_button_purple.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/carrot_option_button_purple@dark.svg");
+                @include svgBgColor("/img/ML/carrot_option_button_purple@dark.svg");
               }
             }
           }

@@ -53,20 +53,21 @@
 
 (defn default-brand-color []
   (when-let [theme-kw (theme/computed-theme)]
-    (get ls/default-primary-color theme-kw)))
+    (get ls/default-brand-color theme-kw)))
 
 (defun set-brand-color!
   ([nil])
 
-  ([primary-color :guard string? primary-light-color :guard string?]
+  ([primary-color :guard string? primary-light-color :guard string? secondary-color :guard string?]
    (.. js/document -documentElement -style (setProperty "--primary-color" primary-color))
-   (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color)))
+   (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color))
+   (.. js/document -documentElement -style (setProperty "--secondary-color" secondary-color)))
 
-  ([color-rgb :guard #(and (:r %) (:g %) (:b %))]
-   (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb)))
+  ([color-rgb :guard #(and (:r %) (:g %) (:b %)) button-color :guard string?]
+   (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb) button-color))
 
-  ([color-map :guard :rgb]
-   (recur (:rgb color-map)))
+  ([color-map :guard #(and (:rgb %) (:button-color %))]
+   (recur (:rgb color-map) (:button-color color-map)))
 
   ([brand-color-map :guard #(and (:dark %) (:light %))]
    (when-let [theme-key (theme/computed-theme)]

@@ -117,7 +117,7 @@ div.user-profile-modal-container {
         background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
         border-radius: 4px;
@@ -166,10 +166,10 @@ div.user-profile-modal-container {
           border-radius: 50%;
           background-color: #F8FCFA;
           // border: 1px dashed var(--primary-color);
-          background-image: cdnUrl("/img/ML/company_avatar_purple_plus.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
+          @include svgBgColor("/img/ML/company_avatar_purple_plus.svg");
           float: left;
         }
 

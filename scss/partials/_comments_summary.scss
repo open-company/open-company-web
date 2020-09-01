@@ -19,10 +19,10 @@ div.is-comments {
   &.has-new-comments {
     div.is-comments-bubble {
       opacity: 1;
-      background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+      @include svgBgColor("/img/ML/foc_bubble_new.svg");
 
       @include dark_mode() {
-        background-image: cdnUrl("/img/ML/foc_bubble_new.svg");
+        @include svgBgColor("/img/ML/foc_bubble_new.svg");
       }
     }
 

@@ -383,10 +383,10 @@ div.search-results {
       &:before {
         position: absolute;
         content: "";
-        background-image: cdnUrl("/img/ML/wut_keep_reading_chevron.svg");
         background-size: 14px 8px;
         background-position: center;
         background-repeat: no-repeat;
+        @include svgBgColor("/img/ML/wut_keep_reading_chevron.svg");
         width: 14px;
         height: 8px;
         top: 4px;

@@ -32,7 +32,7 @@ div.post-to-button {
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
-      color: white;
+      color: var(--secondary-color);
       overflow: hidden;
       cursor: pointer;
       border-radius: 4px;

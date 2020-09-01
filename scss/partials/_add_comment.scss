@@ -249,7 +249,7 @@ div.add-comment-box-container {
           padding: 3px 12px;
           margin: 0 0 0 16px;
           background-color: var(--primary-color);
-          color: white;
+          color: var(--secondary-color);
           @include OC_Body_Bold();
           font-size: 14px;
           line-height: 18px;

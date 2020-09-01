@@ -182,10 +182,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+              @include svgBgColor("/img/ML/all_posts_tab_icon_active.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+                @include svgBgColor("/img/ML/all_posts_tab_icon_active.svg");
               }
             }
           }
@@ -196,11 +196,9 @@ div.dashboard-layout {
               width: 18px;
               height: 16px;
               background-size: 18px 16px;
-
               text-align: center;
               font-size: 19px;
               line-height: 16px;
-              vertical-align: bottom;
               color: var(--color);
               font-family: "Material Design Icons";
               display: block;
@@ -211,11 +209,7 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
-              }
+              color: var(--primary-color);
             }
           }
 
@@ -235,10 +229,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/nav_home_active.svg");
+              @include svgBgColor("/img/ML/nav_home_active.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/nav_home_active.svg");
+                @include svgBgColor("/img/ML/nav_home_active.svg");
               }
             }
           }
@@ -264,10 +258,9 @@ div.dashboard-layout {
                 line-height: 14px;
                 padding: 2px;
                 text-align: center;
-                color: white;
+                color: var(--secondary-color);
                 display: block;
                 background-color: var(--primary-color);
-                vertical-align: top;
                 border-radius: 4px;
                 position: absolute;
                 top: -9px;
@@ -278,15 +271,17 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon span.count-badge {
-              background-color: $ui_grey; //rgb(130, 130, 130);
-              color: white;
+              // background-color: $ui_grey; //rgb(130, 130, 130);
+              // color: white;
+              background-color: var(--primary-color);
+              color: var(--secondary-color);
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+              @include svgBgColor("/img/ML/inbox_tab_icon_active.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+                @include svgBgColor("/img/ML/inbox_tab_icon_active.svg");
               }
             }
           }
@@ -312,10 +307,9 @@ div.dashboard-layout {
                 line-height: 14px;
                 padding: 2px;
                 text-align: center;
-                color: white;
+                color: var(--secondary-color);
                 display: block;
                 background-color: var(--primary-color);
-                vertical-align: top;
                 border-radius: 4px;
                 position: absolute;
                 top: -9px;
@@ -326,8 +320,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon span.count-badge {
-              background-color: $ui_grey; //rgb(130, 130, 130);
-              color: white;
+              // background-color: $ui_grey; //rgb(130, 130, 130);
+              // color: white;
+              background-color: var(--primary-color);
+              color: var(--secondary-color);
             }
 
             &.active span.tab-icon {
@@ -368,10 +364,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+              @include svgBgColor("/img/ML/notifications_tab_icon_active.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+                @include svgBgColor("/img/ML/notifications_tab_icon_active.svg");
               }
             }
           }
@@ -394,10 +390,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+              @include svgBgColor("/img/ML/new_post_tab_icon_active.svg");
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+                @include svgBgColor("/img/ML/new_post_tab_icon_active.svg");
               }
             }
           }

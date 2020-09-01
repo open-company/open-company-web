@@ -57,7 +57,7 @@ div.recurring-updates-modal-container {
         background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         float: right;
         line-height: 18px;
         border-radius: 4px; 

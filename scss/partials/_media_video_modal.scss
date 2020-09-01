@@ -42,7 +42,7 @@ div.media-video-modal-container {
     height: 32px;
     background-color: var(--primary-color);
     border-radius: 4px;
-    color: white;
+    color: var(--secondary-color);
     @include OC_Body_Bold();
     font-size: 14px;
     margin-top: 8px;
