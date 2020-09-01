@@ -959,7 +959,8 @@
                                   (or (not (:publisher? %))
                                       (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
                             #(and (entry? %)
-                                  (not (:unseen-comments %))))
+                                  (or (not (:unseen-comments %))
+                                      (zero? (:unseen-comments %)))))
             ignore-item-fn (if replies?
                              #(or (not (entry? %))
                                   (:ignore-comments %))

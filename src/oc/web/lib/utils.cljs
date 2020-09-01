@@ -639,12 +639,13 @@
     (fn [el e handler] (.addEventListener el e handler))))
 
 (defn page-scroll-top []
-  (let [is-mobile? (responsive/is-mobile-size?)
-        board-slug (dis/current-board-slug)
-        activity-id (dis/current-activity-id)]
-    (if (and (not activity-id)
-             board-slug
-             (not= (keyword board-slug) (keyword default-drafts-board-slug))
-             is-mobile?)
-      65
-      0)))
+  ;; (let [is-mobile? (responsive/is-mobile-size?)
+  ;;       board-slug (dis/current-board-slug)
+  ;;       activity-id (dis/current-activity-id)]
+  ;;   (if (and (not activity-id)
+  ;;            board-slug
+  ;;            (not= (keyword board-slug) (keyword default-drafts-board-slug))
+  ;;            is-mobile?)
+  ;;     65
+  ;;     0))
+  0)
