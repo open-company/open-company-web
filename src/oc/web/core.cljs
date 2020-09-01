@@ -150,11 +150,10 @@
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
-        ;; org-settings (when (and (not user-settings)
-        ;;                       (contains? query-params :org-settings)
-        ;;                       (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
-        ;;                (keyword (:org-settings query-params)))
-        org-settings :org
+        org-settings (when (and (not user-settings)
+                              (contains? query-params :org-settings)
+                              (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
+                       (keyword (:org-settings query-params)))
         reminders (when (and ls/reminders-enabled?
                              (not org-settings)
                              (contains? query-params :reminders))
