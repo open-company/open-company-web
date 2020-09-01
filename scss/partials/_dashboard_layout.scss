@@ -431,10 +431,11 @@ div.dashboard-layout {
         position: relative;
 
         @include mobile() {
-          height: 64px;
-          border-bottom: none;
-          padding: 0;
-          background-color: var(--mobile-background-color);
+          // height: 64px;
+          // border-bottom: none;
+          // padding: 0;
+          // background-color: var(--mobile-background-color);
+          display: none;
 
           &.drafts-board, &.topics-view {
             height: 0;
