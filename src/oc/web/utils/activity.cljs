@@ -621,26 +621,37 @@
          mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
          mention? (.match (:body last-comment) mention-regexp)
          publisher? (:publisher? entry-data)
-         unseen-commenters (reverse (map (comp user-name :author) (filter :unseen replies-data)))
-         subject (case (count unseen-commenters)
+         unseen? (pos? (:unseen-comments entry-data))
+         comments (if unseen?
+                    (filter :unseen replies-data)
+                    replies-data)
+         commenters (reverse (map (comp user-name :author) comments))
+         subject (case (count commenters)
                    0
                    (if (:author? last-comment)
                      "You "
                      (str (user-name last-comment-author) " "))
                    1
-                   (:name (first unseen-commenters))
+                   (:name (first commenters))
                    2
-                   (str (:name (first unseen-commenters)) " and " (:name (last unseen-commenters)))
+                   (str (:name (first commenters)) " and " (:name (last commenters)))
                    3
-                   (str (:name (first unseen-commenters)) ", " (:name (second unseen-commenters)) " and 1 other")
+                   (str (:name (first commenters)) ", " (:name (second commenters)) " and 1 other")
                      ;; :else
-                   (str (:name (first unseen-commenters)) ", " (:name (second unseen-commenters)) " and " (- (count unseen-commenters) 2) " others"))
-         verb (cond (seq unseen-commenters)
-                    (str " left a new comment" (when (> (count unseen-commenters) 1) "s"))
+                   (str (:name (first commenters)) ", " (:name (second commenters)) " and " (- (count commenters) 2) " others"))
+         multiple-comments? (> (count comments) 1)
+         verb (cond (seq commenters)
+                    (if unseen?
+                      (if multiple-comments?
+                        " left new comments"
+                        " left a new comment")
+                      " commented")
                     mention?
                     " mentioned you"
                     :else
-                    " left a comment")]
+                    (if multiple-comments?
+                      " left comments"
+                      " left a comment"))]
      {:label (str subject verb)
       :timestamp (:created-at last-comment)}))
 
