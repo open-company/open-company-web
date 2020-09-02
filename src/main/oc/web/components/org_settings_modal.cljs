@@ -1,7 +1,7 @@
 (ns oc.web.components.org-settings-modal
   (:require [rum.core :as rum]
             [goog.dom :as gdom]
-            [cljsjs.react-color]
+            ["react-color" :as react-color]
             [oops.core :refer (oget oset!)]
             [cuerdas.core :as string]
             [oc.web.lib.react-utils :as rutils]
@@ -22,7 +22,7 @@
             [oc.web.components.ui.email-domains :refer (email-domains)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(def color-picker (partial rutils/build js/ReactColor.ChromePicker))
+(def color-picker (partial rutils/build react-color/ChromePicker))
 
 (def color-presets [{:rgb {:r 251 :g 94 :b 72}
                      :hex "#FB5E48"}
