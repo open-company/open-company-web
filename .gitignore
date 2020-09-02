@@ -28,6 +28,8 @@ forms-analyzed.txt
 .calva/
 
 public/js/cljs-runtime
+public/js/oc.js
+public/js/manifest.edn
 
 # Ignore compiled css and html files
 public/css/app.main.css
