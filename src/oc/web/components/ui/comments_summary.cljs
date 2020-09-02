@@ -91,7 +91,7 @@
                   (or (not hide-label?)
                       (not (zero? comments-count))))
           [:div.is-comments-authors
-           (face-pile {:width 16 :faces comments-authors :margin 4})])
+           (face-pile {:width 16 :faces comments-authors})])
         (when (or show-bubble-icon?
                   (and (not hide-label?)
                        (pos? comments-count)))

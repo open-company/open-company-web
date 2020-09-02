@@ -36,7 +36,7 @@
     {:class (when unseen? "unseen-replies")
      :key (str "stream-item-activity-preview-" (:timestamp for-you-context))}
     [:div.for-you-authors
-     (face-pile {:width 20 :margin 4 :faces (:authors for-you-context)})]
+     (face-pile {:width 20 :faces (:authors for-you-context)})]
     [:span.for-you-body-label
      (:label for-you-context)]
     [:div.separator-dot]
