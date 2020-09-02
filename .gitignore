@@ -14,6 +14,7 @@ resources/public/js/compiled/
 .idea*
 open-company-web.iml
 .sass-cache/
+.shadow-cljs/
 
 .ruby-gemset
 .ruby-version
@@ -25,6 +26,10 @@ forms-read.txt
 forms-analyzed.txt
 
 .calva/
+
+# Ignore compiled css and html files
+public/css/app.main.css
+public/*.html
 
 # See resources/electron-builder.example.env
 resources/electron-builder.env
