@@ -20,8 +20,9 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary foc-comments-summary face-pile)]
+            [oc.web.components.ui.comments-summary :refer (comments-summary foc-comments-summary)]
             [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
@@ -35,7 +36,7 @@
     {:class (when unseen? "unseen-replies")
      :key (str "stream-item-activity-preview-" (:timestamp for-you-context))}
     [:div.for-you-authors
-     (face-pile {:width 24 :margin 2.5 :faces (:authors for-you-context)})]
+     (face-pile {:width 20 :margin 4 :faces (:authors for-you-context)})]
     [:span.for-you-body-label
      (:label for-you-context)]
     [:div.separator-dot]

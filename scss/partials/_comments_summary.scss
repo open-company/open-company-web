@@ -1,42 +1,3 @@
-@mixin face-pile($width: 16, $margin: 3) {
-  $total-width: $width + ($margin * 2);
-  div.face-pile {
-    position: relative;
-
-    &.show-border {
-      div.face-pile-face {
-        background-color: transparent;
-        border: 2px solid transparent;
-      }
-    }
-
-    div.face-pile-face {
-      float: left;
-      width: #{$total-width}px;
-      height: #{$total-width}px;
-      background-color: transparent;
-      border: 2px solid transparent;
-      border-radius: 50%;
-      margin-left: -#{$total-width / 2.2}px;
-
-      @include user-profile($width);
-
-      @include mobile(){
-        width: #{$total-width - 2}px;
-        height: #{$total-width}px;
-        border: 1px solid transparent;
-        margin-left: -#{$total-width / 2.7}px;
-
-        @include user-profile($width);
-      }
-
-      &:first-child {
-        margin-left: 0px;
-      }
-    }
-  }
-}
-
 div.is-comments {
   float: left;
   text-align: right;
@@ -107,7 +68,7 @@ div.is-comments {
       display: none;
     }
 
-    @include face-pile(16, 3);
+    @include face-pile(16);
   }
 
   div.is-comments-summary {

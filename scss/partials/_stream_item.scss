@@ -564,7 +564,7 @@ div.stream-item {
           flex: 0 0 auto;
           margin-right: 8px;
           & > {
-            @include face-pile(24, 5);
+            @include face-pile(20);
           }
         }
 
