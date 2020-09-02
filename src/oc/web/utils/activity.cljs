@@ -622,11 +622,12 @@
          user-name #(if (:self? %)
                       "you"
                       (or (:pointed-name %) (:first-name %) (:name %)))
-         commenters (->> comments
-                         (map :author)
-                         (group-by :user-id)
-                         vals
-                         (map first)
+         authors-list (->> comments
+                           (map :author)
+                           (group-by :user-id)
+                           vals
+                           (map first))
+         commenters (->> authors-list
                          (map user-name)
                          (remove s/blank?))
          last-comment (last comments)
@@ -644,19 +645,22 @@
                    ;; :else
                    (str (first commenters) ", " (second commenters) " and " (- (count commenters) 2) " others"))
          multiple-comments? (> (count comments) 1)
-         verb (cond (seq comments)
-                    (if (seq unseen-comments)
-                      (if multiple-comments?
-                        " left new comments"
-                        " left a new comment")
-                      " commented")
-                    mention?
-                    " mentioned you"
-                    :else
-                    (if multiple-comments?
-                      " left comments"
-                      " left a comment"))]
+        ;;  verb (cond (seq comments)
+        ;;             (if (seq unseen-comments)
+        ;;               (if multiple-comments?
+        ;;                 " left new comments"
+        ;;                 " left a new comment")
+        ;;               " commented")
+        ;;             mention?
+        ;;             " mentioned you"
+        ;;             :else
+        ;;             (if multiple-comments?
+        ;;               " left comments"
+        ;;               " left a comment"))
+        verb (when mention?
+               " mentioned you")]
      {:label (s/capital (str subject verb))
+      :authors authors-list
       :timestamp (:created-at last-comment)}))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]

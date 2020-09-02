@@ -30,6 +30,26 @@
 
 (def max-face-pile 3)
 
+(rum/defc face-pile < rum/static
+  [{:keys [faces width margin max-faces] :or {width 16 margin 4 max-faces max-face-pile}}]
+  (let [is-mobile? (responsive/is-mobile-size?)
+        faces-to-render (take max-faces faces)
+        face-pile-count (count faces-to-render)
+        total-width (+ width margin)
+        margin (if is-mobile? (+ margin 2) margin)
+        face-width-diff (- width margin)
+        face-initial-margin (- width margin)
+        face-pile-width (if (pos? face-pile-count)
+                          (+ face-initial-margin (* face-width-diff face-pile-count))
+                          0)]
+    [:div.face-pile.group
+     {:style {:width (str face-pile-width "px")}
+      :class (when (> face-pile-count 1) "show-border")}
+     (for [face faces-to-render]
+       [:div.face-pile-face
+        {:key (str "face-pile-" (or (:user-id face) (rand 10)))}
+        (user-avatar-image face {:tooltip? (not (responsive/is-tablet-or-mobile?))})])]))
+
 (rum/defc comments-summary < rum/static
   [{:keys [entry-data
            comments-data
@@ -66,11 +86,6 @@
                           (min max-face-pile (count comments-authors)))
         is-mobile? (responsive/is-mobile-size?)
         faces-to-render (take max-face-pile comments-authors)
-        face-pile-width (if (pos? face-pile-count)
-                          (if is-mobile?
-                            (+ 8 (* 12 face-pile-count))
-                            (+ 10 (* 12 face-pile-count)))
-                            0)
         show-new-tag? (pos? new-comments-count)]
     (when comments-count
       [:div.is-comments
@@ -101,13 +116,8 @@
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)
                       (not (zero? comments-count))))
-          [:div.is-comments-authors.group
-            {:style {:width (str face-pile-width "px")}
-             :class (when (> (count faces-to-render) 1) "show-border")}
-            (for [user-data faces-to-render]
-              [:div.is-comments-author
-                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-                (user-avatar-image user-data {:tooltip? (not (responsive/is-tablet-or-mobile?))})])])
+          [:div.is-comments-authors
+           (face-pile {:width 22 :faces faces-to-render})])
         (when (or show-bubble-icon?
                   (and (not hide-label?)
                        (pos? comments-count)))
