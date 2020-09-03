@@ -648,18 +648,18 @@
                        ;; :else
                        (str (first commenters) ", " (second commenters) " and " (- (count commenters) 2) " others"))
              multiple-comments? (> (count comments) 1)
-              verb (cond (seq comments)
-                         (if (seq unseen-comments)
-                           (if multiple-comments?
-                             " left new comments"
-                             " left a new comment")
-                           " commented")
-                         mention?
-                         " mentioned you"
-                         :else
-                         (if multiple-comments?
-                           " left comments"
-                           " left a comment"))]
+             verb (cond (seq comments)
+                        (if (seq unseen-comments)
+                          (if multiple-comments?
+                            " left new comments"
+                            " left a new comment")
+                          " commented")
+                        mention?
+                        " mentioned you"
+                        :else
+                        (if multiple-comments?
+                          " left comments"
+                          " left a comment"))]
          {:label (s/capital (str subject verb))
           :authors authors-list
           :timestamp (:created-at last-comment)}))))
