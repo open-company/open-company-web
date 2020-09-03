@@ -10,12 +10,12 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         faces-to-render (take max-faces faces)
         face-pile-count (count faces-to-render)
-        width (if is-mobile? (- width 2) width)
-        margin (/ width 9)
-        total-width (+ width (* margin 2))
-        left-margin (if is-mobile? (/ width 2) (/ width 1.8))
+        inner-width (if is-mobile? (- width 2) width)
+        margin (js/Math.ceil (/ inner-width 9))
+        outer-width (+ inner-width (* margin 2))
+        left-margin (js/Math.ceil (if is-mobile? (/ inner-width 2) (/ inner-width 1.8)))
         total-width (when (pos? face-pile-count)
-                      (+ left-margin (* (- total-width left-margin) face-pile-count)))]
+                      (+ (* (- outer-width left-margin) face-pile-count) left-margin))]
     [:div.face-pile.group
      {:style {:width (str total-width "px")}
       :class (when (> face-pile-count 1) "show-border")}
