@@ -63,6 +63,7 @@ div.is-comments {
   div.is-comments-authors {
     float: left;
     margin-top: 2px;
+    margin-right: 6px;
 
     @include mobile (){
       display: none;
