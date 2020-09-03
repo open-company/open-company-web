@@ -630,7 +630,9 @@
                                (map :author)
                                (group-by :user-id)
                                vals
-                               (map first))
+                               (map first)
+                               (sort-by (juxt :self? :created-at))
+                               (reverse))
              commenters (->> authors-list
                              (map user-name)
                              (remove s/blank?))
