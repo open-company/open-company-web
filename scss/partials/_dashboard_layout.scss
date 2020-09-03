@@ -189,7 +189,7 @@ div.dashboard-layout {
           }
 
           &.topics-tab {
-            order: 4;
+            order: 2;
             span.tab-icon {
               width: 18px;
               height: 16px;
@@ -328,7 +328,7 @@ div.dashboard-layout {
           }
 
           &.notifications-tab {
-            order: 2;
+            order: 3;
             span.tab-icon {
               width: 16px;
               height: 16px;
@@ -363,7 +363,7 @@ div.dashboard-layout {
           }
 
           &.new-post-tab {
-            order: 3;
+            order: 4;
             display: none;
 
             span.tab-icon {
