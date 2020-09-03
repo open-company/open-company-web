@@ -346,7 +346,7 @@
                 (when member?
                   [:div.stream-item-comments-summary
                     ; {:on-click #(expand s true true)}
-                    (if unseen?
+                    (if (and replies? unseen?)
                       (comments-summary {:entry-data activity-data
                                          :add-comment-focus-prefix "main-comment"
                                          :current-activity-id current-activity-id
