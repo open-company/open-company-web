@@ -832,6 +832,9 @@
 
 (defun org-board-data
   "Get board data from org data map: mostly used to edit the board infos."
+  ([nil] nil)
+  ([nil _] nil)
+  ([_ nil] nil)
   ([]
    (org-board-data (org-data) (current-board-slug)))
   ([board-slug :guard s-or-k?]
