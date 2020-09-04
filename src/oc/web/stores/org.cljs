@@ -73,6 +73,10 @@
      (assoc-in ndb boards-key next-boards)
      (update-in ndb follow-boards-list-key #(user-store/enrich-boards-list unfollow-board-uuids (:boards fixed-org-data))))))
 
+(defmethod dispatcher/action :org-edit-save
+  [db [_]]
+  (update db :org-editing #(dissoc % :saved :error)))
+
 (defmethod dispatcher/action :org-avatar-update/failed
   [db [_]]
   (let [org-data (dispatcher/org-data db)]
