@@ -270,7 +270,7 @@
      (hp/html5 {:lang "en"}
                (head)
                [:body
-                {:class (when (= (env :covid-banner) "true") "covid-banner")}
+                {:class (when (env :covid-banner) "covid-banner")}
                 pages/tag-manager-body
                 [:div
                  {:class "outer header"}
