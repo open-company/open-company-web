@@ -9,7 +9,7 @@
     {:id "wrap"}
     [:div.main.pricing
 
-      (when (env :covid-banner)
+      (when (= (env :covid-banner) "true")
         [:section.pricing-covid-letter
           [:div.covid-letter-box
             [:h4 "Open source and free"]
