@@ -29,7 +29,8 @@
         ;               (shared/cdn "/img/ML/homepage_screenshot@3x.png") " 3x, "
         ;               (shared/cdn "/img/ML/homepage_screenshot@4x.png") " 4x")}]]
 
-        shared/testimonials-logos-line]
+        ; shared/testimonials-logos-line
+        ]
 
       (shared/testimonials-section :index)
 
