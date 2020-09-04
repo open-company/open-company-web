@@ -211,7 +211,8 @@
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
         show-body-thumbnail? (and (not replies?) (:body-thumbnail activity-data))
-        unseen? (pos? (:unseen-comments activity-data))]
+        unseen? (pos? (:unseen-comments activity-data))
+        comments-summary-comp (if (and replies? unseen?) comments-summary foc-comments-summary)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -346,15 +347,10 @@
                 (when member?
                   [:div.stream-item-comments-summary
                     ; {:on-click #(expand s true true)}
-                    (if (and replies? unseen?)
-                      (comments-summary {:entry-data activity-data
-                                         :add-comment-focus-prefix "main-comment"
-                                         :current-activity-id current-activity-id
-                                         :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})
-                      (foc-comments-summary {:entry-data activity-data
-                                             :add-comment-focus-prefix "main-comment"
-                                             :current-activity-id current-activity-id
-                                             :new-comments-count (when show-new-comments? (count (filter :unseen (:replies-data activity-data))))}))])
+                    (comments-summary-comp {:entry-data activity-data
+                                            :add-comment-focus-prefix "main-comment"
+                                            :current-activity-id current-activity-id
+                                            :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
                 (when (and show-wrt? (not unseen?))
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

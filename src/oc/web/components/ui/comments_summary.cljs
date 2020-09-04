@@ -59,8 +59,7 @@
         comments-count (if comments-loaded?
                          (count unwrapped-comments)
                          (:count comments-link))
-        is-mobile? (responsive/is-mobile-size?)
-        show-new-tag? (pos? new-comments-count)]
+        is-mobile? (responsive/is-mobile-size?)]
     (when comments-count
       [:div.is-comments
         {:class (when show-new-tag? "has-new-comments")
