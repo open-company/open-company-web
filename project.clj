@@ -18,17 +18,25 @@
   :dependencies [;; Lisp on the JVM http://clojure.org/documentation
                  [org.clojure/clojure "1.10.2-alpha1"]
                  ;; Library for OC projects https://github.com/open-company/open-company-lib
-                 [open-company/lib "0.17.29-alpha27"]
+                 [open-company/lib "0.17.29-alpha32"]
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]
                  ;; HTML rendering https://github.com/weavejester/hiccup
-                 [hiccup "2.0.0-alpha2"]]
+                 [hiccup "2.0.0-alpha2"]
+                 ;; String manipulation library https://github.com/funcool/cuerdas
+                 [funcool/cuerdas "2020.03.26-3"]]
   
   ;; All profile plugins
-  :plugins [
-    ;; Get environment settings from different sources https://github.com/weavejester/environ
-    [lein-environ "1.1.0"]
-  ]
+  :plugins [;; Common ring tasks https://github.com/weavejester/lein-ring
+            [lein-ring "0.12.5"]
+            ;; Get environment settings from different sources https://github.com/weavejester/environ
+            [lein-environ "1.1.0"]
+            ;; Automatic restart task https://github.com/weavejester/lein-auto
+            [lein-auto "0.1.3"]
+            ;; Call shell from within Leiningen. https://github.com/hypirion/lein-shell
+            [lein-shell "0.5.0"]]
+  
+  :auto {:start {:file-pattern #"\. (clj|cljs|cljx|cljc|edn) $"}}
 
   :profiles {
 
@@ -62,7 +70,29 @@
       :env ^:replace {
         :hot-reload "true" ; reload code when changed on the file system
         :log-level "debug"
+        :ring {:handler oc.dev/handler
+               :reload-paths ["site"] ; work around issue https://github.com/weavejester/lein-ring/issues/68
+               :port 3559
+               :host "localhost"}
       }
+      :dependencies [;; Web application library https://github.com/ring-clojure/ring
+                     [ring/ring-devel "1.8.0"]
+                     ;; Web application library https://github.com/ring-clojure/ring
+                     ;; NB: clj-time pulled in by oc.lib
+                     ;; NB: joda-time pulled in by oc.lib via clj-time
+                     ;; NB: commons-codec pulled in by oc.lib
+                     [ring/ring-core "1.8.0" :exclusions [clj-time joda-time commons-codec]]
+                     ;; CORS library https://github.com/jumblerg/ring.middleware.cors
+                     [jumblerg/ring.middleware.cors "1.0.1"]
+                     ;; ;; Ring logging https://github.com/nberger/ring-logger-timbre
+                     ;; ;; NB: com.taoensso/encore pulled in by oc.lib
+                     ;; ;; NB: com.taoensso/timbre pulled in by oc.lib
+                     ;; ;; NB: org.clojure/tools.logging pulled in by oc.lib
+                     ;; [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore
+                     ;;                                          com.taoensso/timbre
+                     ;;                                          org.clojure/tools.logging]]
+                     ;; Web routing https://github.com/weavejester/compojure
+                     [compojure "1.6.1"]]
       :plugins [
         ;; Check for code smells https://github.com/dakrone/lein-bikeshed
         ;; NB: org.clojure/tools.cli is pulled in by lein-kibit
@@ -95,12 +125,12 @@
     }]
 
     ;; Production environment
-    ;; :prod {
-    ;;   :env {
-    ;;     :env "production"
-    ;;     :hot-reload "false"
-    ;;   }
-    ;; }
+    :prod {
+      :env {
+        :env "production"
+        :hot-reload "false"
+      }
+    }
 
     :uberjar {:aot :all}
 
@@ -108,12 +138,30 @@
 
   :repl-options {
     :welcome (println (str "\n" (slurp (clojure.java.io/resource "public/ascii_art.txt")) "\n"
-                      "OpenCompany Web REPL\n"
-                      "\nReady to do your bidding...\n"))
+                           "OpenCompany Web REPL\n"
+                           "\nReady to do your bidding...\n"))
     :init-ns oc.site
   }
+  
+;;   "start" ["auto" "start*"] ; start a development server
+;; "start*" ["do" "devel," "ocweb"]
+;; "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
+;; "auto-devel" ["auto" "devel"]
+;; "devel" ["do" "watch-site," "http-server"]
+;; "auto-watch-site" ["auto" "watch-site"]
+;; "watch-site" ["run" "dev"] ; build the HTML pages and watch for changes
+;; "http-server" ["ring" "server"] ; Start the ring handler
 
-  :aliases {"build" ["do" "clean," "deps," "compile"] ; clean and build code
+            
+  :aliases {"start" ["auto" "start*"] ; start a development server
+            "start*" ["do" "devel," "ocweb"]
+            "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
+            "auto-devel" ["auto" "devel"]
+            "devel" ["do" "watch-site," "watch-site"]
+            "auto-watch-site" ["auto" "watch-site"]
+            "watch-site" ["run" "dev"] ; build the HTML pages and watch for changes
+
+            "build" ["do" "clean," "deps," "compile"] ; clean and build code
             "autotest" ["with-profile" "qa" "do" "midje" ":autotest"] ; watch for code changes and run affected tests
             "test!" ["with-profile" "qa" "do" "build," "midje"] ; build, init the DB and run all tests
             "repl" ["with-profile" "+repl-config" "repl"]
@@ -144,4 +192,9 @@
 
   :main oc.site
   :nrepl {:port 8451}
+
+  :ring {:handler oc.dev/handler
+         :reload-paths ["site"] ; work around issue https://github.com/weavejester/lein-ring/issues/68
+         :port 3559
+         :host "localhost"}
 )

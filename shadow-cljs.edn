@@ -7,8 +7,7 @@
  :nrepl {:port 8450}
 
  :dependencies
- [
-  [rum "0.11.4"] ; https://github.com/tonsky/rum
+ [[rum "0.11.4"] ; https://github.com/tonsky/rum
   [org.martinklepsch/derivatives "0.3.1-alpha"] ; Chains of derived data https://github.com/martinklepsch/derivatives
   [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
 
@@ -35,10 +34,17 @@
 
   ;; NB: This needs pulled in after oc.lib
   [clojure-humanize "0.2.2" :excludes [com.andrewmcveigh/cljs-time]] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
-  ]
 
- :dev-http {3559 "public"}
+  [ring "1.8.1"]
+  [compojure "1.6.2" :exclusions [ring]]
+  [http-kit "2.5.0-alpha2"]]
+
+ :dev-http {3559 {:roots ["public"]
+                  :handler oc.dev/handler
+                  }}
  :builds
  {:webapp
   {:target :browser
-   :modules {:oc {:init-fn oc.web.core/init}}}}}
+   :modules {:oc {:init-fn oc.web.core/init}}
+   :repl-init-ns oc.web.core
+   :repl-pprint true}}}

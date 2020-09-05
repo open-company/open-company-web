@@ -1,8 +1,8 @@
 (ns oc.site
   (:require [hiccup.page :as hp]
             [environ.core :refer (env)]
-
-            [oc.shared :as shared]            
+            [cuerdas.core :as string]
+            [oc.shared :as shared]
             [oc.pages.not-found :as not-found]
             [oc.pages.server-error :as server-error]
             [oc.pages.about :as about]
@@ -35,66 +35,78 @@
    (if (fn? body) (body opts) body)
    (shared/footer page)])
 
-(def pages [{:name "404"
+(def pages [{:page-name "404"
              :page :404
              :head shared/head
              :body (partial body-wrapper not-found/not-found)
-             :title "Carrot | Page not found"}
-            {:name "500"
+             :title "Carrot | Page not found"
+             :target #{:dev :prod}}
+            {:page-name "500"
              :page :500
              :head shared/head
              :body (partial body-wrapper server-error/server-error)
-             :title "Carrot | Internal server error"}
-            {:name "about"
+             :title "Carrot | Internal server error"
+             :target #{:dev :prod}}
+            {:page-name "about"
              :page :about
              :head shared/head
              :body (partial body-wrapper about/about)
-             :title "Carrot | About"}
-            {:name "app-shell"
+             :title "Carrot | About"
+             :target #{:dev :prod}}
+            {:page-name "app-shell"
              :page :app-shell
              :head (:head app-shell/app-shell)
              :body (:body app-shell/app-shell)
-             :title "Carrot"}
-            {:name "app-shell"
-             :page :app-shell
+             :title "Carrot"
+             :target #{:dev}}
+            {:page-name "app-shell"
+             :page :prod-app-shell
              :head (:head app-shell/prod-app-shell)
              :body (:body app-shell/prod-app-shell)
-             :title "Carrot"}
-            {:name "index"
+             :title "Carrot"
+             :target #{:prod}}
+            {:page-name "index"
              :page :index
              :head shared/head
              :body (partial body-wrapper index/index)
-             :title "Carrot | Home"}
-            {:name "press-kit"
+             :title "Carrot | Home"
+             :target #{:dev :prod}}
+            {:page-name "press-kit"
              :page :press-kit
              :head shared/head
              :body (partial body-wrapper press-kit/press-kit)
-             :title "Carrot | Press kit"}
-            {:name "pricing"
+             :title "Carrot | Press kit"
+             :target #{:dev :prod}}
+            {:page-name "pricing"
              :page :pricing
              :head shared/head
              :body (partial body-wrapper pricing/pricing)
-             :title "Carrot | Pricing"}
-            {:name "privacy"
+             :title "Carrot | Pricing"
+             :target #{:dev :prod}}
+            {:page-name "privacy"
              :page :privacy
              :head shared/head
              :body (partial body-wrapper privacy/privacy)
-             :title "Carrot | Privacy Policy"}
-            {:name "slack"
+             :title "Carrot | Privacy Policy"
+             :target #{:dev :prod}}
+            {:page-name "slack"
              :page :slack
              :head shared/head
              :body (partial body-wrapper slack/slack)
-             :title "Carrot | Slack"}
-            {:name "slack-lander"
+             :title "Carrot | Slack"
+             :target #{:dev :prod}}
+            {:page-name "slack-lander"
              :page :slack-lander
              :head shared/head
              :body (partial body-wrapper slack/slack-lander)
-             :title "Carrot | Slack lander"}
-            {:name "terms"
+             :title "Carrot | Slack lander"
+             :target #{:dev :prod}}
+            {:page-name "terms"
              :page :terms
              :head shared/head
              :body (partial body-wrapper terms/terms)
-             :title "Carrot | Terms of Service"}])
+             :title "Carrot | Terms of Service"
+             :target #{:dev :prod}}])
 
 ;; (defn static-page [title content opts]
 ;;   (hp/html5 {:lang "en"}
@@ -122,19 +134,20 @@
 ;;             (:body pages/prod-app-shell)))
 
 
-(defn build-pages []
-  (for [{:keys [title head body name page] :as p} pages]
-    (->> (hp/html5 {:lang "en"}
-                   (if (fn? head) (head title) head)
-                   (if (fn? body) (body page options) body))
-         (spit (str "public/" name ".html")))))
+(defn build-pages [env-kw]
+  (println "Building pges for..." env-kw)
+  (doseq [{:keys [title head body page-name page target] :as p} pages
+          :let [filename (str "public/" page-name ".html")]]
+    (print (str "...page " filename "... "))
+    (if-not (env-kw target)
+      (println "skip!")
+      (do
+        (->> (hp/html5 {:lang "en"}
+                      (if (fn? head) (head title) head)
+                      (if (fn? body) (body page options) body))
+            (spit filename))
+        (println "built!"))))
+  (println "Static pages built!"))
 
-;; (defn -main [& args]
-;;   (println "DBG in -main" args)
-;;   (let [idx (index)
-;;         _ (println "DBG   idx:" idx)
-;;         hic (h/html idx)
-;;         _ (println "DBG   hic" hic)
-;;         page (str doc-type hic)
-;;         _ (println "DBG   page:" page)]
-;;     page))
+(defn -main [& [env-name & args]]
+  (build-pages (or (string/keyword env-name) :dev)))

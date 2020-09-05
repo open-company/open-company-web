@@ -8,6 +8,7 @@ cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.js $INIT_CWD/publi
 echo "Done!"
 mkdir $INIT_CWD/public/css/medium-editor
 mkdir $INIT_CWD/public/css/medium-editor/themes
+mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/
 mkdir $INIT_CWD/public/css/emojione
 mkdir $INIT_CWD/public/css/emoji-mart/
 echo "Copy medium-editor style..."
@@ -15,6 +16,9 @@ cp $INIT_CWD/node_modules/medium-editor/dist/css/medium-editor.css $INIT_CWD/pub
 echo "Done!"
 echo "Copy medium-editor theme style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
+echo "Done!"
+echo "Copy medium-editor-tc-mention style..."
+cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css
 echo "Done!"
 echo "Copy emojone style..."
 cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/emojione/emojione.css

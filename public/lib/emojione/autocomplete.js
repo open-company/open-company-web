@@ -9,20 +9,20 @@ function unicodeChar(unicode){
     return encodeURI(createHTMLUnicode(unicode));
   }
 }
-function emojiAutocomplete() {
+function emojiAutocomplete(emojiMartIndex) {
     $(".emoji-autocomplete").textcomplete([ {
             match: /\B:([\-+\w]{1,30})$/,
             search: function (term, callback) {
-                callback(EmojiMart.emojiIndex.search(term));
+                callback(emojiMartIndex.search(term));
             },
             unicodeFromShortname: function(shortname){
-              return EmojiMart.emojiIndex.emojis[shortname].unified;
+              return emojiMartIndex.emojis[shortname].unified;
             },
             imageTemplate: function(unicode){
               return unicodeChar(unicode);
             },
             SVGImageFromShortname: function(shortname){
-              return EmojiMart.emojiIndex.emojis[shortname].unified;
+              return emojiMartIndex.emojis[shortname].unified;
             },
             PNGImageFromShortname: function(shortname){
               var unicode = this.unicodeFromShortname(shortname);

@@ -11,7 +11,7 @@
     [:section.about-header
 
      [:h3.about-copy-header
-      "Why we built Carrot"]
+      "Why we built Carrot!"]
 
      [:div.about-copy
       [:div.about-copy-inner

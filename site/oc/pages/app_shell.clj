@@ -38,20 +38,18 @@
           shared/google-fonts
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/default.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/themes/default.css"}]
           ;; Emojione CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/emojione.css"}]
           ;; Emojone Sprites CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart.css"}]
-          ;; MediumEditorTCMention css
-          [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorTCMention/mention-panel.min.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart/emoji-mart.css"}]
           ;; MediumEditorMediaPicker
           [:link
            {:type "text/css"
             :rel "stylesheet"
             :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
           ;; Local env
-          [:script {:type "text/javascript" :src "/js/local-env.js"}]
+          [:script {:type "text/javascript" :src "/lib/local-env.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
@@ -60,7 +58,7 @@
           shared/ziggeo-css
           shared/ziggeo-js
           ;; Intercom (Support)
-          [:script {:src (shared/cdn "/js/intercom.js")}]
+          [:script {:src (shared/cdn "/lib/intercom.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Stripe
@@ -79,7 +77,7 @@
           shared/jquery
           shared/ie-jquery-fix
           ;; Static js files
-          [:script {:type "text/javascript" :src (shared/cdn "/js/static-js.js")}]
+          [:script {:type "text/javascript" :src (shared/cdn "/lib/static-js.js")}]
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -105,13 +103,15 @@
           [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           shared/bootstrap-js
           ;; Emoji One Autocomplete
-          [:script {:src "/js/emojione/autocomplete.js" :type "text/javascript"}]
+          [:script {:src "/lib/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
           shared/oc-js
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
+          ;; MediumEditor
+          [:script {:src "/lib/MediumEditor/index.js" :type "text/javascript"}]
           ;; MediumEditorToolbar
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorToolbar/toolbar.js"}]
           ;; MediumEditorPaste
@@ -133,9 +133,10 @@
           ;; MediumEditorHighlighterButton
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorHighlighterButton/highlighterbutton.js"}]
           ;; MediumEditorTCMention
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js"}]
-          ;; MediumEditorTCMention Panel
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.js"}]]})
+          ;; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js"}]
+          ;; ;; MediumEditorTCMention Panel
+          ;; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.js"}]
+          ]})
 
 (def prod-app-shell
   {:head [:head
@@ -188,7 +189,7 @@
           [:div#oc-loading]
           [:div.preload-interstitial]
           ;; Static js files
-          [:script {:src (shared/cdn "/js/static-js.js")}]
+          [:script {:src (shared/cdn "/lib/static-js.js")}]
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
@@ -203,7 +204,7 @@
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Intercom (Support)
-          [:script {:src (shared/cdn "/js/intercom.js")}]
+          [:script {:src (shared/cdn "/lib/intercom.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN

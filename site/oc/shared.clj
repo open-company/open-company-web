@@ -556,9 +556,9 @@
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
 
-(def oc-js [:script {:src (cdn "/oc.js")}])
+(def oc-js [:script {:src (cdn "/js/oc.js")}])
 
-(def oc-assets-js [:script {:src (cdn "/oc_assets.js")}])
+(def oc-assets-js [:script {:src (cdn "/js/oc_assets.js")}])
 
 (def ph-banner
   [:div.ph-banner
@@ -612,8 +612,8 @@
    bootstrap-css
     ;; Local css
    [:link {:href (cdn "/css/app.main.css"), :rel "stylesheet"}]
-    ;; Fallback for the CDN compacted css
-   [:link {:href (cdn "/main.css") :rel "stylesheet"}]
+  ;;   ;; Fallback for the CDN compacted css
+  ;;  [:link {:href (cdn "/css/main.css") :rel "stylesheet"}]
     ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
     ;; WARNING: Respond.js doesn't work if you view the page via file://
    "<!--[if lt IE 9]>
@@ -627,9 +627,9 @@
    jquery
    ie-jquery-fix
     ;; Static js files
-   [:script {:src (cdn "/js/static-js.js")}]
+   [:script {:src (cdn "/lib/static-js.js")}]
     ;; Intercom (Support chat)
-   [:script {:src (cdn "/js/intercom.js")}]
+   [:script {:src (cdn "/lib/intercom.js")}]
     ;; Google Analytics
    [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]

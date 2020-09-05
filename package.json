@@ -29,6 +29,7 @@
     "jwt-decode": "2.2.0",
     "localforage": "1.5.3",
     "medium-editor": "5.23.3",
+    "medium-editor-tc-mention": "github:open-company/medium-editor-tc-mention",
     "moment-timezone": "0.5.31",
     "react": "16.11.0",
     "react-color": "^2.18.1",
