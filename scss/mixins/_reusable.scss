@@ -289,3 +289,44 @@
   mask-size: #{$size};
   -webkit-mask-size: #{$size};
 }
+
+@mixin face-pile($width: 18) {
+  $margin: $width / 9;
+  $total-width: $width + ($margin * 2);
+  div.face-pile {
+    position: relative;
+
+    &.show-border {
+      div.face-pile-face {
+        background-color: transparent;
+        border: #{$margin}px solid transparent;
+      }
+    }
+
+    div.face-pile-face {
+      float: left;
+      width: #{$total-width}px;
+      height: #{$total-width}px;
+      background-color: transparent;
+      border: #{$margin}px solid transparent;
+      border-radius: 50%;
+      margin-left: -#{$width / 1.8}px;
+
+      @include user-profile($width);
+
+      @include mobile(){
+        $mobile-width: $width - 2;
+        width: #{$mobile-width + ($margin + 2)}px;
+        height: #{$total-width}px;
+        border: 1px solid transparent;
+        margin-left: -#{$mobile-width / 2}px;
+
+        @include user-profile($mobile-width);
+      }
+
+      &:first-child {
+        margin-left: 0px;
+      }
+    }
+  }
+}

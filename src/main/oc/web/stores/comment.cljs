@@ -59,14 +59,12 @@
         new-comment-data (au/parse-comment (dispatcher/org-data db org-slug) activity-data comment-data)
         all-comments (concat comments-data [new-comment-data])
         sorted-comments (cu/sort-comments all-comments)
-        current-user-id (jwt/user-id)
-        for-you-copy (au/for-you-context (assoc activity-data :replies-data sorted-comments) current-user-id)]
+        current-user-id (jwt/user-id)]
     (-> db
      (assoc-in sorted-comments-key sorted-comments)
      ;; Reset new comments count
      (assoc-in (conj activity-key :new-comments-count) 0)
      (assoc-in (conj activity-key :unseen-comments) 0)
-     (assoc-in (conj activity-key :for-you-context) for-you-copy)
      (update-in (conj activity-key :links) (fn [links]
                                              (mapv (fn [link]
                                               (if (= (:rel link) "follow")
@@ -310,11 +308,23 @@
               old-comments-data (filterv :links all-old-comments-data)
               ;; Add the new comment to the comments list, make sure it's not present already
               new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-              new-sorted-comments-data (cu/sort-comments new-comments-data)]
+              new-sorted-comments-data (cu/sort-comments new-comments-data)
+              with-replies-data (assoc with-last-activity-at :replies-data new-sorted-comments-data)
+              current-user-id (jwt/user-id)
+              new-reply-item (-> with-replies-data
+                               (assoc :for-you-context (au/for-you-context with-replies-data current-user-id))
+                               (select-keys au/preserved-keys))
+              replies-data-key (dispatcher/container-key org-slug :replies dispatcher/recent-activity-sort)
+              update-items-fn (fn [items] (map (fn [item] (if (= (:uuid item) activity-data) new-reply-item item)) items))]
           (-> db
-           (assoc-in sorted-comments-key new-sorted-comments-data)
-           (update-in replies-badge-key #(or should-badge-replies? %))
-           (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-last-activity-at)))
+              (assoc-in sorted-comments-key new-sorted-comments-data)
+              (update-in replies-badge-key #(or should-badge-replies? %))
+              (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-replies-data)
+              (update-in replies-data-key (fn [replies-data]
+                                            (-> replies-data
+                                                (assoc :replies-data new-sorted-comments-data)
+                                                (update :posts-list update-items-fn)
+                                                (update :items-to-render update-items-fn))))))
         ;; In case we don't have the comments already loaded just update the :last-activity-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
         (-> db

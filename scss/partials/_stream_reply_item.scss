@@ -6,6 +6,7 @@ div.refresh-button-container.replies-refresh-button-container {
 
   @include mobile() {
     width: 100vw;
+    bottom: calc(#{$mobile_navbar_height}px + 24px);
   }
 }
 

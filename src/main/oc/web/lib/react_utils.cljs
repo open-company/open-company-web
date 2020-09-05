@@ -3,6 +3,3 @@
 
 (defn build [component props & children]
   (apply react/createElement component (clj->js props) children))
-
-(defn build-class [component props]
-  #(new component props))

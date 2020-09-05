@@ -441,6 +441,7 @@
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
         with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))]
+    (dis/dispatch! [:org-edit-save])
     (api/patch-org org-patch-link with-trimmed-name
       (fn [{:keys [success status] :as resp}]
         (if success

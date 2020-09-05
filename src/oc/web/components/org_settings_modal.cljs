@@ -22,7 +22,7 @@
             [oc.web.components.ui.email-domains :refer (email-domains)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(def color-picker (partial rutils/build react-color/ChromePicker))
+(def color-picker (partial rutils/build js/ReactColor.ChromePicker))
 
 (def color-presets [{:rgb {:r 251 :g 94 :b 72}
                      :hex "#FB5E48"}

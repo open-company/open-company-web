@@ -540,8 +540,13 @@ div.stream-item {
         @include OC_Body_Book();
         font-size: 16px;
         line-height: 22px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-items: center;
+        align-items: center;
 
         &.unseen-replies {
+
           span.for-you-body-label {
             @include OC_Body_Bold_Italic();
           }
@@ -555,9 +560,18 @@ div.stream-item {
           }
         }
 
+        div.for-you-authors {
+          flex: 0 0 auto;
+          margin-right: 8px;
+          & > {
+            @include face-pile(20);
+          }
+        }
+
         span.for-you-body-label {
           color: var(--color);
           @include OC_Body_Book_Italic();
+          flex: 0 0 auto;
         }
 
         div.separator-dot {
@@ -566,12 +580,12 @@ div.stream-item {
           background-color: var(--light-color);
           border-radius: 50%;
           margin: 1px 5px 0 5px;
-          display: inline-block;
-          vertical-align: middle;
+          flex: 0 0 auto;
         }
         
         span.time-since {
           color: var(--light-color);
+          flex: 0 0 auto;
         }
       }
     }
@@ -811,10 +825,6 @@ div.stream-item {
         // position: absolute;
         // left: 274px;
         // top: 0;
-
-        @include mobile() {
-          display: none;
-        }
       }
     }
   }

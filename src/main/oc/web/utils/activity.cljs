@@ -619,45 +619,52 @@
          comments (if (seq unseen-comments)
                     unseen-comments
                     replies-data)
-         user-name #(if (:self? %)
-                      "you"
-                      (or (:pointed-name %) (:first-name %) (:name %)))
-         commenters (->> comments
-                         (map :author)
-                         (group-by :user-id)
-                         vals
-                         (map first)
-                         (map user-name)
-                         (remove s/blank?))
          last-comment (last comments)
-         mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
-         mention? (.match (:body last-comment) mention-regexp)
-         subject (case (count commenters)
-                   0
-                   ""
-                   1
-                   (first commenters)
-                   2
-                   (str (first commenters) " and " (last commenters))
-                   3
-                   (str (first commenters) ", " (second commenters) " and 1 other")
-                   ;; :else
-                   (str (first commenters) ", " (second commenters) " and " (- (count commenters) 2) " others"))
-         multiple-comments? (> (count comments) 1)
-         verb (cond (seq comments)
-                    (if (seq unseen-comments)
-                      (if multiple-comments?
-                        " left new comments"
-                        " left a new comment")
-                      " commented")
-                    mention?
-                    " mentioned you"
-                    :else
-                    (if multiple-comments?
-                      " left comments"
-                      " left a comment"))]
-     {:label (s/capital (str subject verb))
-      :timestamp (:created-at last-comment)}))
+         old-context (:for-you-context entry-data)]
+     (if (= (:timestamp old-context) (:created-at last-comment))
+       old-context
+       (let [user-name #(if (:self? %)
+                          "you"
+                          (or (:pointed-name %) (:first-name %) (:name %)))
+             authors-list (->> comments
+                               (map :author)
+                               (group-by :user-id)
+                               vals
+                               (map first)
+                               (sort-by (juxt :self? :created-at))
+                               (reverse))
+             commenters (->> authors-list
+                             (map user-name)
+                             (remove s/blank?))
+             mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
+             mention? (.match (:body last-comment) mention-regexp)
+             subject (case (count commenters)
+                       0
+                       ""
+                       1
+                       (first commenters)
+                       2
+                       (str (first commenters) " and " (last commenters))
+                       3
+                       (str (first commenters) ", " (second commenters) " and 1 other")
+                       ;; :else
+                       (str (first commenters) ", " (second commenters) " and " (- (count commenters) 2) " others"))
+             multiple-comments? (> (count comments) 1)
+             verb (cond (seq comments)
+                        (if (seq unseen-comments)
+                          (if multiple-comments?
+                            " left new comments"
+                            " left a new comment")
+                          " commented")
+                        mention?
+                        " mentioned you"
+                        :else
+                        (if multiple-comments?
+                          " left comments"
+                          " left a comment"))]
+         {:label (s/capital (str subject verb))
+          :authors authors-list
+          :timestamp (:created-at last-comment)}))))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
@@ -677,7 +684,7 @@
     (as-> entry-data e
      (assoc e :comments-loaded? comments-loaded?)
      (assoc e :replies-data (parse-comments org-data (assoc e :headline (:headline full-entry)) temp-comments container-seen-at reset-collapse-comments?))
-     (update e :for-you-context #(or % (for-you-context e (jwt/user-id))))
+     (update e :for-you-context #(for-you-context e (jwt/user-id)))
      (assoc e :comments-count (if comments-loaded? (count comments) comments-count))
      (update e :unseen-comments #(count (filter :unseen (:replies-data e))))
      (assoc e :ignore-comments (comments-ignore? e container-seen-at)))))

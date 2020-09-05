@@ -43,11 +43,11 @@
              (map #(contains? rgb %) [:r :g :b]))
     (str (:r rgb) "," (:g rgb) "," (:b rgb))))
 
-(defn primary-color-from-rgb [rgb]
+(defn color-from-rgb [rgb]
   (when-let [rgbs (rgb-string rgb)]
     (str "rgb(" rgbs ")")))
 
-(defn primary-light-color-from-rgb [rgb]
+(defn light-color-from-rgb [rgb]
   (when-let [rgbs (rgb-string rgb)]
     (str "rgba(" rgbs ", 0.16)")))
 
@@ -55,23 +55,31 @@
   (when-let [theme-kw (theme/computed-theme)]
     (get ls/default-brand-color theme-kw)))
 
+(defn css-color [color-map]
+  (if (:rgb color-map)
+    (color-from-rgb (:rgb color-map))
+    (:hex color-map)))
+
+(defn css-light-color [color-map]
+  (when (:rgb color-map)
+    (light-color-from-rgb (:rgb color-map))))
+
 (defun set-brand-color!
-  ([nil])
+  ([nil] nil)
 
   ([primary-color :guard string? primary-light-color :guard string? secondary-color :guard string?]
    (.. js/document -documentElement -style (setProperty "--primary-color" primary-color))
    (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color))
    (.. js/document -documentElement -style (setProperty "--secondary-color" secondary-color)))
+  
+  ([brand-color-map :guard #(and (:primary %) (:secondary %))]
+   (recur (css-color (:primary brand-color-map))
+          (css-light-color (:primary brand-color-map))
+          (css-color (:secondary brand-color-map))))
 
-  ([color-rgb :guard #(and (:r %) (:g %) (:b %)) button-color :guard string?]
-   (recur (primary-color-from-rgb color-rgb) (primary-light-color-from-rgb color-rgb) button-color))
-
-  ([color-map :guard #(and (:rgb %) (:button-color %))]
-   (recur (:rgb color-map) (:button-color color-map)))
-
-  ([brand-color-map :guard #(and (:dark %) (:light %))]
+  ([brand-colors-map :guard #(and (:dark %) (:light %))]
    (when-let [theme-key (theme/computed-theme)]
-     (recur (get brand-color-map theme-key))))
+     (recur (get brand-colors-map theme-key))))
 
   ([org-data :guard map?]
    (recur (or (:brand-color org-data) (default-brand-color)))))

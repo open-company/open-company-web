@@ -19,8 +19,7 @@
                                                         :selectMentionCallback select-mention-callback}))
                                              panel-el))
                        :activeTriggerList ["@"]}]
-    (js/console.log "DBG TCMention" tc-mention/TCMention)
-    (react-utils/build-class tc-mention/TCMention (clj->js mention-props))))
+    (react-utils/build tc-mention/TCMention (clj->js mention-props))))
 
 (defn- get-slack-usernames [user]
   (let [slack-display-name [(:slack-display-name user)]

@@ -188,14 +188,14 @@
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
-              ;; [:button.mlb-reset.tab-button.topics-tab
-              ;;   {:on-click #(do
-              ;;                 (.stopPropagation %)
-              ;;                 (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
-              ;;    :class (when is-topics
-              ;;             "active")}
-              ;;   [:span.tab-icon]
-              ;;   [:span.tab-label "Explore"]]
+              [:button.mlb-reset.tab-button.topics-tab
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
+                 :class (when is-topics
+                          "active")}
+                [:span.tab-icon]
+                [:span.tab-label "Explore"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)

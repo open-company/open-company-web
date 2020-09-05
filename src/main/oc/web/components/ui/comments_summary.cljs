@@ -9,7 +9,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.face-pile :refer (face-pile)]))
 
 (defn get-author-name [author]
   (if (:author? author)
@@ -27,8 +27,6 @@
     (str (string/capital (get-author-name (first authors))) ", "
          (get-author-name (second authors)) " and "
          (- (count authors) 2) " others commented")))
-
-(def max-face-pile 3)
 
 (rum/defc comments-summary < rum/static
   [{:keys [entry-data
@@ -61,17 +59,7 @@
         comments-count (if comments-loaded?
                          (count unwrapped-comments)
                          (:count comments-link))
-        face-pile-count (if hide-face-pile?
-                          0
-                          (min max-face-pile (count comments-authors)))
-        is-mobile? (responsive/is-mobile-size?)
-        faces-to-render (take max-face-pile comments-authors)
-        face-pile-width (if (pos? face-pile-count)
-                          (if is-mobile?
-                            (+ 8 (* 12 face-pile-count))
-                            (+ 10 (* 12 face-pile-count)))
-                            0)
-        show-new-tag? (pos? new-comments-count)]
+        is-mobile? (responsive/is-mobile-size?)]
     (when comments-count
       [:div.is-comments
         {:class (when show-new-tag? "has-new-comments")
@@ -101,13 +89,8 @@
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)
                       (not (zero? comments-count))))
-          [:div.is-comments-authors.group
-            {:style {:width (str face-pile-width "px")}
-             :class (when (> (count faces-to-render) 1) "show-border")}
-            (for [user-data faces-to-render]
-              [:div.is-comments-author
-                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-                (user-avatar-image user-data {:tooltip? (not (responsive/is-tablet-or-mobile?))})])])
+          [:div.is-comments-authors
+           (face-pile {:width 16 :faces comments-authors})])
         (when (or show-bubble-icon?
                   (and (not hide-label?)
                        (pos? comments-count)))

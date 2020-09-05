@@ -620,19 +620,44 @@ div.pricing-subheadline {
 }
 
 div.pricing-table {
-  background-color: $deep_navy;
-  border-radius: 16px;
-  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
+  // background-color: $deep_navy;
+  // border-radius: 16px;
+  // box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 960px;
   margin: 40px auto 0;
   padding: 40px;
   position: relative;
-  min-height: 240px;
-  display: flex;
-  flex-direction: row;
-  align-items: normal;
-  align-content: flex-start;
+  // min-height: 240px;
+  // display: flex;
+  // flex-direction: row;
+  // align-items: normal;
+  // align-content: flex-start;
+
+  table.pricing-table {
+    border-radius: 4px;
+    margin: 0 auto;
+    display: table;
+    border-collapse: separate;
+    box-sizing: border-box;
+    border-spacing: 2px;
+    border-color: grey;
+    text-align: left;
+    border-top: 2px solid #{rgba($deep_navy, 0.15)};
+    border-left: 2px solid #{rgba($deep_navy, 0.15)};
+
+    tr {
+      th, td {
+        padding: 4px;
+        border-bottom: 2px solid #{rgba($deep_navy, 0.15)};
+        border-right: 2px solid #{rgba($deep_navy, 0.15)};
+      }
+    }
+  }
+
+  div.non-profits {
+    margin-top: 24px;
+  }
 
   @include mobile() {
     margin-top: 24px;

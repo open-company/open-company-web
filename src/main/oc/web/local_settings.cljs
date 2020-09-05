@@ -106,10 +106,12 @@
 (def digest-times #{:700 :1200 :1700})
 
 ;; Primary color
+(def default-color
+  {:primary {:rgb {:r 104 :g 51 :b 241}
+             :hex "#6833F1"}
+   :secondary {:rgb {:r 244 :g 244 :b 244}
+               :hex "#FFFFFF"}})
+
 (def default-brand-color
-  {:light {:rgb {:r 104 :g 51 :b 241}
-           :hex "#6833F1"
-           :button-color "#FFFFFF"}
-   :dark {:rgb {:r 104 :g 51 :b 241}
-          :hex "#6833F1"
-          :button-color "#FFFFFF"}})
+  {:light default-color
+   :dark default-color})

@@ -213,7 +213,7 @@
                      :cy "58"
                      :r "50"
                      :fill "transparent"
-                     :stroke (:hex (ou/current-brand-color))
+                     :stroke (-> (ou/current-brand-color) :primary :hex)
                      :stroke-width "16"
                      :class (when @(:first-render-done s) (str "wrt-donut-segment-" seen-percent))}]
                   [:g.wrt-chart-text

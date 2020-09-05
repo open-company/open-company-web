@@ -11,7 +11,7 @@
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
                                ui-mixins/refresh-tooltips-mixin
-  [s user-data {:keys [preferred-avatar-size tooltip?] :or {preferred-avatar-size 72}}]
+  [s user-data {:keys [preferred-avatar-size tooltip?] :or {preferred-avatar-size 72 tooltip? (not (responsive/is-tablet-or-mobile?))}}]
   (let [use-default @(::use-default s)
         default-avatar (store/user-icon (:user-id user-data))
         user-avatar-url (cond
