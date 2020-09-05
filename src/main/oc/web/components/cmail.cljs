@@ -25,6 +25,7 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -198,7 +199,7 @@
 (defn- setup-headline [state]
   (when-let [headline-el  (headline-element state)]
     (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
-    (js/emojiAutocomplete)
+    (emoji-autocomplete/autocomplete)
     (fullscreen-focus-headline state)))
 
 (defn headline-on-paste

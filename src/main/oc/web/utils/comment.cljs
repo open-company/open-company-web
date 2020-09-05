@@ -13,6 +13,7 @@
   (let [extentions (if (seq users-list)
                      #js {"mention" (mention-utils/mention-ext users-list)}
                      #js {})
+        _ (js/console.log "DBG extentions" extentions)
         config {:toolbar false
                 :anchorPreview false
                 :imageDragging false

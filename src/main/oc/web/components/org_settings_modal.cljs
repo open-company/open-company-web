@@ -143,6 +143,13 @@
                :color text-color}}
       "Button text"]]))
 
+(defn- rgb-from-hex [color] 
+    (let [colors (rest (string/split color #""))
+          red (take 2 colors)
+          green (take 2 (drop 2 colors))
+          blue (take 2 (drop 4 colors))]
+      (map #(-> (conj % "0x") (string/join) (read-string)) {:r red :g green :b blue})))
+
 (rum/defcs org-settings-modal <
   ;; Mixins
   rum/reactive
@@ -253,6 +260,10 @@
               :value (:hex current-brand-color)
               :pattern #"(?i)^[0-9A-Z]{6}$"
               :read-only true
+              :on-change #(when-not (.. % -target -validityState -patternMismatch)
+                            (let [hex-color (.. % -target -value)
+                                  rgb-color (css-color)]
+                              (change-brand-color (.. % -target -value))))
               :on-click #(reset! (::show-color-picker s) true)}]
             (when @(::show-color-picker s)
               [:div.color-picker-container

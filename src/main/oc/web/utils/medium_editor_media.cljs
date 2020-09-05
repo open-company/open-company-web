@@ -19,6 +19,7 @@
             [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            (oc.web.lib.emoji-autocomplete :as emoji-autocomplete)
             ["medium-editor" :as medium-editor]))
 
 (defn get-media-picker-extension [s]
@@ -475,4 +476,4 @@
         (let [classes (:classes options)]
           (when (and (string/includes? classes "emoji-autocomplete")
                      (not (:paywall? options)))
-            (js/emojiAutocomplete)))))))
+            (emoji-autocomplete/autocomplete)))))))

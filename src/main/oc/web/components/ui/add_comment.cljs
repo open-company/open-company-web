@@ -15,6 +15,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.utils.medium-editor-media :as me-media-utils]
+            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
@@ -275,7 +276,7 @@
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
                            (multiple-lines? s)
-                           (utils/after 2500 #(js/emojiAutocomplete))
+                           (utils/after 2500 emoji-autocomplete/autocomplete)
                            s)
                           :will-update (fn [s]
                            (let [props (-> s :rum/args first)
