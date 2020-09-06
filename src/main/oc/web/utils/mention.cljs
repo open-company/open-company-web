@@ -2,24 +2,23 @@
   (:require [oc.web.lib.react-utils :as react-utils]
             ["react" :as react]
             ["react-dom" :as react-dom]
-            ["medium-editor-tc-mention" :as tc-mention]))
-
-;; (defn tc-mention-comp (react-utils/build tc-mention/TCMention))
+            ["medium-editor-tc-mention" :as tc-mention]
+            [oc.web.components.ui.custom-tag :refer (CustomizedTagComponent)]))
 
 (defn mention-ext [users-list]
   (let [mention-props {:tagName "span"
                        :extraPanelClassName "oc-mention-panel"
                        :extraTriggerClassNameMap {"@" "oc-mention"}
                        :renderPanelContent (fn [panel-el current-mention-text select-mention-callback]
-                                            (.render react-dom/ReactDOM
-                                             (.createElement react/React
-                                              tc-mention/CustomizedTagComponent
-                                              (clj->js {:currentMentionText current-mention-text
-                                                        :users (clj->js users-list)
-                                                        :selectMentionCallback select-mention-callback}))
-                                             panel-el))
+                                             (js/console.log "DBG panel-el childs:" (.-children panel-el))
+                                             (react-dom/render
+                                              (react/createElement CustomizedTagComponent
+                                                                   (clj->js {"currentMentionText" current-mention-text
+                                                                             "users" (clj->js users-list)
+                                                                             "selectMentionCallback" select-mention-callback}))
+                                              panel-el))
                        :activeTriggerList ["@"]}]
-    (react-utils/build tc-mention/TCMention (clj->js mention-props))))
+    (tc-mention/TCMention. (clj->js mention-props))))
 
 (defn- get-slack-usernames [user]
   (let [slack-display-name [(:slack-display-name user)]
@@ -36,4 +35,4 @@
                                             ;; is active
                                             (or (= (:status %) "active")
                                                 (= (:status %) "unverified")))
-     fixed-users)))) 
+     fixed-users))))
