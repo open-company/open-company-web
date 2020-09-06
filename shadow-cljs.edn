@@ -45,6 +45,8 @@
  :builds
  {:webapp
   {:target :browser
+   :devtools {:ignore-warnings true
+              :before-load oc.web.core/on-js-reload}
    :modules {:oc {:init-fn oc.web.core/init}}
    :repl-init-ns oc.web.core
    :repl-pprint true}}}
