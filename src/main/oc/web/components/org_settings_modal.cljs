@@ -1,7 +1,6 @@
 (ns oc.web.components.org-settings-modal
   (:require [rum.core :as rum]
             [goog.dom :as gdom]
-            [cljsjs.react-color]
             [oops.core :refer (oget oset!)]
             [cuerdas.core :as string]
             [oc.web.lib.react-utils :as rutils]
@@ -20,7 +19,8 @@
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.email-domains :refer (email-domains)]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            ["react-color" :as react-color]))
 
 (def color-picker (partial rutils/build react-color/ChromePicker))
 
