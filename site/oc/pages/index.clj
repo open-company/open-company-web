@@ -9,14 +9,14 @@
       [:section.cta.group
 
         [:h1.headline
-          "Your team’s news feed"]
-        [:div.subheadline.big-web-tablet-only
-          "The latest updates from your team, simplified."]
+          "A better news feed for team updates "]
+        [:div.subheadline
+         "Carrot makes it simple to know what's happening on your team without all the back-and-forth chatter. Ideal for remote teams and asynchronous updates."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Try Carrot"]
+            "Try Carrot for free"]
           [:span.get-started-subtitle
             "Open source and free."]]
 
