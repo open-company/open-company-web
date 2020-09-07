@@ -41,25 +41,29 @@
     height: 32px;
     background-color: var(--opac-background-color-1);
     border-radius: 4px;
-    padding: 7px 8px;
+    padding: 6px 7px;
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
     margin-top: 8px;
-    border: none;
     outline: none;
+    border: 1px solid var(--opac-background-color-1); // transparent border since it's the same color of the bg
 
     @include placeholder(){
       color: var(--ultralight-color);
     }
 
     &:focus, &:active {
-      border: none;
+      border: 1px solid var(--opac-background-color-1);
       outline: none;
     }
 
     &.not-allowed {
       cursor: not-allowed;
+    }
+
+    &:not(:valid) {
+      border: 1px solid $carrot_orange;
     }
 
     &.half-field {
