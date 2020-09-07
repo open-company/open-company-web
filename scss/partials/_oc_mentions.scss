@@ -13,9 +13,9 @@
 
 div.oc-mention-panel {
   border-radius: 6px;
-  background-color: $deep_navy;
+  background-color: var(--tooltip-background-color);
   width: 226px;
-  color: white;
+  color: var(--tooltip-color);
   max-height: 45vh;
   overflow-y: auto;
   overflow-x: hidden;
