@@ -39,6 +39,7 @@
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/themes/default.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/MediumEditorTCMention/mention-panel.min.css"}]
           ;; Emojione CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/emojione.css"}]
           ;; Emojone Sprites CSS
