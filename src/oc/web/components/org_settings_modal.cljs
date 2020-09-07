@@ -314,14 +314,17 @@
               "Choose the color of buttons and links."]
             [:div.field-label
               "Button/link color"]
+            [:div.field-description
+              "Ie: red, green or #0000ff"]
             [:input.field-value.oc-input
              {:type "text"
               :class (when (:error org-editing) "error")
               :value @(::primary-color-value s)
               :pattern colors-reg-exp
+              :placeholder "Ie: red, green or #0000ff"
               :on-focus #(reset! (::show-color-picker s) true)
               :on-change (fn [e]
-                           (let [v (.. e -target -value)]
+                           (let [v (string/lower (.. e -target -value))]
                              (reset! (::primary-color-value s) v)
                              (when (.. e -target checkValidity)
                                (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
