@@ -2,20 +2,28 @@
   (:require [oc.web.lib.react-utils :as react-utils]
             ["react" :as react]
             ["react-dom" :as react-dom]
+            ["medium-editor" :as medium-editor]
             ["medium-editor-tc-mention" :as tc-mention]
             [oc.web.components.ui.custom-tag :refer (CustomizedTagComponent)]))
 
-(defn mention-ext [users-list]
+(defn- destroy [editor-node]
+  (let [me-editor (.getEditorFromElement medium-editor editor-node)
+        mention-extention (me-editor.base.getExtensionByName "mention")]
+    (when mention-extention
+      (.hidePanel mention-extention))))
+
+(defn mention-ext [editor-node users-list]
   (let [mention-props {:tagName "span"
                        :extraPanelClassName "oc-mention-panel"
                        :extraTriggerClassNameMap {"@" "oc-mention"}
                        :renderPanelContent (fn [panel-el current-mention-text select-mention-callback]
-                                             (js/console.log "DBG panel-el childs:" (.-children panel-el))
                                              (react-dom/render
                                               (react/createElement CustomizedTagComponent
                                                                    (clj->js {"currentMentionText" current-mention-text
                                                                              "users" (clj->js users-list)
-                                                                             "selectMentionCallback" select-mention-callback}))
+                                                                             "selectMentionCallback" select-mention-callback
+                                                                            ;;  "hidePanel" (fn [] (destroy editor-node))
+                                                                             }))
                                               panel-el))
                        :activeTriggerList ["@"]}]
     (tc-mention/TCMention. (clj->js mention-props))))

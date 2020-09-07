@@ -3,34 +3,13 @@
             [cuerdas.core :as string]
             [oops.core :refer (oget oset!)]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.react-utils :as react-utils]
             ["react" :as react]
-            ["react-dom" :as react-dom])
+            ["react-dom" :as react-dom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType])
   (:use-macros [oc.shared.macros :only [goog-extend]]))
-
-(defn- is-hidden [el]
-  (when-let [style (.getComputedStyle js/window el)]
-    (or (= (oget style :?display) "none")
-        (= (oget style :?visibility) "hidden")
-        (nil? (oget el :?offsetParent)))))
-
-(defn- add-event [el e-name cb]
-  (cond
-    (fn? (oget el :?addEventListener))
-    (.addEventListener el e-name cb false)
-    (fn? (oget el :?attachEvent))
-    (.attachEvent el (str "on" e-name) cb)
-    :else
-    (oset! el (str "on" e-name) cb)))
-
-(defn- remove-event [el e-name cb]
-  (cond
-    (fn? (oget el :?addEventListener))
-    (.removeEventListener el e-name cb false)
-    (fn? (oget el :?attachEvent))
-    (.detachEvent el (str "on" e-name) cb)
-    :else
-    (js-delete el (str "on" e-name))))
 
 (defn- user-display-name [user]
   (if (seq (oget user "?name"))
@@ -55,36 +34,45 @@
     (oget user "?email")))
 
 (defn- user-slack-username [user]
-  (if (= (oget user "?selectedKey") "slack-username")
-    (oget user "?slack-username")
-    (first (oget user "?slack-usernames"))))
+  (or (oget user "?slack-username")
+      (oget user "?slack-usernames.?0")))
+
+(defn- subline-text [user]
+  (oget user "?email"))
 
 (defn list-item [props]
   (let [user (oget props "?user")
         avatar-style (clj->js {:backgroundImage (str "url(" (oget user "?avatar-url") ")")})
         display-name (user-display-name user)
-        slack-username (user-slack-username user)]
+        slack-username (user-slack-username user)
+        alt-subline (subline-text user)]
     (react/createElement "div"
                          (clj->js {:key (str "user-" (oget user "?user-id") "-" (oget user "?email") "-" (rand 100))
                                    :className (string/join " " ["oc-mention-option"
-                                                                 (when (= (oget props "?selectedIndex") (oget props "?index"))
-                                                                   "active ")
-                                                                 (when (seq (oget user "?avatar-url"))
-                                                                   "has-avatar ")])
+                                                                (when (= (oget props "?selectedIndex") (oget props "?index"))
+                                                                  "active ")
+                                                                (when (seq (oget user "?avatar-url"))
+                                                                  "has-avatar ")])
                                    :data-name display-name
                                    :data-user-id (oget user "?user-id")
                                    :data-slack-username slack-username
-                                   :on-mouseenter (fn [e]
-                                                     (when (fn? (oget props "?hoverItem"))
-                                                       (props.hoverItem e (oget props "?index"))))
-                                   :on-click (fn [_]
-                                               (when (fn? (oget props "?clickCb"))
-                                                 (props.clickCb user)))})
-                         (clj->js [(react/createElement "div" (clj->js {:className "oc-mention-option-avatar"
-                                                                        :style avatar-style}))
-                                   (react/createElement "div" (clj->js {:className (string/join " "
-                                                                                                 ["oc-mention-option-subline"
-                                                                                                  slack-username])}))]))))
+                                   :onMouseEnter (fn [e]
+                                                   (when (fn? (oget props "?hoverItem"))
+                                                     (props.hoverItem e (oget props "?index"))))
+                                   :onClick (fn [_]
+                                              (when (fn? (oget props "?clickCb"))
+                                                (props.clickCb user)))})
+                         (react/createElement "div"
+                                              (clj->js {:className "oc-mention-option-avatar"
+                                                        :style avatar-style}))
+                         (react/createElement "div"
+                                              (clj->js {:className "oc-mention-option-title"})
+                                              display-name)
+                         (react/createElement "div"
+                                              (clj->js {:className (string/join " " ["oc-mention-option-subline"
+                                                                                     (when (seq slack-username)
+                                                                                       "slack-icon")])})
+                                              (or slack-username alt-subline)))))
 
 (defn- value-lookup [value search-value]
   (when (seq value)
@@ -101,16 +89,16 @@
         (oget user "?slack-usernames")))
 
 (defn- arrow-keys [that e options index-fn index-default]
-  (if (.. that -state -selectedIndex)
-    (that.setState #js {:selectedIndex (mod (index-fn (.. that -state -selectedIndex)) (count options))})
-    (that.setState #js {:selectedIndex index-default}))
+  (if-let [selected-index (oget that "?state.?selectedIndex")]
+    (that.setState (clj->js {"selectedIndex" (mod (index-fn selected-index) (oget options "?length"))}))
+    (that.setState (clj->js {"selectedIndex" index-default})))
   (utils/event-stop e))
 
 (defn- select-current [that e]
-  (when (.. that -state -selectedIndex)
-    (let [user (-> (that.filterUsers (.-props that))
+  (when-let [selected-index (oget that "state.?selectedIndex")]
+    (let [user (-> (that.filterUsers (oget that "?props"))
                    vec
-                   (nth (.. that -state -selectedIndex)))]
+                   (nth selected-index))]
       (.selectItem that user)))
   (utils/event-stop e))
 
@@ -119,8 +107,23 @@
              ([props]
               (this-as this
                        (goog/base this props)
-                       (aset this "state" (clj->js {"selectedIndex" 0}))
+                       (oset! this "!state" (clj->js {"selectedIndex" 0}))
+                       ;; Replace the inherited functions with a one bounded to the current this instead of the parent
+                       (oset! this "setState" (.bind (oget this "setState") this))
+                       (oset! this "componentDidMount" (.bind (oget this "componentDidMount") this))
+                       (oset! this "componentWillUnmount" (.bind (oget this "componentWillUnmount") this))
+                       (oset! this "addBindedEvent" (.bind (oget this "addBindedEvent") this))
+                       (oset! this "removeBindedEvent" (.bind (oget this "removeBindedEvent") this))
+                       (oset! this "keyPress" (.bind (oget this "keyPress") this))
+                       (oset! this "hoverItem" (.bind (oget this "hoverItem") this))
+                       (oset! this "selectItem" (.bind (oget this "selectItem") this))
+                       (oset! this "!hidePanel" (.bind (oget this "hidePanel") this))
                        this))
+             (hidePanel []
+                        (this-as this
+                                 (let [hide-panel-fn (oget this "props.?hidePanel")]
+                                   (when (fn? hide-panel-fn)
+                                     (hide-panel-fn)))))
              (render []
                      (this-as this
                               ;; (goog/base (js* "this") "render")
@@ -134,7 +137,7 @@
                                                                                            (let [user (get filtered-users idx)]
                                                                                              (list-item #js {:user user
                                                                                                              :index idx
-                                                                                                             :selectedIndex (oget this "state.?selectedIndex")
+                                                                                                             :selectedIndex (oget this "?state.?selectedIndex")
                                                                                                              :clickCb (.bind (oget this "?selectItem") this)
                                                                                                              :hoverItem (.bind (oget this "?hoverItem") this)})))
                                                                                          (range (count filtered-users)))))))))
@@ -165,44 +168,44 @@
                                                                  user)))
                                                            (range (.. properties -users -length)))]
                                      (filterv (fn [user] (seq (oget user "?selectedKey"))) mapped-users))))
+             (addBindedEvent [el e-name cb]
+                             (this-as this
+                                      (events/listen el e-name cb)))
+             (removeBindedEvent [el e-name cb]
+                                (this-as this
+                                         (events/unlisten el e-name cb)))
              (keyPress [e]
                (this-as this
                         ;; (goog/base (js* "this") "keyPress" e)
                         (let [event (or e (.-event js/window))
                               node (react-dom/findDOMNode this)
                               options (when node (.querySelectorAll node ".oc-mention-option"))]
-                          (when (and (is-hidden node)
+                          (when (and (not (dom-utils/is-hidden node))
                                      (seq options))
-                            (case (oget event "?-keyCode")
-                              39 ;; Right arrpw
-                              (arrow-keys this event options inc 0)
-                              40 ;; Down arrow
-                              (arrow-keys this event options inc 0)
-                              37 ;; Left arrow
-                              (arrow-keys this event options dec (dec (count options)))
-                              38 ;; Up arrow
-                              (arrow-keys this event options dec (dec (count options)))
-                              13 ;; Enter
-                              (select-current this event)
-                              9 ;; Tab
-                              (select-current this event)
-                              ;; :else
-                              this)))))
+                            (case (oget event "?keyCode")
+                              (39 40) (arrow-keys this event options inc 0) ;; Right and down arrow
+                              (37 38) (arrow-keys this event options dec (dec (oget options "?length"))) ;; Left and up arrow
+                              13      (select-current this event) ;; Enter
+                              9       (select-current this event) ;; Tab
+                              27      (this.hidePanel) ;; Esc
+                              this ;; :else
+                              )))))
 
              (componentDidMount []
                (this-as this
                         ;; (goog/base (js* "this") "componentDidMount")
-                        (add-event js/window "keydown" (.bind (.-keyPress this) this))))
+                        (this.addBindedEvent js/window EventType/KEYDOWN (oget this "keyPress"))))
 
              (componentWillUnmount []
                (this-as this
                         ;; (goog/base (js* "this") "componentWillUnmount")
-                        (remove-event js/window "keydown" (.bind (.-keyPress this) this))))
+                        (this.removeBindedEvent js/window EventType/KEYDOWN (oget this "keyPress"))))
 
              (hoverItem [e idx]
                (this-as this
                         ;; (goog/base (js* "this") "hoverItem" e idx)
-                        (this.setState #js {:selectedIndex idx})))
+                        (this.setState (clj->js {"selectedIndex" idx}))
+                        (utils/event-stop e)))
 
              (selectItem [user]
                (this-as this

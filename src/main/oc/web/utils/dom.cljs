@@ -1,5 +1,6 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
+            [oops.core :refer (oget)]
             [oc.web.lib.responsive :as responsive]))
 
 (defonce onload-recalc-measure-class "onload-reaclc-measure")
@@ -84,3 +85,11 @@
           true
           (recur (.-parentElement element)))
         false))))
+
+(defn is-hidden [el]
+  (when (and (oget el "?nodeType")
+             (= (oget el "?nodeType") (oget js/Node "ELEMENT_NODE")))
+    (when-let [style (.getComputedStyle js/window el)]
+      (or (= (oget style "?display") "none")
+          (= (oget style "?visibility") "hidden")
+          (nil? (oget el "?offsetParent"))))))

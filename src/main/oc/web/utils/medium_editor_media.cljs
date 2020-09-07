@@ -406,7 +406,7 @@
                                                  "strong" "sub" "summary" "sup" "table" "tbody" "td" "tfoot" "th"
                                                  "thead" "time" "title" "tr" "track" "tt" "u" "var" "wbr"]))}
             extensions (cond-> {"autolist" (js/AutoList.)
-                                "mention" (mention-utils/mention-ext users-list)
+                                "mention" (mention-utils/mention-ext body-el users-list)
                                 "fileDragging" false}
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
                                                     "autoquote" (js/AutoQuote.)

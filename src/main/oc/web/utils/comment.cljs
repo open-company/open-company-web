@@ -11,9 +11,8 @@
 
 (defn setup-medium-editor [comment-node users-list]
   (let [extentions (if (seq users-list)
-                     #js {"mention" (mention-utils/mention-ext users-list)}
+                     #js {"mention" (mention-utils/mention-ext comment-node users-list)}
                      #js {})
-        _ (js/console.log "DBG extentions" extentions)
         config {:toolbar false
                 :anchorPreview false
                 :imageDragging false
