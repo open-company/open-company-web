@@ -18,7 +18,7 @@ echo "Copy medium-editor theme style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
 echo "Done!"
 echo "Copy medium-editor-tc-mention style..."
-cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css
+cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/mention-panel.min.css
 echo "Done!"
 echo "Copy emojone style..."
 cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/emojione/emojione.css
