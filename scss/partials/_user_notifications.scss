@@ -248,7 +248,7 @@ div.user-notifications-tray {
         height: 2px;
         left: 0;
         width: 30%;
-        background-color: rgba(var(--primary-color), 0.6);
+        background-color: var(--primary-color-06);
         content: "";
       }
 
@@ -259,7 +259,7 @@ div.user-notifications-tray {
 
         div.all-caught-up-inner {
           div.message {
-            color: rgba(var(--primary-color), 0.6);
+            color: var(--primary-color-06);
           }
         }
       }
@@ -270,7 +270,7 @@ div.user-notifications-tray {
         height: 2px;
         right: 0;
         width: 30%;
-        background-color: rgba(var(--primary-color), 0.6);
+        background-color: var(--primary-color-06); // 0.6
         content: "";
       }
     }

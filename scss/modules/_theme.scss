@@ -11,8 +11,17 @@ $dark_mode: "dark";
 
 :root {
   --primary-color: rgb(#{$wut_purple});
-  --primary-light-color: #{$wut_feint_purple};
+  --primary-light-color: rgba(#{$wut_purple, 0.16});
+  --primary-color-02: rgba(#{$wut_purple}, 0.2);
+  --primary-color-04: rgba(#{$wut_purple}, 0.4);
+  --primary-color-06: rgba(#{$wut_purple}, 0.6);
+  --primary-color-08: rgba(#{$wut_purple}, 0.8);
   --secondary-color: white;
+  --secondary-light-color: #{rgba(white, 0.16)};
+  --secondary-color-02: #{rgba(white, 0.2)};
+  --secondary-color-04: #{rgba(white, 0.4)};
+  --secondary-color-06: #{rgba(white, 0.6)};
+  --secondary-color-08: #{rgba(white, 0.8)};
   --background-color: #{$grey_num_2};
   --color: #{$deep_navy};
   --light-color: #{rgba($deep_navy,0.5)};
@@ -137,8 +146,17 @@ $dark_mode: "dark";
 
 @include dark_mode() {
   --primary-color: rgb(#{$wut_purple});
-  --primary-light-color: #{$wut_feint_purple};
+  --primary-light-color: rgba(#{$wut_purple}, 0.16);
+  --primary-color-02: rgba(#{$wut_purple}, 0.2);
+  --primary-color-04: rgba(#{$wut_purple}, 0.4);
+  --primary-color-06: rgba(#{$wut_purple}, 0.6);
+  --primary-color-08: rgba(#{$wut_purple}, 0.8);
   --secondary-color: white;
+  --secondary-light-color: #{rgba(white, 0.16)};
+  --secondary-color-02: #{rgba(white,0.2 )};
+  --secondary-color-04: #{rgba(white,0.4)};
+  --secondary-color-06: #{rgba(white,0.6)};
+  --secondary-color-08: #{rgba(white,0.8)};
   --background-color: #1B202A;
   --color: white;
   --light-color: #{rgba(white,0.5)};

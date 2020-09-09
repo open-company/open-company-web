@@ -411,7 +411,7 @@ $header_top_margin: 24;
 
             div.poll-reply-outer.voted {
               &:before {
-                background-color: rgba(var(--primary-color), 0.3);
+                background-color: var(--primary-color-04); // 0.3
               }
 
               button.poll-reply {
@@ -465,7 +465,7 @@ $header_top_margin: 24;
 
                 &:hover {
                   &:before {
-                    background-color: rgba(var(--primary-color), 0.3);
+                    background-color: var(--primary-color-04); // 0.3
                     width: 100%;
                   }
 

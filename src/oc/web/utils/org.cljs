@@ -47,9 +47,9 @@
   (when-let [rgbs (rgb-string rgb)]
     (str "rgb(" rgbs ")")))
 
-(defn light-color-from-rgb [rgb]
+(defn rgb->rgba [rgb opacity]
   (when-let [rgbs (rgb-string rgb)]
-    (str "rgba(" rgbs ", 0.16)")))
+    (str "rgba(" rgb ", " opacity ")")))
 
 (defn default-brand-color []
   (when-let [theme-kw (theme/computed-theme)]
@@ -60,22 +60,47 @@
     (color-from-rgb (:rgb color-map))
     (:hex color-map)))
 
-(defn css-light-color [color-map]
-  (when (:rgb color-map)
-    (light-color-from-rgb (:rgb color-map))))
-
 (defun set-brand-color!
   ([nil] nil)
 
-  ([primary-color :guard string? primary-light-color :guard string? secondary-color :guard string?]
-   (.. js/document -documentElement -style (setProperty "--primary-color" primary-color))
-   (.. js/document -documentElement -style (setProperty "--primary-light-color" primary-light-color))
-   (.. js/document -documentElement -style (setProperty "--secondary-color" secondary-color)))
+  ([primary-color-strings :guard #(and (:rgb-string %)
+                                       (:rgba-016 %)
+                                       (:rgba-02 %)
+                                       (:rgba-04 %)
+                                       (:rgba-06 %)
+                                       (:rgba-08 %))
+    secondary-color-strings :guard #(and (:rgb-string %)
+                                         (:rgba-016 %)
+                                         (:rgba-02 %)
+                                         (:rgba-04 %)
+                                         (:rgba-06 %)
+                                         (:rgba-08 %))]
+   (.. js/document -documentElement -style (setProperty "--primary-color" (:rgb-string primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--primary-light-color" (:rgba-016 primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--primary-color-02" (:rgba-02 primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--primary-color-04" (:rgba-04 primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--primary-color-06" (:rgba-06 primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--primary-color-08" (:rgba-08 primary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-color" (:rgb-string secondary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-light-color" (:rgba-016 secondary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-color-02" (:rgba-02 secondary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-color-04" (:rgba-04 secondary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-color-06" (:rgba-06 secondary-color-strings)))
+   (.. js/document -documentElement -style (setProperty "--secondary-color-08" (:rgba-08 secondary-color-strings))))
   
   ([brand-color-map :guard #(and (:primary %) (:secondary %))]
-   (recur (css-color (:primary brand-color-map))
-          (css-light-color (:primary brand-color-map))
-          (css-color (:secondary brand-color-map))))
+   (recur {:rgb-string (css-color (:primary brand-color-map))
+           :rgba-016 (rgb->rgba (:rgb (:primary brand-color-map)) "0.16")
+           :rgba-02 (rgb->rgba (:rgb (:primary brand-color-map)) "0.2")
+           :rgba-04 (rgb->rgba (:rgb (:primary brand-color-map)) "0.4")
+           :rgba-06 (rgb->rgba (:rgb (:primary brand-color-map)) "0.6")
+           :rgba-08 (rgb->rgba (:rgb (:primary brand-color-map)) "0.8")}
+          {:rgb-string (css-color (:secondary brand-color-map))
+           :rgba-016 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.16")
+           :rgba-02 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.2")
+           :rgba-04 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.4")
+           :rgba-06 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.6")
+           :rgba-08 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.8")}))
 
   ([brand-colors-map :guard #(and (:dark %) (:light %))]
    (when-let [theme-key (theme/computed-theme)]

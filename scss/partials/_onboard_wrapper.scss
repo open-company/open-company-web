@@ -623,7 +623,7 @@ div.onboard-lander {
       }
 
       &.valid {
-        border: 1px solid rgba(var(--primary-color), 0.5);
+        border: 1px solid var(--primary-color-06); // 0.5
       }
     }
 
