@@ -12,7 +12,8 @@
    :sourceRoot ls/web-server
    :release ls/deploy-key
    :debug (= ls/log-level "debug")
-   :dsn dsn})
+   :dsn dsn
+   :environment ls/env-name})
 
 (defn sentry-setup []
   (when (and (exists? js/Sentry) ls/local-dsn)
