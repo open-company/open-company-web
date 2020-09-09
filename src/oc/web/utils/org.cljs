@@ -49,7 +49,7 @@
 
 (defn rgb->rgba [rgb opacity]
   (when-let [rgbs (rgb-string rgb)]
-    (str "rgba(" rgb ", " opacity ")")))
+    (str "rgba(" rgbs ", " opacity ")")))
 
 (defn default-brand-color []
   (when-let [theme-kw (theme/computed-theme)]
