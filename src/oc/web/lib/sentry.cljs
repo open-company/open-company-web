@@ -10,10 +10,10 @@
    :tags {:isMobile (responsive/is-mobile-size?)
           :hasJWT (not (not (jwt/jwt)))}
    :sourceRoot ls/web-server
-   :release ls/deploy-key
+   :release ls/sentry-release
    :debug (= ls/log-level "debug")
    :dsn dsn
-   :environment ls/env-name})
+   :environment ls/sentry-env})
 
 (defn sentry-setup []
   (when (and (exists? js/Sentry) ls/local-dsn)
