@@ -53,6 +53,10 @@ div.explore-view {
         color: var(--primary-color);
         margin-left: 4px;
         margin-right: auto;
+
+        @include mobile() {
+          font-size: 14px;
+        }
       }
 
       @include mobile() {
