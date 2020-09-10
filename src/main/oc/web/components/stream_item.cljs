@@ -23,7 +23,7 @@
             [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary foc-comments-summary)]
-            [cljsjs.hammer]))
+            ["hammerjs" :as hammer]))
 
 (defn- stream-item-summary [activity-data]
   [:div.stream-item-body.oc-mentions
