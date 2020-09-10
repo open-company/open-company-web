@@ -86,6 +86,9 @@ div.virtualized-list-row:not(.collapsed-item) {
 
   @include mobile() {
     background-color: var(--mobile-background-color);
+    &.open-item div.stream-item {
+      border-top: 1px solid var(--foc-divider-line-color);
+    }
   }
 }
 
@@ -294,6 +297,10 @@ div.stream-item {
         border-radius: 50%;
         margin: 1px 5px 0 5px;
         flex: 0 0 auto;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       span.time-since {
@@ -308,28 +315,35 @@ div.stream-item {
         white-space: nowrap;
         flex: 0 0 auto;
         overflow: hidden;
+
+        @include mobile() {
+          color: var(--light-color);
+          margin-left: 6px;
+        }
       }
 
       div.new-item-tag {
         flex: 0 0 auto;
-        width: 35px;
-        height: 16px;
+        width: 31px;
+        height: 14px;
         position: relative;
-        background-color: $feint_emerald;
-        border-radius: 8px;
+        background-color: var(--primary-light-color);
+        border-radius: 4px;
         margin-left: 8px;
+        padding: 1px 2px;
 
         &:before {
-          width: 35px;
-          height: 16px;
+          display: block;
+          width: 27px;
+          height: 12px;
           @include OC_Body_Bold();
           font-size: 11px;
-          line-height: 16px;
+          line-height: 12px;
           content: "NEW";
-          color: $carrot_green;
-          position: absolute;
-          top: 0;
-          left: 0;
+          color: var(--primary-color);
+          // position: absolute;
+          // top: 0;
+          // left: 0;
           text-align: center;
         }
       }
@@ -598,7 +612,10 @@ div.stream-item {
       @include mobile() {
         height: auto;
         overflow: hidden;
-        height: 32px;
+        margin-top: 2px;
+        min-height: 20px;
+        height: 20px;
+        width: 100%;
       }
 
       div.reactions {
@@ -825,6 +842,40 @@ div.stream-item {
         // position: absolute;
         // left: 274px;
         // top: 0;
+      }
+
+      div.stream-item-mobile-view-more {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          float: right;
+          height: 26px;
+          line-height: 26px;
+          font-size: 14px;
+          @include OC_Body_Book();
+          color: var(--light-color);
+          padding-left: 12px;
+          position: relative;
+          
+          &:before {
+            content: "";
+            width: 8px;
+            height: 4px;
+            background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
+            background-size: 8px 4px;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 11px;
+            left: 0;
+            transform: rotate(-90deg);
+            display: block;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/mobile_comments_chevron@dark.svg");
+            }
+          }
+        }
       }
     }
   }

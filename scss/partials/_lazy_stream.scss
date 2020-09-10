@@ -26,14 +26,17 @@ div.lazy-stream {
     }
 
     @include mobile() {
-      margin-top: 0;
-      // background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+      margin-top: 16px;
+      padding: 0 8px 0 0;
+      background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
       min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
-      background-size: cover;
+      background-size: calc(100% - 48px) auto;
+      background-position: left 24px top 0;
+      background-repeat: repeat-y;
 
-      // @include dark_mode() {
-      //   background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
-      // }
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+      }
     }
   }
 }

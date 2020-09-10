@@ -49,12 +49,12 @@ div.caught-up-line {
   }
 
   @include mobile() {
-    height: 36px;
-    padding: 4px 0 0;
+    height: 32px;
+    padding: 0;
 
     // Line besides caught up
     &:before {
-      top: 20px;
+      top: 16px;
     }
   }
 

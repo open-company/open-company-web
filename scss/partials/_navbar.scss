@@ -84,8 +84,8 @@ nav.oc-navbar {
           text-align: center;
 
           div.navbar-mobile-title {
-            @include OC_Body_Bold();
-            font-size: 18px;
+            @include OC_Body_Book();
+            font-size: 16px;
             color: var(--color);
             line-height: 24px;
             overflow: hidden;
@@ -122,18 +122,17 @@ nav.oc-navbar {
 
           @include mobile() {
             display: block;
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: var(--ultralight-color);
             border-radius: 4px;
             position: absolute;
             padding: 0;
-            top: 11px;
-            left: 16px;
+            top: 18px;
+            left: 12px;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
@@ -221,11 +220,9 @@ nav.oc-navbar {
           min-width: unset;
           display: initial;
           position: absolute;
-          top: 11px;
+          top: 16px;
           left: unset;
           right: 16px;
-          width: 32px;
-          height: 32px;
         }
 
         div.user-notifications {
@@ -259,48 +256,6 @@ nav.oc-navbar {
             }
           }
         }
-      }
-    }
-  }
-
-  div.mobile-header {
-    display: none;
-
-    @include mobile() {
-      height: #{$mobile_navbar_height}px;
-      width: 100vw;
-      background-color: var(--mobile-background-color);
-      border-bottom: 1px solid var(--divider-line);
-      padding: 15px 16px;
-      display: block;
-      text-align: center;
-      z-index: 2;
-
-      button.search-close-bt {
-        display: block;
-        width: 32px;
-        height: 32px;
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 12px 12px;
-        background-color: var(--divider-line);
-        border-radius: 4px;
-        position: absolute;
-        left: 16px;
-        top: 11px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-
-      div.mobile-header-title {
-        @include OC_Body_Bold();
-        font-size: 18px;
-        color: var(--color);
-        line-height: 24px;
-        height: 24px;
       }
     }
   }

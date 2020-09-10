@@ -36,8 +36,6 @@ div.user-info-modal {
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: var(--divider-line);
-      border-radius: 4px;
       z-index: 3;
 
       @include dark_mode() {
@@ -61,9 +59,8 @@ div.user-info-modal {
 
     @include mobile() {
       top: 0;
-      left: unset;
-      right: 0;
-      width: 85vw;
+      left: 0;
+      width: 100%;
       height: auto;
       max-height: initial;
       min-height: 100vh;
@@ -89,7 +86,9 @@ div.user-info-modal {
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
-        width: 85vw;
+        width: 100%;
+        right: unset;
+        left: 0;
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
         padding: 16px;

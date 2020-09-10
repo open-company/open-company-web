@@ -17,23 +17,16 @@ div.explore-view {
       background-color: var(--overlay-background-color);
       padding: 24px;
       border: 1px solid var(--opac-background-color-2);
-      margin-top: 4px;
-      margin-bottom: 4px;
+      margin: 4px;
       border-radius: 8px;
       height: 190px;
-      width: calc(50% - 4px);
+      width: calc(50% - 8px);
 
       @include mobile() {
-        min-height: 190px;
+        // min-height: 190px;
         height: auto;
-      }
-
-      &:nth-child(2n + 1) {
-        margin-right: 4px;
-      }
-
-      &:nth-child(2n) {
-        margin-left: 4px;
+        margin: 4px 0;
+        width: 100%;
       }
     }
 
@@ -60,6 +53,12 @@ div.explore-view {
         color: var(--primary-color);
         margin-left: 4px;
         margin-right: auto;
+      }
+
+      @include mobile() {
+        width: 100%;
+        min-height: initial;
+        height: #{$mobile_navbar_height}px;
       }
     }
 
@@ -229,15 +228,12 @@ div.explore-view {
         @include mobile() {
           height: auto;
           min-height: 32px;
+          margin-top: 16px;
         }
 
         button.follow-button {
           float: left;
           order: 1;
-
-          @include mobile() {
-            order: 3;
-          }
         }
 
         span.posts-count {
@@ -250,12 +246,6 @@ div.explore-view {
           padding-left: 22px;
           position: relative;
           order: 2;
-
-          @include mobile() {
-            order: 1;
-            margin-left: 0;
-            margin-right: 16px;
-          }
 
           &:before {
             content: "";
@@ -287,11 +277,6 @@ div.explore-view {
           padding-left: 22px;
           position: relative;
           order: 3;
-
-          @include mobile() {
-            order: 2;
-            margin-left: 0;
-          }
 
           &:before {
             content: "";

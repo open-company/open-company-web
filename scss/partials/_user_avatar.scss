@@ -1,5 +1,4 @@
 $avatar_size: 24;
-$mobile_avatar_size: 32;
 
 button.user-avatar-button{
   margin: 0;
@@ -7,22 +6,19 @@ button.user-avatar-button{
   background-color: transparent;
   padding: 0;
   position: relative;
+  height: #{$avatar_size}px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding-right: 14px;
+  background-image: cdnUrl("/img/ML/menu_chevron.svg");
+  background-size: 6px 4px;
+  background-position: right 0px top 10px;
+  background-repeat: no-repeat;
 
-  @include big_web() {
-    height: #{$avatar_size}px;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    padding-right: 16px;
-    background-image: cdnUrl("/img/ML/menu_chevron.svg");
-    background-size: 8px 4px;
-    background-position: right 0px top 10px;
-    background-repeat: no-repeat;
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/menu_chevron@dark.svg");
-    }
+  @include dark_mode() {
+    background-image: cdnUrl("/img/ML/menu_chevron@dark.svg");
   }
 
   &.disabled-user-menu {
@@ -38,14 +34,6 @@ button.user-avatar-button{
     flex: 0 0 auto;
   }
 
-  @include mobile() {
-    width: #{$mobile_avatar_size}px;
-    height: #{$mobile_avatar_size}px;
-    display: initial;
-    @include user-profile($mobile_avatar_size);
-    
-  }
-
   span.user-name {
     flex: 0 1 auto;
     @include OC_Body_Book();
@@ -57,5 +45,9 @@ button.user-avatar-button{
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    @include mobile() {
+      display: none;
+    }
   }
 }

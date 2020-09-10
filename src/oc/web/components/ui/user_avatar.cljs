@@ -47,6 +47,5 @@
        :aria-haspopup true
        :aria-expanded false}
       (user-avatar-image user-data)
-      (when-not is-mobile?
-        [:span.user-name
-          (:name user-data)])]))
+      [:span.user-name
+       (:name user-data)]]))

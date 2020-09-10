@@ -1,7 +1,7 @@
 $startPosX: 120%;
 $startPosY: -800%;
 
-div.oc-loading {
+div.oc-loading-ghost-screen {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -115,16 +115,144 @@ div.oc-loading {
         background-size: #{$board_container_width}px 664px;
         background-repeat: repeat-y;
 
-        @include mobile() {
-          margin-top: 40px;
-          height: calc(100% - 40px);
-          background-size: 100% auto;
-        }
-
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/oc_loading_dashboard@dark.svg");
         }
+
+        @include mobile() {
+          $mobile_interstitial_ratio: 327/496;
+
+          margin-top: 16px;
+          padding: 0 24px;
+          height: 100%;
+          background-size: calc(100% - 48px) auto;
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
+          background-position: top 0 left 24px;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+          }
+        }
       }
     }
+  }
+}
+
+div.oc-loading {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background-color: var(--background-color);
+  z-index: #{$navbar_zindex + 3001};
+
+  @include mobile() {
+    background-color: var(--mobile-background-color);
+  }
+
+  &.active {
+    display: inline;
+  }
+
+  div.setup-cta {
+    display: none;
+  }
+
+  div.oc-loading-inner {
+    position: relative;
+    width: 52px;
+    height: 96px;
+    top: 50%;
+    left: 50%;
+    margin-left: -26px;
+    margin-top: -48px;
+
+    div.oc-loading-body {
+      background-image: cdnUrl("/img/ML/carrot_loading_body.svg");
+      background-position: 52px 74px;
+      width: 52px;
+      height: 74px;
+      position: absolute;
+      top: 22px;
+      left: 0px;
+    }
+
+    div.oc-loading-heart {
+      background-image: cdnUrl("/img/ML/carrot_loading_heart.svg");
+      background-position: 23px 23px;
+      width: 23px;
+      height: 23px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+  }
+
+  &.active div.oc-loading-inner {
+    -webkit-animation: -webkit-loading-frames 3.2s linear 1.0s;
+    -webkit-animation-iteration-count: infinite;
+    animation: loading-frames 3.2s linear 1.0s;
+    animation-iteration-count: infinite;
+  }
+}
+
+@-webkit-keyframes -webkit-loading-frames {
+  10% {
+    -webkit-transform:scale(1);
+  }
+  15%{
+    -webkit-transform:scale(1.2);
+  }
+  20%{
+    -webkit-transform:scale(1.2) rotate(30deg);
+  }
+  25%{
+    -webkit-transform:scale(1.2) rotate(0deg);
+
+  }
+  30%{
+    -webkit-transform:scale(1.2) rotate(30deg);
+
+  }
+  35%{
+    -webkit-transform:scale(1.2) rotate(0deg);
+  }
+  40%{
+    -webkit-transform:scale(1) rotate(0deg);
+  }
+}
+
+@keyframes loading-frames {
+  10% {
+    transform:scale(1);
+  }
+  15%{
+    transform:scale(1.2);
+  }
+  20%{
+    transform:scale(1.2) rotate(30deg);
+  }
+  25%{
+    transform:scale(1.2) rotate(0deg);
+
+  }
+  30%{
+    transform:scale(1.2) rotate(30deg);
+
+  }
+  35%{
+    transform:scale(1.2) rotate(0deg);
+  }
+  40%{
+    transform:scale(1) rotate(0deg);
+  }
+}
+
+@include dark_mode() {
+  div.oc-loading div.oc-loading-inner div.oc-loading-body,
+  div.oc-loading div.oc-loading-inner div.oc-loading-heart {
+    opacity: 0.4;
   }
 }

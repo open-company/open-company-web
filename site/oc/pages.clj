@@ -12,17 +12,9 @@
 
 (def oc-loading
   [:div.oc-loading.active
-    [:div.oc-loading-navbar]
-    [:div.oc-loading-page
-      [:div.oc-loading-navigation-sidebar
-        [:div.oc-loading-navigation-sidebar-row]
-        [:div.oc-loading-navigation-sidebar-row]
-        [:div.oc-loading-navigation-sidebar-row]
-        [:div.oc-loading-navigation-sidebar-row]
-        [:div.oc-loading-navigation-sidebar-row]]
-      [:div.oc-loading-dashboard
-        [:div.oc-loading-qp]
-        [:div.oc-loading-feed]]]])
+   [:div.oc-loading-inner
+    [:div.oc-loading-heart]
+    [:div.oc-loading-body]]])
 
 (def tag-manager-head
   [:script"

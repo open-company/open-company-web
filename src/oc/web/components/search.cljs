@@ -187,10 +187,20 @@
           is-mobile? (responsive/is-mobile-size?)]
       [:div.search-box
         {:class (when search-active? "active")
-         :on-click (fn [e]
-                    (when (and (not search-active?)
-                               (not (utils/event-inside? e (rum/ref-node s :search-close))))
-                      (.focus (rum/ref-node s "search-input"))))}
+         :on-click (when-not is-mobile?
+                     (fn [e]
+                       (when (and (not search-active?)
+                                  (not (utils/event-inside? e (rum/ref-node s :search-close))))
+                         (.focus (rum/ref-node s "search-input")))))}
+        (when is-mobile?
+          [:div.mobile-header
+           [:div.mobile-header-title
+            "Search"]
+           [:button.mlb-reset.search-close-bt
+            {:on-click (fn [e]
+                         (utils/event-stop e)
+                         (search/reset)
+                         (search/inactive))}]])
         [:button.mlb-reset.search-close
           {:ref :search-close
            :on-click #(search-reset s)}]
@@ -200,27 +210,30 @@
            :class (when (and (map? search-results)
                              (:loading search-results))
                     "loading")}]
-        [:form
-          {:on-submit #(.preventDefault %)
-           :action "."}
-          [:input.search.oc-input
-            {:class (utils/class-set {:inactive (not search-active?)
-                                      :loading (and (map? search-results)
-                                                    (:loading search-results))})
-             :ref "search-input"
-             :type "search"
-             :value @(::query s)
-             :placeholder (if is-mobile? "Search posts..." "Search")
-             :on-focus #(search/active)
-             :on-change (fn [e]
-                          (let [v (.-value (.-target e))]
-                            (reset! (::query s) v)
-                            ;; Auto search
-                            (debounced-auto-search! s)))
-             :on-key-press (fn [e]
-                            (when (or (= (.-key e) "Enter")
-                                      (= (.-keyCode e) 13))
-                              (cancel-auto-search! s)
-                              (search/query @(::query s) false)
-                              (.blur (rum/ref-node s "search-input"))))}]]
-       (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))
+        [:div.search-box-container
+          [:div.search-box-form-container
+            [:form
+              {:on-submit #(.preventDefault %)
+              :action "."}
+              [:input.search.oc-input
+                {:class (utils/class-set {:inactive (not search-active?)
+                                          :loading (and (map? search-results)
+                                                        (:loading search-results))})
+                :ref "search-input"
+                :type "search"
+                :value @(::query s)
+                :placeholder "Search"
+                :on-focus #(search/active)
+                :on-change (fn [e]
+                              (let [v (.-value (.-target e))]
+                                (reset! (::query s) v)
+                                ;; Auto search
+                                (debounced-auto-search! s)))
+                :on-key-press (fn [e]
+                                (when (or (= (.-key e) "Enter")
+                                          (= (.-keyCode e) 13))
+                                  (cancel-auto-search! s)
+                                  (search/query @(::query s) false)
+                                  (.blur (rum/ref-node s "search-input"))))}]]]
+        [:div.search-box-results-container
+          (search-results-view {:did-select-history-item #(reset! (::query s) %)})]]])))

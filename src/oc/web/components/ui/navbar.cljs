@@ -108,36 +108,25 @@
                                                      (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
-      (if (and is-mobile?
-               search-active?)
-        [:div.mobile-header
-          [:button.mlb-reset.search-close-bt
-            {:on-click (fn [e]
-                         (utils/event-stop e)
-                         (search-actions/reset)
-                         (search-actions/inactive))}]
-          [:div.mobile-header-title
-            "Search"]]
-        [:div.oc-navbar-header.group
-          [:div.oc-navbar-header-container.group
-            [:div.navbar-left
-              (if is-mobile?
-                [:button.mlb-reset.mobile-ham-menu
-                  {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
-                (orgs-dropdown))]
+      [:div.oc-navbar-header.group
+        [:div.oc-navbar-header-container.group
+          [:div.navbar-left
             (if is-mobile?
-              [:div.navbar-center
-                [:div.navbar-mobile-title
-                  mobile-title]]
-              [:div.navbar-center
-                {:class (when search-active "search-active")}
-                (search-box)])
-            (if (jwt/jwt)
-              [:div.navbar-right.group
-                [:div.user-menu
-                  [:div.user-menu-button
-                    {:class (when show-whats-new-green-dot "green-dot")}
-                    (user-avatar
-                     {:click-cb #(nav-actions/menu-toggle)})]]]
-              [:div.navbar-right.anonymous-user
-                (login-button)])]])]))
+              [:button.mlb-reset.mobile-ham-menu
+                {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
+              (orgs-dropdown))]
+          (if is-mobile?
+            [:div.navbar-center
+              [:div.navbar-mobile-title
+                mobile-title]]
+            [:div.navbar-center
+              {:class (when search-active "search-active")}
+              (search-box)])
+          (if (jwt/jwt)
+            [:div.navbar-right.group
+              [:div.user-menu
+                [:div.user-menu-button
+                  {:class (when show-whats-new-green-dot "green-dot")}
+                  (user-avatar {:click-cb #(nav-actions/menu-toggle)})]]]
+            [:div.navbar-right.anonymous-user
+              (login-button)])]]]))

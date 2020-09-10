@@ -11,7 +11,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.search :as search]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
@@ -20,11 +19,9 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
-            [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.search :refer (search-box)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
@@ -63,7 +60,6 @@
                               (drv/drv :activities-read)
                               (drv/drv :followers-boards-count)
                               (drv/drv :comment-reply-to)
-                              (drv/drv search/search-active?)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -140,7 +136,6 @@
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
-        search-active? (drv/react s search/search-active?)
         member? (:member? org-data)
         is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
         show-follow-banner? (and (not is-container?)
@@ -166,7 +161,6 @@
                        (pos? (count (:posts-list contributions-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (utils/class-set {:search-active search-active?})}
         [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
@@ -359,11 +353,6 @@
                   ;      :data-placement "top"
                   ;      :data-container "body"
                   ;      :title "Curate your Home feed"}])
-                  ;; Remove search from mobile for now
-                  ;; (when (and (not is-drafts-board)
-                  ;;            is-mobile?
-                  ;;            (not is-topics))
-                  ;;   (search-box))
                   ]])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view

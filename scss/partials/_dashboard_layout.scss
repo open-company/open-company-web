@@ -4,24 +4,6 @@ div.dashboard-layout {
   overflow: visible;
 
   @include mobile() {
-    &.search-active {
-      div.dashboard-layout-container {
-        div.dashboard-layout-mobile-tabbar {
-          display: none;
-        }
-
-        div.board-container {
-          min-height: calc(100vh - #{$mobile_navbar_height * 2}px - 20px);
-
-          div.lazy-stream {
-            display: none;
-          }
-        }
-      }
-    }
-  }
-
-  @include mobile() {
     background-color: var(--opac-background-color-05);
 
     &.sticky-board-name {
@@ -191,23 +173,24 @@ div.dashboard-layout {
           &.topics-tab {
             order: 2;
             span.tab-icon {
-              width: 18px;
-              height: 16px;
-              background-size: 18px 16px;
+              width: 14px;
+              height: 14px;
+              background-size: 14px 14px;
               text-align: center;
-              font-size: 19px;
-              line-height: 16px;
-              color: var(--color);
-              font-family: "Material Design Icons";
               display: block;
+              background-image: cdnUrl("/img/ML/nav_explore.svg");
 
-              &:before {
-                content: "\F18B";
+              @include dark_mode(){
+                background-image: cdnUrl("/img/ML/nav_explore@dark.svg");
               }
             }
 
             &.active span.tab-icon {
-              color: var(--primary-color);
+              @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+
+              @include dark_mode() {
+                @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+              }
             }
           }
 

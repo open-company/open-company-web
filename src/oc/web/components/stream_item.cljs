@@ -390,4 +390,7 @@
                     [:div.stream-item-mobile-attachments
                       [:span.mobile-attachments-icon]
                       [:span.mobile-attachments-count
-                        (count activity-attachments)]]))]])]]))
+                        (count activity-attachments)]]))]
+              (when is-mobile?
+                [:div.stream-item-mobile-view-more
+                  "View more"])])]]))
