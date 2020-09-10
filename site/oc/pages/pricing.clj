@@ -1,5 +1,5 @@
 (ns oc.pages.pricing
-  (:require [oc.pages.shared :as shared]
+  (:require [oc.shared :as shared]
             [environ.core :refer (env)]))
 
 (defn pricing
