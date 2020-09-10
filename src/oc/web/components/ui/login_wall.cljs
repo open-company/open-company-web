@@ -17,14 +17,14 @@
 (rum/defcs login-wall < rum/reactive
                         (drv/drv :jwt)
                         (drv/drv :auth-settings)
-                        (drv/drv :current-org-slug)
+                        (drv/drv :org-slug)
                         (drv/drv :login-with-email-error)
                         (drv/drv :expo-deep-link-origin)
                         (rum/local "" ::email)
                         (rum/local "" ::pswd)
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
-        current-org-slug (drv/react s :current-org-slug)
+        current-org-slug (drv/react s :org-slug)
         deep-link-origin (drv/react s :expo-deep-link-origin)
         email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
         login-enabled (and auth-settings
