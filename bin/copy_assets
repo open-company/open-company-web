@@ -1,0 +1,28 @@
+#!/bin/bash
+echo $(PWD)
+echo "$INIT_CWD"
+echo "Copy node_modules assets..."
+mkdir $INIT_CWD/public/lib/MediumEditor/
+echo "Copy medium-editor js..."
+cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.js $INIT_CWD/public/lib/MediumEditor/index.js
+echo "Done!"
+mkdir $INIT_CWD/public/css/medium-editor
+mkdir $INIT_CWD/public/css/medium-editor/themes
+mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/
+mkdir $INIT_CWD/public/css/emojione
+mkdir $INIT_CWD/public/css/emoji-mart/
+echo "Copy medium-editor style..."
+cp $INIT_CWD/node_modules/medium-editor/dist/css/medium-editor.css $INIT_CWD/public/css/medium-editor/medium-editor.css
+echo "Done!"
+echo "Copy medium-editor theme style..."
+cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
+echo "Done!"
+echo "Copy medium-editor-tc-mention style..."
+cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/mention-panel.min.css
+echo "Done!"
+echo "Copy emojone style..."
+cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/emojione/emojione.css
+echo "Done!"
+echo "Copy emoj-mart style..."
+cp $INIT_CWD/node_modules/emoji-mart/css/emoji-mart.css $INIT_CWD/public/css/emoji-mart/emoji-mart.css
+echo "Done!"
