@@ -149,41 +149,45 @@
   ([section-data note success-cb]
     (section-save section-data note success-cb section-save-error))
   ([section-data note success-cb error-cb]
-    (timbre/debug section-data)
-    (if (empty? (:links section-data))
-      (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")]
-        (api/create-board create-board-link section-data note
-          (fn [{:keys [success status body]}]
-            (let [section-data (when success (json->cljs body))
-                  editable-board? (utils/link-for (:links section-data) "create")]
-              (if-not success
-                (when (fn? error-cb)
-                  (error-cb status))
-                (do
-                  (utils/after 100
-                   #(do
-                     (when (and editable-board?
-                                (:collapsed (dis/cmail-state)))
-                        (dispatcher/dispatch! [:input dis/cmail-data-key {:board-slug (:slug section-data)
-                                                                          :board-name (:name section-data)
-                                                                          :publisher-board (:publisher-board section-data)}])
-                        (dispatcher/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))
-                  (utils/after 500 refresh-org-data)
-                  (ws-cc/container-watch (:uuid section-data))
-                  (dispatcher/dispatch! [:section-edit-save/finish section-data])
-                  (when (fn? success-cb)
-                    (success-cb section-data))))))))
-      (let [board-patch-link (utils/link-for (:links section-data) "partial-update")]
-        (api/patch-board board-patch-link section-data note (fn [success body status]
-          (let [section-data (when success (json->cljs body))]
-            (if-not success
-              (when (fn? error-cb)
-                (error-cb status))
-              (do
-                (refresh-org-data)
-                (dispatcher/dispatch! [:section-edit-save/finish ])
-                (when (fn? success-cb)
-                  (success-cb section-data)))))))))))
+   (timbre/debug section-data)
+   (let [org-slug (dis/current-org-slug)
+         board-link (if (contains? section-data :links)
+                      (utils/link-for (:links section-data) "partial-update")
+                      (utils/link-for (:links (dispatcher/org-data)) "create"))]
+     (dis/dispatch! [:section-edit-save org-slug section-data])
+     (if (empty? (:links section-data))
+       (api/create-board board-link section-data note
+                         (fn [{:keys [success status body]}]
+                           (let [section-data (when success (json->cljs body))
+                                 editable-board? (utils/link-for (:links section-data) "create")]
+                             (if-not success
+                               (when (fn? error-cb)
+                                 (error-cb status))
+                               (do
+                                 (utils/after 100
+                                              #(do
+                                                 (when (and editable-board?
+                                                            (:collapsed (dis/cmail-state)))
+                                                   (dispatcher/dispatch! [:input dis/cmail-data-key {:board-slug (:slug section-data)
+                                                                                                     :board-name (:name section-data)
+                                                                                                     :publisher-board (:publisher-board section-data)}])
+                                                   (dispatcher/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))
+                                 (utils/after 500 refresh-org-data)
+                                 (ws-cc/container-watch (:uuid section-data))
+                                 (dispatcher/dispatch! [:section-edit-save/finish org-slug section-data])
+                                 (when (fn? success-cb)
+                                   (success-cb section-data)))))))
+       (api/patch-board board-link section-data note
+                        (fn [success body status]
+                          (let [section-data (when success (json->cljs body))]
+                            (if-not success
+                              (when (fn? error-cb)
+                                (error-cb status))
+                              (do
+                                (refresh-org-data)
+                                (dispatcher/dispatch! [:section-edit-save/finish org-slug section-data])
+                                (when (fn? success-cb)
+                                  (success-cb section-data)))))))))))
 
 (defn private-section-user-add
   [user user-type]

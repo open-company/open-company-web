@@ -2,7 +2,7 @@
   (:require [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.jwt :as jwt]
-            ["@sentry/browser" :as sentry-browser]
+            [cljsjs.sentry-browser]
             [taoensso.timbre :as timbre]))
 
 (defn init-parameters [dsn]
@@ -10,17 +10,18 @@
    :tags {:isMobile (responsive/is-mobile-size?)
           :hasJWT (not (not (jwt/jwt)))}
    :sourceRoot ls/web-server
-   :release ls/deploy-key
+   :release ls/sentry-release
    :debug (= ls/log-level "debug")
-   :dsn dsn})
+   :dsn dsn
+   :environment ls/sentry-env})
 
 (defn sentry-setup []
-  (when (and (exists? sentry-browser) ls/local-dsn)
+  (when (and (exists? js/Sentry) ls/local-dsn)
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)]
-      (.init sentry-browser (clj->js sentry-params))
+      (.init js/Sentry (clj->js sentry-params))
       (timbre/debug "Sentry params:" sentry-params)
-      (.configureScope sentry-browser (fn [scope]
+      (.configureScope js/Sentry (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
         (.setTag scope "hasJWT" (not (not (jwt/jwt))))
         (when (jwt/jwt)
@@ -38,14 +39,14 @@
 (defn capture-error!
   ([e]
     (timbre/info "Capture error:" e)
-    (.captureException sentry-browser e))
+    (.captureException js/Sentry e))
   ([e error-info]
     (timbre/info "Capture error:" e "extra:" error-info)
-    (.captureException sentry-browser e #js {:extra error-info})))
+    (.captureException js/Sentry e #js {:extra error-info})))
 
 (defn capture-message! [msg & [log-level]]
   (timbre/info "Capture message:" msg)
-  (.captureMessage sentry-browser msg (or log-level "info")))
+  (.captureMessage js/Sentry msg (or log-level "info")))
 
 (defn ^:export test-sentry []
   (js/setTimeout #(capture-message! "Message from clojure") 1000)
@@ -62,13 +63,13 @@
 
 (defn capture-message-with-extra-context! [ctx message]
   (timbre/info "Capture message:" message "with context:" ctx)
-  (.withScope sentry-browser (fn [scope]
+  (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (capture-message! message))))
 
 (defn capture-error-with-extra-context! [ctx error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message "with context:" ctx)
-  (.withScope sentry-browser (fn [scope]
+  (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (try
       (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))

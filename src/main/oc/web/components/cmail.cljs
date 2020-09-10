@@ -25,7 +25,6 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
@@ -35,7 +34,8 @@
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
-            [clojure.contrib.humanize :refer (filesize)])
+            [clojure.contrib.humanize :refer (filesize)]
+            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
 
 (def self-board-name "All")
@@ -545,7 +545,6 @@
                           @(::saving s))
                      (and (not published?)
                           @(::publishing s)))
-        unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
                             "Share update")
@@ -595,24 +594,22 @@
       [:div.cmail-container
         {:ref :cmail-container}
         [:div.cmail-mobile-header
-          [:button.mlb-reset.mobile-close-bt
-            {:on-click (partial close-cmail s)}]
-          [:div.cmail-mobile-header-right
+          [:div.cmail-mobile-header-left
             [:button.mlb-reset.mobile-attachment-button
-              {:on-click #(add-attachment s)}]
-            [:div.post-button-container.group
-              (post-to-button {:on-submit #(post-clicked s)
-                               :disabled disabled?
-                               :title post-button-title
-                               :post-tt-kw post-tt-kw
-                               :force-show-tooltip @(::show-post-tooltip s)})]]]
+              {:on-click #(add-attachment s)}]]
+          [:div.cmail-mobile-header-title
+            (if (:published? cmail-data)
+              "Edit update"
+              "New update")]
+         [:button.mlb-reset.mobile-close-bt
+           {:on-click (partial close-cmail s)}]]
         [:div.dismiss-inline-cmail-container
-          {:class (when unpublished? "long-tooltip")}
+          {:class (when-not (:published? cmail-data) "long-tooltip")}
           [:button.mlb-reset.dismiss-inline-cmail
             {:on-click (partial close-cmail s)
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
-             :title (if unpublished?
+             :title (if-not (:published? cmail-data)
                       "Save & Close"
                       "Close")}]]
         [:div.cmail-content-outer
@@ -633,7 +630,13 @@
                   [:div.section-picker-container
                     (sections-picker {:active-slug (:board-slug cmail-data)
                                       :on-change did-pick-section
-                                      :current-user-data current-user-data})])])
+                                      :current-user-data current-user-data})])
+                 [:div.post-button-container.group
+                   (post-to-button {:on-submit #(post-clicked s)
+                                    :disabled disabled?
+                                    :title post-button-title
+                                    :post-tt-kw post-tt-kw
+                                    :force-show-tooltip @(::show-post-tooltip s)})]])
             ; Headline element
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline.emoji-autocomplete.emojiable

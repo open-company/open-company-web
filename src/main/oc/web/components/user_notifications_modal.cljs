@@ -135,7 +135,9 @@
               "Your timezone is "
               [:a
                 {:href "?user-settings=profile"
-                 :on-click #(nav-actions/show-user-settings :profile)
+                 :on-click #(do
+                              (utils/event-stop %)
+                              (nav-actions/show-user-settings :profile))
                  :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
                  :data-placement "top"
                  :data-container "body"

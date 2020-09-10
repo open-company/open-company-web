@@ -16,6 +16,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -86,7 +87,8 @@
                 payments-data
                 user-info-data
                 active-users
-                current-user-data]} (drv/react s :org-dashboard-data)
+                current-user-data
+                search-active]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
                      app-loading
@@ -162,10 +164,14 @@
         show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
-        show-follow-picker (= open-panel :follow-picker)]
+        show-follow-picker (= open-panel :follow-picker)
+        mobile-search? (and is-mobile?
+                            search-active)]
     (if is-loading
       [:div.org-dashboard
-        (loading {:loading true})]
+        (loading {:loading true
+                  :jwt (map? jwt-data)
+                  :current-org-slug current-org-slug})]
       [:div
         {:class (utils/class-set {:org-dashboard true
 
@@ -241,7 +247,10 @@
           (user-info-modal {:user-data user-info-data :org-data org-data})
           ;; Follow user picker
           show-follow-picker
-          (follow-picker))
+          (follow-picker)
+          ;; Mobile fullscreen search
+          mobile-search?
+          (search-box))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

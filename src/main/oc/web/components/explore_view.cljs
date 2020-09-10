@@ -38,6 +38,7 @@
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
       [:div.explore-view-blocks
+        {:class (when can-create-topic? "has-create-topic-bt")}
         (when can-create-topic?
           [:button.mlb-reset.explore-view-block.create-topic-bt
             {:on-click #(nav-actions/show-section-add)}

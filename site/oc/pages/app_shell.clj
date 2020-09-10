@@ -2,6 +2,12 @@
   (:require [environ.core :refer (env)]
             [oc.shared :as shared]))
 
+(def oc-loading
+  [:div.oc-loading.active
+   [:div.oc-loading-inner
+    [:div.oc-loading-heart]
+    [:div.oc-loading-body]]])
+
 (def app-shell
   {:head [:head
           shared/tag-manager-head
@@ -25,10 +31,6 @@
           shared/font-awesome
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
-          ;; jQuery UI CSS
-          [:link
-           {:rel "stylesheet"
-            :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Lineto font
@@ -55,9 +57,6 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
-          ;; Ziggeo
-          shared/ziggeo-css
-          shared/ziggeo-js
           ;; Intercom (Support)
           [:script {:src (shared/cdn "/lib/intercom.js")}]
           ;; Headway (What's New)
@@ -67,10 +66,7 @@
    :body [:body
           shared/tag-manager-body
           [:div#app
-           [:div.oc-loading.active
-            [:div.oc-loading-inner
-             [:div.oc-loading-heart]
-             [:div.oc-loading-body]]]]
+           oc-loading]
           [:div#oc-notifications-container]
           [:div#oc-loading]
           [:div.preload-interstitial]
@@ -84,8 +80,6 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (shared/google-analytics-init)
-          ;; Truncate html string
-          [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
@@ -98,10 +92,6 @@
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           ;; jQuery scrollTo plugin
           [:script {:src "/lib/scrollTo/scrollTo.min.js" :type "text/javascript"}]
-          ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
-          ;; Resolve jQuery UI and Bootstrap tooltip conflict
-          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           shared/bootstrap-js
           ;; Emoji One Autocomplete
           [:script {:src "/lib/emojione/autocomplete.js" :type "text/javascript"}]
@@ -162,10 +152,6 @@
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           shared/bootstrap-css
           shared/font-awesome
-          ;; jQuery UI CSS
-          [:link
-           {:rel "stylesheet"
-            :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (shared/cdn "/main.css")}]
           ;; jQuery needed by Bootstrap JavaScript
@@ -174,9 +160,6 @@
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
-          ;; Ziggeo
-          shared/ziggeo-css
-          shared/ziggeo-js
           ;; Stripe
           shared/stripe-js]
    :body [:body
@@ -197,10 +180,6 @@
             :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
-          ;; jQuery UI
-          [:script {:src "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" :type "text/javascript"}]
-          ;; Resolve jQuery UI and Bootstrap tooltip conflict
-          [:script "$.widget.bridge('uitooltip', $.ui.tooltip);"]
           shared/bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]

@@ -998,7 +998,7 @@
                              (number? caught-up-index)
                              (let [[before after] (split-at caught-up-index (vec grouped-items))]
                                (vec (remove nil? (concat before [caught-up-item] after))))
-                             (#{:following :replies} (:container-slug container-data))
+                             (#{:following} (:container-slug container-data))
                              (insert-caught-up (:container-slug container-data) grouped-items check-item-fn ignore-item-fn opts)
                              :else
                              grouped-items)

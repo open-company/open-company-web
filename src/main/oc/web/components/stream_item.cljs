@@ -23,7 +23,7 @@
             [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (comments-summary foc-comments-summary)]
-            ["hammerjs" :as hammer]))
+            [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
   [:div.stream-item-body.oc-mentions
@@ -96,7 +96,7 @@
     (when (and (fn? disabled)
                (not (disabled s)))
       (let [el (rum/dom-node s)
-            hr (hammer. el)
+            hr (js/Hammer. el)
             current-board-slug @(drv/get-ref s :board-slug)]
         (when (and (fn? swipe-left)
                    (= current-board-slug "inbox"))
@@ -390,4 +390,7 @@
                     [:div.stream-item-mobile-attachments
                       [:span.mobile-attachments-icon]
                       [:span.mobile-attachments-count
-                        (count activity-attachments)]]))]])]]))
+                        (count activity-attachments)]]))]
+              (when is-mobile?
+                [:div.stream-item-mobile-view-more
+                  "View more"])])]]))

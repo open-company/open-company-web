@@ -54,9 +54,12 @@
   db)
 
 (defmethod dispatcher/action :section-edit-save/finish
-  [db [_ section-data]]
-  (let [org-slug (utils/section-org-slug section-data)
-        section-slug (:slug section-data)
+  [db [_ org-slug section-data]]
+  (assoc db :section-editing {:loading true}))
+
+(defmethod dispatcher/action :section-edit-save/finish
+  [db [_ org-slug section-data]]
+  (let [section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
         ;; Parse the new section data
         fixed-section-data (au/parse-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
@@ -66,11 +69,11 @@
         next-board-data (merge fixed-section-data
                          (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
-     (assoc-in board-key next-board-data)
-     (dissoc :section-editing)
-     (as-> ndb
-      (update-in ndb (dispatcher/user-notifications-key org-slug)
-       #(notif-util/fix-notifications ndb %))))))
+        (assoc-in board-key next-board-data)
+        (update :section-editing #(dissoc % :loading :has-changes))
+        (as-> ndb
+              (update-in ndb (dispatcher/user-notifications-key org-slug)
+                         #(notif-util/fix-notifications ndb %))))))
 
 (defmethod dispatcher/action :section-edit/dismiss
   [db [_]]

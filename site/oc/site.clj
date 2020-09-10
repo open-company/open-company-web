@@ -57,13 +57,13 @@
              :page :app-shell
              :head (:head app-shell/app-shell)
              :body (:body app-shell/app-shell)
-             :title "Carrot"
+             :title "Carrot | Remote team communication"
              :target #{:dev}}
             {:page-name "app-shell"
              :page :prod-app-shell
              :head (:head app-shell/prod-app-shell)
              :body (:body app-shell/prod-app-shell)
-             :title "Carrot"
+             :title "Carrot | Remote team communication"
              :target #{:prod}}
             {:page-name "index"
              :page :index

@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -16,6 +15,7 @@
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive
+                        (drv/drv :jwt)
                         (drv/drv :auth-settings)
                         (drv/drv :org-slug)
                         (drv/drv :login-with-email-error)
@@ -35,10 +35,13 @@
                         (.preventDefault %)
                         (user-actions/maybe-save-login-redirect)
                         (user-actions/login-with-email @(::email s) @(::pswd s)))
-        login-with-email-error (drv/react s :login-with-email-error)]
-    (if (jwt/jwt)
+        login-with-email-error (drv/react s :login-with-email-error)
+        logged-in? (map? (drv/react s :jwt))]
+    (if logged-in?
       [:div.login-wall-container
-        (loading)]
+        (loading {:loading true
+                  :jwt logged-in?
+                  :current-org-slug current-org-slug})]
       [:div.login-wall-container
         (login-overlays-handler)
         [:header.login-wall-header
