@@ -1,0 +1,15 @@
+.suggestion {
+	display: inline-block;
+	text-decoration: none;
+	padding: 20px 40px;
+	border-radius: 4px;
+	background: #e0e0e0;
+	color: #333;
+	flex-grow: 1;
+	margin: 5px;
+	text-align: center;
+}
+
+.suggestion:hover {
+	background: #f0f0f0;
+}

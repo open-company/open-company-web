@@ -1,0 +1,14 @@
+.queryForm {
+	display: flex;
+	padding: 5px;
+}
+
+.queryFormInput {
+	flex-grow: 2;
+	display: block;
+}
+
+.queryFormSubmit {
+	flex-grow: 0;
+	display: block;
+}

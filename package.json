@@ -5,7 +5,7 @@
   "scripts": {
     "dev:build": "npm run css:copyAssets & npm run scss:build npm run cljs:build",
     "dev:watch": "npm run css:copyAssets & concurrently --kill-others \"npm run scss:watch\" \"npm run cljs:watch\"",
-    "scss:build": "node-sass --inclde-paths scss scss/app.main.scss public/css/app.main.css",
+    "scss:build": "node-sass --include-paths scss scss/app.main.scss public/css/app.main.css",
     "scss:watch": "nodemon -e scss -x \"npm run scss:build\"",
     "css:copyAssets": "bin/copy_assets",
     "cljs:build": "npx shadow-cljs build webapp",
