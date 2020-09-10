@@ -1,6 +1,6 @@
 (ns oc.web.utils.mention
   (:require [oc.web.lib.react-utils :as react-utils]
-            ["react" :as react]
+            ["react" :as react :refer (createElement)]
             ["react-dom" :as react-dom]
             ["medium-editor" :as medium-editor]
             ["medium-editor-tc-mention" :as tc-mention]
@@ -18,12 +18,12 @@
                        :extraTriggerClassNameMap {"@" "oc-mention"}
                        :renderPanelContent (fn [panel-el current-mention-text select-mention-callback]
                                              (react-dom/render
-                                              (react/createElement CustomizedTagComponent
-                                                                   (clj->js {"currentMentionText" current-mention-text
-                                                                             "users" (clj->js users-list)
-                                                                             "selectMentionCallback" select-mention-callback
+                                              (createElement CustomizedTagComponent
+                                                             (clj->js {"currentMentionText" current-mention-text
+                                                                       "users" (clj->js users-list)
+                                                                       "selectMentionCallback" select-mention-callback
                                                                             ;;  "hidePanel" (fn [] (destroy editor-node))
-                                                                             }))
+                                                                       }))
                                               panel-el))
                        :activeTriggerList ["@"]}]
     (tc-mention/TCMention. (clj->js mention-props))))

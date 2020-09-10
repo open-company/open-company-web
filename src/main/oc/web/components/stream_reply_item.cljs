@@ -36,7 +36,7 @@
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]
             [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]
-            ["emoji-mart" :as emoji-mart]))
+            ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 ;; Comment delete
 
@@ -85,7 +85,7 @@
     [:button.mlb-reset.close-bt
       {:on-click dismiss-cb}
       "Cancel"]
-    (react-utils/build (.-Picker emoji-mart)
+    (react-utils/build Picker
       {:native true
        :autoFocus true
        :onClick (fn [emoji _]

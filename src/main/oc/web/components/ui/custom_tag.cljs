@@ -5,8 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.react-utils :as react-utils]
-            ["react" :as react]
-            ["react-dom" :as react-dom]
+            ["react" :as react :refer (createElement PureComponent)]
+            ["react-dom" :as react-dom :refer (findDOMNode)]
             [goog.events :as events]
             [goog.events.EventType :as EventType])
   (:use-macros [oc.shared.macros :only [goog-extend]]))
@@ -46,33 +46,33 @@
         display-name (user-display-name user)
         slack-username (user-slack-username user)
         alt-subline (subline-text user)]
-    (react/createElement "div"
-                         (clj->js {:key (str "user-" (oget user "?user-id") "-" (oget user "?email") "-" (rand 100))
-                                   :className (string/join " " ["oc-mention-option"
-                                                                (when (= (oget props "?selectedIndex") (oget props "?index"))
-                                                                  "active ")
-                                                                (when (seq (oget user "?avatar-url"))
-                                                                  "has-avatar ")])
-                                   :data-name display-name
-                                   :data-user-id (oget user "?user-id")
-                                   :data-slack-username slack-username
-                                   :onMouseEnter (fn [e]
-                                                   (when (fn? (oget props "?hoverItem"))
-                                                     (props.hoverItem e (oget props "?index"))))
-                                   :onClick (fn [_]
-                                              (when (fn? (oget props "?clickCb"))
-                                                (props.clickCb user)))})
-                         (react/createElement "div"
-                                              (clj->js {:className "oc-mention-option-avatar"
-                                                        :style avatar-style}))
-                         (react/createElement "div"
-                                              (clj->js {:className "oc-mention-option-title"})
-                                              display-name)
-                         (react/createElement "div"
-                                              (clj->js {:className (string/join " " ["oc-mention-option-subline"
-                                                                                     (when (seq slack-username)
-                                                                                       "slack-icon")])})
-                                              (or slack-username alt-subline)))))
+    (createElement "div"
+                   (clj->js {:key (str "user-" (oget user "?user-id") "-" (oget user "?email") "-" (rand 100))
+                             :className (string/join " " ["oc-mention-option"
+                                                          (when (= (oget props "?selectedIndex") (oget props "?index"))
+                                                            "active ")
+                                                          (when (seq (oget user "?avatar-url"))
+                                                            "has-avatar ")])
+                             :data-name display-name
+                             :data-user-id (oget user "?user-id")
+                             :data-slack-username slack-username
+                             :onMouseEnter (fn [e]
+                                             (when (fn? (oget props "?hoverItem"))
+                                               (props.hoverItem e (oget props "?index"))))
+                             :onClick (fn [_]
+                                        (when (fn? (oget props "?clickCb"))
+                                          (props.clickCb user)))})
+                   (createElement "div"
+                                  (clj->js {:className "oc-mention-option-avatar"
+                                            :style avatar-style}))
+                   (createElement "div"
+                                  (clj->js {:className "oc-mention-option-title"})
+                                  display-name)
+                   (createElement "div"
+                                  (clj->js {:className (string/join " " ["oc-mention-option-subline"
+                                                                         (when (seq slack-username)
+                                                                           "slack-icon")])})
+                                  (or slack-username alt-subline)))))
 
 (defn- value-lookup [value search-value]
   (when (seq value)
@@ -103,7 +103,7 @@
   (utils/event-stop e))
 
 (goog-extend CustomizedTagComponent
-             react/PureComponent
+             PureComponent
              ([props]
               (this-as this
                        (goog/base this props)
@@ -128,19 +128,19 @@
                      (this-as this
                               ;; (goog/base (js* "this") "render")
                               (let [filtered-users (this.filterUsers (oget this "props"))]
-                                (react/createElement "div"
-                                                     #js {:className "oc-mention-options"
-                                                          :contentEditable false}
-                                                     (react/createElement "div"
-                                                                          #js {:className "oc-mention-options-list"}
-                                                                          (clj->js (mapv (fn [idx]
-                                                                                           (let [user (get filtered-users idx)]
-                                                                                             (list-item #js {:user user
-                                                                                                             :index idx
-                                                                                                             :selectedIndex (oget this "?state.?selectedIndex")
-                                                                                                             :clickCb (.bind (oget this "?selectItem") this)
-                                                                                                             :hoverItem (.bind (oget this "?hoverItem") this)})))
-                                                                                         (range (count filtered-users)))))))))
+                                (createElement "div"
+                                               #js {:className "oc-mention-options"
+                                                    :contentEditable false}
+                                               (createElement "div"
+                                                              #js {:className "oc-mention-options-list"}
+                                                              (clj->js (mapv (fn [idx]
+                                                                               (let [user (get filtered-users idx)]
+                                                                                 (list-item #js {:user user
+                                                                                                 :index idx
+                                                                                                 :selectedIndex (oget this "?state.?selectedIndex")
+                                                                                                 :clickCb (.bind (oget this "?selectItem") this)
+                                                                                                 :hoverItem (.bind (oget this "?hoverItem") this)})))
+                                                                             (range (count filtered-users)))))))))
              (filterUsers [properties]
                           (this-as this
                                   ;;  (goog/base (js* "this") "filterUsers" properties)
@@ -178,7 +178,7 @@
                (this-as this
                         ;; (goog/base (js* "this") "keyPress" e)
                         (let [event (or e (.-event js/window))
-                              node (react-dom/findDOMNode this)
+                              node (findDOMNode this)
                               options (when node (.querySelectorAll node ".oc-mention-option"))]
                           (when (and (not (dom-utils/is-hidden node))
                                      (seq options))

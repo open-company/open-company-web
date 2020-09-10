@@ -12,7 +12,7 @@
             [oc.web.actions.reaction :as reaction-actions]
             [oc.web.mixins.ui :as ui-mixins]
             [goog.object :as gobj]
-            ["emoji-mart" :as emoji-mart]))
+            ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (def default-reaction-number 3)
 
@@ -114,7 +114,7 @@
                {:on-click #(reset! (::show-picker s) false)}
                "Cancel"])
            (when-not (utils/is-test-env?)
-             (react-utils/build (.-Picker emoji-mart)
+             (react-utils/build Picker
                {:native true
                 :autoFocus true
                 :onClick (fn [emoji event]

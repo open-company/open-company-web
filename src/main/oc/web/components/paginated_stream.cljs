@@ -20,17 +20,12 @@
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            ["react-virtualized" :as react-virtualized]
-            ;; ["ReactVirtualized.grid" :as react-virtualized-grid]
-            ;; ["ReactVirtualized.WindowScroller" :as react-virtualized-window-scroller]
-            ;; ["ReactVirtualized.CellMeasurer" :as react-virtualized-cell-measurer]
-            ;; ["ReactVirtualized.CellMeasurer" :as RVCellMeasurerCache]
-            ))
+            ["react-virtualized" :as react-virtualized :refer (Grid WindowScroller CellMeasurer CellMeasurerCache)]))
 
-(def virtualized-grid (partial rutils/build react-virtualized/Grid))
-(def window-scroller (partial rutils/build react-virtualized/WindowScroller))
-(def cell-measurer (partial rutils/build react-virtualized/CellMeasurer))
-(def RVCellMeasurerCache react-virtualized/CellMeasurerCache)
+(def virtualized-grid (partial rutils/build Grid))
+(def window-scroller (partial rutils/build WindowScroller))
+(def cell-measurer (partial rutils/build CellMeasurer))
+(def RVCellMeasurerCache CellMeasurerCache)
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def collapsed-foc-height 56)

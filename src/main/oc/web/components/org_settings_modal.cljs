@@ -20,9 +20,9 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.email-domains :refer (email-domains)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
-            ["react-color" :as react-color]))
+            ["react-color" :as react-color :refer (ChromePicker)]))
 
-(def color-picker (partial rutils/build react-color/ChromePicker))
+(def color-picker (partial rutils/build ChromePicker))
 
 (def color-presets [{:rgb {:r 251 :g 94 :b 72}
                      :hex "#FB5E48"}

@@ -26,7 +26,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]
-            ["emoji-mart" :as emoji-mart]))
+            ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
@@ -94,7 +94,7 @@
     [:button.mlb-reset.close-bt
       {:on-click dismiss-cb}
       "Cancel"]
-    (react-utils/build (.-Picker emoji-mart)
+    (react-utils/build Picker
       {:native true
        :autoFocus true
        :onClick (fn [emoji _]
