@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="14px" viewBox="0 0 18 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.1 (47250) - http://www.bohemiancoding.com/sketch -->
+    <title>Menu Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Empty-board-(m)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-24.000000, -25.000000)">
+        <path d="M24,25 L42,25 L42,27 L24,27 L24,25 Z M24,31 L42,31 L42,33 L24,33 L24,31 Z M24,37 L42,37 L42,39 L24,39 L24,37 Z" id="Menu-Icon" fill="#373F4F"></path>
+    </g>
+</svg>

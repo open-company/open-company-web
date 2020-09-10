@@ -1,0 +1,4 @@
+{:require [oc.electron.main]
+ :init-fns [oc.electron.main/init]
+ :compiler-options {:target :nodejs
+                    :output-to "index.js"}}

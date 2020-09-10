@@ -1,0 +1,52 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"
+  "scss"]
+ :nrepl {:port 8450}
+
+ :dependencies
+ [[rum "0.11.4"] ; https://github.com/tonsky/rum
+  [org.martinklepsch/derivatives "0.3.1-alpha"] ; Chains of derived data https://github.com/martinklepsch/derivatives
+  [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
+
+  ;; ClojureScript libraries
+  [cljs-http "0.1.46"] ; HTTP for cljs https://github.com/r0man/cljs-http
+  [clj-commons/secretary "1.2.5-SNAPSHOT"] ; Client-side router https://github.com/clj-commons/secretary
+  [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
+  [funcool/cuerdas "2020.03.26-3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+  [medley "1.2.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+  ;; [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
+  [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
+  [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
+
+  ;; Library for OC projects https://github.com/open-company/open-company-lib
+  [open-company/lib "0.17.29-alpha25" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+  ;; In addition to common functions, brings in the following common dependencies used by this project:
+  ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
+  ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
+  ;; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
+  ;; environ - Get environment settings from different sources https://github.com/weavejester/environ
+  ;; hickory - HTML as data https://github.com/davidsantiago/hickory
+  ;; cljs-time - clj-time inspired date library for clojurescript. https://github.com/andrewmcveigh/cljs-time
+  ;; com.taoensso/sente - WebSocket client https://github.com/ptaoussanis/sente
+
+  ;; NB: This needs pulled in after oc.lib
+  [clojure-humanize "0.2.2" :excludes [com.andrewmcveigh/cljs-time]] ; Produce human readable strings in clojure https://github.com/trhura/clojure-humanize
+
+  [ring "1.8.1"]
+  [compojure "1.6.2" :exclusions [ring]]
+  [http-kit "2.5.0-alpha2"]]
+
+ :dev-http {3559 {:roots ["public"]
+                  :handler oc.dev/handler
+                  }}
+ :builds
+ {:webapp
+  {:target :browser
+   :devtools {:ignore-warnings true
+              :before-load oc.web.core/on-js-reload}
+   :modules {:oc {:init-fn oc.web.core/init}}
+   :repl-init-ns oc.web.core
+   :repl-pprint true}}}

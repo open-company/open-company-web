@@ -6,6 +6,7 @@
   "Pricing page."
   [options]
   [:div.pricing-wrap.group
+
     {:id "wrap"}
     [:div.main.pricing
 
@@ -173,5 +174,4 @@
       ; (shared/dashed-string 5 "big-web-tablet-only")
 
       ; shared/pricing-footer
-
     ]])

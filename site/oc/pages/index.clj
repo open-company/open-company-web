@@ -1,22 +1,21 @@
 (ns oc.pages.index
-  (:require [oc.pages.shared :as shared]))
+  (:require [oc.shared :as shared]))
 
 (defn index [options]
   [:div.home-wrap.group
-    {:id "wrap"}
-    [:div.main.home-page
+   {:id "wrap"}
+   [:div.main.home-page
       ; Hope page header
-      [:section.cta.group
-
+    [:section.cta.group
         [:h1.headline
-          "A better news feed for team updates "]
-        [:div.subheadline
-         "Carrot makes it simple to know what's happening on your team without all the back-and-forth chatter. Ideal for remote teams and asynchronous updates."]
+          "Your team’s news feed"]
+        [:div.subheadline.big-web-tablet-only
+          "The latest updates from your team, simplified."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Try Carrot for free"]
+            "Try Carrot"]
           [:span.get-started-subtitle
             "Open source and free."]]
 
@@ -44,5 +43,4 @@
                       (shared/cdn "/img/ML/homepage_screenshot@3x.png") " 3x, "
                       (shared/cdn "/img/ML/homepage_screenshot@4x.png") " 4x")}]]]
 
-      shared/pricing-footer
-      ]])
+    shared/pricing-footer]])

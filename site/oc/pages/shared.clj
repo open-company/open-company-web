@@ -145,11 +145,23 @@
 (defn testimonials-section [page]
   [:section.testimonials
 
-    (dashed-string 1)
+    ; (dashed-string 1)
 
-    (testimonial-block :ifttt "")
+    ; (testimonial-block :ifttt "big-web-tablet-only")
+    ; (testimonials-screenshot-block :thoughtful-communication "mobile-only")
 
-    (dashed-string 2)
+    ; (dashed-string 2)
+
+    ; ; (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
+    ; (testimonial-block :ifttt "mobile-only")
+
+    ; (dashed-string 3 "mobile-only")
+
+    ; (if (= page :slack)
+    ;   (testimonials-screenshot-block :stay-in-sync-slack "mobile-only")
+    ;   (testimonials-screenshot-block :conversation "mobile-only"))
+
+    ; (dashed-string 4 "mobile-only")
 
     [:div.testimonials-floated-block.big-web-tablet-only
       [:div.testimonials-floated-block-inner.left-block.group
@@ -164,9 +176,9 @@
           [:div.testimonials-floated-header
             "Stay focused with less noise"]
           [:div.testimonials-floated-subheader
-            "Personalize your news feed to filter out topics you don't care about."
+            "Focus on useful updates by filtering out topics you don’t care about."
             [:br]
-            "This saves you time and makes it faster to get caught up."]]]
+            "Ideal for remote teams and asynchronous updates."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot
@@ -180,17 +192,84 @@
           [:div.testimonials-floated-header
             "Reduce interruptions"]
           [:div.testimonials-floated-subheader
-            "Prefer to see team updates batched together to read them all at once?"
+            "Prefer to see updates batched together? Get a personalized digest on your schedule."
             [:br]
-            "Your daily digest makes it easy to get caught up when it's more convenient."]]]
+            "Perfect for getting caught up when you’re ready."]]]
 
+    ;   [:div.testimonials-floated-block-inner.left-block.group
+    ;     [:img.testimonials-floated-screenshot
+    ;       {:src (cdn "/img/ML/testimonials_floated_screenshot_3.png")
+    ;        :srcSet (str
+    ;                 (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x, "
+    ;                 (cdn "/img/ML/testimonials_floated_screenshot_3@3x.png") " 3x, "
+    ;                 (cdn "/img/ML/testimonials_floated_screenshot_3@4x.png") " 4x")}]
+    ;     [:div.testimonials-floated-copy
+    ;       [:div.testimonials-floated-header
+    ;         "Know who saw your update"]
+    ;       [:div.testimonials-floated-subheader
+    ;         "Is anyone paying attention? Carrot works in the background to make sure everyone sees what matters. If it's missed, Carrot reminds them for you."]]]
     ]
+    ; (if (= page :slack)
+    ;   (testimonials-screenshot-block :conversation "mobile-only")
+    ;   (testimonials-screenshot-block :threads "mobile-only"))
 
-    (dashed-string 5)
+    ; (dashed-string 5)
 
-    (testimonial-block :blend-labs "")
-    
-    (dashed-string 6)
+    ; [:div.testimonials-commgaps-block.big-web-tablet-only
+    ;   [:div.testimonals-commgaps-header
+    ;     "Close communication gaps"]
+    ;   [:div.testimonals-commgaps-subheader
+    ;     "Automatically share posts to Slack and email to increase coverage."]
+    ;   [:div.testimonials.commgaps-block-inner.group
+    ;     [:div.testimonials-commgaps-column.left-column
+    ;       (if (= page :slack)
+    ;         [:img.testimonials-commgaps-column-screenshot
+    ;           {:src (cdn "/img/ML/testimonials_commgaps_slack_digest.png")
+    ;            :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x, "
+    ;                         (cdn "/img/ML/testimonials_commgaps_slack_digest@3x.png") " 3x, "
+    ;                         (cdn "/img/ML/testimonials_commgaps_slack_digest@4x.png") " 4x")}]
+    ;         [:img.testimonials-commgaps-column-screenshot
+    ;           {:src (cdn "/img/ML/testimonials_commgaps_email.png")
+    ;            :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x, "
+    ;                         (cdn "/img/ML/testimonials_commgaps_email@3x.png") " 3x, "
+    ;                         (cdn "/img/ML/testimonials_commgaps_email@4x.png") " 4x")}])
+    ;       [:div.testimonials-commgaps-column-header
+    ;         "Daily newsletter to stay in sync"]
+    ;       [:div.testimonials-commgaps-column-subheader
+    ;         "Everyone gets a daily, personalized summary of what's important."]]
+    ;     [:div.testimonials-commgaps-column.right-column
+    ;       [:img.testimonials-commgaps-column-screenshot
+    ;         {:src (cdn "/img/ML/testimonials_commgaps_slack.png")
+    ;          :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x, "
+    ;                       (cdn "/img/ML/testimonials_commgaps_slack@3x.png") " 3x, "
+    ;                       (cdn "/img/ML/testimonials_commgaps_slack@4x.png") " 4x")}]
+    ;       [:div.testimonials-commgaps-column-header
+    ;         "Auto-share posts to Slack"]
+    ;       [:div.testimonials-commgaps-column-subheader
+    ;         "Your Carrot posts are automatically shared to the right Slack #channel."]]]]
+    ; (testimonial-block :blend-labs "mobile-only")
+
+    ; (dashed-string 6)
+
+    ; (testimonial-block :blend-labs "big-web-tablet-only")
+
+    ; (dashed-string 1 "big-web-tablet-only")
+
+    ; (if (= page :slack)
+    ;   (testimonials-screenshot-block :threads "mobile-only")
+    ;   (testimonials-screenshot-block :analytics "mobile-only"))
+
+    ; (dashed-string 5 "mobile-only")
+
+    ; (if (= page :slack)
+    ;   (testimonials-screenshot-block :analytics "mobile-only")
+    ;   (testimonials-screenshot-block :stay-in-sync "mobile-only"))
+
+    ; (dashed-string 2 "mobile-only")
+
+    ; (testimonials-screenshot-block :share-to-slack "mobile-only")
+
+    ; (dashed-string 3 "mobile-only")
     ])
 
 (def pricing-table

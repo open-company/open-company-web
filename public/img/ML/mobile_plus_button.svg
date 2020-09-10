@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="All-posts" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Mobile-nav-headers" transform="translate(-327.000000, -186.000000)" fill="#FA6654">
+            <g id="Group-14" transform="translate(258.000000, 186.000000)">
+                <g id="Group" transform="translate(69.000000, 0.000000)">
+                    <ellipse id="Oval-2" opacity="0.200000003" cx="15.8095952" cy="15.7944664" rx="15.8095952" ry="15.7944664"></ellipse>
+                    <path d="M14.8,14.7954067 L14.8,9.19333404 C14.8,8.53427385 15.3326378,8 16,8 C16.6627417,8 17.2,8.53841171 17.2,9.19333404 L17.2,14.7954067 L22.8055229,14.7954067 C23.4652144,14.7954067 24,15.3275348 24,15.9942584 C24,16.6563659 23.4610726,17.19311 22.8055229,17.19311 L17.2,17.19311 L17.2,22.7951827 C17.2,23.4542429 16.6673622,23.9885167 16,23.9885167 C15.3372583,23.9885167 14.8,23.450105 14.8,22.7951827 L14.8,17.19311 L9.19447708,17.19311 C8.53478561,17.19311 8,16.660982 8,15.9942584 C8,15.3321509 8.53892743,14.7954067 9.19447708,14.7954067 L14.8,14.7954067 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

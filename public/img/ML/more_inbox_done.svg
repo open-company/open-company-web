@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="12px" viewBox="0 0 16 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Path</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Inbox/unread" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="Inbox:-Action-bar-states" transform="translate(-294.000000, -459.000000)" fill="#34414F" stroke="#34414F">
+            <path d="M307.218935,460.299605 C307.626242,459.900132 308.295327,459.900132 308.702634,460.299605 C309.099122,460.688469 309.099122,461.311531 308.702634,461.700395 L300.545771,469.700395 C300.138464,470.099868 299.469379,470.099868 299.062072,469.700395 L295.297366,466.008087 C294.900878,465.619223 294.900878,464.996161 295.297366,464.607298 C295.704673,464.207824 296.373758,464.207824 296.781065,464.607298 L299.803922,467.572022 L307.218935,460.299605 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>
