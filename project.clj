@@ -58,6 +58,7 @@
         [jonase/eastwood "0.3.11"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
         [lein-kibit "0.1.8" :exclusions [org.clojure/clojure]]
+        [lein-pdo "0.1.1"]
       ]
     }
 
@@ -116,11 +117,11 @@
   }
 
             
-  :aliases {"start" ["auto" "start*"] ; start a development server
-            "start*" ["do" "watch-site," "ocweb"] ; Site & cljs dev
+  :aliases {"start" ["pdo" "watch-site," "watch-ocweb"] ; Site & cljs dev
+            "watch-ocweb" ["auto" "ocweb"]
             "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
-            "auto-watch-site" ["auto" "watch-site"] ; Build the static website
-            "watch-site" ["run" "dev"] ; build the HTML pages and watch for changes
+            "watch-site" ["auto" "watch-site"] ; Build the static website
+            "build-site" ["run" "dev"] ; build the HTML pages and watch for changes
 
             "build" ["do" "clean," "deps," "compile"] ; clean and build code
             "autotest" ["with-profile" "qa" "do" "midje" ":autotest"] ; watch for code changes and run affected tests
