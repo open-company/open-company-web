@@ -117,7 +117,7 @@
   }
 
             
-  :aliases {"start" ["pdo" "watch-site," "watch-ocweb"] ; Site & cljs dev
+  :aliases {"start" ["pdo" "run" "watch-site," "watch-ocweb"] ; Site & cljs dev
             "watch-ocweb" ["auto" "ocweb"]
             "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
             "watch-site" ["auto" "watch-site"] ; Build the static website
