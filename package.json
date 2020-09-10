@@ -8,8 +8,9 @@
     "scss:build": "node-sass --include-paths scss scss/app.main.scss public/css/app.main.css",
     "scss:watch": "nodemon -e scss -x \"npm run scss:build\"",
     "css:copyAssets": "bin/copy_assets",
-    "cljs:build": "npx shadow-cljs build webapp",
-    "cljs:watch": "npx shadow-cljs watch webapp"
+    "cljs:build": "npx shadow-cljs compile webapp",
+    "cljs:watch": "npx shadow-cljs watch webapp",
+    "release": "npx shadow-cljs release webapp"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",

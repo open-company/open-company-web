@@ -49,4 +49,7 @@
               :before-load oc.web.core/on-js-reload}
    :modules {:oc {:init-fn oc.web.core/init}}
    :repl-init-ns oc.web.core
-   :repl-pprint true}}}
+   :repl-pprint true
+   :dev {:compiler-options {:optimizations :none}}
+   :compiler-options {:infer-externs :auto}
+   :release {:compiler-options {:optimizations :advanced}}}}}
