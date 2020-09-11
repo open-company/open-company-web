@@ -13,6 +13,7 @@ export enum ResultSort {
 
 export interface IGifImage {
   gif_url: string;
+  url: string;
   height: string;
   width: string;
 }

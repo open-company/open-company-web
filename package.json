@@ -35,7 +35,7 @@
     "react": "16.11.0",
     "react-color": "^2.18.1",
     "react-dom": "16.11.0",
-    "react-giphy-selector": "0.0.1",
+    "react-giphy-selector": "github:bago2k4/react-giphy-selector#shadow-cljs",
     "react-virtualized": "9.21.2",
     "xregexp": "4.3.0"
   }

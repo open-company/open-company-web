@@ -27,7 +27,8 @@ export class SearchResult extends React.Component<ISearchResultProps, {}> {
   public render(): JSX.Element {
     const { gifObject, searchResultClassName, searchResultStyle } = this.props;
 
-    const sourceImage: IGifImage = gifObject.images.fixed_width;
+    const fixedWidth: IGifImage = gifObject.images.fixed_width,
+          sourceImageUrl: string = fixedWidth.url || fixedWidth.gif_url;
 
     return (
       <li>
@@ -37,7 +38,7 @@ export class SearchResult extends React.Component<ISearchResultProps, {}> {
           onClick={this.onClick}
           className={cn(defaultStyle.searchResult, searchResultClassName)}
         >
-          <img src={sourceImage.gif_url} />
+          <img src={sourceImageUrl} />
         </a>
       </li>
     );
