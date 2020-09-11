@@ -56,7 +56,7 @@
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
         show-new-comments? replies?
-        collapsed-item? (and (= foc-layout dis/other-foc-layout)
+        collapsed-item? (and replies?
                              (not is-mobile))]
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
@@ -431,6 +431,7 @@
         member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)]
     [:div.paginated-stream.group
+      {:class (when replies? "collapsed-cards")}
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
           (when replies?

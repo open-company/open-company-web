@@ -8,6 +8,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
@@ -80,29 +81,29 @@
         {:class (utils/class-set {:must-see-item (:must-see activity-data)
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
+                                  :new-item (pos? (:unseen-comments activity-data))
                                   :no-comments has-zero-comments?})}
         [:div.stream-collapsed-item-avatar-container
           (user-info-hover {:user-data publisher :current-user-id (:user-id current-user-data)})
           [:div.stream-collapsed-item-avatar
-            (user-avatar-image publisher)]]
+            (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]]
         [:div.stream-collapsed-item-fill
+          [:div.stream-item-context
+           (-> activity-data :for-you-context :label)]
+          [:div.stream-item-arrow]
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-collapsed-item-dot.muted-dot]
+          [:div.new-item-tag]
           [:div.muted-activity]
           [:div.must-see-tag]
           [:div.bookmark-tag-small]
-          (stream-item-summary activity-data)]
-        (when-not has-zero-comments?
-          (comments-summary {:entry-data activity-data
-                             :comments-data comments-data
-                             :new-comments-count (:new-comments-count activity-data)
-                             :hide-label? is-mobile?
-                             :current-activity-id current-activity-id}))
+          ;; (stream-item-summary activity-data)
+         ]
         [:div.collapsed-time
-          (let [t (or (:published-at activity-data) (:created-at activity-data))]
+          (let [t (:timestamp (:for-you-context activity-data))]
             [:time
               {:date-time t
                :data-toggle (when-not is-mobile? "tooltip")
