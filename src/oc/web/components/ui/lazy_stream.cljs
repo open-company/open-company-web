@@ -24,7 +24,6 @@
                     (map? container-data))
         collapsed-foc? (or (= foc-layout dis/other-foc-layout)
                            (= current-board-slug "replies"))]
-    (js/console.log "DBG lazy-stream" current-board-slug)
     [:div.lazy-stream
       (if ready?
         (stream-comp)

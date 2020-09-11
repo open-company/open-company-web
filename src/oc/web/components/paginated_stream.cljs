@@ -31,11 +31,14 @@
 (def collapsed-foc-height 56)
 (def foc-height 204)
 (def mobile-foc-height 166)
+(def mobile-collapsed-foc-height 83)
 
-(defn- calc-card-height [mobile? foc-layout]
-  (cond mobile?
+(defn- calc-card-height [mobile? collapsed?]
+  (cond (and mobile? collapsed?)
+        mobile-collapsed-foc-height
+        mobile?
         mobile-foc-height
-        (= foc-layout dis/other-foc-layout)
+        collapsed?
         collapsed-foc-height
         :else
         foc-height))
@@ -56,8 +59,7 @@
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
         show-new-comments? replies?
-        collapsed-item? (and replies?
-                             (not is-mobile))]
+        collapsed-item? replies?]
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
@@ -232,7 +234,7 @@
                                     (reset! (::force-re-render s) (utils/activity-uuid))
                                     (reset! (::cache s)
                                      (RVCellMeasurerCache.
-                                      (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (:foc-layout props))
+                                      (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (or (:foc-layout props) replies?))
                                                 :minHeight 1
                                                 :fixedWidth true})))
                                     (reset! (::row-keys s) next-row-keys))

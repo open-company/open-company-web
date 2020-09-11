@@ -83,35 +83,59 @@
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :new-item (pos? (:unseen-comments activity-data))
                                   :no-comments has-zero-comments?})}
-        [:div.stream-collapsed-item-avatar-container
-          (user-info-hover {:user-data publisher :current-user-id (:user-id current-user-data)})
-          [:div.stream-collapsed-item-avatar
-            (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]]
-        [:div.stream-collapsed-item-fill
-          [:div.stream-item-context
-           (-> activity-data :for-you-context :label)]
-          [:div.stream-item-arrow]
-          [:div.stream-item-headline.ap-seen-item-headline
-            {:ref "activity-headline"
-             :data-itemuuid (:uuid activity-data)
-             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          [:div.stream-collapsed-item-dot.muted-dot]
-          [:div.new-item-tag]
-          [:div.muted-activity]
-          [:div.must-see-tag]
-          [:div.bookmark-tag-small]
-          ;; (stream-item-summary activity-data)
-         ]
-        [:div.collapsed-time
-          (let [t (:timestamp (:for-you-context activity-data))]
-            [:time
-              {:date-time t
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :data-title (utils/activity-date-tooltip activity-data)}
-              (utils/foc-date-time t)])]]
+        (if false ;is-mobile?
+          [:div.stream-collapsed-item-fillers
+           [:div.stream-collapsed-item-fill
+            [:div.stream-collapsed-item-avatar
+             (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
+            [:div.stream-item-context
+             (-> activity-data :for-you-context :label)]
+            [:div.stream-collapsed-item-dot.muted-dot]
+            [:div.new-item-tag]
+            [:div.bookmark-tag-small]
+            [:div.muted-activity]
+            [:div.collapsed-time
+             (let [t (:timestamp (:for-you-context activity-data))]
+               [:time
+                {:date-time t
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]]
+            [:div.stream-collapsed-item-fill
+             [:div.stream-item-arrow]
+              [:div.stream-item-headline.ap-seen-item-headline
+               {:ref "activity-headline"
+                :data-itemuuid (:uuid activity-data)
+                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]]
+          [:div.stream-collapsed-item-fill
+            [:div.stream-collapsed-item-avatar
+              (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
+            [:div.stream-item-context
+            (-> activity-data :for-you-context :label)]
+            ;; Needed to wrap mobile on a new line
+            [:div.stream-item-break]
+            [:div.stream-item-arrow]
+            [:div.stream-item-headline.ap-seen-item-headline
+              {:ref "activity-headline"
+              :data-itemuuid (:uuid activity-data)
+              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            [:div.stream-collapsed-item-dot.muted-dot]
+            [:div.new-item-tag]
+            [:div.bookmark-tag-small]
+            [:div.muted-activity]
+            [:div.collapsed-time
+              (let [t (:timestamp (:for-you-context activity-data))]
+                [:time
+                {:date-time t
+                  :data-toggle (when-not is-mobile? "tooltip")
+                  :data-placement "top"
+                  :data-container "body"
+                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                  :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]])]
       (more-menu {:entity-data activity-data
                   :share-container-id dom-element-id
                   :editable-boards editable-boards

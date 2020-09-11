@@ -11,6 +11,10 @@ div.paginated-stream {
 
   &.collapsed-cards {
     margin-top: 16px;
+
+    @include mobile() {
+      margin-top: 0;
+    }
   }
 
   div.paginated-stream-cards {
