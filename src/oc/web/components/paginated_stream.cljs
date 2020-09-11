@@ -276,11 +276,13 @@
                                       (partial list-item derived-props row-props)))))
         width (if is-mobile?
                 js/window.innerWidth
-                620)]
+                620)
+        replies? (= (:container-slug container-data) :replies)]
     [:div.virtualized-list-container
       {:ref registerChild
        :data-render-key @(::force-re-render s)
-       :key (str "virtualized-list-" key-prefix)}
+       :key (str "virtualized-list-" key-prefix)
+       :class (when replies? "collapsed")}
       (virtualized-grid {:autoHeight true
                          :ref :virtualized-list-comp
                          :deferredMeasurementCache @(::cache s)
