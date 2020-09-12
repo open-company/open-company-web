@@ -516,11 +516,17 @@
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
 
-(def oc-js
-  [:script {:type "text/javascript" :src "/oc.js"}])
+(defn oc-js []
+  [:script {:type "text/javascript" :src (cdn "/js/oc.js")}])
 
-(def oc-assets-js
-  [:script {:type "text/javascript" :src "/oc_assets.js"}])
+(defn oc-assets-js []
+  [:script {:type "text/javascript" :src (cdn "/js/oc_assets.js")}])
+
+(defn static-js []
+  [:script {:src (cdn "/js/static-js.js")}])
+
+(defn intercom-js []
+  [:script {:src (cdn "/js/intercom.js")}])
 
 (def tag-manager-head
   [:script"
@@ -606,17 +612,16 @@
     jquery
     ie-jquery-fix
     ;; Static js files
-    [:script {:src (cdn "/js/static-js.js")}]
+    (static-js)
     ;; Intercom (Support chat)
-    [:script {:src (cdn "/js/intercom.js")}]
+    (intercom-js)
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
-    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
-    [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-    (google-analytics-init)
+    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/autotrack.js")}]
+    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/google-analytics.js")}]
     ;; TODO: enable when we want to use full story for static pages.
     ;;(when (= (env :fullstory) "true")
-    ;;  [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
+    ;;  [:script {:type "text/javascript" :src (cdn "/lib/fullstory.js")}])
     ;;(when (= (env :fullstory) "true") (fullstory-init))
     bootstrap-js])
 

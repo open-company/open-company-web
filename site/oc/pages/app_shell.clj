@@ -58,7 +58,7 @@
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
           ;; Intercom (Support)
-          [:script {:src (shared/cdn "/lib/intercom.js")}]
+          (shared/intercom-js)
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Stripe
@@ -74,12 +74,11 @@
           shared/jquery
           shared/ie-jquery-fix
           ;; Static js files
-          [:script {:type "text/javascript" :src (shared/cdn "/lib/static-js.js")}]
+          (shared/static-js)
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-          (shared/google-analytics-init)
           ;; Rangy
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
@@ -173,7 +172,7 @@
           [:div#oc-loading]
           [:div.preload-interstitial]
           ;; Static js files
-          [:script {:src (shared/cdn "/lib/static-js.js")}]
+          (shared/static-js)
           ;; jQuery textcomplete needed by Emoji One autocomplete
           [:script
            {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
@@ -184,13 +183,13 @@
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
           ;; Intercom (Support)
-          [:script {:src (shared/cdn "/lib/intercom.js")}]
+          (shared/intercom-js)
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN
-          shared/oc-js
+          (shared/oc-js)
           ;; Compiled assets
-          shared/oc-assets-js
+          (shared/oc-assets-js)
           (when (= (env :fullstory) "true")
             (shared/fullstory-init))
           (shared/google-analytics-init)]})

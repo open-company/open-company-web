@@ -58,4 +58,6 @@
    :dev {:compiler-options {:optimizations :none}}
    :compiler-options {:infer-externs :auto}
    :release {:compiler-options {:optimizations :advanced
-                                :source-map true}}}}}
+                                :source-map true
+                                :source-map-include-sources-content true
+                                :source-map-detail-level :symbols}}}}}

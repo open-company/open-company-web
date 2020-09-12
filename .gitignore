@@ -5,7 +5,7 @@ pom.xml
 /classes/
 /out/
 /target/
-resources/public/js/compiled/
+public/js/compiled/
 .lein-*
 .repl
 .nrepl-*
@@ -19,7 +19,7 @@ open-company-web.iml
 .ruby-gemset
 .ruby-version
 
-resources/public/js/oc_assets.*
+public/js/oc_assets.*
 
 forms-emitted.txt
 forms-read.txt
@@ -28,18 +28,17 @@ forms-analyzed.txt
 .calva/
 
 public/js/cljs-runtime
-public/oc.js
-public/oc_assets.js
-public/oc.js.map
-public/oc_assets.map.js
-public/js/manifest.edn
+public/js/oc.*
 
 # Ignore compiled css and html files
 public/css/app.main.css
 public/*.html
 
-# See resources/electron-builder.example.env
-resources/electron-builder.env
+# See electron-builder.example.env
+electron-builder.env
 
 # Local env file used only in local development
-resources/public/js/local-env.js
+public/js/local-env.js
+
+# Manifest file from shadow-cljs for code splitting
+public/js/manifest.edn
