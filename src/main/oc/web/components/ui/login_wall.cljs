@@ -18,6 +18,7 @@
                         (drv/drv :jwt)
                         (drv/drv :auth-settings)
                         (drv/drv :org-slug)
+                        (drv/drv :board-slug)
                         (drv/drv :login-with-email-error)
                         (drv/drv :expo-deep-link-origin)
                         (rum/local "" ::email)
@@ -25,6 +26,7 @@
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         current-org-slug (drv/react s :org-slug)
+        current-board-slug (drv/react s :board-slug)
         deep-link-origin (drv/react s :expo-deep-link-origin)
         email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
         login-enabled (and auth-settings
@@ -41,7 +43,8 @@
       [:div.login-wall-container
         (loading {:loading true
                   :jwt logged-in?
-                  :current-org-slug current-org-slug})]
+                  :current-org-slug current-org-slug
+                  :current-board-slug current-board-slug})]
       [:div.login-wall-container
         (login-overlays-handler)
         [:header.login-wall-header

@@ -324,28 +324,6 @@ div.stream-item {
 
       div.new-item-tag {
         flex: 0 0 auto;
-        width: 31px;
-        height: 14px;
-        position: relative;
-        background-color: var(--primary-light-color);
-        border-radius: 4px;
-        margin-left: 8px;
-        padding: 1px 2px;
-
-        &:before {
-          display: block;
-          width: 27px;
-          height: 12px;
-          @include OC_Body_Bold();
-          font-size: 11px;
-          line-height: 12px;
-          content: "NEW";
-          color: var(--primary-color);
-          // position: absolute;
-          // top: 0;
-          // left: 0;
-          text-align: center;
-        }
       }
 
       div.bookmark-tag-small {
@@ -399,6 +377,8 @@ div.stream-item {
   @include bookmark-tag();
 
   @include muted-activity();
+
+  @include new-item-tag();
 
   div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;

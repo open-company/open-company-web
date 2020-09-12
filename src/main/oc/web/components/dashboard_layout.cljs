@@ -197,7 +197,7 @@
                  :class (when is-replies
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "For you"]]
+                [:span.tab-label "Activity"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -303,7 +303,7 @@
                                                    "Unfollowing"
 
                                                    is-replies
-                                                   "For you"
+                                                   "Activity"
 
                                                    :default
                                                    ;; Fallback to the org board data

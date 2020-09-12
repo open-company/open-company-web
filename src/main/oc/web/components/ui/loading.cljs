@@ -24,11 +24,13 @@
      [:div.oc-loading-navigation-sidebar-row]]
     [:div.oc-loading-dashboard
      [:div.oc-loading-qp]
-     [:div.oc-loading-feed]]]])
+     [:div.oc-loading-feed-title]
+     [:div.oc-loading-feed
+      {:class (when (= (:current-board-slug data) "replies") "collapsed")}]]]])
 
 (rum/defc loading < rum/static
-  [{:keys [current-org-slug jwt loading]}]
+  [{:keys [current-org-slug current-board-slug jwt loading]}]
   (if (and current-org-slug
            jwt)
-    (ghost-screen {:loading loading})
+    (ghost-screen {:loading loading :current-board-slug current-board-slug})
     (shaky-carrot {:loading loading})))

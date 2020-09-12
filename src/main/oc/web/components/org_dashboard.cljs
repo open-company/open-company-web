@@ -171,7 +171,8 @@
       [:div.org-dashboard
         (loading {:loading true
                   :jwt (map? jwt-data)
-                  :current-org-slug current-org-slug})]
+                  :current-org-slug current-org-slug
+                  :current-board-slug current-board-slug})]
       [:div
         {:class (utils/class-set {:org-dashboard true
 

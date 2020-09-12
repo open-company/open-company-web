@@ -9,6 +9,14 @@ div.paginated-stream {
     min-height: calc(100vh - 54px - 72px);
   }
 
+  &.collapsed-cards {
+    margin-top: 16px;
+
+    @include mobile() {
+      margin-top: 0;
+    }
+  }
+
   div.paginated-stream-cards {
 
     div.loading-updates {
@@ -97,21 +105,48 @@ div.paginated-stream {
       div.virtualized-list-container {
         position: relative;
         background-size: contain;
-        background-repeat-x: no-repeat;
-        background-repeat-y: repeat;
-        background-position: 0px 0px;
+        // background-repeat-x: no-repeat;
+        background-repeat: repeat-y;
+        background-position: left 0px top 16px;
+        background-origin: top 16px left 0;
         width: 100%;
-        background-image: cdnUrl("/img/ML/interstitial.svg");
+        // background-image: cdnUrl("/img/ML/interstitial.svg");
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard.svg");
 
         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/interstitial@dark.svg");
+          // background-image: cdnUrl("/img/ML/interstitial@dark.svg");
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard@dark.svg");
         }
 
         @include mobile() {
-          background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+          background-position: left 0px top 0px;
+          background-origin: top 0 left 0;
+          // background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
 
           @include dark_mode() {
-            background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
+            // background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+          }
+        }
+
+        &.collapsed {
+          background-position: left 0px top 0px;
+          background-origin: top 0 left 0;
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed@dark.svg");
+          }
+
+          @include mobile() {
+            background-position: left 0px top 0px;
+            background-origin: top 0 left 0;
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collpased.svg");
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collapsed@dark.svg");
+            }
           }
         }
 

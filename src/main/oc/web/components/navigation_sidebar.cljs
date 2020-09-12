@@ -179,7 +179,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "For you"]
+                "Activity"]
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile

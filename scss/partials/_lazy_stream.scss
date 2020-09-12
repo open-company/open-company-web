@@ -12,7 +12,7 @@ div.lazy-stream {
     width: 100%;
     height: 100%;
     background-repeat: repeat-y;
-    background-position: top -40px left 0;
+    background-position: top -32px left 0;
 
     @include big_web() {
       margin-top: 16px;
@@ -36,6 +36,35 @@ div.lazy-stream {
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+      }
+    }
+
+    &.collapsed {
+      background-position: top 0 left 0;
+
+      @include big_web() {
+        margin-top: 16px;
+        min-height: calc(100vh - 140px);
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed.svg");
+        background-size: #{$board_container_width}px auto;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed@dark.svg");
+        }
+      }
+
+      @include mobile() {
+        margin-top: 16px;
+        padding: 0 8px 0 0;
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collapsed.svg");
+        min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
+        background-size: calc(100% - 48px) auto;
+        background-position: left 24px top 0;
+        background-repeat: repeat-y;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collaped@dark.svg");
+        }
       }
     }
   }
