@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cat $1/public/css/app.main.css >> $2.temp
+cat $1/public/css/medium-editor/medium-editor.css >> $2.temp
+cat $1/public/css/medium-editor/themes/default.css >> $2.temp
+cat $1/public/css/medium-editor/MediumEditorTCMention/mention-panel.min.css >> $2.temp
+cat $1/public/css/emojione/emojione.css >> $2.temp
+cat $1/public/css/emoji-mart/emoji-mart.css >> $2.temp
+cat $1/public/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css >> $2.temp
+
+cssnano --no-zindex < $2.temp > $2

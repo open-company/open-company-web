@@ -8,9 +8,26 @@
     [:div.oc-loading-heart]
     [:div.oc-loading-body]]])
 
+(def tag-manager-head
+  [:script"
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5D4DTSB');"])
+
+(def tag-manager-body
+  [:noscript
+    [:iframe
+      {:src "https://www.googletagmanager.com/ns.html?id=GTM-5D4DTSB"
+       :height "0"
+       :width "0"
+       :style {:display "none"
+               :visibility "hidden"}}]])
+
 (def app-shell
   {:head [:head
-          shared/tag-manager-head
+          tag-manager-head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta
@@ -64,7 +81,7 @@
           ;; Stripe
           shared/stripe-js]
    :body [:body
-          shared/tag-manager-body
+          tag-manager-body
           [:div#app
            oc-loading]
           [:div#oc-notifications-container]
@@ -131,7 +148,7 @@
 
 (def prod-app-shell
   {:head [:head
-          shared/tag-manager-head
+          tag-manager-head
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta
@@ -163,7 +180,7 @@
           ;; Stripe
           shared/stripe-js]
    :body [:body
-          shared/tag-manager-body
+          tag-manager-body
           [:div#app
            [:div.oc-loading.active
             [:div.oc-loading-inner

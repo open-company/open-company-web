@@ -1,5 +1,20 @@
-(ns oc.pages.shared
+(ns oc.shared
   (:require [environ.core :refer (env)]))
+
+(defn circular-font-folder [font-file]
+  (str (when (env :oc-web-cdn-url)
+        (env :oc-web-cdn-url))
+   font-file))
+
+(defn circular-book-font []
+  [:link {:rel "stylesheet"
+          :type "text/css"
+          :href (circular-font-folder "/CircularWebFont/LLCircular-BookWeb/css/stylesheet.css")}])
+
+(defn circular-bold-font []
+  [:link {:rel "stylesheet"
+          :type "text/css"
+          :href (circular-font-folder "/CircularWebFont/LLCircular-BoldWeb/css/stylesheet.css")}])
 
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))

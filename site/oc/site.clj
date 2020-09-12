@@ -150,4 +150,5 @@
   (println "Static pages built!"))
 
 (defn -main [& [env-name & args]]
+  (println "DBG building site with env" env-name)
   (build-pages (or (string/keyword env-name) :dev)))
