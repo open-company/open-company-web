@@ -36,7 +36,12 @@
 
   [ring "1.8.1"]
   [compojure "1.6.2" :exclusions [ring]]
-  [http-kit "2.5.0-alpha2"]]
+  [http-kit "2.5.0-alpha2"]
+
+  ;; Dev dependencies
+  ^:dev [binaryage/devtools "0.9.8"]
+  ^:dev [djblue/portal "0.4.0"]
+  ]
 
  :dev-http {3559 {:roots ["public"]
                   :handler oc.dev/handler
@@ -45,10 +50,12 @@
  {:webapp
   {:target :browser
    :devtools {:ignore-warnings true
-              :before-load oc.web.core/on-js-reload}
+              :before-load oc.web.core/on-js-reload
+              :preloads '[devtools.preload]}
    :modules {:oc {:init-fn oc.web.core/init}}
    :repl-init-ns oc.web.core
    :repl-pprint true
    :dev {:compiler-options {:optimizations :none}}
    :compiler-options {:infer-externs :auto}
-   :release {:compiler-options {:optimizations :advanced}}}}}
+   :release {:compiler-options {:optimizations :advanced
+                                :source-map true}}}}}
