@@ -520,7 +520,7 @@
   [:script {:type "text/javascript" :src "/oc.js"}])
 
 (def oc-assets-js
-  [:script {:type "text/javascript" :src "/lib/oc_assets.js"}])
+  [:script {:type "text/javascript" :src "/oc_assets.js"}])
 
 (def tag-manager-head
   [:script"
