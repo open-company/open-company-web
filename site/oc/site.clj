@@ -33,7 +33,7 @@
     (shared/nav (name page))
     (shared/mobile-menu (name page))]
    (if (fn? body) (body opts) body)
-   (shared/footer page)])
+   (shared/footer opts)])
 
 (def pages [{:page-name "404"
              :page :404
@@ -135,20 +135,19 @@
 
 
 (defn build-pages [env-kw]
-  (println "Building pges for..." env-kw)
+  (println "Building pages for..." (string/capital (name env-kw)))
   (doseq [{:keys [title head body page-name page target] :as p} pages
           :let [filename (str "public/" page-name ".html")]]
-    (print (str "...page " filename "... "))
+    (print (str "...page " (name page) (string/join "" (vec (take (- 15 (count (name page))) (repeat " ")))) " -> " filename "... "))
     (if-not (env-kw target)
       (println "skip!")
       (do
         (->> (hp/html5 {:lang "en"}
-                      (if (fn? head) (head title) head)
+                      (if (fn? head) (head) head)
                       (if (fn? body) (body page options) body))
             (spit filename))
         (println "built!"))))
   (println "Static pages built!"))
 
 (defn -main [& [env-name & args]]
-  (println "DBG building site with env" env-name)
   (build-pages (or (string/keyword env-name) :dev)))

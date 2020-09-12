@@ -118,7 +118,8 @@
 
             
   :aliases {;; Release
-            "release" ["do" "prod"]
+            "prod-build" ["do" "clean," "deps," "prod-site" ] ; clean and build code
+            "prod-site" ["run" "prod"]
             ;; Development
             "start" ["pdo" "run" "watch-site," "ocweb"] ; Site & cljs dev
             ; "watch-ocweb" ["auto" "ocweb"]

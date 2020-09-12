@@ -462,3 +462,323 @@
                 (cdn "/img/ML/slack_screenshot@2x.png") " 2x, "
                 (cdn "/img/ML/slack_screenshot@3x.png") " 3x, "
                 (cdn "/img/ML/slack_screenshot@4x.png") " 4x")}]])
+
+(def bootstrap-css
+  ;; Bootstrap CSS //getbootstrap.com/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+     :integrity "sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+     :crossorigin "anonymous"}])
+
+(def bootstrap-js
+  ;; Bootstrap JavaScript //getf.com/
+  [:script
+    {:src "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+     :type "text/javascript"
+     :integrity "sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+     :crossorigin "anonymous"}])
+
+(def font-awesome
+  ;; Font Awesome icon fonts //fortawesome.github.io/Font-Awesome/cheatsheet/
+  [:link
+    {:rel "stylesheet"
+     :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}])
+
+(def ie-jquery-fix
+  ;; From https://stackoverflow.com/questions/5087549/access-denied-to-jquery-script-on-ie
+  ;; Github: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
+  [:script
+    {:src "//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.4/jquery.xdomainrequest.min.js"
+     :crossorigin "anonymous"}])
+
+(def jquery
+  [:script
+    {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
+     :crossorigin "anonymous"}])
+
+(def google-fonts
+  ;; Google fonts Muli
+  [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&display=swap" :rel "stylesheet"}])
+
+(def stripe-js
+  [:script {:src "https://js.stripe.com/v3/"}])
+
+(defn google-analytics-init []
+  [:script (let [ga-version (if (env :ga-version)
+                              (str "'" (env :ga-version) "'")
+                              false)
+                 ga-tracking-id (if (env :ga-tracking-id)
+                                  (str "'" (env :ga-tracking-id) "'")
+                                  false)]
+             (str "CarrotGA.init(" ga-version "," ga-tracking-id ");"))])
+
+(defn fullstory-init []
+  [:script (str "init_fullstory();")])
+
+(def oc-js
+  [:script {:type "text/javascript" :src "/oc.js"}])
+
+(def oc-assets-js
+  [:script {:type "text/javascript" :src "/lib/oc_assets.js"}])
+
+(def tag-manager-head
+  [:script"
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5D4DTSB');"])
+
+(def tag-manager-body
+  [:noscript
+    [:iframe
+      {:src "https://www.googletagmanager.com/ns.html?id=GTM-5D4DTSB"
+       :height "0"
+       :width "0"
+       :style {:display "none"
+               :visibility "hidden"}}]])
+
+(def ph-banner
+  [:div.ph-banner
+    [:div.ph-banner-content
+      [:div.ph-banner-cat]
+      [:div.ph-banner-copy
+        [:span.heavy "Hello Product Hunter! "]
+        " We can't wait to hear what you think about Carrot 2.0."]]
+    [:div.ph-banner-opac-bg]
+    [:button.mlb-reset.ph-banner-close-button
+      {:onclick "OCStaticHidePHBanner();"}]])
+
+(defn covid-banner [page]
+  [:div.covid-banner
+    [:div.covid-banner-content
+      [:div.covid-banner-carrot-logo]
+      [:div.covid-banner-copy.mobile-only
+        "Given COVID-19, Carrot is now free."
+        (when-not (= page :pricing)
+          [:br])
+        (when-not (= page :pricing)
+          [:a
+            {:href "/pricing"}
+            "Learn more"])
+        (when-not (= page :pricing)
+          ".")]
+      [:div.covid-banner-copy.big-web-tablet-only
+        "Given the COVID-19 crisis, Carrot is free for unlimited users until further notice. "
+        (when-not (= page :pricing)
+          [:a
+            {:href "/pricing"}
+            "Learn more"])
+        (when-not (= page :pricing)
+          ".")]]
+    [:button.mlb-reset.covid-banner-close-button
+      {:onclick "OCStaticHideCovidBanner();"}]])
+
+(defn head []
+  [:head
+    tag-manager-head
+    ;; -------------
+    [:meta {:charset "utf-8"}]
+    [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
+    [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
+    [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
+    ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
+    [:title "Wut! | wuts.io"]
+    (circular-book-font)
+    (circular-bold-font)
+    google-fonts
+    bootstrap-css
+    ;; Local css
+    [:link {:href (cdn "/css/app.main.css"), :rel "stylesheet"}]
+    ;; Fallback for the CDN compacted css
+    [:link {:href (cdn "/main.css") :rel "stylesheet"}]
+    ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
+    ;; WARNING: Respond.js doesn't work if you view the page via file://
+    "<!--[if lt IE 9]>
+      <script src=\"//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js\"></script>
+      <script src=\"//oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
+    <![endif]-->"
+    font-awesome
+    ;; Favicon
+    [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
+    ;; jQuery needed by Bootstrap JavaScript
+    jquery
+    ie-jquery-fix
+    ;; Static js files
+    [:script {:src (cdn "/js/static-js.js")}]
+    ;; Intercom (Support chat)
+    [:script {:src (cdn "/js/intercom.js")}]
+    ;; Google Analytics
+    [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
+    (google-analytics-init)
+    ;; TODO: enable when we want to use full story for static pages.
+    ;;(when (= (env :fullstory) "true")
+    ;;  [:script {:type "text/javascript" :src "/lib/fullstory.js"}])
+    ;;(when (= (env :fullstory) "true") (fullstory-init))
+    bootstrap-js])
+
+(defn mobile-menu
+  "Mobile menu used to show the collapsable menu in the marketing site."
+  [active-page]
+  [:div.site-mobile-menu.hidden
+    [:div.site-mobile-menu-container
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/?no_redirect=1"
+           :class (when (= active-page "index") "active")}
+          "Home"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/pricing"
+           :class (when (= active-page "pricing") "active")}
+          "Pricing"]]
+      [:div.site-mobile-menu-item
+        [:a
+          {:href "/apps/detect"}
+          "Get the mobile app"]]]
+    [:div.site-mobile-menu-footer
+      [:button.mlb-reset.login-btn
+        {:id "site-mobile-menu-login"}
+        "Login"]
+      [:button.mlb-reset.get-started-button.get-started-action
+        {:id "site-mobile-menu-getstarted"}
+        "Start free"]]])
+
+(defn nav
+  "Static hiccup for the site header."
+  [active-page]
+  (let [is-slack-lander? (= active-page "slack-lander")
+        is-slack-page? (= active-page "slack")
+        site-navbar-container (if is-slack-lander?
+                               :div.site-navbar-container.is-slack-header
+                               :div.site-navbar-container)]
+    [:nav.site-navbar
+      [site-navbar-container
+        [:a.navbar-brand-left
+          {:href "/?no_redirect=1"}]
+        [:div.navbar-brand-center
+          [:a
+            {:href "/?no_redirect=1"
+             :class (when (= active-page "index") "active")}
+            "Home"]
+          [:div.apps-container
+            [:button.mlb-reset.apps-bt
+              {:class (when (= active-page "about") "active")}
+              "Apps"]
+            [:div.apps-dropdown-menu
+              [:div.app-items-group
+                "Desktop apps"]
+              [:a.app-item
+                {:href "/apps/mac"}
+                [:span "Mac"]
+                [:span.beta-app-label "BETA"]]
+              [:a.app-item
+                {:href "/apps/win"}
+                [:span "Windows"]
+                [:span.beta-app-label "BETA"]]
+              [:div.app-items-group
+                "Mobile apps"]
+              [:a.app-item
+                {:href "/apps/android"}
+                [:span "Android"]
+                [:span.beta-app-label "BETA"]]
+              [:a.app-item
+                {:href "/apps/ios"}
+                [:span "iPhone"]
+                [:span.beta-app-label "BETA"]]]]
+          [:a
+            {:href "/pricing"
+             :class (when (= active-page "pricing") "active")}
+            "Pricing"]]
+
+        ;; Desktop & tablet
+        (cond
+          is-slack-page?
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.login
+              {:id "site-header-login-item"
+               :href (env :slack-signup-url)}
+                "Add to Slack"]]
+          is-slack-lander?
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.signup.continue-with-slack
+              {:id "site-header-signup-item"
+               :href (env :slack-signup-url)}
+                "Continue with Slack"]]
+          :else
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.login
+              {:id "site-header-login-item"
+               :href "/login"}
+                "Login"]
+            [:a.signup
+              {:id "site-header-signup-item"
+               :href "/sign-up"}
+              "Start free"]])
+
+        ;; Mobile
+        (cond
+          is-slack-lander?
+          [:div.site-navbar-right.mobile-only
+            [:a.signup.continue-with-slack
+              {:id "site-header-signup-item-mobile"
+               :href (env :slack-signup-url)}]]
+          :else
+          [:div.site-navbar-right.mobile-only
+            [:a.login
+              {:id "site-header-login-item-mobile"
+               :data-bago false
+               :href "/login"}
+                "Login"]])
+        [:div.mobile-ham-menu
+          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
+
+(defn footer
+  "Static hiccup for the site footer."
+  [options]
+  [:footer.navbar.navbar-default.navbar-bottom
+    [:div.container-fluid.group
+      [:div.right-column.group
+
+        [:div.column.column-company
+          [:div.column-title
+            "Product"]
+          [:div.column-item [:a {:href "/pricing"} "Pricing"]]
+          [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href (:oc-github options) :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
+
+        [:div.column.column-resources
+          [:div.column-title
+            "Company"]
+          [:div.column-item [:a {:href "/about"} "About"]]
+          [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
+          [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]]
+
+        [:div.column.column-support
+          [:div.column-title
+            "Resources"]
+          [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]
+          [:div.column-item
+            [:a
+              {:class "intercom-chat-link"
+               :href "mailto:hello@carrot.io"}
+              "Contact us"]]]]]
+      [:div.left-column.group
+        [:img.logo
+          {:src (cdn "/img/ML/carrot_wordmark.svg")}]
+        [:div.footer-small-links.static
+          [:a {:href "/login"} "Login"]
+          "or"
+          [:a {:href "/sign-up"} "create your team"]]
+        [:div.tos-and-pp
+          [:a {:href "/privacy"}
+           "Privacy"]
+          " & "
+          [:a {:href "/terms"}
+           "Terms"]]
+        [:div.copyright
+          "© 2020 Carrot"]]]])
