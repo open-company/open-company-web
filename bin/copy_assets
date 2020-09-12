@@ -6,6 +6,9 @@ mkdir $INIT_CWD/public/lib/MediumEditor/
 echo "Copy medium-editor js..."
 cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.js $INIT_CWD/public/lib/MediumEditor/index.js
 echo "Done!"
+echo "Copy medium-editor minified js..."
+cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.min.js $INIT_CWD/public/lib/MediumEditor/index.min.js
+echo "Done!"
 mkdir $INIT_CWD/public/css/medium-editor
 mkdir $INIT_CWD/public/css/medium-editor/themes
 mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/

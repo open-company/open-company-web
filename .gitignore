@@ -28,7 +28,10 @@ forms-analyzed.txt
 .calva/
 
 public/js/cljs-runtime
-public/js/oc.js
+public/oc.js
+public/oc_assets.js
+public/oc.js.map
+public/oc_assets.map.js
 public/js/manifest.edn
 
 # Ignore compiled css and html files
