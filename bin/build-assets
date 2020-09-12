@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $2/target/public/ && \
+cd $2/public/ && \
 java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 -W QUIET \
 --js_output_file oc_assets.js \
@@ -29,7 +29,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --output_wrapper "%output%
 //# sourceMappingURL=$3/oc_assets.js.map"
 
-cd $2/target/public/ && \
+cd $2/public/ && \
 cat <<EOT >> oc.js
 
 //# sourceMappingURL=$3/oc.js.map
