@@ -117,11 +117,14 @@
   }
 
             
-  :aliases {"start" ["pdo" "run" "watch-site," "watch-ocweb"] ; Site & cljs dev
-            "watch-ocweb" ["auto" "ocweb"]
+  :aliases {;; Release
+            "release" ["do" "prod"]
+            ;; Development
+            "start" ["pdo" "run" "watch-site," "ocweb"] ; Site & cljs dev
+            ; "watch-ocweb" ["auto" "ocweb"]
             "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
-            "watch-site" ["auto" "watch-site"] ; Build the static website
-            "build-site" ["run" "dev"] ; build the HTML pages and watch for changes
+            "watch-site" ["auto" "build-site"] ; Build the static website and watch for changes
+            "build-site" ["run" "dev"] ; build the static website
 
             "build" ["do" "clean," "deps," "compile"] ; clean and build code
             "autotest" ["with-profile" "qa" "do" "midje" ":autotest"] ; watch for code changes and run affected tests
