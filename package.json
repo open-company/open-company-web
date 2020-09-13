@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "release": "npm install && npm ci && npx shadow-cljs release webapp",
+    "release": "npm install && npm ci && npm run scss:build && npx shadow-cljs release webapp",
 
     "dev:build": "npm run css:copyAssets & npm run scss:build npm run cljs:build",
     "dev:watch": "npm run css:copyAssets & concurrently --kill-others \"npm run scss:watch\" \"npm run cljs:watch\"",

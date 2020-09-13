@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cat $1/public/css/normalize.css >> $2.temp
 cat $1/public/css/app.main.css >> $2.temp
 cat $1/public/css/medium-editor/medium-editor.css >> $2.temp
 cat $1/public/css/medium-editor/themes/default.css >> $2.temp
