@@ -637,18 +637,16 @@
                              (map user-name)
                              (remove s/blank?))
              mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
-             mention? (.match (:body last-comment) mention-regexp)
-             subject (case (count commenters)
-                       0
-                       ""
-                       1
-                       (first commenters)
-                       2
-                       (str (first commenters) " + 1 other")
-                       3
-                       (str (first commenters) " + 2 others")
-                       ;; :else
-                       (str (first commenters) " + " (- (count commenters) 2) " others"))
+             mention? (and (not (:self? (:author last-comment)))
+                           (.match (:body last-comment) mention-regexp))
+             commenters-count (count commenters)
+             subject (cond
+                       mention?               (user-name (:author last-comment))
+                       (= 0 commenters-count) ""
+                       (= 1 commenters-count) (first commenters)
+                       (= 2 commenters-count) (str (first commenters) " and " (second commenters))
+                       (= 3 commenters-count) (str (first commenters) ", " (second commenters) " + 1 other")
+                       :else                  (str (first commenters) ", " (second commenters) " + " (- (count commenters) 2) " others"))
              multiple-comments? (> (count comments) 1)
              verb (if mention?
                     " mentioned you"
