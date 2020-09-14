@@ -293,8 +293,15 @@
 @mixin face-pile($width: 18) {
   $margin: $width / 9;
   $total-width: $width + ($margin * 2);
+  $mobile-width: $width - 2;
+  $mobile-margin: $margin / 2;
   div.face-pile {
     position: relative;
+    margin-left: -#{$margin}px;
+
+    @include mobile() {
+      margin-left: -#{$mobile-margin}px;
+    }
 
     &.show-border {
       div.face-pile-face {
@@ -315,10 +322,9 @@
       @include user-profile($width);
 
       @include mobile(){
-        $mobile-width: $width - 2;
         width: #{$mobile-width + ($margin + 2)}px;
         height: #{$total-width}px;
-        border: 1px solid transparent;
+        border: #{$mobile-margin}px solid transparent;
         margin-left: -#{$mobile-width / 2}px;
 
         @include user-profile($mobile-width);
