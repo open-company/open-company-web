@@ -2,7 +2,7 @@
   (:require [clojure.walk :refer (stringify-keys)]))
 
 (defn json->cljs [json-str]
-  (let [parsed-json (.parse js/JSON json-str :keywordize-keys true)]
+  (let [parsed-json (.parse ^js js/JSON json-str :keywordize-keys true)]
     (js->clj parsed-json :keywordize-keys true)))
 
 (defn cljs->json [coll]
