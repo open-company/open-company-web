@@ -945,7 +945,8 @@
                                   (:ignore-comments %))
                              #(not (entry? %)))
             opts {:has-next next-link
-                  :hide-bottom-line true}
+                  :hide-bottom-line true
+                  :hide-top-line true}
             caught-up-item (when (and keep-caught-up?
                                       (seq (:items-to-render container-data)))
                              (some #(when (resource-type? % :caught-up) %) (:items-to-render container-data)))
