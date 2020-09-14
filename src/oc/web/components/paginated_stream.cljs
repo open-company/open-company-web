@@ -80,7 +80,8 @@
                                :read-data         read-data
                                :show-wrt?         show-wrt?
                                :editable-boards   editable-boards
-                               :current-user-data current-user-data})
+                               :current-user-data current-user-data
+                               :replies?           replies?})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data

@@ -29,7 +29,7 @@
                                    (drv/drv :activity-share-container)
                                    (drv/drv :board-slug)
                                    (drv/drv :activity-uuid)
-  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member?]}]
+  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member? replies?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
@@ -142,9 +142,10 @@
                   :external-share (not is-mobile?)
                   :external-bookmark (not is-mobile?)
                   :external-follow (not is-mobile?)
-                  :show-edit? true
-                  :show-delete? true
+                  :show-edit? (not replies?)
+                  :show-delete? (not replies?)
                   :show-unread (not (:unread activity-data))
-                  :show-move? (not is-mobile?)
+                  :show-move? (and (not replies?)
+                                   (not is-mobile?))
                   :show-inbox? is-inbox?})
       [:div.activity-share-container]]))
