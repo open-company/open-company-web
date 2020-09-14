@@ -36,7 +36,7 @@
         ;; only on recently posted sorting
         (= sort-type dis/recently-posted-sort)
         ;; on All posts, Following and Unfollowing only
-        (#{:all-posts :following :unfollowing :contributions} (keyword container-slug)))))
+        (#{:all-posts :following :unfollowing :replies :contributions} (keyword container-slug)))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
