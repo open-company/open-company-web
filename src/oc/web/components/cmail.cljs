@@ -624,7 +624,8 @@
                 [:span.post-to "Post to"]
                 [:button.mlb-reset.section-picker-bt
                   {:on-click #(toggle-section-picker s)}
-                  (:board-name cmail-data)]
+                  (:board-name cmail-data)
+                  [:div.dropdown-cog]]
                 (when @(::show-section-picker s)
                   [:div.section-picker-container
                     (sections-picker {:active-slug (:board-slug cmail-data)
@@ -708,7 +709,8 @@
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            (:board-name cmail-data)]
+            (:board-name cmail-data)
+            [:div.dropdown-cog]]
           (when @(::show-section-picker s)
             [:div.section-picker-container
               (sections-picker {:active-slug (:board-slug cmail-data)

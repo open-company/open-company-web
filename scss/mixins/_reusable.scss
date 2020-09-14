@@ -279,7 +279,7 @@
 
 @mixin svgBgColor($svgUrl, $position: "center", $size: "contain", $bgColor: var(--primary-color)) {
   background-color: #{$bgColor};
-  background-image: unset;
+  background-image: none;
   -webkit-mask-image: cdnUrl(#{$svgUrl});
   mask-image: cdnUrl(#{$svgUrl});
   -webkit-mask-repeat: no-repeat;

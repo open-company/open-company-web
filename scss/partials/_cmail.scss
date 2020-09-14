@@ -299,13 +299,13 @@ div.cmail-outer {
             height: 32px;
             padding: 7px 24px 7px 8px;
             // background-color: var(--cmail-section-bt-background);
-            background-color: var(--primary-color);
+            background-color: var(--primary-light-color);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
             // color: var(--cmail-section-bt-color);
-            color: var(--secondary-color);
+            color: var(--primary-color);
             position: relative;
             text-align: left;
             max-width: calc(100vw - 32px - 52px - 120px - 8px);
@@ -315,17 +315,13 @@ div.cmail-outer {
             white-space: nowrap;
             flex: 0 1 auto;
 
-            &:after {
-              content: "";
-              width: 8px;
-              height: 10px;
+            div.dropdown-cog {
+              width: 6px;
+              height: 32px;
               position: absolute;
-              top: calc(50% - 5px);
+              top: 0;
               right: 8px;
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              background-position: center;
-              @include svgBgColor("/img/ML/menu_chevron.svg", center, 6px 4px, var(--secondary-color));
+              @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
             }
           }
 
@@ -572,9 +568,9 @@ div.cmail-outer {
           text-overflow: ellipsis;
           vertical-align: super;
           white-space: nowrap;
-          color: var(--secondary-color);
+          color: var(--primary-color);
           border-radius: 4px;
-          background-color: var(--primary-color);
+          background-color: var(--primary-light-color);
 
           @include mobile() {
             height: 28px;
@@ -585,17 +581,13 @@ div.cmail-outer {
             }
           }
 
-          &:after {
-            content: "";
+          div.dropdown-cog {
             width: 8px;
             height: 32px;
             position: absolute;
             top: 0;
             right: 8px;
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
-            @include svgBgColor("/img/ML/purple_arrow.svg", center, 8px 4px, var(--secondary-color));
+            @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
           }
         }
       }
