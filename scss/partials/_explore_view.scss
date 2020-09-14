@@ -77,9 +77,12 @@ div.explore-view {
         border: 1px solid var(--opac-background-color-2);
       }
 
-      &:hover {
-        div.explore-view-block-title {
-          text-decoration: underline;
+      @include big_web() {
+        &:hover {
+          div.explore-view-block-title span.board-name {
+            text-decoration: underline;
+            color: var(--primary-color);
+          }
         }
       }
 
@@ -101,12 +104,6 @@ div.explore-view {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-
-          @include big_web() {
-            &:hover {
-              color: var(--primary-color);
-            }
-          }
         }
 
         @include big_web() {
@@ -123,22 +120,19 @@ div.explore-view {
         div.board-dropdown-container {
           width: 24px;
           height: 24px;
-          marign-right: auto;
+          margin-right: auto;
           flex: 0 0 auto;
           position: relative;
+
+          @include mobile() {
+            display: none;
+          }
 
           button.board-dropdown-bt {
             height: 24px;
             width: 24px;
-            background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
+            @include svgBgColor("/img/ML/gear_icon.svg", center, 12px 12px, var(--light-color));
             transition: transform 180ms;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
-            }
 
             &.open {
               transform: rotate(90deg);

@@ -60,7 +60,8 @@
               [:div.board-dropdown-container
                 {:ref (str "dropdown-menu-" (:uuid item))}
                 [:button.mlb-reset.board-dropdown-bt
-                 {:on-click (fn [e]
+                 {:class (when (= @(::dropdown-menu s) (:uuid item)) "open")
+                  :on-click (fn [e]
                               (utils/event-stop e)
                               (reset! (::dropdown-menu s) (:uuid item)))}]
                 (when (= @(::dropdown-menu s) (:uuid item))
