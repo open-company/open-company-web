@@ -18,8 +18,10 @@ div.virtualized-list-row.collapsed-item {
     z-index: 1;
 
     &.open-item div.stream-collapsed-item {
+      border-top: 1px solid var(--foc-divider-line-color);
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
+      margin-top: 16px;
     }
 
     &.close-item div.stream-collapsed-item {

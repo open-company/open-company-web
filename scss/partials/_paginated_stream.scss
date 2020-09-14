@@ -9,14 +9,6 @@ div.paginated-stream {
     min-height: calc(100vh - 54px - 72px);
   }
 
-  &.collapsed-cards {
-    margin-top: 16px;
-
-    @include mobile() {
-      margin-top: 0;
-    }
-  }
-
   div.paginated-stream-cards {
 
     div.loading-updates {

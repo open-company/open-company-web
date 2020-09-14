@@ -435,7 +435,6 @@
         member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)]
     [:div.paginated-stream.group
-      {:class (when replies? "collapsed-cards")}
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
           (when replies?
