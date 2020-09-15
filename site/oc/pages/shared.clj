@@ -27,11 +27,12 @@
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
-                          "“Carrot eliminates the fear of missing key Slack conversations, "
-                          "and cuts out the \"Did you see my message?\" nagging.”")
+                          "“Carrot helps us communicate efficiently across time zones. It minimizes FOMO from "
+                          "missed Slack conversations, and cuts out the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
-                          "“We use Carrot for key announcements and weekly updates no one can miss.”")
+                          "“Carrot is a perfect compliment for Slack. We use it for longer-form "
+                          "weekly updates no one should miss.”")
                          (= slug :bank-novo)
                          (str
                           "“Carrot keeps everyone across our global offices up to date. It "
@@ -72,57 +73,26 @@
 
 (defn testimonials-screenshot-block [block & [responsive-class]]
   (let [header (cond
-                (= block :thoughtful-communication)
-                "Thoughtful communication"
-                (= block :conversation)
-                "What’s new"
-                (= block :threads)
-                "Clear, organized discussions"
-                (= block :analytics)
-                "Know who saw your update"
-                (= block :stay-in-sync)
-                "Daily newsletter to stay in sync"
-                (= block :stay-in-sync-slack)
-                "Daily digest to stay in sync"
-                (= block :share-to-slack)
-                "Auto-share posts to Slack")
-        subline (cond
-                 (= block :thoughtful-communication)
-                 "Space to write longer updates that convey more information"
-                 (= block :conversation)
-                 (str
-                  "Get caught up - fast - and let Carrot help you filter "
-                  "out the discussions you don't want to follow.")
-                 (= block :threads)
-                 (str
-                  "Threaded comments make it easy for your "
-                  "team to stay engaged asynchronously. Ideal "
-                  "for remote teams.")
+                 (= block :stay-focused)
+                 "Stay focused with less noise"
+                 (= block :reduce-interruptions)
+                 "Reduce interruptions"
                  (= block :analytics)
-                 (str
-                  "Carrot works in the background to make sure "
-                  "everyone sees what matters")
-                 (= block :stay-in-sync)
-                 "Everyone gets a daily, personalized summary of what's important."
-                 (= block :stay-in-sync-slack)
-                 "Everyone gets a daily, personalized summary of what's important."
-                 (= block :share-to-slack)
-                 "Your Carrot posts are automatically shared to the right Slack #channel.")
+                 "Know who saw your update")
+        subline (cond
+                  (= block :stay-focused)
+                  "Personalize your news feed to filter out topics you don't care about. This saves you time and makes it faster to get caught up."
+                  (= block :reduce-interruptions)
+                  "Carrot batches updates together in a daily digest so it's easy to get caught up all at once — when it’s more convenient for you."
+                  (= block :analytics)
+                  "Curious if anyone heard you? It’s easy to see who’s on the same page, and easy to remind someone that missed it, too.")
         screenshot-num (cond
-                        (= block :thoughtful-communication)
-                        1
-                        (= block :conversation)
-                        2
-                        (= block :threads)
-                        3
-                        (= block :analytics)
-                        4
-                        (= block :stay-in-sync)
-                        5
-                        (= block :stay-in-sync-slack)
-                        7
-                        (= block :share-to-slack)
-                        6)]
+                         (= block :stay-focused)
+                         1
+                         (= block :reduce-interruptions)
+                         2
+                         (= block :analytics)
+                         3)]
     [:div.testimonials-screenshot-block
       {:class responsive-class}
       [:div.testimonials-screenshot-header
@@ -133,140 +103,97 @@
         {:src (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num ".png"))
          :srcSet (str
                   (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@2x.png")) " 2x, "
-                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@3x.png")) " 3x, "
-                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@4x.png")) " 4x")}]
+                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@3x.png")) " 3x")}]
       [:img.testimonials-screenshot.big-web-tablet-only
         {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
          :srcSet (str
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
-                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x, "
-                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@4x.png")) " 4x")}]]))
+                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x")}]]))
+
+(defn close-communication-gaps [class-name]
+  [:div.close-communication-gaps-container
+   {:class class-name}
+   [:h3.close-communication-gaps
+    "Close communication gaps"]
+   [:p
+    "Carrot makes sure everyone will see what matters."]
+   [:div.close-communigation-gaps-video
+    [:p.not-needed
+     "Some not needed content"]]])
 
 (defn testimonials-section [page]
   [:section.testimonials
 
-    (dashed-string 1)
+   (dashed-string 1)
 
-    (testimonial-block :ifttt "")
+   (testimonials-screenshot-block :stay-focused "")
 
-    (dashed-string 2)
+   (dashed-string 2)
 
-    [:div.testimonials-floated-block.big-web-tablet-only
-      [:div.testimonials-floated-block-inner.left-block.group
-        [:img.testimonials-floated-screenshot
-          {:src (cdn "/img/ML/testimonials_floated_screenshot_1.png")
-           ; :srcSet (str
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x, "
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_1@3x.png") " 3x, "
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_1@4x.png") " 4x")
-           }]
-        [:div.testimonials-floated-copy
-          [:div.testimonials-floated-header
-            "Stay focused with less noise"]
-          [:div.testimonials-floated-subheader
-            "Personalize your news feed to filter out topics you don't care about."
-            [:br]
-            "This saves you time and makes it faster to get caught up."]]]
+   (testimonials-screenshot-block :reduce-interruptions "")
 
-      [:div.testimonials-floated-block-inner.right-block.group
-        [:img.testimonials-floated-screenshot
-          {:src (cdn "/img/ML/testimonials_floated_screenshot_2.png")
-           ; :srcSet (str
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x, "
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_2@3x.png") " 3x, "
-           ;          (cdn "/img/ML/testimonials_floated_screenshot_2@4x.png") " 4x")
-           }]
-        [:div.testimonials-floated-copy
-          [:div.testimonials-floated-header
-            "Reduce interruptions"]
-          [:div.testimonials-floated-subheader
-            "Prefer to see team updates batched together to read them all at once?"
-            [:br]
-            "Your daily digest makes it easy to get caught up when it's more convenient."]]]
+   (dashed-string 3)
 
-    ]
+   (testimonials-screenshot-block :analytics "")
 
-    (dashed-string 5)
-
-    (testimonial-block :blend-labs "")
-    
-    (dashed-string 6)
-    ])
+   (dashed-string 4)
+   
+   (close-communication-gaps "")
+   
+   (dashed-string 5)])
 
 (def pricing-table
   [:div.pricing-table.group
-    ; [:div.pricing-table-left
-    ;   [:div.pricing-table-left-price
-    ;     "$0"]
-    ;   [:div.pricing-table-left-subprice
-    ;     "for teams of up to 20 people"]]
-    ; [:div.pricing-table-divider-line]
-    ; [:div.pricing-table-right.group
-    ;   [:div.pricing-table-right-copy
-    ;     (str
-    ;      "Carrot is free for up to 20 people. After that, it’s "
-    ;      "just $3.25 / month for each person with our annual plan. "
-    ;      "If you prefer a monthly plan, it’s $4.00 / month.")]
-    ;   [:a.pricing-table-right-link
-    ;     {:href "/sign-up"}
-    ;     "Try Carrot for free"]]
-
-    [:table.pricing-table
-      [:thead
-        [:tr
-          [:th
-            [:h4
-              "Free"]]
-          [:th
-            [:h4
-              "Premium $5/user per month"]]]]
-      [:tbody
-        [:tr
-          [:td
-            [:span.bold
-              "Unlimited users"]]
-          [:td
-            [:span.bold
-              "Unlimited users"]]]
-        [:tr
-          [:td
-            [:span.bold
-              "Unlimited posts"]]
-          [:td
-            [:span.bold
-              "Unlimited posts"]]]
-        [:tr
-          [:td
-            [:span
-              "Team-level access to all updates"]]
-          [:td
-            [:span
-              "Team, private and public access"]]]
-        [:tr
-          [:td
-            [:span
-              "Anyone can add an update"]]
-          [:td
-            [:span
-              "Editor and view-only permissions"]]]
-        [:tr
-          [:td]
-          [:td
-            [:span
-              "Editor and view-only permissions"]]]
-        [:tr
-          [:td]
-          [:td
-            [:span
-              "Admin advanced settings"]]]
-        [:tr
-          [:td]
-          [:td
-            [:span
-              "Assign roles for team onboarding (coming)"]]]]]
-      [:div.non-profits
-        [:span
-          "Nonprofits and K-12 education are always free."]]])
+   [:div.pricing-table-column
+    [:div.pricing-table-column-inner
+     [:div.pricing-column-header
+      "Free"]
+     [:div.pricing-column-value
+      [:div.price-value
+       "$0"]
+      [:div.price-desc
+       "per user"
+       [:br]
+       "per month"]]
+     [:a.pricing-column-right-link
+      {:href "/sign-up"}
+      "Try for free"]
+     [:div.pricing-column-row
+      "Unlimited users"]
+     [:div.pricing-column-row
+      "Unlimited posts"]
+     [:div.pricing-column-row
+      "Team-level access to all updates"]
+     [:div.pricing-column-row
+      "Anyone can add an update"]]
+    [:div.pricing-column-footer-note
+     "Nonprofits and K-12 education are always free."]]
+   [:div.pricing-table-column
+    [:div.pricing-table-column-inner
+     [:div.pricing-column-header
+      "Premium"]
+     [:div.pricing-column-value
+      [:div.price-value
+       "$5"]
+      [:div.price-desc
+       "per user"
+       [:br]
+       "per month"]]
+     [:a.pricing-column-right-link
+      {:href "/sign-up"}
+      "Try for free"]
+     [:div.pricing-column-row
+      "Unlimited users"]
+     [:div.pricing-column-row
+      "Unlimited posts"]
+     [:div.pricing-column-row
+      "Team, private and public access"]
+     [:div.pricing-column-row
+      "Editor and view-only permissions"]
+     [:div.pricing-column-row
+      "Advanced team settings"]
+     [:div.pricing-column-row.coming-feature
+      "Assign roles for team onboarding (coming)"]]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
@@ -445,5 +372,4 @@
       {:src (cdn "/img/ML/slack_screenshot.png")
        :srcSet (str
                 (cdn "/img/ML/slack_screenshot@2x.png") " 2x, "
-                (cdn "/img/ML/slack_screenshot@3x.png") " 3x, "
-                (cdn "/img/ML/slack_screenshot@4x.png") " 4x")}]])
+                (cdn "/img/ML/slack_screenshot@3x.png") " 3x")}]])
