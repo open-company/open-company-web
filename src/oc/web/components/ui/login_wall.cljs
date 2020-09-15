@@ -48,6 +48,7 @@
       [:div.login-wall-container
         (login-overlays-handler)
         [:header.login-wall-header
+         [:div.top-back-button-container
           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
              :class (when ua/mobile-app? "mobile-app")
@@ -57,13 +58,14 @@
                             (.preventDefault %)
                             (router/redirect! oc-urls/home)))
              :aria-label "Back"}
-            "Back"]
+            "Back"]]
           [:div.title
             (or title default-title)]
-          [:button.mlb-reset.top-continue
+          [:div.top-continue-container
+           [:button.mlb-reset.top-continue
             {:class (when-not login-enabled "disabled")
              :on-click login-action}
-            "Log in"]]
+            "Log in"]]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
             
@@ -152,7 +154,7 @@
                     {:aria-label "Login"
                      :disabled (not login-enabled)
                      :on-click login-action}
-                    "Log in"]]]]]
+                    "Log in"]]]]]]
           [:div.footer-link
             "Don't have an account yet?"
             [:div.footer-link-inner
@@ -161,4 +163,4 @@
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (router/nav! oc-urls/sign-up))}
-                "Sign up here"]]]]])))
+                "Sign up here"]]]])))
