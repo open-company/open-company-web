@@ -186,10 +186,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+              @include svgBgColor("/img/ML/nav_explore_active.svg", center, 14px 14px);
 
               @include dark_mode() {
-                @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+                @include svgBgColor("/img/ML/nav_explore_active.svg", center, 14px 14px);
               }
             }
           }
