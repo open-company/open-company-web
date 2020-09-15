@@ -71,7 +71,7 @@
              :target "_blank"}
             testimonial-company]]]]))
 
-(defn testimonials-screenshot-block [block & [responsive-class]]
+(defn- block-data [block]
   (let [header (cond
                  (= block :stay-focused)
                  "Stay focused with less noise"
@@ -86,13 +86,41 @@
                   "Carrot batches updates together in a daily digest so it's easy to get caught up all at once — when it’s more convenient for you."
                   (= block :analytics)
                   "Curious if anyone heard you? It’s easy to see who’s on the same page, and easy to remind someone that missed it, too.")
-        screenshot-num (cond
-                         (= block :stay-focused)
-                         1
-                         (= block :reduce-interruptions)
-                         2
-                         (= block :analytics)
-                         3)]
+        screenshot-num (case block
+                         :stay-focused         1
+                         :reduce-interruptions 2
+                         :analytics            3)
+        block-float (case block
+                      :stay-focused         :left-block
+                      :reduce-interruptions :right-block
+                      :analytics            :left-block)]
+    [header subline screenshot-num block-float]))
+
+(defn- testimonials-desktop-block [block]
+  (let [[header subline screenshot-num block-float] (block-data block)]
+    [:div.testimonials-floated-block-inner.group
+     {:class (name block-float)}
+     [:img.testimonials-floated-screenshot
+      {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
+       :srcSet (str
+                (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
+                (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x")}]
+     [:div.testimonials-floated-copy
+      [:div.testimonials-floated-header
+       header]
+      [:div.testimonials-floated-subheader
+       subline]]]))
+
+(defn testimonials-desktop-blocks []
+  [:div.testimonials-floated-block.big-web-tablet-only
+   (testimonials-desktop-block :stay-focused)
+
+   (testimonials-desktop-block :reduce-interruptions)
+
+   (testimonials-desktop-block :analytics)])
+
+(defn testimonials-mobile-block [block & [responsive-class]]
+  (let [[header subline screenshot-num] (block-data block)]
     [:div.testimonials-screenshot-block
       {:class responsive-class}
       [:div.testimonials-screenshot-header
@@ -126,15 +154,17 @@
 
    (dashed-string 1)
 
-   (testimonials-screenshot-block :stay-focused "")
+   (testimonials-mobile-block :stay-focused "mobile-only")
 
-   (dashed-string 2)
+   (dashed-string 2 "mobile-only")
 
-   (testimonials-screenshot-block :reduce-interruptions "")
+   (testimonials-mobile-block :reduce-interruptions "mobile-only")
 
-   (dashed-string 3)
+   (dashed-string 3 "mobile-only")
 
-   (testimonials-screenshot-block :analytics "")
+   (testimonials-mobile-block :analytics "mobile-only")
+   
+   (testimonials-desktop-blocks)
 
    (dashed-string 4)
    
