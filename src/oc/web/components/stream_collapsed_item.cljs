@@ -144,7 +144,6 @@
                   :external-follow (not is-mobile?)
                   :show-edit? (not replies?)
                   :show-delete? (not replies?)
-                  :show-unread (not (:unread activity-data))
                   :show-move? (and (not replies?)
                                    (not is-mobile?))
                   :show-inbox? is-inbox?})
