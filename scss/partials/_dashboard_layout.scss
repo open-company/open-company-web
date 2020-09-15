@@ -643,11 +643,11 @@ div.dashboard-layout {
           div.private-board {
             position: relative;
             width: 12px;
-            height: 23px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/board_private_dark.svg");
             background-size: 10px 12px;
             background-repeat: no-repeat;
-            background-position: left 0 bottom 1px;
+            background-position: center;
             float: left;
             margin-left: 6px;
 
@@ -666,11 +666,11 @@ div.dashboard-layout {
           div.public-board {
             position: relative;
             width: 12px;
-            height: 23px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/board_public_dark.svg");
             background-size: 12px 12px;
             background-repeat: no-repeat;
-            background-position: left 0 bottom 1px;
+            background-position: center;
             float: left;
             margin-left: 6px;
 
@@ -720,7 +720,7 @@ div.dashboard-layout {
             float: right;
             position: relative;
             height: 24px;
-            margin-right: -12px;
+            margin-right: -8px;
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
