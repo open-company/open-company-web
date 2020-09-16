@@ -9,9 +9,9 @@
       [:section.cta.group
 
         [:h1.headline
-          "A better news feed for team updates"]
+          "Your news feed for team updates"]
         [:div.subheadline
-         "Carrot makes it simple to know what's happening without all the back-and-forth chatter. Ideal for remote teams and asynchronous updates."]
+         "Stay in sync with fewer interruptions and less noisy chatter. Ideal for remote teams and asynchronous updates."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
