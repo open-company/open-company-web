@@ -470,7 +470,7 @@
 
 (def default-invite-note
   (str
-    "Hey there, let's explore " ls/local-settings " together. It's a place to make sure important "
+    "Hey there, let's explore " ls/product-name " together. It's a place to make sure important "
     "announcements, updates, and decisions don't get lost in the noise."))
 
 (rum/defcs lander-invite < rum/reactive
