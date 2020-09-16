@@ -52,15 +52,16 @@
             [:div.explore-view-block-title
               {:class (when (< (count (:name item)) 15) "short-name")}
               [:span.board-name (:name item)]
-              [:div.board-settings
-                [:button.mlb-reset.board-settings-bt
-                 {:data-placement "top"
-                  :data-container "body"
-                  :data-toggle (when-not is-mobile? "tooltip")
-                  :title "Edit topic"
-                  :on-click (fn [e]
-                              (utils/event-stop e)
-                              (nav-actions/show-section-editor (:slug item)))}]]]
+              (when (utils/link-for (:links item) "partial-update")
+                [:div.board-settings
+                  [:button.mlb-reset.board-settings-bt
+                  {:data-placement "top"
+                    :data-container "body"
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :title "Edit topic"
+                    :on-click (fn [e]
+                                (utils/event-stop e)
+                                (nav-actions/show-section-editor (:slug item)))}]])]
             [:div.explore-view-block-description
               (:description item)]
             (when (:last-entry-at item)

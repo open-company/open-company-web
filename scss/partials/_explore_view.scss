@@ -78,6 +78,10 @@ div.explore-view {
           text-decoration: none;
           border: 1px solid var(--explore-hover-border-color);
           box-shadow: var(--explore-hover-box-shadow);
+
+          div.explore-view-block-title div.board-settings button.board-settings-bt {
+            display: block;
+          }
         }
       }
 
@@ -118,6 +122,7 @@ div.explore-view {
             @include svgBgColor("/img/ML/gear_icon.svg", center, 14px 14px, var(--color));
             transition: transform 180ms;
             opacity: 0.5;
+            display: none;
 
             @include big_web() {
               &:hover {
