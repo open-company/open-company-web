@@ -62,17 +62,23 @@
 (def color-picker (partial rutils/build js/ReactColor.ChromePicker))
 
 (def color-presets [{:rgb {:r 251 :g 94 :b 72}
-                     :hex "#FB5E48"}
-                    {:rgb {:r 248 :g 154 :b 68}
-                     :hex "#F89A44"}
-                    {:rgb {:r 63 :g 189 :b 124}
-                     :hex "#3FBD7C"}
+                     :hex "#FB5E48"
+                     :name "Carrot orange"}
+                    {:rgb {:r 248 :g 155 :b 68}
+                     :hex "#F89A44"
+                     :name "Orange"}
+                    {:rgb {:r 33 :g 178 :b 104}
+                     :hex "#21B268"
+                     :name "Carrot green"}
                     {:rgb {:r 105 :g 184 :b 171}
-                     :hex "#69B8AB"}
+                     :hex "#69B8AB"
+                     :name "Teal"}
                     {:rgb {:r 97 :g 135 :b 248}
-                     :hex "#6187F8"}
-                    {:rgb {:r 104 :g 51 :b 241}
-                     :hex "#6833F1"}])
+                     :hex "#6187F8"
+                     :name "Blue"}
+                    {:rgb {:r 120 :g 83 :b 215}
+                     :hex "#7853D7"
+                     :name "Purple"}])
 
 (def brand-colors-list [{:label "White (default)" :value "#FFFFFF" :rgb {:r 244 :g 244 :b 244}}
                         {:label "Deep navy" :value "#34414F" :rgb {:r 52 :g 65 :b 79}}
@@ -309,13 +315,9 @@
             (email-domains)]
           [:div.org-settings-fields.field-group
             [:div.field-label
-              "Customize colors"]
+              "Customize your team's colors"]
             [:div.field-description
-              "Choose the color of buttons and links."]
-            [:div.field-label
               "Button/link color"]
-            [:div.field-description
-              "Ie: red, green or #0000ff"]
             [:input.field-value.oc-input
              {:type "text"
               :class (when (:error org-editing) "error")
@@ -358,7 +360,7 @@
                    :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
                    :style {:background-color (:hex c)}
                    }]])]]
-            [:div.field-label
+            [:div.field-description
              "Button text color"]
             [:select.oc-input.field-value.button-text-color
              {:value (-> current-brand-color :secondary :hex)
