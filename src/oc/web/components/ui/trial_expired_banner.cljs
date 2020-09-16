@@ -26,7 +26,7 @@
           [:button.mlb-reset.open-payments-bt
             {:on-click #(nav-actions/show-org-settings :payments)}
             "select a plan"]
-          (srt" to continue using " ls/product-name ". Need more time? ")
+          (str " to continue using " ls/product-name ". Need more time? ")
           [:a.chat-with-us
             {:class "intercom-chat-link"
              :href oc-urls/contact-mail-to}
