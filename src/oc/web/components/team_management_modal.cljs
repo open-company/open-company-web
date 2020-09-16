@@ -8,6 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -130,7 +131,7 @@
                                                        (if pending?
                                                         "Are you sure you want to cancel this invitation?"
                                                         [:span
-                                                          "This user will no longer be able to access your team on Wut."
+                                                          (str "This user will no longer be able to access your team on " ls/product-name ".")
                                                           [:br][:br]
                                                           "Are you sure you want to remove this user?"])
                                                       :link-button-title (if pending?

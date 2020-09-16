@@ -48,6 +48,10 @@
 ;; Web location
 (def web-server (str web-hostname ":" web-port))
 
+(def whats-new-url "https://carrot.news/")
+
+(def product-name "Carrot")
+
 ;; JWT
 (def jwt-cookie-domain web-hostname)
 (def jwt-cookie-secure false)
@@ -93,9 +97,6 @@
 
 ;; Polls
 (def poll-can-add-reply false)
-
-;; Wut
-(def wut? true)
 
 ;; Publisher boards feature-flag
 (def publisher-board-enabled? false)

@@ -5,13 +5,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.shared.useragent :as ua]
             [oc.web.expo :as expo]))
 
-(def default-title "Login to Wut")
+(def default-title (str "Login to " ls/product-name))
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive

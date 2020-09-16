@@ -19,13 +19,13 @@
           [:button.mlb-reset.open-payments-bt
             {:on-click #(nav-actions/show-org-settings :payments)}
             "select a plan"]
-          " to continue using Wut."]
+          (str " to continue using " ls/product-name ".")]
         [:div.trial-expired-banner
           "📣 Your 14-day free trial has ended. Please "
           [:button.mlb-reset.open-payments-bt
             {:on-click #(nav-actions/show-org-settings :payments)}
             "select a plan"]
-          " to continue using Wut. Need more time? "
+          (srt" to continue using " ls/product-name ". Need more time? ")
           [:a.chat-with-us
             {:class "intercom-chat-link"
              :href oc-urls/contact-mail-to}
@@ -35,8 +35,9 @@
         [:div.trial-expired-banner.reduced-copy
           "📣 Your 14-day free trial has ended. Please ask your team admin to choose a new plan."]
         [:div.trial-expired-banner
-          "📣 Your team's 14-day free trial has ended. Please ask your team admin "
-          "to subscribe to Wut. Need more time? "
+          (str
+           "📣 Your team's 14-day free trial has ended. Please ask your team admin "
+           "to subscribe to " ls/product-name ". Need more time? ")
           [:a.chat-with-us
             {:class "intercom-chat-link"
              :href oc-urls/contact-mail-to}
@@ -65,7 +66,7 @@
           [:div.trial-expired-alert-description
             (str
              "Hi, it looks like your free trial has ended. Please ask your "
-             "team admin to subscribe to Wut to continue adding new posts.")])
+             "team admin to subscribe to " ls/product-name " to continue adding new posts.")])
         (when is-admin?
           [:button.mlb-reset.trial-expired-alert-bt
             {:on-click #(do

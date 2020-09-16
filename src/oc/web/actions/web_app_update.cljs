@@ -3,6 +3,7 @@
             [oc.web.api :as api]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.notifications :as notification-actions]
             [oc.shared.interval :as interval]
             [oc.shared.useragent :as ua]))
@@ -35,7 +36,7 @@
                          (when e
                            (utils/event-stop e))
                          (.. js/window -location reload))]
-           (notification-actions/show-notification {:title "New version of Wut available!"
+           (notification-actions/show-notification {:title (str "New version of " ls/product-name " available!")
                                                     :web-app-update true
                                                     :id :web-app-update-error
                                                     :dismiss on-notification-dismissed

@@ -470,7 +470,7 @@
 
 (def default-invite-note
   (str
-    "Hey there, let's explore Wut together. It's a place to make sure important "
+    "Hey there, let's explore " ls/local-settings " together. It's a place to make sure important "
     "announcements, updates, and decisions don't get lost in the noise."))
 
 (rum/defcs lander-invite < rum/reactive
@@ -528,7 +528,7 @@
         [:div.title
           "Invite your team"]]
       [:div.subtitle
-        "Invite some colleagues to explore Wut with you."]
+         (str "Invite some colleagues to explore " ls/product-name " with you.")]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -612,7 +612,7 @@
         (if auth-settings
           (if (:team auth-settings)
             [:div.title
-              "Your team is using Wut to share updates"]
+              (str "Your team is using " ls/product-name " to share updates")]
             [:div.title
               "Oh oh..."])
           [:div.title
@@ -627,7 +627,7 @@
                 [:div.team-logo-container
                   (org-avatar team-data false :never)]
                 [:div.title.main-lander
-                  "Join " (:name team-data) " on Wut"]]
+                  (str "Join " (:name team-data) " on " ls/product-name)]]
               [:div.field-label.email-field
                 "Work email"
                 (cond
@@ -718,7 +718,7 @@
       [:header.main-cta
         [:div.invite-container
           [:div.title
-            "Join your team on Wut"]]]
+            (str "Join your team on " ls/product-name)]]]
       (if (:invitation-error confirm-invitation)
         [:div.subtitle.token-error
           "An error occurred while confirming your invitation, please try again."]
@@ -746,7 +746,7 @@
     [:div.onboard-container-inner.invitee-lander-password
       [:header.main-cta
         [:div.title
-          "Join your team on Wut"]
+          (str "Join your team on " ls/product-name)]
         [:div.top-continue-container
          [:button.mlb-reset.top-continue
            {:class (when continue-disabled? "disabled")
@@ -870,7 +870,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/onboard-profile-save current-user-data edit-user-profile))}
-            "Start using Wut"]]]]))
+            (str "Start using " ls/product-name)]]]]))
 
 (rum/defcs email-wall < rum/reactive
                         (drv/drv :query-params)

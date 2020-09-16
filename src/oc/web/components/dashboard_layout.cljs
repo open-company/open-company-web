@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.user :as user-store]
@@ -209,7 +210,7 @@
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
             ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-            ;       non-admin-tooltip (str "Wut is where you'll find key announcements, updates, and "
+            ;       non-admin-tooltip (str ls/product-name " is where you'll find key announcements, updates, and "
             ;                              "decisions to keep you and your team pulling in the same direction.")
             ;       is-second-user (= add-post-tooltip :is-second-user)]
             ;   (when (and (not is-drafts-board)
@@ -222,12 +223,12 @@
             ;         {:class (when is-second-user "second-user")}
             ;         [:div.add-post-tooltip-box-mobile]
             ;         [:div.add-post-tooltip-title
-            ;           "Welcome to Wut!"]
+            ;           (str "Welcome to " ls/product-name "!")]
             ;           [:div.add-post-tooltip
             ;             (if is-admin-or-author
             ;               (if is-second-user
             ;                 non-admin-tooltip
-            ;                 "Create your first post now to see how Wut works. Don't worry, you can delete it anytime.")
+            ;                 (str "Create your first post now to see how " ls/product-name " works. Don't worry, you can delete it anytime."))
             ;               non-admin-tooltip)]
             ;           (when (and is-admin-or-author
             ;                      (not is-second-user))

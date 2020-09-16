@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
@@ -105,14 +106,14 @@
                             "Viewer"]]])
                     (if has-bot?
                       [:div.bot-line
-                        "Wut bot is currently " [:strong "on"] "."]
+                        (str ls/product-name " bot is currently ") [:strong "on"] "."]
                       [:div.bot-line
-                        "Wut bot is currently " [:strong "off"] ". "
+                        (str ls/product-name " bot is currently ") [:strong "off"] ". "
                         [:button.mlb-reset.turn-on-bot-bt
                           {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
                           "Turn it on?"]
                         [:i.mdi.mdi-information-outline
-                          {:title "The Wut bot integrates Wut with Slack to allow invites, shares, digests and notifications to use Slack rather than email."
+                          {:title (str "The " ls/product-name " bot integrates " ls/product-name " with Slack to allow invites, shares, digests and notifications to use Slack rather than email.")
                            :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                            :data-placement "top"
                            :data-container "body"

@@ -10,6 +10,8 @@
             [oc.pages.about :as about]
             [oc.pages.press-kit :as press-kit]))
 
+(def default-page-title (str (or (env :product-name) "Carrot") " | " (env :web-server)))
+
 (def oc-loading
   [:div.oc-loading.active
    [:div.oc-loading-inner
@@ -159,7 +161,7 @@
           [:link {:rel "icon" :type "image/png" :href (shared/cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Wut! | wuts.io"]
+          [:title default-page-title]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
@@ -283,7 +285,7 @@
           [:link {:rel "icon" :type "image/png" :href (shared/cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Wut! | wuts.io"]
+          [:title default-page-title]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css

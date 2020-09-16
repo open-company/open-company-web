@@ -343,7 +343,7 @@
                 [:button.mlb-reset.enable-slack-bot-bt
                   {:on-click (fn [_]
                                (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
-                  "Add Wut bot"]]))
+                  (str "Add " ls/product-name " bot")]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
               "Public topics are visible to the world, including search engines."])
@@ -391,7 +391,7 @@
                              "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              "Wut topic settings"]
+                              (str ls/product-name " topic settings")]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
