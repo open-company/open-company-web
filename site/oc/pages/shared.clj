@@ -81,7 +81,7 @@
                  "Know who saw your update")
         subline (cond
                   (= block :stay-focused)
-                  "Personalize your news feed to filter out topics you don't care about. This saves you time and makes it faster to get caught up."
+                  "Personalize your news feed to filter out topics you don't care about. Less noise saves you time."
                   (= block :reduce-interruptions)
                   "Carrot batches updates together in a daily digest so it's easy to get caught up all at once — when it’s more convenient for you."
                   (= block :analytics)
@@ -154,23 +154,32 @@
 
    (dashed-string 1)
 
+   (testimonial-block :ifttt)
+
+   (dashed-string 2)
+
    (testimonials-mobile-block :stay-focused "mobile-only")
-
-   (dashed-string 2 "mobile-only")
-
-   (testimonials-mobile-block :reduce-interruptions "mobile-only")
 
    (dashed-string 3 "mobile-only")
 
+   (testimonials-mobile-block :reduce-interruptions "mobile-only")
+
+   (dashed-string 4 "mobile-only")
+
    (testimonials-mobile-block :analytics "mobile-only")
-   
+
    (testimonials-desktop-blocks)
 
-   (dashed-string 4)
-   
+   (dashed-string 5)
+
    (close-communication-gaps "")
-   
-   (dashed-string 5)])
+
+   (dashed-string 6)
+
+  ;;  (testimonial-block :blend-labs)
+
+  ;;  (dashed-string 1)
+   ])
 
 (def pricing-table
   [:div.pricing-table.group
