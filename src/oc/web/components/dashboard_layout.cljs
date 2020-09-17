@@ -23,8 +23,10 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
+            [oc.web.actions.notifications :as notif-actions]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
+            [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
@@ -61,6 +63,8 @@
                               (drv/drv :activities-read)
                               (drv/drv :followers-boards-count)
                               (drv/drv :comment-reply-to)
+                              (drv/drv :mobile-user-notifications)
+                              (drv/drv :user-notifications)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -91,6 +95,8 @@
         current-activity-id (drv/react s :activity-uuid)
         current-org-slug (drv/react s :org-slug)
         current-user-data (drv/react s :current-user-data)
+        mobile-user-notifications (drv/react s :mobile-user-notifications)
+        user-notifications-data (drv/react s :user-notifications)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
@@ -179,7 +185,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "following" (oc-urls/following)))
-                 :class (when (= current-board-slug "following")
+                 :class (when (and is-following (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
@@ -187,18 +193,28 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
-                 :class (when is-topics
+                 :class (when (and is-topics (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Explore"]]
-              [:button.mlb-reset.tab-button.notifications-tab
+              [:button.mlb-reset.tab-button.replies-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "replies" (oc-urls/replies)))
-                 :class (when is-replies
+                 :class (when (and is-replies (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Activity"]]
+              [:button.mlb-reset.tab-button.notifications-tab
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (notif-actions/toggle-mobile-user-notifications))
+                 :class (when mobile-user-notifications
+                          "active")}
+                [:span.tab-icon
+                  (when (user-notifications/has-new-content? user-notifications-data)
+                    [:span.unread-dot])]
+                [:span.tab-label "Alerts"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -206,6 +222,9 @@
                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                   [:span.tab-icon]
                   [:span.tab-label "Add"]])])
+          (when (and is-mobile?
+                     mobile-user-notifications)
+            (user-notifications/user-notifications))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group

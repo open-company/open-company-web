@@ -34,10 +34,7 @@
                                  (dissoc with-current-edit :fixed-items))
      (update-in org-drafts-count-key #(if is-drafts-board?
                                         (ou/disappearing-count-value % (:total-count section-data))
-                                        %))
-     (as-> ndb
-      (update-in ndb (dispatcher/user-notifications-key org-slug)
-       #(notif-util/fix-notifications ndb %))))))
+                                        %)))))
 
 ; (defn fix-posts-new-label
 ;   [db changes]
@@ -70,10 +67,7 @@
                          (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
         (assoc-in board-key next-board-data)
-        (update :section-editing #(dissoc % :loading :has-changes))
-        (as-> ndb
-              (update-in ndb (dispatcher/user-notifications-key org-slug)
-                         #(notif-util/fix-notifications ndb %))))))
+        (update :section-editing #(dissoc % :loading :has-changes)))))
 
 (defmethod dispatcher/action :section-edit/dismiss
   [db [_]]
@@ -233,10 +227,7 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+        (assoc-in posts-data-key new-items-map)))
     db))
 
 (defmethod dispatcher/action :setup-section-editing

@@ -138,6 +138,7 @@ div.oc-loading-ghost-screen {
           background-size: calc(100% - 48px) auto;
           background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
           background-position: top 0 left 24px;
+          flex: 1;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
@@ -166,6 +167,44 @@ div.oc-loading-ghost-screen {
               background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collapsed@dark.svg");
             }
           } 
+        }
+      }
+
+      div.oc-loading-tabbar {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          margin-bottom: 0;
+          height: #{$mobile_navbar_height}px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: stretch;
+
+          div.oc-loading-tabbar-item {
+            display: flex;
+            flex-flow: column nowarp;
+            justify-content: center;
+            align-items: center;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              background-color: var(--opac-background-color-08);
+              margin-bottom: 6px;
+            }
+
+            &:after {
+              content: "";
+              width: 30%;
+              height: 15px;
+              border-radius: 6px;
+              background-color: var(--opac-background-color-08);
+            }
+          }
         }
       }
     }

@@ -362,6 +362,7 @@
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
+   :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
@@ -520,7 +521,8 @@
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
                                                                  :search-active
-                                                                 :show-whats-new-green-dot])]
+                                                                 :show-whats-new-green-dot\
+                                                                 :mobile-user-notifications])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)

@@ -26,7 +26,12 @@
      [:div.oc-loading-qp]
      [:div.oc-loading-feed-title]
      [:div.oc-loading-feed
-      {:class (when (= (:current-board-slug data) "replies") "collapsed")}]]]])
+      {:class (when (= (:current-board-slug data) "replies") "collapsed")}]
+     [:div.oc-loading-tabbar
+      [:div.oc-loading-tabbar-item]
+      [:div.oc-loading-tabbar-item]
+      [:div.oc-loading-tabbar-item]
+      [:div.oc-loading-tabbar-item]]]]])
 
 (rum/defc loading < rum/static
   [{:keys [current-org-slug current-board-slug jwt loading]}]
