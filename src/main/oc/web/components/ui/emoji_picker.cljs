@@ -9,7 +9,8 @@
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
-            [oc.shared.useragent :as ua]))
+            [oc.shared.useragent :as ua]
+            ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (def emojiable-class "emojiable")
 
@@ -167,7 +168,7 @@
                         (reset! visible false))}
           "Cancel"]
          (when-not (utils/is-test-env?)
-           (react-utils/build (.-Picker js/EmojiMart)
+           (react-utils/build Picker
              {:native true
               :autoFocus true
               :onClick (fn [emoji event]
