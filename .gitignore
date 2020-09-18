@@ -26,6 +26,7 @@ forms-read.txt
 forms-analyzed.txt
 
 .calva/
+.vscode/
 
 public/js/cljs-runtime
 public/js/oc.*
