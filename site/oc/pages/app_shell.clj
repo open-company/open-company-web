@@ -32,7 +32,7 @@
           ;; OpenCompany CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/app.main.css"}]
           ;; Emoji One Autocomplete CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-autocomplete/main.css"}]
           ;; Lineto font
           (shared/circular-book-font)
           (shared/circular-bold-font)
@@ -42,8 +42,6 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/themes/default.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/MediumEditorTCMention/mention-panel.min.css"}]
-          ;; Emojione CSS
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/emojione.css"}]
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart/emoji-mart.css"}]
           ;; MediumEditorMediaPicker
@@ -83,17 +81,9 @@
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
           [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
-          ;; jQuery textcomplete needed by Emoji One autocomplete
-          [:script
-           {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
-            :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
-          ;; jQuery scrollTo plugin
-          [:script {:src "/lib/scrollTo/scrollTo.min.js" :type "text/javascript"}]
           shared/bootstrap-js
-          ;; Emoji One Autocomplete
-          [:script {:src "/lib/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
           (shared/oc-js)
           ;; Utilities
@@ -173,10 +163,6 @@
           [:div.preload-interstitial]
           ;; Static js files
           (shared/static-js)
-          ;; jQuery textcomplete needed by Emoji One autocomplete
-          [:script
-           {:src "//cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.min.js"
-            :type "text/javascript"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           shared/bootstrap-js

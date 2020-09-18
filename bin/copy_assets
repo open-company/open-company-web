@@ -11,9 +11,10 @@ cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.min.js $INIT_CWD/p
 echo "Done!"
 mkdir $INIT_CWD/public/css/medium-editor
 mkdir $INIT_CWD/public/css/medium-editor/themes
-mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/
+mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention
 mkdir $INIT_CWD/public/css/emojione
-mkdir $INIT_CWD/public/css/emoji-mart/
+mkdir $INIT_CWD/public/css/emoji-mart
+mkdir $INIT_CWD/public/css/emoji-autocomplete
 echo "Copy medium-editor style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/medium-editor.css $INIT_CWD/public/css/medium-editor/medium-editor.css
 echo "Done!"
@@ -28,4 +29,7 @@ cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/
 echo "Done!"
 echo "Copy emoj-mart style..."
 cp $INIT_CWD/node_modules/emoji-mart/css/emoji-mart.css $INIT_CWD/public/css/emoji-mart/emoji-mart.css
+echo "Done!"
+echo "Copy emoj-autocomplete style..."
+cp $INIT_CWD/node_modules/@bago2k4/emoji-autocomplete/main.css $INIT_CWD/public/css/emoji-autocomplete/main.css
 echo "Done!"
