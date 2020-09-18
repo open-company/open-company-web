@@ -95,7 +95,7 @@
           ;; Emoji One Autocomplete
           [:script {:src "/lib/emojione/autocomplete.js" :type "text/javascript"}]
           ;; ClojureScript generated JavaScript
-          shared/oc-js
+          (shared/oc-js)
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input

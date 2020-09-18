@@ -109,7 +109,7 @@
              :target #{:dev :prod}}])
 
 (defn build-pages [env-kw]
-  (println "Building pages for..." (string/capital (name env-kw)))
+  (println (str "Building static pages (" env-kw "):"))
   (doseq [{:keys [title head body page-name page target] :as p} pages
           :let [filename (str "public/" page-name ".html")]]
     (print (str "...page " (name page) (string/join "" (vec (take (- 15 (count (name page))) (repeat " ")))) " -> " filename "... "))
@@ -121,7 +121,7 @@
                       (if (fn? body) (body page options) body))
             (spit filename))
         (println "built!"))))
-  (println "Static pages built!"))
+  (println "Done!"))
 
 (defn -main [& [env-name & args]]
   (build-pages (or (string/keyword env-name) :dev)))
