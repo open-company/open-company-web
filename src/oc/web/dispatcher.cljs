@@ -233,12 +233,6 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
-(defn grouped-user-notifications-key [org-slug]
-  (vec (concat (org-key org-slug) [:user-notifications :grouped])))
-
-(defn sorted-user-notifications-key [org-slug]
-  (vec (concat (org-key org-slug) [:user-notifications :sorted])))
-
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -563,14 +557,6 @@
                             (fn [base org-slug]
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
-   :sorted-user-notifications [[:base :org-slug]
-                               (fn [base org-slug]
-                                 (when (and base org-slug)
-                                   (get-in base (sorted-user-notifications-key org-slug))))]
-   :grouped-user-notifications [[:base :org-slug]
-                                (fn [base org-slug]
-                                  (when (and base org-slug)
-                                    (get-in base (grouped-user-notifications-key org-slug))))]
    :replies-badge        [[:base :org-slug]
                            (fn [base org-slug]
                              (get-in base (replies-badge-key org-slug)))]
