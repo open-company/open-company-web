@@ -108,32 +108,6 @@
              :title "Carrot | Terms of Service"
              :target #{:dev :prod}}])
 
-;; (defn static-page [title content opts]
-;;   (hp/html5 {:lang "en"}
-;;             (shared/head)
-;;             [:body
-;;              {:class (when (env :covid-banner) "covid-banner")}
-;;              shared/tag-manager-body
-;;              [:div
-;;               {:class "outer header"}
-;;               shared/ph-banner
-;;               (shared/covid-banner page)
-;;               (shared/nav (name page))
-;;               (shared/mobile-menu (name page))]
-;;              content
-;;              (shared/footer page)]))
-
-;; (defn app-shell [_]
-;;   (hp/html5 {:lang "en"}
-;;             (:head pages/app-shell)
-;;             (:body pages/app-shell)))
-
-;; (defn prod-app-shell [_]
-;;   (hp/html5 {:lang "en"}
-;;             (:head pages/prod-app-shell)
-;;             (:body pages/prod-app-shell)))
-
-
 (defn build-pages [env-kw]
   (println "Building pages for..." (string/capital (name env-kw)))
   (doseq [{:keys [title head body page-name page target] :as p} pages
