@@ -121,7 +121,7 @@
             "prod-build" ["do" "clean," "deps," "prod-site" ] ; clean and build code
             "prod-site" ["run" "prod"]
             ;; Development
-            "start" ["pdo" "run" "watch-site," "ocweb"] ; Site & cljs dev
+            "start" ["pdo" "watch-site," "ocweb"] ; Site & cljs dev
             ; "watch-ocweb" ["auto" "ocweb"]
             "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
             "watch-site" ["auto" "build-site"] ; Build the static website and watch for changes
