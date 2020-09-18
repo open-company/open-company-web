@@ -341,7 +341,7 @@
                              (.destroy @(::me-media-utils/editor s))
                              (reset! (::me-media-utils/editor s) nil))
                            (when-let [throttled-did-change @(::did-change-throttled s)]
-                             (.dispose throttled-did-change))
+                             (.dispose ^js throttled-did-change))
                            s)}
   [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb add-comment-focus-prefix internal-max-width
              edit-comment-data scroll-after-posting? add-comment-cb collapse? add-comment-did-change row-index]}]

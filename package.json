@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "release": "npm install && npm ci && npm run scss:build && npx shadow-cljs release webapp",
-
     "dev:build": "npm run css:copyAssets & npm run scss:build npm run cljs:build",
     "dev:watch": "npm run css:copyAssets & concurrently --kill-others \"npm run scss:watch\" \"npm run cljs:watch\"",
     "scss:build": "node-sass --include-paths scss scss/app.main.scss public/css/app.main.css",
@@ -21,6 +20,7 @@
     "shadow-cljs": "2.11.1"
   },
   "dependencies": {
+    "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete",
     "@sentry/browser": "^5.22.3",
     "clipboard": "2.0.6",
     "create-react-class": "15.6.3",
