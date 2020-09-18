@@ -488,10 +488,10 @@
   [:script {:type "text/javascript" :src (cdn "/js/oc_assets.js")}])
 
 (defn static-js []
-  [:script {:src (cdn "/js/static-js.js")}])
+  [:script {:src (cdn "/lib/static-js.js")}])
 
 (defn intercom-js []
-  [:script {:src (cdn "/js/intercom.js")}])
+  [:script {:src (cdn "/lib/intercom.js")}])
 
 (def tag-manager-head
   [:script"
