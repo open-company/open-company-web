@@ -43,7 +43,7 @@ div.login-wall-container {
         @include OC_Body_Book();
         font-size: 16px;
         line-height: 20px;
-        color: var(--color);
+        color: $deep_navy;
         padding-left: 22px;
         margin-right: auto;
       }
@@ -72,7 +72,7 @@ div.login-wall-container {
         @include OC_Body_Book();
         font-size: 16px;
         line-height: 20px;
-        color: var(--primary-color);
+        color: $carrot_orange;
 
         &.disabled, &:disabled {
           opacity: 0.4;
@@ -103,7 +103,7 @@ div.login-wall-container {
         position: absolute;
         top: 12px;
         right: 24px;
-        color: var(--primary-color);
+        color: $carrot_orange;
         text-align: right;
 
         &.disabled, &:disabled {
@@ -294,7 +294,7 @@ div.login-wall-container {
             }
 
             &.valid {
-              border: 1px solid var(--primary-color-06); // 0.5
+              border: 1px solid rgba($carrot_orange, 0.5); // 0.5
             }
 
             -webkit-app-region: no-drag;
@@ -328,7 +328,7 @@ div.login-wall-container {
           border: none;
           width: 100%;
           height: 40px;
-          background-color: var(--primary-color);
+          background-color: $carrot_orange;
           color: white;
           @include OC_Body_Bold();
           font-size: 16px;
