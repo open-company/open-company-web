@@ -45,11 +45,11 @@
 
   ([href :guard string?]
     (let [parsed-uri (guri/parse href)]
-      (str (.getPath parsed-uri)
-           (when (.hasQuery parsed-uri)
-             (str "?" (.getEncodedQuery parsed-uri)))
-           (when (.hasFragment parsed-uri)
-             (str "#" (.getFragment parsed-uri)))))))
+      (str (.getPath ^js parsed-uri)
+           (when (.hasQuery ^js parsed-uri)
+             (str "?" (.getEncodedQuery ^js parsed-uri)))
+           (when (.hasFragment ^js parsed-uri)
+             (str "#" (.getFragment ^js parsed-uri)))))))
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))

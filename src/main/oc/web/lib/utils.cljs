@@ -324,7 +324,7 @@
 
 (defn parse-input-email [email-address]
   (let [parsed-email (email/parse email-address)]
-    {:name (.getName parsed-email) :address (.getAddress parsed-email)}))
+    {:name (.getName ^js parsed-email) :address (.getAddress ^js parsed-email)}))
 
 (defn index-of
   "Given a collection and a function return the index that make the function truely."
@@ -501,14 +501,14 @@
                                                                         (let [$this (js/$ this)]
                                                                           (.remove $this))))
         $hidden-div (js/$ (str "." hidden-class))
-        body-without-preview (.html $hidden-div)
+        body-without-preview (.html ^js $hidden-div)
         _ (.remove $hidden-div)]
     body-without-preview))
 
 (defn- remove-elements [$container el-selector re-check]
   (loop [$el (.find $container el-selector)]
     (when (and (pos? (.-length $el))
-               (.match (.html $el) re-check))
+               (.match (.html ^js $el) re-check))
       (.remove $el)
       (recur (.find $container el-selector)))))
 

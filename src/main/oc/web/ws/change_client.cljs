@@ -272,8 +272,9 @@
   [ws-link uid org-slug containers]
   (timbre/debug "Change service reconnect" (:href ws-link) uid org-slug containers)
   (let [ws-uri (guri/parse (:href ws-link))
-        ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
-        ws-org-path (.getPath ws-uri)]
+        ws-port (.getPort ^js ws-uri)
+        ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
+        ws-org-path (.getPath ^js ws-uri)]
     ;; Save passed parameters
     (reset! last-ws-link ws-link)
     (reset! container-ids containers)

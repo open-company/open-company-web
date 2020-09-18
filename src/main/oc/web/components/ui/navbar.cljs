@@ -56,7 +56,7 @@
                      s)
                      :will-unmount (fn [s]
                       (when @(::throttled-scroll-check s)
-                        (.dispose @(::throttled-scroll-check s)))
+                        (.dispose ^js @(::throttled-scroll-check s)))
                      s)}
   [s]
   (let [{:keys [org-data

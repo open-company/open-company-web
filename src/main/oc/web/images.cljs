@@ -7,14 +7,14 @@
 
 (defn- is-filestack?
   [uri]
-  (= (.getDomain uri) "cdn.filestackcontent.com"))
+  (= (.getDomain ^js uri) "cdn.filestackcontent.com"))
 
 (defn- optimize-filestack-image-url
   [url preferred-height]
   (let [uri (Uri. url)]
     (if-not (is-filestack? uri)
       url
-      (let [cur-path    (.getPath uri)
+      (let [cur-path    (.getPath ^js uri)
             resize-frag (str "resize=height:" preferred-height)
             new-path    (str resize-frag cur-path)
             new-uri     (.setPath uri new-path)]
@@ -25,7 +25,7 @@
 
 (defn- is-slack?
   [uri]
-  (= (.getDomain uri) "avatars.slack-edge.com"))
+  (= (.getDomain ^js uri) "avatars.slack-edge.com"))
 
 (defn- approximate-slack-org-height
   [pref-height]
@@ -56,7 +56,7 @@
   (let [uri (Uri. url)]
     (if-not (is-slack? uri)
       url
-      (let [cur-path      (.getPath uri)
+      (let [cur-path      (.getPath ^js uri)
             re            #"_(\d{2,3})\.([a-z]+)$"
             template      (str "_" approx-height ".$2")
             new-path      (cstr/replace cur-path re template)

@@ -66,7 +66,7 @@
   (try
     (let [fs-client (init-filestack)]
       (.then
-        (.upload fs-client file #js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent %)))})
+        (.upload fs-client file #js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent ^js %)))})
         (fn [res]
           (let [url (gobj/get res "url")]
             (when (fn? success-cb)

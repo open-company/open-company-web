@@ -114,10 +114,11 @@
        :author (:author notification)
        :click (if reminder?
                 (when-not (responsive/is-mobile-size?)
-                  (if (and reminder-data
-                           (= (:notification-type reminder-data) "reminder-notification"))
-                    #(oc.web.actions.nav-sidebar/show-reminders)
-                    #(ui-compose)))
+                  ;; (if (and reminder-data
+                  ;;          (= (:notification-type reminder-data) "reminder-notification"))
+                  ;;   #(oc.web.actions.nav-sidebar/show-reminders)
+                  ;;   #(ui-compose)))
+                  #(ui-compose))
                 (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid))})))
 
 (defn sorted-notifications [notifications]

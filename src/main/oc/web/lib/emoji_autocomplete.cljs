@@ -1,7 +1,7 @@
 (ns oc.web.lib.emoji-autocomplete
-  (:require ["emoji-mart" :as emoji-mart :refer (emojiIndex)]))
+  (:require ["@bago2k4/emoji-autocomplete" :as emoji-autocomplete :refer (emojiAutocomplete)]))
 
 (defn autocomplete []
   (try
-    (js/emojiAutocomplete emojiIndex)
+    (emojiAutocomplete ".emoji-autocomplete")
     (catch :default e false)))

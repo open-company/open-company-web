@@ -178,7 +178,7 @@
                          :will-unmount (fn [s]
                           (remove-window-click-listener s)
                           (when-let [debounced-auto-search @(::debounced-auto-search s)]
-                            (.dispose debounced-auto-search))
+                            (.dispose ^js debounced-auto-search))
                           s)}
   [s]
   (when (store/should-display)

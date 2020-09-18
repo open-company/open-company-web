@@ -80,11 +80,10 @@
 
 (defn- get-vimeo-thumbnail [s video]
   (.ajax js/$
-    #js {
-      :method "GET"
-      :url (str "https://vimeo.com/api/v2/video/" (:id video) ".json")
-      :success #(get-vimeo-thumbnail-success s video %)
-      :error #(get-vimeo-thumbnail-retry s video)}))
+    #js {:method "GET"
+         :url (str "https://vimeo.com/api/v2/video/" (:id video) ".json")
+         :success #(get-vimeo-thumbnail-success s video %)
+         :error #(get-vimeo-thumbnail-retry s video)}))
 
 (defn valid-video-url? [url]
   (let [trimmed-url (string/trim url)

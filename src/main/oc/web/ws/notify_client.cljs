@@ -130,8 +130,9 @@
   "Connect or reconnect the WebSocket connection to the notify service"
   [ws-link uid]
   (let [ws-uri (guri/parse (:href ws-link))
-        ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
-        ws-org-path (.getPath ws-uri)]
+        ws-port (.getPort ^js ws-uri)
+        ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
+        ws-org-path (.getPath ^js ws-uri)]
     (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 

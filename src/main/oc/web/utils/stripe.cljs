@@ -14,7 +14,7 @@
 
 (defn redirect-to-checkout [session-data & [callback]]
   (let [s (stripe)
-        checkout-promise (.redirectToCheckout s
+        checkout-promise (.redirectToCheckout ^js s
                           (clj->js session-data))]
     (.then checkout-promise
      (fn [res]

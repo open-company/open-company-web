@@ -512,7 +512,7 @@
                     (when (responsive/is-mobile-size?)
                       (dom-utils/unlock-page-scroll))
                     (when-let [debounced-autosave @(::debounced-autosave s)]
-                      (.dispose debounced-autosave))
+                      (.dispose ^js debounced-autosave))
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)

@@ -1,7 +1,7 @@
 (ns oc.web.components.ui.custom-tag
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [oops.core :refer (oget oset!)]
+            [oops.core :refer (oget oget+ oset!)]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.react-utils :as react-utils]
@@ -99,10 +99,10 @@
     (let [user (-> (that.filterUsers (oget that "?props"))
                    vec
                    (nth selected-index))]
-      (.selectItem that user)))
+      (.selectItem ^js that user)))
   (utils/event-stop e))
 
-(goog-extend CustomizedTagComponent
+(goog-extend ^js CustomizedTagComponent
              PureComponent
              ([props]
               (this-as this
@@ -144,10 +144,10 @@
              (filterUsers [properties]
                           (this-as this
                                   ;;  (goog/base (js* "this") "filterUsers" properties)
-                                   (let [current-mention-text (.-currentMentionText properties)
+                                   (let [current-mention-text (.-currentMentionText ^js properties)
                                          current-text (string/lower (subs current-mention-text 1 (count current-mention-text)))
                                          mapped-users (map (fn [user-index]
-                                                             (let [user (oget properties (str "?users.?" user-index))]
+                                                             (let [user (oget+ ^js properties (str "?users.?" user-index))]
                                                                (cond
                                                                  (value-lookup (oget user "?name") current-text)
                                                                  (js/Object.assign user #js {:selectedKey "name"})
@@ -166,7 +166,7 @@
                                                                 ;;  (oset! user "selectedKey" "email")
                                                                  :else
                                                                  user)))
-                                                           (range (.. properties -users -length)))]
+                                                           (range (oget ^js properties "?users.?length")))]
                                      (filterv (fn [user] (seq (oget user "?selectedKey"))) mapped-users))))
              (addBindedEvent [el e-name cb]
                              (this-as this

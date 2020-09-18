@@ -38,7 +38,7 @@
          (.saveSelection editable)))
        (let [poll-id (poll-utils/new-poll-id)
              dispatch-input-key (:dispatch-input-key options)]
-         (.addPoll editable poll-id)
+         (.addPoll ^js editable poll-id)
          (poll-actions/add-poll dispatch-input-key poll-id))))))
 
 ;; Gif handling
@@ -48,7 +48,7 @@
 
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
-    (.addGIF editable nil nil nil nil)
+    (.addGIF ^js editable nil nil nil nil)
     (let [original (oget gif-data ["images" "original"])
           original-url (or (oget original "?url")
                            (oget original "?gif_url"))
@@ -58,7 +58,7 @@
           original-width (oget original "width")
           original-height (oget original "height")]
       (.addGIF
-       editable
+       ^js editable
        original-url
        fixed-width-still-url
        original-width
@@ -151,9 +151,9 @@
 
 (defn media-video-add [s editable video-data]
   (if (nil? video-data)
-    (.addVideo editable nil nil nil nil)
+    (.addVideo ^js editable nil nil nil nil)
     (.addVideo
-     editable
+     ^js editable
      (get-video-src video-data)
      (name (:type video-data))
      (:id video-data)
@@ -183,7 +183,7 @@
                (contains? image :width)
                (contains? image :height)
                (contains? image :thumbnail))
-      (.addPhoto editable (:url image) (:thumbnail image) (:width image) (:height image))
+      (.addPhoto ^js editable (:url image) (:thumbnail image) (:width image) (:height image))
       (reset! (::media-photo s) nil)
       (reset! (::media-photo-did-success s) false)
       (reset! (::upload-lock s) false)
@@ -203,7 +203,7 @@
   [s editable]
   (when-not @(::media-photo-did-success s)
     (reset! (::media-photo s) false)
-    (.addPhoto editable nil nil nil nil)))
+    (.addPhoto ^js editable nil nil nil nil)))
 
 (defn add-photo [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
@@ -294,7 +294,7 @@
                                                                         :key (:key cmail-state)}))
         (if (.match (.-type file) "image")
           (do
-            (.hide @(::media-picker-ext s))
+            (.hide  ^js @(::media-picker-ext s))
             (dis/dispatch! [:input [:attachment-uploading]
              {:progress "0"
               :comment-parent-uuid (:comment-parent-uuid options)}])
@@ -305,7 +305,7 @@
                  (fn []
                    (dis/dispatch! [:input [:attachment-uploading] nil])
                    (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
-                   (utils/after 500 #(.togglePicker @(::media-picker-ext s))))))
+                   (utils/after 500 #(.togglePicker ^js @(::media-picker-ext s))))))
               (fn []
                (dis/dispatch! [:input [:attachment-uploading] nil])
                (let [alert-data {:icon "/img/ML/error_icon.png"

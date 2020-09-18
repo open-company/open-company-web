@@ -165,8 +165,9 @@
 
 (defn reconnect [ws-link uid]
   (let [ws-uri (guri/parse (:href ws-link))
-        ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
-        ws-board-path (.getPath ws-uri)]
+        ws-port (.getPort ^js ws-uri)
+        ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
+        ws-board-path (.getPath ^js ws-uri)]
     (reset! last-ws-link ws-link)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))

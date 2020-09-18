@@ -140,7 +140,7 @@
                                 ;; Do not show the post under the wrong board slug/uuid
                                 (or (= (:board-slug activity-data) current-board-slug)
                                     (= (:board-uuid activity-data) current-board-slug)))
-        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
+        no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         member? (:member? org-data)

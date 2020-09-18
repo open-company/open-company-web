@@ -31,7 +31,7 @@
 (defn search-history []
   (let [res (cook/get-cookie search-history-cookie)]
     (if (seq res)
-      (->> res js/$.parseJSON js->clj vec)
+      (->> res (.parse ^js js/JSON) js->clj vec)
       #{})))
 
 (defn query
