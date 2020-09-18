@@ -14,7 +14,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.comment :as cu]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.user :as user-utils]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]))
 
@@ -24,7 +23,7 @@
 
 ;; Posts separators
 
-(defn show-separators?
+(defn- show-separators?
 
   ([container-slug] (show-separators? container-slug (dis/current-sort-type)))
 
@@ -33,10 +32,16 @@
         (not (s/blank? container-slug))
         ;; never on mobile
         (not (responsive/is-mobile-size?))
-        ;; only on recently posted sorting
-        (= sort-type dis/recently-posted-sort)
+        ;; only on recently posted sorting except for replies
+        (or (= (keyword container-slug) :replies)
+            (= sort-type dis/recently-posted-sort))
         ;; on All posts, Following and Unfollowing only
-        (#{:all-posts :following :unfollowing :contributions} (keyword container-slug)))))
+        (#{:all-posts :following :unfollowing :replies :contributions} (keyword container-slug)))))
+
+(def preserved-keys
+  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
+   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
+   :for-you-context :last-activity-at])
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -83,14 +88,8 @@
        :date (post-month-date-from-date d)
        :last-activity-at (post-month-date-from-date d)})))
 
-(def preserved-keys
-  [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
-   :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
-   :for-you-context])
-
-(defn- add-posts-to-separator [post-data separators-map last-monday two-weeks-ago first-month]
-  (let [post-date (utils/js-date (:published-at post-data))
-        item-data (select-keys post-data preserved-keys)]
+(defn- add-posts-to-separator [item-data date-time-key separators-map last-monday two-weeks-ago first-month]
+  (let [post-date (utils/js-date (get item-data date-time-key))]
     (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj item-data) vec))
@@ -99,12 +98,10 @@
         (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
          :posts-list [item-data]))))))
 
-(defn grouped-posts
-  ([full-items-list]
-   (let [items-list (map #(select-keys % preserved-keys) full-items-list)
-         items-map (zipmap (map :uuid full-items-list) full-items-list)]
-     (grouped-posts items-list items-map)))
-  ([items-list fixed-items]
+(defn- grouped-posts
+  ([items-list]
+   (grouped-posts items-list :published-at))
+  ([items-list date-time-key]
    (let [last-monday (utils/js-date)
          _last-monday (doto last-monday
                         (.setDate (- (.getDate last-monday)
@@ -136,12 +133,14 @@
                         (.setSeconds 59)
                         (.setMilliseconds 999))
 
-         last-date (:published-at (last items-list))
+         last-date (-> items-list
+                       last
+                       date-time-key)
          separators-data (loop [separators []
                                 posts items-list]
                            (if (empty? posts)
                              separators
-                             (recur (add-posts-to-separator (first posts) separators last-monday two-weeks-ago first-month)
+                             (recur (add-posts-to-separator (first posts) date-time-key separators last-monday two-weeks-ago first-month)
                                     (rest posts))))]
          (vec (rest ;; Always remove the first label
           (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
@@ -238,31 +237,6 @@
         boards (:boards org-data)]
     (some #(when (= (:uuid %) board-uuid) %) boards)))
 
-(defn reset-truncate-body
-  "Reset dotdotdot for the give body element."
-  [body-el]
-  (let [$body-els (js/$ ">*" body-el)]
-    (.each $body-els (fn [idx el]
-      (this-as this
-        (.trigger (js/$ this) "destroy"))))))
-
-(def default-body-height 72)
-(def default-all-posts-body-height 144)
-(def default-draft-body-height 48)
-
-(defn truncate-body
-  "Given a body element truncate the body. It iterate on the elements
-  of the body and truncate the first exceeded element found.
-  This is to avoid truncating a DIV with multiple spaced P inside,
-  since this is a problem for the dotdotdot library that we are using."
-  [body-el height]
-  (reset-truncate-body body-el)
-  (.dotdotdot (js/$ body-el)
-    #js {:height height
-         :wrap "word"
-         :watch true
-         :ellipsis "..."}))
-
 (defn icon-for-mimetype
   "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"
   [mimetype]
@@ -301,22 +275,11 @@
     ;; Generic case
     "fa-file"))
 
-(defn get-activity-date [activity]
-  (or (:published-at activity) (:created-at activity)))
-
-(defn compare-activities [act-1 act-2]
-  (let [time-1 (get-activity-date act-1)
-        time-2 (get-activity-date act-2)]
-    (compare time-2 time-1)))
-
-(defn get-sorted-activities [posts-data]
-  (vec (sort compare-activities (vals posts-data))))
-
-(defn readonly-org? [links]
+(defn- readonly-org? [links]
   (let [update-link (utils/link-for links "partial-update")]
     (nil? update-link)))
 
-(defn readonly-board? [links]
+(defn- readonly-board? [links]
   (let [new-link (utils/link-for links "create")
         update-link (utils/link-for links "partial-update")
         delete-link (utils/link-for links "delete")]
@@ -324,7 +287,7 @@
          (nil? update-link)
          (nil? delete-link))))
 
-(defn readonly-entry? [links]
+(defn- readonly-entry? [links]
   (let [partial-update (utils/link-for links "partial-update")
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
@@ -637,18 +600,16 @@
                              (map user-name)
                              (remove s/blank?))
              mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
-             mention? (.match (:body last-comment) mention-regexp)
-             subject (case (count commenters)
-                       0
-                       ""
-                       1
-                       (first commenters)
-                       2
-                       (str (first commenters) " + 1 other")
-                       3
-                       (str (first commenters) " + 2 others")
-                       ;; :else
-                       (str (first commenters) " + " (- (count commenters) 2) " others"))
+             mention? (and (not (:self? (:author last-comment)))
+                           (.match (:body last-comment) mention-regexp))
+             commenters-count (count commenters)
+             subject (cond
+                       mention?               (user-name (:author last-comment))
+                       (= 0 commenters-count) ""
+                       (= 1 commenters-count) (first commenters)
+                       (= 2 commenters-count) (str (first commenters) " and " (second commenters))
+                       (= 3 commenters-count) (str (first commenters) ", " (second commenters) " + 1 other")
+                       :else                  (str (first commenters) ", " (second commenters) " + " (- (count commenters) 2) " others"))
              multiple-comments? (> (count comments) 1)
              verb (if mention?
                     " mentioned you"
@@ -815,7 +776,7 @@
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
             grouped-items (if (show-separators? (:slug board-data) sort-type)
-                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            (grouped-posts full-items-list)
                             full-items-list)
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
@@ -884,7 +845,7 @@
                           (:items contributions-data)))
             full-items-list (merge-items-lists items-list (:posts-list contributions-data) direction)
             grouped-items (if (show-separators? :contributions sort-type)
-                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            (grouped-posts full-items-list)
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
@@ -960,8 +921,12 @@
             full-items-list (if replies?
                               (mapv #(entry-replies-data % org-data (:fixed-items with-fixed-activities) (:last-seen-at container-data)) items-list*)
                               items-list*)
+            separator-date-time-key (cond replies?                     :last-activity-at
+                                          (= sort-type
+                                             dis/recent-activity-sort) :last-activity-at
+                                          :else                        :published-at)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
-                            (grouped-posts full-items-list (:fixed-items with-fixed-activities))
+                            (grouped-posts full-items-list separator-date-time-key)
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
             check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
@@ -979,7 +944,8 @@
                                   (:ignore-comments %))
                              #(not (entry? %)))
             opts {:has-next next-link
-                  :hide-bottom-line true}
+                  :hide-bottom-line true
+                  :hide-top-line true}
             caught-up-item (when (and keep-caught-up?
                                       (seq (:items-to-render container-data)))
                              (some #(when (resource-type? % :caught-up) %) (:items-to-render container-data)))
@@ -1007,24 +973,6 @@
           (get (:uuid activity-data))
           :sorted-comments)
       (sort-by :created-at (:comments activity-data))))
-
-(defn is-element-visible?
-   "Given a DOM element return true if it's actually visible in the viewport."
-  [el]
-  (let [rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
-        doc-element (.-documentElement js/document)
-        win-height (or (.-clientHeight doc-element)
-                       (.-innerHeight js/window))]
-    (or      ;; Item top is more then the navbar height
-        (and (>= (.-top rect) responsive/navbar-height)
-             ;; and less than the screen height
-             (< (.-top rect) win-height))
-             ;; Item bottom is less than the screen height
-        (and (<= (.-bottom rect) win-height)
-         ;; and more than the navigation bar to
-         (> (.-bottom rect) responsive/navbar-height)))))
 
 (defn clean-who-reads-count-ids
   "Given a list of items we want to request the who reads count

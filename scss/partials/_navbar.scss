@@ -107,9 +107,8 @@ nav.oc-navbar {
       div.navbar-left {
         height: 32px;
         margin-left: 0;
-        flex: 0 0 250px;
+        flex: 1;
         margin-right: auto;
-        width: 250px;
         text-align: left;
 
         @include mobile() {
@@ -205,11 +204,13 @@ nav.oc-navbar {
 
       div.navbar-right {
         margin-right: 0px;
-        width: 250px;
         margin-right: 0;
-        flex: 0 0 250px;
+        flex: 1;
         margin-left: auto;
-        text-align: right;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
 
         &.anonymous-user {
           width: auto;
@@ -226,8 +227,8 @@ nav.oc-navbar {
         }
 
         div.user-notifications {
-          float: left;
           margin-right: 8px;
+          margin-left: auto;
 
           @include mobile() {
             display: none;
@@ -237,8 +238,8 @@ nav.oc-navbar {
         div.user-menu {
           min-width: 24px;
           height: 24px;
-          float: right;
           position: relative;
+          margin-left: 8px;
 
           div.user-menu-button {
             position: relative;

@@ -266,7 +266,7 @@
             [:button.mlb-reset.invite-people-close
               {:on-click #(user-actions/dismiss-invite-box (:user-id current-user-data) true)}]
             [:label.explore-label
-              "Explore Wut together"]
+              (str "Explore " ls/product-name " together")]
             [:button.mlb-reset.invite-people-bt
               {:on-click #(nav-actions/show-org-settings :invite-picker)}
               "Invite teammates"]])]]))

@@ -89,7 +89,6 @@ div.dashboard-layout {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        align-content: stretch;
         align-items: stretch;
         flex-wrap: nowrap;
         background-color: var(--mobile-background-color);
@@ -186,10 +185,10 @@ div.dashboard-layout {
             }
 
             &.active span.tab-icon {
-              @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+              @include svgBgColor("/img/ML/nav_explore_active.svg", center, 14px 14px);
 
               @include dark_mode() {
-                @include svgBgColor("/img/ML/nav_explore.svg", center, 14px 14px);
+                @include svgBgColor("/img/ML/nav_explore_active.svg", center, 14px 14px);
               }
             }
           }
@@ -310,7 +309,7 @@ div.dashboard-layout {
             }
           }
 
-          &.notifications-tab {
+          &.replies-tab {
             order: 3;
             span.tab-icon {
               width: 16px;
@@ -322,6 +321,24 @@ div.dashboard-layout {
               @include dark_mode() {
                 background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
               }
+            }
+
+            &.active span.tab-icon {
+              @include svgBgColor("/img/ML/notifications_tab_icon.svg", center, 16px 16px, var(--primary-color));
+
+              @include dark_mode() {
+                @include svgBgColor("/img/ML/notifications_tab_icon.svg", center, 16px 16px, var(--primary-color));
+              }
+            }
+          }
+
+          &.notifications-tab {
+            order: 4;
+            span.tab-icon {
+              width: 16px;
+              height: 16px;
+              position: relative;
+              @include svgBgColor("/img/ML/notification_bell.svg", center, 16px 16px, var(--color));
 
               span.unread-dot {
                 display: block;
@@ -330,23 +347,19 @@ div.dashboard-layout {
                 border: 2px solid white;
                 border-radius: 50%;
                 position: absolute;
-                background-color: var(--primary-color);
+                background-color: $carrot_green;
                 top: -1px;
                 right: -1px;
               }
             }
 
             &.active span.tab-icon {
-              @include svgBgColor("/img/ML/notifications_tab_icon.svg", center, 16px 16px);
-
-              @include dark_mode() {
-                @include svgBgColor("/img/ML/notifications_tab_icon.svg", center, 16px 16px);
-              }
+              @include svgBgColor("/img/ML/notification_bell.svg", center, 16px 16px, var(--primary-color));
             }
           }
 
           &.new-post-tab {
-            order: 4;
+            order: 5;
             display: none;
 
             span.tab-icon {
@@ -643,11 +656,11 @@ div.dashboard-layout {
           div.private-board {
             position: relative;
             width: 12px;
-            height: 23px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/board_private_dark.svg");
             background-size: 10px 12px;
             background-repeat: no-repeat;
-            background-position: left 0 bottom 1px;
+            background-position: center;
             float: left;
             margin-left: 6px;
 
@@ -666,11 +679,11 @@ div.dashboard-layout {
           div.public-board {
             position: relative;
             width: 12px;
-            height: 23px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/board_public_dark.svg");
             background-size: 12px 12px;
             background-repeat: no-repeat;
-            background-position: left 0 bottom 1px;
+            background-position: center;
             float: left;
             margin-left: 6px;
 
@@ -720,7 +733,7 @@ div.dashboard-layout {
             float: right;
             position: relative;
             height: 24px;
-            margin-right: -12px;
+            margin-right: -8px;
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");

@@ -1,5 +1,6 @@
 (ns oc.web.urls
   (:require [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [clojure.string :as clj-str]))
 
 (defn params->query-string [m]
@@ -15,7 +16,7 @@
 
 (def slack "/slack")
 
-(def domain "wuts.io")
+(def domain ls/web-server)
 
 (def blog (str "https://blog." domain))
 
@@ -25,7 +26,7 @@
 
 (def help (str "http://help." domain "/"))
 
-(def what-s-new "https://wuts.news/")
+(def what-s-new ls/whats-new-url)
 
 (def home-try-it-focus (str home "?tif"))
 

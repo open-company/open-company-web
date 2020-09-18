@@ -71,15 +71,17 @@ div.explore-view {
       flex-flow: column nowrap;
       align-items: flex-start;
       justify-content: center;
+      box-shadow: none;
 
-      &:focus, &:active, &:hover {
-        text-decoration: none;
-        border: 1px solid var(--opac-background-color-2);
-      }
+      @include big_web() {
+        &:hover {
+          text-decoration: none;
+          border: 1px solid var(--explore-hover-border-color);
+          box-shadow: var(--explore-hover-box-shadow);
 
-      &:hover {
-        div.explore-view-block-title {
-          text-decoration: underline;
+          div.explore-view-block-title div.board-settings button.board-settings-bt {
+            display: block;
+          }
         }
       }
 
@@ -101,98 +103,35 @@ div.explore-view {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-
-          @include big_web() {
-            &:hover {
-              color: var(--primary-color);
-            }
-          }
         }
 
-        @include big_web() {
-          &.short-name {
-            div.board-dropdown-container {
-              div.dropdown-list-container {
-                right: unset;
-                left: 4px;
-              }
-            }
-          }
-        }
-
-        div.board-dropdown-container {
+        div.board-settings {
           width: 24px;
           height: 24px;
-          marign-right: auto;
+          margin-right: auto;
           flex: 0 0 auto;
           position: relative;
 
-          button.board-dropdown-bt {
+          @include mobile() {
+            display: none;
+          }
+
+          button.board-settings-bt {
             height: 24px;
             width: 24px;
-            background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
+            @include svgBgColor("/img/ML/gear_icon.svg", center, 14px 14px, var(--color));
             transition: transform 180ms;
+            opacity: 0.5;
+            display: none;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
+            @include big_web() {
+              &:hover {
+                opacity: 1;
+              }
             }
 
             &.open {
               transform: rotate(90deg);
-            }
-          }
-
-          div.dropdown-list-container {
-            top: 18px;
-            left: unset;
-            right: 0;
-            position: absolute;
-            width: auto;
-            min-width: 93px;
-
-            div.triangle {
-              display: none;
-            }
-
-            div.dropdown-list-content {
-              background-color: var(--tooltip-background-color);
-              border: 1px solid var(--divider-line);
-              border-radius: 4px;
-              border: none;
-              padding: 12px 8px;
-
-              ul.dropdown-list {
-                background-color: var(--tooltip-background-color);
-                margin: 0;
-                padding: 0;
-
-                li.dropdown-list-item {
-                  color: var(--tooltip-color);
-                  line-height: 18px;
-                  height: 24px;
-                  padding: 4px 8px;
-                  margin: 0;
-
-                  &:not(.disabled):not(:disabled):hover {
-                    span.dropdown-list-item-label {
-                      opacity: 1;
-                    }
-                  }
-
-                  span.dropdown-list-item-label {
-                    color: var(--tooltip-color);
-                    line-height: 18px;
-                    opacity: 0.5;
-
-                    @include mobile() {
-                      opacity: 1;
-                    }
-                  }
-                }
-              }
             }
           }
         }

@@ -48,9 +48,9 @@
 
         shared/pricing-table
         
-        ; shared/pricing-table-footer
+        shared/pricing-table-footer
 
-        ; shared/pricing-chat
+        shared/pricing-chat
         ]
 
       [:section.video

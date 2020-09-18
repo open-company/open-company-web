@@ -2,7 +2,8 @@
   (:require [rum.core :as rum]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.expo :as expo]))
+            [oc.web.expo :as expo]
+            [oc.web.local-settings :as ls]))
 
 (rum/defcs push-notifications-permission-modal < no-scroll-mixin
   [s]
@@ -15,7 +16,7 @@
     [:div.carrot-icon
      [:div.notification-bubble "3"]]
     [:p.modal-body-text
-     "Get notified when your team shares on Wut"]
+     (str "Get notified when your team shares on " ls/product-name)]
     [:button.mlb-reset.enable-notifications-bt
      {:on-click #(expo/bridge-request-push-notification-permission!)}
      "Enable notifications"]

@@ -5,6 +5,7 @@
             [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
@@ -73,7 +74,7 @@
                 [:div.invite-token-title
                   "Share an invite link"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Wut team as a "
+                  (str "Anyone can use this link to join your " ls/product-name " team as a ")
                   [:strong "contributor"]
                   "."]
                 [:div.invite-token-description
@@ -123,7 +124,7 @@
                 [:div.invite-token-title
                   "Share an invite link"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Wut team as a "
+                  (str "Anyone can use this link to join your " ls/product-name " team as a ")
                   [:strong "contributor"]
                   "."]
                 [:button.mlb-reset.generate-link-bt

@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.ui :as uu]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -361,7 +362,8 @@
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :title "Get notified about new post activity"}]
+             :title uu/watch-activity-copy
+             }]
             (when unfollow-link
               [:button.mlb-reset.more-menu-entry-unfollow-bt
                 {:type "button"
@@ -378,7 +380,7 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title "Don't show replies to this update" ; "Ignore future activity unless mentioned"
+                 :title uu/unwatch-activity-copy
                  }])))
         (when external-bookmark
           (if remove-bookmark-link

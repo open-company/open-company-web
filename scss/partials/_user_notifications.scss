@@ -1,19 +1,19 @@
 div.user-notifications {
   position: relative;
+  height: 32px;
 
   @include mobile() {
     position: fixed;
-    top: 0;
+    top: #{$mobile_navbar_height}px;
     left: 0;
     width: 100%;
     // Has fixed navbar and visible tabbar at the bottom
     height: calc(100vh - #{$mobile_navbar_height * 2}px);
-    margin-top: #{$mobile_navbar_height}px;
-    margin-bottom: #{$mobile_navbar_height}px;
     background-color: var(--mobile-background-color);
     z-index: 21;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    height: calc(100vh - #{$mobile_navbar_height * 2}px);
 
     button.notification-bell-bt {
       display: none;
@@ -37,508 +37,276 @@ div.user-notifications {
       left: 0;
       width: 32px;
       height: 32px;
-      background-image: cdnUrl("/img/ML/notification_bell.svg");
-      background-size: 12px 15px;
-      background-position: center;
-      background-repeat: no-repeat;
       opacity: 0.5;
       transition: opacity 180ms ease-in;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
-      }
+      @include svgBgColor("/img/ML/notification_bell.svg", center, 12px 15px, $deep_navy);
     }
 
     &:hover, &.active {
-      background-color: var(--primary-color);
+      background-color: var(--opac-background-color-2);
 
       span.bell-icon {
         opacity: 1;
-        background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
+      }
 
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
-        }
+      &.new {
+        background-color: var(--primary-color-04);
       }
     }
 
-    &.new:after {
-      position: absolute;
-      content: "";
-      width: 12px;
-      height: 12px;
-      top: 0px;
-      right: 0px;
-      background-color: var(--primary-color);
-      border-radius: 50%;
-      border: 2px solid var(--background-color);
+    &.new {
+      background-color: var(--primary-light-color);
+
+      span.bell-icon {
+        @include svgBgColor("/img/ML/notification_bell.svg", center, 12px 15px, var(--primary-color));
+        opacity: 1;
+      }
     }
   }
 
   div.user-notifications-tray {
+    $tray-width: 375;
     position: absolute;
-    top: 31px;
-    right: 0px;
-    width: 375px;
-    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
-    border: 1px solid var(--notifications-border);
+    top: 36px;
+    left: -#{$tray-width / 2}px;
     background-color: var(--overlay-background-color);
     border-radius: 4px;
+    border: 1px solid var(--notifications-border);
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
+    width: #{$tray-width}px;
+
+    &.hidden-tray {
+      top: -99999px;
+      right: -99999px;
+    }
 
     @include mobile() {
       position: relative;
       top: unset;
       right: unset;
+      left: 0;
+      width: 100%;
       box-shadow: none;
       border: none;
       background-color: var(--mobile-background-color);
-    }
-  }
-}
 
-div.user-notifications-tray {
-  width: 100%;
-
-  &.hidden-tray {
-    position: absolute;
-    top: -99999px;
-    right: -99999px;
-  }
-
-  @include mobile() {
-    width: 100%;
-
-    &.hidden-tray {
-      top: unset;
-      right: unset;
-    }
-  }
-
-  div.user-notifications-tray-header {
-    height: 40px;
-    padding: 0 0 8px;
-    position: relative;
-
-    @include mobile(){
-      display: none;
+      &.hidden-tray {
+        top: unset;
+        right: unset;
+      }
     }
 
-    div.title {
-      @include OC_Body_Bold();
-      color: var(--color);
-      font-size: 18px;
-      line-height: 32px;
-      text-align: left;
-      width: auto;
-      float: left;
-      padding-left: 22px;
+    div.user-notifications-tray-header {
+      padding: 16px;
       position: relative;
 
-      &:before {
-        content: "";
-        width: 24px;
-        height: 32px;
-        background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
-        background-size: 16px 16px;
-        background-position: top 8px left 0;
-        background-repeat: no-repeat;
-        position: absolute;
-        left: 0;
-        top: 0;
+      @include mobile(){
+        display: none;
+      }
 
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+      button.user-notifications-tray-mobile-close {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 14px 14px;
+          position: absolute;
+          top: 12px;
+          right: 11px;
         }
       }
-    }
 
-    button.user-notifications-tray-mobile-close {
-      display: none;
-
-      @include mobile() {
-        display: block;
+      button.notification-settings-bt {
+        position:absolute;
+        top: 12px;
+        right: 12px;
         width: 24px;
         height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+        background-image: cdnUrl("/img/ML/notification_settings_bt.svg");
         background-position: center;
         background-repeat: no-repeat;
-        background-size: 14px 14px;
-        position: absolute;
+        background-size: 15px 16px;
+      }
+
+      div.title {
+        @include OC_Body_Book();
+        color: var(--color);
+        font-size: 14px;
+        text-align: center;
+        width: 100px;
+        margin: 0 auto;
+        line-height: 20px;
+        height: 18px;
+        line-height: 18px;
+
+        @include mobile() {
+          font-size: 16px;
+        }
+      }
+
+      button.all-read-bt {
+        position:absolute;
         top: 12px;
-        right: 11px;
+        left: 12px;
+        height: 24px;
+        width: 24px;
+        padding: 0px;
+        margin: 0px;
+        background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
       }
     }
 
-    div.notification-settings-bt-container {
-      float: right;
-      width: 24px;
-      height: 32px;
+    div.user-notifications-tray-list {
+      max-height: calc(90vh - 100px);
+      overflow-y: auto;
+      overflow-x: hidden;
 
-      button.notification-settings-bt {
-        width: 24px;
-        height: 32px;
-        padding: 0;
-        background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy.svg");
-        background-position: right 4px top 9px;
-        background-repeat: no-repeat;
-        background-size: 3px 14px;
-        opacity: 0.5;
+      @include mobile() {
+        min-height: calc(100vh - #{$mobile_navbar_height * 2}px);
+        max-height: initial;
+        overflow-y: hidden;
+        overflow-x: hidden;
+      }
 
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/vertical_ellipsis_deep_navy@dark.svg");
+      div.user-notifications-tray-empty {
+        @include mobile() {
+          height: calc(100vh - #{$mobile_navbar_height * 2}px);
+          display: flex;
+          flex-flow: column nowrap;
+
+          div.all-caught-up {
+            margin-top: auto;
+            margin-bottom: auto;
+            display: block !important;
+          }
+        }
+      }
+
+      div.user-notification {
+        border-top: 1px solid var(--divider-line);
+        padding: 16px 16px 13px;
+        cursor: pointer;
+        text-align: left;
+        opacity: 0.9;
+        position: relative;
+        background-color: var(--background-color);
+
+        @include mobile() {
+          background-color: var(--mobile-background-color);
+          border-top: 1px solid var(--divider-line);
+
+          &:first-child {
+            border-top: none;
+          }
         }
 
         &:hover {
-          opacity: 1;
-        }
-      }
-
-      .tooltip {
-        margin-left: 8px;
-      }
-    }
-
-    button.all-read-bt {
-      float: right;
-      height: 32px;
-      width: 24px;
-      padding: 0px;
-      margin: 0 3px 0 0;
-      background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
-      background-size: 14px 14px;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.5;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/notifications_mark_all_read@dark.svg");
-      }
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
-
-  div.user-notifications-tray-list {
-
-    @include mobile() {
-      min-height: 100%;
-    }
-
-    div.user-notifications-tray-empty {
-      margin-top: 100px;
-      @include mobile() {
-        div.all-caught-up {
-          display: block !important;
-          margin-top: 100px;
-        }
-      }
-    }
-
-    div.user-notification-caught-up {
-      height: 55px;
-      width: 100%;
-      position: relative;
-      margin: 16px 0;
-
-      &:before {
-        position: absolute;
-        top: 24px;
-        height: 2px;
-        left: 0;
-        width: 30%;
-        background-color: var(--primary-color-06);
-        content: "";
-      }
-
-      div.all-caught-up {
-        // width: 40%;
-        margin: 0 auto;
-        height: 55px;
-
-        div.all-caught-up-inner {
-          div.message {
-            color: var(--primary-color-06);
-          }
-        }
-      }
-
-      &:after {
-        position: absolute;
-        top: 24px;
-        height: 2px;
-        right: 0;
-        width: 30%;
-        background-color: var(--primary-color-06); // 0.6
-        content: "";
-      }
-    }
-
-    div.user-notification {
-      margin: 0;
-      border-top: 1px solid transparent;
-      border-right: 1px solid var(--foc-divider-line-color);
-      border-bottom: 1px solid var(--foc-divider-line-color);
-      border-left: 1px solid var(--foc-divider-line-color);
-      padding: 24px 32px;
-      background-color: var(--foc-background-color);
-      overflow: visible;
-      cursor: pointer;
-
-      &:hover, &.unread {
-        background-color: var(--foc-hover-color);
-        z-index: 2;
-        border-top: 1px solid var(--foc-hover-border-color);
-        border-right: 1px solid var(--foc-hover-border-color);
-        border-bottom: 1px solid var(--foc-hover-border-color);
-        border-left: 1px solid var(--foc-hover-border-color);
-      }
-
-      &.open-item {
-        border-top: 1px solid var(--foc-divider-line-color);
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-      }
-
-      &.close-item {
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
-      }
-
-      @include mobile() {
-        background-color: var(--mobile-background-color);
-        border-top: 1px solid var(--divider-line);
-
-        &:first-child {
-          border-top: none;
-        }
-      }
-
-      &:hover {
-        button.read-bt {
-          display: block;
-        }
-      }
-
-      &.unread {
-        background-color: var(--overlay-background-color);
-
-        @include mobile() {
-          background-color: var(--background-color);
-        }
-      }
-
-      div.user-notification-header {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-start;
-        align-items: center;
-        height: 18px;
-        margin-bottom: 8px;
-        text-align: left;
-
-        div.user-notification-board-name-container {
-          position: relative;
-
-          span.board-name {
-            @include OC_Body_Book();
-            font-size: 12px;
-            line-height: 18px;
-            flex: 0 1 auto;
-            color: var(--color);
-            text-decoration: underline;
+          button.read-bt {
             display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
           }
         }
 
-        div.separator-dot {
-          width: 3px;
-          height: 3px;
-          background-color: var(--divider-line);
-          border-radius: 50%;
-          margin: 1px 5px 0 5px;
-          flex: 0 0 auto;
+        &:last-child {
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;
         }
 
-        span.time-since {
+        &.unread {
+          background-color: var(--overlay-background-color);
+
+          @include mobile() {
+            background-color: var(--background-color);
+          }
+        }
+
+        @include user-profile(24);
+
+        div.user-avatar-img-container {
+          float: left;
+        }
+
+        div.user-notification-title {
+          margin-left: 16px;
+          float: left;
+          width: calc(100% - 24px - 16px - 42px);
+          padding-right: 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          float: left;
+        }
+
+        div.user-notification-time-since {
+          float: right;
+          text-align: right;
+          width: 42px;
           @include OC_Body_Book();
           font-size: 12px;
+          color: var(--light-color);
+          height: 12px;
+          line-height: 12px;
+        }
+
+        div.user-notification-body {
+          margin-left: 16px;
+          margin-top: 4px;
+          width: calc(100% - 40px);
+          padding-right: 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
           line-height: 18px;
-          flex: 0 0 auto;
           color: var(--color);
+          float: right;
+          overflow-wrap: break-word;
+
+          p {
+            margin: 0px;
+            padding: 0px;
+          }
+
+          a {
+            color: $carrot_green;
+          }
+
+          img {
+            display: none;
+          }
+
+          // truncate
+          overflow: hidden;
+          text-overflow: ellipsis;
+          // Truncate last line of text preview
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          /*! autoprefixer: off */
+          -webkit-box-orient: vertical;
+          /* autoprefixer: on */
+          max-height: 36px;
         }
-      }
 
-      div.user-notification-title {
-        @include activity-title(20px, 28px);
-        height: 28px;
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow-wrap: break-word;
-        max-width: 100%;
-      }
-
-      div.user-notification-blocks {
-
-        div.user-notification-block {
-          margin-top: 8px;
-          position: relative;
-          height: 100%;
-
-          &.horizontal-line, &.vertical-line {
-            div.user-notification-body-container {
-              div.user-notification-body {
-                margin-left: 12px;
-                padding-left: 20px;
-                padding-top: 2px;
-                margin-top: -6px;
-              }
-            }
-          }
-
-          &.horizontal-line {
-            margin-left: 32px;
-            width: calc(100% - 32px);
-
-            &:last-child:before {
-              width: 2px;
-              height: calc(100% - 14px);
-              content: "";
-              background-color: var(--foc-background-color);
-              position: absolute;
-              left: -21px;
-              top: 14px;
-            }
-
-            &:after {
-              height: 2px;
-              width: 10px;
-              background-color: var(--divider-line);
-              content: "";
-              position: absolute;
-              top: 12px;
-              left: -19px;
-            }
-          }
-
-          &.vertical-line {
-            &:before {
-              width: 2px;
-              height: calc(100% - 32px);
-              background-color: var(--divider-line);
-              content: "";
-              position: absolute;
-              top: 32px;
-              left: 11px;
-            }
-          }
-
-          div.user-notification-attribution {
-            position: relative;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-start;
-            align-items: center;
-            margin-top: 4px;
-
-            div.post-authorship {
-              display: contents;
-              flex: 0 1 auto;
-              z-index: 2;
-              max-width: 100%;
-
-              div.user-hover-container a.publisher-name {
-                margin-right: 0;
-              }
-            }
-
-            div.separator-dot {
-              width: 3px;
-              height: 3px;
-              background-color: var(--divider-line);
-              border-radius: 50%;
-              margin: 1px 5px 0 5px;
-              flex: 0 0 auto;
-            }
-
-            span.time-since {
-              display: block;
-              height: 24px;
-              line-height: 24px;
-              text-align: left;
-              @include OC_Body_Book();
-              font-size: 12px;
-              color: var(--light-color);
-              position: relative;
-              white-space: nowrap;
-              flex: 0 0 auto;
-              overflow: hidden;
-            }
-
-            div.new-tag {
-              flex: 0 0 auto;
-              @include OC_Body_Bold();
-              font-size: 11px;
-              line-height: 16px;
-              height: 16px;
-              width: 32px;
-              border-radius: 4px;
-              background-color: $feint_emerald;
-              color: $carrot_green;
-              text-align: center;
-            }
-          }
-
-          div.user-notification-body-container {
-            margin-top: 4px;
-
-            div.user-notification-body {
-              margin-top: 4px;
-              p {
-                min-height: 0;
-                p > br:only-child {
-                  display: none;
-                }
-              }
-            }
-
-            &.entry div.user-notification-body {
-              @include activity-body-preview(16, 22, var(--color), 3);
-              max-height: unset;
-              heigth: unset;
-            }
-
-            &.comment div.user-notification-body {
-              @include activity-comment(15, 18, 12);
-              min-height: 22px;
-            }
-          }
+        button.read-bt {
+          position: absolute;
+          right: 4px;
+          top: 50%;
+          float: right;
+          margin-top: -12px;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/notification_read_bt.svg");
+          background-size: 8px 8px;
+          background-position: center;
+          background-repeat: no-repeat;
+          display: none;
         }
-      }
-
-      div.add-comment-box-container {
-        margin-top: 8px;
-      }
-
-      button.read-bt {
-        position: absolute;
-        right: 4px;
-        top: 50%;
-        float: right;
-        margin-top: -12px;
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/notification_read_bt.svg");
-        background-size: 8px 8px;
-        background-position: center;
-        background-repeat: no-repeat;
-        display: none;
       }
     }
   }

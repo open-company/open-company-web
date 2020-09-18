@@ -6,6 +6,7 @@
             [goog.events.EventType :as EventType]
             [clojure.data :as clj-data]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.utils.ui :as uu]
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -14,7 +15,6 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.mixins.seen :as seen-mixins]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.reply :as reply-actions]
@@ -271,8 +271,8 @@
         (when (or follow-link unfollow-link)
           [:button.mlb-reset.mute-bt
             {:title (if follow-link
-                      "Get notified about new activity"
-                      "Don't show future replies to this update")
+                      uu/watch-activity-copy
+                      uu/unwatch-activity-copy)
              :class (if follow-link "unfollowing" "following")
              :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
              :data-placement "top"

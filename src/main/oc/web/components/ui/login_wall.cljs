@@ -5,13 +5,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.shared.useragent :as ua]
             [oc.web.expo :as expo]))
 
-(def default-title "Login to Wut")
+(def default-title (str "Login to " ls/product-name))
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive
@@ -48,6 +49,7 @@
       [:div.login-wall-container
         (login-overlays-handler)
         [:header.login-wall-header
+         [:div.top-back-button-container
           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
              :class (when ua/mobile-app? "mobile-app")
@@ -57,13 +59,14 @@
                             (.preventDefault %)
                             (router/redirect! oc-urls/home)))
              :aria-label "Back"}
-            "Back"]
+            "Back"]]
           [:div.title
             (or title default-title)]
-          [:button.mlb-reset.top-continue
+          [:div.top-continue-container
+           [:button.mlb-reset.top-continue
             {:class (when-not login-enabled "disabled")
              :on-click login-action}
-            "Log in"]]
+            "Log in"]]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
             
@@ -152,7 +155,7 @@
                     {:aria-label "Login"
                      :disabled (not login-enabled)
                      :on-click login-action}
-                    "Log in"]]]]]
+                    "Log in"]]]]]]
           [:div.footer-link
             "Don't have an account yet?"
             [:div.footer-link-inner
@@ -161,4 +164,4 @@
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (router/nav! oc-urls/sign-up))}
-                "Sign up here"]]]]])))
+                "Sign up here"]]]])))

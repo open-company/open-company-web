@@ -27,3 +27,12 @@
 
 (defn remove-notification-by-id [notification-id]
   (dis/dispatch! [:notification-remove-by-id notification-id]))
+
+(defn show-mobile-user-notifications []
+  (dis/dispatch! [:input [:mobile-user-notifications] true]))
+
+(defn hide-mobile-user-notifications []
+  (dis/dispatch! [:input [:mobile-user-notifications] false]))
+
+(defn toggle-mobile-user-notifications []
+  (dis/dispatch! [:update [:mobile-user-notifications] not]))

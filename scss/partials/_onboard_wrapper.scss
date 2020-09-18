@@ -18,15 +18,13 @@ div.onboard-wrapper-container {
 
   div.onboard-wrapper {
     text-align: center;
-    padding-bottom: 16vh;
     position: relative;
+    height: 100%;
 
     @include mobile() {
       width: 100%;
       box-shadow: unset;
       margin: 0;
-      min-height: unset;
-      padding-bottom: 32px;
     }
   }
 }
@@ -56,7 +54,7 @@ div.onboard-email-container {
   &.email-wall {
     width: 385px;
     color: $deep_navy;
-    @incldude OC_Body_Bold();
+    @include OC_Body_Bold();
 
     div.email-wall-icon {
       background-size: 48px 36px;
@@ -108,14 +106,14 @@ div.onboard-email-container {
   }
 }
 
-div.onboard-lander {
+div.onboard-container-inner {
   text-align: center;
-  display: inline-block;
   width: 100%;
-
-  @include mobile() {
-    padding: 0 16px;
-  }
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  min-height: 100vh;
+  box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
 
   header.main-cta {
     position: fixed;
@@ -127,26 +125,29 @@ div.onboard-lander {
     border-bottom: 0.5px solid var(--opac-background-color-24);
     padding: 18px 24px;
     background-color: $grey_num_2;
-    display: inline-block;
-    text-align: center;
+    display: flex;
+    flex-flow: row nowrap;
     z-index: 2;
+    align-items: center;
+    justify-content: center;
 
-    button.top-back-button {
-      display: block;
-      width: auto;
-      height: 20px;
-      background-position: top 6px left 0;
-      background-repeat: no-repeat;
-      background-image: cdnUrl("/img/ML/black_back_arrow.svg");
-      background-size: 14px 10px;
-      padding-left: 22px;
-      @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: var(--color);
-      position: absolute;
-      left: 24px;
-      top: 18px;
+    div.top-back-button-container {
+      flex: 1;
+      display: flex;
+
+      button.top-back-button {
+        height: 20px;
+        background-position: top 6px left 0;
+        background-repeat: no-repeat;
+        background-image: cdnUrl("/img/ML/black_back_arrow.svg");
+        background-size: 14px 10px;
+        padding-left: 22px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--color);
+        margin-right: auto;
+      }
     }
 
     div.title {
@@ -157,27 +158,26 @@ div.onboard-lander {
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 61px;
-        font-size: 30px;
         margin: 0 auto;
       }
     }
 
-    button.top-continue {
-      padding: 0;
-      position: absolute;
-      right: 24px;
-      top: 18px;
-      height: 20px;
-      width: auto;
-      @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: var(--primary-color);
+    div.top-continue-container {
+      flex: 1;
+      display:flex;
 
-      &.disabled, &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
+      button.top-continue {
+        padding: 0;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--primary-color);
+        margin-left: auto;
+
+        &.disabled, &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
       }
     }
 
@@ -259,7 +259,8 @@ div.onboard-lander {
 
   div.onboard-form {
     width: 400px;
-    margin: 104px auto 32px;
+    margin-top: auto;
+    margin-bottom: 24px;
     text-align: center;
     border: 1px solid #DCDDE1;
     box-sizing: border-box;
@@ -267,6 +268,16 @@ div.onboard-lander {
     border-radius: 8px;
     background-color: white;
     padding: 40px;
+
+    @include mobile() {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 32px 16px;
+      // margin: #{$mobile_navbar_height}px auto 0;
+      width: 100%;
+    }
 
     div.form-title {
       @include OC_Body_Bold();
@@ -330,11 +341,6 @@ div.onboard-lander {
         @include OC_Body_Book();
         margin: 0 auto;
       }
-    }
-
-    @include mobile() {
-      width: 100%;
-      padding: 0;
     }
 
     button.signup-with-slack {
@@ -714,7 +720,7 @@ div.onboard-lander {
   }
 
   div.logout-cancel {
-    margin-top: 40px;
+    margin-bottom: auto;
     text-align: center;
     @include OC_Body_Book();
     font-size: 14px;
@@ -734,7 +740,7 @@ div.onboard-lander {
   }
 
   div.footer-link {
-    margin-top: 40px;
+    margin-bottom: auto;
     @include OC_Body_Book();
     font-size: 14px;
     color: $ui_grey;
@@ -755,38 +761,43 @@ div.onboard-lander {
     }
   }
 
-  @include mobile() {
-    header.main-cta {
-      div.mobile-header {
-        height: 104px;
-        border-bottom: none;
-        position: absolute;
+  // @include mobile() {
+  //   header.main-cta {
+  //     div.mobile-header {
+  //       height: 104px;
+  //       border-bottom: none;
+  //       position: absolute;
 
-        div.onboard-lander-header {
-          width: 36px;
-          height: 64px;
-          background-size: 36px 64px;
-          position: relative;
-          top: unset;
-          left: unset;
-          margin: 40px auto 0;
-        }
-      }
+  //       div.onboard-lander-header {
+  //         width: 36px;
+  //         height: 64px;
+  //         background-size: 36px 64px;
+  //         position: relative;
+  //         top: unset;
+  //         left: unset;
+  //         margin: 40px auto 0;
+  //       }
+  //     }
 
-      div.title {
-        @include OC_Body_Bold();
-        font-size: 30px;
-        line-height: 41px;
-        color: $deep_navy;
-      }
-    }
-  }
+  //     div.title {
+  //       @include OC_Body_Bold();
+  //       font-size: 16px;
+  //       line-height: 20px;
+  //       color: $deep_navy;
 
-  &.lander {
-    @include mobile() {
-      padding: 0 0 24px;
-    }
-  }
+  //       @include mobile() {
+  //         margin-top: 0px;
+  //         margin: 0 auto;
+  //       }
+  //     }
+  //   }
+  // }
+
+  // &.lander {
+  //   @include mobile() {
+  //     padding: 0 0 24px;
+  //   }
+  // }
 
   &.lander-profile {
     div.onboard-form {
@@ -813,6 +824,10 @@ div.onboard-lander {
 
       div.title.main-lander {
         margin-top: 24px;
+
+        @include mobile() {
+          margin-top: 0;
+        }
       }
     }
   }

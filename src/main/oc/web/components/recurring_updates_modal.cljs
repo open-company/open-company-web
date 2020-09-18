@@ -3,6 +3,7 @@
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.lib.user :as user-lib]
+            [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -69,5 +70,6 @@
                 "Set up recurring updates"]
               [:div.recurring-updates-empty-list-desc
                 (str
-                 "Wut reminds you when it's time to update your team. "
+                 ls/product-name
+                 " reminds you when it's time to update your team. "
                  "You can create reminders for yourself and others.")]])]]))

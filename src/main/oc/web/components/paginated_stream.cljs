@@ -80,7 +80,8 @@
                                :read-data         read-data
                                :show-wrt?         show-wrt?
                                :editable-boards   editable-boards
-                               :current-user-data current-user-data})
+                               :current-user-data current-user-data
+                               :replies?           replies?})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data
@@ -435,7 +436,6 @@
         member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)]
     [:div.paginated-stream.group
-      {:class (when replies? "collapsed-cards")}
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
           (when replies?

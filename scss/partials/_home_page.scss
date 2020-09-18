@@ -4,13 +4,9 @@ div.home-wrap {
   div.main.home-page {
     width: 100%;
 
-    section {
-      background-color: $ultra_light_gold;
-    }
-
-    section.pricing-footer {
-      background-color: $another_ui_grey;
-    }
+    // section {
+    //   background-color: $ultra_light_gold;
+    // }
 
     section.cta {
       padding-top: 143px;
@@ -82,14 +78,14 @@ div.home-wrap {
       // }
 
       h1.headline {
-        font-size: 60px;
-        @include OC_Body_Bold()
+        font-size: 50px;
+        @include OC_Body_Bold();
         color: $deep_navy;
-        line-height: 66px;
+        line-height: 50px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 622px;
+        max-width: 441px;
 
         @include mobile(){
           font-size: 36px;
@@ -104,13 +100,13 @@ div.home-wrap {
 
       div.subheadline {
         color: $deep_navy;
-        font-size: 28px;
-        line-height: 36px;
+        font-size: 20px;
+        line-height: 25px;
         @include OC_Body_Book();
         margin: 16px auto 0;
         z-index: 2;
         position: relative;
-        max-width: 652px;
+        max-width: 540px;
 
         @include tablet(){
           font-size: 24px;

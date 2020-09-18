@@ -3,8 +3,10 @@ div.login-wall-container {
   box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
   width: 100%;
   margin: 0 auto;
-  display: inline-block;
   min-height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
 
   -webkit-app-region: drag;
   -webkit-user-select: none;
@@ -19,31 +21,32 @@ div.login-wall-container {
     border-bottom: 0.5px solid var(--opac-background-color-24);
     padding: 18px 24px;
     background-color: $grey_num_2;
-    display: inline-block;
-    text-align: center;
+    display: flex;
+    flex-flow: row nowrap;
     z-index: 2;
+    align-items: center;
+    justify-content: center;
 
-    button.top-back-button {
-      display: block;
-      width: auto;
-      height: 20px;
-      background-position: top 6px left 0;
-      background-repeat: no-repeat;
-      background-image: cdnUrl("/img/ML/black_back_arrow.svg");
-      background-size: 14px 10px;
-      padding-left: 22px;
-      @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: var(--color);
-      position: absolute;
-      left: 24px;
-      top: 18px;
+    @include mobile() {
+      height: #{$mobile_navbar_height}px;
     }
 
-    button.right-bt {
-      float: right;
-      padding: 0;
+    div.top-back-button-container {
+      flex: 1;
+      display: flex;
+
+      button.top-back-button {
+        background-position: top 6px left 0;
+        background-repeat: no-repeat;
+        background-image: cdnUrl("/img/ML/black_back_arrow.svg");
+        background-size: 14px 10px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--color);
+        padding-left: 22px;
+        margin-right: auto;
+      }
     }
 
     div.title {
@@ -54,53 +57,27 @@ div.login-wall-container {
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 61px;
-        font-size: 30px;
         margin: 0 auto;
       }
     }
 
-    button.top-continue {
-      padding: 0;
-      position: absolute;
-      right: 24px;
-      top: 18px;
-      height: 20px;
-      width: auto;
-      @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: var(--primary-color);
+    div.top-continue-container {
+      flex: 1;
+      display: flex;
 
-      &.disabled, &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-    }
+      button.top-continue {
+        padding: 0;
+        margin-left: auto;
+        width: auto;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: var(--primary-color);
 
-    button.continue {
-      margin-top: 32px;
-      width: 100%;
-      height: 40px;
-      background-color: var(--primary-color);
-      color: white;
-      @include OC_Body_Bold();
-      font-size: 16px;
-      line-height: 20px;
-      padding: 10px 24px;
-      border-radius: 6px;
-      outline: none;
-      border: none;
-      max-width: 320px;
-
-      @include mobile() {
-        max-width: initial;
-      }
-
-      &.disabled, &:disabled {
-        background-color: $light_ui_grey;
-        opacity: 1 !important;
-        cursor: not-allowed;
+        &.disabled, &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
       }
     }
 
@@ -138,15 +115,18 @@ div.login-wall-container {
   }
 
   div.login-wall-wrapper {
+    margin-top: auto;
+    margin-bottom: 24px;
 
     @include mobile(){
-      display: block;
+      // display: block;
       width: 100%;
     }
 
     div.login-wall-internal {
       width: 400px;
-      margin: 104px auto 32px;
+      margin-top: auto;
+      margin-bottom: 24px;
       text-align: center;
       border: 1px solid #DCDDE1;
       box-sizing: border-box;
@@ -155,6 +135,16 @@ div.login-wall-container {
       background-color: white;
       padding: 40px;
 
+      @include mobile() {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 32px 16px;
+        width: 100%;
+        // margin: #{$mobile_navbar_height}px auto 0;
+      }
+
       div.login-wall-content {
         width: 320px;
         margin: 0 auto;
@@ -162,7 +152,6 @@ div.login-wall-container {
 
         @include mobile() {
           width: 100%;
-          padding: 0 16px;
           margin: 0 auto;
         }
 
@@ -355,26 +344,27 @@ div.login-wall-container {
         }
       }
     }
+  }
 
-    div.footer-link {
-      margin-top: 40px;
+  div.footer-link {
+    // margin-top: 40px;
+    margin-bottom: auto;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: $ui_grey;
+    line-height: 18px;
+    text-align: center;
+
+    a {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $ui_grey;
+      color: blue;
+      text-decoration: underline;
       line-height: 18px;
-      text-align: center;
+      display: inline-block;
 
-      a {
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: blue;
+      &:hover {
         text-decoration: underline;
-        line-height: 18px;
-        display: inline-block;
-
-        &:hover {
-          text-decoration: underline;
-        }
       }
     }
   }

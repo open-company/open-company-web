@@ -24,10 +24,6 @@ div.pricing-wrap {
       }
     }
 
-    section {
-      background-color: $ultra_light_gold;
-    }
-
     section.pricing-covid-letter {
       padding: 120px 0 0;
       text-align: center;
@@ -83,10 +79,11 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding: 120px 0 0;
+      padding: 120px 0 80px;
       text-align: center;
       position: relative;
       width: 100%;
+      background-color: rgba($deep_navy, 0.08) !important;
 
       @include tablet() {
         overflow: visible;
@@ -96,19 +93,19 @@ div.pricing-wrap {
       }
 
       @include mobile() {
-        padding: 40px 16px 40px;
+        padding: 88px 16px 40px;
       }
 
       h1.pricing-headline {
         font-size: 60px;
         line-height: 78px;
-        @include OC_Title()
+        @include OC_Title();
         color: $deep_navy;
         margin: 0 auto;
         max-width: 730px;
 
         @include mobile() {
-          margin: 0 auto 40px;
+          margin-bottom: 40px;
           font-size: 36px;
           line-height: initial;
           max-width: initial;
@@ -163,7 +160,6 @@ div.pricing-wrap {
 
     section.pricing-apps {
       padding: 80px 16px;
-      background-color: $another_ui_grey;
 
       @include mobile() {
         padding: 40px 0 0;

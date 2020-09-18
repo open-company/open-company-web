@@ -5,7 +5,6 @@
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]))
 
@@ -165,7 +164,7 @@
                                  $all-items (js/$ items-selector dom-node)]
                              (.each $all-items (fn [idx el]
                                                  (when (and (fn? item-is-visible-cb)
-                                                            (au/is-element-visible? el))
+                                                            (dom-utils/is-element-top-in-viewport? el))
                                                    (item-is-visible-cb s (.attr (js/$ el) "data-itemuuid"))))))))]
      {:init (fn [s]
        (assoc s mounted-kw (atom false)))
@@ -205,7 +204,7 @@
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
                          ;; when the element is visible in the viewport
-                         (when (au/is-element-visible? el)
+                         (when (dom-utils/is-element-top-in-viewport? el)
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
                          (when @(get s mounted-kw)
