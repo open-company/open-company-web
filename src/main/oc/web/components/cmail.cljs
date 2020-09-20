@@ -199,7 +199,6 @@
 (defn- setup-headline [state]
   (when-let [headline-el  (headline-element state)]
     (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
-    (emoji-autocomplete/autocomplete)
     (fullscreen-focus-headline state)))
 
 (defn headline-on-paste
@@ -444,6 +443,7 @@
                     (calc-video-height s)
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (setup-top-padding s)
+                    (emoji-autocomplete/autocomplete (rum/ref-node s "headline"))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]

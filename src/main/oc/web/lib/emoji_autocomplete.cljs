@@ -1,7 +1,5 @@
 (ns oc.web.lib.emoji-autocomplete
-  (:require ["@bago2k4/emoji-autocomplete" :as emoji-autocomplete :refer (emojiAutocomplete)]))
+  (:require ["@bago2k4/emoji-autocomplete" :as emoji-autocomplete :refer (default) :rename {default emojiAutocomplete}]))
 
-(defn autocomplete []
-  (try
-    (emojiAutocomplete ".emoji-autocomplete")
-    (catch :default e false)))
+(defn autocomplete [el]
+  (emojiAutocomplete el))

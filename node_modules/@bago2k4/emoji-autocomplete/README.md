@@ -5,9 +5,6 @@
 ```
 var emojiAutocomplete = require('emoji-autocomplete');
 
-emojiAutocomplete();
-
-// or
-
-emojiAutocomplete(".customClassName");
+var element = document.querySelector(".emoji-autocomplete");
+emojiAutocomplete(element);
 ```

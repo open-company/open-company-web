@@ -476,4 +476,4 @@
         (let [classes (:classes options)]
           (when (and (string/includes? classes "emoji-autocomplete")
                      (not (:paywall? options)))
-            (emoji-autocomplete/autocomplete)))))))
+            (emoji-autocomplete/autocomplete body-el)))))))

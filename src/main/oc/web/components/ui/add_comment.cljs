@@ -276,7 +276,7 @@
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
                            (multiple-lines? s)
-                           (utils/after 2500 emoji-autocomplete/autocomplete)
+                           (utils/after 2500 #(emoji-autocomplete/autocomplete (rum/ref-node s "editor-node")))
                            s)
                           :will-update (fn [s]
                            (let [props (-> s :rum/args first)

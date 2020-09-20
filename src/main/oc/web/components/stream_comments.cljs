@@ -19,7 +19,6 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -285,9 +284,6 @@
                                     fixed-threads (filterv #(not (au/resource-type? % :collapsed-comments)) threads)]
                                 (reset! (::threads s) fixed-threads))
                               s)
-                             :did-mount (fn [s]
-                              (emoji-autocomplete/autocomplete)
-                              s)
                              :did-remount (fn [o s]
                               (let [{:keys [comments-data last-read-at]} (-> s :rum/args first)
                                     comments-diff (diff (-> o :rum/args first :comments-data) comments-data)]
@@ -299,7 +295,6 @@
                                         updated-threads (cu/collapse-comments comments-data last-read-at)
                                         fixed-updated-threads (filterv #(not (au/resource-type? % :collapsed-comments)) updated-threads)]
                                     (reset! (::threads s) fixed-updated-threads))))
-                              (emoji-autocomplete/autocomplete)
                               s)}
   [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix loading-comments-count]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
