@@ -73,11 +73,14 @@
 
 .giphy-picker-container .footer {
   padding: 5px;
+  width: 110px;
+  height: 21px;
 }
 
-.giphy-picker-container .footer .attributionMark {
+.giphy-picker-container .footer span {
   width: 100px;
   height: 11px;
+  color: rgb(127, 127, 127);
 }
 
 /* Suggestion.css */

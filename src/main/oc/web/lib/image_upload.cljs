@@ -1,14 +1,15 @@
 (ns oc.web.lib.image-upload
   (:require [oc.web.local-settings :as ls]
             [goog.object :as gobj]
-            [oc.web.lib.sentry :as sentry]))
+            [oc.web.lib.sentry :as sentry]
+            ["filestack-js" :as filestack]))
 
 (def _fs (atom nil))
 
 (defn init-filestack []
   (or
     @_fs
-    (let [new-fs (.init js/filestack ls/filestack-key)]
+    (let [new-fs (.init filestack ls/filestack-key)]
       (reset! _fs new-fs)
       new-fs)))
 
