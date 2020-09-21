@@ -41,14 +41,10 @@
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/themes/default.css"}]
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/MediumEditorTCMention/mention-panel.min.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/extensions/mention-panel.min.css"}]
+          [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/extensions/media-picker.css"}]
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart/emoji-mart.css"}]
-          ;; MediumEditorMediaPicker
-          [:link
-           {:type "text/css"
-            :rel "stylesheet"
-            :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
           ;; Local env
           [:script {:type "text/javascript" :src "/lib/local-env.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]

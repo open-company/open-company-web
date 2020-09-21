@@ -1,6 +1,11 @@
 module.exports = {
   entry: "./src/index.ts",
 
+  // -----------------------
+  // DO NOT CHANGE: shadow-cljs doesn't like inline css in production
+  mode: "development",
+  // -----------------------
+
   output: {
     filename: "index.js",
     path: __dirname + "/lib/",

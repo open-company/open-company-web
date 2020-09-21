@@ -34,7 +34,7 @@ export class SearchResult extends React.Component<ISearchResultProps, {}> {
       <li>
         <a
           style={searchResultStyle}
-          href="javascript:void(0)"
+          // href="javascript:void(0)"
           onClick={this.onClick}
           className={cn(defaultStyle.searchResult, searchResultClassName)}
         >

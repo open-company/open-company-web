@@ -20,7 +20,8 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             (oc.web.lib.emoji-autocomplete :as emoji-autocomplete)
-            ["medium-editor" :as medium-editor]))
+            ["medium-editor" :as medium-editor]
+            ["@bago2k4/medium-editor-media-picker" :refer (default) :rename {default MediaPicker}]))
 
 (defn get-media-picker-extension [s]
   (let [body-el (rum/ref-node s "editor-node")
@@ -382,7 +383,7 @@
                                                              }
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
-            media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
+            media-picker-ext (when-not mobile-editor (MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
             buttons ["bold" "italic" "unorderedlist" "anchor" "quote" "highlighter" "h1" "h2"]

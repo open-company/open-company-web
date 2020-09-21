@@ -11,7 +11,7 @@ cp $INIT_CWD/node_modules/medium-editor/dist/js/medium-editor.min.js $INIT_CWD/p
 echo "Done!"
 mkdir $INIT_CWD/public/css/medium-editor
 mkdir $INIT_CWD/public/css/medium-editor/themes
-mkdir $INIT_CWD/public/css/medium-editor/MediumEditorTCMention
+mkdir $INIT_CWD/public/css/medium-editor/extensions
 mkdir $INIT_CWD/public/css/emojione
 mkdir $INIT_CWD/public/css/emoji-mart
 mkdir $INIT_CWD/public/css/emoji-autocomplete
@@ -22,7 +22,10 @@ echo "Copy medium-editor theme style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
 echo "Done!"
 echo "Copy medium-editor-tc-mention style..."
-cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css $INIT_CWD/public/css/medium-editor/MediumEditorTCMention/mention-panel.min.css
+cp $INIT_CWD/node_modules/medium-editor-tc-mention/lib/mention-panel.min.css $INIT_CWD/public/css/medium-editor/extensions/mention-panel.min.css
+echo "Done!"
+echo "Copy medium-editor-media-picker style..."
+cp $INIT_CWD/node_modules/@bago2k4/medium-editor-media-picker/style.css $INIT_CWD/public/css/medium-editor/extensions/media-picker.css
 echo "Done!"
 echo "Copy emojone style..."
 cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/emojione/emojione.css

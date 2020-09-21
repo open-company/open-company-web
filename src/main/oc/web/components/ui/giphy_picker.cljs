@@ -4,7 +4,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.react-utils :as react-utils]
-            ;; ["react-giphy-selector" :as react-giphy-selector]
+            ["@bago2k4/react-giphy-selector" :refer (Selector default) :rename {default GiphySelector}]
             ))
 
 (def giphy-picker-max-height 408)
@@ -31,21 +31,21 @@
                             top-position)]
     [:div.giphy-picker
       {:style {:top (str adjusted-position "px")}}
-      ;; (react-utils/build (.-Selector react-giphy-selector)
-      ;;  {:apiKey ls/giphy-api-key
-      ;;   :queryInputPlaceholder "Search for GIF"
-      ;;   :resultColumns 1
-      ;;   :preloadTrending true
-      ;;   :containerClassName "giphy-picker-container"
-      ;;   :queryFormAutoFocus true
-      ;;   :queryFormClassName "giphy-picker-form"
-      ;;   :queryFormInputClassName "giphy-picker-form-input"
-      ;;   :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
-      ;;   :queryFormSubmitContent "Search"
-      ;;   :searchResultsClassName (str "giphy-picker-results-container" (when fullscreen " fullscreen"))
-      ;;   :searchResultClassName "giphy-picker-results-item"
-      ;;   :suggestionsClassName "giphy-picker-suggestions"
-      ;;   :suggestionClassName "giphy-picker-suggestions-suggestion"
-      ;;   :loaderClassName "giphy-picker-loader"
-      ;;   :onGifSelected pick-emoji-cb})
+      (react-utils/build Selector
+       {:apiKey ls/giphy-api-key
+        :queryInputPlaceholder "Search for GIF"
+        :resultColumns 1
+        :preloadTrending true
+        :containerClassName "giphy-picker-container"
+        :queryFormAutoFocus true
+        :queryFormClassName "giphy-picker-form"
+        :queryFormInputClassName "giphy-picker-form-input"
+        :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
+        :queryFormSubmitContent "Search"
+        :searchResultsClassName (str "giphy-picker-results-container" (when fullscreen " fullscreen"))
+        :searchResultClassName "giphy-picker-results-item"
+        :suggestionsClassName "giphy-picker-suggestions"
+        :suggestionClassName "giphy-picker-suggestions-suggestion"
+        :loaderClassName "giphy-picker-loader"
+        :onGifSelected pick-emoji-cb})
      ]))

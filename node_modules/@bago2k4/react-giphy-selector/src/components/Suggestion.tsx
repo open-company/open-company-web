@@ -30,7 +30,7 @@ export class Suggestion extends React.Component<ISuggestionProps, {}> {
       <a
         style={suggestionStyle}
         className={cn(defaultStyle.suggestion, suggestionClassName)}
-        href="javascript:void(0)"
+        // href="javascript:void(0)"
         onClick={this.onClick}
       >
         {suggestion}

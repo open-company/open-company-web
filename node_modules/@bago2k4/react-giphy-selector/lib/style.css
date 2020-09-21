@@ -1,0 +1,108 @@
+/* QueryForm.css */
+
+.giphy-picker-container .queryForm {
+  display: flex;
+  padding: 5px;
+}
+
+.giphy-picker-container .queryFormInput {
+  flex-grow: 2;
+  display: block;
+}
+
+.giphy-picker-container .queryFormSubmit {
+  flex-grow: 0;
+  display: block;
+}
+
+/* SearchResult.css */
+
+.giphy-picker-container .searchResults .searchResult {
+  display: block;
+  text-decoration: none;
+}
+
+.giphy-picker-container .searchResults .searchResult > img {
+  width: 100%;
+}
+
+/* SearchResults.css */
+
+.giphy-picker-container .searchResults {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.giphy-picker-container .searchResults > li {
+  padding: 0;
+  margin: 0;
+  display: block;
+  min-width: 50px;
+  flex-grow: 1;
+}
+
+.giphy-picker-container .searchResults > li > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 5px;
+}
+
+.giphy-picker-container .searchResults > li > ul > li {
+  margin-bottom: 5px;
+}
+
+/* Selector.css */
+
+.giphy-picker-container .loader {
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.giphy-picker-container .searchError {
+  text-align: center;
+  color: red;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.giphy-picker-container .footer {
+  padding: 5px;
+}
+
+.giphy-picker-container .footer .attributionMark {
+  width: 100px;
+  height: 11px;
+}
+
+/* Suggestion.css */
+
+.giphy-picker-container .suggestions .suggestion {
+  display: inline-block;
+  text-decoration: none;
+  padding: 20px 40px;
+  border-radius: 4px;
+  background: #e0e0e0;
+  color: #333;
+  flex-grow: 1;
+  margin: 5px;
+  text-align: center;
+}
+
+.giphy-picker-container .suggestions .suggestion:hover {
+  background: #f0f0f0;
+}
+
+/* Suggestions.css */
+
+.giphy-picker-container .suggestions {
+  display: flex;
+  padding: 20px 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}

@@ -10,13 +10,13 @@
             ["medium-editor" :as medium-editor]))
 
 (defn setup-medium-editor [comment-node users-list]
-  (let [extentions (if (seq users-list)
+  (let [extensions (if (seq users-list)
                      #js {"mention" (mention-utils/mention-ext comment-node users-list)}
                      #js {})
         config {:toolbar false
                 :anchorPreview false
                 :imageDragging false
-                :extensions extentions
+                :extensions extensions
                 :autoLink true
                 :anchor false
                 :targetBlank true

@@ -1,3 +1,4 @@
+
 div.giphy-picker {
   position: absolute;
   top: 0;
@@ -10,6 +11,112 @@ div.giphy-picker {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
   div.giphy-picker-container {
+
+    /* QueryForm.css */
+
+    .giphy-picker-form {
+      display: flex;
+      padding: 5px;
+
+      input.giphy-picker-form-input {
+        flex-grow: 2;
+        display: block;
+      }
+
+      button.giphy-picker-form-submit {
+        flex-grow: 0;
+        display: block;
+      }
+    }
+
+    .giphy-picker-results-container {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      
+      max-height: 300px;
+      overflow-y: auto;
+
+      .giphy-picker-results-item {
+        display: block;
+        text-decoration: none;
+      }
+
+      & > img {
+        width: 100%;
+      }
+      & > li {
+        padding: 0;
+        margin: 0;
+        display: block;
+        min-width: 50px;
+        flex-grow: 1;
+        
+        & > ul {
+          list-style: none;
+          margin: 0;
+          padding: 0 5px;
+
+          & > li {
+            margin-bottom: 5px;
+          }
+        }
+      }
+    }
+
+    .giphy-picker-loader {
+      text-align: center;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .searchError {
+      text-align: center;
+      color: red;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .footer {
+      padding: 5px;
+
+      .attributionMark {
+        width: 100px;
+        height: 11px;
+      }
+    }
+
+    .giphy-picker-suggestions {
+      display: flex;
+      padding: 20px 0;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .giphy-picker-suggestions-suggestion {
+        display: inline-block;
+        text-decoration: none;
+        padding: 20px 40px;
+        border-radius: 4px;
+        background: #e0e0e0;
+        color: #333;
+        flex-grow: 1;
+        margin: 5px;
+        text-align: center;
+        
+        &:hover {
+          background: #f0f0f0;
+        }
+      }
+    }
+
+    // Custom style
+
+    .giphy-picker-loader {
+      @include OC_Body_Book();
+      font-size: 12px;
+      color: var(--color);
+    }
 
     .giphy-picker-form {
 
@@ -48,17 +155,11 @@ div.giphy-picker {
       }
     }
 
-    div.giphy-picker-suggestions {
-      .giphy-picker-suggestions-suggestion {
+    // div.giphy-picker-suggestions {
+    //   .giphy-picker-suggestions-suggestion {
 
-      }
-    }
-
-    .giphy-picker-loader {
-      @include OC_Body_Book();
-      font-size: 12px;
-      color: var(--color);
-    }
+    //   }
+    // }
   }
 }
 
