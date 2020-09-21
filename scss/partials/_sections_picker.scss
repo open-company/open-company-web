@@ -42,11 +42,11 @@ div.sections-picker {
         }
 
         div.public-icon {
-          background-image: cdnUrl("/img/ML/board_public_green.svg");
+          @include svgBgColor("/img/ML/board_public.svg", center, 12px 12px, var(--primary-color));
         }
 
         div.private-icon {
-          background-image: cdnUrl("/img/ML/board_private_green.svg");
+          @include svgBgColor("/img/ML/board_private.svg", center, 10px 12px, var(--primary-color));
         }
       }
 
@@ -73,28 +73,14 @@ div.sections-picker {
         float: right;
         width: 12px;
         height: 18px;
-        background-image: cdnUrl("/img/ML/board_private.svg");
-        background-size: 10px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
-
-         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_private_white.svg");
-        }
+        @include svgBgColor("/img/ML/board_private.svg", center, 10px 12px, var(--color));
       }
 
       div.public-icon {
         float: right;
         width: 12px;
         height: 18px;
-        background-image: cdnUrl("/img/ML/board_public.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
-
-         @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_public_white.svg");
-        }
+        @include svgBgColor("/img/ML/board_public.svg", center, 12px 12px, var(--color));
       }
     }
   }
