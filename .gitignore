@@ -15,6 +15,7 @@ public/js/compiled/
 open-company-web.iml
 .sass-cache/
 .shadow-cljs/
+node_modules/
 
 .ruby-gemset
 .ruby-version
