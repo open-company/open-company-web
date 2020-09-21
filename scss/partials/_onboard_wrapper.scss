@@ -269,6 +269,10 @@ div.onboard-container-inner {
     background-color: white;
     padding: 40px;
 
+    &:last-child {
+      margin-bottom: auto;
+    }
+
     @include mobile() {
       background-color: transparent;
       border: none;
