@@ -18,22 +18,32 @@
 
 (def default-reaction-number 3)
 
+(defn- thumb-reaction? [r]
+  (= (:reaction r) "👍"))
+
 (rum/defcs reactions < (rum/local false ::show-picker)
                        (rum/local false ::mounted)
                        ui-mixins/refresh-tooltips-mixin
                        (ui-mixins/on-click-out #(reset! (::show-picker %1) false))
-  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb only-thumb?]}]
+  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb only-thumb? thumb-first?]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
-  (let [filtered-reactions (if only-thumb?
-                             (filter #(= (:reaction %) "👍") (:reactions entity-data))
+  (let [first-reactions (when (or thumb-first? only-thumb?)
+                          (filter thumb-reaction?  (:reactions entity-data)))
+        rest-reactions (cond thumb-first?
+                             (filter (comp not thumb-reaction?) (:reactions entity-data))
+                             only-thumb?
+                             []
+                             :else
                              (:reactions entity-data))
+        all-reactions (vec (remove nil? (concat first-reactions rest-reactions)))
         reactions-max-count (if only-thumb? 1 (or max-reactions default-reaction-number))
-        reactions-data (vec (take reactions-max-count filtered-reactions))
+        reactions-data (vec (take reactions-max-count all-reactions))
         reactions-loading (:reactions-loading entity-data)
         react-link (utils/link-for (:links entity-data) "react")
         should-show-picker? (and (not only-thumb?)
+                                 (not thumb-first?)
                                  (not hide-picker)
                                  react-link
                                  (< (count reactions-data) reactions-max-count))
@@ -68,14 +78,15 @@
                                                           (dec (:count reaction-data))
                                                           (inc (:count reaction-data)))
                                                   :reacted (not reacted)})
-                            reaction-data)]]
+                            reaction-data)
+                        thumb? (thumb-reaction? r)]]
 
               [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entity-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))
-                                          :only-thumb only-thumb?
+                                          :only-thumb thumb?
                                           utils/hide-class true})
                  :on-mouse-leave (when-not is-mobile?
                                    #(this-as this
@@ -95,7 +106,7 @@
                 [:span.reaction
                   {:class (utils/class-set {:has-count (pos? (:count r))
                                             :safari ua/safari?})}
-                  (if only-thumb?
+                  (if thumb?
                     [:span.thumb-up-icon]
                     (:reaction r))]
                 [:div.count
