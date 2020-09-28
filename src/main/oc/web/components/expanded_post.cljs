@@ -270,7 +270,8 @@
             ;     (reactions {:entity-data activity-data})])
             [:div.expanded-post-footer.group
               (reactions {:entity-data activity-data
-                          :only-thumb? true})
+                          :thumb-first? true
+                          :hide-picker true})
               [:div.expanded-post-footer-mobile-group
                 (when (:member? org-data)
                   (foc-comments-summary {:entry-data activity-data

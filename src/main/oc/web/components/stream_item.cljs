@@ -341,9 +341,10 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (when (and member? (not unseen?))
+              (when member?
                 (reactions {:entity-data activity-data
-                            :only-thumb? true}))
+                            :only-thumb? true
+                            :hide-picker true}))
               [:div.stream-item-footer-mobile-group
                 (when member?
                   [:div.stream-item-comments-summary
