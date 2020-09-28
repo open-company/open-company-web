@@ -23,9 +23,9 @@ div.orgs-dropdown {
 
         &:after {
           content: "";
-          background-image: cdnUrl("/img/ML/select_arrows.svg");
-          background-size: 8px 12px;
-          background-position: top 11px right 0;
+          background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
+          background-size: 8px 4px;
+          background-position: right 0px top 14px;
           background-repeat: no-repeat;
           width: 8px;
           height: 32px;
@@ -109,6 +109,11 @@ div.orgs-dropdown {
               font-size: 14px;
               color: var(--color);
               max-width: 88px;
+
+              @include mobile() {
+                font-size: 18px;
+                line-height: 22px;
+              }
             }
           }
         }

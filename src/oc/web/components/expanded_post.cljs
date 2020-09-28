@@ -184,10 +184,13 @@
                                                   (fn [] (reset! (::force-show-menu s) false)))}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")
-        bookmarked? (or (:must-see activity-data)
-                        (:bookmarked-at activity-data))]
+        bm-ms-tag? (or (:must-see activity-data)
+                       (:bookmarked-at activity-data))]
     [:div.expanded-post
-      {:class dom-node-class
+      {:class (utils/class-set {dom-node-class true
+                                :bookmark-item (:bookmarked-at activity-data)
+                                :must-see-item (:must-see activity-data)
+                                :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
        :data-last-activity-at (:last-activity-at activity-data)
@@ -202,11 +205,12 @@
         {:ref :expanded-post-container}
         [:div.activity-share-container]
         [:div.expanded-post-header.group
-          [:button.mlb-reset.back-to-board
-            {:on-click close-expanded-post
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Close"}]
+          [:div.back-to-board-container
+            [:button.mlb-reset.back-to-board
+              {:on-click close-expanded-post
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :title "Close"}]]
           [:div.expanded-post-header-center
             (post-authorship {:activity-data activity-data
                               :user-avatar? true
@@ -214,7 +218,6 @@
                               :user-hover? true
                               :board-hover? true
                               :current-user-id current-user-id})
-            [:div.separator-dot]
             [:time
               {:date-time (:published-at activity-data)
                :data-toggle (when-not is-mobile? "tooltip")
@@ -223,24 +226,19 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :data-title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]
-            (when bookmarked?
-              [:div.separator-dot])
-            (when bookmarked?
-              (if (:bookmarked-at activity-data)
-                [:div.bookmark-tag]
-                [:div.must-see-tag]))
-            (when muted-post?
-              [:div.separator-dot.muted-dot])
-            (when muted-post?
-              [:div.muted-activity
-                {:data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :title "Muted"}])]
-          (if show-mobile-menu?
-            (rum/portal (more-menu-comp) mobile-more-menu-el)
-            (more-menu-comp))
-          [:button.mlb-reset.mobile-more-bt
-            {:on-click #(swap! (::force-show-menu s) not)}]]
+            [:div.must-see-tag]
+            [:div.bookmark-tag]
+            [:div.bookmark-tag-small]
+            [:div.muted-activity
+             {:data-toggle (when-not is-mobile? "tooltip")
+              :data-placement "top"
+              :title "Muted"}]]
+          [:div.more-menu-container
+            (if show-mobile-menu?
+              (rum/portal (more-menu-comp) mobile-more-menu-el)
+              (more-menu-comp))
+            [:button.mlb-reset.mobile-more-bt
+              {:on-click #(swap! (::force-show-menu s) not)}]]]
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner

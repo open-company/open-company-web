@@ -121,6 +121,33 @@ $header_top_margin: 24;
   }
 }
 
+@mixin new-item-tag() {
+  div.new-item-tag {
+    width: 31px;
+    height: 14px;
+    position: relative;
+    background-color: var(--primary-light-color);
+    border-radius: 4px;
+    margin-left: 8px;
+    padding: 1px 2px;
+
+    &:before {
+      display: block;
+      width: 27px;
+      height: 12px;
+      @include OC_Body_Bold();
+      font-size: 11px;
+      line-height: 12px;
+      content: "NEW";
+      color: var(--primary-color);
+      // position: absolute;
+      // top: 0;
+      // left: 0;
+      text-align: center;
+    }
+  }
+}
+
 @mixin muted-activity($width: 12, $height: 14) {
   div.muted-activity {
     margin-right: 8px;
@@ -411,7 +438,7 @@ $header_top_margin: 24;
 
             div.poll-reply-outer.voted {
               &:before {
-                background-color: rgba(var(--primary-color), 0.3);
+                background-color: var(--primary-color-04); // 0.3
               }
 
               button.poll-reply {
@@ -465,7 +492,7 @@ $header_top_margin: 24;
 
                 &:hover {
                   &:before {
-                    background-color: rgba(var(--primary-color), 0.3);
+                    background-color: var(--primary-color-04); // 0.3
                     width: 100%;
                   }
 

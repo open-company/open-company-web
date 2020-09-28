@@ -52,11 +52,11 @@
   (when-let* [org-data (dis/org-data)
               bot-access (dis/bot-access)]
     (when (= bot-access "bot")
-      (notification-actions/show-notification {:title "Wut Bot enabled"
-                                                      :primary-bt-title "OK"
-                                                      :primary-bt-dismiss true
-                                                      :expire 5
-                                                      :id :slack-bot-added}))
+      (notification-actions/show-notification {:title (str ls/product-name " Bot enabled")
+                                               :primary-bt-title "OK"
+                                               :primary-bt-dismiss true
+                                               :expire 5
+                                               :id :slack-bot-added}))
     (when (and (= bot-access "team")
                (not= (:new (dis/query-params)) "true"))
       (notification-actions/show-notification {:title "Integration added"
@@ -128,7 +128,7 @@
   ;; Check the loaded org
   (let [boards (:boards org-data)
         current-board-slug (dis/current-board-slug)
-        ; inbox-link (utils/link-for (:links org-data) "following-inbox")
+        inbox-link (utils/link-for (:links org-data) "following-inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         following-link (utils/link-for (:links org-data) "following")
@@ -138,8 +138,8 @@
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         replies-link (utils/link-for (:links org-data) "replies")
         active-users-link (utils/link-for (:links org-data) "active-users")
-        ; is-inbox? (= current-board-slug "inbox")
-        ; is-all-posts? (= current-board-slug "all-posts")
+        is-inbox? (= current-board-slug "inbox")
+        is-all-posts? (= current-board-slug "all-posts")
         is-following? (= current-board-slug "following")
         is-replies? (= current-board-slug "replies")
         is-bookmarks? (= current-board-slug "bookmarks")
@@ -149,8 +149,8 @@
         is-unfollowing? (= current-board-slug "unfollowing")
         sort-type (dis/current-sort-type)
         delay-count (atom 1)
-        ; inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
-        ; all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
+        inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
+        all-posts-delay (if (and is-all-posts? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         following-delay (if (and is-following? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         replies-delay (if is-replies? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
@@ -176,12 +176,11 @@
                      (dis/current-entry-board-slug))
             (cmail-actions/get-entry-with-uuid (dis/current-entry-board-slug) (dis/current-activity-id)))
           ;; Load inbox data
-          ; (when (and ls/wut?
-          ;            inbox-link)
-          ;   (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
+          (when inbox-link
+            (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data with recently posted sort
-          ; (when all-posts-link
-          ;   (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
+          (when all-posts-link
+            (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
           ;; Preload following data with recently posted sort
           (when following-link
             (utils/maybe-after following-delay #(aa/following-get org-data)))
@@ -212,10 +211,10 @@
       true
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
-      (when (or ; (and is-inbox?
-                ;     (not inbox-link))
-                ; (and is-all-posts?
-                ;      (not all-posts-link))
+      (when (or (and is-inbox?
+                    (not inbox-link))
+                (and is-all-posts?
+                     (not all-posts-link))
                 (and is-replies?
                      (not replies-link))
                 (and is-bookmarks?
@@ -286,7 +285,7 @@
   (payments-actions/maybe-load-payments-data org-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
-  (set! (.-title js/document) (str "Wut | " (:name org-data))))
+  (set! (.-title js/document) (str ls/product-name  " | " (:name org-data))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]

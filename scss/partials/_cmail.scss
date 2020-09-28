@@ -27,81 +27,79 @@ div.cmail-outer {
     display: none;
   }
 
-  &.quick-post-collapsed {
+  @include big_web() {
+    &.quick-post-collapsed {
 
-    @include mobile() {
-      display: none;
-    }
+      &.show-trial-expired-alert {
+        div.cmail-container, div.cmail-container div.cmail-content-outer,
+        div.cmail-container div.cmail-content-outer div.cmail-content
+        div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
+          cursor: not-allowed;
+        }
 
-    &.show-trial-expired-alert {
-      div.cmail-container, div.cmail-container div.cmail-content-outer,
-      div.cmail-container div.cmail-content-outer div.cmail-content
-      div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
-        cursor: not-allowed;
-      }
+        div.trial-expired-alert-container {
+          margin-left: -#{$paywall_alert_width / 2}px;
+        }
 
-      div.trial-expired-alert-container {
-        margin-left: -#{$paywall_alert_width / 2}px;
-      }
-
-      @include big_web() {
-        &:hover {
-          div.trial-expired-alert-container {
-            display: block;
+        @include big_web() {
+          &:hover {
+            div.trial-expired-alert-container {
+              display: block;
+            }
           }
         }
       }
-    }
 
-    div.cmail-container {
+      div.cmail-container {
 
-      div.dismiss-inline-cmail-container {
-        display: none;
-      }
+        div.dismiss-inline-cmail-container {
+          display: none;
+        }
 
-      div.delete-bt-container {
-        display: none;
-      }
+        div.delete-bt-container {
+          display: none;
+        }
 
-      div.fullscreen-bt-container {
-        display: none;
-      }
+        div.fullscreen-bt-container {
+          display: none;
+        }
 
-      div.cmail-content-outer {
-        padding: 18px 24px;
+        div.cmail-content-outer {
+          padding: 18px 24px;
 
-        div.cmail-content {
-          height: 20px;
-          min-height: 20px;
-
-          div.cmail-content-headline-container {
-            display: none;
-          }
-
-          div.rich-body-editor-outer-container {
-            display: none;
-          }
-
-          div.stream-attachments {
-            display: none;
-          }
-
-          div.cmail-content-collapsed-placeholder {
-            @include OC_Body_Book();
-            font-size: 16px;
-            line-height: 20px;
+          div.cmail-content {
             height: 20px;
-            color: var(--light-color);
-            display: block;
-            cursor: text;
+            min-height: 20px;
 
-            @include no-user-select();
+            div.cmail-content-headline-container {
+              display: none;
+            }
+
+            div.rich-body-editor-outer-container {
+              display: none;
+            }
+
+            div.stream-attachments {
+              display: none;
+            }
+
+            div.cmail-content-collapsed-placeholder {
+              @include OC_Body_Book();
+              font-size: 16px;
+              line-height: 20px;
+              height: 20px;
+              color: var(--light-color);
+              display: block;
+              cursor: text;
+
+              @include no-user-select();
+            }
           }
         }
-      }
 
-      div.cmail-footer {
-        display: none;
+        div.cmail-footer {
+          display: none;
+        }
       }
     }
   }
@@ -137,43 +135,49 @@ div.cmail-outer {
         justify-items: center;
         align-items: center;
 
-        button.mobile-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 32px;
-          height: 32px;
-          padding: 0;
-          background-color: var(--opac-background-color-1);
-          border-radius: 4px;
-          flex: 0 0 auto;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-        }
-
-        div.cmail-mobile-header-right {
-          margin-left: auto;
+        div.cmail-mobile-header-left {
+          margin-right: auto;
           flex: 0 0 auto;
           height: 32px;
 
           button.mobile-attachment-button {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
+            background-size: 16px 18px;
             background-position: center;
             background-repeat: no-repeat;
             width: 32px;
             height: 32px;
             padding: 0;
             opacity: 1;
-            background-color: var(--opac-background-color-1);
             border-radius: 4px;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
             }
+          }
+        }
+
+        div.cmail-mobile-header-title {
+          @include OC_Body_Book();
+          font-size: 16px;
+          flex: 0 1 auto;
+          max-width: 50vw;
+        }
+
+        button.mobile-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          border-radius: 4px;
+          flex: 0 0 auto;
+          margin-left: auto;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
           }
         }
       }
@@ -224,9 +228,7 @@ div.cmail-outer {
       float: right;
 
       @include mobile() {
-        margin-left: 16px;
         padding-left: 16px;
-        border-left: 1px solid var(--divider-line);
       }
     }
 
@@ -252,7 +254,7 @@ div.cmail-outer {
       height: auto;
 
       @include mobile() {
-        padding: 24px 16px;
+        padding: 16px;
         min-height: calc(100vh - #{$mobile_navbar_height}px);
         max-height: initial;
         overflow-x: visible;
@@ -267,62 +269,67 @@ div.cmail-outer {
           position: relative;
           margin: 0;
           width: 100%;
-          height: 44px;
+          height: 48px;
           border-bottom: 1px solid var(--divider-line);
           padding-bottom: 16px;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-items: center;
+          align-items: center;
 
           span.post-to {
-            float: left;
-            display: block;
-            height: 28px;
+            height: 32px;
             font-size: 16px;
-            line-height: 28px;
+            line-height: 32px;
             @include OC_Body_Book();
             color: var(--color);
             margin-right: 8px;
-            width: 52px;
+            flex: 0 0 auto;
           }
 
           div.section-picker-container {
             position: absolute;
-            top: 30px;
+            top: 40px;
             left: 0;
             z-index: #{$navbar_zindex - 1};
           }
 
           button.section-picker-bt {
-            float: left;
-            height: 28px;
-            padding: 5px 24px 5px 8px;
+            height: 32px;
+            padding: 7px 8px;
             // background-color: var(--cmail-section-bt-background);
-            background-color: var(--primary-color);
+            background-color: var(--primary-light-color);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
             // color: var(--cmail-section-bt-color);
-            color: var(--secondary-color);
+            color: var(--primary-color);
             position: relative;
             text-align: left;
-            max-width: 200px;
+            max-width: calc(100vw - 32px - 52px - 120px - 8px);
             vertical-align: super;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            flex: 0 1 auto;
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
 
-            &:after {
-              content: "";
-              width: 8px;
-              height: 10px;
-              position: absolute;
-              top: calc(50% - 5px);
-              right: 8px;
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              background-position: center;
-              @include svgBgColor("/img/ML/select_arrows_white.svg", center, 8px 10px, var(--secondary-color));
+            div.dropdown-cog {
+              width: 6px;
+              height: 4px;
+              margin-left: 4px;
+              @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
             }
+          }
+
+          div.post-button-container {
+            margin-left: auto;
+            flex: 0 0 auto;
           }
         }
       }
@@ -351,14 +358,9 @@ div.cmail-outer {
           display: block;
 
           @include mobile() {
-            @include activity-title(16px, 22px);
-            min-height: 22px;
-            line-height: 22px;
-
-            &:empty:before {
-              @include activity-title(16px, 22px);
-              height: 22px;
-            }
+            @include activity-title(18px, 23px);
+            min-height: 23px;
+            line-height: 23px;
           }
 
           &:empty:before {
@@ -370,6 +372,11 @@ div.cmail-outer {
             height: 28px;
             margin: 0;
             padding: 0;
+
+            @include mobile() {
+              @include activity-title(18px, 23px);
+              height: 23px;
+            }
           }
         }
       }
@@ -388,6 +395,7 @@ div.cmail-outer {
         }
 
         @include mobile() {
+          margin-top: 16px;
           min-height: calc(100vh - 334px);
         }
       }
@@ -550,42 +558,33 @@ div.cmail-outer {
 
         button.section-picker-bt {
           height: 32px;
-          max-width: 156px;
-          padding: 0 20px 0 8px;
-          position: relative;
-          text-align: left;
+          padding: 7px 8px;
+          // background-color: var(--cmail-section-bt-background);
+          background-color: var(--primary-light-color);
+          border-radius: 4px;
           @include OC_Body_Book();
           font-size: 14px;
-          line-height: 32px;
-          // color: var(--primary-color);
+          line-height: 18px;
+          // color: var(--cmail-section-bt-color);
+          color: var(--primary-color);
+          position: relative;
+          text-align: left;
+          max-width: calc(100vw - 32px - 52px - 120px - 8px);
+          vertical-align: super;
           overflow: hidden;
           text-overflow: ellipsis;
-          vertical-align: super;
           white-space: nowrap;
-          color: var(--secondary-color);
-          border-radius: 4px;
-          background-color: var(--primary-color);
+          flex: 0 1 auto;
+          display: flex;
+          flex-flow: row nowrap;
+          align-items: center;
+          justify-content: center;
 
-          @include mobile() {
-            height: 28px;
-            font-size: 16px;
-
-            &:after {
-              top: 9px;
-            }
-          }
-
-          &:after {
-            content: "";
-            width: 8px;
-            height: 32px;
-            position: absolute;
-            top: 0;
-            right: 8px;
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
-            @include svgBgColor("/img/ML/purple_arrow.svg", center, 8px 4px, var(--secondary-color));
+          div.dropdown-cog {
+            width: 6px;
+            height: 4px;
+            margin-left: 4px;
+            @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
           }
         }
       }
@@ -776,8 +775,8 @@ div.cmail-outer {
           @include mobile() {
             position: initial;
             top: unset;
-            padding: 0;
             width: 100%;
+            min-height: 23px;
           }
         }
 

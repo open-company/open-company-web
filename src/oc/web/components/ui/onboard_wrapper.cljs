@@ -70,21 +70,23 @@
                         (when (<= (count @(::pswd s)) 7)
                           (reset! (::password-error s) true)))
                       #(user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))]
-    [:div.onboard-lander.lander.group
+    [:div.onboard-container-inner.lander.group
       [:header.main-cta
-        [:button.mlb-reset.top-back-button
-          {:on-touch-start identity
-           :on-click #(router/history-back!)}
-          "Back"]
+        [:div.top-back-button-container
+         [:button.mlb-reset.top-back-button
+           {:on-touch-start identity
+            :on-click #(router/history-back!)}
+           "Back"]]
         [:div.title.main-lander
           "Let’s get started!"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled? "disabled")
-           :on-click continue-fn}
-          "Continue"]]
+        [:div.top-continue-container
+         [:button.mlb-reset.top-continue
+           {:class (when continue-disabled? "disabled")
+            :on-click continue-fn}
+           "Continue"]]]
       [:div.onboard-form
         [:div.form-title
-          "Your profile"]
+          "Sign up"]
         [:div.signup-buttons.group
           [:button.mlb-reset.signup-with-slack
             {:on-touch-start identity
@@ -278,7 +280,7 @@
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
                        (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
-    [:div.onboard-lander.lander-profile
+    [:div.onboard-container-inner.lander-profile
       [:header.main-cta
         [:div.title.about-yourself
           (if has-org?
@@ -403,7 +405,7 @@
                            ;; Create org and show setup screen
                            (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
-    [:div.onboard-lander.lander-team
+    [:div.onboard-container-inner.lander-team
       [:header.main-cta
         [:div.title.company-setup
           "Set up your company"]]
@@ -468,7 +470,7 @@
 
 (def default-invite-note
   (str
-    "Hey there, let's explore Wut together. It's a place to make sure important "
+    "Hey there, let's explore " ls/product-name " together. It's a place to make sure important "
     "announcements, updates, and decisions don't get lost in the noise."))
 
 (rum/defcs lander-invite < rum/reactive
@@ -521,12 +523,12 @@
                          (let [not-empty-invites (filter #(seq (:user %)) @(::invite-rows s))]
                            (team-actions/invite-users not-empty-invites "")))))
         continue-disabled (not (zero? (count error-rows)))]
-    [:div.onboard-lander.lander-invite
+    [:div.onboard-container-inner.lander-invite
       [:header.main-cta
         [:div.title
           "Invite your team"]]
       [:div.subtitle
-        "Invite some colleagues to explore Wut with you."]
+         (str "Invite some colleagues to explore " ls/product-name " with you.")]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -599,17 +601,18 @@
         email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
         team-data (:team auth-settings)
         signup-with-email (drv/react s user-store/signup-with-email)]
-    [:div.onboard-lander.invitee-team-lander
+    [:div.onboard-container-inner.invitee-team-lander
       [:header.main-cta
         (when-not ua/mobile-app?
-          [:button.mlb-reset.top-back-button
+          [:div.top-back-button-container
+           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
-             :on-click #(router/history-back!)
-             :aria-label "Back"}])
+             :on-click #(router/history-back!)}
+            "Back"]])
         (if auth-settings
           (if (:team auth-settings)
             [:div.title
-              "Your team is using Wut to share updates"]
+              (str "Your team is using " ls/product-name " to share updates")]
             [:div.title
               "Oh oh..."])
           [:div.title
@@ -624,7 +627,7 @@
                 [:div.team-logo-container
                   (org-avatar team-data false :never)]
                 [:div.title.main-lander
-                  "Join " (:name team-data) " on Wut"]]
+                  (str "Join " (:name team-data) " on " ls/product-name)]]
               [:div.field-label.email-field
                 "Work email"
                 (cond
@@ -711,11 +714,11 @@
                               s)}
   [s]
   (let [confirm-invitation (drv/react s :confirm-invitation)]
-    [:div.onboard-lander.invitee-lander
+    [:div.onboard-container-inner.invitee-lander
       [:header.main-cta
         [:div.invite-container
           [:div.title
-            "Join your team on Wut"]]]
+            (str "Join your team on " ls/product-name)]]]
       (if (:invitation-error confirm-invitation)
         [:div.subtitle.token-error
           "An error occurred while confirming your invitation, please try again."]
@@ -740,14 +743,15 @@
                       (reset! (::password-error s) true)
                       (user-actions/pswd-collect collect-pswd false))
         is-mobile? (responsive/is-mobile-size?)]
-    [:div.onboard-lander.invitee-lander-password
+    [:div.onboard-container-inner.invitee-lander-password
       [:header.main-cta
         [:div.title
-          "Join your team on Wut"]
-        [:button.mlb-reset.top-continue
-          {:class (when continue-disabled? "disabled")
-           :on-click continue-fn}
-          "Continue"]]
+          (str "Join your team on " ls/product-name)]
+        [:div.top-continue-container
+         [:button.mlb-reset.top-continue
+           {:class (when continue-disabled? "disabled")
+            :on-click continue-fn}
+           "Continue"]]]
       [:div.onboard-form
         [:div.form-title
           "Set a password to get started"]
@@ -819,7 +823,7 @@
         current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
         is-mobile? (responsive/is-mobile-size?)]
-    [:div.onboard-lander.invitee-lander-profile
+    [:div.onboard-container-inner.invitee-lander-profile
       [:header.main-cta
         [:div.title.about-yourself
           "Tell us about you"]]
@@ -866,7 +870,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/onboard-profile-save current-user-data edit-user-profile))}
-            "Start using Wut"]]]]))
+            (str "Start using " ls/product-name)]]]]))
 
 (rum/defcs email-wall < rum/reactive
                         (drv/drv :query-params)

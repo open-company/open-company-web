@@ -13,3 +13,6 @@
   (activity-actions/activity-edit)
   (when show-add-post-tooltip
     (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
+
+(def watch-activity-copy "Watch this update for future activity") ; "Get notified about new post activity"
+(def unwatch-activity-copy "Ignore future activity for this update") ; "Don't show replies to this update" ; "Ignore future activity unless mentioned"

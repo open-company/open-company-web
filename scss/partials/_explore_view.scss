@@ -17,23 +17,16 @@ div.explore-view {
       background-color: var(--overlay-background-color);
       padding: 24px;
       border: 1px solid var(--opac-background-color-2);
-      margin-top: 4px;
-      margin-bottom: 4px;
+      margin: 4px;
       border-radius: 8px;
       height: 190px;
-      width: calc(50% - 4px);
+      width: calc(50% - 8px);
 
       @include mobile() {
-        min-height: 190px;
+        // min-height: 190px;
         height: auto;
-      }
-
-      &:nth-child(2n + 1) {
-        margin-right: 4px;
-      }
-
-      &:nth-child(2n) {
-        margin-left: 4px;
+        margin: 4px 0;
+        width: 100%;
       }
     }
 
@@ -60,6 +53,16 @@ div.explore-view {
         color: var(--primary-color);
         margin-left: 4px;
         margin-right: auto;
+
+        @include mobile() {
+          font-size: 14px;
+        }
+      }
+
+      @include mobile() {
+        width: 100%;
+        min-height: initial;
+        height: #{$mobile_navbar_height}px;
       }
     }
 
@@ -68,15 +71,17 @@ div.explore-view {
       flex-flow: column nowrap;
       align-items: flex-start;
       justify-content: center;
+      box-shadow: none;
 
-      &:focus, &:active, &:hover {
-        text-decoration: none;
-        border: 1px solid var(--opac-background-color-2);
-      }
+      @include big_web() {
+        &:hover {
+          text-decoration: none;
+          border: 1px solid var(--explore-hover-border-color);
+          box-shadow: var(--explore-hover-box-shadow);
 
-      &:hover {
-        div.explore-view-block-title {
-          text-decoration: underline;
+          div.explore-view-block-title div.board-settings button.board-settings-bt {
+            display: block;
+          }
         }
       }
 
@@ -98,98 +103,35 @@ div.explore-view {
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-
-          @include big_web() {
-            &:hover {
-              color: var(--primary-color);
-            }
-          }
         }
 
-        @include big_web() {
-          &.short-name {
-            div.board-dropdown-container {
-              div.dropdown-list-container {
-                right: unset;
-                left: 4px;
-              }
-            }
-          }
-        }
-
-        div.board-dropdown-container {
+        div.board-settings {
           width: 24px;
           height: 24px;
-          marign-right: auto;
+          margin-right: auto;
           flex: 0 0 auto;
           position: relative;
 
-          button.board-dropdown-bt {
+          @include mobile() {
+            display: none;
+          }
+
+          button.board-settings-bt {
             height: 24px;
             width: 24px;
-            background-image: cdnUrl("/img/ML/wut_nav_arrow.svg");
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
-            background-position: center;
+            @include svgBgColor("/img/ML/gear_icon.svg", center, 14px 14px, var(--color));
             transition: transform 180ms;
+            opacity: 0.5;
+            display: none;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/wut_nav_arrow@dark.svg");
+            @include big_web() {
+              &:hover {
+                opacity: 1;
+              }
             }
 
             &.open {
               transform: rotate(90deg);
-            }
-          }
-
-          div.dropdown-list-container {
-            top: 18px;
-            left: unset;
-            right: 0;
-            position: absolute;
-            width: auto;
-            min-width: 93px;
-
-            div.triangle {
-              display: none;
-            }
-
-            div.dropdown-list-content {
-              background-color: var(--tooltip-background-color);
-              border: 1px solid var(--divider-line);
-              border-radius: 4px;
-              border: none;
-              padding: 12px 8px;
-
-              ul.dropdown-list {
-                background-color: var(--tooltip-background-color);
-                margin: 0;
-                padding: 0;
-
-                li.dropdown-list-item {
-                  color: var(--tooltip-color);
-                  line-height: 18px;
-                  height: 24px;
-                  padding: 4px 8px;
-                  margin: 0;
-
-                  &:not(.disabled):not(:disabled):hover {
-                    span.dropdown-list-item-label {
-                      opacity: 1;
-                    }
-                  }
-
-                  span.dropdown-list-item-label {
-                    color: var(--tooltip-color);
-                    line-height: 18px;
-                    opacity: 0.5;
-
-                    @include mobile() {
-                      opacity: 1;
-                    }
-                  }
-                }
-              }
             }
           }
         }
@@ -229,15 +171,12 @@ div.explore-view {
         @include mobile() {
           height: auto;
           min-height: 32px;
+          margin-top: 16px;
         }
 
         button.follow-button {
           float: left;
           order: 1;
-
-          @include mobile() {
-            order: 3;
-          }
         }
 
         span.posts-count {
@@ -250,12 +189,6 @@ div.explore-view {
           padding-left: 22px;
           position: relative;
           order: 2;
-
-          @include mobile() {
-            order: 1;
-            margin-left: 0;
-            margin-right: 16px;
-          }
 
           &:before {
             content: "";
@@ -287,11 +220,6 @@ div.explore-view {
           padding-left: 22px;
           position: relative;
           order: 3;
-
-          @include mobile() {
-            order: 2;
-            margin-left: 0;
-          }
 
           &:before {
             content: "";

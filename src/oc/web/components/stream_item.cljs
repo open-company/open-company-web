@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -361,7 +362,7 @@
                     ;     [:div.post-added-tooltip-title
                     ;       "Post analytics"]
                     ;     [:div.post-added-tooltip
-                    ;       (str "Invite your team to Wut so you can know who read your "
+                    ;       (str "Invite your team to " ls/product-name " so you can know who read your "
                     ;        "post and when. Click here to access your post analytics anytime.")]
                     ;     [:button.mlb-reset.post-added-tooltip-bt
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
@@ -391,4 +392,7 @@
                     [:div.stream-item-mobile-attachments
                       [:span.mobile-attachments-icon]
                       [:span.mobile-attachments-count
-                        (count activity-attachments)]]))]])]]))
+                        (count activity-attachments)]]))]
+              (when is-mobile?
+                [:div.stream-item-mobile-view-more
+                  "View more"])])]]))

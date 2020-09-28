@@ -13,6 +13,7 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.notifications :as notif-actions]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -49,7 +50,8 @@
              (.-preventDefault e))
     (.preventDefault e))
   (when ua/mobile?
-    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+    (notif-actions/hide-mobile-user-notifications))
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (dis/current-org-slug)
@@ -167,7 +169,8 @@
              (.-preventDefault e))
     (.preventDefault e))
   (when ua/mobile?
-    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+    (notif-actions/hide-mobile-user-notifications))
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (dis/current-org-slug)
@@ -384,7 +387,7 @@
     (.stopPropagation e))
   (if (responsive/is-mobile-size?)
     (let [alert-data {:action "mobile-integrations-link"
-                      :message "Wut integrations need to be configured in a desktop browser."
+                      :message (str ls/product-name " integrations need to be configured in a desktop browser.")
                       :solid-button-style :green
                       :solid-button-title "OK, got it"
                       :solid-button-cb #(alert-modal/hide-alert)}]

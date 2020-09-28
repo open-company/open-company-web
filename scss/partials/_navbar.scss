@@ -84,8 +84,8 @@ nav.oc-navbar {
           text-align: center;
 
           div.navbar-mobile-title {
-            @include OC_Body_Bold();
-            font-size: 18px;
+            @include OC_Body_Book();
+            font-size: 16px;
             color: var(--color);
             line-height: 24px;
             overflow: hidden;
@@ -107,9 +107,8 @@ nav.oc-navbar {
       div.navbar-left {
         height: 32px;
         margin-left: 0;
-        flex: 0 0 250px;
+        flex: 1;
         margin-right: auto;
-        width: 250px;
         text-align: left;
 
         @include mobile() {
@@ -122,18 +121,17 @@ nav.oc-navbar {
 
           @include mobile() {
             display: block;
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: var(--ultralight-color);
             border-radius: 4px;
             position: absolute;
             padding: 0;
-            top: 11px;
-            left: 16px;
+            top: 18px;
+            left: 12px;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
@@ -206,11 +204,13 @@ nav.oc-navbar {
 
       div.navbar-right {
         margin-right: 0px;
-        width: 250px;
         margin-right: 0;
-        flex: 0 0 250px;
+        flex: 1;
         margin-left: auto;
-        text-align: right;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
 
         &.anonymous-user {
           width: auto;
@@ -221,16 +221,14 @@ nav.oc-navbar {
           min-width: unset;
           display: initial;
           position: absolute;
-          top: 11px;
+          top: 16px;
           left: unset;
           right: 16px;
-          width: 32px;
-          height: 32px;
         }
 
         div.user-notifications {
-          float: left;
           margin-right: 8px;
+          margin-left: auto;
 
           @include mobile() {
             display: none;
@@ -240,8 +238,8 @@ nav.oc-navbar {
         div.user-menu {
           min-width: 24px;
           height: 24px;
-          float: right;
           position: relative;
+          margin-left: 8px;
 
           div.user-menu-button {
             position: relative;
@@ -259,48 +257,6 @@ nav.oc-navbar {
             }
           }
         }
-      }
-    }
-  }
-
-  div.mobile-header {
-    display: none;
-
-    @include mobile() {
-      height: #{$mobile_navbar_height}px;
-      width: 100vw;
-      background-color: var(--mobile-background-color);
-      border-bottom: 1px solid var(--divider-line);
-      padding: 15px 16px;
-      display: block;
-      text-align: center;
-      z-index: 2;
-
-      button.search-close-bt {
-        display: block;
-        width: 32px;
-        height: 32px;
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 12px 12px;
-        background-color: var(--divider-line);
-        border-radius: 4px;
-        position: absolute;
-        left: 16px;
-        top: 11px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-
-      div.mobile-header-title {
-        @include OC_Body_Bold();
-        font-size: 18px;
-        color: var(--color);
-        line-height: 24px;
-        height: 24px;
       }
     }
   }

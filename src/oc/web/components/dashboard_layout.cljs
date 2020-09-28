@@ -9,9 +9,9 @@
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.search :as search]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
@@ -20,13 +20,13 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
-            [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.search :refer (search-box)]
+            [oc.web.actions.notifications :as notif-actions]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
+            [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
@@ -63,7 +63,8 @@
                               (drv/drv :activities-read)
                               (drv/drv :followers-boards-count)
                               (drv/drv :comment-reply-to)
-                              (drv/drv search/search-active?)
+                              (drv/drv :mobile-user-notifications)
+                              (drv/drv :user-notifications)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -94,6 +95,8 @@
         current-activity-id (drv/react s :activity-uuid)
         current-org-slug (drv/react s :org-slug)
         current-user-data (drv/react s :current-user-data)
+        mobile-user-notifications (drv/react s :mobile-user-notifications)
+        user-notifications-data (drv/react s :user-notifications)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
@@ -140,7 +143,6 @@
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
-        search-active? (drv/react s search/search-active?)
         member? (:member? org-data)
         is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
         show-follow-banner? (and (not is-container?)
@@ -166,7 +168,6 @@
                        (pos? (count (:posts-list contributions-data))))]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (utils/class-set {:search-active search-active?})}
         [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
@@ -184,7 +185,7 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "following" (oc-urls/following)))
-                 :class (when (= current-board-slug "following")
+                 :class (when (and is-following (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Home"]]
@@ -192,18 +193,28 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
-                 :class (when is-topics
+                 :class (when (and is-topics (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
                 [:span.tab-label "Explore"]]
-              [:button.mlb-reset.tab-button.notifications-tab
+              [:button.mlb-reset.tab-button.replies-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "replies" (oc-urls/replies)))
-                 :class (when is-replies
+                 :class (when (and is-replies (not mobile-user-notifications))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "For you"]]
+                [:span.tab-label "Activity"]]
+              [:button.mlb-reset.tab-button.notifications-tab
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (notif-actions/toggle-mobile-user-notifications))
+                 :class (when mobile-user-notifications
+                          "active")}
+                [:span.tab-icon
+                  (when (user-notifications/has-new-content? user-notifications-data)
+                    [:span.unread-dot])]
+                [:span.tab-label "Alerts"]]
               (when can-compose?
                 [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
@@ -211,11 +222,14 @@
                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                   [:span.tab-icon]
                   [:span.tab-label "Add"]])])
+          (when (and is-mobile?
+                     mobile-user-notifications)
+            (user-notifications/user-notifications))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
             ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-            ;       non-admin-tooltip (str "Wut is where you'll find key announcements, updates, and "
+            ;       non-admin-tooltip (str ls/product-name " is where you'll find key announcements, updates, and "
             ;                              "decisions to keep you and your team pulling in the same direction.")
             ;       is-second-user (= add-post-tooltip :is-second-user)]
             ;   (when (and (not is-drafts-board)
@@ -228,12 +242,12 @@
             ;         {:class (when is-second-user "second-user")}
             ;         [:div.add-post-tooltip-box-mobile]
             ;         [:div.add-post-tooltip-title
-            ;           "Welcome to Wut!"]
+            ;           (str "Welcome to " ls/product-name "!")]
             ;           [:div.add-post-tooltip
             ;             (if is-admin-or-author
             ;               (if is-second-user
             ;                 non-admin-tooltip
-            ;                 "Create your first post now to see how Wut works. Don't worry, you can delete it anytime.")
+            ;                 (str "Create your first post now to see how " ls/product-name " works. Don't worry, you can delete it anytime."))
             ;               non-admin-tooltip)]
             ;           (when (and is-admin-or-author
             ;                      (not is-second-user))
@@ -309,7 +323,7 @@
                                                    "Unfollowing"
 
                                                    is-replies
-                                                   "For you"
+                                                   "Activity"
 
                                                    :default
                                                    ;; Fallback to the org board data
@@ -359,11 +373,6 @@
                   ;      :data-placement "top"
                   ;      :data-container "body"
                   ;      :title "Curate your Home feed"}])
-                  ;; Remove search from mobile for now
-                  ;; (when (and (not is-drafts-board)
-                  ;;            is-mobile?
-                  ;;            (not is-topics))
-                  ;;   (search-box))
                   ]])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view

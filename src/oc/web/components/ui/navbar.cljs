@@ -17,6 +17,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
+            [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.navigation-sidebar :as navigation-sidebar]
@@ -69,15 +70,18 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
-                current-user-data]
+                current-user-data
+                mobile-user-notifications]
          :as navbar-data} (drv/react s :navbar-data)
-         is-mobile? (responsive/is-mobile-size?)
-         current-panel (last panel-stack)
-         expanded-user-menu (= current-panel :menu)
-         cmail-state (drv/react s :cmail-state)
-         mobile-title (cond
+        is-mobile? (responsive/is-mobile-size?)
+        current-panel (last panel-stack)
+        expanded-user-menu (= current-panel :menu)
+        cmail-state (drv/react s :cmail-state)
+        mobile-title (cond
+                       mobile-user-notifications
+                       "Alerts"
                        (= (keyword current-board-slug) :replies)
-                       "For you"
+                       "Activity"
                        (= (keyword current-board-slug) :inbox)
                        "Unread"
                        (= (keyword current-board-slug) :all-posts)
@@ -94,7 +98,7 @@
                        (:name contributions-user-data)
                        :else
                        (:name board-data))
-         search-active? (drv/react s search/search-active?)]
+        search-active? (drv/react s search/search-active?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -108,36 +112,27 @@
                                                      (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
-      (if (and is-mobile?
-               search-active?)
-        [:div.mobile-header
-          [:button.mlb-reset.search-close-bt
-            {:on-click (fn [e]
-                         (utils/event-stop e)
-                         (search-actions/reset)
-                         (search-actions/inactive))}]
-          [:div.mobile-header-title
-            "Search"]]
-        [:div.oc-navbar-header.group
-          [:div.oc-navbar-header-container.group
-            [:div.navbar-left
-              (if is-mobile?
-                [:button.mlb-reset.mobile-ham-menu
-                  {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
-                (orgs-dropdown))]
+      [:div.oc-navbar-header.group
+        [:div.oc-navbar-header-container.group
+          [:div.navbar-left
             (if is-mobile?
-              [:div.navbar-center
-                [:div.navbar-mobile-title
-                  mobile-title]]
-              [:div.navbar-center
-                {:class (when search-active "search-active")}
-                (search-box)])
-            (if (jwt/jwt)
-              [:div.navbar-right.group
-                [:div.user-menu
-                  [:div.user-menu-button
-                    {:class (when show-whats-new-green-dot "green-dot")}
-                    (user-avatar
-                     {:click-cb #(nav-actions/menu-toggle)})]]]
-              [:div.navbar-right.anonymous-user
-                (login-button)])]])]))
+              [:button.mlb-reset.mobile-ham-menu
+                {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
+              (orgs-dropdown))]
+          (if is-mobile?
+            [:div.navbar-center
+              [:div.navbar-mobile-title
+                mobile-title]]
+            [:div.navbar-center
+              {:class (when search-active "search-active")}
+              (search-box)])
+          (if (jwt/jwt)
+            [:div.navbar-right.group
+              (when-not is-mobile?
+                (user-notifications))
+              [:div.user-menu
+                [:div.user-menu-button
+                  {:class (when show-whats-new-green-dot "green-dot")}
+                  (user-avatar {:click-cb #(nav-actions/menu-toggle)})]]]
+            [:div.navbar-right.anonymous-user
+              (login-button)])]]]))

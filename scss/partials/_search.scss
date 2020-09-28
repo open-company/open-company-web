@@ -21,10 +21,74 @@ div.search-box {
     background-color: var(--mobile-foc-background-color);
     border: none;
     border-bottom: 1px solid var(--divider-line);
-    padding: 16px;
+    padding: 0;
     box-shadow: none;
     transition: width 0ms ease-in, background-color 0ms ease-in;
     border-radius: 0;
+    z-index: #{$navbar_zindex + 156};
+  }
+
+  div.mobile-header {
+    display: none;
+
+    @include mobile() {
+      height: #{$mobile_navbar_height}px;
+      background-color: var(--mobile-background-color);
+      border-bottom: 1px solid var(--divider-line);
+      padding: 0 16px;
+      text-align: center;
+      z-index: 2;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+
+      button.search-close-bt {
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 12px 12px;
+        border-radius: 4px;
+        margin-left: auto;
+        order: 2;
+        flex: 0 0 auto;
+        margin-right: -10px;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+
+      div.mobile-header-title {
+        @include OC_Body_Bold();
+        font-size: 18px;
+        color: var(--color);
+        line-height: 24px;
+        margin-left: auto;
+        order: 1;
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  div.search-box-container {
+    padding: 0 16px;
+
+    @include mobile() {
+      min-height: calc(100% - #{$mobile_navbar_height}px);
+    }
+
+    div.search-box-form-container {
+      @include mobile() {
+        padding: 16px 0;
+      }
+    }
+
+    div.search-box-results-container {
+    }
   }
 
   div.search-history {
@@ -41,7 +105,7 @@ div.search-box {
       background-color: var(--mobile-background-color);
       width: 100%;
       box-shadow: none;
-      height: calc(100vh - #{$mobile_navbar_height}px);
+      height: 100vh;
       border: none;
     }
 
@@ -132,16 +196,17 @@ div.search-box {
       top: unset;
       width: 100%;
       height: 32px;
-      padding: 10px 14px 10px 32px;
+      // padding: 7px 14px 7px 32px;
       @include OC_Body_Book();
       font-size: 14px;
       color: var(--color);
+      line-height: 18px;
       border-radius: 4px;
       background-color: var(--opac-background-color-1);
       background-image: cdnUrl("/img/ML/spyglass.svg");
       background-size: 16px 16px;
       background-repeat: no-repeat;
-      background-position: 8px center;
+      background-position: left 8px top 50%;
 
       @include placeholder() {
         color: var(--light-color);
@@ -186,8 +251,7 @@ div.search-box {
     z-index: 2;
 
     @include mobile() {
-      top: 19px;
-      right: 20px;
+      display: none;
     }
 
     &:hover {
@@ -222,6 +286,7 @@ div.search-history {
     border-radius: 0;
     max-height: initial;
     overflow-y: initial;
+    width: 100%;
   }
 
   div.search-history-row {

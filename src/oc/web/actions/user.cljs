@@ -647,13 +647,12 @@
 (defn subscribe []
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [data]}]
-      ; (let [fixed-notifications (notif-utils/fix-notifications @dis/app-state (:notifications data))]
-      ;   (dis/dispatch! [:user-notifications (dis/current-org-slug) fixed-notifications]))
-      ))
+      (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
+        (dis/dispatch! [:user-notifications (dis/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
-      (when-let [fixed-notification (notif-utils/fix-notification @dis/app-state (assoc data :unread true))]
-        ; (dis/dispatch! [:user-notification (dis/current-org-slug) data])
+      (when-let [fixed-notification (notif-utils/fix-notification (assoc data :unread true))]
+        (dis/dispatch! [:user-notification (dis/current-org-slug) fixed-notification])
         (notification-actions/show-notification
          {:title (:title fixed-notification)
           :mention true

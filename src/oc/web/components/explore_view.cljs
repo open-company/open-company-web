@@ -7,7 +7,6 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.follow-button :refer (follow-button)]))
 
 (defn- filter-item [s item]
@@ -23,11 +22,7 @@
   (drv/drv :org-data)
   (drv/drv :follow-boards-list)
   (drv/drv :followers-boards-count)
-  (rum/local nil ::dropdown-menu)
-  (ui-mixins/on-click-out #(str "dropdown-menu-" @(::dropdown-menu %))
-   (fn [s e]
-     (when (seq @(::dropdown-menu s))
-       (reset! (::dropdown-menu s) nil))))
+  ui-mixins/refresh-tooltips-mixin
   [s]
   (let [org-data (drv/react s :org-data)
         follow-boards-list (map :uuid (drv/react s :follow-boards-list))
@@ -38,6 +33,7 @@
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
     [:div.explore-view
       [:div.explore-view-blocks
+        {:class (when can-create-topic? "has-create-topic-bt")}
         (when can-create-topic?
           [:button.mlb-reset.explore-view-block.create-topic-bt
             {:on-click #(nav-actions/show-section-add)}
@@ -56,28 +52,16 @@
             [:div.explore-view-block-title
               {:class (when (< (count (:name item)) 15) "short-name")}
               [:span.board-name (:name item)]
-              [:div.board-dropdown-container
-                {:ref (str "dropdown-menu-" (:uuid item))}
-                [:button.mlb-reset.board-dropdown-bt
-                 {:on-click (fn [e]
-                              (utils/event-stop e)
-                              (reset! (::dropdown-menu s) (:uuid item)))}]
-                (when (= @(::dropdown-menu s) (:uuid item))
-                  (dropdown-list {:items [{:label "Edit topic"
-                                           :value :edit
-                                           :disabled (:read-only item)}
-                                          {:label "Preview" :value :preview}]
-                                  :on-change (fn [i e]
-                                               (when e
-                                                 (utils/event-stop e))
-                                               (reset! (::dropdown-menu s) nil)
-                                               (cond
-                                                 (= (:value i) :edit)
-                                                 (nav-actions/show-section-editor (:slug item))
-                                                 (= (:value i) :preview)
-                                                 (nav-actions/nav-to-url! nil (:slug item) (oc-urls/board (:slug item)))
-                                                 :else
-                                                 nil))}))]]
+              (when (utils/link-for (:links item) "partial-update")
+                [:div.board-settings
+                  [:button.mlb-reset.board-settings-bt
+                  {:data-placement "top"
+                    :data-container "body"
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :title "Edit topic"
+                    :on-click (fn [e]
+                                (utils/event-stop e)
+                                (nav-actions/show-section-editor (:slug item)))}]])]
             [:div.explore-view-block-description
               (:description item)]
             (when (:last-entry-at item)

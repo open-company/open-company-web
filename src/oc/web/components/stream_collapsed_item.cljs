@@ -8,6 +8,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
@@ -28,7 +29,7 @@
                                    (drv/drv :activity-share-container)
                                    (drv/drv :board-slug)
                                    (drv/drv :activity-uuid)
-  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member?]}]
+  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member? replies?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
@@ -80,46 +81,70 @@
         {:class (utils/class-set {:must-see-item (:must-see activity-data)
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
+                                  :new-item (pos? (:unseen-comments activity-data))
                                   :no-comments has-zero-comments?})}
-        [:div.stream-collapsed-item-avatar-container
-          (user-info-hover {:user-data publisher :current-user-id (:user-id current-user-data)})
-          [:div.stream-collapsed-item-avatar
-            (user-avatar-image publisher)]]
-        [:div.stream-collapsed-item-fill
-          [:div.stream-item-headline.ap-seen-item-headline
-            {:ref "activity-headline"
-             :data-itemuuid (:uuid activity-data)
-             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          [:div.stream-collapsed-item-dot.muted-dot]
-          [:div.muted-activity]
-          [:div.must-see-tag]
-          [:div.bookmark-tag-small]
-          (stream-item-summary activity-data)]
-        (when-not has-zero-comments?
-          (comments-summary {:entry-data activity-data
-                             :comments-data comments-data
-                             :new-comments-count (:new-comments-count activity-data)
-                             :hide-label? is-mobile?
-                             :current-activity-id current-activity-id}))
-        [:div.collapsed-time
-          (let [t (or (:published-at activity-data) (:created-at activity-data))]
-            [:time
-              {:date-time t
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :data-title (utils/activity-date-tooltip activity-data)}
-              (utils/foc-date-time t)])]]
+        (if false ;is-mobile?
+          [:div.stream-collapsed-item-fillers
+           [:div.stream-collapsed-item-fill
+            [:div.stream-collapsed-item-avatar
+             (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
+            [:div.stream-item-context
+             (-> activity-data :for-you-context :label)]
+            [:div.stream-collapsed-item-dot.muted-dot]
+            [:div.new-item-tag]
+            [:div.bookmark-tag-small]
+            [:div.muted-activity]
+            [:div.collapsed-time
+             (let [t (:timestamp (:for-you-context activity-data))]
+               [:time
+                {:date-time t
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]]
+            [:div.stream-collapsed-item-fill
+             [:div.stream-item-arrow]
+              [:div.stream-item-headline.ap-seen-item-headline
+               {:ref "activity-headline"
+                :data-itemuuid (:uuid activity-data)
+                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]]
+          [:div.stream-collapsed-item-fill
+            [:div.stream-collapsed-item-avatar
+              (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
+            [:div.stream-item-context
+            (-> activity-data :for-you-context :label)]
+            ;; Needed to wrap mobile on a new line
+            [:div.stream-item-break]
+            [:div.stream-item-arrow]
+            [:div.stream-item-headline.ap-seen-item-headline
+              {:ref "activity-headline"
+              :data-itemuuid (:uuid activity-data)
+              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+            [:div.stream-collapsed-item-dot.muted-dot]
+            [:div.new-item-tag]
+            [:div.bookmark-tag-small]
+            [:div.muted-activity]
+            [:div.collapsed-time
+              (let [t (:timestamp (:for-you-context activity-data))]
+                [:time
+                {:date-time t
+                  :data-toggle (when-not is-mobile? "tooltip")
+                  :data-placement "top"
+                  :data-container "body"
+                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                  :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]])]
       (more-menu {:entity-data activity-data
                   :share-container-id dom-element-id
                   :editable-boards editable-boards
                   :external-share (not is-mobile?)
                   :external-bookmark (not is-mobile?)
                   :external-follow (not is-mobile?)
-                  :show-edit? true
-                  :show-delete? true
-                  :show-unread (not (:unread activity-data))
-                  :show-move? (not is-mobile?)
+                  :show-edit? (not replies?)
+                  :show-delete? (not replies?)
+                  :show-move? (and (not replies?)
+                                   (not is-mobile?))
                   :show-inbox? is-inbox?})
       [:div.activity-share-container]]))

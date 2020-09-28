@@ -14,6 +14,7 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.actions.search :as search-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -119,8 +120,7 @@
         show-topics user-is-part-of-the-team?
         show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
-        show-plus-button? (and (not is-mobile?)
-                               (:can-compose? org-data))]
+        show-plus-button? (:can-compose? org-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
@@ -132,6 +132,10 @@
           [:div.left-navigation-sidebar-mobile-header
             [:button.mlb-reset.mobile-close-bt
               {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+            [:button.mlb-reset.mobile-search-bt
+              {:on-click #(do
+                            (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                            (search-actions/active))}]
             (orgs-dropdown)])
         ;; All posts
         (when show-following
@@ -175,7 +179,7 @@
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                "For you"]
+                "Activity"]
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile
@@ -262,7 +266,7 @@
             [:button.mlb-reset.invite-people-close
               {:on-click #(user-actions/dismiss-invite-box (:user-id current-user-data) true)}]
             [:label.explore-label
-              "Explore Wut together"]
+              (str "Explore " ls/product-name " together")]
             [:button.mlb-reset.invite-people-bt
               {:on-click #(nav-actions/show-org-settings :invite-picker)}
               "Invite teammates"]])]]))

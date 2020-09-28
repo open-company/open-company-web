@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
@@ -133,7 +134,7 @@
         [:div.plan-summary-details
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(payments-actions/add-payment-method payments-data)}
-            "Subscribe to Wut"]])
+            (str "Subscribe to " ls/product-name)]])
       (when (or (is-trial? subscription-data)
                 (is-trial-expired? subscription-data))
         [:div.plan-summary-details.bottom-margin
@@ -333,9 +334,9 @@
                         current-plan-data))))}
         (if has-payment-info?
           (if (:cancel-at-period-end? subscription-data)
-            "Subscribe to Wut"
+            (str "Subscribe to " ls/product-name)
             "Change plan")
-          "Subscribe to Wut")]
+          (str "Subscribe to " ls/product-name))]
       (when @(::saving-plan s)
         (small-loading))
      [:div.plan-change-separator]

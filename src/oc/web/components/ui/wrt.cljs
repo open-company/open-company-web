@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -59,7 +60,7 @@
                         {:medium "slack"
                          :channel {:slack-org-id (:slack-org-id slack-user)
                                    :channel-id (:id slack-user)
-                                   :channel-name "Wut"
+                                   :channel-name ls/product-name
                                    :type "user"}}
                         {:medium "email"
                          :to [(:email u)]}))}))]

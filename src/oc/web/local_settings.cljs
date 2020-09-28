@@ -11,6 +11,8 @@
 ;; Sentry
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 (def local-whitelist-array (remove nil? ["localhost" "127.0.0.1" (env :web-hostname)]))
+(def sentry-env "local")
+(def sentry-release "")
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network
@@ -45,6 +47,10 @@
 
 ;; Web location
 (def web-server (str web-hostname ":" web-port))
+
+(def whats-new-url "https://carrot.news/")
+
+(def product-name "Carrot")
 
 ;; JWT
 (def jwt-cookie-domain web-hostname)
@@ -91,9 +97,6 @@
 
 ;; Polls
 (def poll-can-add-reply false)
-
-;; Wut
-(def wut? true)
 
 ;; Publisher boards feature-flag
 (def publisher-board-enabled? false)

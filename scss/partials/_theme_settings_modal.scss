@@ -34,8 +34,6 @@ div.theme-settings-modal {
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: var(--divider-line);
-      border-radius: 4px;
       z-index: 3;
 
       @include dark_mode() {
@@ -58,7 +56,7 @@ div.theme-settings-modal {
     overflow-y: auto;
 
     @include mobile() {
-      width: 85vw;
+      width: 100%;
       min-height: 100vh;
       overflow-y: auto;
       padding: #{$mobile_navbar_height}px 16px 16px;
@@ -78,7 +76,9 @@ div.theme-settings-modal {
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
-        width: 85vw;
+        right: unset;
+        left: 0;
+        width: 100%;
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
         padding: 15px 16px;

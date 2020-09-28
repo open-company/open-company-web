@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -131,7 +132,7 @@
        (reset! (::initial-section-name s) (:name fixed-section-data)))
      (dis/dispatch! [:input [:section-editing] fixed-section-data])
      (reset! (::slack-enabled s)
-      (-> fixed-section-data :slack-mirror :channel-id seq)))
+             (-> fixed-section-data :slack-mirror :channel-id seq)))
   s)
   :will-update (fn [s]
    (let [section-editing @(drv/get-ref s :section-editing)]
@@ -144,7 +145,9 @@
      ;; Re-enable the save button after a save failure
      (when (and @(::saving s)
                 (not (:loading section-editing)))
-       (reset! (::saving s) false)))
+       (reset! (::saving s) false)
+       (reset! (::slack-enabled s)
+               (-> section-editing :slack-mirror :channel-id seq))))
    s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
@@ -211,9 +214,11 @@
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
                                (:pre-flight-loading section-editing)
-                               (seq (:section-name-error section-editing)))]
+                               (seq (:section-name-error section-editing))
+                               (and @(::slack-enabled s)
+                                    (some #(-> section-editing :slack-mirror % seq not) [:channel-id :slack-org-id])))]
             [:button.mlb-reset.save-bt
-              {:on-click (fn [_]
+             {:on-click (fn [_]
                           (when (and (not disable-bt)
                                      (compare-and-set! (::saving s) false true))
                             (let [section-node (rum/ref-node s "section-name")
@@ -223,8 +228,8 @@
                                   success-cb #(when (fn? on-change)
                                                 (on-change % personal-note nav-actions/hide-section-editor))]
                               (section-actions/section-save-create section-editing section-name success-cb))))
-               :class (when disable-bt "disabled")}
-              "Save"])
+              :class (when disable-bt "disabled")}
+             "Save"])
           [:button.mlb-reset.cancel-bt
             {:on-click #(wrapped-on-change nav-actions/hide-section-editor)}
             "Back"]]
@@ -339,7 +344,7 @@
                 [:button.mlb-reset.enable-slack-bot-bt
                   {:on-click (fn [_]
                                (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
-                  "Add Wut bot"]]))
+                  (str "Add " ls/product-name " bot")]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
               "Public topics are visible to the world, including search engines."])
@@ -387,7 +392,7 @@
                              "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              "Wut topic settings"]
+                              (str ls/product-name " topic settings")]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))

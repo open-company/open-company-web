@@ -33,9 +33,8 @@ div.follow-picker {
     @include mobile() {
       position: absolute;
       top: #{$mobile_navbar_height}px;
-      left: unset;
-      right: 0;
-      width: 85vw;
+      left: 0;
+      width: 100%;
       height: auto;
       max-height: initial;
       min-height: calc(100vh - #{$mobile_navbar_height}px);
@@ -73,7 +72,6 @@ div.follow-picker {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        background-color: var(--divider-line);
         border-radius: 4px;
         z-index: 3;
 
@@ -137,13 +135,13 @@ div.follow-picker {
         transform: translateX(-50%);
 
         @include mobile() {
-          width: 85vw;
+          width: 100%;
           height: #{$mobile_navbar_height}px;
           border-bottom: 1px solid var(--divider-line);
           padding: 13px 16px;
           position: fixed;
           top: 0;
-          right: 0;
+          left: 0;
           background-color: var(--mobile-background-color);
           z-index: 2;
           transform: unset;

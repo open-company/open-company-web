@@ -115,7 +115,7 @@
           ;          :disabled (not slack-enabled?)}
           ;         "Via Slack"])]
           ;   [:div.field-description
-          ;     "Wut will curate all the content you should see and deliver it to you directly each morning."]]
+          ;     (str ls/product-name " will curate all the content you should see and deliver it to you directly each morning.")]]
           [:div.user-profile-modal-fields
             [:div.field-label
               "The latest updates will be sent to you in a digest at your preferred times."]
@@ -135,7 +135,9 @@
               "Your timezone is "
               [:a
                 {:href "?user-settings=profile"
-                 :on-click #(nav-actions/show-user-settings :profile)
+                 :on-click #(do
+                              (utils/event-stop %)
+                              (nav-actions/show-user-settings :profile))
                  :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
                  :data-placement "top"
                  :data-container "body"

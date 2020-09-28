@@ -83,10 +83,6 @@
   outline: none;
   border-radius: 4px;
 
-  @include mobile() {
-    border-radius: 0;
-  }
-
   div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
@@ -235,8 +231,8 @@ div.left-navigation-sidebar {
 
     @include mobile() {
       position: relative;
-      padding-bottom: 40px;
-      width: 85%;
+      padding: 0 16px 40px;
+      width: 100%;
       height: auto;
       background-color: var(--background-color);
       min-height: 100%;
@@ -249,31 +245,50 @@ div.left-navigation-sidebar {
       display: none;
 
       @include mobile() {
-        display: block;
         height: #{$mobile_navbar_height}px;
         position: fixed;
         top: 0;
         left: 0;
-        width: calc(85% - 1px);
+        width: 100%;
         background-color: var(--background-color);
         padding: 11px 16px;
         border-bottom: 1px solid var(--divider-line);
         z-index: #{$navbar_zindex};
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+
+        button.mobile-search-bt {
+          display: block;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/dark_search_lens.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          flex: 0 0 auto;
+          margin-left: auto;
+          order: 2;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/wrt_search_lens@dark.svg");
+          }
+        }
 
         button.mobile-close-bt {
           display: block;
-          position: absolute;
-          right: 16px;
-          top: 11px;
           width: 32px;
           height: 32px;
           padding: 0;
           background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
+          background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: var(--ultralight-color);
-          border-radius: 4px;
+          flex: 0 0 auto;
+          margin-left: 8px;
+          order: 3;
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -281,7 +296,12 @@ div.left-navigation-sidebar {
         }
 
         div.orgs-dropdown  {
-          width: calc(100% - 40px);
+          // width: calc(100% - 40px);
+          flex: 0 0 auto;
+          order: 1;
+          position: relative;
+          top: unset;
+          left: unset;
 
           div.orgs-dropdown-container {
             z-index: 2;
@@ -299,6 +319,22 @@ div.left-navigation-sidebar {
       margin-top: 16px;
       border-top: 1px solid var(--opac-background-color-08);
       padding-top: 16px;
+
+      @include mobile() {
+        border-top: 0px;
+        position: relative;
+
+        &:before {
+          content: "";
+          position: absolute;
+          width: calc(100% + 32px);
+          height: 1px;
+          position: absolute;
+          top: 0px;
+          left: -16px;
+          background-color: var(--opac-background-color-08);
+        }
+      }
     }
 
     a.nav-link {

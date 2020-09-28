@@ -138,6 +138,7 @@ div.org-settings-modal {
     div.org-settings-fields {
       margin-top: 16px;
       border-top: 1px solid var(--divider-line);
+      position: relative;
 
       div.org-settings-description {
         @include OC_Body_Book();
@@ -148,15 +149,20 @@ div.org-settings-modal {
       }
 
       div.color-picker-container {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        z-index: 4;
+
+        & > div {
+          position: absolute;
+          top: 8px;
+        }
       }
 
       div.theme-previews {
         display: flex;
         flex-flow: column nowrap;
         margin-top: 8px;
+        z-index: 2;
 
         &.on-dark-theme {
            div.dark-preview {
@@ -220,6 +226,8 @@ div.org-settings-modal {
             margin-left: auto;
             margin-right: 8px;
             z-index: 2;
+            @include OC_Body_Book();
+            font-size: 14px;
           }
 
           button.mlb-reset.sample-button {

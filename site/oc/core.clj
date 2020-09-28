@@ -22,7 +22,7 @@
     [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-    [:title "Wut! | wuts.io"]
+    [:title pages/default-page-title]
     (pages/circular-book-font)
     (pages/circular-bold-font)
     pages/google-fonts
@@ -83,7 +83,7 @@
         "Login"]
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
-        "Start free"]]])
+        "Try Carrot for free"]]])
 
 (defn nav
   "Static hiccup for the site header."
@@ -155,7 +155,7 @@
             [:a.signup
               {:id "site-header-signup-item"
                :href "/sign-up"}
-              "Start free"]])
+              "Try Carrot for free"]])
 
         ;; Mobile
         (cond

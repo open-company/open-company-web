@@ -29,11 +29,11 @@
       [:img.user-avatar-img
         {:src user-avatar-url
          :on-error #(reset! (::use-default s) true)
-         :data-toggle (if tooltip? "tooltip" "")
+         :data-toggle (when tooltip? "tooltip")
          :data-placement "top"
          :data-container "body"
          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-         :title (if tooltip? (:name user-data) "")}]]))
+         :title (when tooltip? (:name user-data))}]]))
 
 (rum/defcs user-avatar < rum/static
                          rum/reactive
@@ -46,7 +46,6 @@
        :on-click #(when (fn? click-cb) (click-cb))
        :aria-haspopup true
        :aria-expanded false}
-      (user-avatar-image user-data)
-      (when-not is-mobile?
-        [:span.user-name
-          (:name user-data)])]))
+      (user-avatar-image user-data {:tooltip? false})
+      [:span.user-name
+       (:name user-data)]]))

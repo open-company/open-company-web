@@ -3,7 +3,6 @@
 // --foc-hover-color: rgba($deep_navy, 0.10);
 // --foc-new-color: white;
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
-$foc_hover_extra_padding: 4;
 
 div.virtualized-list-separator:not(.expanded-list) {
   & + div.virtualized-list-row.collapsed-item div.stream-collapsed-item {
@@ -19,8 +18,10 @@ div.virtualized-list-row.collapsed-item {
     z-index: 1;
 
     &.open-item div.stream-collapsed-item {
+      border-top: 1px solid var(--foc-divider-line-color);
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
+      margin-top: 16px;
     }
 
     &.close-item div.stream-collapsed-item {
@@ -34,18 +35,11 @@ div.virtualized-list-row.collapsed-item {
 
     &:hover {
       z-index: 2;
-      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
-      height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
-      margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
 
       div.stream-collapsed-item {
         background-color: var(--foc-hover-color);
         z-index: 2;
         box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-        border-radius: 4px;
-        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
         border: 1px solid var(--foc-hover-border-color);
 
         div.more-menu {
@@ -82,11 +76,7 @@ div.virtualized-list-row.collapsed-item {
           background-color: var(--foc-new-color);
           z-index: 2;
           box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-          border-radius: 4px;
           border: 1px solid var(--foc-new-border-color);
-          padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-          width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-          height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
         }
       }
     }
@@ -99,14 +89,21 @@ div.virtualized-list-row.collapsed-item {
 
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
+  height: #{$collapsed_foc_height}px;
   margin: 0;
   border: 1px solid var(--foc-divider-line-color);
   background-color: var(--foc-background-color);
   overflow: visible;
   height: #{$collapsed_foc_height}px;
-  padding: 12px 12px 12px 20px;
+  padding: 12px;
   display: block;
   position: relative;
+
+  @include mobile() {
+    height: #{$mobile_collapsed_foc_height}px;
+    width: 100%;
+    padding: 16px;
+  }
 
   &.expandable {
     cursor: pointer;
@@ -133,33 +130,23 @@ div.stream-collapsed-item {
   div.stream-collapsed-item-inner {
     width: 100%;
     height: 32px;
-    position: relative;
-    overflow: visible;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-content: flex-start;
-    flex-wrap: nowrap;
-    padding: 4px 4px 4px 0;
-    align-items: center;
+    // position: relative;
+    // overflow: visible;
+    // display: flex;
+    // flex-direction: row;
+    // justify-content: flex-start;
+    // align-content: flex-start;
+    // flex-wrap: nowrap;
+    padding: 4px;
+    // align-items: center;
+
+    @include mobile() {
+      padding: 0;
+      height: 50px;
+    }
 
     & > * {
       text-align: left;
-    }
-
-    div.stream-collapsed-item-avatar-container {
-      margin: 0;
-      padding: 0;
-      flex: 0 0 20px;
-      position: relative;
-
-      div.stream-collapsed-item-avatar {
-        @include activity-author(20);
-
-        div.user-avatar-img-container {
-          margin-right: 0;
-        }
-      }
     }
 
     &.bookmark-item div.stream-collapsed-item-fill {
@@ -167,175 +154,181 @@ div.stream-collapsed-item {
       div.bookmark-tag-small {
         display: block;
       }
-
-      div.stream-item-headline {
-        max-width: calc(100% - 23px);
-      }
-    }
-
-    &.must-see-item div.stream-collapsed-item-fill {
-      div.must-see-tag {
-        display: block;
-      }
-
-      div.stream-item-headline {
-        max-width: calc(100% - 78px);
-      }
     }
 
     &.muted-item div.stream-collapsed-item-fill {
       div.muted-activity {
         display: block;
       }
-
-      div.stream-item-headline {
-        max-width: calc(100% - 16px);
-      }
     }
 
-    &.bookmark-item.muted-item div.stream-collapsed-item-fill {
-      div.stream-item-headline {
-        max-width: calc(100% - 43px);
-      }
-    }
+    &.new-item {
+      div.stream-collapsed-item-fill {
+        div.stream-item-context {
+          @include OC_Body_Bold();
+        }
 
-    &.must-see-item.muted-item div.stream-collapsed-item-fill {
-      div.stream-item-headline {
-        max-width: calc(100% - 98px);
+        div.new-item-tag {
+          display: block;
+        }
       }
     }
 
     div.stream-collapsed-item-fill {
-      width: auto;
-      flex: 0 1 auto;
+      width: 100%;
       display: flex;
-      flex-direction: row;
-      margin-left: 8px;
+      flex-flow: row nowrap;
+      align-items: center;
       overflow: hidden;
       text-overflow: ellipsis;
 
+      div.stream-collapsed-item-avatar {
+        flex: 0 0 auto;
+        @include face-pile(24);
+      }
+
+      div.stream-item-context {
+        height: 24px;
+        color: var(--color);
+        flex: 0 0 auto;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 24px;
+        margin-left: 6px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow-wrap: break-word;
+      }
+
+      div.stream-item-arrow {
+        width: 12px;
+        height: 8px;
+        background-image: cdnUrl("/img/ML/collapsed_foc_arrow.svg");
+        background-size: 12px 8px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-left: 8px;
+        flex: 0 0 12px;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/collapsed_foc_arrow@dark.svg");
+        }
+      }
+
       div.stream-item-headline {
         height: 24px;
-        @include activity-title(14px, 24px);
-        flex: 0 0 auto;
-        max-width: 100%;
+        flex: 0 1 auto;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow-wrap: break-word;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--light-color);
+        margin-left: 8px;
       }
-
-      @include must-see-tag();
 
       @include bookmark-tag();
 
       @include muted-activity();
 
-      div.bookmark-tag-small, div.must-see-tag, div.muted-activity {
+      @include new-item-tag();
+
+      div.bookmark-tag-small, div.muted-activity, div.new-item-tag {
         display: none;
       }
 
-      div.bookmark-tag-small, div.must-see-tag {
-        margin: 4px 0 0 6px;
+      div.new-item-tag {
         flex: 0 0 auto;
+        margin-left: 8px;
       }
 
       div.muted-activity {
         flex: 0 0 auto;
-        margin: 5px 0 0 6px;
+        margin-left: 8px;
       }
 
-      div.stream-item-body {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        @include activity-body(14, 24, var(--color));
-        margin-left: 3px;
-        padding-left: 8px;
-        position: relative;
+      div.bookmark-tag-small {
+        margin-left: 8px;
+        flex: 0 0 auto;
+      }
+
+      div.collapsed-time {
         height: 24px;
-        min-width: 0;
-        flex: 0 1 auto;
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 24px;
+        color: var(--light-color);
+        margin-left: auto;
+        flex: 0 0 auto;
+        padding-left: 8px;
+      }
 
-        & > div.hide-tooltip:first-child:before {
-          content: '';
+      div.stream-item-break {
+        display: none;
+      }
+
+      @include mobile() {
+        margin-left: 0;
+        display: flex;
+        flex-flow: row wrap;
+        width: 100%;
+
+        div.stream-collapsed-item-avatar {
+          order: 1;
+        }
+
+        div.stream-item-context {
+          order: 2;
+          flex: 0 1 auto;
+          max-width: 70%;
+        }
+
+        div.new-item-tag {
+          order: 3;
+        }
+
+        div.bookmark-tag-small {
+          order: 4;
+        }
+
+        div.muted-activity {
+          order: 5;
+        }
+
+        div.collapsed-time {
+          order: 6;
+        }
+
+        div.stream-item-break {
+          order: 7;
+          flex: 0 0 100%;
+          height: 0;
           display: block;
         }
 
-        h1, h2, mark, mark.highlight {
-          color: var(--color);
-          @include OC_Body_Book();
-          font-size: 13px;
-          line-height: 24px;
-          background-color: transparent;
+        div.stream-item-arrow {
+          order: 8;
+          margin-left: 0;
         }
 
-        h1, h2, p {
-          padding-left: 4px !important;
-        }
-
-        * { // We need to specify code and pre to override specific rules
-          height: 24px;
-          white-space: nowrap;
-          margin: 0 !important;
-          padding: 0 !important;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          vertical-align: top;
-          display: inline !important;
-          background-color: transparent;
-          color: var(--color);
-          border: none;
-          border-radius: 0;
-          min-height: unset;
-          line-height: 24px;
-          @include OC_Body_Book();
-        }
-
-        code, pre {
-          display: none!important;
-        }
-
-        img, iframe, video {
-          display: none !important;
-        }
-
-        &:before {
-          content: "-";
-          width: 8px;
-          height: 24px;
-          color: var(--color);
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 24px;
-          display: block;
-          position: absolute;
-          top: 0;
-          left: 0;
+        div.stream-item-headline {
+          max-width: calc(100% - 20px);
+          height: 18px;
+          line-height: 18px;
+          order: 9;
         }
       }
     }
 
-    div.is-comments {
-      height: 24px;
-      margin-left: 8px;
-      flex: 0 0 auto;
-
-      div.is-comments-authors {
-        margin-top: 1px;
+    @include mobile() {
+      &.new-item.bookmark-item, &.new-item.muted-item, &.bookmark-item.muted-item {
+        div.stream-collapsed-item-fill div.stream-item-context {
+          max-width: 40%;
+        }
       }
-    }
-
-    div.collapsed-time {
-      height: 24px;
-      @include OC_Body_Book();
-      font-size: 12px;
-      line-height: 24px;
-      color: var(--light-color);
-      margin-left: auto;
-      padding-left: 8px;
-      margin-top: 1px;
-      flex: 0 0 auto;
     }
   }
 

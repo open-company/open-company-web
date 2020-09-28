@@ -45,7 +45,7 @@ div.carrot-switch {
   }
 
   &.selected {
-    background-color: rgba(var(--primary-color), 0.4);
+    background-color: var(--primary-color-04); // 0.4
     color: var(--primary-color);
 
     span.dot {

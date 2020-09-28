@@ -233,12 +233,6 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
-(defn grouped-user-notifications-key [org-slug]
-  (vec (concat (org-key org-slug) [:user-notifications :grouped])))
-
-(defn sorted-user-notifications-key [org-slug]
-  (vec (concat (org-key org-slug) [:user-notifications :sorted])))
-
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -362,6 +356,7 @@
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
+   :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
@@ -520,7 +515,8 @@
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
                                                                  :search-active
-                                                                 :show-whats-new-green-dot])]
+                                                                 :show-whats-new-green-dot\
+                                                                 :mobile-user-notifications])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
@@ -561,14 +557,6 @@
                             (fn [base org-slug]
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
-   :sorted-user-notifications [[:base :org-slug]
-                               (fn [base org-slug]
-                                 (when (and base org-slug)
-                                   (get-in base (sorted-user-notifications-key org-slug))))]
-   :grouped-user-notifications [[:base :org-slug]
-                                (fn [base org-slug]
-                                  (when (and base org-slug)
-                                    (get-in base (grouped-user-notifications-key org-slug))))]
    :replies-badge        [[:base :org-slug]
                            (fn [base org-slug]
                              (get-in base (replies-badge-key org-slug)))]

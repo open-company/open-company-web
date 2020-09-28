@@ -34,10 +34,7 @@
                                  (dissoc with-current-edit :fixed-items))
      (update-in org-drafts-count-key #(if is-drafts-board?
                                         (ou/disappearing-count-value % (:total-count section-data))
-                                        %))
-     (as-> ndb
-      (update-in ndb (dispatcher/user-notifications-key org-slug)
-       #(notif-util/fix-notifications ndb %))))))
+                                        %)))))
 
 ; (defn fix-posts-new-label
 ;   [db changes]
@@ -54,9 +51,12 @@
   db)
 
 (defmethod dispatcher/action :section-edit-save/finish
-  [db [_ section-data]]
-  (let [org-slug (utils/section-org-slug section-data)
-        section-slug (:slug section-data)
+  [db [_ org-slug section-data]]
+  (assoc db :section-editing {:loading true}))
+
+(defmethod dispatcher/action :section-edit-save/finish
+  [db [_ org-slug section-data]]
+  (let [section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
         ;; Parse the new section data
         fixed-section-data (au/parse-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
@@ -66,11 +66,8 @@
         next-board-data (merge fixed-section-data
                          (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
-     (assoc-in board-key next-board-data)
-     (dissoc :section-editing)
-     (as-> ndb
-      (update-in ndb (dispatcher/user-notifications-key org-slug)
-       #(notif-util/fix-notifications ndb %))))))
+        (assoc-in board-key next-board-data)
+        (update :section-editing #(dissoc % :loading :has-changes)))))
 
 (defmethod dispatcher/action :section-edit/dismiss
   [db [_]]
@@ -230,10 +227,7 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)
-        (as-> ndb
-         (update-in ndb (dispatcher/user-notifications-key org)
-          #(notif-util/fix-notifications ndb %)))))
+        (assoc-in posts-data-key new-items-map)))
     db))
 
 (defmethod dispatcher/action :setup-section-editing

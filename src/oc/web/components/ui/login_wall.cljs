@@ -2,27 +2,32 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.shared.useragent :as ua]
             [oc.web.expo :as expo]))
 
-(def default-title "Login to Wut")
+(def default-title (str "Login to " ls/product-name))
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive
+                        (drv/drv :jwt)
                         (drv/drv :auth-settings)
+                        (drv/drv :org-slug)
+                        (drv/drv :board-slug)
                         (drv/drv :login-with-email-error)
                         (drv/drv :expo-deep-link-origin)
                         (rum/local "" ::email)
                         (rum/local "" ::pswd)
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
+        current-org-slug (drv/react s :org-slug)
+        current-board-slug (drv/react s :board-slug)
         deep-link-origin (drv/react s :expo-deep-link-origin)
         email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
         login-enabled (and auth-settings
@@ -33,13 +38,18 @@
                         (.preventDefault %)
                         (user-actions/maybe-save-login-redirect)
                         (user-actions/login-with-email @(::email s) @(::pswd s)))
-        login-with-email-error (drv/react s :login-with-email-error)]
-    (if (jwt/jwt)
+        login-with-email-error (drv/react s :login-with-email-error)
+        logged-in? (map? (drv/react s :jwt))]
+    (if logged-in?
       [:div.login-wall-container
-        (loading)]
+        (loading {:loading true
+                  :jwt logged-in?
+                  :current-org-slug current-org-slug
+                  :current-board-slug current-board-slug})]
       [:div.login-wall-container
         (login-overlays-handler)
         [:header.login-wall-header
+         [:div.top-back-button-container
           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
              :class (when ua/mobile-app? "mobile-app")
@@ -49,13 +59,14 @@
                             (.preventDefault %)
                             (router/redirect! oc-urls/home)))
              :aria-label "Back"}
-            "Back"]
+            "Back"]]
           [:div.title
             (or title default-title)]
-          [:button.mlb-reset.top-continue
+          [:div.top-continue-container
+           [:button.mlb-reset.top-continue
             {:class (when-not login-enabled "disabled")
              :on-click login-action}
-            "Log in"]]
+            "Log in"]]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
             
@@ -144,7 +155,7 @@
                     {:aria-label "Login"
                      :disabled (not login-enabled)
                      :on-click login-action}
-                    "Log in"]]]]]
+                    "Log in"]]]]]]
           [:div.footer-link
             "Don't have an account yet?"
             [:div.footer-link-inner
@@ -153,4 +164,4 @@
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (router/nav! oc-urls/sign-up))}
-                "Sign up here"]]]]])))
+                "Sign up here"]]]])))
