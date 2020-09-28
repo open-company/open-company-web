@@ -348,12 +348,6 @@ div.stream-comments {
           div.stream-comment-header {
             height: 24px;
 
-            @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
-
-            @include dark_mode() {
-              @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
-            }
-
             div.stream-comment-author-right {
               float: left;
               max-width: 100%;
@@ -378,6 +372,12 @@ div.stream-comments {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+
+                @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
+
+                @include dark_mode() {
+                  @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
+                }
               }
 
               @include mobile() {
