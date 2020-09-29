@@ -18,6 +18,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -488,8 +489,7 @@
                                    following-board? (some #(when (= (:slug %) (:board-slug cmail-data)) %) follow-boards-list)
                                    current-board-slug @(drv/get-ref s :board-slug)
                                    posting-to-current-board? (= (keyword current-board-slug) (keyword (:board-slug cmail-data)))
-                                   to-url (if (and following-board?
-                                                   (not posting-to-current-board?))
+                                   to-url (if-not posting-to-current-board?
                                             ;; If user is following the board they posted to
                                             ;; and they are in home
                                             {:slug "following"
@@ -499,6 +499,8 @@
                                             {:slug (:board-slug cmail-data)
                                              :url (oc-urls/board (:board-slug cmail-data))
                                              :refresh true})]
+                               (when-not following-board?
+                                 (user-actions/toggle-board (:board-uuid cmail-data)))
                                (nav-actions/nav-to-url! nil (:slug to-url) (:url to-url) 0 (:refresh to-url)))))))))
                     s)
                    :after-render (fn [s]
