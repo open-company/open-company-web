@@ -431,8 +431,7 @@
       (fn [success resp]
         (when success
           (utils/after 100 #(jwt-actions/jwt-refresh)))
-        (when (fn? save-cb)
-          (utils/after 280 #(save-cb success resp))))))))
+        (utils/after 280 #(save-cb success resp)))))))
 
 (defn onboard-profile-save
   ([current-user-data edit-data]
