@@ -525,6 +525,7 @@ div.left-navigation-sidebar {
     align-items: center;
     flex: 0 0 auto;
     margin-top: 16px;
+    border: none;
 
     @include mobile() {
       display: none;
