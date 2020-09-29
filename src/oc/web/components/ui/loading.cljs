@@ -31,6 +31,7 @@
       [:div.oc-loading-tabbar-item]
       [:div.oc-loading-tabbar-item]
       [:div.oc-loading-tabbar-item]
+      [:div.oc-loading-tabbar-item]
       [:div.oc-loading-tabbar-item]]]]])
 
 (rum/defc loading < rum/static

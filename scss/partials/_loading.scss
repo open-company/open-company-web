@@ -176,22 +176,27 @@ div.oc-loading-ghost-screen {
         @include mobile() {
           display: block;
           margin-bottom: 0;
+          width: 100%;
           height: #{$mobile_navbar_height}px;
           display: flex;
           flex-flow: row nowrap;
           justify-content: center;
           align-items: stretch;
+          background-color: var(--background-color);
+          border-top: 1px solid var(--opac-background-color-08);
 
           div.oc-loading-tabbar-item {
+            flex-grow: 1;
             display: flex;
-            flex-flow: column nowarp;
+            flex-flow: column nowrap;
             justify-content: center;
             align-items: center;
+            padding-bottom: 4px;
 
             &:before {
               content: "";
-              width: 12px;
-              height: 12px;
+              width: 18px;
+              height: 18px;
               border-radius: 50%;
               background-color: var(--opac-background-color-08);
               margin-bottom: 6px;
@@ -199,8 +204,8 @@ div.oc-loading-ghost-screen {
 
             &:after {
               content: "";
-              width: 30%;
-              height: 15px;
+              width: 40%;
+              height: 14px;
               border-radius: 6px;
               background-color: var(--opac-background-color-08);
             }
