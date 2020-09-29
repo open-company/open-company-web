@@ -6,9 +6,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.section-editor :refer (private-access-copy public-access-copy)]
-            [oc.web.components.ui.follow-button :refer (follow-button)]))
+            [oc.web.components.ui.follow-button :refer (follow-button)]
+            [oc.web.components.ui.section-editor :refer (private-access-copy public-access-copy)]))
 
 (defn- filter-item [s item]
   (not= (:slug item) utils/default-drafts-board-slug))
