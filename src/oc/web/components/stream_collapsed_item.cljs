@@ -146,5 +146,6 @@
                   :show-delete? (not replies?)
                   :show-move? (and (not replies?)
                                    (not is-mobile?))
-                  :show-inbox? is-inbox?})
+                  :show-inbox? is-inbox?
+                  :current-user-data current-user-data})
       [:div.activity-share-container]]))

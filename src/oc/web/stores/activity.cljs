@@ -1258,3 +1258,9 @@
         change-data (dispatcher/change-data db)
         active-users (dispatcher/active-users org-slug db)]
     (au/update-containers db org-data change-data active-users)))
+
+(defmethod dispatcher/action :foc-menu-open
+  [db [_ val]]
+  (if (not= (:foc-menu-open db) val)
+    (assoc db :foc-menu-open val)
+    db))

@@ -1385,3 +1385,6 @@
                                       (inbox-real-dismiss-all)
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
+
+(defn foc-menu-open [v]
+  (dis/dispatch! [:foc-menu-open v]))
