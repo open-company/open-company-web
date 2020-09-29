@@ -8,6 +8,7 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
@@ -96,6 +97,9 @@
           board-data (current-container-data)]
        (cond
 
+        (= board-slug "topics")
+        (user-actions/load-explore-data)
+
         (= board-slug "inbox")
         (activity-actions/inbox-get org-data)
 
@@ -143,7 +147,9 @@
           org-data (dis/org-data)
           container-data (current-container-data)
           board-kw (keyword current-board-slug)]
-       (cond (= board-kw :all-posts)
+       (cond (= board-kw :topics)
+             (user-actions/load-explore-data)
+             (= board-kw :all-posts)
              (activity-actions/all-posts-refresh org-data)
              (= board-kw :bookmarks)
              (activity-actions/bookmarks-refresh org-data)

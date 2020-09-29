@@ -413,18 +413,23 @@
   [db [_ org-slug data]]
   (let [publisher-uuids (filter au/user? data)
         publishers-map (zipmap (map :resource-uuid publisher-uuids) publisher-uuids)
-
         unfollow-boards (filter au/board? data)
         unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
         active-users-count (count (dispatcher/active-users org-slug db))
-        all-board-uuids (->> (dispatcher/org-data db org-slug) :boards filter-org-boards (map :uuid))
+        all-boards-uuid-and-count (->> (dispatcher/org-data db org-slug)
+                                       :boards
+                                       filter-org-boards
+                                       (map #(hash-map :uuid (:uuid %)
+                                                       :active-users-count (if (= (:access %) "private")
+                                                                             (+ (count (:viewers %)) (count (:authors %)))
+                                                                             active-users-count))))
         all-boards-count (apply merge
-                          (map #(hash-map % {:resource-uuid %
-                                             :resource-type :board
-                                             :count (if-let [unfollow-board (get unfollow-boards-map %)]
-                                                      (- active-users-count (:count unfollow-board))
-                                                      active-users-count)})
-                           all-board-uuids))]
+                          (map #(hash-map (:uuid %) {:resource-uuid (:uuid %)
+                                                     :resource-type :board
+                                                     :count (if-let [unfollow-board (get unfollow-boards-map (:uuid %))]
+                                                              (- (:active-users-count %) (:count unfollow-board))
+                                                              (:active-users-count %))})
+                           all-boards-uuid-and-count))]
     (-> db
      (assoc-in (dispatcher/followers-publishers-count-key org-slug) publishers-map)
      (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))

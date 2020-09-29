@@ -431,8 +431,7 @@
       (fn [success resp]
         (when success
           (utils/after 100 #(jwt-actions/jwt-refresh)))
-        (when (fn? save-cb)
-          (utils/after 280 #(save-cb success resp))))))))
+        (utils/after 280 #(save-cb success resp)))))))
 
 (defn onboard-profile-save
   ([current-user-data edit-data]
@@ -584,6 +583,14 @@
 
 (defn load-followers-count []
   (ws-cc/followers-count))
+
+(defn load-follow-data []
+  (load-follow-list)
+  (load-followers-count))
+
+(defn load-explore-data []
+  (org-actions/get-org)
+  (load-follow-data))
 
 (defn refresh-follow-containers []
   (let [org-data (dis/org-data)

@@ -143,8 +143,7 @@
     (reset! (::filter-open s) false))))
  {:init (fn [s]
    ;; Refresh the following list
-   (user-actions/load-follow-list)
-   (user-actions/load-followers-count)
+   (user-actions/load-follow-data)
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)

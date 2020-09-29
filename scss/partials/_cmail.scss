@@ -801,6 +801,21 @@ div.cmail-outer {
       }
 
       div.cmail-footer {
+        div.section-picker-bt-container {
+          div.section-picker-container {
+            position: absolute;
+            top: unset;
+            bottom: 32px;
+            width: 100%;
+            left: 0;
+            z-index: #{$navbar_zindex - 1};
+
+            div.sections-picker {
+              width: 100%;
+            }
+          }
+        }
+
         div.cmail-footer-right {
           div.fullscreen-bt-container {
             display: none;

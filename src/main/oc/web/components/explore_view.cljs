@@ -6,8 +6,10 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.follow-button :refer (follow-button)]))
+            [oc.web.components.ui.follow-button :refer (follow-button)]
+            [oc.web.components.ui.section-editor :refer (private-access-copy public-access-copy)]))
 
 (defn- filter-item [s item]
   (not= (:slug item) utils/default-drafts-board-slug))
@@ -52,6 +54,18 @@
             [:div.explore-view-block-title
               {:class (when (< (count (:name item)) 15) "short-name")}
               [:span.board-name (:name item)]
+              (when (= (:access item) "private")
+                [:span.private-board
+                  {:data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :title private-access-copy}])
+              (when (= (:access item) "public")
+                [:span.public-board
+                  {:data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :title public-access-copy}])
               (when (utils/link-for (:links item) "partial-update")
                 [:div.board-settings
                   [:button.mlb-reset.board-settings-bt

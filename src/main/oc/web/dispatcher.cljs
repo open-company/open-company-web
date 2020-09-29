@@ -662,6 +662,7 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box      [[:base] (fn [base] (get base show-invite-box-key))]
    :can-compose         [[:org-data] (fn [org-data] (get org-data can-compose-key))]
+   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
    })
 
 ;; Action Loop =================================================================

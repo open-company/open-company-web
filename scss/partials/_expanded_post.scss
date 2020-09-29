@@ -255,7 +255,7 @@ div.expanded-post {
           top: 34px;
         }
 
-        button:not(.more-menu-bt) {
+        & > button:not(.more-menu-bt), & > * > button:not(.more-menu-bt) {
           width: 32px;
           height: 32px;
           background-color: var(--opac-background-color-2);

@@ -57,8 +57,11 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- set-foc-menu-open [s open?]
+  (activity-actions/foc-menu-open (when open? (-> s :rum/args first :activity-data :uuid))))
+
 (defn- show-mobile-menu [s]
-  (reset! (::force-show-menu s) true))
+  (set-foc-menu-open s true))
 
 (defn- show-swipe-button [s ref-kw]
   (dis/dispatch! [:input [:mobile-swipe-menu] (-> s :rum/args first :activity-data :uuid)])
@@ -131,7 +134,6 @@
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
                          (rum/local nil ::hammer-recognizer)
-                         (rum/local false ::force-show-menu)
                          (rum/local false ::show-mobile-dismiss-bt)
                          (rum/local false ::show-mobile-more-bt)
                          (rum/local false ::on-scroll)
@@ -166,7 +168,7 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? replies?]}]
+             current-user-data container-slug show-new-comments? replies? foc-menu-open]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -203,9 +205,11 @@
                            :show-edit? true
                            :show-delete? true
                            :show-move? (not is-mobile?)
-                           :will-close (fn [] (reset! (::force-show-menu s) false))
-                           :force-show-menu @(::force-show-menu s)
-                           :mobile-tray-menu show-mobile-menu?})
+                           :will-open (fn [] (set-foc-menu-open s true))
+                           :will-close (fn [] (set-foc-menu-open s false))
+                           :force-show-menu foc-menu-open
+                           :mobile-tray-menu show-mobile-menu?
+                           :current-user-data current-user-data})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         is-home? (-> container-slug keyword (= :following))
         show-new-item-tag (and is-home?

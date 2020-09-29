@@ -242,7 +242,7 @@
                   [:span.error "Please provide your name."])]
 
               [:input.field-value.oc-input.half-field
-                {:value (:first-name current-user-data)
+                {:value (or (:first-name current-user-data) "")
                  :type "text"
                  :tab-index 1
                  :placeholder (placeholder :first-name)
@@ -255,7 +255,7 @@
                   "Last name"]
 
               [:input.field-value.oc-input.half-field
-                {:value (:last-name current-user-data)
+                {:value (or (:last-name current-user-data) "")
                  :type "text"
                  :tab-index 2
                  :id "profile-last-name"
@@ -267,7 +267,7 @@
                 {:for "profile-role"}
                 "Role"]
               [:input.field-value.oc-input
-                {:value (:title current-user-data)
+                {:value (or (:title current-user-data) "")
                  :type "text"
                  :id "profile-role"
                  :placeholder (placeholder :title)
@@ -279,7 +279,7 @@
                 (when @(::email-error s)
                   [:span.error "This email isn't valid."])]
               [:input.field-value.not-allowed.oc-input
-                {:value (:email current-user-data)
+                {:value (or (:email current-user-data) "")
                  :placeholder (placeholder :email)
                  :read-only true
                  :type "text"}]
@@ -287,7 +287,7 @@
                 {:for "profile-blurb"}
                 "Blurb"]
               [:textarea.field-value.oc-input
-                {:value (:blurb current-user-data)
+                {:value (or (:blurb current-user-data) "")
                  :ref :blurb
                  :id "profile-blurb"
                  :placeholder (placeholder :blurb)
@@ -299,7 +299,7 @@
                 {:for "profile-location"}
                 "Location"]
               [:input.field-value.oc-input
-                {:value (:location current-user-data)
+                {:value (or (:location current-user-data) "")
                  :type "text"
                  :id "profile-location"
                  :placeholder (placeholder :location)
@@ -340,7 +340,7 @@
                     {:for field-name}
                     (string/capital (string/camel k))]
                   [:input.field-value.oc-input
-                    {:value (get (:profiles current-user-data) k)
+                    {:value (or (get (:profiles current-user-data) k) "")
                      :placeholder (placeholder k)
                      :max-length 128
                      :id field-name
@@ -365,7 +365,7 @@
                    :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                    :placeholder (placeholder :password)
                    :on-change #(change! s [:current-password] (.. % -target -value))
-                   :value (:current-password current-user-data)}])
+                   :value (or (:current-password current-user-data) "")}])
               (when show-password?
                 [:label.field-label
                   {:for "profile-new-password"}
@@ -379,4 +379,4 @@
                    :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                    :placeholder (placeholder :new-password)
                    :on-change #(change! s [:password] (.. % -target -value))
-                   :value (:password current-user-data)}])]]]]]))
+                   :value (or (:password current-user-data) "")}])]]]]]))

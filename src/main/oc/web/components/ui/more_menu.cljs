@@ -14,17 +14,36 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
-(defn show-hide-menu
+(defn- currently-shown? [s]
+  (or @(::move-activity s)
+      @(::showing-menu s)
+      (-> s :rum/args first :force-show-menu)))
+
+(defn- show-menu
+  [s will-open & [force]]
+  (when (or force
+            (not (currently-shown? s)))
+    (utils/remove-tooltips)
+    (when (fn? will-open)
+      (will-open))
+    (reset! (::move-activity s) false)
+    (reset! (::showing-menu s) true)))
+
+(defn- hide-menu
+  [s will-close & [force]]
+  (when (or force
+            (currently-shown? s))
+    (utils/remove-tooltips)
+    (when (fn? will-close)
+      (will-close))
+    (reset! (::move-activity s) false)
+    (reset! (::showing-menu s) false)))
+
+(defn- toggle-menu
   [s will-open will-close]
-  (utils/remove-tooltips)
-  (let [current-showing-menu (or @(::showing-menu s) (-> s :rum/args first :force-show-menu))
-        next-showing-menu (not current-showing-menu)]
-    (if next-showing-menu
-      (when (fn? will-open)
-        (will-open))
-      (when (fn? will-close)
-        (will-close)))
-    (reset! (::showing-menu s) next-showing-menu)))
+  (if (currently-shown? s)
+    (hide-menu s will-close true)
+    (show-menu s will-open true)))
 
 ;; Delete handling
 
@@ -72,10 +91,7 @@
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s e]
-                        (when-let [will-close (-> s :rum/args first :will-close)]
-                          (when (fn? will-close)
-                            (will-close)))
-                        (reset! (::showing-menu s) false)))
+                        (hide-menu s (-> s :rum/args first :will-close))))
                        {:did-mount (fn [s]
                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                        s)
@@ -99,7 +115,7 @@
              can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
-             mark-unread-cb]}]
+             mark-unread-cb current-user-data]}]
   (let [{current-org-slug :org
          current-board-slug :board
          current-contributions-id :contributions
@@ -125,7 +141,10 @@
                                      show-unread))
         follow-link (utils/link-for (:links entity-data) "follow")
         unfollow-link (utils/link-for (:links entity-data) "unfollow")
-        show-menu (or @(::showing-menu s) force-show-menu)]
+        showing-menu? (currently-shown? s)
+        can-move-item? (and show-move?
+                            edit-link
+                            (> (count editable-boards) 1))]
     (when (or edit-link
               share-link
               inbox-unread-link
@@ -138,8 +157,7 @@
               inbox-unread-link)
       [:div.more-menu
         {:ref "more-menu"
-         :class (utils/class-set {:menu-expanded (or @(::move-activity s)
-                                                     show-menu)
+         :class (utils/class-set {:menu-expanded showing-menu?
                                   :has-more-menu-bt should-show-more-bt
                                   :mobile-tray-menu mobile-tray-menu
                                   :android-browser (and ua/android?
@@ -147,16 +165,16 @@
                                   :ios-browser (and ua/ios?
                                                     (not ua/mobile-app?))})
          :on-click (when mobile-tray-menu
-                     #(when (and show-menu
+                     #(when (and showing-menu?
                                  @(::can-unmount s))
                         (.stopPropagation %)
-                        (show-hide-menu s will-open will-close)))}
+                        (hide-menu s will-close)))}
         (when should-show-more-bt
           [:button.mlb-reset.more-menu-bt
             {:type "button"
              :ref "more-menu-bt"
-             :on-click #(show-hide-menu s will-open will-close)
-             :class (when show-menu "active")
+             :on-click #(toggle-menu s will-open will-close)
+             :class (when showing-menu? "active")
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
@@ -164,10 +182,10 @@
              :title "More"}])
         (cond
           @(::move-activity s)
-          (activity-move {:boards-list (vals editable-boards)
-                          :activity-data entity-data
+          (activity-move {:activity-data entity-data
+                          :current-user-data current-user-data
                           :dismiss-cb #(reset! (::move-activity s) false)})
-          show-menu
+          (or @(::showing-menu s) force-show-menu)
           [:ul.more-menu-list
             {:class (utils/class-set {:has-remove-bookmark (and add-bookmark-link
                                                                 (or is-mobile?
@@ -180,9 +198,7 @@
                        show-edit?)
               [:li.edit.top-rounded
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (if (fn? edit-cb)
                                 (edit-cb entity-data)
                                 (do
@@ -194,15 +210,12 @@
                        show-delete?)
               [:li.delete.bottom-rounded.bottom-margin
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (if (fn? delete-cb)
                                 (delete-cb entity-data)
                                 (delete-clicked % current-org-slug current-board-slug current-contributions-id entity-data)))}
                 "Delete"])
-            (when (and edit-link
-                       show-move?)
+            (when can-move-item?
               [:li.move.top-rounded
                {:class (when (and (not (and (not external-share)
                                             share-link))
@@ -225,9 +238,7 @@
                                             (not external-bookmark))))
                           "bottom-rounded bottom-margin")
                  :on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
             (when (and inbox-unread-link
@@ -239,9 +250,7 @@
                                             (not external-bookmark))))
                           "bottom-rounded bottom-margin")
                  :on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (activity-actions/mark-unread entity-data)
                               (when (fn? mark-unread-cb)
                                 (mark-unread-cb)))}
@@ -252,18 +261,14 @@
                 [:li.follow
                   {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                    :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
+                                (hide-menu s will-close)
                                 (activity-actions/entry-follow (:uuid entity-data)))}
                   "Follow"]
                 (when unfollow-link
                   [:li.unfollow
                     {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                      :on-click #(do
-                                  (reset! (::showing-menu s) false)
-                                  (when (fn? will-close)
-                                    (will-close))
+                                  (hide-menu s will-close)
                                   (activity-actions/entry-unfollow (:uuid entity-data)))}
                     "Mute"])))
             (when (or is-mobile?
@@ -272,9 +277,7 @@
                 [:li.remove-bookmark.bottom-rounded.bottom-margin
                   {:ref "more-menu-remove-bookmark-bt"
                    :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
+                                (hide-menu s will-close)
                                 (activity-actions/remove-bookmark entity-data remove-bookmark-link))}
                   "Remove bookmark"]
                 (when add-bookmark-link
@@ -282,17 +285,13 @@
                     {:ref "more-menu-add-bookmark-bt"
                      :data-container "body"
                      :on-click #(do
-                                  (reset! (::showing-menu s) false)
-                                  (when (fn? will-close)
-                                    (will-close))
+                                  (hide-menu s will-close)
                                   (activity-actions/add-bookmark entity-data add-bookmark-link))}
                     "Bookmark"])))
             (when can-react?
               [:li.react.top-rounded
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (when (fn? react-cb)
                                 (react-cb)))
                  :disabled react-disabled?}
@@ -300,27 +299,21 @@
             (when can-reply?
               [:li.reply
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (when (fn? reply-cb)
                                 (reply-cb)))}
                 "Reply"])
             (when can-comment-share?
               [:li.comment-share.bottom-rounded.bottom-margin
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (when (fn? comment-share-cb)
                                 (comment-share-cb)))}
                 "Copy link"])
             (when show-inbox?
               [:li.dismiss.top-rounded.bottom-rounded
                 {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (activity-actions/inbox-dismiss (:uuid entity-data))
                               (when (seq current-activity-id)
                                 (nav-actions/dismiss-post-modal %)))}
@@ -336,9 +329,7 @@
                                    (or add-bookmark-link
                                        remove-bookmark-link))) "has-next-bt")
              :on-click #(do
-                          (reset! (::showing-menu s) false)
-                          (when (fn? will-close)
-                            (will-close))
+                          (hide-menu s will-close)
                           (activity-actions/activity-share-show entity-data share-container-id))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-container "body"
@@ -355,9 +346,7 @@
                                (or add-bookmark-link
                                    remove-bookmark-link)) "has-next-bt")
              :on-click #(do
-                          (reset! (::showing-menu s) false)
-                          (when (fn? will-close)
-                            (will-close))
+                          (hide-menu s will-close)
                           (activity-actions/entry-follow (:uuid entity-data)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
@@ -373,9 +362,7 @@
                                    (or add-bookmark-link
                                        remove-bookmark-link)) "has-next-bt")
                  :on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
+                              (hide-menu s will-close)
                               (activity-actions/entry-unfollow (:uuid entity-data)))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
@@ -389,9 +376,7 @@
                :ref "more-menu-remove-bookmark-bt"
                :class (when show-inbox? "has-next-bt")
                :on-click #(do
-                            (reset! (::showing-menu s) false)
-                            (when (fn? will-close)
-                              (will-close))
+                            (hide-menu s will-close)
                             (activity-actions/remove-bookmark entity-data remove-bookmark-link))
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
@@ -405,9 +390,7 @@
                    :ref "more-menu-add-bookmark-bt"
                    :class (when show-inbox? "has-next-bt")
                    :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
+                                (hide-menu s will-close)
                                 (activity-actions/add-bookmark entity-data add-bookmark-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
@@ -418,9 +401,7 @@
             {:type "button"
              :ref "more-menu-inbox-dismiss-bt"
              :on-click #(do
-                          (reset! (::showing-menu s) false)
-                          (when (fn? will-close)
-                            (will-close))
+                          (hide-menu s will-close)
                           (activity-actions/inbox-dismiss (:uuid entity-data))
                           (when (seq current-activity-id)
                             (nav-actions/dismiss-post-modal %)))

@@ -54,7 +54,8 @@
            clear-cell-measure-cb
            current-user-data
            add-comment-force-update
-           row-index] :as props}]
+           row-index
+           foc-menu-open] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
@@ -63,7 +64,8 @@
    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
-                               :close-item (:close-item item)})}
+                               :close-item (:close-item item)
+                               :foc-menu-open foc-menu-open})}
      (cond
       ;;  (= (:container-slug container-data) :replies)
       ;;  (stream-reply-item {:reply-data            item
@@ -125,7 +127,8 @@
              current-user-data
              clear-cell-measure-cb
              add-comment-force-update
-             row-index]
+             row-index
+             foc-menu-open]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -165,7 +168,8 @@
                                                  :container-data container-data
                                                  :add-comment-force-update add-comment-force-update
                                                  :clear-cell-measure-cb clear-cell-measure-cb
-                                                 :row-index row-index})))]))
+                                                 :row-index row-index
+                                                 :foc-menu-open (boolean (= foc-menu-open (:uuid item)))})))]))
 
 ;; (defn- replies-unique-key [entry-data]
 ;;   (let [replies-data (vec (:replies-data entry-data))]
@@ -256,7 +260,8 @@
              foc-layout
              is-mobile?
              container-data
-             current-user-data]
+             current-user-data
+             foc-menu-open]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -385,6 +390,7 @@
                         (drv/drv :board-slug)
                         (drv/drv :contributions-id)
                         (drv/drv :add-comment-force-update)
+                        (drv/drv :foc-menu-open)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local false ::has-next)
@@ -434,7 +440,8 @@
         viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         member? (:member? org-data)
-        replies? (= (:container-slug container-data) :replies)]
+        replies? (= (:container-slug container-data) :replies)
+        foc-menu-open (drv/react s :foc-menu-open)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -450,4 +457,5 @@
                                         :is-mobile? is-mobile?
                                         :current-user-data current-user-data
                                         :activities-read activities-read
-                                        :editable-boards editable-boards}))]]]));)]]]))
+                                        :editable-boards editable-boards
+                                        :foc-menu-open foc-menu-open}))]]]));)]]]))

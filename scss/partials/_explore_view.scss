@@ -105,6 +105,22 @@ div.explore-view {
           overflow: hidden;
         }
 
+        span.private-board {
+          margin-left: 6px;
+          flex: 0 0 24px;
+          width: 24px;
+          height: 24px;
+          @include svgBgColor("/img/ML/board_private_dark.svg", center, 12px 12px, var(--light-color));
+        }
+
+        span.public-board {
+          margin-left: 6px;
+          flex: 0 0 24px;
+          width: 24px;
+          height: 24px;
+          @include svgBgColor("/img/ML/board_public_dark.svg", center, 12px 12px, var(--light-color));
+        }
+
         div.board-settings {
           width: 24px;
           height: 24px;

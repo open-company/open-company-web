@@ -181,7 +181,8 @@
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
-                                                  (fn [] (reset! (::force-show-menu s) false)))}))
+                                                  (fn [] (reset! (::force-show-menu s) false)))
+                                    :current-user-data current-user-data}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")
         bm-ms-tag? (or (:must-see activity-data)
