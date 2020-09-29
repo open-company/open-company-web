@@ -39,7 +39,7 @@
   [http-kit "2.5.0-alpha2"]
 
   ;; Dev dependencies
-  ^:dev [binaryage/devtools "0.9.8"]
+  [binaryage/devtools "0.9.8"]
   ^:dev [djblue/portal "0.4.0"]
   ]
 
@@ -51,9 +51,9 @@
   {:target :browser
    :devtools {:ignore-warnings true
               :before-load oc.web.core/on-js-reload
-              :preloads [devtools.preload]}
+              :repl-pprint true
+              :repl-init-ns oc.web.core}
    :modules {:oc {:init-fn oc.web.core/init}}
-   :repl-init-ns oc.web.core
    :repl-pprint true
    :dev {:compiler-options {:optimizations :none}}
    :compiler-options {:infer-externs :auto}
