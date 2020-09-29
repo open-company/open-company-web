@@ -51,17 +51,21 @@
         without-self (remove #(= (:user-id %) (jwt/user-id)) users)]
     (remove #(some #{(:user-id %)} already-in-ids) without-self)))
 
+(def private-access-copy "Team members you invite")
+(def team-access-copy "Anyone on the team")
+(def public-access-copy "Open for the public")
+
 (def private-access
   [:div.access-item.private-access
-    "Team members you invite"])
+    private-access-copy])
 
 (def team-access
   [:div.access-item.team-access
-    "Anyone on the team"])
+    team-access-copy])
 
 (def public-access
   [:div.access-item.public-access
-    "Open for the public"])
+    public-access-copy])
 
 (defn section-for-editing [section-data]
   (-> section-data
@@ -85,10 +89,14 @@
           (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
         (if (>= (count sec-name) section-actions/min-section-name-length)
           (do
-            (section-actions/pre-flight-check (when @(::editing-existing-section s) (:slug section-editing))
+            (section-actions/pre-flight-check (when (seq (:links section-editing)) (:slug section-editing))
              sec-name)
             (reset! (::pre-flight-check s) true))
           (reset! (::pre-flight-check s) false))))))
+
+(defn- creating-new-section? [section-data]
+  (or (not (seq (:uuid section-data)))
+      (not (seq (:links section-data)))))
 
 (rum/defcs section-editor <
   ;; Mixins
@@ -100,10 +108,9 @@
   (rum/local false ::show-search-results)
   (rum/local nil ::show-edit-user-dropdown)
   (rum/local nil ::show-edit-user-top)
-  (rum/local "" ::initial-section-name)
-  (rum/local false ::editing-existing-section)
   (rum/local false ::slack-enabled)
   (rum/local "" ::section-name)
+  (rum/local false ::editing-existing-section?)
   (rum/local false ::pre-flight-check)
   (rum/local false ::pre-flight-ok)
   (rum/local nil ::section-name-check-timeout)
@@ -120,16 +127,14 @@
   {:will-mount (fn [s]
    (team-actions/teams-get)
    (let [initial-section-data (first (:rum/args s))
-         new-section (nil? initial-section-data)
-         fixed-section-data (if new-section
-                            utils/default-section
-                            (section-for-editing initial-section-data))]
+         new-section? (creating-new-section? initial-section-data)
+         fixed-section-data (if new-section?
+                              utils/default-section
+                              (section-for-editing initial-section-data))]
+     (reset! (::editing-existing-section? s) (not new-section?))
      (when (string? (:name fixed-section-data))
        (reset! (::section-name s) (clojure.string/trim
         (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
-     (reset! (::editing-existing-section s) (not new-section))
-     (when (seq (:name fixed-section-data))
-       (reset! (::initial-section-name s) (:name fixed-section-data)))
      (dis/dispatch! [:input [:section-editing] fixed-section-data])
      (reset! (::slack-enabled s)
              (-> fixed-section-data :slack-mirror :channel-id seq)))
@@ -158,19 +163,21 @@
         team-data (drv/react s :team-data)
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
-        channel-name (when @(::editing-existing-section s) (:channel-name (:slack-mirror section-data)))
+        editing-existing-section? @(::editing-existing-section? s)
+        channel-name (when editing-existing-section? (:channel-name (:slack-mirror section-data)))
         roster (drv/react s :team-roster)
         all-users-data (if team-data (:users team-data) (:users roster))
         slack-orgs (:slack-orgs team-data)
         cur-user-data (drv/react s :current-user-data)
         slack-users (:slack-users cur-user-data)
         current-user-id (jwt/user-id)
+        user-is-admin? (= (:role cur-user-data) :admin)
         ;; user can edit the private section users if
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
         can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (:authors section-editing))
-                       (jwt/is-admin? (:team-id org-data)))
+                       user-is-admin?)
         last-section-standing (= (count no-drafts-boards) 1)
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))
@@ -205,11 +212,9 @@
                        (reset! (::show-edit-user-dropdown s) nil)))}
         [:div.section-editor-header
           [:div.section-editor-header-title
-            {:dangerouslySetInnerHTML
-              (utils/emojify
-               (if @(::editing-existing-section s)
-                 "Team settings"
-                 "Create topic"))}]
+            (if editing-existing-section?
+              "Team settings"
+              "Create topic")]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
@@ -505,9 +510,11 @@
                                         (= (.-key e) "Enter"))
                                 (utils/event-stop e)))
                :dangerouslySetInnerHTML {:__html ""}}])
-          [:div.section-editor-add-footer
-            (when (and @(::editing-existing-section s)
-                       (utils/link-for (:links section-data) "delete"))
+          (when (and editing-existing-section?
+                     (utils/link-for (:links section-editing) "delete")
+                     (or (zero? (:total-count section-editing))
+                         user-is-admin?))
+            [:div.section-editor-add-footer
               [:button.mlb-reset.delete-bt
                 {:on-click (fn []
                             (when-not last-section-standing
@@ -516,11 +523,11 @@
                                 :action "delete-section"
                                 :message [:span
                                            [:span "Are you sure?"]
-                                           (when (-> section-data :entry-count pos?)
+                                           (when (-> section-data :total-count pos?)
                                              [:span
-                                               " This will delete the topic and "
+                                               "Deleting this topic will also delete "
                                                [:strong "all"]
-                                               " its updates, too."])]
+                                               " the updates on it's news feed."])]
                                 :link-button-title "No"
                                 :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-style :red
@@ -542,4 +549,4 @@
                          "You cannot delete the last remaining topic."
                          "Delete this topic and all its updates.")
                  :class (when last-section-standing "disabled")}
-                "Delete topic"])]]]]))
+                "Delete topic"]])]]]))
