@@ -102,13 +102,14 @@
       (.selectItem ^js that user)))
   (utils/event-stop e))
 
+(js* "/** @nocollapse */")
 (goog-extend ^js CustomizedTagComponent
              PureComponent
              ([props]
               (this-as this
                        (goog/base this props)
                        (oset! this "!state" (clj->js {"selectedIndex" 0}))
-                       ;; Replace the inherited functions with a one bounded to the current this instead of the parent
+                       ;; Replace the inherited functions with one bounded to the current this instead of the parent
                        (oset! this "setState" (.bind (oget this "setState") this))
                        (oset! this "componentDidMount" (.bind (oget this "componentDidMount") this))
                        (oset! this "componentWillUnmount" (.bind (oget this "componentWillUnmount") this))

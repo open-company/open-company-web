@@ -2,7 +2,7 @@
   (:require [clojure.string]
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
-            [goog.object :as gobj]
+            [oops.core :refer (oget)]
             [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.drafts :as du]
@@ -595,7 +595,7 @@
   (element-clicked? e "A"))
 
 (defn content-editable-clicked? [e]
-  (find-node e #(.. % -attributes -contenteditable)))
+  (find-node e #(oget % "?attributes.contenteditable")))
 
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately
