@@ -20,9 +20,11 @@
 
 (defn remove-poll [dispatch-key poll-data]
   (timbre/info "Remove poll" dispatch-key (:poll-uuid poll-data))
-  (dis/dispatch! [:update (vec (conj dispatch-key :polls)) #(dissoc % (:poll-uuid poll-data))])
-  (when-let [poll-element (pu/get-poll-portal-element (:poll-uuid poll-data))]
-    (.removeChild (.-parentElement poll-element) poll-element)))
+  (let [poll-key (keyword (:poll-uuid poll-data))
+        poll-dispatch-key (conj dispatch-key :polls)]
+    (dis/dispatch! [:update poll-dispatch-key #(dissoc % poll-key)])
+    (when-let [poll-element (pu/get-poll-portal-element (:poll-uuid poll-data))]
+      (.removeChild (.-parentElement poll-element) poll-element))))
 
 (defn remove-poll-for-max-retry [dispatch-key poll-data]
   (timbre/info "Remove poll for max retry" dispatch-key (:poll-uuid poll-data))

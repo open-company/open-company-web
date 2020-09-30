@@ -80,7 +80,7 @@
   (when e
     (loop [element (.-target e)]
       (if element
-        (if (.contains (.-classList element) class-name)
+        (if (.contains (.-classList element) (if (keyword? class-name) (name class-name) class-name))
           true
           (recur (.-parentElement element)))
         false))))

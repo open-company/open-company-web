@@ -433,7 +433,8 @@
                    (mixins/on-click-out :section-picker-container (fn [s e] (hide-section-picker s)))
 
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
-                                                                     (-> %1 (drv/get-ref :cmail-state) deref :fullscreen))
+                                                                     (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
+                                                                     (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper")))
                                                             (close-cmail %1 %2)))
 
                    {:will-mount (fn [s]
@@ -692,6 +693,7 @@
                               :current-user-id (jwt/user-id)
                               :container-selector "div.cmail-content"
                               :dispatch-key (first dis/cmail-data-key)
+                              :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
       [:div.cmail-footer
         [:div.post-button-container.group
