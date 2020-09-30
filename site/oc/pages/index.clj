@@ -9,7 +9,7 @@
       [:section.cta.group
 
         [:h1.headline
-          "Your news feed for team updates"]
+          "Team updates without the noise"]
         [:div.subheadline
          "Stay in sync with fewer interruptions and less noisy chatter. Ideal for remote teams and asynchronous updates."]
 
