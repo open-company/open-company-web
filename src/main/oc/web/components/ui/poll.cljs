@@ -116,7 +116,7 @@
                           (when-let [q-el (rum/ref-node s :question)]
                             (.focus q-el))
                         s)}
-  [s {:keys [poll-data poll-key current-user-id] :as props}]
+  [s {:keys [poll-data poll-key current-user-id remove-poll-cb] :as props}]
   (let [should-show-delete-reply? (-> poll-data :replies count (> poll-utils/min-poll-replies))
         is-mobile? (responsive/is-mobile-size?)
         tab-index-base @(::tab-index-base s)]
@@ -137,8 +137,10 @@
                                            :solid-button-style :red
                                            :solid-button-title "Yes"
                                            :solid-button-cb (fn []
-                                                             (poll-actions/remove-poll (get-dispatch-key poll-key) poll-data)
-                                                             (alert-modal/hide-alert))}]
+                                                              (when (fn? remove-poll-cb)
+                                                                (utils/after 200 remove-poll-cb))
+                                                              (poll-actions/remove-poll (get-dispatch-key poll-key) poll-data)
+                                                              (alert-modal/hide-alert))}]
                            (alert-modal/show-alert alert-data)))
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
@@ -247,13 +249,14 @@
     (rum/portal (poll props) portal-element)))
 
 (rum/defc polls-wrapper < rum/static
-  [{:keys [polls-data editing? dispatch-key current-user-id container-selector activity-data]}]
+  [{:keys [polls-data editing? dispatch-key current-user-id container-selector activity-data remove-poll-cb]}]
   (for [[poll-uuid-k poll] polls-data
         :let [poll-uuid (name poll-uuid-k)
               poll-selector (str "." poll-utils/poll-selector-prefix poll-uuid)]]
     (rum/with-key
      (poll-portal {:poll-data poll
                    :editing? editing?
+                   :remove-poll-cb remove-poll-cb
                    :container-selector container-selector
                    :current-user-id current-user-id
                    :poll-key (vec (concat (if (coll? dispatch-key) dispatch-key [dispatch-key]) [:polls poll-uuid-k]))
