@@ -55,8 +55,8 @@ nav.site-navbar {
   }
 
   div.site-navbar-container {
-    height: 60px;
-    padding: 39px 16px 16px;
+    height: 63px;
+    padding: 16px;
     position: relative;
     max-width: 1209px;
     margin: 0 auto;
@@ -81,7 +81,7 @@ nav.site-navbar {
         background-repeat: no-repeat;
         background-position: 0 center;
         top: 21px;
-        left: 16px;
+        left: 14px;
       }
     }
 
@@ -111,7 +111,7 @@ nav.site-navbar {
       a.navbar-brand-left {
         @include mobile() {
           position: absolute;
-          top: 24px;
+          top: 16px;
           left: 50%;
         }
       }
@@ -122,14 +122,14 @@ nav.site-navbar {
 
       div.site-navbar-right {
         margin-top: 0;
-      } 
+      }
     }
 
     div.site-navbar-right {
       position: absolute;
       height: 40px;
       right: 16px;
-      top: 33px;
+      top: 10px;
       transform: top 180ms;
 
       @include mobile() {
