@@ -29,7 +29,8 @@
    [:div
     {:class "outer header"}
     shared/ph-banner
-    (shared/covid-banner page)
+    (when (env :covid-banner)
+      (shared/covid-banner page))
     (shared/nav (name page))
     (shared/mobile-menu (name page))]
    (if (fn? body) (body opts) body)
