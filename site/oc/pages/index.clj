@@ -10,14 +10,20 @@
         [:h1.headline
           "Team updates without the noise"]
         [:div.subheadline
-         "Stay in sync with fewer interruptions and less noisy chatter. Ideal for remote teams and asynchronous updates."]
+         "Carrot is a personalized news feed that keeps your team in sync with fewer interruptions. Ideal for remote teams and asynchronous updates."]
 
         [:div.get-started-button-container.group
+<<<<<<< HEAD
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
             "Try Carrot"]
+=======
+          [:a.get-started-button.get-started-action
+            {:href "/sign-up"}
+            "Start free"]
+>>>>>>> Change homepage headline copy.
           [:span.get-started-subtitle
-            "Carrot is open source. Join us."]]
+            "Carrot is open source."]]
 
         [:div.main-animation-container
           [:img.main-animation.big-web-tablet-only
