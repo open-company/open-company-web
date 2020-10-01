@@ -174,10 +174,9 @@ Headway.show = function(){};
 var Intercom = function(){};
 // Homepage animation
 var OCWebSetupStaticPagesJS = function(){};
-var OCStaticShowAnimationLightbox = function(){};
-var OCStaticHideAnimationLightbox = function(){};
+var OCYTVideoPlay = function(){};
+var OCYTVideoPause = function(){};
 var OCStaticDeleteCookie = function(){};
-var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
 // UI Theme detection
