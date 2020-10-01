@@ -70,7 +70,7 @@ nav.site-navbar {
       display: flex;
       flex-flow: row nowrap;
 
-      & > *:last-child {
+      & > *:first-child {
         margin-left: auto;
       }
     }

@@ -999,6 +999,14 @@ div.close-communication-gaps-container {
     border: 1px solid rgba($deep_navy, 0.72);
     margin: 40px auto 0;
     border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+
+    &.video-playing {
+      div.animation-lightbox-container {
+        display: block;
+      }
+    }
 
     p.not-needed {
       position: absolute;
@@ -1019,6 +1027,23 @@ div.close-communication-gaps-container {
       text-align: center;
       vertical-align: middle;
       font-size: 47px;
+    }
+
+    div.animation-lightbox-container {
+      text-align: center;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      div.animation-lightbox {
+        width: 100vw;
+        height: 100vh;
+        max-width: 1080px;
+        max-height: 608px;
+        margin: 0 auto;
+        position: relative;
+      }
     }
   }
 }

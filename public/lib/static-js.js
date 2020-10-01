@@ -315,6 +315,8 @@ function OCDarkModeEarlySetup(){
   }
 }
 
+var OCYTVideoAutoplay = false;
+
 (function(){
   $(document).ready(function(){
     
@@ -328,7 +330,77 @@ function OCDarkModeEarlySetup(){
         $("div.apps-container").removeClass("dropdown-menu-visible");
       });
     }
+
+    if (window.location.pathname == "/" && window.location.hash == "#oc-video") {
+      OCYTVideoAutoplay = true;
+      OCStaticShowYTVideo()
+    }
   });
 })();
 
 OCDarkModeEarlySetup();
+
+var OCYTVideoPlayer = null,
+OCYTVideoFinished = false;
+
+function onYouTubeIframeAPIReady() {
+  var winWidth = document.documentElement.clientWidth || window.innerWidth,
+  winHeight = document.documentElement.clientHeight || window.innerHeight;
+  OCYTVideoPlayer = new YT.Player('youtube-player', {
+    height: Math.min(winHeight, 608).toString(),
+    width: Math.min(winWidth, 1080).toString(),
+    videoId: 'dMWpnHxQMP4',
+    allowsInlineMediaPlayback: 'TRUE',
+    allowfullscreen: 'true',
+    playerVars: {
+        showinfo: 0,
+        rel: 0,
+        playsinline: 1,
+        autoplay: (OCYTVideoAutoplay? 1 : 0)
+    },
+    events: {
+      'onReady': OCYTVideoOnPlayerReady,
+      'onStateChange': OCYTVideoOnPlayerStateChange
+    }
+  });
+  if (OCYTVideoAutoplay) {
+    setTimeout(OCYTVideoPlay, 500);
+  }
+}
+
+function OCYTVideoOnPlayerReady(event) {
+}
+
+function OCYTVideoPlay(restart) {
+  if (OCYTVideoPlayer && OCYTVideoPlayer.playVideo) {
+    if (OCYTVideoFinished || restart) {
+      OCYTVideoPlayer.seekTo(0);
+      OCYTVideoFinished = false;
+    }
+    OCYTVideoPlayer.playVideo();
+  }
+}
+
+function OCYTVideoOnPlayerStateChange(event){
+  if (event.data === 0) {
+    OCYTVideoFinished = true;
+    OCYTVideoPause();
+  }
+}
+
+function OCYTVideoPause(e) {
+  if (OCYTVideoPlayer) {
+    OCYTVideoPlayer.pauseVideo();
+    console.log("pause!");
+    $(document.body).removeClass('show-animation-lightbox no-scroll');
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+}
+
+function OCStaticShowYTVideo() {
+  $("div.close-communigation-gaps-video").addClass("video-playing");
+  OCYTVideoPlay();
+}

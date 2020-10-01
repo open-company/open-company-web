@@ -153,16 +153,26 @@
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x")}]]))
 
+(def video-lightbox
+  (let [dismiss-cb "OCYTVideoPlay(event);"]
+    [:div.animation-lightbox-container
+     [:script {:src "//www.youtube.com/iframe_api" :type "text/javascript"}]
+     [:div.animation-lightbox
+      [:div#youtube-player]]]))
+
 (defn close-communication-gaps [class-name]
   [:div.close-communication-gaps-container
-   {:class class-name}
+   {:class class-name
+    :id "oc-video"}
    [:h3.close-communication-gaps
     "Close communication gaps"]
    [:p
     "Carrot makes sure everyone will see what matters."]
    [:div.close-communigation-gaps-video
+    {:onClick "OCStaticShowYTVideo();"}
     [:p.not-needed
-     "Some not needed content"]]])
+     "Some not needed content"]
+    video-lightbox]])
 
 (defn testimonials-section [page]
   [:section.testimonials
