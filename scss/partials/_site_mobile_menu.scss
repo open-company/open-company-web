@@ -13,7 +13,7 @@ div.site-mobile-menu {
   height: calc(100vh - 64px);
   top: 64px;
   left: 0px;
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
   z-index: 1081;
   padding: 0px 16px;
 
@@ -56,11 +56,11 @@ div.site-mobile-menu {
     margin: 0;
     padding: 16px 0;
 
-    button {
+    a {
       text-transform: uppercase;
     }
 
-    button.login-btn {
+    a.login {
       background-color: white;
       border-radius: 8px;
       @include OC_Body_Bold();
@@ -70,12 +70,19 @@ div.site-mobile-menu {
       margin: 16px auto 0px;
     }
 
-    button, button.get-started-button {
+    a, a.get-started-button {
       display: block;
       height: 48px;
       width: 100%;
+      line-height: 48px;
       margin: 16px auto 0px;
       max-width: 320px;
+      border: none;
+      padding: 0;
+
+      &:after {
+        line-height: 48px;
+      }
     }
   }
 }

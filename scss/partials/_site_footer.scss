@@ -1,5 +1,5 @@
 .navbar-bottom {
-  background-color: $ultra_light_gold !important;
+  background-color: $marketing_site_bg !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
@@ -46,7 +46,7 @@
       @include tablet() {
         width: 100%;
         float: none;
-        padding-top: 40px;
+        padding-bottom: 40px;
       }
 
       @include mobile() {
@@ -144,7 +144,7 @@
         width: 100%;
         float: none;
         margin-right: 0;
-        padding-bottom: 40px;
+        padding-top: 40px;
       }
 
       @include mobile() {

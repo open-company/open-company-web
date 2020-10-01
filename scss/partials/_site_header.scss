@@ -14,53 +14,40 @@ span.go-to-digest {
 }
 
 nav.site-navbar {
-  height: 83px;
   position: fixed;
   width: 100%;
   z-index: 100;
   background-color: transparent;
   border-bottom: 1px solid transparent;
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
   transition: background-color 180ms, height 180ms;
 
-  @include tablet() {
-    height: 72px;
-  }
-
   &.sticky {
-    // border-bottom: 1px solid rgba($carrot_dark_brown_1, 0.1);
-    height: 60px;
     box-shadow: 0px 2px 16px 0px rgba(0, 0, 0, 0.16);
     background-color: white;
 
     div.site-navbar-container {
+      height: 60px;
       padding: 16px;
+    }
 
-      &.is-slack-header {
-        a.navbar-brand-left {
-          @include mobile() {
-            top: 16px;
-          }
-        }
-      }
-
-      div.site-navbar-right {
-        top: 10px;
-      }
-
-      div.mobile-ham-menu {
-        top: 14px;
-      }
+    @include tablet() {
+      height: 60px;
     }
   }
 
   div.site-navbar-container {
-    height: 63px;
-    padding: 16px;
+    height: 102px;
+    padding: 16px 24px;
     position: relative;
     max-width: 1209px;
+    width: 100%;
     margin: 0 auto;
-    transition: padding 180ms;
+    transition: all 180ms;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
 
     @include tablet() {
       width: 100%;
@@ -68,296 +55,171 @@ nav.site-navbar {
       height: 72px;
     }
 
-    div.mobile-ham-menu {
-      display: none;
-
-      @include tablet() {
-        display: block;
-        position: absolute;
-        width: 32px;
-        height: 28px;
-        background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: 0 center;
-        top: 21px;
-        left: 14px;
-      }
-    }
-
-    a {
-      @include OC_Body_Bold();
-      color: rgba(#70674B, 0.8);
-      font-size: 16px;
-      margin: 0px 8px;
-      display: inline-block;
-      height: 30px;
-      margin-top: 12px;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
     div.site-navbar-left {
-      // position: absolute;
-      // top: 15px;
-      // left: 16px;
-      // height: 40px;
-      float: left;
-    }
+      flex: 1;
+      display: flex;
+      flex-flow: row nowrap;
 
-    &.is-slack-header {
-      a.navbar-brand-left {
-        @include mobile() {
-          position: absolute;
-          top: 16px;
-          left: 50%;
-        }
-      }
-
-      div.navbar-brand-center {
-        display: none;
-      }
-
-      div.site-navbar-right {
-        margin-top: 0;
+      & > *:last-child {
+        margin-right: auto;
       }
     }
 
     div.site-navbar-right {
-      position: absolute;
-      height: 40px;
-      right: 16px;
-      top: 10px;
-      transform: top 180ms;
+      flex: 1;
+      display: flex;
+      flex-flow: row nowrap;
 
-      @include mobile() {
-        top: 21px;
-        height: 28px;
+      & > *:last-child {
+        margin-left: auto;
+      }
+    }
+  }
 
-        a.go-to-digest-bt {
-          display: none;
-        }
+  button.mobile-ham-menu {
+    display: none;
+
+    @include tablet() {
+      display: block;
+      width: 32px;
+      height: 28px;
+      background-image: cdnUrl("/img/ML/mobile_ham_menu.svg");
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: 0 center;
+      padding: 0;
+    }
+  }
+
+  .site-navbar-links {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+
+    a {
+      @include OC_Body_Book();
+      padding: 0px 20px;
+      display: inline-block;
+      font-size: 18px;
+      line-height: 28px;
+      color: $deep_navy;
+      height: 28px;
+      z-index: 2;
+
+      &.active {
+        color: rgba($deep_navy, 0.5);
+      }
+    }
+  }
+
+  a.navbar-brand {
+    margin: 0;
+    width: 118px;
+    height: 28px;
+    background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
+    background-size: 118px 28px;
+    background-repeat: no-repeat;
+    padding: 0;
+    margin-right: auto;
+
+    @include tablet() {
+      display: block;
+      width: 131px;
+      height: 32px;
+      background-size: 131px 32px;
+    }
+
+    @include mobile() {
+      width: 99px;
+      height: 24px;
+      background-size: 99px 24px;
+    }
+
+    @media screen and (max-width: 320px) {
+      width: 20px;
+    }
+  }
+
+  div.apps-container {
+    position: relative;
+
+    button.apps-bt {
+      @include OC_Body_Book();
+      display: inline-block;
+      font-size: 18px;
+      line-height: 28px;
+      color: $deep_navy;
+      margin: 0;
+      padding: 0px 20px;
+      height: 28px;
+      position: relative;
+      z-index: 2;
+
+      &.active {
+        color: $deep_navy;
+      }
+    }
+
+    &.dropdown-menu-visible {
+      div.apps-dropdown-menu {
+        opacity: 1;
+        margin-top: 55px;
+        top: 0;
       }
 
-      a.login, a.signup {
-        height: 40px;
+      button.apps-bt {
         color: $carrot_green;
-        @include OC_Body_Book();
-        font-size: 18px;
-        line-height: 40px;
-        padding: 0;
-        margin: 0;
-        text-align: center;
-        margin-top: 0;
+      }
+    }
 
-        @include mobile() {
-          height: 30px;
-        }
+    div.apps-dropdown-menu {
+      opacity: 0;
+      transition: opacity 180ms, margin-top 180ms;
+      background-color: white;
+      border-radius: 6px;
+      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.18);
+      width: 200px;
+      padding: 24px 40px;
+      text-align: center;
+      position: absolute;
+      top: -500px;
+      margin-top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      & > div.app-items-group:first-child {
+        margin-top: 0;
+      }
+
+      div.app-items-group {
+        margin-top: 24px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: rgba($deep_navy, 0.5);
+      }
+
+      a.app-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 8px;
 
         &:hover {
           text-decoration: none;
-          opacity: 1;
-        }
 
-        &.continue-with-slack {
-          position: relative;
-
-          @include mobile() {
-            width: 24px;
-            background-color: transparent;
-            padding: 0;
-            margin: 0;
-
-            &:before {
-              content: "";
-              position: absolute;
-              top: 2px;
-              left: 0;
-              width: 24px;
-              height: 24px;
-              background-position: center;
-              background-size: 24px 24px;
-              background-repeat: no-repeat;
-              background-image: cdnUrl("/img/ML/slack_purple_logo.svg");
-            }
-          }
-        }
-      }
-
-      a.signup {
-        background-color: $carrot_orange;
-        color: white;
-        heigth: 40px;
-        @include OC_Body_Bold();
-        color: white;
-        font-size: 18px;
-        line-height: 24px;
-        padding: 8px 16px;
-        border-radius: 4px;
-        margin-left: 16px;
-
-        &.your-digest {
-          margin-left: 0;
-          color: white;
-        }
-      }
-
-      a.mobile-your-digest {
-        margin-top: 6px;
-
-        img.user-avatar {
-          max-width: 32px;
-          max-height: 32px;
-          float: left;
-          border-radius: 50%;
-        }
-      }
-    }
-
-    a.navbar-brand-left {
-      float: left;
-      margin: 0;
-      width: 118px;
-      height: 28px;
-      background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
-      background-size: 118px 28px;
-      background-repeat: no-repeat;
-      padding: 0;
-
-      @include tablet() {
-        display: block;
-        position: absolute;
-        float: unset;
-        left: 50%;
-        margin: 0 0 0 -65px;
-        width: 131px;
-        height: 32px;
-        background-size: 131px 32px;
-      }
-
-      @include mobile() {
-        width: 99px;
-        height: 24px;
-        background-size: 99px 24px;
-        margin: 2px 0 0 -50px;
-      }
-
-      @media screen and (max-width: 320px) {
-        width: 20px;
-        margin-left: -10px;
-      }
-    }
-
-    div.navbar-brand-center {
-      width: 327px;
-      height: 28px;
-      margin: 0 auto;
-      text-align: center;
-
-      @include tablet() {
-        display: none;
-      }
-
-      a {
-        @include OC_Body_Book();
-        padding: 0px 20px;
-        display: inline-block;
-        font-size: 18px;
-        line-height: 28px;
-        color: $deep_navy;
-        margin: 0;
-        height: 28px;
-        z-index: 2;
-
-        &.active {
-          color: rgba($deep_navy, 0.5);
-        }
-      }
-
-      div.apps-container {
-        position: relative;
-        display: inline-block;
-
-        button.apps-bt {
-          @include OC_Body_Book();
-          display: inline-block;
-          font-size: 18px;
-          line-height: 28px;
-          color: $deep_navy;
-          margin: 0;
-          padding: 0px 20px;
-          height: 28px;
-          position: relative;
-          z-index: 2;
-
-          &.active {
-            color: $deep_navy;
-          }
-        }
-
-        &.dropdown-menu-visible {
-          div.apps-dropdown-menu {
-            opacity: 1;
-            margin-top: 55px;
-            top: 0;
-          }
-
-          button.apps-bt {
+          span:not(.beta-app-label) {
+            text-decoration: none;
             color: $carrot_green;
           }
         }
 
-        div.apps-dropdown-menu {
-          opacity: 0;
-          transition: opacity 180ms, margin-top 180ms;
-          background-color: white;
-          border-radius: 6px;
-          box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.18);
-          width: 200px;
-          padding: 24px 40px;
-          text-align: center;
-          position: absolute;
-          top: -500px;
-          margin-top: 35px;
-          left: 50%;
-          transform: translateX(-50%);
-
-          & > div.app-items-group:first-child {
-            margin-top: 0;
-          }
-
-          div.app-items-group {
-            margin-top: 24px;
-            @include OC_Body_Book();
-            font-size: 16px;
-            line-height: 20px;
-            color: rgba($deep_navy, 0.5);
-          }
-
-          a.app-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 8px;
-
-            &:hover {
-              text-decoration: none;
-
-              span:not(.beta-app-label) {
-                text-decoration: none;
-                color: $carrot_green;
-              }
-            }
-
-            span:not(.beta-app-label) {
-              @include OC_Body_Book();
-              font-size: 18px;
-              line-height: 23px;
-              color: $deep_navy;
-            }
-          }
+        span:not(.beta-app-label) {
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 23px;
+          color: $deep_navy;
         }
       }
     }
@@ -388,33 +250,136 @@ section {
   }
 }
 
+.login-signup-links {
+  .anonymous {
+    .anonymous-after {
+      &, &:hover, &:active {
+        font-size: 0 !important;
+      }
+      &:after {
+        font-size: 18px;
+        content: attr(data-anonymous-title);
+      }
+    }
+  }
+
+  .your-digest {
+    .not-your-digest {
+      &, &:hover, &:active {
+        width: 0 !important;
+        opacity: 0.01;
+      }
+    }
+
+    .your-digest-after {
+      &, &:hover, &:active {
+        font-size: 0 !important;
+      }
+      &:after {
+        font-size: 18px;
+        content: attr(data-your-digest-title);
+      }
+    }
+  }
+
+  a.login {
+    height: 40px;
+    color: $carrot_green;
+    @include OC_Body_Book();
+    font-size: 18px;
+    line-height: 24px;
+    padding: 8px 0;
+    margin: 0;
+    text-align: center;
+    margin-left: 16px;
+
+    @include mobile() {
+      height: 30px;
+      padding: 3px;
+    }
+
+    &:hover {
+      text-decoration: none;
+      opacity: 1;
+    }
+  }
+
+  a.signup {
+    background-color: $carrot_orange;
+    height: 40px;
+    color: transparent;
+    font-size: 0;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    margin-left: 16px;
+
+    &:after {
+      font-size: 18px;
+      line-height: 24px;
+      @include OC_Body_Bold();
+      color: white;
+      content: "";
+    }
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
+
+    @include mobile() {
+      height: 30px;
+      padding: 3px;
+    }
+
+    &.continue-with-slack {
+
+      @include mobile() {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+        display: flex;
+
+        &:after {
+          color: $carrot_green;
+          margin-left: 6px;
+        }
+
+        &:before {
+          content: "";
+          width: 24px;
+          height: 24px;
+          background-position: center;
+          background-size: 24px 24px;
+          background-repeat: no-repeat;
+          background-image: cdnUrl("/img/ML/slack_green_logo.svg");
+        }
+      }
+
+      @media screen and (max-width: 650px) {
+          &:after {
+            display: none;
+          }
+      }
+    }
+  }
+}
+
+
 @include tablet() {
   body.mobile-menu-expanded {
     nav.site-navbar {
       div.site-navbar-container {
-        div.mobile-ham-menu {
+        button.mobile-ham-menu {
           background-image: cdnUrl("/img/ML/mobile_x_menu.svg");
           background-size: 14px 14px;
         }
-
-        // a.navbar-brand-left {
-        //   left: 50%;
-        //   margin-left: -62px;
-        // }
 
         div.site-navbar-right {
           opacity: 0;
         }
       }
     }
-  }
-}
-
-@include big_web()  { /* not mobile */
-  .navbar-nav>li>a {
-    padding-top: 18px;
-  }
-  .navbar-nav>li button.mlb-get-started{
-    margin-top: 12px;
   }
 }
