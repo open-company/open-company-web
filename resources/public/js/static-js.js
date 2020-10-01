@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
   // Sticky header for marketing site
   if ( $("nav.site-navbar").length > 0) {
     $(window).on("scroll", function(){
-      if ($(window).scrollTop() < 100) {
+      if ($(window).scrollTop() < 54) {
         $("nav.site-navbar").removeClass("sticky");
       }else{
         $("nav.site-navbar").addClass("sticky");
@@ -155,59 +155,19 @@ document.addEventListener("DOMContentLoaded", function(_) {
   });
 
   if (jwt) {
-    $("#site-header-login-item").hide();
-    $("#site-header-signup-item").hide();
-    $("#site-header-login-item-mobile").hide();
-    $("#site-header-signup-item-mobile").hide();
+    $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("anonymous").addClass("your-digest");
+    $(".your-digest-after").attr("href", your_board_url);
     $(".login-signup-or").hide();
-    // Move the red guy up
-    $("div.home-page").addClass("no-get-started-button");
-    $("div.main.slack").addClass("no-get-started-button");
-    // Remove the signup with slack buttons
-    $("div.sigin-with-slack-container").css({"display": "none"});
     // Remove the get started centered button if the user is signed in
-    $("#get-started-centred-bt").css({"display": "none"});
-    // Remove the get started bottom button if the user is signed in
-    $("div.about-bottom-get-started").css({"display": "none"});
-    // Hide the try it box at the bottom of the homepage
-    $("section.keep-aligned").css({"display": "none"});
-    // Remove login button from the site mobile menu
-    $("button#site-mobile-menu-login").css({"display": "none"});
-    $("a.pricing-table-right-link").css({"display": "none"});
-    // Change Get started button to Your digest on site mobile menu
-    var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
-    siteMobileMenuGetStarted.text( "Your digest" );
-    siteMobileMenuGetStarted.addClass("your-digest");
-    // No credit card copy below the buttons
-    var siteMobileMenuNoCreditCard = $("button#site-mobile-menu-nocreditcard");
-    siteMobileMenuNoCreditCard.css({"display": "none"});
-    // Top right corner became Your digest
-    var signupButton = $("#site-header-signup-item");
-    signupButton.addClass("your-digest");
-    signupButton.attr("href", your_board_url);
-    signupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
-    signupButton.show();
+    $("#get-started-centred-bt").hide();
 
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
-    // Set the action of the site mobile menu's Get started button
-    siteMobileMenuGetStarted.attr("onClick", "window.location = \"" + your_board_url + "\"");
     // If in 404 page show error message for logged in users
     $("div.error-page.not-found-page p.not-logged-in").hide();
 
   }else{ // No logged in user
-    // Remove get started button missing classes
-    $("div.home-page").removeClass("no-get-started-button");
-    $("div.main.slack").removeClass("no-get-started-button");
-    // link all get started button to signup with Slack
-    $("button.get-started-action").attr("onClick", "window.location = \"/sign-up\"");
-    $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
-    $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
-    // Top right corner login button
-    $("#site-header-login-item").attr("href", "/login");
-    $("#site-header-login-item-mobile").attr("href", "/login");
-    // Mobile menu login button
-    $("button#site-mobile-menu-login").attr("onClick", "window.location = \"/login\"");
+    $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("your-digest").addClass("anonymous");
     // If in 404 page show error message for not logged in users
     $("div.error-page.not-found-page p.logged-in").show();
   }
