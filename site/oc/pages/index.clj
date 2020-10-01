@@ -13,15 +13,9 @@
          "Carrot is a personalized news feed that keeps your team in sync with fewer interruptions. Ideal for remote teams and asynchronous updates."]
 
         [:div.get-started-button-container.group
-<<<<<<< HEAD
-          [:button.mlb-reset.get-started-button.get-started-action
-            {:id "get-started-centred-bt"}
-            "Try Carrot"]
-=======
           [:a.get-started-button.get-started-action
             {:href "/sign-up"}
             "Start free"]
->>>>>>> Change homepage headline copy.
           [:span.get-started-subtitle
             "Carrot is open source."]]
 

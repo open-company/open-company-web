@@ -1,12 +1,8 @@
 div.home-wrap {
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
 
   div.main.home-page {
     width: 100%;
-
-    // section {
-    //   background-color: $ultra_light_gold;
-    // }
 
     section.cta {
       padding-top: 143px;
@@ -106,7 +102,7 @@ div.home-wrap {
         margin: 16px auto 0;
         z-index: 2;
         position: relative;
-        max-width: 540px;
+        max-width: 640px;
 
         @include tablet(){
           font-size: 24px;
