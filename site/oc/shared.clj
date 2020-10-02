@@ -626,6 +626,10 @@
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
         "Try Carrot for free"]]])
+
+(def anonymous-title "Try Carrot for free")
+(def your-digest-title "Your digest")
+
 (defn nav
   "Static hiccup for the site header."
   [active-page]
