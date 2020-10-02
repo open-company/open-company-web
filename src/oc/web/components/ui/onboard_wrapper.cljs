@@ -603,20 +603,21 @@
         signup-with-email (drv/react s user-store/signup-with-email)]
     [:div.onboard-container-inner.invitee-team-lander
       [:header.main-cta
+       [:div.top-back-button-container
         (when-not ua/mobile-app?
-          [:div.top-back-button-container
-           [:button.mlb-reset.top-back-button
-            {:on-touch-start identity
-             :on-click #(router/history-back!)}
-            "Back"]])
-        (if auth-settings
-          (if (:team auth-settings)
-            [:div.title
-              (str "Your team is using " ls/product-name " to share updates")]
-            [:div.title
-              "Oh oh..."])
-          [:div.title
-            "Please wait"])]
+          [:button.mlb-reset.top-back-button
+           {:on-touch-start identity
+            :on-click #(router/history-back!)}
+           "Back"])]
+       (if auth-settings
+         (if (:team auth-settings)
+           [:div.title
+            (str "Your team is using " ls/product-name " to share updates")]
+           [:div.title
+            "Oh oh..."])
+         [:div.title
+          "Please wait"])
+       [:div.top-continue-container]]
       (if auth-settings
         (if (:team auth-settings)
           [:div.onboard-form
