@@ -626,95 +626,81 @@
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
         "Try Carrot for free"]]])
-
 (defn nav
   "Static hiccup for the site header."
   [active-page]
   (let [is-slack-lander? (= active-page "slack-lander")
-        is-slack-page? (= active-page "slack")
-        site-navbar-container (if is-slack-lander?
-                               :div.site-navbar-container.is-slack-header
-                               :div.site-navbar-container)]
-    [:nav.site-navbar
-      [site-navbar-container
-        [:a.navbar-brand-left
-          {:href "/?no_redirect=1"}]
-        [:div.navbar-brand-center
-          [:a
-            {:href "/?no_redirect=1"
-             :class (when (= active-page "index") "active")}
-            "Home"]
-          [:div.apps-container
-            [:button.mlb-reset.apps-bt
-              {:class (when (= active-page "about") "active")}
-              "Apps"]
-            [:div.apps-dropdown-menu
-              [:div.app-items-group
-                "Desktop apps"]
-              [:a.app-item
-                {:href "/apps/mac"}
-                [:span "Mac"]
-                [:span.beta-app-label "BETA"]]
-              [:a.app-item
-                {:href "/apps/win"}
-                [:span "Windows"]
-                [:span.beta-app-label "BETA"]]
-              [:div.app-items-group
-                "Mobile apps"]
-              [:a.app-item
-                {:href "/apps/android"}
-                [:span "Android"]
-                [:span.beta-app-label "BETA"]]
-              [:a.app-item
-                {:href "/apps/ios"}
-                [:span "iPhone"]
-                [:span.beta-app-label "BETA"]]]]
-          [:a
-            {:href "/pricing"
-             :class (when (= active-page "pricing") "active")}
-            "Pricing"]]
+        is-slack-page? (= active-page "slack")]
+    [:nav.site-navbar.login-signup-links
 
-        ;; Desktop & tablet
+      ;; Desktop navbar
+      [:div.site-navbar-container.big-web-only.anonymous
+        {:class (when is-slack-lander? "is-slack-header")}
+        [:div.site-navbar-left
+          [:a.navbar-brand
+            {:href "/?no_redirect=1"}]]
+        [:div.site-navbar-center
+          [:div.site-navbar-links
+            [:a
+              {:href "/?no_redirect=1"
+              :class (when (= active-page "index") "active")}
+              "Home"]
+            [:div.apps-container
+              [:button.mlb-reset.apps-bt
+                {:class (when (= active-page "about") "active")}
+                "Apps"]
+              apps-menu]
+            [:a
+              {:href "/pricing"
+              :class (when (= active-page "pricing") "active")}
+              "Pricing"]]]
         (cond
           is-slack-page?
-          [:div.site-navbar-right.big-web-tablet-only
-            [:a.login
-              {:id "site-header-login-item"
-               :href (env :slack-signup-url)}
-                "Add to Slack"]]
+          [:div.site-navbar-right
+            [:a.login.anonymous-after.your-digest-after
+              {:href (env :slack-signup-url)
+               :data-anonymous-title "Add to Slack"
+               :data-your-digest-title your-digest-title}
+              "Add to Slack"]]
           is-slack-lander?
-          [:div.site-navbar-right.big-web-tablet-only
-            [:a.signup.continue-with-slack
-              {:id "site-header-signup-item"
-               :href (env :slack-signup-url)}
-                "Continue with Slack"]]
+          [:div.site-navbar-right
+            [:a.signup.anonymous-after.your-digest-after
+              {:href (env :slack-signup-url)
+               :data-your-digest-title your-digest-title
+               :data-anonymous-title "Continue with Slack"}
+              "Continue with Slack"]]
           :else
-          [:div.site-navbar-right.big-web-tablet-only
-            [:a.login
-              {:id "site-header-login-item"
-               :href "/login"}
-                "Login"]
-            [:a.signup
-              {:id "site-header-signup-item"
-               :href "/sign-up"}
-              "Try Carrot for free"]])
+          [:div.site-navbar-right
+            [:a.login.not-your-digest
+              {:href "/login"}
+              "Login"]
+            [:a.signup.anonymous-after.your-digest-after
+             {:href "/sign-up"
+              :data-your-digest-title your-digest-title
+              :data-anonymous-title anonymous-title}
+             "Sign Up"]])]
 
-        ;; Mobile
-        (cond
-          is-slack-lander?
-          [:div.site-navbar-right.mobile-only
-            [:a.signup.continue-with-slack
-              {:id "site-header-signup-item-mobile"
-               :href (env :slack-signup-url)}]]
-          :else
-          [:div.site-navbar-right.mobile-only
+      ;; Mobile and tablet
+      [:div.site-navbar-container.tablet-mobile-only.anonymous
+        [:div.site-navbar-left
+          [:button.mlb-reset.mobile-ham-menu
+            {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]
+        [:div.site-navbar-center
+          [:a.navbar-brand
+            {:href "/?no_redirect=1"}]]
+        [:div.site-navbar-right
+          (cond
+            is-slack-lander?
+            [:a.signup.anonymous-after.your-digest-after.continue-with-slack
+              {:href (env :slack-signup-url)
+               :data-your-digest-title your-digest-title
+               :data-anonymous-title "Continue with Slack"}
+              "Continue with Slack"]
+            :else
             [:a.login
-              {:id "site-header-login-item-mobile"
-               :data-bago false
-               :href "/login"}
-                "Login"]])
-        [:div.mobile-ham-menu
-          {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
+              {:href "/login"
+               :data-your-digest-title your-digest-title}
+                "Login"])]]]))
 
 (defn footer
   "Static hiccup for the site footer."
