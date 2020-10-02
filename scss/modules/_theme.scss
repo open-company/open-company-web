@@ -10,18 +10,18 @@ $dark_mode: "dark";
 }
 
 :root {
-  --primary-color: rgb(#{$carrot_orange});
-  --primary-light-color: rgba(#{$carrot_orange, 0.16});
-  --primary-color-02: rgba(#{$carrot_orange}, 0.2);
-  --primary-color-04: rgba(#{$carrot_orange}, 0.4);
-  --primary-color-06: rgba(#{$carrot_orange}, 0.6);
-  --primary-color-08: rgba(#{$carrot_orange}, 0.8);
-  --secondary-color: white;
-  --secondary-light-color: #{rgba(white, 0.16)};
-  --secondary-color-02: #{rgba(white, 0.2)};
-  --secondary-color-04: #{rgba(white, 0.4)};
-  --secondary-color-06: #{rgba(white, 0.6)};
-  --secondary-color-08: #{rgba(white, 0.8)};
+  --primary-color: #{$primary_color};
+  --primary-light-color: #{rgba($primary_color, 0.16)};
+  --primary-color-02: #{rgba($primary_color, 0.2)};
+  --primary-color-04: #{rgba($primary_color, 0.4)};
+  --primary-color-06: #{rgba($primary_color, 0.6)};
+  --primary-color-08: #{rgba($primary_color, 0.8)};
+  --secondary-color: #{rgba($secondary_color, 1)};
+  --secondary-light-color: #{rgba($secondary_color, 0.16)};
+  --secondary-color-02: #{rgba($secondary_color, 0.2)};
+  --secondary-color-04: #{rgba($secondary_color, 0.4)};
+  --secondary-color-06: #{rgba($secondary_color, 0.6)};
+  --secondary-color-08: #{rgba($secondary_color, 0.8)};
   --background-color: #{$grey_num_2};
   --color: #{$deep_navy};
   --light-color: #{rgba($deep_navy,0.5)};
@@ -148,18 +148,18 @@ $dark_mode: "dark";
 }
 
 @include dark_mode() {
-  --primary-color: rgb(#{$carrot_orange});
-  --primary-light-color: rgba(#{$carrot_orange}, 0.16);
-  --primary-color-02: rgba(#{$carrot_orange}, 0.2);
-  --primary-color-04: rgba(#{$carrot_orange}, 0.4);
-  --primary-color-06: rgba(#{$carrot_orange}, 0.6);
-  --primary-color-08: rgba(#{$carrot_orange}, 0.8);
-  --secondary-color: white;
-  --secondary-light-color: #{rgba(white, 0.16)};
-  --secondary-color-02: #{rgba(white,0.2 )};
-  --secondary-color-04: #{rgba(white,0.4)};
-  --secondary-color-06: #{rgba(white,0.6)};
-  --secondary-color-08: #{rgba(white,0.8)};
+  --primary-color: #{$primary_color};
+  --primary-light-color: #{rgba($primary_color, 0.16)};
+  --primary-color-02: #{rgba($primary_color, 0.2)};
+  --primary-color-04: #{rgba($primary_color, 0.4)};
+  --primary-color-06: #{rgba($primary_color, 0.6)};
+  --primary-color-08: #{rgba($primary_color, 0.8)};
+  --secondary-color: #{rgba($secondary_color, 1)};
+  --secondary-light-color: #{rgba($secondary_color, 0.16)};
+  --secondary-color-02: #{rgba($secondary_color, 0.2)};
+  --secondary-color-04: #{rgba($secondary_color, 0.4)};
+  --secondary-color-06: #{rgba($secondary_color, 0.6)};
+  --secondary-color-08: #{rgba($secondary_color, 0.8)};
   --background-color: #1B202A;
   --color: white;
   --light-color: #{rgba(white,0.5)};

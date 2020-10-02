@@ -212,11 +212,6 @@ nav.oc-navbar {
         align-items: center;
         flex-flow: row nowrap;
 
-        &.anonymous-user {
-          width: auto;
-          flex: 0 0 auto;
-        }
-
         @include mobile() {
           min-width: unset;
           display: initial;
