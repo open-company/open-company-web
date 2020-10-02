@@ -159,12 +159,11 @@
         no-drafts-boards (filter #(and (not (:draft %)) (not= (:slug %) utils/default-drafts-board-slug))
                           (:boards org-data))
         section-editing (drv/react s :section-editing)
-        section-data (if (seq (:slug section-editing)) (drv/react s :board-data) section-editing)
         team-data (drv/react s :team-data)
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         editing-existing-section? @(::editing-existing-section? s)
-        channel-name (when editing-existing-section? (:channel-name (:slack-mirror section-data)))
+        channel-name (when editing-existing-section? (:channel-name (:slack-mirror initial-section-data)))
         roster (drv/react s :team-roster)
         all-users-data (if team-data (:users team-data) (:users roster))
         slack-orgs (:slack-orgs team-data)
@@ -471,10 +470,10 @@
                           " (you)")]
                       (if self
                         (if (and (seq (:slug section-editing))
-                                 (> (count (:authors section-data)) 1))
+                                 (> (count (:authors section-editing)) 1))
                           [:div.user-type.remove-link
                             {:on-click (fn []
-                              (let [authors (:authors section-data)
+                              (let [authors (:authors section-editing)
                                     self-data (first (filter #(= (:user-id %) current-user-id) authors))]
                                 (alert-modal/show-alert
                                  {:icon "/img/ML/error_icon.png"
@@ -523,23 +522,28 @@
                                 :action "delete-section"
                                 :message [:span
                                            [:span "Are you sure?"]
-                                           (when (-> section-data :total-count pos?)
+                                           [:br]
+                                           (when (-> section-editing :total-count pos?)
                                              [:span
                                                "Deleting this topic will also delete "
-                                               [:strong "all"]
-                                               " the updates on it's news feed."])]
+                                               [:strong "all"
+                                                " the "
+                                                (when (-> section-editing :total-count (> 1))
+                                                  (:total-count section-editing))
+                                                " updates"]
+                                              " in its news feed."])]
                                 :link-button-title "No"
                                 :link-button-cb #(alert-modal/hide-alert)
                                 :solid-button-style :red
                                 :solid-button-title "Yes, I'm sure"
                                 :solid-button-cb (fn []
                                                    (section-actions/section-delete
-                                                     (:slug section-data)
-                                                     (notification-actions/show-notification
-                                                      {:title "Topic deleted"
-                                                       :dismiss true
-                                                       :expire 3
-                                                       :id :section-deleted}))
+                                                     (:slug section-editing)
+                                                     #(notification-actions/show-notification
+                                                        {:title "Topic deleted"
+                                                         :dismiss true
+                                                         :expire 3
+                                                         :id :section-deleted}))
                                                    (alert-modal/hide-alert)
                                                    (nav-actions/hide-section-editor))})))
                  :data-toggle "tooltip"
