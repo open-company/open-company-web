@@ -159,3 +159,10 @@
   ([user-data org-data board-data :guard map?]
    (if (get-author (:user-id user-data) (:authors board-data))
      :viewer)))
+
+(defn user-name-regex [n]
+  (defn- allowed-name? [name]
+    (and (string? name)
+         (not (re-matches #".*\d.*" name)) ; don't allow any numeral
+        ;;  (= (count name) (.codePointCount name 0 (count name)))
+         (= (count name) (count (re-matches #"(?u)." name))))))

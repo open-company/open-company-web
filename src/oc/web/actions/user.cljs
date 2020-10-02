@@ -412,14 +412,14 @@
 (defn- user-profile-patch [user-data user-profile-link patch-cb]
   (dis/dispatch! [:user-profile-save])
   (api/patch-user user-profile-link user-data
-   (fn [status body success]
-     (if (= status 422)
-       (dis/dispatch! [:user-profile-update/failed])
-       (let [resp (when success (json->cljs body))]
-         (when (fn? patch-cb)
-           (patch-cb success resp))
-         (when success
-           (dis/dispatch! [:user-data resp])))))))
+                  (fn [status body success]
+                    (when (= status 422)
+                      (dis/dispatch! [:user-profile-update/failed]))
+                    (let [resp (when success (json->cljs body))]
+                      (when (fn? patch-cb)
+                        (patch-cb success resp status))
+                      (when success
+                        (dis/dispatch! [:user-data resp]))))))
 
 (defn user-profile-save
   ([current-user-data edit-data]
@@ -428,7 +428,7 @@
    (let [user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
      (user-profile-patch user-data user-profile-link
-      (fn [success resp]
+      (fn [success resp status]
         (when success
           (utils/after 100 #(jwt-actions/jwt-refresh)))
         (utils/after 280 #(save-cb success resp)))))))
@@ -443,15 +443,23 @@
          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
      (dis/dispatch! [:user-profile-save])
      (user-profile-patch user-data user-profile-link
-      (fn [success resp]
-       (when-not org-editing
-         (dis/dispatch! [:input [:ap-loading] true]))
-       (utils/after 100 (fn []
-        (jwt-actions/jwt-refresh (fn []
-         (if org-editing
-           (org-actions/create-or-update-org org-editing)
-           (api/get-entry-point nil (fn [_ entry-point-body]
-            (router/nav! (oc-urls/default-landing (-> entry-point-body :collection :items first :slug)))))))))))))))
+      (fn [success resp status]
+        (if-not success
+          (notification-actions/show-notification {:title "An error occurred"
+                                                   :description "Please try again"
+                                                   :expire 3
+                                                   :primary-bt-title "OK"
+                                                   :primary-bt-dismiss true
+                                                   :id :user-profile-save-failed})
+          (do
+            (when-not org-editing
+              (dis/dispatch! [:input [:ap-loading] true]))
+            (utils/after 100 (fn []
+                               (jwt-actions/jwt-refresh (fn []
+                                                          (if org-editing
+                                                            (org-actions/create-or-update-org org-editing)
+                                                            (api/get-entry-point nil (fn [_ entry-point-body]
+                                                                                       (router/nav! (oc-urls/default-landing (-> entry-point-body :collection :items first :slug)))))))))))))))))
 
 (defn user-avatar-save [avatar-url]
   (let [user-avatar-data {:avatar-url avatar-url}
