@@ -630,6 +630,29 @@
 (def anonymous-title "Try Carrot for free")
 (def your-digest-title "Your digest")
 
+(def apps-menu
+  [:div.apps-dropdown-menu
+   [:div.app-items-group
+    "Desktop apps"]
+   [:a.app-item
+    {:href "/apps/mac"}
+    [:span "Mac"]
+    [:span.beta-app-label "BETA"]]
+   [:a.app-item
+    {:href "/apps/win"}
+    [:span "Windows"]
+    [:span.beta-app-label "BETA"]]
+   [:div.app-items-group
+    "Mobile apps"]
+   [:a.app-item
+    {:href "/apps/android"}
+    [:span "Android"]
+    [:span.beta-app-label "BETA"]]
+   [:a.app-item
+    {:href "/apps/ios"}
+    [:span "iPhone"]
+    [:span.beta-app-label "BETA"]]])
+
 (defn nav
   "Static hiccup for the site header."
   [active-page]
