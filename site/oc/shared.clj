@@ -556,7 +556,7 @@
     [:button.mlb-reset.covid-banner-close-button
       {:onclick "OCStaticHideCovidBanner();"}]])
 
-(defn head []
+(defn head [page options]
   [:head
     tag-manager-head
     ;; -------------
@@ -592,8 +592,11 @@
     (intercom-js)
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
-    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/autotrack.js")}]
-    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/google-analytics.js")}]
+    ;; No need to CDN these since in production they are included in oc_assets.js
+    (when (not= (:env-kw opts) :prod)
+      [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}])
+    (when (not= (:env-kw opts) :prod)
+      [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}])
     ;; TODO: enable when we want to use full story for static pages.
     ;;(when (= (env :fullstory) "true")
     ;;  [:script {:type "text/javascript" :src (cdn "/lib/fullstory.js")}])

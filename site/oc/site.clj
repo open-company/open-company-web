@@ -112,14 +112,15 @@
 (defn build-pages [env-kw]
   (println (str "Building static pages (" env-kw "):"))
   (doseq [{:keys [title head body page-name page target] :as p} pages
-          :let [filename (str "public/" page-name ".html")]]
+          :let [filename (str "public/" page-name ".html")]
+          opts (assoc options :env-kw env-kw)]
     (print (str "...page " (name page) (string/join "" (vec (take (- 15 (count (name page))) (repeat " ")))) " -> " filename "... "))
     (if-not (env-kw target)
       (println "skip!")
       (do
         (->> (hp/html5 {:lang "en"}
-                      (if (fn? head) (head) head)
-                      (if (fn? body) (body page options) body))
+                      (if (fn? head) (head page opts) head)
+                      (if (fn? body) (body page opts) body))
             (spit filename))
         (println "built!"))))
   (println "Done!"))
