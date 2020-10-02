@@ -593,9 +593,9 @@
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     ;; No need to CDN these since in production they are included in oc_assets.js
-    (when (not= (:env-kw opts) :prod)
+    (when (not= (:env-kw options) :prod)
       [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}])
-    (when (not= (:env-kw opts) :prod)
+    (when (not= (:env-kw options) :prod)
       [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}])
     ;; TODO: enable when we want to use full story for static pages.
     ;;(when (= (env :fullstory) "true")
