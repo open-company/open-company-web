@@ -35,6 +35,9 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
+(defn- valid-first-last-name? [n]
+  (not (re-matches #"(?).*\d.*" n)))
+
 (defn- clean-org-name [org-name]
   (string/trim org-name))
 
@@ -270,11 +273,15 @@
         teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         user-data (:user-data edit-user-profile)
+        invalid-first-name (not (valid-first-last-name? (:first-name user-data)))
+        invalid-last-name (not (valid-first-last-name? (:last-name user-data)))
         continue-disabled (or @(::saving s)
                               (and (empty? (:first-name user-data))
                                    (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (-> org-editing :name clean-org-name count (<= 1))))
+                                   (-> org-editing :name clean-org-name count (<= 1)))
+                              invalid-first-name
+                              invalid-last-name)
         is-mobile? (responsive/is-tablet-or-mobile?)
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
@@ -288,7 +295,9 @@
            "Create your team")]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
-          "An error occurred while saving your data, please try again"])
+          (if (string? (:error edit-user-profile))
+            (:error edit-user-profile)
+            "An error occurred while saving your data, please try again")])
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -307,22 +316,34 @@
           [:div.field-label.name-fields
               "First name"]
           [:input.field.oc-input
-            {:class utils/hide-class
+            {:class (utils/class-set {utils/hide-class true
+                                      :error invalid-first-name})
              :type "text"
              :ref "first-name"
              :placeholder "First name..."
              :max-length user-utils/user-name-max-lenth
              :value (or (:first-name user-data) "")
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+             :on-change (fn [ev]
+                          (let [v (.. ev -target -value)]
+                            (if (valid-first-last-name? v)
+                              (dis/dispatch! [:update [:edit-user-profile] #(merge %{:first-name v
+                                                                                     :error "First name can not contain any number."})])
+                              (dis/dispatch! [:input [:edit-user-profile :first-name] v]))))}]
           [:div.field-label
             "Last name"]
           [:input.field.oc-input
-            {:class utils/hide-class
+            {:class (utils/class-set {utils/hide-class true
+                                      :error invalid-last-name})
              :type "text"
              :placeholder "Last name..."
              :value (or (:last-name user-data) "")
              :max-length user-utils/user-name-max-lenth
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+             :on-change (fn [ev]
+                          (let [v (.. ev -target -value)]
+                            (if (valid-first-last-name? v)
+                              (dis/dispatch! [:update [:edit-user-profile] #(merge %{:last-name v
+                                                                                     :error "Last name can not contain any number."})])
+                              (dis/dispatch! [:input [:edit-user-profile :last-name] v]))))}]
           (when-not has-org?
             [:div.field-label.company-name
               "Company name"])
@@ -823,14 +844,22 @@
   (let [edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
         user-data (:user-data edit-user-profile)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        invalid-first-name (not (valid-first-last-name? (:first-name user-data)))
+        invalid-last-name (not (valid-first-last-name? (:last-name user-data)))
+        invalid-name? (or (and (empty? (:first-name user-data))
+                               (empty? (:last-name user-data)))
+                          invalid-first-name
+                          invalid-last-name)]
     [:div.onboard-container-inner.invitee-lander-profile
       [:header.main-cta
         [:div.title.about-yourself
           "Tell us about you"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
-          "An error occurred while saving your data, please try again"])
+         (if (string? (:error edit-user-profile))
+           (:error edit-user-profile)
+           "An error occurred while saving your data, please try again")])
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -848,25 +877,36 @@
           [:div.field-label
             "First name"]
           [:input.field.oc-input
-            {:class utils/hide-class
+            {:class (utils/class-set {utils/hide-class true
+                                      :error invalid-first-name})
              :type "text"
              :ref "first-name"
              :placeholder "First name..."
              :value (:first-name user-data)
              :max-length user-utils/user-name-max-lenth
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+             :on-change (fn [ev]
+                          (let [v (.. ev -target -value)]
+                            (if (valid-first-last-name? v)
+                              (dis/dispatch! [:update [:edit-user-profile] #(merge %{:first-name v
+                                                                                     :error "First name can not contain any number."})])
+                              (dis/dispatch! [:input [:edit-user-profile :first-name] v]))))}]
           [:div.field-label
             "Last name"]
           [:input.field.oc-input
-            {:class utils/hide-class
+            {:class (utils/class-set {utils/hide-class true
+                                      :error invalid-last-name})
              :type "text"
              :placeholder "Last name..."
              :value (:last-name user-data)
              :max-length user-utils/user-name-max-lenth
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+             :on-change (fn [ev]
+                          (let [v (.. ev -target -value)]
+                            (if (valid-first-last-name? v)
+                              (dis/dispatch! [:update [:edit-user-profile] #(merge % {:last-name v
+                                                                                      :error "Last name can not contain any number."})])
+                              (dis/dispatch! [:input [:edit-user-profile :last-name] v]))))}]
           [:button.continue.start-using-carrot
-            {:disabled (and (empty? (:first-name user-data))
-                            (empty? (:last-name user-data)))
+            {:disabled invalid-name?
              :on-touch-start identity
              :on-click #(do
                           (reset! (::saving s) true)
