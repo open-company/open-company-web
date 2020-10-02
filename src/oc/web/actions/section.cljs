@@ -109,32 +109,29 @@
   ;; Update change-data state that the board has a change
   (dispatcher/dispatch! [:section-change section-uuid]))
 
-(defn section-delete [section-slug & callback]
-  (let [section-data (dispatcher/board-data (dis/current-org-slug) section-slug)
-        delete-section-link (utils/link-for (:links section-data) "delete")]
-    (api/delete-board delete-section-link section-slug (fn [status success body]
-      (if success
-        (let [org-slug (dis/current-org-slug)
-              last-used-section-slug (au/last-used-section)]
-          (when (= last-used-section-slug section-slug)
-            (au/save-last-used-section nil))
-          (when (fn? callback)
-           (callback section-slug))
-          (if (= section-slug (dis/current-board-slug))
-            (do
-              (router/nav! (oc-urls/default-landing org-slug))
-              (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
-                (api/get-org org-link
-                  (fn [{:keys [status body success]}]
-                    (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
-            (dispatcher/dispatch! [:section-delete org-slug section-slug])))
-        (.reload (.-location js/window)))))))
-
-(defn refresh-org-data []
+(defn- refresh-org-data []
   (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
     (api/get-org org-link
-      (fn [{:keys [status body success]}]
-        (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
+                 (fn [{:keys [status body success]}]
+                   (dispatcher/dispatch! [:org-loaded (when success (json->cljs body))])))))
+
+(defn section-delete [section-slug & [callback]]
+  (let [section-data (dispatcher/board-data (dis/current-org-slug) section-slug)
+        delete-section-link (utils/link-for (:links section-data) "delete")]
+    (api/delete-board delete-section-link section-slug
+                      (fn [status success body]
+                        (if success
+                          (let [org-slug (dis/current-org-slug)
+                                last-used-section-slug (au/last-used-section)]
+                            (when (= last-used-section-slug section-slug)
+                              (au/save-last-used-section nil))
+                            (when (fn? callback)
+                              (callback section-slug))
+                            (refresh-org-data)
+                            (if (= section-slug (dis/current-board-slug))
+                              (router/nav! (oc-urls/default-landing org-slug))
+                              (dispatcher/dispatch! [:section-delete org-slug section-slug])))
+                          (.reload (.-location js/window)))))))
 
 (defn section-save-error [status]
   ;; Board name exists or too short
