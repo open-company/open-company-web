@@ -646,7 +646,7 @@
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
   [active-page]
-  [:div.site-mobile-menu.hidden
+  [:div.site-mobile-menu.hidden.login-signup-links
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
         [:a
@@ -663,12 +663,14 @@
           {:href "/apps/detect"}
           "Get the mobile app"]]]
     [:div.site-mobile-menu-footer
-      [:button.mlb-reset.login-btn
-        {:id "site-mobile-menu-login"}
+      [:a.login.not-your-digest
+        {:href "/login"}
         "Login"]
-      [:button.mlb-reset.get-started-button.get-started-action
-        {:id "site-mobile-menu-getstarted"}
-        "Try Carrot for free"]]])
+      [:a.signup.anonymous-after.your-digest-after
+        {:href "/sign-up"
+         :data-your-digest-title your-digest-title
+         :data-anonymous-title anonymous-title}
+       "Sign Up"]]])
 
 (def anonymous-title "Try Carrot for free")
 (def your-digest-title "Your digest")
