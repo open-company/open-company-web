@@ -43,9 +43,8 @@
 
        [:p
         (str
-         "The result is Carrot - a platform for remote team communication that "
-         "keeps everyone focused on what matters to build transparency, "
-         "trust, and stronger teams.")]]]]
+         "The result is Carrot - a personalized new feed for team updates that builds "
+         "transparency, trust, and stronger teams.")]]]]
 
     [:section.team-section
      [:div.team-section-block

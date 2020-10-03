@@ -797,12 +797,12 @@
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]
+          ;; [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]]
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
                :href "mailto:hello@carrot.io"}
-              "Contact us"]]]]]
+              "Contact us"]]]]
       [:div.left-column.group
         [:img.logo
           {:src (cdn "/img/ML/carrot_wordmark.svg")}]
