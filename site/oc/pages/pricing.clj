@@ -47,7 +47,7 @@
 
         shared/pricing-table
         
-        shared/pricing-table-footer
+        ; shared/pricing-table-footer
 
         shared/pricing-chat
         ]
