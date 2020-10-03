@@ -17,10 +17,14 @@
 (def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
 (def oc-github "https://github.com/open-company")
+(def anonymous-title "Try Carrot for free")
+(def your-digest-title "Your digest")
 
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to
-              :oc-github oc-github})
+              :oc-github oc-github
+              :anonymous-title anonymous-title
+              :your-digest-title your-digest-title})
 
 (defn- body-wrapper [body page opts]
   [:body
@@ -31,8 +35,8 @@
     shared/ph-banner
     (when (env :covid-banner)
       (shared/covid-banner page))
-    (shared/nav (name page))
-    (shared/mobile-menu (name page))]
+    (shared/nav (name page) opts)
+    (shared/mobile-menu (name page) opts)]
    (if (fn? body) (body opts) body)
    (shared/footer opts)])
 

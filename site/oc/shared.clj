@@ -645,7 +645,7 @@
 
 (defn mobile-menu
   "Mobile menu used to show the collapsable menu in the marketing site."
-  [active-page]
+  [active-page options]
   [:div.site-mobile-menu.hidden.login-signup-links
     [:div.site-mobile-menu-container
       [:div.site-mobile-menu-item
@@ -668,12 +668,9 @@
         "Login"]
       [:a.signup.anonymous-after.your-digest-after
         {:href "/sign-up"
-         :data-your-digest-title your-digest-title
-         :data-anonymous-title anonymous-title}
+         :data-your-digest-title (:your-digest-title options)
+         :data-anonymous-title (:anonymous-title options)}
        "Sign Up"]]])
-
-(def anonymous-title "Try Carrot for free")
-(def your-digest-title "Your digest")
 
 (def apps-menu
   [:div.apps-dropdown-menu
@@ -700,9 +697,10 @@
 
 (defn nav
   "Static hiccup for the site header."
-  [active-page]
+  [active-page options]
   (let [is-slack-lander? (= active-page "slack-lander")
-        is-slack-page? (= active-page "slack")]
+        is-slack-page? (= active-page "slack")
+        {:keys [your-digest-title anonymous-title]} options]
     [:nav.site-navbar.login-signup-links
 
       ;; Desktop navbar
