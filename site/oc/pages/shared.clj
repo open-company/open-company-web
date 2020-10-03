@@ -9,7 +9,7 @@
     ; [:div.homepage-testimonials-copy
     ;   "Growing and distributed teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logos
-      [:div.homepage-testimonials-logo.logo-ifttt]
+      ; [:div.homepage-testimonials-logo.logo-ifttt]
       [:div.homepage-testimonials-logo.logo-hopper]
       [:div.homepage-testimonials-logo.logo-primary]
       [:div.homepage-testimonials-logo.logo-hinge]
@@ -25,10 +25,10 @@
 
 (defn testimonial-block [slug & [responsive-class]]
   (let [testimonial-copy (cond
-                         (= slug :ifttt)
+                         (= slug :hopper)
                          (str
-                          "“Carrot helps us communicate efficiently across time zones. It minimizes FOMO from "
-                          "missed Slack conversations, and cuts out the \"Did you see my message?\" nagging.”")
+                          "“We use Carrot to make sure team updates and announcements don't get "
+                          "lost in Slack conversations. It keeps our remote teams in sync.”")
                          (= slug :blend-labs)
                          (str
                           "“Carrot is a perfect compliment for Slack. We use it for longer-form "
@@ -38,22 +38,22 @@
                           "“Carrot keeps everyone across our global offices up to date. It "
                           "helps us share big wins and key information across our growing family.”"))
         footer-copy (cond
-                      (= slug :ifttt)
-                      "Kevin Ebaugh, Senior Platform Community Manager"
+                      (= slug :hopper)
+                      "Camilo Alvarez, Operations Lead"
                       (= slug :blend-labs)
                       "Sara Vienna, Head of Design"
                       (= slug :bank-novo)
                       "Tyler McIntyre, CEO")
         testimonial-website (cond
-                             (= slug :ifttt)
-                             "https://ifttt.com/"
+                             (= slug :hopper)
+                             "https://hopper.com/"
                              (= slug :blend-labs)
                              "https://bl3ndlabs.com/"
                              (= slug :bank-novo)
                              "https://banknovo.com/")
         testimonial-company (cond
-                             (= slug :ifttt)
-                             "IFTTT.com"
+                             (= slug :hopper)
+                             "Hopper.com"
                              (= slug :blend-labs)
                              "Bl3NDlabs.com"
                              (= slug :bank-novo)
@@ -78,22 +78,36 @@
                  (= block :reduce-interruptions)
                  "Reduce interruptions"
                  (= block :analytics)
-                 "Know who saw your update")
+                 "Know who saw your update"
+                 (= block :stay-in-sync)
+                 "Daily newsletter to stay in sync"
+                 (= block :stay-in-sync-slack)
+                 "Daily digest to stay in sync"
+                 (= block :share-to-slack)
+                 "Auto-share posts to Slack")
         subline (cond
                   (= block :stay-focused)
                   "Personalize your news feed to filter out topics you don't care about. Less noise saves you time."
                   (= block :reduce-interruptions)
                   "Carrot batches updates together in a daily digest so it's easy to get caught up all at once — when it’s more convenient for you."
                   (= block :analytics)
-                  "Curious if anyone heard you? It’s easy to see who’s on the same page, and easy to remind someone that missed it, too.")
+                  "Curious if anyone heard you? It’s easy to see who’s on the same page, and easy to remind someone that missed it, too."
+                  (= block :stay-in-sync)
+                 "Everyone gets a daily, personalized summary of what's important."
+                 (= block :stay-in-sync-slack)
+                 "Everyone gets a daily, personalized summary of what's important."
+                 (= block :share-to-slack)
+                 "Your Carrot posts are automatically shared to the right Slack #channel.")
         screenshot-num (case block
                          :stay-focused         1
                          :reduce-interruptions 2
-                         :analytics            3)
+                         :analytics            3
+                         :stay-in-sync         5
+                         :share-to-slack       6
+                         :stay-in-sync-slack   7)
         block-float (case block
-                      :stay-focused         :left-block
-                      :reduce-interruptions :right-block
-                      :analytics            :left-block)]
+                      (:stay-focused :analytics :share-to-slack)                :left-block
+                      (:reduce-interruptions :stay-in-sync :stay-in-sync-slack) :right-block)]
     [header subline screenshot-num block-float]))
 
 (defn- testimonials-desktop-block [block]
@@ -138,37 +152,53 @@
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x")}]]))
 
-(def video-lightbox
-  (let [dismiss-cb "OCYTVideoPlay(event);"]
-    [:div.animation-lightbox-container
-     [:script {:src "//www.youtube.com/iframe_api" :type "text/javascript"}]
-     [:div.animation-lightbox
-      [:div#youtube-player]]]))
-
-(defn close-communication-gaps [class-name]
-  [:div.close-communication-gaps-container
-   {:class class-name
-    :id "oc-video"}
-   [:h3.close-communication-gaps
+(defn close-communication-gaps
+  [active-page]
+  [:div.testimonials-commgaps-block.big-web-tablet-only
+   [:div.testimonals-commgaps-header
     "Close communication gaps"]
-   [:p
-    "Carrot makes sure everyone will see what matters."]
-   [:div.close-communigation-gaps-video
-    {:onClick "OCStaticShowYTVideo();"}
-    [:p.not-needed
-     "Some not needed content"]
-    video-lightbox]])
+   [:div.testimonals-commgaps-subheader
+    "Automatically share posts to Slack and email to increase coverage."]
+   [:div.testimonials.commgaps-block-inner.group
+    [:div.testimonials-commgaps-column.left-column
+     (if (= active-page :slack)
+       [:img.testimonials-commgaps-column-screenshot
+        {:src (cdn "/img/ML/testimonials_commgaps_slack_digest.png")
+         :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x, "
+                      (cdn "/img/ML/testimonials_commgaps_slack_digest@3x.png") " 3x, "
+                      (cdn "/img/ML/testimonials_commgaps_slack_digest@4x.png") " 4x")}]
+       [:img.testimonials-commgaps-column-screenshot
+        {:src (cdn "/img/ML/testimonials_commgaps_email.png")
+         :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x, "
+                      (cdn "/img/ML/testimonials_commgaps_email@3x.png") " 3x, "
+                      (cdn "/img/ML/testimonials_commgaps_email@4x.png") " 4x")}])
+     [:div.testimonials-commgaps-column-header
+      "Daily newsletter to stay in sync"]
+     [:div.testimonials-commgaps-column-subheader
+      "Everyone gets a daily, personalized summary of what's important."]]
+    [:div.testimonials-commgaps-column.right-column
+     [:img.testimonials-commgaps-column-screenshot
+      {:src (cdn "/img/ML/testimonials_commgaps_slack.png")
+       :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_commgaps_slack@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_commgaps_slack@4x.png") " 4x")}]
+     [:div.testimonials-commgaps-column-header
+      "Auto-share posts to Slack"]
+     [:div.testimonials-commgaps-column-subheader
+      "Your Carrot posts are automatically shared to the right Slack #channel."]]]])
 
 (defn testimonials-section [page]
   [:section.testimonials
 
    (dashed-string 1)
 
-   (testimonial-block :ifttt)
+   (testimonial-block :hopper)
 
    (dashed-string 2)
 
-   (testimonials-mobile-block :stay-focused "mobile-only")
+   (if (= page :slack)
+     (testimonials-mobile-block :stay-in-sync-slack "mobile-only")
+     (testimonials-mobile-block :stay-focused "mobile-only"))
 
    (dashed-string 3 "mobile-only")
 
@@ -182,7 +212,15 @@
 
    (dashed-string 5)
 
-   (close-communication-gaps "")
+   (close-communication-gaps page)
+
+   (when-not (= page :slack)
+     (testimonials-mobile-block :stay-in-sync "mobile-only"))
+
+   (when-not (= page :slack)
+     (dashed-string 1 "mobile-only"))
+
+   (testimonials-mobile-block :share-to-slack "mobile-only")
 
    (dashed-string 6)
 
@@ -215,7 +253,7 @@
       "Team-level access to all updates"]
      [:div.pricing-column-row
       "Anyone can add an update"]]
-    [:div.pricing-column-footer-note
+    [:div.pricing-column-footer-note.big-web-tablet-only
      "Nonprofits and K-12 education are always free."]]
    [:div.pricing-table-column
     [:div.pricing-table-column-inner
@@ -242,7 +280,9 @@
      [:div.pricing-column-row
       "Advanced team settings"]
      [:div.pricing-column-row.coming-feature
-      "Assign roles for team onboarding (coming)"]]]])
+      "Assign roles for team onboarding (coming)"]]]
+   [:div.pricing-column-footer-note.mobile-only
+    "Nonprofits and K-12 education are always free."]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer

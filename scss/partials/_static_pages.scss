@@ -256,10 +256,17 @@ div.testimonials-block {
     padding: 0 16px;
   }
 
-  &.ifttt {
-    max-width: 640px;
+  // &.ifttt {
+  //   max-width: 640px;
+  //   div.testimonial-author-pic {
+  //     @include image-2x("/img/ML/testimonial_author_ifttt");
+  //   }
+  // }
+
+  &.hopper {
+    max-width: 700px;
     div.testimonial-author-pic {
-      @include image-2x("/img/ML/testimonial_author_ifttt");
+      @include image-2x("/img/ML/testimonial_author_hopper");
     }
   }
 
@@ -715,13 +722,17 @@ div.pricing-table {
         }
       }
     }
+  }
 
-    div.pricing-column-footer-note {
-      margin-top: 16px;
-      text-align: center;
-      margin-bottom: auto;
-      @include OC_Body_Book();
-      font-size: 14px;
+  div.pricing-column-footer-note {
+    margin-top: 16px;
+    text-align: center;
+    margin-bottom: auto;
+    @include OC_Body_Book();
+    font-size: 14px;
+
+    @include mobile() {
+      margin-top: 24px;
     }
   }
 }
@@ -776,6 +787,67 @@ div.pricing-header-footer {
       &:hover {
         color: $carrot_green;
         text-decoration: underline;
+      }
+    }
+  }
+}
+
+div.testimonials-commgaps-block {
+  width: 100%;
+  max-width: 1212px;
+  margin: 0 auto;
+
+  div.testimonals-commgaps-header {
+    @include OC_Body_Bold();
+    font-size: 60px;
+    line-height: 60px;
+    color: $deep_navy;
+  }
+
+  div.testimonals-commgaps-subheader {
+    margin-top: 24px;
+    @include OC_Body_Book();
+    font-size: 24px;
+    line-height: 32px;
+    color: $deep_navy;
+  }
+
+  div.testimonials.commgaps-block-inner {
+    width: 100%;
+    margin-top: 40px;
+
+    div.testimonials-commgaps-column {
+      width: calc(50% - 3px);
+      text-align: center;
+
+      &.left-column {
+        float: left;
+      }
+
+      &.right-column {
+        float: right;
+      }
+
+      img.testimonials-commgaps-column-screenshot {
+        width: 100%;
+      }
+
+      div.testimonials-commgaps-column-header {
+        @include OC_Body_Bold();
+        font-size: 26px;
+        line-height: 33px;
+        color: $deep_navy;
+        max-width: 404px;
+        margin: 16px auto 0;
+      }
+
+      div.testimonials-commgaps-column-subheader {
+        @include OC_Body_Book();
+        font-size: 20px;
+        line-height: 26px;
+        color: $deep_navy;
+        max-width: 404px;
+        margin: 8px auto 0;
       }
     }
   }
