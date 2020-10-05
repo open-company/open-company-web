@@ -289,10 +289,12 @@
                        (user-actions/onboard-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-container-inner.lander-profile
       [:header.main-cta
-        [:div.title.about-yourself
+       [:div.top-back-button-container]
+       [:div.title.about-yourself
           (if has-org?
            "Tell us about you"
-           "Create your team")]]
+           "Create your team")]
+       [:div.top-continue-container]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           (if (string? (:error edit-user-profile))
@@ -428,8 +430,10 @@
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-container-inner.lander-team
       [:header.main-cta
-        [:div.title.company-setup
-          "Set up your company"]]
+       [:div.top-back-button-container]
+       [:div.title.company-setup
+          "Set up your company"]
+       [:div.top-continue-container]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -546,8 +550,10 @@
         continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-container-inner.lander-invite
       [:header.main-cta
-        [:div.title
-          "Invite your team"]]
+       [:div.top-back-button-container]
+       [:div.title
+          "Invite your team"]
+       [:div.top-continue-container]]
       [:div.subtitle
          (str "Invite some colleagues to explore " ls/product-name " with you.")]
       [:div.onboard-form
@@ -738,9 +744,10 @@
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-container-inner.invitee-lander
       [:header.main-cta
-        [:div.invite-container
-          [:div.title
-            (str "Join your team on " ls/product-name)]]]
+        [:div.top-back-button-container]
+        [:div.title
+          (str "Join your team on " ls/product-name)]
+       [:div.top-continue-container]]
       (if (:invitation-error confirm-invitation)
         [:div.subtitle.token-error
           "An error occurred while confirming your invitation, please try again."]
@@ -767,13 +774,14 @@
         is-mobile? (responsive/is-mobile-size?)]
     [:div.onboard-container-inner.invitee-lander-password
       [:header.main-cta
-        [:div.title
-          (str "Join your team on " ls/product-name)]
-        [:div.top-continue-container
-         [:button.mlb-reset.top-continue
-           {:class (when continue-disabled? "disabled")
-            :on-click continue-fn}
-           "Continue"]]]
+       [:div.top-back-button-container]
+       [:div.title
+        (str "Join your team on " ls/product-name)]
+       [:div.top-continue-container
+        [:button.mlb-reset.top-continue
+         {:class (when continue-disabled? "disabled")
+          :on-click continue-fn}
+         "Continue"]]]
       [:div.onboard-form
         [:div.form-title
           "Set a password to get started"]
@@ -853,8 +861,10 @@
                           invalid-last-name)]
     [:div.onboard-container-inner.invitee-lander-profile
       [:header.main-cta
-        [:div.title.about-yourself
-          "Tell us about you"]]
+       [:div.top-back-button-container]
+       [:div.title.about-yourself
+          "Tell us about you"]
+       [:div.top-continue-container]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
          (if (string? (:error edit-user-profile))
