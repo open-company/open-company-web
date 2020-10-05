@@ -15,7 +15,7 @@
         [:div.get-started-button-container.group
           [:a.get-started-button.get-started-action
             {:href "/sign-up"}
-            "Start free"]
+            "Try Carrot for free"]
           [:span.get-started-subtitle
             "Carrot is open source."]]
 

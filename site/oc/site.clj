@@ -17,7 +17,7 @@
 (def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
 (def oc-github "https://github.com/open-company")
-(def anonymous-title "Try Carrot for free")
+(def anonymous-title "Start free")
 (def your-digest-title "Your digest")
 
 (def options {:contact-email contact-email
