@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete",
-    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector#shadow-cljs",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
-    "@sentry/browser": "^5.22.3",
+    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector#shadow-cljs",
+    "@sentry/browser": "^5.25.0",
     "clipboard": "2.0.6",
     "create-react-class": "15.6.3",
     "emoji-mart": "2.2.1",
