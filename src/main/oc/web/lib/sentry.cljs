@@ -2,24 +2,27 @@
   (:require [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.jwt :as jwt]
+            [oops.core :refer (oget ocall)]
             ["@sentry/browser" :as sentry-browser]
             [taoensso.timbre :as timbre]))
 
 (defn init-parameters [dsn]
   {:whitelistUrls ls/local-whitelist-array
    :tags {:isMobile (responsive/is-mobile-size?)
-          :hasJWT (not (not (jwt/jwt)))}
+          :hasJWT (not (not (jwt/jwt)))
+          :deployKey ls/deploy-key}
    :sourceRoot ls/web-server
    :release ls/sentry-release
+   :deploy ls/sentry-release-deploy
    :debug (= ls/log-level "debug")
    :dsn dsn
    :environment ls/sentry-env})
 
 (defn sentry-setup []
-  (when (and (exists? sentry-browser) ls/local-dsn)
+  (when (and (fn? (oget sentry-browser "init")) ls/local-dsn)
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)]
-      (.init sentry-browser (clj->js sentry-params))
+      (ocall sentry-browser "init" (clj->js sentry-params))
       (timbre/debug "Sentry params:" sentry-params)
       (.configureScope sentry-browser (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
