@@ -359,7 +359,7 @@
     (reset! (::latest-key s) (:key cmail-state))
     (utils/after 300 (fn []
                       (setup-headline s)
-                      (js/emojiAutocomplete)))
+                      (emoji-autocomplete/autocomplete (rum/dom-node s) ".emoji-autocomplete")))
     (when (responsive/is-mobile-size?)
       (dom-utils/lock-page-scroll))))
 
@@ -447,7 +447,6 @@
                     (calc-video-height s)
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (setup-top-padding s)
-                    (emoji-autocomplete/autocomplete (rum/dom-node s) ".emoji-autocomplete")
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
