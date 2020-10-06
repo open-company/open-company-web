@@ -16,10 +16,14 @@
 (defn unlock-page-scroll
   "Remove no-scroll class from the page body tag to unlock the scroll"
   []
-  (swap! _lock-counter dec)
-  (when-not (pos? @_lock-counter)
-    (reset! _lock-counter 0)
-    (dommy/remove-class! (sel1 [:html]) :no-scroll)))
+  (let [lock-counter (swap! _lock-counter dec)]
+    (when-not (pos? lock-counter)
+      (reset! _lock-counter 0)
+      (dommy/remove-class! (sel1 [:html]) :no-scroll))))
+
+(defn force-unlock-page-scroll []
+  (reset! _lock-counter 0)
+  (dommy/remove-class! (sel1 [:html]) :no-scroll))
 
 (defn viewport-width []
   (or (oget js/document "documentElement.?clientWidth")
