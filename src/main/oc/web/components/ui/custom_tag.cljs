@@ -1,7 +1,7 @@
 (ns oc.web.components.ui.custom-tag
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [oops.core :refer (oget oget+ oset!)]
+            [oops.core :refer (oget oget+ oset! ocall)]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.react-utils :as react-utils]
@@ -47,7 +47,7 @@
         slack-username (user-slack-username user)
         alt-subline (subline-text user)]
     (createElement "div"
-                   (clj->js {:key (str "user-" (oget user "?user-id") "-" (oget user "?email") "-" (rand 100))
+                   (clj->js {:key (str "user-" (oget user "?user-id"))
                              :className (string/join " " ["oc-mention-option"
                                                           (when (= (oget props "?selectedIndex") (oget props "?index"))
                                                             "active ")
@@ -99,7 +99,7 @@
     (let [user (-> (that.filterUsers (oget that "?props"))
                    vec
                    (nth selected-index))]
-      (.selectItem ^js that user)))
+      (ocall that "selectItem" user)))
   (utils/event-stop e))
 
 (js* "/** @nocollapse */")
@@ -145,10 +145,10 @@
              (filterUsers [properties]
                           (this-as this
                                   ;;  (goog/base (js* "this") "filterUsers" properties)
-                                   (let [current-mention-text (.-currentMentionText ^js properties)
+                                   (let [current-mention-text (oget properties "currentMentionText")
                                          current-text (string/lower (subs current-mention-text 1 (count current-mention-text)))
                                          mapped-users (map (fn [user-index]
-                                                             (let [user (oget+ ^js properties (str "?users.?" user-index))]
+                                                             (let [user (oget+ properties (str "?users.?" user-index))]
                                                                (cond
                                                                  (value-lookup (oget user "?name") current-text)
                                                                  (js/Object.assign user #js {:selectedKey "name"})
@@ -167,7 +167,7 @@
                                                                 ;;  (oset! user "selectedKey" "email")
                                                                  :else
                                                                  user)))
-                                                           (range (oget ^js properties "?users.?length")))]
+                                                           (range (oget properties "?users.?length")))]
                                      (filterv (fn [user] (seq (oget user "?selectedKey"))) mapped-users))))
              (addBindedEvent [el e-name cb]
                              (this-as this
@@ -178,9 +178,9 @@
              (keyPress [e]
                (this-as this
                         ;; (goog/base (js* "this") "keyPress" e)
-                        (let [event (or e (.-event js/window))
+                        (let [event (or e (oget js/window "event"))
                               node (findDOMNode this)
-                              options (when node (.querySelectorAll node ".oc-mention-option"))]
+                              options (when node (ocall node "querySelectorAll" ".oc-mention-option"))]
                           (when (and (not (dom-utils/is-hidden node))
                                      (seq options))
                             (case (oget event "?keyCode")
@@ -211,4 +211,7 @@
              (selectItem [user]
                (this-as this
                         ;; (goog/base (js* "this") "selectItem" user)
-                        (let [selected-value (user-selected-display-value user)]))))
+                        (let [select-mention-cb (oget this "props.selectMentionCallback")
+                              selected-value (user-selected-display-value user)]
+                          (when (fn? select-mention-cb)
+                            (select-mention-cb (str "@" selected-value) user))))))
