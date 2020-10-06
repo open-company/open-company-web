@@ -160,6 +160,7 @@
                :on-click #(nav-actions/nav-to-url! % "topics" (oc-urls/topics))}
               [:div.nav-link-icon]
               [:div.nav-link-label
+                {:class "explore-nav"} ; for intercom targetting
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
                 "Explore"]
               ; (when (pos? (count all-unread-items))
