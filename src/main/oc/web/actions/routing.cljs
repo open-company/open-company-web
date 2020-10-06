@@ -1,6 +1,7 @@
 (ns oc.web.actions.routing
   (:require [oc.web.urls :as oc-urls]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.dom :as du]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -21,5 +22,6 @@
     (dis/dispatch! [:show-login-wall]))))
 
 (defn switch-org-dashboard [org]
+  (du/force-unlock-page-scroll)
   (dis/dispatch! [:org-nav-out (dis/current-org-slug) (:slug org)])
   (router/nav! (oc-urls/default-landing (:slug org))))

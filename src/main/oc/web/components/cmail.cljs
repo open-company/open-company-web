@@ -337,6 +337,8 @@
       (cmail-actions/cmail-hide))))
 
 (defn- reset-cmail [s]
+  (when @(::unlock-scroll s)
+    (dom-utils/unlock-page-scroll))
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
         initial-body (if (seq (:body cmail-data))
@@ -346,7 +348,9 @@
                            (if (seq (:headline cmail-data))
                              (:headline cmail-data)
                              ""))
-        body-text (.text (.html (js/$ "<div/>") initial-body))]
+        body-text (.text (.html (js/$ "<div/>") initial-body))
+        scroll-lock? (or (responsive/is-mobile-size?)
+                         (:fullscreen cmail-state))]
     (when-not (seq (:uuid cmail-data))
       (nux-actions/dismiss-add-post-tooltip))
     (reset! (::last-body s) initial-body)
@@ -360,7 +364,8 @@
     (utils/after 300 (fn []
                       (setup-headline s)
                       (emoji-autocomplete/autocomplete (rum/dom-node s) ".emoji-autocomplete")))
-    (when (responsive/is-mobile-size?)
+    (reset! (::unlock-scroll s) scroll-lock?)
+    (when scroll-lock?
       (dom-utils/lock-page-scroll))))
 
 (defn- hide-section-picker [s]
@@ -424,6 +429,7 @@
                    (rum/local nil ::post-tt-kw)
                    (rum/local 68 ::top-padding)
                    (rum/local false ::last-fullscreen-state)
+                   (rum/local false ::unlock-scroll)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -513,7 +519,7 @@
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
-                    (when (responsive/is-mobile-size?)
+                    (when @(::unlock-scroll s)
                       (dom-utils/unlock-page-scroll))
                     (when-let [debounced-autosave @(::debounced-autosave s)]
                       (.dispose ^js debounced-autosave))
