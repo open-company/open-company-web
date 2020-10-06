@@ -720,7 +720,8 @@
             [:div.section-picker-container
               (sections-picker {:active-slug (:board-slug cmail-data)
                                 :on-change did-pick-section
-                                :current-user-data current-user-data})])]
+                                :current-user-data current-user-data
+                                :direction (if (:fullscreen cmail-state) :up :down)})])]
         (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                        :width 24
                        :height 32

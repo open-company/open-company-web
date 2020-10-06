@@ -226,7 +226,7 @@ div.stream-collapsed-item {
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 24px;
-        color: var(--light-color);
+        color: var(--color);
         margin-left: 8px;
       }
 
@@ -319,6 +319,7 @@ div.stream-collapsed-item {
           height: 18px;
           line-height: 18px;
           order: 9;
+          color: var(--light-color);
         }
       }
     }

@@ -212,7 +212,7 @@
         [:div.section-editor-header
           [:div.section-editor-header-title
             (if editing-existing-section?
-              "Team settings"
+              "Topic settings"
               "Create topic")]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
@@ -527,7 +527,6 @@
                                              [:span
                                                "Deleting this topic will also delete "
                                                [:strong "all"
-                                                " the "
                                                 (when (-> section-editing :total-count (> 1))
                                                   (:total-count section-editing))
                                                 " updates"]

@@ -1,9 +1,11 @@
 (ns oc.web.components.ui.sections-picker
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as du]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]))
 
@@ -16,17 +18,23 @@
    :access "team"
    :authors [(:user-id user-data)]})
 
-(def distance-from-bottom 80)
+(def relative-max-allowed-height (/ 1 2))
+(def min-allowed-height 200)
+
+(def distance-from-edge 32)
+
+(def default-popup-direction :down)
 
 (defn calc-max-height [s]
-  (let [win-height (or (.-clientHeight (.-documentElement js/document))
-                       (.-innerHeight js/window))
-        dom-node (rum/dom-node s)
-        scroll-top (.-scrollTop (.-scrollingElement js/document))
-        body-rect (.getBoundingClientRect (.-body js/document))
-        elem-rect (.getBoundingClientRect dom-node)
-        offset-top (- (.-top elem-rect) (+ (.-top body-rect) scroll-top))]
-    (reset! (::container-max-height s) (max 239 (- win-height offset-top 8 distance-from-bottom)))))
+  (let [popup-direction (or (-> s :rum/args first :direction))
+        parent-node (oget (rum/dom-node s) "parentElement")
+        win-height (du/window-height)
+        max-allowed-height (* win-height relative-max-allowed-height)
+        elem-rect (du/bounding-rect parent-node)
+        container-max-height (if (= popup-direction :up)
+                               (- (:bottom elem-rect) distance-from-edge)
+                               (- (du/viewport-height) (:top elem-rect) (:height elem-rect) distance-from-edge))]
+    (reset! (::container-max-height s) (min max-allowed-height (max container-max-height min-allowed-height)))))
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
@@ -38,11 +46,8 @@
                              ;; Local mixins
                              {:did-mount (fn [s]
                                (calc-max-height s)
-                               s)
-                              :did-remount (fn [_ s]
-                               (calc-max-height s)
                                s)}
-  [s {:keys [active-slug on-change moving? current-user-data]}]
+  [s {:keys [active-slug on-change moving? current-user-data direction] :or {direction default-popup-direction}}]
   (let [org-data (drv/react s :org-data)
         editable-boards (vals (drv/react s :editable-boards))
         author? (not= (:role current-user-data) :viewer)
@@ -58,10 +63,10 @@
                        sorted-boards)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
-                          {})
+                          {:opacity 0})
         scroller-style  (if @(::container-max-height s)
                           {:max-height (str (- @(::container-max-height s) 55) "px")}
-                          {})
+                          {:opacity 0})
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.sections-picker
       {:style container-style}

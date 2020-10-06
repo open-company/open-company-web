@@ -294,8 +294,9 @@
       "Editor and view-only permissions"]
      [:div.pricing-column-row
       "Advanced team settings"]
-     [:div.pricing-column-row.coming-feature
-      "Assign roles for team onboarding (coming)"]]]
+    ;;  [:div.pricing-column-row.coming-feature
+    ;;   "Assign roles for team onboarding (coming)"]
+     ]]
    [:div.pricing-column-footer-note.mobile-only
     "Nonprofits and K-12 education are always free."]])
 

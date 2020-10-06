@@ -285,13 +285,14 @@ div.cmail-outer {
             @include OC_Body_Book();
             color: var(--color);
             margin-right: 8px;
-            flex: 0 0 auto;
+            width: 50px;
+            flex: 0 0 50px;
           }
 
           div.section-picker-container {
             position: absolute;
             top: 40px;
-            left: 0;
+            left: 58px;
             z-index: #{$navbar_zindex - 1};
           }
 
@@ -299,7 +300,7 @@ div.cmail-outer {
             height: 32px;
             padding: 7px 8px;
             // background-color: var(--cmail-section-bt-background);
-            background-color: var(--primary-light-color);
+            background-color: var(--secondary-color);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
@@ -526,7 +527,7 @@ div.cmail-outer {
         display: block;
         float: left;
         height: 32px;
-        
+
         &:after {
           width: 1px;
           height: 16px;
@@ -560,7 +561,7 @@ div.cmail-outer {
           height: 32px;
           padding: 7px 8px;
           // background-color: var(--cmail-section-bt-background);
-          background-color: var(--primary-light-color);
+          background-color: var(--secondary-color);
           border-radius: 4px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -701,9 +702,13 @@ div.cmail-outer {
     width: 100vw;
     z-index: #{$navbar_zindex + 100};
     background-color: $carrot_modal_bg;
+    border: none;
+    box-shadow: none;
 
     @include mobile() {
       background-color: var(--mobile-background-color);
+      border: initial;
+      box-shadow: initial;
     }
 
     div.cmail-container {
@@ -806,13 +811,8 @@ div.cmail-outer {
             position: absolute;
             top: unset;
             bottom: 32px;
-            width: 100%;
             left: 0;
             z-index: #{$navbar_zindex - 1};
-
-            div.sections-picker {
-              width: 100%;
-            }
           }
         }
 
@@ -820,7 +820,7 @@ div.cmail-outer {
           div.fullscreen-bt-container {
             display: none;
           }
-        } 
+        }
       }
     }
   }

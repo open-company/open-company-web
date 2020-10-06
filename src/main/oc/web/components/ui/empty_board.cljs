@@ -63,7 +63,7 @@
            is-bookmarks? "No updates are bookmarked"
            is-following?
            [:div.empty-following
-             "Home is where you'll find updates from the people and topics you're following."
+             "Home is where you'll find updates for the topics you're following."
              ; (when (:can-compose? org-data)
              ;   [:button.mlb-reset.create-bt
              ;     {:on-click #(nav-actions/show-follow-picker)}

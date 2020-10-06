@@ -80,7 +80,8 @@ $dark_mode: "dark";
   --navigation-sidebar-invite-bt-background: var(--primary-light-color);
 
   // Notifications tray
-  --notifications-item-background: #848D95;
+  --notifications-item-background: #{$grey_num_2};
+  --notifications-item-unread-background: white;
   --notifications-border: #{$deep_tan};
 
   // Search
@@ -217,8 +218,9 @@ $dark_mode: "dark";
   --navigation-sidebar-invite-bt-background: var(--primary-color);
 
   // Notifications tray
-  --notifications-item-background: #1B202A;
-  --notifications-border: #{rgba(white, 0.5)};
+  --notifications-item-background: #{#1B202A};
+  --notifications-item-unread-background: #{rgba(white, 0.1)};
+  --notifications-border: #{rgba(white, 0.16)};
 
   // Search
   --search-background-color: #{rgba(white, 0.09)};

@@ -251,28 +251,23 @@ div.secure-activity-container {
 
       div.sent-via-carrot-copy {
         height: 18px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--color);
-        padding-left: 18px;
-        position: relative;
-        opacity: 0.5;
-        width: 110px;
         margin: 0 auto;
+        display: flex;
 
-        &:before {
-          content: "";
-          height: 18px;
+        span.sent-copy {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--light-color);
+          margin-right: auto;
+        }
+
+        span.sent-icon {
           width: 10px;
-          background-image: cdnUrl("/img/ML/carrot_grey.svg");
-          background-size: 10px 18px;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-color: transparent;
-          position: absolute;
-          top: 0;
-          left: 0;
+          height: 18px;
+          @include svgBgColor("/img/ML/carrot_grey.svg", center, 10px 18px, var(--light-color));
+          margin-left: auto;
+          margin-right: 8px;
         }
       }
     }
@@ -284,11 +279,5 @@ div.secure-activity-container {
       color: var(--primary-color);
       padding: 0;
     }
-  }
-}
-
-@include dark_mode() {
-  div.secure-activity-container div.secure-activity-footer a.sent-via-carrot div.sent-via-carrot-copy:before {
-    background-image: cdnUrl("/img/ML/carrot_logo_white.svg");
   }
 }

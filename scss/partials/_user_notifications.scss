@@ -66,10 +66,11 @@ div.user-notifications {
 
   div.user-notifications-tray {
     $tray-width: 375;
+
     position: absolute;
     top: 36px;
-    left: -#{$tray-width / 2}px;
-    background-color: var(--overlay-background-color);
+    right: 0;
+    background-color: var(--notifications-item-background);
     border-radius: 4px;
     border: 1px solid var(--notifications-border);
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
@@ -88,7 +89,7 @@ div.user-notifications {
       width: 100%;
       box-shadow: none;
       border: none;
-      background-color: var(--mobile-background-color);
+      background-color: var(--notifications-item-background);
 
       &.hidden-tray {
         top: unset;
@@ -194,17 +195,17 @@ div.user-notifications {
       }
 
       div.user-notification {
-        border-top: 1px solid var(--divider-line);
+        border-top: 1px solid var(--notifications-border);
         padding: 16px 16px 13px;
         cursor: pointer;
         text-align: left;
         opacity: 0.9;
         position: relative;
-        background-color: var(--background-color);
+        background-color: var(--notifications-item-background);
 
         @include mobile() {
-          background-color: var(--mobile-background-color);
-          border-top: 1px solid var(--divider-line);
+          background-color: var(--notifications-item-background);
+          border-top: 1px solid var(--notifications-border);
 
           &:first-child {
             border-top: none;
@@ -223,10 +224,10 @@ div.user-notifications {
         }
 
         &.unread {
-          background-color: var(--overlay-background-color);
+          background-color: var(--notifications-item-unread-background);
 
           @include mobile() {
-            background-color: var(--background-color);
+            background-color: var(--notifications-item-background);
           }
         }
 

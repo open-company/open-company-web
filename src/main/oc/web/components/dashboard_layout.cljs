@@ -221,7 +221,7 @@
                                 (.stopPropagation %)
                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                   [:span.tab-icon]
-                  [:span.tab-label "Add"]])])
+                  [:span.tab-label "New"]])])
           (when (and is-mobile?
                      mobile-user-notifications)
             (user-notifications/user-notifications))
