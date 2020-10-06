@@ -261,6 +261,16 @@ div.cmail-outer {
         overflow-y: visible;
       }
 
+      @include mobile() {
+        &.section-picker-visible {
+          div.section-picker-bt-container {
+            span.post-to, button.section-picker-bt, div.section-picker-container {
+              display: block;
+            }
+          }
+        }
+      }
+
       div.section-picker-bt-container {
         display: none;
 
@@ -287,6 +297,7 @@ div.cmail-outer {
             margin-right: 8px;
             width: 50px;
             flex: 0 0 50px;
+            display: none;
           }
 
           div.section-picker-container {
@@ -294,6 +305,7 @@ div.cmail-outer {
             top: 40px;
             left: 58px;
             z-index: #{$navbar_zindex - 1};
+            display: none;
           }
 
           button.section-picker-bt {
@@ -319,6 +331,7 @@ div.cmail-outer {
             flex-flow: row nowrap;
             align-items: center;
             justify-content: center;
+            display: none;
 
             div.dropdown-cog {
               width: 6px;
