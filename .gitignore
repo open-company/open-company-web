@@ -30,7 +30,8 @@ forms-analyzed.txt
 .vscode/
 
 public/js/cljs-runtime
-public/js/oc.*
+# public/js/oc.*
+public/js/*
 
 # Ignore compiled css and html files
 public/css/app.main.css

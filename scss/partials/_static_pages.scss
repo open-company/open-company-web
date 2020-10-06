@@ -988,7 +988,7 @@ section.testimonials-section-old {
         }
 
         div.testimonial-name {
-          @include OC_Title()
+          @include OC_Title();
           font-size: 14px;
           color: $deep_navy;
           line-height: 18px;
