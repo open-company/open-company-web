@@ -109,10 +109,22 @@ div.fullscreen-page {
 }
 
 html.no-scroll {
-  overflow-y: hidden;
+  @include big_web() {
+    // overflow-y: hidden;
+    overflow: hidden;
 
-  body {
+    body {
+      // overflow-y: hidden;
+      overflow: hidden;
+    }
+  }
+
+  @include mobile() {
     overflow-y: hidden;
+
+    body {
+      overflow-y: hidden;
+    }
   }
 }
 
