@@ -357,7 +357,9 @@
     (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
     (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
     (reset! (::latest-key s) (:key cmail-state))
-    (utils/after 300 #(setup-headline s))
+    (utils/after 300 (fn []
+                      (setup-headline s)
+                      (js/emojiAutocomplete)))
     (when (responsive/is-mobile-size?)
       (dom-utils/lock-page-scroll))))
 
