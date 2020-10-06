@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer (go)]
                    [if-let.core :refer (when-let*)])
   (:require [goog.Uri :as guri]
-            [oops.core :refer (ocall)]
+            [oops.core :refer (ocall oget)]
             [clojure.string :as s]
             [cljs-http.client :as http]
             [defun.core :refer (defun-)]
