@@ -7,7 +7,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
@@ -29,7 +28,7 @@
                                    (drv/drv :activity-share-container)
                                    (drv/drv :board-slug)
                                    (drv/drv :activity-uuid)
-  [s {:keys [activity-data read-data comments-data editable-boards current-user-data member? replies?]}]
+  [s {:keys [activity-data read-data comments-data]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
@@ -63,10 +62,10 @@
        :on-click (fn [e]
                    (if is-drafts-board
                      (activity-actions/activity-edit activity-data)
-                     (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                     (let [;more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
                            comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)]
                        (when (and ;; More menu wasn't clicked
-                                  (not (utils/event-inside? e more-menu-el))
+                                  ; (not (utils/event-inside? e more-menu-el))
                                   ;; Comments summary wasn't clicked
                                   (not (utils/event-inside? e comments-summary-el))
                                   ;; a button wasn't clicked
@@ -83,7 +82,7 @@
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :new-item (pos? (:unseen-comments activity-data))
                                   :no-comments has-zero-comments?})}
-        (if false ;is-mobile?
+        (if is-mobile?
           [:div.stream-collapsed-item-fillers
            [:div.stream-collapsed-item-fill
             [:div.stream-collapsed-item-avatar
@@ -114,10 +113,10 @@
             [:div.stream-collapsed-item-avatar
               (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
             [:div.stream-item-context
-            (-> activity-data :for-you-context :label)]
+             (str (-> activity-data :for-you-context :label) " to:")]
             ;; Needed to wrap mobile on a new line
             [:div.stream-item-break]
-            [:div.stream-item-arrow]
+            ;; [:div.stream-item-arrow]
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
               :data-itemuuid (:uuid activity-data)
@@ -136,16 +135,4 @@
                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                   :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]])]
-      (more-menu {:entity-data activity-data
-                  :share-container-id dom-element-id
-                  :editable-boards editable-boards
-                  :external-share (not is-mobile?)
-                  :external-bookmark (not is-mobile?)
-                  :external-follow (not is-mobile?)
-                  :show-edit? (not replies?)
-                  :show-delete? (not replies?)
-                  :show-move? (and (not replies?)
-                                   (not is-mobile?))
-                  :show-inbox? is-inbox?
-                  :current-user-data current-user-data})
       [:div.activity-share-container]]))

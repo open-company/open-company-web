@@ -141,9 +141,11 @@
             {:on-click #(user-actions/show-login :login-with-email)}
             "Log in required to access all posts"]
           [:a.sent-via-carrot
-            {:href oc-urls/home}
-            [:div.sent-via-carrot-copy
-              (str "Sent with " ls/product-name)]])]
+           {:href oc-urls/home}
+           [:div.sent-via-carrot-copy
+            [:span.sent-icon]
+            [:span.sent-copy
+             (str "Sent with " ls/product-name)]]])]
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))
