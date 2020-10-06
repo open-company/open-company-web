@@ -13,6 +13,7 @@
 (def local-whitelist-array (remove nil? ["localhost" "127.0.0.1" (env :web-hostname)]))
 (def sentry-env "local")
 (def sentry-release "")
+(def sentry-release-deploy "")
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network
