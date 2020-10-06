@@ -9,7 +9,7 @@
   {:whitelistUrls ls/local-whitelist-array
    :tags {:isMobile (responsive/is-mobile-size?)
           :hasJWT (not (not (jwt/jwt)))
-          :deployTag ls/deploy-tag}
+          :deployKey ls/deploy-key}
    :sourceRoot ls/web-server
    :release ls/sentry-release
    :deploy ls/sentry-release-deploy
