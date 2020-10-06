@@ -47,9 +47,9 @@
   ([href :guard string?]
     (let [parsed-uri (guri/parse href)]
       (str (ocall parsed-uri "getPath")
-           (when (ocall parsed-uri "hasQuery")
+           (when (oget parsed-uri "hasQuery")
              (str "?" (ocall parsed-uri "getEncodedQuery")))
-           (when (ocall parsed-uri "hasFragment")
+           (when (oget parsed-uri "hasFragment")
              (str "#" (ocall parsed-uri "getFragment")))))))
 
 (defn- content-type [type]
