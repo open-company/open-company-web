@@ -45,7 +45,7 @@
 (defn poll-data [user-data poll-id]
   {:question ""
    :poll-uuid poll-id
-   :can-add-reply (boolean ls/poll-can-add-reply)
+   :can-add-reply false ;; To enable just use: (boolean ls/poll-can-add-reply)
    :created-at (created-at)
    :updated-at (created-at)
    :author (author-for-user user-data)
