@@ -145,7 +145,7 @@
                 (user-utils/readable-tz (:timezone current-user-data))]
               "."]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Mentions:"]
+            [:div.field-label "Comments and mentions:"]
             [:select.field-value.oc-input
               {:value (:notification-medium current-user-data)
                :on-change #(change! s :notification-medium (.. % -target -value))}
@@ -162,7 +162,7 @@
                 {:value "in-app"}
                 "In-app only"]]
             [:div.field-description
-              "Notifications are sent in real-time if someone mentions you."]]
+              "Notifications are sent in real-time if someone comments on a post you are watching or mentions you."]]
           (when ls/reminders-enabled?
             [:div.user-profile-modal-fields
               [:div.field-label "Recurring update reminders"]
