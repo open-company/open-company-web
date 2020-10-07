@@ -6,7 +6,6 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
-            [oc.web.lib.js-infer :refer (void-infer)]
             [oops.core :refer (oget ocall oset!)]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]
@@ -686,7 +685,7 @@
       ;; we are checking if this event is due to user action,
       ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
-      (when-not (void-infer e :isNavigation)
+      (when-not (oget e "isNavigation")
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if ua/edge?
