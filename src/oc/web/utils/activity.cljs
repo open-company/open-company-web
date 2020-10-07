@@ -370,60 +370,10 @@
     :else
     (vec new-items-list)))
 
-(def default-caught-up-message "You’re up to date")
-
 (defn- next-activity-timestamp [prev-item]
   (if (:last-activity-at prev-item)
    (-> prev-item :last-activity-at utils/js-date .getTime inc utils/js-date .toISOString)
    (utils/as-of-now)))
-
-(defn- caught-up-map
-  ([container-slug prev-items] (caught-up-map container-slug prev-items default-caught-up-message))
-  ([container-slug prev-items message] ; ([n gray-scale? message]
-   (let [t (next-activity-timestamp (last prev-items))]
-     {:resource-type :caught-up
-      :last-activity-at t
-      :message message
-      :gray-style (if (= container-slug :following)
-                    (or (not (seq prev-items))
-                        (every? :publisher? prev-items))
-                    (not (seq prev-items)))})))
-
-(defn- insert-caught-up [container-slug items-list check-fn ignore-fn & [{:keys [hide-top-line hide-bottom-line has-next] :as opts}]]
-  (when (seq items-list)
-    (let [index (loop [last-valid-idx 0
-                       current-idx 0]
-                  (let [item (get items-list current-idx)]
-                    (cond
-                     ;; We reached the end, no more items, return last index
-                     (nil? item)
-                     last-valid-idx
-                     ;; If it's an element to ginore, return the last valid index
-                     (and (fn? ignore-fn)
-                          (ignore-fn item))
-                     (recur last-valid-idx
-                            (inc current-idx))
-                     ;; Found the first truthy item, return last index
-                     (check-fn item)
-                     last-valid-idx
-                     :else
-                     (recur (inc current-idx)
-                            (inc current-idx)))))
-          [before after] (split-at index items-list)]
-      (cond
-        (and (= index (count items-list))
-             (or has-next
-                 hide-bottom-line))
-        (vec items-list)
-
-        (and hide-top-line
-             (zero? index))
-        (vec items-list)
-
-        :else
-        (vec (remove nil? (concat before
-                                  [(caught-up-map container-slug before)]
-                                  after)))))))
 
 (defn- insert-open-close-item [items-list check-fn]
   (vec
@@ -878,7 +828,7 @@
   ([container-data change-data org-data active-users sort-type]
    (parse-container container-data change-data org-data active-users sort-type nil))
 
-  ([container-data change-data org-data active-users sort-type {:keys [direction load-comments? keep-caught-up?] :as options}]
+  ([container-data change-data org-data active-users sort-type {:keys [direction load-comments?] :as options}]
     (when container-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -930,37 +880,7 @@
                             (grouped-posts full-items-list separator-date-time-key)
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
-            check-item-fn (if (#{:following :unfollowing} (:container-slug container-data))
-                            ;; Find first item that is an entry and is unseen or it's published by
-                            ;; the user but after the last seen-at of the container
-                            #(and (entry? %)
-                                  (not (:unseen %))
-                                  (or (not (:publisher? %))
-                                      (not (pos? (compare (:published-at %) (:last-seen-at container-data))))))
-                            #(and (entry? %)
-                                  (or (not (:unseen-comments %))
-                                      (zero? (:unseen-comments %)))))
-            ignore-item-fn (if replies?
-                             #(or (not (entry? %))
-                                  (:ignore-comments %))
-                             #(not (entry? %)))
-            opts {:has-next next-link
-                  :hide-bottom-line true
-                  :hide-top-line true}
-            caught-up-item (when (and keep-caught-up?
-                                      (seq (:items-to-render container-data)))
-                             (some #(when (resource-type? % :caught-up) %) (:items-to-render container-data)))
-            caught-up-index (when caught-up-item
-                              (utils/index-of (vec (:items-to-render container-data)) #(resource-type? % :caught-up)))
-            with-caught-up (cond
-                             (number? caught-up-index)
-                             (let [[before after] (split-at caught-up-index (vec grouped-items))]
-                               (vec (remove nil? (concat before [caught-up-item] after))))
-                             (#{:following} (:container-slug container-data))
-                             (insert-caught-up (:container-slug container-data) grouped-items check-item-fn ignore-item-fn opts)
-                             :else
-                             grouped-items)
-            with-open-close-items (insert-open-close-item with-caught-up #(not= (:resource-type %2) (:resource-type %3)))
+            with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items next-link)]
         (-> with-fixed-activities
          (assoc :resource-type :container)
@@ -1058,36 +978,30 @@
     (keys (get-in db boards-key)))))
 
 (defn update-container
-
-  ([db container-slug org-data change-data active-users]
-  (update-container db container-slug org-data change-data active-users false))
-
-  ([db container-slug org-data change-data active-users keep-caught-up?]
+  [db container-slug org-data change-data active-users]
   (let [org-slug (:slug org-data)
         rp-container-data-key (dis/container-key org-slug container-slug dis/recently-posted-sort)
         ra-container-data-key (dis/container-key org-slug container-slug dis/recent-activity-sort)]
     (as-> db tdb
-     (if (contains? (get-in tdb (butlast rp-container-data-key)) (last rp-container-data-key))
-       (update-in tdb rp-container-data-key
-        #(-> %
-          (parse-container change-data org-data active-users dis/recently-posted-sort {:keep-caught-up? keep-caught-up?})
-          (dissoc :fixed-items)))
-       tdb)
-     (if (contains? (get-in tdb (butlast ra-container-data-key)) (last ra-container-data-key))
-       (update-in tdb ra-container-data-key
-        #(-> %
-          (parse-container change-data org-data active-users dis/recent-activity-sort {:keep-caught-up? keep-caught-up?})
-          (dissoc :fixed-items)))
-       tdb)))))
+      (if (contains? (get-in tdb (butlast rp-container-data-key)) (last rp-container-data-key))
+        (update-in tdb rp-container-data-key
+                   #(-> %
+                        (parse-container change-data org-data active-users dis/recently-posted-sort {})
+                        (dissoc :fixed-items)))
+        tdb)
+      (if (contains? (get-in tdb (butlast ra-container-data-key)) (last ra-container-data-key))
+        (update-in tdb ra-container-data-key
+                   #(-> %
+                        (parse-container change-data org-data active-users dis/recent-activity-sort {})
+                        (dissoc :fixed-items)))
+        tdb))))
 
 (defn update-replies-container
   ([db org-data change-data active-users]
-  (update-replies-container db org-data change-data active-users false))
-  ([db org-data change-data active-users keep-caught-up?]
-  (update-container db :replies org-data change-data active-users keep-caught-up?)))
+  (update-container db :replies org-data change-data active-users)))
 
 (defn update-replies-comments [db org-data change-data active-users]
-  (update-replies-container db org-data change-data active-users true))
+  (update-replies-container db org-data change-data active-users))
 
 (defn update-containers [db org-data change-data active-users]
   (let [org-slug (:slug org-data)
