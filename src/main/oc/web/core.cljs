@@ -99,7 +99,7 @@
         search-values (when (seq keep-params)
                         (remove nil?
                          (map #(when-let [v (get query-params %)]
-                                 (str (if (keyword %) (name %) %) "=" v))
+                                 (str (if (keyword? %) (name %) %) "=" v))
                               keep-params)))
         with-search (if (pos? (count search-values))
                       (str rewrite-to "?"
