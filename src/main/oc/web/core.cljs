@@ -1,12 +1,13 @@
 (ns oc.web.core
   (:require [secretary.core :as secretary :refer-macros (defroute)]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
             [oc.web.lib.js-infer :refer (void-infer)]
+            [oops.core :refer (oget ocall oset!)]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]
             [oc.shared.useragent :as ua]
@@ -92,23 +93,26 @@
     (drv-root loading target)))
 
 (defn rewrite-url [& [{:keys [query-params keep-params]}]]
-  (let [l (.-location js/window)
-        rewrite-to (str (.-pathname l) (.-hash l))
+  (let [window-location (oget js/window "location")
+        window-history (oget js/window "history")
+        rewrite-to (str (oget window-location "pathname") (oget window-location "hash"))
         search-values (when (seq keep-params)
                         (remove nil?
-                         (map #(when (get query-params %)
-                                 (str (name %) "=" (get query-params %))) keep-params)))
+                         (map #(when-let [v (get query-params %)]
+                                 (str (if (keyword %) (name %) %) "=" v))
+                              keep-params)))
         with-search (if (pos? (count search-values))
                       (str rewrite-to "?"
                         (clojure.string/join "&" search-values))
-                      rewrite-to)]
+                      rewrite-to)
+        doc-title (oget js/document "title")]
     ;; Push state only if the query string has parameters or the history will have duplicates.
-    (when (seq (.-search l))
-      (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
+    (when (seq (oget window-location "search"))
+      (ocall window-history "pushState" #js {} doc-title with-search))))
 
 (defn pre-routing [params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
-  (let [body (sel1 [:body])]
+  (let [body (oget js/document "body")]
     (when ua/desktop-app?
       (dommy/add-class! body :electron)
       (when ua/mac?
@@ -119,10 +123,11 @@
   (when (-> params :query-params :log-level)
     (logging/config-log-level! (-> params :query-params :log-level)))
   ; make sure the menu is closed
-  (let [pathname (.. js/window -location -pathname)]
-    (when (not= pathname (s/lower pathname))
-      (let [lower-location (str (s/lower pathname) (.. js/window -location -search) (.. js/window -location -hash))]
-        (set! (.-location js/window) lower-location))))
+  (let [window-location (oget js/window "location")
+        location-pathname (oget window-location "pathname")]
+    (when (not= location-pathname (s/lower location-pathname))
+      (let [lower-location (str (s/lower location-pathname) (oget window-location "search") (oget window-location "hash"))]
+        (oset! js/window "location" lower-location))))
   (dis/dispatch! [:routing {}])
   (when (and (contains? (:query-params params) :jwt)
              (map? (js->clj (jwt/decode (-> params :query-params :jwt)))))
@@ -685,7 +690,7 @@
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if ua/edge?
-          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (oset! (oget js/document "scrollingElement") "scrollTop" (utils/page-scroll-top))
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
@@ -729,12 +734,12 @@
   (web-app-update-actions/start-web-app-update-check!)
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
-  (.click (js/$ js/window) #(utils/remove-tooltips))
+  (listen! js/window :click #(utils/remove-tooltips))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change
     (router/setup-navigation! handle-url-change)))
 
 (defn on-js-reload []
-  (.clear js/console)
+  (ocall js/console "clear")
   (secretary/dispatch! (router/get-token)))

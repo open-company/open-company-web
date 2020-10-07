@@ -8,7 +8,8 @@
             [oc.web.lib.sentry :as sentry]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as jwt]
-            [clojure.string :as cstr]))
+            [clojure.string :as cstr]
+            [oops.core :refer (oget ocall oset!)]))
 
 (defn get-token []
   (when (or (not js/window.location.pathname)
@@ -30,20 +31,18 @@
   See: https://gist.github.com/pleasetrythisathome/d1d9b1d74705b6771c20"
   []
   (let [transformer (goog.history.Html5History.TokenTransformer.)]
-    (set! (.. transformer -retrieveToken)
-          (fn [path-prefix location]
-            (str (.-pathname location) (.-search location))))
-    (set! (.. transformer -createUrl)
-          (fn [token path-prefix location]
-            (str path-prefix token)))
+    (oset! transformer "retrieveToken" (fn [path-prefix location]
+                                         (str (ocall location "pathname") (oget location "search"))))
+    (oset! transformer "createUrl" (fn [token path-prefix location]
+                                     (str path-prefix token)))
     transformer))
 
 (defn make-history []
   (doto (goog.history.Html5History. js/window (build-transformer))
-    (.setPathPrefix (str js/window.location.protocol
+    (ocall "setPathPrefix" (str js/window.location.protocol
                          "//"
                          js/window.location.host))
-    (.setUseFragment false)))
+    (ocall "setUseFragment" false)))
 
 (def history (atom nil))
 
@@ -51,7 +50,7 @@
 (defn nav! [token]
   (timbre/info "nav!" token)
   (timbre/debug "history:" @history)
-  (.setToken ^js @history token))
+  (ocall @history "setToken" token))
 
 (defn rewrite-org-uuid-as-slug
   [org-uuid org-slug]
@@ -64,42 +63,40 @@
   (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
     ; (swap! path assoc :board board-slug)
     (dis/dispatch! [:route/rewrite :board board-slug])
-    (.replaceState js/window.history #js {} js/window.title new-path)))
+    (ocall js/window.history "replaceState" #js {} js/window.title new-path)))
 
 (defn redirect! [loc]
   (timbre/info "redirect!" loc)
-  (set! (.-location js/window) loc))
+  (oset! js/window "location" loc))
 
 (defn redirect-404! []
-  (let [win-location (.-location js/window)
-        pathname (.-pathname win-location)
-        search (.-search win-location)
-        hash-string (.-hash win-location)
+  (let [win-location (oget js/window "location")
+        pathname (oget win-location "pathname")
+        search (oget win-location "search")
+        hash-string (oget win-location "hash")
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (.replace (.-location js/window) (str "/404?path=" encoded-url))))
+    (ocall (oget js/window "location") "replace" (str "/404?path=" encoded-url))))
 
 (defn redirect-500! []
-  (let [win-location (.-location js/window)
-        pathname (.-pathname win-location)
-        search (.-search win-location)
-        hash-string (.-hash win-location)
+  (let [win-location (oget js/window "location")
+        pathname (oget win-location "pathname")
+        search (oget win-location "search")
+        hash-string (oget win-location "hash")
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (.replace (.-location js/window) (str "/500?path=" encoded-url))))
+    (ocall (oget js/window "location") "replace" (str "/500?path=" encoded-url))))
 
 (defn history-back! []
   (timbre/info "history-back!")
-  (.go (.-history js/window) -1))
+  (ocall (oget js/window "history") "go" -1))
 
 (defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
-            (events/listen HistoryEventType/NAVIGATE
-              ;; wrap in a fn to allow live reloading
-              cb-fn)
-            (.setEnabled true))]
+            (events/listen HistoryEventType/NAVIGATE cb-fn) ;; wrap in a fn to allow live reloading
+            (ocall "setEnabled" true))]
     (reset! history h)))
 
 (defn last-org-cookie

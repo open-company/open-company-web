@@ -1,5 +1,6 @@
 (ns oc.web.images
-  (:require [clojure.string :as cstr])
+  (:require [clojure.string :as cstr]
+            [oops.core :refer (ocall)])
   (:import [goog Uri]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -7,17 +8,17 @@
 
 (defn- is-filestack?
   [uri]
-  (= (.getDomain ^js uri) "cdn.filestackcontent.com"))
+  (= (ocall uri "getDomain") "cdn.filestackcontent.com"))
 
 (defn- optimize-filestack-image-url
   [url preferred-height]
   (let [uri (Uri. url)]
     (if-not (is-filestack? uri)
       url
-      (let [cur-path    (.getPath ^js uri)
+      (let [cur-path    (ocall uri "getPath")
             resize-frag (str "resize=height:" preferred-height)
             new-path    (str resize-frag cur-path)
-            new-uri     (.setPath uri new-path)]
+            new-uri     (ocall uri "setPath" new-path)]
         (str new-uri)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -25,7 +26,7 @@
 
 (defn- is-slack?
   [uri]
-  (= (.getDomain ^js uri) "avatars.slack-edge.com"))
+  (= (ocall uri "getDomain") "avatars.slack-edge.com"))
 
 (defn- approximate-slack-org-height
   [pref-height]
@@ -56,11 +57,11 @@
   (let [uri (Uri. url)]
     (if-not (is-slack? uri)
       url
-      (let [cur-path      (.getPath ^js uri)
+      (let [cur-path      (ocall uri "getPath")
             re            #"_(\d{2,3})\.([a-z]+)$"
             template      (str "_" approx-height ".$2")
             new-path      (cstr/replace cur-path re template)
-            new-uri       (.setPath uri new-path)]
+            new-uri       (ocall uri "setPath" new-path)]
         (str new-uri)))))
 
 (defn- optimize-slack-org-avatar
