@@ -12,13 +12,16 @@
             [oops.core :refer (oget ocall oset!)]))
 
 (defn get-token []
-  (when (or (not js/window.location.pathname)
-            (not js/window.location.search))
-    (sentry/capture-message! (str "Window.location problem:"
-                                " windown.location.pathname:" js/window.location.pathname
-                                " window.location.search:" js/window.location.search
-                                " return:" (str js/window.location.pathname js/window.location.search))))
-  (str js/window.location.pathname js/window.location.search))
+  (let [win-loc (oget js/window "location")
+        loc-pathname (oget win-loc "pathname")
+        loc-search (oget win-loc "search")]
+    (when (or (not loc-pathname)
+              (not loc-search))
+      (sentry/capture-message! (str "Window.location problem:"
+                                  "\n windown.location.pathname:" loc-pathname
+                                  "\n window.location.search:" loc-search
+                                  "\n return:" (str loc-pathname loc-search))))
+    (str loc-pathname loc-search)))
 
 ; this is needed as of this
 ; https://code.google.com/p/closure-library/source/detail?spec=svn
@@ -32,16 +35,14 @@
   []
   (let [transformer (goog.history.Html5History.TokenTransformer.)]
     (oset! transformer "retrieveToken" (fn [path-prefix location]
-                                         (str (ocall location "pathname") (oget location "search"))))
+                                         (str (oget location "pathname") (oget location "search"))))
     (oset! transformer "createUrl" (fn [token path-prefix location]
                                      (str path-prefix token)))
     transformer))
 
 (defn make-history []
   (doto (goog.history.Html5History. js/window (build-transformer))
-    (ocall "setPathPrefix" (str js/window.location.protocol
-                         "//"
-                         js/window.location.host))
+    (ocall "setPathPrefix" (str (oget js/window "location.protocol") "//" (oget js/window "location.host")))
     (ocall "setUseFragment" false)))
 
 (def history (atom nil))
@@ -63,7 +64,7 @@
   (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
     ; (swap! path assoc :board board-slug)
     (dis/dispatch! [:route/rewrite :board board-slug])
-    (ocall js/window.history "replaceState" #js {} js/window.title new-path)))
+    (ocall js/window "history.replaceState" #js {} (oget js/window "title") new-path)))
 
 (defn redirect! [loc]
   (timbre/info "redirect!" loc)
@@ -77,7 +78,7 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (ocall (oget js/window "location") "replace" (str "/404?path=" encoded-url))))
+    (ocall js/window "location.replace" (str "/404?path=" encoded-url))))
 
 (defn redirect-500! []
   (let [win-location (oget js/window "location")
@@ -87,11 +88,11 @@
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (ocall (oget js/window "location") "replace" (str "/500?path=" encoded-url))))
+    (ocall js/window "location.replace" (str "/500?path=" encoded-url))))
 
 (defn history-back! []
   (timbre/info "history-back!")
-  (ocall (oget js/window "history") "go" -1))
+  (ocall js/window "history.go" -1))
 
 (defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
