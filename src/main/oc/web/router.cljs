@@ -14,9 +14,8 @@
 (defonce ^:export history (atom nil))
 
 (defn get-token []
-  (let [win-loc (oget js/window "location")
-        loc-pathname (oget win-loc "pathname")
-        loc-search (oget win-loc "search")]
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")]
     (when (or (not loc-pathname)
               (not loc-search))
       (sentry/capture-message! (str "Window.location problem:"
@@ -35,11 +34,13 @@
   than adding to them.
   See: https://gist.github.com/pleasetrythisathome/d1d9b1d74705b6771c20"
   []
-  (let [transformer (goog.history.Html5History.TokenTransformer.)]
-    (oset! transformer "retrieveToken" (fn [path-prefix location]
-                                         (str (oget location "pathname") (oget location "search"))))
-    (oset! transformer "createUrl" (fn [token path-prefix location]
-                                     (str path-prefix token)))
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")
+        transformer (goog.history.Html5History.TokenTransformer.)]
+    (.retrieveToken transformer (fn [path-prefix location]
+                                  (str loc-pathname loc-search)))
+    (.createUrl transformer (fn [token path-prefix location]
+                              (str path-prefix token)))
     transformer))
 
 (defn make-history []
@@ -47,8 +48,8 @@
         loc-host (oget js/window "location.host")
         mh (goog.history.Html5History. js/window (build-transformer))
         hs (doto mh
-             (ocall "setPathPrefix" (str loc-protocol "//" loc-host))
-             (ocall "setUseFragment" false))]
+             (.setPathPrefix (str loc-protocol "//" loc-host))
+             (.setUseFragment false))]
     (js/console.log "DBG router/make-history")
     (js/console.log "DBG   loc-protocol" loc-protocol)
     (js/console.log "DBG   loc-host" loc-host)
@@ -104,7 +105,7 @@
 (defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
             (events/listen HistoryEventType/NAVIGATE cb-fn) ;; wrap in a fn to allow live reloading
-            (ocall "setEnabled" true))]
+            (.setEnabled true))]
     (js/console.log "DBG router/setup-navigation!" h)
     (reset! history h)))
 
