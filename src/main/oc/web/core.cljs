@@ -735,6 +735,7 @@
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (listen! js/window :click #(utils/remove-tooltips))
+  (js/console.log "DBG oc.web.core/init handle-url-change:" handle-url-change "fn?" (fn? handle-url-change))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change

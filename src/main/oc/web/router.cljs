@@ -11,6 +11,8 @@
             [clojure.string :as cstr]
             [oops.core :refer (oget ocall oset!)]))
 
+(defonce ^:export history (atom nil))
+
 (defn get-token []
   (let [win-loc (oget js/window "location")
         loc-pathname (oget win-loc "pathname")
@@ -41,11 +43,18 @@
     transformer))
 
 (defn make-history []
-  (doto (goog.history.Html5History. js/window (build-transformer))
-    (ocall "setPathPrefix" (str (oget js/window "location.protocol") "//" (oget js/window "location.host")))
-    (ocall "setUseFragment" false)))
-
-(def history (atom nil))
+  (let [loc-protocol (oget js/window "location.protocol")
+        loc-host (oget js/window "location.host")
+        mh (goog.history.Html5History. js/window (build-transformer))
+        hs (doto mh
+             (ocall "setPathPrefix" (str  "//" (oget js/window "location.host")))
+             (ocall "setUseFragment" false))]
+    (js/console.log "DBG router/make-history")
+    (js/console.log "DBG   loc-protocol" loc-protocol)
+    (js/console.log "DBG   loc-host" loc-host)
+    (js/console.log "DBG   mh" mh)
+    (js/console.log "DBG   hs" hs)
+    hs))
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
@@ -98,6 +107,7 @@
   (let [h (doto (make-history)
             (events/listen HistoryEventType/NAVIGATE cb-fn) ;; wrap in a fn to allow live reloading
             (ocall "setEnabled" true))]
+    (js/console.log "DBG router/setup-navigation!" h)
     (reset! history h)))
 
 (defn last-org-cookie
