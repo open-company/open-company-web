@@ -111,7 +111,7 @@
 
 (defn pre-routing [params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
-  (let [body (oget js/document "body")]
+  (let [body (sel1 [:body])]
     (when ua/desktop-app?
       (dommy/add-class! body :electron)
       (when ua/mac?

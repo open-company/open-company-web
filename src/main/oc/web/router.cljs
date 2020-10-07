@@ -47,7 +47,7 @@
         loc-host (oget js/window "location.host")
         mh (goog.history.Html5History. js/window (build-transformer))
         hs (doto mh
-             (ocall "setPathPrefix" (str  "//" (oget js/window "location.host")))
+             (ocall "setPathPrefix" (str loc-protocol "//" loc-host))
              (ocall "setUseFragment" false))]
     (js/console.log "DBG router/make-history")
     (js/console.log "DBG   loc-protocol" loc-protocol)
@@ -80,20 +80,18 @@
   (oset! js/window "location" loc))
 
 (defn redirect-404! []
-  (let [win-location (oget js/window "location")
-        pathname (oget win-location "pathname")
-        search (oget win-location "search")
-        hash-string (oget win-location "hash")
+  (let [pathname (oget js/window "location.pathname")
+        search (oget js/window "location.search")
+        hash-string (oget js/window "location.hash")
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (ocall js/window "location.replace" (str "/404?path=" encoded-url))))
 
 (defn redirect-500! []
-  (let [win-location (oget js/window "location")
-        pathname (oget win-location "pathname")
-        search (oget win-location "search")
-        hash-string (oget win-location "hash")
+  (let [pathname (oget js/window "location.pathname")
+        search (oget js/window "location.search")
+        hash-string (oget js/window "location.hash")
         encoded-url (js/encodeURIComponent (str pathname search hash-string))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
