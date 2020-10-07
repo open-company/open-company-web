@@ -700,7 +700,7 @@
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message! "Error: div#app is not defined!")))
 
-(defn ^:expot init []
+(defn ^:export init []
   ;; Setup timbre log level
   (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
   ;; Setup API requests
