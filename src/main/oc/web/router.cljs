@@ -45,17 +45,10 @@
 
 (defn make-history []
   (let [loc-protocol (oget js/window "location.protocol")
-        loc-host (oget js/window "location.host")
-        mh (goog.history.Html5History. js/window (build-transformer))
-        hs (doto mh
-             (.setPathPrefix (str loc-protocol "//" loc-host))
-             (.setUseFragment false))]
-    (js/console.log "DBG router/make-history")
-    (js/console.log "DBG   loc-protocol" loc-protocol)
-    (js/console.log "DBG   loc-host" loc-host)
-    (js/console.log "DBG   mh" mh)
-    (js/console.log "DBG   hs" hs)
-    hs))
+        loc-host (oget js/window "location.host")]
+    (doto (goog.history.Html5History. js/window (build-transformer))
+      (.setPathPrefix (str loc-protocol "//" loc-host))
+      (.setUseFragment false))))
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
@@ -106,7 +99,6 @@
   (let [h (doto (make-history)
             (events/listen HistoryEventType/NAVIGATE cb-fn) ;; wrap in a fn to allow live reloading
             (.setEnabled true))]
-    (js/console.log "DBG router/setup-navigation!" h)
     (reset! history h)))
 
 (defn last-org-cookie

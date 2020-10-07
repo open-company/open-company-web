@@ -681,22 +681,17 @@
         (router/redirect-404!)
         (router/redirect! (str urls/login-wall "?login-redirect=" (js/encodeURIComponent (router/get-token))))))
 
-    (js/console.log "DBG oc.web.core defn handle-url-change")
     (defn handle-url-change [e]
-      (js/console.log "DBG oc.web.core/handle-url-change" e)
-      (js/console.log "DBG   isNav:" (oget e "isNavigation"))
       ;; we are checking if this event is due to user action,
       ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
       (when-not (oget e "isNavigation")
-        (js/console.log "DBG   it is NOT nav!")
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if ua/edge?
           (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
-      (js/console.log "DBG   token:" (router/get-token))
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
@@ -705,58 +700,41 @@
     (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn ^:export init []
-  (js/console.log "DBG oc.web.core/init")
   ;; Setup timbre log level
   (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
-  (js/console.log "DBG   loggin configured")
   ;; Setup API requests
   (api/config-request
    #(ja/update-jwt %) ;; success jwt refresh after expire
    #(ja/logout) ;; failed to refresh jwt
    ;; network error
    #(notification-actions/show-notification (assoc utils/network-error :expire 5)))
-  (js/console.log "DBG   config-request done")
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
-  (js/console.log "DBG   dispatch jwt done")
   (ja/dispatch-id-token)
-  (js/console.log "DBG   dispatch id-token done")
 
   ;; Recall Expo push token into app state (push notification permission)
   (user-actions/recall-expo-push-token)
-  (js/console.log "DBG   recall expo push-token done")
   ;; Get the mobile app deep link origin if we're on mobile
   (when ua/mobile-app?
     (expo/bridge-get-deep-link-origin)
     (expo/bridge-get-app-version))
-  (js/console.log "DBG   bridge app initialization for mobile done (maybe)")
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
-  (js/console.log "DBG   activity subscribtions done")
   (sa/ws-change-subscribe)
-  (js/console.log "DBG   section subscribtions done")
   (contrib-actions/subscribe)
-  (js/console.log "DBG   contributoins subscribtions done")
   (oa/subscribe)
-  (js/console.log "DBG   org subscribtions done")
   (ra/subscribe)
-  (js/console.log "DBG   reaction subscribtions done")
   (ca/subscribe)
-  (js/console.log "DBG   comment subscribtions done")
   (user-actions/subscribe)
-  (js/console.log "DBG   user subscribtions done")
 
   ;; Start the app update check cicle
   (web-app-update-actions/start-web-app-update-check!)
-  (js/console.log "DBG   web app update checker started!")
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (listen! js/window :click #(utils/remove-tooltips))
-  (js/console.log "DBG   listening for window clicks")
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change
-    (js/console.log "DBG   going to setup navigation")
     (router/setup-navigation! handle-url-change)))
 
 (defn on-js-reload []
