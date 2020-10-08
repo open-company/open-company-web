@@ -7,6 +7,9 @@
 $thumbnail_width: 128;
 $thumbnail_height: 98;
 
+$mobile_thumbnail_height: 72;
+$mobile_thumbnail_width: 72 * ($thumbnail_width/$thumbnail_height);
+
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
 
@@ -414,61 +417,78 @@ div.stream-item {
 
       &.has-preview {
         height: #{$thumbnail_height}px;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: flex-end;
 
-        @include mobile() {
-          height: 71px;
-        }
-      }
-
-      div.body-thumbnail-wrapper {
-        width: #{$thumbnail_width}px;
-        max-height: #{$thumbnail_height}px;
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center;
-        position: absolute;
-        right: 0;
-        top: 3px;
-        cursor: pointer;
-
-        img.body-thumbnail {
-          border-radius: 6px;
-          object-fit: contain;
-          max-width: #{$thumbnail_width}px;
+        div.body-thumbnail-wrapper {
+          width: #{$thumbnail_width}px;
           max-height: #{$thumbnail_height}px;
-        }
-
-        @include mobile() {
-          width: 95px;
-          top: 0;
-          // Remove thumbnails from mobile for now
-          display: none;
+          background-repeat: no-repeat;
+          background-size: contain;
+          background-position: center;
+          order: 2;
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: center;
+          align-items: center;
 
           img.body-thumbnail {
-            max-height: 72px;
-            max-width: 95px;
+            border-radius: 6px;
+            object-fit: contain;
+            max-width: #{$thumbnail_width}px;
+            max-height: #{$thumbnail_height}px;
+          }
+
+          @include mobile() {
+            width: #{$mobile_thumbnail_width}px;
+            height: #{$mobile_thumbnail_height}px;
+            max-height: initial;
+
+            img.body-thumbnail {
+              max-height: #{$mobile_thumbnail_height}px;
+              max-width: #{$mobile_thumbnail_width}px;
+            }
+          }
+
+          &.video {
+            &:hover:after {
+              opacity: 1;
+            }
+
+            &:after {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              content: "";
+              width: 45px;
+              height: 45px;
+              background-image: cdnUrl("/img/ML/play.svg");
+              background-repeat: no-repeat;
+              background-position: center;
+              background-size: 45px;
+              opacity: 0.6;
+            }
           }
         }
 
-        &.video {
-          &:hover:after {
-            opacity: 1;
-          }
+        div.stream-body-left {
+          position: relative;
+          height: #{$thumbnail_height}px;
+          width: calc(100% - #{$thumbnail_width}px - 8px);
+          order: 1;
+          margin-right: 8px;
 
-          &:after {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            content: "";
-            width: 45px;
-            height: 45px;
-            background-image: cdnUrl("/img/ML/play.svg");
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 45px;
-            opacity: 0.6;
+          @include mobile() {
+            width: calc(100% - #{$mobile_thumbnail_width}px - 8px);
+            height: #{$mobile_thumbnail_height}px;
           }
+        }
+
+        @include mobile() {
+          height: #{$mobile_thumbnail_height}px;
         }
       }
     }
@@ -480,27 +500,9 @@ div.stream-item {
         padding-bottom: 8px;
       }
 
-      &.has-thumbnail, &.has-video {
-        float: left;
-        width: calc(100% - #{$thumbnail_width}px - 8px);
-        height: #{$thumbnail_height}px;
-
-        @include mobile() {
-          width: 100%;
-        }
-      }
-
       @include tablet() {
         width: 100%;
         margin: 0;
-      }
-
-      &.has-video {
-        @include tablet() {
-          float: unset;
-          width: 100%;
-          min-height: initial;
-        }
       }
 
       div.stream-item-headline {
@@ -576,7 +578,7 @@ div.stream-item {
           margin: 1px 5px 0 5px;
           flex: 0 0 auto;
         }
-        
+
         span.time-since {
           color: var(--light-color);
           flex: 0 0 auto;
@@ -837,7 +839,7 @@ div.stream-item {
           color: var(--light-color);
           padding-left: 12px;
           position: relative;
-          
+
           &:before {
             content: "";
             width: 8px;
