@@ -743,8 +743,8 @@
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (api/patch-entry patch-entry-link fixed-activity-data nil create-update-entry-cb)
-    (dis/dispatch! [:activity-move activity-data (dis/current-org-slug) board-data])))
+    (dis/dispatch! [:activity-move activity-data (dis/current-org-slug) board-data])
+    (api/patch-entry patch-entry-link fixed-activity-data nil create-update-entry-cb)))
 
 (defn activity-share-show [activity-data & [element-id share-medium]]
   (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
