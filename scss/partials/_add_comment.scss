@@ -147,6 +147,10 @@ div.add-comment-box-container {
         position: relative;
         padding: 0 12px 0 16px;
 
+        @include mobile() {
+          padding: 0;
+        }
+
         div.upload-progress {
           margin-right: 16px;
           margin-top: 6px;
