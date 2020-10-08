@@ -10,7 +10,7 @@
             [oc.pages.about :as about]
             [oc.pages.press-kit :as press-kit]))
 
-(def default-page-title (str (or (env :product-name) "Carrot") " | " (env :web-server)))
+(def default-page-title (str (or (env :product-name) "Carrot") " | " (or (env :oc-web-server-name) "carrot.io")))
 
 (def oc-loading
   [:div.oc-loading.active
