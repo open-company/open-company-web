@@ -363,10 +363,14 @@
     (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data true)))
 
 (defn org-create-check-errors [status]
-  (if (= status 409)
-    ;; Redirect to the already available org
-    (router/nav! (oc-urls/org (:slug (first (dis/orgs-data)))))
-    (dis/dispatch! [:input [:org-editing :error] true])))
+  (cond (= status 409) ;; Redirect to the already available org
+        (router/nav! (oc-urls/org (:slug (first (dis/orgs-data)))))
+        (= status 412) ;; Error in the data
+        (dis/dispatch! [:input [:org-editing :error] :data-error])
+        (< 399 status 500)
+        (dis/dispatch! [:input [:org-editing :error] :validation-error])
+        :else
+        (dis/dispatch! [:input [:org-editing :error] :error])))
 
 (defn org-create-cb [email-domain {:keys [success status body]}]
   (if success
