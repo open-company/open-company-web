@@ -476,7 +476,7 @@
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
       (when (= container-id (:uuid org-data))
-        (utils/after 1000 #(get-org org-data true))))))
+        (utils/after 100 #(get-org org-data true uu/load-follow-data))))))
 
 ;; subscribe to websocket events
 (defn subscribe []

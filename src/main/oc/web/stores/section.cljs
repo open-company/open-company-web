@@ -50,7 +50,7 @@
   [db [_ section-uuid]]
   db)
 
-(defmethod dispatcher/action :section-edit-save/finish
+(defmethod dispatcher/action :section-edit-save
   [db [_ org-slug section-data]]
   (assoc db :section-editing {:loading true}))
 
@@ -58,15 +58,22 @@
   [db [_ org-slug section-data]]
   (let [section-slug (:slug section-data)
         board-key (dispatcher/board-data-key org-slug section-slug)
+        org-data-key (dispatcher/org-data-key org-slug)
+        org-boards-data-key (conj org-data-key :boards)
         ;; Parse the new section data
         fixed-section-data (au/parse-board section-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list))
         old-board-data (get-in db board-key)
         ;; Replace the old section data
         ;; w/o overriding the posts and links to avoid breaking pagination
         next-board-data (merge fixed-section-data
-                         (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
+                               (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
         (assoc-in board-key next-board-data)
+        (update-in org-boards-data-key #(map (fn [board]
+                                               (if (= (:uuid board) (:uuid fixed-section-data))
+                                                 fixed-section-data
+                                                 board))
+                                             %))
         (update :section-editing #(dissoc % :loading :has-changes)))))
 
 (defmethod dispatcher/action :section-edit/dismiss

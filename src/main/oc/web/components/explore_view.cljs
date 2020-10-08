@@ -41,8 +41,7 @@
             [:span.plus]
             [:span.new-topic "New topic"]])
         (for [item sorted-items
-              :let [followers-count-data (get followers-boards-count (:uuid item))
-                    followers-count (:count followers-count-data)]]
+              :let [followers-count (get-in followers-boards-count [(:uuid item) :count])]]
           [:a.explore-view-block.board-link
             {:key (str "explore-view-board-" (:slug item))
              :href (oc-urls/board (:slug item))

@@ -526,10 +526,10 @@
                                            (when (-> section-editing :total-count pos?)
                                              [:span
                                                "Deleting this topic will also delete "
-                                               [:strong "all"
+                                               [:strong "all "
                                                 (when (-> section-editing :total-count (> 1))
-                                                  (:total-count section-editing))
-                                                " updates"]
+                                                  (str (:total-count section-editing) " "))
+                                                "updates"]
                                               " in its news feed."])]
                                 :link-button-title "No"
                                 :link-button-cb #(alert-modal/hide-alert)

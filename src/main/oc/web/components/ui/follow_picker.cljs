@@ -7,6 +7,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.user :as user-utils]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -143,7 +144,7 @@
     (reset! (::filter-open s) false))))
  {:init (fn [s]
    ;; Refresh the following list
-   (user-actions/load-follow-data)
+   (user-utils/load-follow-data)
    s)
   :will-unmount (fn [s]
    (user-actions/refresh-follow-containers)

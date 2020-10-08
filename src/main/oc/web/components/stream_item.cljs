@@ -352,7 +352,6 @@
               [:div.stream-item-footer-mobile-group
                 (when member?
                   [:div.stream-item-comments-summary
-                    ; {:on-click #(expand s true true)}
                     (comments-summary-comp {:entry-data activity-data
                                             :add-comment-focus-prefix "main-comment"
                                             :current-activity-id current-activity-id

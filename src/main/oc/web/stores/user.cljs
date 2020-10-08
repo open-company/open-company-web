@@ -382,9 +382,13 @@
                      ra-board-data-key (dispatcher/board-data-key org-slug board-key dispatcher/recent-activity-sort)]
                  (-> tdb
                   (update-in rp-board-data-key
-                   #(dissoc (au/parse-board % change-data next-active-users follow-boards-list dispatcher/recently-posted-sort) :fixed-items))
+                             #(-> %
+                                  (au/parse-board change-data next-active-users follow-boards-list dispatcher/recently-posted-sort)
+                                  (dissoc :fixed-items)))
                   (update-in ra-board-data-key
-                   #(dissoc (au/parse-board % change-data next-active-users follow-boards-list dispatcher/recent-activity-sort) :fixed-items)))))
+                             #(-> %
+                                  (au/parse-board change-data next-active-users follow-boards-list dispatcher/recent-activity-sort)
+                                  (dissoc :fixed-items))))))
        next-db
        (keys (get-in db boards-key)))))
 
@@ -416,13 +420,15 @@
         unfollow-boards (filter au/board? data)
         unfollow-boards-map (zipmap (map :resource-uuid unfollow-boards) unfollow-boards)
         active-users-count (count (dispatcher/active-users org-slug db))
-        all-boards-uuid-and-count (->> (dispatcher/org-data db org-slug)
-                                       :boards
-                                       filter-org-boards
-                                       (map #(hash-map :uuid (:uuid %)
-                                                       :active-users-count (if (= (:access %) "private")
-                                                                             (+ (count (:viewers %)) (count (:authors %)))
-                                                                             active-users-count))))
+        org-boards-list (-> db
+                            (dispatcher/org-data org-slug)
+                            :boards
+                            filter-org-boards)
+        all-boards-uuid-and-count (map #(hash-map :uuid (:uuid %)
+                                                  :active-users-count (if (= (:access %) "private")
+                                                                        (+ (count (:viewers %)) (count (:authors %)))
+                                                                        active-users-count))
+                                       org-boards-list)
         all-boards-count (apply merge
                           (map #(hash-map (:uuid %) {:resource-uuid (:uuid %)
                                                      :resource-type :board
@@ -431,6 +437,7 @@
                                                               (:active-users-count %))})
                            all-boards-uuid-and-count))]
     (-> db
+     (update-contributions-and-boards org-slug all-boards-count publishers-map)
      (assoc-in (dispatcher/followers-publishers-count-key org-slug) publishers-map)
      (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))
 

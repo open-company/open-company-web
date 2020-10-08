@@ -584,21 +584,8 @@
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (dis/current-org-slug) notification]))
 
-;; Follow/unfollow related actions
-
-(defn load-follow-list []
-  (ws-cc/follow-list))
-
-(defn load-followers-count []
-  (ws-cc/followers-count))
-
-(defn load-follow-data []
-  (load-follow-list)
-  (load-followers-count))
-
 (defn load-explore-data []
-  (org-actions/get-org)
-  (load-follow-data))
+  (org-actions/get-org (dis/org-data) true user-utils/load-follow-data))
 
 (defn refresh-follow-containers []
   (let [org-data (dis/org-data)
