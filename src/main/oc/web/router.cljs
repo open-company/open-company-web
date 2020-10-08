@@ -53,8 +53,8 @@
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
   (timbre/info "nav!" token)
-  (timbre/debug "history:" @history)
-  (ocall @history "setToken" token))
+  (timbre/info "history:" @history)
+  (.setToken ^js @history token))
 
 (defn rewrite-org-uuid-as-slug
   [org-uuid org-slug]
