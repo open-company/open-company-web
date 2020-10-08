@@ -54,7 +54,9 @@
 (defn nav! [token]
   (timbre/info "nav!" token)
   (timbre/info "history:" @history)
-  (.setToken ^js @history token))
+  (timbre/info "history setToken oget:" (oget @history "setToken"))
+  (timbre/info "history setToken direct:" (.-setToken @history))
+  (.setToken @history token))
 
 (defn rewrite-org-uuid-as-slug
   [org-uuid org-slug]
