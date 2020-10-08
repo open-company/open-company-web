@@ -13,16 +13,17 @@
 
 (defonce ^:export history (atom nil))
 
-(defn get-token []
+(defn ^:export get-token []
   (let [loc-pathname (oget js/window "location.pathname")
-        loc-search (oget js/window "location.search")]
+        loc-search (oget js/window "location.search")
+        loc-string (str loc-pathname loc-search)]
     (when (or (not loc-pathname)
               (not loc-search))
       (sentry/capture-message! (str "Window.location problem:"
-                                  "\n windown.location.pathname:" loc-pathname
-                                  "\n window.location.search:" loc-search
-                                  "\n return:" (str loc-pathname loc-search))))
-    (str loc-pathname loc-search)))
+                                    " windown.location.pathname:" loc-pathname
+                                    " window.location.search:" loc-search
+                                    " return:" loc-string)))
+    loc-string))
 
 ; this is needed as of this
 ; https://code.google.com/p/closure-library/source/detail?spec=svn
@@ -34,72 +35,69 @@
   than adding to them.
   See: https://gist.github.com/pleasetrythisathome/d1d9b1d74705b6771c20"
   []
-  (let [loc-pathname (oget js/window "location.pathname")
-        loc-search (oget js/window "location.search")
-        transformer (goog.history.Html5History.TokenTransformer.)]
-    (.retrieveToken transformer (fn [path-prefix location]
-                                  (str loc-pathname loc-search)))
-    (.createUrl transformer (fn [token path-prefix location]
-                              (str path-prefix token)))
+  (let [transformer (goog.history.Html5History.TokenTransformer.)]
+    (set! (.. transformer -retrieveToken)
+          (fn [path-prefix location]
+            (str (.-pathname location) (.-search location))))
+    (set! (.. transformer -createUrl)
+          (fn [token path-prefix location]
+            (str path-prefix token)))
     transformer))
 
 (defn make-history []
-  (let [loc-protocol (oget js/window "location.protocol")
-        loc-host (oget js/window "location.host")]
-    (doto (goog.history.Html5History. js/window (build-transformer))
-      (.setPathPrefix (str loc-protocol "//" loc-host))
-      (.setUseFragment false))))
+  (doto (goog.history.Html5History. js/window (build-transformer))
+    (.setPathPrefix (oget js/window "location.origin"))
+    (.setUseFragment false)))
 
 ; FIXME: remove the warning of history not found
-(defn nav! [token]
+(defn ^:export nav! [token]
   (timbre/info "nav!" token)
-  (timbre/info "history:" @history)
-  (timbre/info "history setToken oget:" (oget @history "setToken"))
-  (timbre/info "history setToken direct:" (.-setToken @history))
-  (.setToken @history token))
+  (timbre/debug "history:" @history)
+  (.setToken ^js @history token))
 
-(defn rewrite-org-uuid-as-slug
+(defn ^:export rewrite-org-uuid-as-slug
   [org-uuid org-slug]
   (timbre/info "Navigate from org" org-uuid "to slug:" org-slug)
   (nav! (cstr/replace (get-token) (re-pattern org-uuid) org-slug)))
 
-(defn rewrite-board-uuid-as-slug
+(defn ^:export rewrite-board-uuid-as-slug
   [board-uuid board-slug]
   (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
   (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
-    ; (swap! path assoc :board board-slug)
     (dis/dispatch! [:route/rewrite :board board-slug])
     (ocall js/window "history.replaceState" #js {} (oget js/window "title") new-path)))
 
-(defn redirect! [loc]
+(defn ^:export redirect! [loc]
   (timbre/info "redirect!" loc)
   (oset! js/window "location" loc))
 
-(defn redirect-404! []
-  (let [pathname (oget js/window "location.pathname")
-        search (oget js/window "location.search")
-        hash-string (oget js/window "location.hash")
-        encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+(defn ^:export redirect-404! []
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")
+        loc-hash (oget js/window "location.hash")
+        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
     (timbre/info "redirect-404!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (ocall js/window "location.replace" (str "/404?path=" encoded-url))))
 
-(defn redirect-500! []
-  (let [pathname (oget js/window "location.pathname")
-        search (oget js/window "location.search")
-        hash-string (oget js/window "location.hash")
-        encoded-url (js/encodeURIComponent (str pathname search hash-string))]
+(defn ^:export redirect-500! []
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")
+        loc-hash (oget js/window "location.hash")
+        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
     (timbre/info "redirect-500!" encoded-url)
     ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
     (ocall js/window "location.replace" (str "/500?path=" encoded-url))))
 
 (defn history-back! []
   (timbre/info "history-back!")
-  (ocall js/window "history.go" -1))
+  (call js/window "history.go" -1))
 
 (defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
-            (events/listen HistoryEventType/NAVIGATE cb-fn) ;; wrap in a fn to allow live reloading
+            (events/listen HistoryEventType/NAVIGATE
+              ;; wrap in a fn to allow live reloading
+                           cb-fn)
             (.setEnabled true))]
     (reset! history h)))
 
