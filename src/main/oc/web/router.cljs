@@ -91,7 +91,7 @@
 
 (defn history-back! []
   (timbre/info "history-back!")
-  (call js/window "history.go" -1))
+  (ocall js/window "history.go" -1))
 
 (defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
