@@ -478,12 +478,7 @@
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
-  (let [change-data (dispatcher/change-data db org-slug)
-        fixed-activity-data (au/parse-entry activity-data board-data change-data)
-        activity-key (dispatcher/activity-key
-                      org-slug
-                      (:uuid activity-data))]
-    (assoc-in db activity-key fixed-activity-data)))
+  (update db :foc-menu-open #(if (= % (:uuid activity-data)) nil %)))
 
 (defmethod dispatcher/action :activity-share-show
   [db [_ activity-data container-element-id share-medium]]
