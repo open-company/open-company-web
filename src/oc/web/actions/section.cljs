@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]
@@ -116,7 +117,7 @@
                    (dispatcher/dispatch! [:org-loaded (when success (json->cljs body))])))))
 
 (defn section-delete [section-slug & [callback]]
-  (let [section-data (dispatcher/board-data (dis/current-org-slug) section-slug)
+  (let [section-data (dispatcher/org-board-data (dis/current-org-slug) section-slug)
         delete-section-link (utils/link-for (:links section-data) "delete")]
     (api/delete-board delete-section-link section-slug
                       (fn [status success body]
@@ -172,6 +173,7 @@
                                  (utils/after 500 refresh-org-data)
                                  (ws-cc/container-watch (:uuid section-data))
                                  (dispatcher/dispatch! [:section-edit-save/finish org-slug section-data])
+                                 (uu/load-follow-data)
                                  (when (fn? success-cb)
                                    (success-cb section-data)))))))
        (api/patch-board board-link section-data note
@@ -183,6 +185,7 @@
                               (do
                                 (refresh-org-data)
                                 (dispatcher/dispatch! [:section-edit-save/finish org-slug section-data])
+                                (uu/load-follow-data)
                                 (when (fn? success-cb)
                                   (success-cb section-data)))))))))))
 

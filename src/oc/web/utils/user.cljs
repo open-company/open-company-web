@@ -2,6 +2,7 @@
   (:require [defun.core :refer (defun)]
             [cuerdas.core :as string]
             [oc.lib.oauth :as oauth]
+            [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.utils :as utils]))
 
 (def default-avatar "/img/ML/happy_face_purple.svg")
@@ -129,12 +130,16 @@
    "contributor"
    "viewer"))
 
-(defn get-author
+(defun get-author
   "Get the author data from the org list of authors"
-  [user-id authors]
-  (when (and (seq authors)
-             (seq user-id))
-    ((set (map :user-id authors)) user-id)))
+  ([user-id _x :guard empty?]
+   nil)
+  ([user-id authors :guard #(every? map? %)]
+   (recur user-id (map :user-id authors)))
+  ([user-id author-uuids :guard #(every? string? %)]
+   (when (and (seq author-uuids)
+              (seq user-id))
+     ((set author-uuids) user-id))))
 
 (defun get-user-type
   "Calculate the user type, return admin if it's an admin,
@@ -157,5 +162,18 @@
     :else
     :viewer))
   ([user-data org-data board-data :guard map?]
-   (if (get-author (:user-id user-data) (:authors board-data))
-     :viewer)))
+   (if (= (:access board-data) "private")
+     (or (get-author (:user-id user-data) (:authors board-data))
+         :viewer)
+     (get-user-type user-data org-data))))
+
+;; Follow/unfollow related actions
+(defn load-follow-list []
+  (ws-cc/follow-list))
+
+(defn load-followers-count []
+  (ws-cc/followers-count))
+
+(defn load-follow-data []
+  (load-follow-list)
+  (load-followers-count))
