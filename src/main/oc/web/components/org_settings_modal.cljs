@@ -120,10 +120,14 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
+(defn- on-change [k v]
+  (dis/dispatch! [:update [:org-editing] #(merge % {k v
+                                                    :has-changes true
+                                                    :error false})]))
+
 (defn- change-content-visibility [content-visibility-data k v]
   (let [new-content-visibility (merge content-visibility-data {k v})]
-    (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
-                                                      :content-visibility new-content-visibility})])))
+    (on-change :content-visibility new-content-visibility)))
 
 (defn logo-on-load [org-avatar-editing url img]
   (org-actions/org-avatar-edit-save {:logo-url url})
@@ -171,7 +175,7 @@
 (defn- change-brand-color [primary-color secondary-color]
   (let [color-map {:primary primary-color :secondary secondary-color}
         new-brand-color {:light color-map :dark color-map}]
-    (dis/dispatch! [:update [:org-editing] #(merge % {:brand-color new-brand-color :has-changes true})])
+    (on-change :brand-color new-brand-color)
     (org-utils/set-brand-color! color-map)))
 
 (defn- theme-preview [brand-color theme]
@@ -301,16 +305,13 @@
               "Company name"]
             [:input.field-value.oc-input
               {:type "text"
-               :class (when (:error org-editing) "error")
+               :class (when (= (:error org-editing) :name-field) "error")
                :value (or (:name org-editing) "")
                :max-length org-utils/org-name-max-length
                :on-change #(let [org-name (.. % -target -value)
                                  clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
-                            (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
-                                                                                      :has-changes true
-                                                                                      :error false
-                                                                                      :rand (rand 1000)})]))}]
-            (when (:error org-editing)
+                             (on-change :name clean-org-name))}]
+            (when (= (:error org-editing) :name-field)
               [:div.error "Must be between 3 and 50 characters"])
             (email-domains)]
           [:div.org-settings-fields.field-group
@@ -320,7 +321,7 @@
               "Button/link color"]
             [:input.field-value.oc-input
              {:type "text"
-              :class (when (:error org-editing) "error")
+              :class (when (= (:error org-editing) :primary-color-field) "error")
               :value @(::primary-color-value s)
               :pattern colors-reg-exp
               :placeholder "Ie: red, green or #0000ff"
@@ -353,7 +354,8 @@
                   {:key (str "color-preset-" (:hex c))
                    :on-click #(do
                                 (reset! (::primary-color-value s) (:hex c))
-                                (change-brand-color c (:secondary current-brand-color)))
+                                (change-brand-color (select-keys c [:hex :rgb])
+                                                    (:secondary current-brand-color)))
                    :class (when active? "active")}
                  [:span.dot
                   {:data-color-hex (:hex c)
