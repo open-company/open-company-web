@@ -288,7 +288,7 @@
   (set! (.-title js/document) (str ls/product-name  " | " (:name org-data))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
-  (let [org-data (json->cljs body)]
+  (let [org-data (when success (json->cljs body))]
     (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
 (defn get-org
@@ -480,7 +480,7 @@
         user-id (:user-id change-data)]
     (when (not= (jwt/user-id) user-id) ; no need to respond to our own events
       (when (= container-id (:uuid org-data))
-        (utils/after 100 #(get-org org-data true uu/load-follow-data))))))
+        (utils/after 100 #(get-org org-data false uu/load-follow-data))))))
 
 ;; subscribe to websocket events
 (defn subscribe []

@@ -105,3 +105,9 @@
 
   ([replies-coll :guard coll?]
    (sort-by #(.getTime (utils/js-date (:created-at %))) replies-coll)))
+
+(defn poll-key-parts [poll-key]
+  (let [[org-slug _posts activity-uuid _polls poll-uuid] (vec poll-key)]
+    {:org-slug org-slug
+     :activity-uuid activity-uuid
+     :poll-uuid poll-uuid}))

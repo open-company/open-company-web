@@ -70,6 +70,7 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
+                current-entry-board-slug
                 current-activity-id
                 contributions-data
                 initial-section-editing
@@ -91,22 +92,20 @@
                 search-active]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
-                     app-loading
+                  app-loading
                      ;; the org data are not loaded yet
-                     (not org-data)
+                  (not org-data)
                      ;; No board or contributions specified
-                     (and (not current-board-slug)
-                          (not current-contributions-id)
+                  (and (not current-board-slug)
+                       (not current-contributions-id)
                           ;; but there are some
-                          (pos? (count (:boards org-data))))
+                       (pos? (count (:boards org-data))))
                      ;; Active users have not been loaded yet:
                      ;; they are blocking since they are used to:
                      ;; - init entries body and comments body for mentions
-                     ;; - show the people list in the navigation sidebar
                      ;; - show user's info on hover and in profile panels
                      ;; - on mobile it's not blocking since cmail is closed
-                     (and (not is-mobile?)
-                          (not (map? active-users))))
+                  (not (map? active-users)))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) current-org-slug)))
         section-not-found (and (not org-not-found)
@@ -114,12 +113,17 @@
                                (not current-contributions-id)
                                (not (dis/is-container? current-board-slug))
                                (not ((set (map :slug (:boards org-data))) current-board-slug)))
+        contributions-not-found (and (not org-not-found)
+                                     org-data
+                                     current-contributions-id
+                                     (map? active-users)
+                                     (get active-users (keyword current-contributions-id)))
         current-activity-data (when current-activity-id
                                 (get posts-data current-activity-id))
-        entry-not-found (and ;; org is present
-                             (not org-not-found)
+                             ;; org is present
+        entry-not-found (and (not org-not-found)
                              ;; Users for mentions has not been loaded
-                             (not (map? active-users))
+                             (map? active-users)
                              ;; section is present
                              (not section-not-found)
                              ;; route is for a single post and it's been loaded
@@ -129,19 +133,17 @@
                                  ;; route has wrong board slug/uuid for the current post
                                  (and (map? current-activity-data)
                                       (not (:loading current-activity-data))
-                                      (not= (:board-slug current-activity-data) current-board-slug)
-                                      (not= (:board-uuid current-activity-data) current-board-slug))))
+                                      (not= (:board-slug current-activity-data) current-entry-board-slug)
+                                      (not= (:board-uuid current-activity-data) current-entry-board-slug))))
         show-login-wall (and (not jwt-data)
                              (or force-login-wall
                                  (and current-activity-id
                                       (or org-not-found
                                           section-not-found
+                                          contributions-not-found
                                           entry-not-found))))
         show-activity-removed (and jwt-data
-                                   current-activity-id
-                                   (or org-not-found
-                                       section-not-found
-                                       entry-not-found))
+                                   entry-not-found)
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
@@ -166,7 +168,10 @@
                              (s/starts-with? (name open-panel) "user-info-"))
         show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
-                            search-active)]
+                            search-active)
+        should-show-expanded-post? (and (not entry-not-found)
+                                        (map? current-activity-data)
+                                        (:published? current-activity-data))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true
@@ -291,5 +296,5 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (dashboard-layout)]
-              (when current-activity-id
+              (when should-show-expanded-post?
                 (expanded-post))]])])))

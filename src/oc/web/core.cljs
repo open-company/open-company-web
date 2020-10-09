@@ -52,6 +52,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
@@ -736,4 +737,5 @@
 
 (defn on-js-reload []
   (.clear js/console)
+  (dom-utils/force-unlock-page-scroll)
   (secretary/dispatch! (router/get-token)))
