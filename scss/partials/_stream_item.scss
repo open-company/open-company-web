@@ -453,6 +453,8 @@ div.stream-item {
           }
 
           &.video {
+            position: relative;
+
             &:hover:after {
               opacity: 1;
             }

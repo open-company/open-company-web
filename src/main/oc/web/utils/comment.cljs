@@ -155,6 +155,12 @@
       (map #(assoc % :collapsed false) expanded-comments))))))
 
 (defun add-comment-focus-value
+  ([nil & args]
+   nil)
+
+  ([prefix :guard string? nil & args]
+   prefix)
+
   ([prefix :guard string? comment-data :guard map?]
    (add-comment-focus-value prefix (:resource-uuid comment-data) (:parent-uuid comment-data) (:uuid comment-data)))
 

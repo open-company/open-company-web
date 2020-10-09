@@ -378,7 +378,7 @@
                         (for [u filtered-users
                               :let [team-user (some #(when (= (:user-id %) (:user-id u)) %) (:users roster))
                                     user (merge u team-user)
-                                    user-type (uu/get-user-type user org-data section-editing)]]
+                                    user-type (uu/get-user-type user org-data)]]
                           [:div.section-editor-private-users-result
                             {:class utils/hide-class
                              :on-click #(do

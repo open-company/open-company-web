@@ -304,7 +304,9 @@
         container-data (get-in base cnt-key)
         posts-list (get container-data items-key)
         container-posts (map (fn [entry]
-                               (if (and (map? entry) (= (:resource-type entry) :entry))
+                               (if (and (map? entry)
+                                        (= (:resource-type entry) :entry)
+                                        (map? (get posts-data (:uuid entry))))
                                  ;; Make sure the local map is merged as last value
                                  ;; since the kept value relates directly to the container
                                  (merge (get posts-data (:uuid entry)) entry)
@@ -600,10 +602,10 @@
                                   (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
                             :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data :current-user-data
-                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :activity-uuid]
+                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
                             (fn [base orgs org-data contributions-data container-data posts-data activity-data
                                  entry-editing jwt wrt-show loading payments search-active user-info-data current-user-data
-                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id activity-uuid]
+                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -612,6 +614,7 @@
                                :current-org-slug org-slug
                                :current-board-slug board-slug
                                :current-contributions-id contributions-id
+                               :current-entry-board-slug entry-board-slug
                                :current-activity-id activity-uuid
                                :contributions-data contributions-data
                                :initial-section-editing (:initial-section-editing base)

@@ -556,18 +556,12 @@
 (defn get-entry [entry-data]
   (if (dis/current-secure-activity-id)
     (secure-activity-get)
-    (let [entry-link (utils/link-for (:links entry-data) "self")]
-      (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug)
+    (let [org-slug (dis/current-org-slug)
+          entry-link (utils/link-for (:links entry-data) "self")]
+      (dis/dispatch! [:activity-get {:org-slug org-slug
                                      :board-slug (:board-slug entry-data)
                                      :activity-uuid (:uuid entry-data)}])
-      (api/get-entry entry-link
-        (fn [{:keys [status success body]}]
-          (if (and (= status 404)
-                   (= (:uuid entry-data) (dis/current-activity-id)))
-            (do
-              (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid entry-data) nil])
-              (routing-actions/maybe-404))
-            (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil])))))))
+      (api/get-entry entry-link (partial cmail-actions/get-entry-finished org-slug (:uuid entry-data))))))
 
 (declare entry-revert)
 
@@ -781,31 +775,6 @@
                               (dis/dispatch! [:entry-revert/finish (json->cljs body)]))))
         (dis/dispatch! [:entry-revert false])))))
 
-(defn activity-get-finish [status activity-data secure-uuid]
-  (cond
-
-   (some #{status} [401 404])
-   ;; Force a 404 in case user is visiting a secure activity as anonymous
-   ;; that don't exists, the secure activity are always visible
-   (routing-actions/maybe-404 (and (not (jwt/jwt))
-                                   (not (jwt/id-token))
-                                   (some? (dis/current-secure-activity-id))))
-
-   ;; The id token will have a current activity id, shared urls will not.
-   ;; if the ids don't match return a 404
-   (and (some? (dis/current-activity-id))
-        (not= (:uuid activity-data)
-              (dis/current-activity-id)))
-   (routing-actions/maybe-404)
-
-   (and secure-uuid
-        (jwt/jwt)
-        (:member? (dis/org-data)))
-   (router/redirect! (oc-urls/entry (dis/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
-
-   :default
-   (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) activity-data secure-uuid])))
-
 (defn- org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
     (-> secure-activity-data
@@ -816,10 +785,10 @@
                                 :org-logo-url :logo-url})
       (merge old-org-data))))
 
-(defn- secure-activity-get-finish [{:keys [status success body]}]
+(defn- secure-activity-get-finish [secure-uuid {:keys [status success body] :as resp}]
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
-    (activity-get-finish status secure-activity-data (dis/current-secure-activity-id))
+    (cmail-actions/get-entry-finished (:slug org-data) nil resp secure-uuid)
     (dis/dispatch! [:org-loaded org-data])))
 
 (defn get-org [org-data cb]
@@ -844,7 +813,7 @@
          secure-link (or link-with-replacements (build-secure-activity-link (dis/current-org-slug) secure-uuid))]
      (api/get-secure-entry secure-link
       (fn [resp]
-        (secure-activity-get-finish resp)
+        (secure-activity-get-finish secure-uuid resp)
         (when (fn? cb)
           (cb resp)))))))
 
@@ -1190,18 +1159,12 @@
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
     (dis/dispatch! [:bookmark-toggle (dis/current-org-slug) (:uuid activity-data) true])
-    (api/toggle-bookmark add-bookmark-link
-     (fn [{:keys [status success body]}]
-      (let [new-activity-data (if success (json->cljs body) {})]
-        (activity-get-finish status new-activity-data nil))))))
+    (api/toggle-bookmark add-bookmark-link (partial cmail-actions/get-entry-finished (dis/current-org-slug) (:uuid activity-data)))))
 
 (defn remove-bookmark [activity-data remove-bookmark-link]
   (when remove-bookmark-link
     (dis/dispatch! [:bookmark-toggle (dis/current-org-slug) (:uuid activity-data) false])
-    (api/toggle-bookmark remove-bookmark-link
-     (fn [{:keys [status success body]}]
-      (let [new-activity-data (if success (json->cljs body) {})]
-        (activity-get-finish status new-activity-data nil))))))
+    (api/toggle-bookmark remove-bookmark-link (partial cmail-actions/get-entry-finished (dis/current-org-slug) (:uuid activity-data)))))
 
 ;; Sort type handling
 
@@ -1294,43 +1257,46 @@
 ;; Inbox actions
 
 (defn entry-follow [entry-uuid]
-  (let [activity-data (dis/activity-data entry-uuid)
+  (let [org-slug (dis/current-org-slug)
+        activity-data (dis/activity-data entry-uuid)
         follow-link (utils/link-for (:links activity-data) "follow")]
     (api/inbox-follow follow-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
                 (= (:uuid activity-data) (dis/current-activity-id)))
          (do
-           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
+           (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))))))
+         (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))))))
 
 (defn entry-unfollow [entry-uuid]
-  (let [activity-data (dis/activity-data entry-uuid)
+  (let [org-slug (dis/current-org-slug)
+        activity-data (dis/activity-data entry-uuid)
         unfollow-link (utils/link-for (:links activity-data) "unfollow")]
     (api/inbox-unfollow unfollow-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
                 (= (:uuid activity-data) (dis/current-activity-id)))
          (do
-           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
+           (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))))))
+         (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))))))
 
 (defn inbox-dismiss [entry-uuid]
-  (let [dismiss-at (utils/as-of-now)
+  (let [org-slug (dis/current-org-slug)
+        dismiss-at (utils/as-of-now)
         activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
     (when dismiss-link
-      (dis/dispatch! [:inbox/dismiss (dis/current-org-slug) entry-uuid dismiss-at])
+      (dis/dispatch! [:inbox/dismiss org-slug entry-uuid dismiss-at])
       (api/inbox-dismiss dismiss-link dismiss-at
        (fn [{:keys [status success body]}]
          (if (and (= status 404)
                   (= (:uuid activity-data) (dis/current-activity-id)))
            (do
-             (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
+             (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
              (routing-actions/maybe-404))
-           (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))
+           (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))
           ; (inbox-get (dis/org-data))
           )))))
 
@@ -1350,17 +1316,18 @@
 
 (defn inbox-unread [activity-data]
   (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
-    (dis/dispatch! [:inbox/unread (dis/current-org-slug) (dis/current-board-slug) (:uuid activity-data)])
-    (api/inbox-unread unread-link
-     (fn [{:keys [status success body]}]
-       (if (and (= status 404)
-                (= (:uuid activity-data) (dis/current-activity-id)))
-         (do
-           (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) (:uuid activity-data) nil])
-           (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (json->cljs body) nil]))
-       ; (inbox-get (dis/org-data))
-       ))))
+    (let [org-slug (dis/current-org-slug)]
+      (dis/dispatch! [:inbox/unread org-slug (dis/current-board-slug) (:uuid activity-data)])
+      (api/inbox-unread unread-link
+                        (fn [{:keys [status success body]}]
+                          (if (and (= status 404)
+                                   (= (:uuid activity-data) (dis/current-activity-id)))
+                            (do
+                              (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
+                              (routing-actions/maybe-404))
+                            (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) nil]))
+                            ; (inbox-get (dis/org-data))
+                          )))))
 
 (defn- inbox-real-dismiss-all []
   (let [dismiss-at (utils/as-of-now)

@@ -229,8 +229,6 @@ div.dashboard-layout {
             span.tab-icon {
               width: 12px;
               height: 16px;
-              background-image: cdnUrl("/img/ML/bookmarks_tab_icon.svg");
-              background-size: 12px 16px;
               position: relative;
               @include svgBgColor("/img/ML/bookmarks_tab_icon.svg", center, 12px 16px, var(--color));
 
@@ -270,8 +268,6 @@ div.dashboard-layout {
             span.tab-icon {
               width: 16px;
               height: 16px;
-              background-size: 16px 16px;
-              background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
               position: relative;
               @include svgBgColor("/img/ML/notifications_tab_icon.svg", center, 16px 16px, var(--color));
             }

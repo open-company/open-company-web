@@ -2,6 +2,8 @@
   (:require [defun.core :refer (defun)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -10,8 +12,9 @@
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.actions.routing :as routing-actions]))
 
 ;; Cached items
 
@@ -82,23 +85,44 @@
 
 ;; Entry
 
+(defn get-entry-finished [org-slug entry-uuid {:keys [status success body]} & [secure-uuid]]
+  ;; Redirect to the real post page in case user has access to it
+  (let [activity-data (when success (json->cljs body))]
+    (when (and secure-uuid
+               (jwt/jwt)
+               (:member? (dis/org-data)))
+      (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data)))))
+  ; (when (and (< 399 status 500)
+  ;            (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
+  ;                (and (seq entry-uuid)
+  ;                     (= entry-uuid (dis/current-activity-id)))
+  ;                ;; We are trying to open a post via secure url but it doesn't exists or we don't have access
+  ;                (and (seq secure-uuid)
+  ;                     (= secure-uuid (dis/current-secure-activity-id)))))
+  ;     ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
+  ;     (routing-actions/maybe-404 (and (not (jwt/jwt))
+  ;                                     (not (jwt/id-token))
+  ;                                     (seq (dis/current-secure-activity-id)))))
+  (cond
+    (< 399 status 500)
+    (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
+    (not success)
+    (dis/dispatch! [:activity-get/failed org-slug entry-uuid secure-uuid])
+    :else
+    (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) secure-uuid])))
+
 (defn get-entry-with-uuid [board-slug entry-uuid & [loaded-cb]]
-  (let [entry-data (dis/activity-data entry-uuid)]
+  (let [org-slug (dis/current-org-slug)
+        entry-data (dis/activity-data entry-uuid)]
     (when (and (not= entry-data :404)
                (or board-slug
                    (:board-slug entry-data)))
-      (dis/dispatch! [:activity-get {:org-slug (dis/current-org-slug) :board-slug (or board-slug (:board-slug entry-data)) :activity-uuid entry-uuid}])
-      (api/get-entry-with-uuid (dis/current-org-slug) board-slug entry-uuid
-       (fn [{:keys [status success body]}]
-        (cond
-          (= status 404)
-          (dis/dispatch! [:activity-get/not-found (dis/current-org-slug) entry-uuid nil])
-          (not success)
-          (dis/dispatch! [:activity-get/failed (dis/current-org-slug) entry-uuid nil])
-          :else
-          (dis/dispatch! [:activity-get/finish status (dis/current-org-slug) (when success (json->cljs body)) nil]))
-        (when (fn? loaded-cb)
-          (utils/after 100 #(loaded-cb success status))))))))
+      (dis/dispatch! [:activity-get {:org-slug org-slug :board-slug (or board-slug (:board-slug entry-data)) :activity-uuid entry-uuid}])
+      (api/get-entry-with-uuid org-slug board-slug entry-uuid
+       (fn [{:keys [status success] :as resp}]
+         (get-entry-finished org-slug entry-uuid resp)
+         (when (fn? loaded-cb)
+           (utils/after 100 #(loaded-cb success status))))))))
 
 ;; Cmail
 

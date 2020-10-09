@@ -25,11 +25,11 @@
       [:div.activity-removed-icon]
 
       [:div.activity-removed-title
-        "Post not available"]
+        "Update not available"]
 
       [:div.activity-removed-description
-        "Looks like you don’t have access to the post or it doesn’t exist."]
+        "Looks like you don’t have access to this update or it doesn’t exist."]
 
       [:button.mlb-reset.activity-removed-button
         {:on-click close-clicked}
-        "Return to recent"]]])
+        "Return to Home"]]])

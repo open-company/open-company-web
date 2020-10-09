@@ -276,7 +276,9 @@
                      route-path*)]
     (dis/dispatch! [:routing route-path])
     (cmail-actions/cmail-hide)
-    (.pushState (.-history js/window) #js {} (.-title js/document) post-url))))
+    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)
+    ;; Refresh the post data
+    (cmail-actions/get-entry-with-uuid entry-board-slug entry-uuid))))
 
 ;; Push panel
 

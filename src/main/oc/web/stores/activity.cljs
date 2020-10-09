@@ -546,7 +546,7 @@
     (assoc-in db activity-key failed-activity-data)))
 
 (defmethod dispatcher/action :activity-get/finish
-  [db [_ status org-slug activity-data secure-uuid]]
+  [db [_ org-slug activity-data secure-uuid]]
   (let [activity-uuid (:uuid activity-data)
         board-data (au/board-by-uuid (:board-uuid activity-data))
         activity-key (if secure-uuid

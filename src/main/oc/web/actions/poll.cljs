@@ -5,7 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.actions.cmail :as cmail-actions]))
 
 ;; Polls
 
@@ -54,20 +54,22 @@
   (dis/dispatch! [:update poll-key #(merge % {:replies (dissoc (:replies %) (keyword poll-reply-id))
                                               :updated-at (utils/as-of-now)})]))
 
+(defn- activity-get-finish [poll-key resp]
+  (let [key-parts (pu/poll-key-parts poll-key)]
+    (cmail-actions/get-entry-finished (:org-slug key-parts) (:activity-uuid key-parts) resp)))
+
 (defn add-new-reply [poll-data poll-key reply-body]
   (timbre/info "Adding new reply to" poll-key "body:" reply-body)
   (let [add-reply-link (utils/link-for (:links poll-data) "reply" "POST")]
     (add-reply poll-key reply-body)
-    (api/poll-add-reply add-reply-link reply-body (fn [{:keys [status body success]}]
-     (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil)))))
+    (api/poll-add-reply add-reply-link reply-body (partial activity-get-finish poll-key))))
 
 (defn delete-existing-reply [poll-data poll-key poll-reply-id]
   (timbre/info "Deleting existing reply from" poll-key "reply:" poll-reply-id)
   (let [reply-data (-> poll-data :replies (keyword poll-reply-id))
         delete-reply-link (utils/link-for (:links reply-data) "delete" "DELETE")]
     (delete-reply poll-key poll-reply-id)
-    (api/poll-delete-reply delete-reply-link (fn [{:keys [status body success]}]
-     (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil)))))
+    (api/poll-delete-reply delete-reply-link (partial activity-get-finish poll-key))))
 
 ;; Vote/unvote
 
@@ -89,8 +91,7 @@
     (when-let [vote-link (utils/link-for (:links reply) "vote")]
       (let [user-id (:user-id (dis/current-user-data))]
         (dis/dispatch! [:update (vec (conj poll-key :replies)) #(update-vote-reply user-id % reply-id)]))
-      (api/poll-vote vote-link (fn [{:keys [status body success]}]
-       (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
+      (api/poll-vote vote-link (partial activity-get-finish poll-key)))))
 
 (defn unvote-reply [poll-data poll-key reply-id]
   (timbre/info "Unvoting reply" reply-id)
@@ -98,5 +99,4 @@
     (when-let [unvote-link (utils/link-for (:links reply) "unvote")]
       (let [user-id (:user-id (dis/current-user-data))]
         (dis/dispatch! [:update (concat poll-key [:replies (keyword reply-id) :votes]) #(update-reply-vote user-id % false)]))
-      (api/poll-vote unvote-link (fn [{:keys [status body success]}]
-       (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
+      (api/poll-vote unvote-link (partial activity-get-finish poll-key)))))
