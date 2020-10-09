@@ -272,16 +272,16 @@
 }
 
 @mixin svgBgColor($svgUrl, $position: "center", $size: "contain", $bgColor: var(--primary-color)) {
-  background-color: #{$bgColor};
-  background-image: none;
-  -webkit-mask-image: cdnUrl(#{$svgUrl});
-  mask-image: cdnUrl(#{$svgUrl});
+  background-color: $bgColor;
+  // background-image: none;
+  -webkit-mask-image: cdnUrl($svgUrl);
   -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: $position;
+  -webkit-mask-size: $size;
+  mask-image: cdnUrl($svgUrl);
   mask-repeat: no-repeat;
-  -webkit-mask-position: #{$position};
-  mask-position: #{$position};
-  mask-size: #{$size};
-  -webkit-mask-size: #{$size};
+  mask-position: $position;
+  mask-size: $size;
 }
 
 @mixin face-pile($width: 18) {
