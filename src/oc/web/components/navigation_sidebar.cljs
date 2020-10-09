@@ -147,6 +147,7 @@
                :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
               [:div.nav-link-icon]
               [:div.nav-link-label
+                {:class "home-nav"} ; for intercom targetting
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
                 "Home"]
               (when following-badge
