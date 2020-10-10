@@ -140,6 +140,7 @@
         ;; All posts
         (when show-following
           [:div.left-navigation-sidebar-top
+            {:class "home-nav"} ; for intercom targetting
             [:a.nav-link.home.hover-item.group
               {:class (utils/class-set {:item-selected is-following
                                         :new following-badge})
@@ -147,7 +148,6 @@
                :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
               [:div.nav-link-icon]
               [:div.nav-link-label
-                {:class "home-nav"} ; for intercom targetting
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
                 "Home"]
               (when following-badge
@@ -155,13 +155,13 @@
                 [:span.unread-dot])]])
         (when show-topics
           [:div.left-navigation-sidebar-top
+            {:class "explore-nav"} ; for intercom targetting
             [:a.nav-link.topics.hover-item.group
               {:class (utils/class-set {:item-selected is-topics})
                :href (oc-urls/unfollowing)
                :on-click #(nav-actions/nav-to-url! % "topics" (oc-urls/topics))}
               [:div.nav-link-icon]
               [:div.nav-link-label
-                {:class "explore-nav"} ; for intercom targetting
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
                 "Explore"]
               ; (when (pos? (count all-unread-items))
