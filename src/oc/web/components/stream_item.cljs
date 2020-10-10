@@ -22,9 +22,9 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.face-pile :refer (face-pile)]
+            [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
-            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]
-            [cljsjs.hammer]))
+            [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]))
 
 (defn- stream-item-summary [activity-data]
   [:div.stream-item-body.oc-mentions
@@ -62,64 +62,24 @@
 (defn- show-mobile-menu [s]
   (set-foc-menu-open s true))
 
-(defn- show-swipe-button [s ref-kw]
-  (dis/dispatch! [:input [:mobile-swipe-menu] (-> s :rum/args first :activity-data :uuid)])
-  (if (= ref-kw ::show-mobile-dismiss-bt)
-    (do
-      (compare-and-set! (::show-mobile-more-bt s) true false)
-      (swap! (::show-mobile-dismiss-bt s) not))
-    (do
-      (compare-and-set! (::show-mobile-dismiss-bt s) true false)
-      (swap! (::show-mobile-more-bt s) not))))
-
 (defn- dismiss-swipe-button [s & [e ref-kw]]
   (when e
     (utils/event-stop e))
   (when (or (not ref-kw)
             (= ref-kw ::show-mobile-more-bt))
     (reset! (::show-mobile-more-bt s) false))
-  (when (or (not ref-kw)
-            (= ref-kw ::show-mobile-dismiss-bt))
-    (reset! (::show-mobile-dismiss-bt s) false))
   (reset! (::last-mobile-swipe-menu s) nil)
   (dis/dispatch! [:input [:mobile-swipe-menu] nil]))
 
 (defn- swipe-left-handler [s _]
-  (show-swipe-button s ::show-mobile-dismiss-bt))
-
-(defn- swipe-right-handler [s _]
-  (show-swipe-button s ::show-mobile-more-bt))
+  (dis/dispatch! [:input [:mobile-swipe-menu] (-> s :rum/args first :activity-data :uuid)])
+  (swap! (::show-mobile-more-bt s) not))
 
 (defn- long-press-handler [s _]
   (dismiss-swipe-button s)
   (utils/after 180 #(show-mobile-menu s)))
 
-(defn- swipe-gesture-manager [{:keys [swipe-left swipe-right long-press disabled] :as options}]
-  {:did-mount (fn [s]
-    (when (and (fn? disabled)
-               (not (disabled s)))
-      (let [el (rum/dom-node s)
-            hr (js/Hammer. el)
-            current-board-slug @(drv/get-ref s :board-slug)]
-        (when (and (fn? swipe-left)
-                   (= current-board-slug "inbox"))
-          (.on hr "swipeleft" (partial swipe-left s)))
-        (when (fn? swipe-right)
-          (.on hr "swiperight" (partial swipe-right s)))
-        (when (fn? long-press)
-          (.on hr "press" (partial long-press s)))
-        (reset! (::hammer-recognizer s) hr)))
-    s)
-   :will-unmount (fn [s]
-    (when @(::hammer-recognizer s)
-      (.remove @(::hammer-recognizer s) "swipeleft")
-      (.remove @(::hammer-recognizer s) "swiperight")
-      (.remove @(::hammer-recognizer s) "pressup")
-      (.destroy @(::hammer-recognizer s)))
-    s)})
-
 (defn- on-scroll [s]
-  (reset! (::show-mobile-dismiss-bt s) false)
   (reset! (::show-mobile-more-bt s) false))
 
 (rum/defcs stream-item < rum/static
@@ -132,33 +92,29 @@
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
-                         (rum/local nil ::hammer-recognizer)
-                         (rum/local false ::show-mobile-dismiss-bt)
                          (rum/local false ::show-mobile-more-bt)
                          (rum/local false ::on-scroll)
                          (rum/local nil ::last-mobile-swipe-menu)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (when ua/mobile?
+                         (when (responsive/is-mobile-size?)
                            (swipe-gesture-manager {:swipe-left swipe-left-handler
-                                                   :swipe-right swipe-right-handler
                                                    :long-press long-press-handler
                                                    :disabled #(not (au/is-published? (-> % :rum/args first :activity-data)))}))
                          ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
-                           (when ua/mobile?
+                           (when (responsive/is-mobile-size?)
                              (reset! (::on-scroll s)
                               (events/listen js/window EventType/SCROLL (partial on-scroll s))))
                            s)
                           :did-update (fn [s]
-                           (when ua/mobile?
+                           (when (responsive/is-mobile-size?)
                              (let [mobile-swipe-menu @(drv/get-ref s :mobile-swipe-menu)
                                    activity-uuid (-> s :rum/args first :activity-data :uuid)]
                                (when (not= @(::last-mobile-swipe-menu s) mobile-swipe-menu)
                                  (reset! (::last-mobile-swipe-menu s) mobile-swipe-menu)
                                  (when (not= activity-uuid mobile-swipe-menu)
-                                   (compare-and-set! (::show-mobile-dismiss-bt s) true false)
                                    (compare-and-set! (::show-mobile-more-bt s) true false)))))
                            s)
                           :will-unmount (fn [s]
@@ -192,7 +148,7 @@
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
-        show-mobile-menu? (and is-mobile?
+        mobile-more-menu? (and is-mobile?
                                mobile-more-menu-el)
         more-menu-comp #(more-menu
                           {:entity-data activity-data
@@ -207,7 +163,7 @@
                            :will-open (fn [] (set-foc-menu-open s true))
                            :will-close (fn [] (set-foc-menu-open s false))
                            :force-show-menu foc-menu-open
-                           :mobile-tray-menu show-mobile-menu?
+                           :mobile-tray-menu mobile-more-menu?
                            :current-user-data current-user-data})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         is-home? (-> container-slug keyword (= :following))
@@ -223,7 +179,6 @@
                                 :expandable is-published?
                                 :muted-item (utils/link-for (:links activity-data) "follow")
                                 :show-mobile-more-bt true
-                                :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
@@ -262,13 +217,8 @@
          :on-click (fn [e]
                     (dismiss-swipe-button s e ::show-mobile-more-bt)
                     (show-mobile-menu s))}
-        [:span "More"]]
-      [:button.mlb-reset.mobile-dismiss-bt
-        {:class (when @(::show-mobile-dismiss-bt s) "visible")
-         :on-click (fn [e]
-                    (dismiss-swipe-button s e ::show-mobile-dismiss-bt)
-                    (activity-actions/inbox-dismiss (:uuid activity-data)))}
-        [:span "Dismiss"]]
+        [:span.mobile-more-bt-icon]
+        [:span.mobile-more-bt-text "More"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (post-authorship {:activity-data activity-data
@@ -300,9 +250,9 @@
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]]
         (when is-published?
-          (if (and is-mobile?
-                   mobile-more-menu-el)
-            (rum/portal (more-menu-comp) mobile-more-menu-el)
+          (if is-mobile?
+            (when mobile-more-menu?
+              (rum/portal (more-menu-comp) mobile-more-menu-el))
             (more-menu-comp)))
         [:div.activity-share-container]]
       [:div.stream-item-body-ext.group

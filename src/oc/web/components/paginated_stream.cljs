@@ -83,11 +83,13 @@
                                :show-wrt?         show-wrt?
                                :editable-boards   editable-boards
                                :current-user-data current-user-data
-                               :replies?           replies?})
+                               :replies?           replies?
+                               :foc-menu-open      foc-menu-open})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data
                      :show-wrt?          show-wrt?
+                     :foc-menu-open      foc-menu-open
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?

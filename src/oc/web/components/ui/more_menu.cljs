@@ -115,18 +115,18 @@
              can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
-             mark-unread-cb current-user-data]}]
+             mark-unread-cb current-user-data hide-bookmark? hide-share?]}]
   (let [{current-org-slug :org
          current-board-slug :board
          current-contributions-id :contributions
          current-activity-id :activity}          (drv/react s :route)
         delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
-        share-link (utils/link-for (:links entity-data) "share")
+        share-link (when-not hide-share? (utils/link-for (:links entity-data) "share"))
         inbox-unread-link (utils/link-for (:links entity-data) "unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
-        add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
-        remove-bookmark-link (when (:bookmarked-at entity-data)
+        add-bookmark-link (when-not hide-bookmark? (utils/link-for (:links entity-data) "bookmark" "POST"))
+        remove-bookmark-link (when (and (not hide-bookmark?) (:bookmarked-at entity-data))
                                (utils/link-for (:links entity-data) "bookmark" "DELETE"))
         should-show-more-bt (or (and show-edit?
                                      edit-link)
@@ -154,7 +154,8 @@
               can-reply?
               add-bookmark-link
               remove-bookmark-link
-              inbox-unread-link)
+              follow-link
+              unfollow-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded showing-menu?

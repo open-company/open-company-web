@@ -336,7 +336,7 @@ div.stream-collapsed-item {
 
   div.more-menu {
     position: absolute;
-    right: 16px;
+    right: 8px;
     top: 16px;
     height: 32px;
     z-index: 100;
@@ -368,6 +368,60 @@ div.stream-collapsed-item {
     div.activity-share-modal-container {
       margin-top: 0;
       right: 0;
+    }
+  }
+
+  // Mobile swipe buttons
+  button.mobile-follow-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: var(--tooltip-background-color);
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    right: 16px;
+    z-index: 4;
+    transition: width 180ms, margin-right 180ms;
+    width: 0;
+    margin-right: -124px;
+    overflow: hidden;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    @include big_web() {
+      display: none;
+    }
+
+    &.follow {
+      span.mobile-follow-bt-icon {
+        @include svgBgColor("/img/ML/more_inbox_follow.svg", center, 12px 14px, var(--tooltip-color));
+      }
+    }
+
+    span.mobile-follow-bt-text {
+      color: var(--tooltip-color);
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      order: 2;
+      margin-right: 24px;
+      margin-left: 4px;
+    }
+
+    span.mobile-follow-bt-icon {
+      width: 12px;
+      height: 14px;
+      @include svgBgColor("/img/ML/more_inbox_unfollow.svg", center, 12px 14px, var(--tooltip-color));
+      order: 1;
+      margin-left: 24px;
+      margin-right: 4px;
+    }
+
+    &.visible {
+      width: auto;
+      margin-right: 0;
     }
   }
 }
