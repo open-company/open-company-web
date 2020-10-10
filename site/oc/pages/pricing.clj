@@ -169,4 +169,6 @@
 
     (shared/dashed-string 4)
 
-    shared/testimonials-section-old]])
+    shared/testimonials-section-old
+    
+    (shared/dashed-string 5 "big-web-tablet-only")]])

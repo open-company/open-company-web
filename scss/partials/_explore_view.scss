@@ -60,9 +60,7 @@ div.explore-view {
       }
 
       @include mobile() {
-        width: 100%;
-        min-height: initial;
-        height: #{$mobile_navbar_height}px;
+        display: none;
       }
     }
 
