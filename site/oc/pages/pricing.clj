@@ -172,6 +172,6 @@
 
       shared/testimonials-section-old
 
-      ;; (shared/dashed-string 5 "big-web-tablet-only")
+      (shared/dashed-string 5 "big-web-tablet-only")
 
     ]])
