@@ -691,59 +691,59 @@
 
 ;; Path components retrieve
 
-(defn route
+(defn ^:export route
   ([] (route @app-state))
   ([data] (get-in data [router-key])))
 
-(defn current-org-slug
+(defn ^:export current-org-slug
   ([] (current-org-slug @app-state))
   ([data] (get-in data [router-key :org])))
 
-(defn current-board-slug
+(defn ^:export current-board-slug
   ([] (current-board-slug @app-state))
   ([data] (get-in data [router-key :board])))
 
-(defn current-contributions-id
+(defn ^:export current-contributions-id
   ([] (current-contributions-id @app-state))
   ([data] (get-in data [router-key :contributions])))
 
-(defn current-sort-type
+(defn ^:export current-sort-type
   ([] (current-sort-type @app-state))
   ([data] (get-in data [router-key :sort-type])))
 
-(defn current-activity-id
+(defn ^:export current-activity-id
   ([] (current-activity-id @app-state))
   ([data] (get-in data [router-key :activity])))
 
-(defn current-entry-board-slug
+(defn ^:export current-entry-board-slug
   ([] (current-entry-board-slug @app-state))
   ([data] (get-in data [router-key :entry-board])))
 
-(defn current-secure-activity-id
+(defn ^:export current-secure-activity-id
   ([] (current-secure-activity-id @app-state))
   ([data] (get-in data [router-key :secure-id])))
 
-(defn current-comment-id
+(defn ^:export current-comment-id
   ([] (current-comment-id @app-state))
   ([data] (get-in data [router-key :comment])))
 
-(defn query-params
+(defn ^:export query-params
   ([] (query-params @app-state))
   ([data] (get-in data [router-key :query-params])))
 
-(defn query-param
+(defn ^:export query-param
   ([k] (query-param @app-state k))
   ([data k] (get-in data [router-key :query-params k])))
 
-(defn route-param
+(defn ^:export route-param
   ([k] (route-param @app-state k))
   ([data k] (get-in data [router-key k])))
 
-(defn route-set
+(defn ^:export route-set
   ([] (route-set @app-state))
   ([data] (route-param data :route)))
 
-(defn invite-token
+(defn ^:export invite-token
   ([] (invite-token @app-state))
   ([data] (query-param data :invite-token)))
 
