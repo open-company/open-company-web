@@ -83,12 +83,10 @@ div.stream-comments {
         margin-left: -8px;
 
         // @include big_web() {
-
         //   &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
         //     background-color: var(--comments-floating-bt-background);
         //     border-radius: 4px;
         //   }
-
         // }
 
         &.open-thread {
@@ -99,7 +97,7 @@ div.stream-comments {
 
         &:hover, &.showing-picker {
           div.stream-comment div.stream-comment-floating-buttons {
-            display: block;
+            display: flex;
           }
         }
 
@@ -200,6 +198,7 @@ div.stream-comments {
             height: 32px;
             z-index: 2;
             display: none;
+            flex-flow: row nowrap;
             border-radius: 6px;
             box-shadow: var(--comments-floating-bt-shadow);
             background-color: var(--comments-floating-bt-background);
@@ -207,20 +206,22 @@ div.stream-comments {
 
             div.more-bt-container {
               height: 32px;
-              float: left;
+              width: 32px;
+              padding: 0;
               position: relative;
+              flex: 0 0 auto;
 
               div.comment-more-menu-container {
                 position: absolute;
                 top: 34px;
                 left: 0;
-                padding: 8px 0;
+                padding: 0;
                 border-radius: 4px;
                 width: 78px;
                 outline: none;
                 z-index: 110;
-                background-color: var(--color);
-                border: var(--comments-floating-bt-border);
+                background-color: var(--tooltip-background-color);
+                overflow: hidden;
 
                 button {
                   padding: 0;
@@ -231,16 +232,16 @@ div.stream-comments {
                   line-height: 18px;
                   cursor: pointer;
                   padding: 8px 16px;
-                  background-color: var(--tooltip-background-color);
                   position: relative;
                 }
               }
             }
 
             div.react-bt-container {
-              // width: 30px;
+              width: 32px;
               height: 32px;
-              float: left;
+              padding: 0;
+              flex: 0 0 auto;
 
               div.emoji-mart {
                 position: absolute;
@@ -257,18 +258,13 @@ div.stream-comments {
               }
             }
 
-            div.react-bt-container .tooltip {
-              width: 86px;
-            }
-
             button.floating-bt {
               padding: 0;
               height: 32px;
-              min-width: 20px;
+              width: 32px;
               background-position: center;
               background-repeat: no-repeat;
-              padding: 0 8px;
-              float: left;
+              flex: 0 0 auto;
               @include OC_Body_Bold();
               font-size: 12px;
               line-height: 32px;
@@ -277,35 +273,25 @@ div.stream-comments {
 
               @include big_web() {
                 opacity: 0.5;
+
                 &:hover {
                   opacity: 1;
-
-                  &:before {
-                    opacity: 0.5;
-                  }
                 }
               }
 
               &.more-bt {
-                padding-left: 30px;
                 background-image: cdnUrl("/img/ML/comment_more@dark.svg");
                 background-size: 18px 4px;
-                background-position: left 8px top 14px;
               }
 
               &.reply-bt {
-                padding-left: 24px;
                 background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
                 background-size: 12px 12px;
-                background-position: left 8px top 10px;
               }
 
               &.react-bt {
-                padding-left: 26px;
                 background-image: cdnUrl("/img/ML/comment_react@dark.svg");
                 background-size: 14px 14px;
-                background-position: left 8px top 9px;
-                border-right: none;
 
                 div.emoji-mart {
                   right: 0;
