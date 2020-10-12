@@ -35,6 +35,12 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
+(defn- submit-on-enter [submit-cb e]
+  (when (= (.-key e) "Enter")
+    (utils/event-stop e)
+    (when (fn? submit-cb)
+      (submit-cb))))
+
 (defn- valid-first-last-name? [n]
   (not (re-matches #"(?).*\d.*" n)))
 
@@ -134,6 +140,7 @@
                                       utils/hide-class true})
              :pattern utils/valid-email-pattern
              :value @(::email s)
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
                            (reset! (::email-error s) false)
@@ -148,6 +155,7 @@
              :pattern ".{8,}"
              :value @(::pswd s)
              :placeholder "Minimum 8 characters"
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
                            (reset! (::email-error s) false)
@@ -325,6 +333,7 @@
              :placeholder "First name..."
              :max-length user-utils/user-name-max-lenth
              :value (or (:first-name user-data) "")
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change (fn [ev]
                           (let [v (.. ev -target -value)]
                             (if (valid-first-last-name? v)
@@ -340,6 +349,7 @@
              :placeholder "Last name..."
              :value (or (:last-name user-data) "")
              :max-length user-utils/user-name-max-lenth
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change (fn [ev]
                           (let [v (.. ev -target -value)]
                             (if (valid-first-last-name? v)
@@ -358,6 +368,7 @@
                                         utils/hide-class true})
                :max-length org-utils/org-name-max-length
                :value (:name org-editing)
+               :on-key-press (partial submit-on-enter continue-fn)
                :on-change #(let [new-name (.. % -target -value)
                                  clean-org-name (subs new-name 0 (min (count new-name)
                                                  org-utils/org-name-max-length))]
@@ -471,6 +482,7 @@
              :class (utils/class-set {:error (:error org-editing)
                                       utils/hide-class true})
              :value (:name org-editing)
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change #(dis/dispatch! [:input [:org-editing]
                (merge org-editing {:error nil :name (.. % -target -value)})])}]
           (when (:error org-editing)
@@ -577,6 +589,7 @@
                 [:input.oc-input
                   {:type "text"
                    :placeholder "name@example.com"
+                   :on-key-press (partial submit-on-enter continue-fn)
                    :on-change (fn [e]
                                (reset! (::invite-rows s)
                                 (vec
@@ -627,7 +640,16 @@
         auth-settings (:auth-settings team-invite-drv)
         email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
         team-data (:team auth-settings)
-        signup-with-email (drv/react s user-store/signup-with-email)]
+        signup-with-email (drv/react s user-store/signup-with-email)
+        continue-fn (fn []
+                      (if (or (not (utils/valid-email? @(::email s)))
+                              (<= (count @(::pswd s)) 7))
+                        (do
+                          (when-not (utils/valid-email? @(::email s))
+                            (reset! (::email-error s) true))
+                          (when (<= (count @(::pswd s)) 7)
+                            (reset! (::password-error s) true)))
+                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true)))]
     [:div.onboard-container-inner.invitee-team-lander
       [:header.main-cta
        [:div.top-back-button-container
@@ -669,6 +691,7 @@
                                           utils/hide-class true})
                  :pattern utils/valid-email-pattern
                  :value @(::email s)
+                 :on-key-press (partial submit-on-enter continue-fn)
                  :on-change #(let [v (.. % -target -value)]
                                (reset! (::password-error s) false)
                                (reset! (::email-error s) false)
@@ -683,6 +706,7 @@
                  :pattern ".{8,}"
                  :value @(::pswd s)
                  :placeholder "Minimum 8 characters"
+                 :on-key-press (partial submit-on-enter continue-fn)
                  :on-change #(let [v (.. % -target -value)]
                                (reset! (::password-error s) false)
                                (reset! (::email-error s) false)
@@ -702,14 +726,7 @@
                                   (<= (count @(::pswd s)) 7))
                           "disabled")
                  :on-touch-start identity
-                 :on-click #(if (or (not (utils/valid-email? @(::email s)))
-                                    (<= (count @(::pswd s)) 7))
-                              (do
-                                (when-not (utils/valid-email? @(::email s))
-                                  (reset! (::email-error s) true))
-                                (when (<= (count @(::pswd s)) 7)
-                                  (reset! (::password-error s) true)))
-                              (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
+                 :on-click continue-fn}
                 (str "Join " (:name team-data))]]]
           [:div.subtitle.token-error
             (str "The invite link you’re trying to access "
@@ -808,6 +825,7 @@
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
              :ref "password"
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change #(do
                            (reset! (::password-error s) false)
                            (dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)]))
@@ -855,10 +873,13 @@
         is-mobile? (responsive/is-mobile-size?)
         invalid-first-name (not (valid-first-last-name? (:first-name user-data)))
         invalid-last-name (not (valid-first-last-name? (:last-name user-data)))
-        invalid-name? (or (and (empty? (:first-name user-data))
-                               (empty? (:last-name user-data)))
-                          invalid-first-name
-                          invalid-last-name)]
+        disabled? (or (and (empty? (:first-name user-data))
+                           (empty? (:last-name user-data)))
+                      invalid-first-name
+                      invalid-last-name)
+        continue-fn #(when-not disabled?
+                       (reset! (::saving s) true)
+                       (user-actions/onboard-profile-save current-user-data edit-user-profile))]
     [:div.onboard-container-inner.invitee-lander-profile
       [:header.main-cta
        [:div.top-back-button-container]
@@ -894,6 +915,7 @@
              :placeholder "First name..."
              :value (:first-name user-data)
              :max-length user-utils/user-name-max-lenth
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change (fn [ev]
                           (let [v (.. ev -target -value)]
                             (if (valid-first-last-name? v)
@@ -909,6 +931,7 @@
              :placeholder "Last name..."
              :value (:last-name user-data)
              :max-length user-utils/user-name-max-lenth
+             :on-key-press (partial submit-on-enter continue-fn)
              :on-change (fn [ev]
                           (let [v (.. ev -target -value)]
                             (if (valid-first-last-name? v)
@@ -916,11 +939,9 @@
                                                                                       :error "Last name can not contain any number."})])
                               (dis/dispatch! [:input [:edit-user-profile :last-name] v]))))}]
           [:button.continue.start-using-carrot
-            {:disabled invalid-name?
+            {:disabled disabled?
              :on-touch-start identity
-             :on-click #(do
-                          (reset! (::saving s) true)
-                          (user-actions/onboard-profile-save current-user-data edit-user-profile))}
+             :on-click continue-fn}
             (str "Start using " ls/product-name)]]]]))
 
 (rum/defcs email-wall < rum/reactive
