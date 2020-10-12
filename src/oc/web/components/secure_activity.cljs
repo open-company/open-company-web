@@ -55,7 +55,7 @@
   [s]
   (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
         activity-author (:publisher activity-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        is-mobile? (responsive/is-mobile-size?)
         id-token (drv/react s :id-token)
         org-data (-> activity-data
                   (select-keys [:org-slug :org-name :org-logo-url])

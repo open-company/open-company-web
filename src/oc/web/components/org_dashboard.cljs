@@ -90,7 +90,7 @@
                 active-users
                 current-user-data
                 search-active]} (drv/react s :org-dashboard-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        is-mobile? (responsive/is-mobile-size?)
         loading? (or ;; force loading screen
                   app-loading
                      ;; the org data are not loaded yet
@@ -180,8 +180,6 @@
                   :current-board-slug current-board-slug})]
       [:div
         {:class (utils/class-set {:org-dashboard true
-
-                                  :mobile-or-tablet is-mobile?
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity current-activity-id
