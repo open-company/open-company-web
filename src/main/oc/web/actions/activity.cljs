@@ -1036,7 +1036,6 @@
               org-id (:uuid org-data)
               _seen-at seen-at]
     (timbre/info "Send seen for container:" container-id "at:" seen-at)
-    (js/console.log "DBG send-container-seen" container-id seen-at)
     (ws-cc/container-seen org-id container-id seen-at)
     (dis/dispatch! [:container-seen (:org-slug org-data) container-id seen-at])))
 
@@ -1047,9 +1046,6 @@
 (defn container-nav-in [container-slug sort-type]
   (let [container-data (dis/container-data @dis/app-state (dis/current-org-slug) container-slug sort-type)
         next-seen-at (str "last-seen-at-" (:container-slug container-data) "-" (:next-seen-at container-data))]
-    (js/console.log "DBG container-daat" container-data)
-    (js/console.log "DBG    next-seen-at:" next-seen-at)
-    (js/console.log "DBG    check: (:container-id container-data)" (:container-id container-data) "and (" @last-seen-at "!==" next-seen-at "=" (not= @last-seen-at next-seen-at)")")
     (when (and (:container-id container-data)
                (not= @last-seen-at next-seen-at))
       (send-container-seen (:container-id container-data) (:next-seen-at container-data))
