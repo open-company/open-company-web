@@ -2,7 +2,6 @@
   (:require-macros [cljs.core.async.macros :refer (go)]
                    [if-let.core :refer (when-let*)])
   (:require [goog.Uri :as guri]
-            [oops.core :refer (ocall oget)]
             [clojure.string :as s]
             [cljs-http.client :as http]
             [defun.core :refer (defun-)]
@@ -46,11 +45,11 @@
 
   ([href :guard string?]
     (let [parsed-uri (guri/parse href)]
-      (str (ocall parsed-uri "getPath")
-           (when (oget parsed-uri "hasQuery")
-             (str "?" (ocall parsed-uri "getEncodedQuery")))
-           (when (oget parsed-uri "hasFragment")
-             (str "#" (ocall parsed-uri "getFragment")))))))
+      (str (.getPath ^js parsed-uri)
+           (when (.-hasQuery ^js parsed-uri)
+             (str "?" (.getEncodedQuery ^js parsed-uri)))
+           (when (.-hasFragment ^js parsed-uri)
+             (str "#" (.getFragment ^js parsed-uri)))))))
 
 (defn- content-type [type]
   (str "application/vnd.open-company." type ".v1+json;charset=UTF-8"))

@@ -50,10 +50,10 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF ^js editable nil nil nil nil)
-    (let [original (oget gif-data ["images" "original"])
+    (let [original (oget gif-data "images.original")
           original-url (or (oget original "?url")
                            (oget original "?gif_url"))
-          fixed-width-still (oget gif-data ["images" "fixed_width_still"])
+          fixed-width-still (oget gif-data "images.fixed_width_still")
           fixed-width-still-url (or (oget fixed-width-still "?url")
                                     (oget fixed-width-still "?gif_url"))
           original-width (oget original "width")
@@ -87,12 +87,12 @@
 
 (defn attachment-upload-success-cb [state options editable res]
   (reset! (::media-attachment-did-success state) true)
-  (let [url (oget res :url)]
+  (let [url (oget res "url")]
     (if-not url
       (attachment-upload-failed-cb state editable)
-      (let [size (oget res :size)
-            mimetype (oget res :mimetype)
-            filename (oget res :filename)
+      (let [size (oget res "size")
+            mimetype (oget res "mimetype")
+            filename (oget res "filename")
             createdat (utils/js-date)
             prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
@@ -215,7 +215,7 @@
        ;; success-cb
        (fn [res]
          (reset! (::media-photo-did-success s) true)
-         (let [url (oget res :url)
+         (let [url (oget res "url")
                img   (gdom/createDom "img")]
            (set! (.-onload img) #(img-on-load s options editable url img))
            (set! (.-onerror img) #(img-on-load s options editable nil nil))
@@ -224,8 +224,8 @@
            (set! (.-src img) url)
            (reset! (::media-photo s) {:res res :url url})
            ;; if the image is a vector image
-           (if (or (= (string/lower (oget res :mimetype)) "image/svg+xml")
-                   (string/ends-with? (string/lower (oget res :filename)) ".svg"))
+           (if (or (= (string/lower (oget res "mimetype")) "image/svg+xml")
+                   (string/ends-with? (string/lower (oget res "filename")) ".svg"))
              ;l use the same url for the thumbnail since the size doesn't matter
              (do
                (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
@@ -278,7 +278,7 @@
 ;; DND
 
 (defn file-dnd-handler [s options editor-ext file]
-  (if (< (oget file :size) ls/file-upload-size)
+  (if (< (oget file "size") ls/file-upload-size)
     (if (:attachment-uploading @dis/app-state)
       (let [alert-data {:icon "/img/ML/error_icon.png"
                       :action "dnd-already-running"
@@ -327,9 +327,9 @@
                 :comment-parent-uuid (:comment-parent-uuid options)}])
               (iu/upload-file! file
                 (fn [url]
-                  (let [size (oget file :size)
-                        mimetype (oget file :type)
-                        filename (oget file :name)
+                  (let [size (oget file "size")
+                        mimetype (oget file "type")
+                        filename (oget file "name")
                         createdat (utils/js-date)
                         prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
                         subtitle (str prefix (filesize size :binary false :format "%.2f" ))
