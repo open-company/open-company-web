@@ -163,6 +163,7 @@
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
     (when is-drafts?
       (dis/dispatch! [:drafts-nav/show (:slug org-data)]))
+    (js/console.log "DBG org-loaded" org-data complete-refresh?)
     (when complete-refresh?
       ;; Load secure activity
       (if (dis/current-secure-activity-id)
@@ -170,35 +171,45 @@
         (do
           ;; Load the active users
           (when active-users-link
+            (js/console.log "DBG  active-users-link" active-users-link)
             (load-active-users active-users-link))
           ;; Load the current activity
           (when (and (dis/current-activity-id)
                      (dis/current-entry-board-slug))
+            (js/console.log "DBG  loading current activity" (dis/current-activity-id) (dis/current-entry-board-slug))
             (cmail-actions/get-entry-with-uuid (dis/current-entry-board-slug) (dis/current-activity-id)))
           ;; Load inbox data
           (when inbox-link
+            (js/console.log "DBG  loading inbox" inbox-delay inbox-link)
             (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data with recently posted sort
           (when all-posts-link
+            (js/console.log "DBG  loading all-posts" all-posts-delay all-posts-link)
             (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
           ;; Preload following data with recently posted sort
           (when following-link
+            (js/console.log "DBG  loading following" following-delay following-link)
             (utils/maybe-after following-delay #(aa/following-get org-data)))
           ;; Preload replies data
           (when replies-link
+            (js/console.log "DBG  loading replies" replies-delay replies-link)
             (utils/maybe-after replies-delay #(aa/replies-get org-data)))
           ;; Preload bookmarks data
           (when bookmarks-link
+            (js/console.log "DBG  loading bookmarks" bookmarks-delay bookmarks-link)
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           ;; Drafts
           (when drafts-link
+            (js/console.log "DBG  loading drafts" drafts-delay drafts-link)
             (utils/maybe-after drafts-delay #(sa/section-get utils/default-drafts-board-slug drafts-link)))
           ;; contributions data
           (when (and contrib-link
                      (dis/current-contributions-id))
+            (js/console.log "DBG  loading contributions" contributions-delay (dis/current-contributions-id))
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
           ;; Preload unfollowing data with recently posted sort
           (when (and is-unfollowing? unfollowing-link)
+            (js/console.log "DBG  loading unfollowing" unfollowing-link)
             (aa/unfollowing-get org-data))
           ))
       (when (:badge-following org-data)
