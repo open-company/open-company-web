@@ -708,6 +708,18 @@ div.pricing-table {
         font-size: 16px;
       }
 
+      div.tooltip {
+        max-width: 50vw;
+
+        div.tooltip-inner {
+          @include OC_Body_Book();
+
+          strong {
+            @include OC_Body_Bold();
+          }
+        }
+      }
+
       div.pricing-column-row {
         padding: 16px 0;
         margin: 0 24px;
@@ -716,9 +728,20 @@ div.pricing-table {
         color: $deep_navy;
         border-top: 1px solid rgba($deep_navy, 0.08);
         text-align: left;
+        cursor: pointer;
 
         &.coming-feature {
           color: rgba($deep_navy, 0.5);
+        }
+
+        i.mdi.mdi-information-outline {
+          color: $deep_navy;
+          margin-left: 4px;
+          vertical-align: super;
+
+          &:before {
+            font-size: 15px;
+          }
         }
       }
     }

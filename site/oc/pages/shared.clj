@@ -231,6 +231,7 @@
 
 (def pricing-table
   [:div.pricing-table.group
+   ;; Free
    [:div.pricing-table-column
     [:div.pricing-table-column-inner
      [:div.pricing-column-header
@@ -255,6 +256,7 @@
       "Anyone can add an update"]]
     [:div.pricing-column-footer-note.big-web-tablet-only
      "Nonprofits and K-12 education are always free."]]
+   ;; Premium
    [:div.pricing-table-column
     [:div.pricing-table-column-inner
      [:div.pricing-column-header
@@ -274,11 +276,33 @@
      [:div.pricing-column-row
       "Unlimited posts"]
      [:div.pricing-column-row
-      "Team, private and public access"]
+      {:title "<strong>The standard Lorem Ipsum passage, used since the 1500s</strong>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+       :data-toggle "tooltip"
+       :data-html "true"
+       :data-placement "top"
+      ;  :data-container "body"
+       }
+      "Team, private and public access"
+      [:i.mdi.mdi-information-outline]]
      [:div.pricing-column-row
-      "Editor and view-only permissions"]
+      {:title "<span>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.</span>"
+       :data-toggle "tooltip"
+       :data-html "true"
+       :data-placement "top"
+      ;  :data-container "body"
+       }
+      "Editor and view-only permissions"
+      [:i.mdi.mdi-information-outline]]
      [:div.pricing-column-row
-      "Advanced team settings"]
+      {:title "<span>Blah blah blah blah blah blah blah blah.</span><br/><span>Blah blah blah</span>"
+       :data-toggle "tooltip"
+       :data-html "true"
+       :data-placement "top"
+      ;  :data-container "body"
+       }
+      "Advanced team settings"
+      [:i.mdi.mdi-information-outline]]
     ;;  [:div.pricing-column-row.coming-feature
     ;;   "Assign roles for team onboarding (coming)"]
      ]]
