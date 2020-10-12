@@ -306,7 +306,7 @@
       (.-innerWidth js/window)))
 
 (defn calc-video-height [s]
-  (when (responsive/is-tablet-or-mobile?)
+  (when (responsive/is-mobile-size?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn- collapse-if-needed [s & [e]]
@@ -525,7 +525,7 @@
                       (.dispose ^js debounced-autosave))
                     s)}
   [s]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+  (let [is-mobile? (responsive/is-mobile-size?)
         _current-board-slug (drv/react s :board-slug)
         cmail-state (drv/react s :cmail-state)
         cmail-data* (drv/react s :cmail-data)
@@ -578,7 +578,7 @@
                               (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         editable-boards (drv/react s :editable-boards)
-        show-section-picker? (or ;; Publisher board can still be creaeted
+        show-section-picker? (or ;; Publisher board can still be created
                                  (and (not (some :publisher-board editable-boards))
                                       ls/publisher-board-enabled?
                                       (pos? (count editable-boards)))
@@ -628,14 +628,16 @@
                              (:fullscreen cmail-state))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
-            {:class (when show-section-picker? "section-picker-visible")}
+            {:class (utils/class-set {:has-section-button show-section-picker
+                                      :sections-dropdown-shown @(::show-section-picker s)})}
             (when is-mobile?
               [:div.section-picker-bt-container
                 {:ref :section-picker-container}
                 [:span.post-to "Post to"]
                 [:button.mlb-reset.section-picker-bt
                   {:on-click #(toggle-section-picker s)}
-                  (:board-name cmail-data)
+                  [:span.section-picker-bt-copy
+                    (:board-name cmail-data)]
                   [:div.dropdown-cog]]
                 (when @(::show-section-picker s)
                   [:div.section-picker-container
@@ -721,7 +723,8 @@
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            (:board-name cmail-data)
+            [:span.section-picker-bt-copy
+             (:board-name cmail-data)]
             [:div.dropdown-cog]]
           (when @(::show-section-picker s)
             [:div.section-picker-container
@@ -742,18 +745,18 @@
            :data-container "body"
            :title "Add attachment"}]
         [:div.cmail-footer-media-picker-container.group]
-        [:div.cmail-footer-right
-          ; (when-not (:fullscreen cmail-state)
-          ;   [:div.fullscreen-bt-container
-          ;     [:button.mlb-reset.fullscreen-bt
-          ;       {:on-click #(cmail-actions/cmail-toggle-fullscreen)
-          ;        :data-toggle (when-not is-mobile? "tooltip")
-          ;        :data-placement "top"
-          ;        :title "Fullscreen"}]])
-          (when (:uuid cmail-data)
-            [:div.delete-bt-container
-              [:button.mlb-reset.delete-bt
-                {:on-click #(delete-clicked s % cmail-data)
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :title "Delete"}]])]]]]))
+        (when (:uuid cmail-data)
+          [:div.delete-bt-container
+           [:button.mlb-reset.delete-bt
+            {:on-click #(delete-clicked s % cmail-data)
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :title "Delete"}]])
+        ; (when-not (:fullscreen cmail-state)
+        ;   [:div.fullscreen-bt-container
+        ;     [:button.mlb-reset.fullscreen-bt
+        ;       {:on-click #(cmail-actions/cmail-toggle-fullscreen)
+        ;        :data-toggle (when-not is-mobile? "tooltip")
+        ;        :data-placement "top"
+        ;        :title "Fullscreen"}]])
+        ]]]))

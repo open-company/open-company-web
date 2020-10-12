@@ -368,7 +368,7 @@
   (let [users-list @(drv/get-ref s :mention-users)]
     (when (and (seq users-list)
                (nil? @(::editor s)))
-      (let [mobile-editor (responsive/is-tablet-or-mobile?)
+      (let [mobile-editor (responsive/is-mobile-size?)
             media-config (:media-config options)
             placeholder (or (:placeholder options) "What would you like to share?")
             body-el (rum/ref-node s "editor-node")
