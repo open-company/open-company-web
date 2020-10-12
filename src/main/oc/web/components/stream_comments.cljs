@@ -221,6 +221,7 @@
                     [:button.mlb-reset.floating-bt.reply-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
+                       :data-container "body"
                        :on-click reply-cb
                        :title "Reply"}])
                   ;; React container
@@ -228,6 +229,7 @@
                     [:button.mlb-reset.floating-bt.react-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
+                       :data-container "body"
                        :title "Add reaction"
                        :on-click react-cb}]
                     emoji-picker]])]]
