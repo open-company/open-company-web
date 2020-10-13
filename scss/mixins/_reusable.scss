@@ -271,7 +271,7 @@
   }
 }
 
-@mixin svgBgColor($svgUrl, $position: "center", $size: "contain", $bgColor: var(--primary-color)) {
+@mixin svgBgColor($svgUrl, $position: center, $size: contain, $bgColor: var(--primary-color)) {
   background-color: $bgColor;
   background-image: none;
   mask-image: cdnUrl($svgUrl);

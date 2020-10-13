@@ -367,7 +367,7 @@
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
 
-(defn- hide-section-picker [s]
+(defn- hide-section-picker! [s]
   (reset! (::show-section-picker s) false))
 
 (defn- clear-delayed-show-section-picker [s]
@@ -379,21 +379,21 @@
 (defn- maybe-hide-section-picker [s]
   (clear-delayed-show-section-picker s)
   (when (= @(::show-section-picker s) :hover)
-    (hide-section-picker s)))
+    (hide-section-picker! s)))
 
-(defn- show-section-picker [s v]
+(defn- show-section-picker! [s v]
   (reset! (::show-section-picker s) v)
   (reset! (::delayed-show-section-picker s) nil))
 
 (defn- maybe-show-section-picker [s]
   (when-not @(::show-section-picker s)
     (clear-delayed-show-section-picker s)
-    (reset! (::delayed-show-section-picker s) (utils/after 720 #(show-section-picker s :hover)))))
+    (reset! (::delayed-show-section-picker s) (utils/after 720 #(show-section-picker! s :hover)))))
 
 (defn- toggle-section-picker [s]
   (if (= @(::show-section-picker s) :click)
-    (hide-section-picker s)
-    (show-section-picker s :click)))
+    (hide-section-picker! s)
+    (show-section-picker! s :click)))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -437,7 +437,7 @@
                      (mixins/on-window-click-mixin collapse-if-needed))
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
-                   (mixins/on-click-out :section-picker-container (fn [s e] (hide-section-picker s)))
+                   (mixins/on-click-out :section-picker-container (fn [s e] (hide-section-picker! s)))
 
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
                                                                      (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
@@ -558,7 +558,7 @@
                             "Save"
                             "Share update")
         did-pick-section (fn [board-data note dismiss-action]
-                           (hide-section-picker s)
+                           (hide-section-picker! s)
                            (when (and board-data
                                       (seq (:name board-data)))
                             (let [has-changes (or (:has-changes cmail-data)
@@ -627,7 +627,7 @@
                              (:fullscreen cmail-state))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
-            {:class (utils/class-set {:has-section-button show-section-picker
+            {:class (utils/class-set {:has-section-button show-section-picker?
                                       :sections-dropdown-shown @(::show-section-picker s)})}
             (when is-mobile?
               [:div.section-picker-bt-container

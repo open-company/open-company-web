@@ -49,10 +49,10 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF editable nil nil nil nil)
-    (let [original (oget gif-data ["images" "original"])
+    (let [original (oget gif-data "images.original")
           original-url (or (oget original "?url")
                            (oget original "?gif_url"))
-          fixed-width-still (oget gif-data ["images" "fixed_width_still"])
+          fixed-width-still (oget gif-data "images.?fixed_width_still")
           fixed-width-still-url (or (oget fixed-width-still "?url")
                                     (oget fixed-width-still "?gif_url"))
           original-width (oget original "width")
@@ -215,7 +215,7 @@
        (fn [res]
          (reset! (::media-photo-did-success s) true)
          (let [url (oget res :url)
-               img   (gdom/createDom "img")]
+               img (gdom/createDom "img")]
            (set! (.-onload img) #(img-on-load s options editable url img))
            (set! (.-onerror img) #(img-on-load s options editable nil nil))
            (set! (.-className img) "hidden")

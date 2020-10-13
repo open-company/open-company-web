@@ -645,7 +645,7 @@
         (assoc :fixed-video-id fixed-video-id)
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
-                                 (html-lib/first-body-thumbnail (:body entry-data))))
+                                 (html-lib/first-body-thumbnail (:body entry-data) false)))
         (assoc :container-seen-at container-seen-at))))))
 
 (defn parse-org
