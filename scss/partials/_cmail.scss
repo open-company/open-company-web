@@ -375,6 +375,7 @@ div.cmail-outer {
 
           div.post-button-container {
             margin-left: auto;
+            margin-right: 0;
             flex: 0 0 auto;
           }
         }
@@ -573,7 +574,7 @@ div.cmail-outer {
       }
 
       div.section-picker-bt-container {
-        margin: 0 28px 0 16px;
+        margin: 0 28px 0 4px;
         position: relative;
         display: block;
         height: 32px;
@@ -649,6 +650,7 @@ div.cmail-outer {
 
       div.post-button-container {
         margin-left: 0;
+        margin-right: 12px;
         flex: 0 0 auto;
         order: 1;
 

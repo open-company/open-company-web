@@ -67,27 +67,28 @@
       (:content notification))))
 
 (defn- load-item-if-needed [board-slug entry-uuid interaction-uuid]
-  (when (and board-slug
-             entry-uuid)
+  (when (and entry-uuid
+             (not= entry-uuid :404)
+             board-slug)
     (let [url (if interaction-uuid
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
                 (oc-urls/entry board-slug entry-uuid))]
-      #(if (seq (dis/activity-data entry-uuid))
-         (router/nav! url)
-         (cmail-actions/get-entry-with-uuid board-slug entry-uuid
-                                            (fn [success status]
-                                              (if success
-                                                (router/nav! url)
-                                                (let [alert-data {:icon "/img/ML/trash.svg"
-                                                                  :action "notification-click-item-load"
-                                                                  :title (if (= status 404) "Post not found" "An error occurred")
-                                                                  :message (if (= status 404)
-                                                                             "The post you're trying to access may have been moved or deleted."
-                                                                             "Please try again")
-                                                                  :solid-button-title "Ok"
-                                                                  :solid-button-style :red
-                                                                  :solid-button-cb alert-modal/hide-alert}]
-                                                  (alert-modal/show-alert alert-data)))))))))
+      #(let [activity-data (dis/activity-data entry-uuid)]
+         (if (or (= activity-data :404) (seq activity-data))
+           (router/nav! url)
+           (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+                                              (fn [success status]
+                                                (if (or success
+                                                        (< 399 status 500))
+                                                  (router/nav! url)
+                                                  (let [alert-data {:icon "/img/ML/trash.svg"
+                                                                    :action "notification-click-item-load"
+                                                                    :title "An error occurred"
+                                                                    :message "Please try again"
+                                                                    :solid-button-title "Ok"
+                                                                    :solid-button-style :red
+                                                                    :solid-button-cb alert-modal/hide-alert}]
+                                                    (alert-modal/show-alert alert-data))))))))))
 
 (defn fix-notification [notification & [unread]]
   (let [board-id (:board-id notification)

@@ -268,7 +268,7 @@
      [:div.pricing-column-row
       "Team-level access to all updates"]
      [:div.pricing-column-row
-      "Anyone can add an update"]]
+      "Everyone can add an update"]]
     [:div.pricing-column-footer-note.big-web-tablet-only
      "Nonprofits and K-12 education are always free."]]
    ;; Premium
@@ -291,33 +291,33 @@
      [:div.pricing-column-row
       "Unlimited posts"]
      [:div.pricing-column-row
-      {:title "<strong>The standard Lorem Ipsum passage, used since the 1500s</strong>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>"
+      {:title "Create updates that are private for select users, or public for people outside the team."
        :data-toggle "tooltip"
-       :data-html "true"
-       :data-placement "top"
-      ;  :data-container "body"
-       }
-      "Team, private and public access"
+       :data-placement "top"}
+      "Team, private and public updates"
       [:i.mdi.mdi-information-outline]]
      [:div.pricing-column-row
-      {:title "<span>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.</span>"
+      {:title "In the free version, everyone on the team can add updates. With premium, admins can assign editor and view-only roles."
        :data-toggle "tooltip"
-       :data-html "true"
-       :data-placement "top"
-      ;  :data-container "body"
-       }
-      "Editor and view-only permissions"
+       :data-placement "top"}
+      "View-only users"
       [:i.mdi.mdi-information-outline]]
      [:div.pricing-column-row
-      {:title "<span>Blah blah blah blah blah blah blah blah.</span><br/><span>Blah blah blah</span>"
+      {:title "In the free version, everyone receives a morning digest at 7AM. With premium, users can add periodic digests at noon and 5PM to stay in sync through the day."
        :data-toggle "tooltip"
-       :data-html "true"
-       :data-placement "top"
-      ;  :data-container "body"
-       }
-      "Advanced team settings"
+       :data-placement "top"}
+      "Custom digest schedule"
       [:i.mdi.mdi-information-outline]]
+     [:div.pricing-column-row
+      {:title "Know who saw your update, and easily remind those that missed it."
+       :data-toggle "tooltip"
+       :data-placement "top"}
+      "Analytics"
+      [:i.mdi.mdi-information-outline]]
+     [:div.pricing-column-row
+      "Custom colors"]
+     [:div.pricing-column-row
+      "Remove Carrot branding"]
     ;;  [:div.pricing-column-row.coming-feature
     ;;   "Assign roles for team onboarding (coming)"]
      ]]

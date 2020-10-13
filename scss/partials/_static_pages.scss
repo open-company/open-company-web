@@ -732,15 +732,18 @@ div.pricing-table {
 
         &.coming-feature {
           color: rgba($deep_navy, 0.5);
+
+          i.mdi.mdi-information-outline {
+            color: rgba($deep_navy, 0.5);
+          }
         }
 
         i.mdi.mdi-information-outline {
           color: $deep_navy;
           margin-left: 4px;
-          vertical-align: super;
 
           &:before {
-            font-size: 15px;
+            font-size: 14px;
           }
         }
       }

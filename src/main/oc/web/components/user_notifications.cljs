@@ -111,6 +111,7 @@
          [:div.user-notifications-tray-empty
           (all-caught-up)]
          (for [n user-notifications-data
+               :when (map? n)
                :let [entry-uuid (:uuid n)
                      board-slug (:board-slug n)
                      reminder? (:reminder? n)
