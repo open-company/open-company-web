@@ -77,95 +77,6 @@
          (when refresh?
            (refresh-contributions-data author-uuid)))))))))
 
-(defn- current-container-data []
-  (let [board-slug (dis/current-board-slug)
-        contributions-id (dis/current-contributions-id)]
-    (cond
-     (seq contributions-id)
-     (dis/contributions-data @dis/app-state (dis/current-org-slug) contributions-id)
-     (dis/is-container? board-slug)
-     (dis/container-data @dis/app-state (dis/current-org-slug) board-slug)
-     (= (keyword board-slug) :topic)
-     nil
-     :else
-     (dis/board-data @dis/app-state (dis/current-org-slug) board-slug))))
-
-(defn- reload-board-data []
-  (when-not (dis/current-activity-id)
-    (let [board-slug (dis/current-board-slug)
-          org-data (dis/org-data)
-          board-data (current-container-data)]
-       (cond
-
-        (= board-slug "topics")
-        (user-actions/load-explore-data)
-
-        (= board-slug "inbox")
-        (activity-actions/inbox-get org-data)
-
-        (= board-slug "replies")
-        (activity-actions/replies-get org-data true nil)
-
-        (and (= board-slug "all-posts")
-             (= (dis/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/all-posts-get org-data)
-
-        (and (= board-slug "all-posts")
-             (= (dis/current-sort-type) dis/recent-activity-sort))
-        (activity-actions/recent-all-posts-get org-data)
-
-        (= board-slug "bookmarks")
-        (activity-actions/bookmarks-get org-data)
-
-        (and (= board-slug "following")
-             (= (dis/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/following-get org-data true nil)
-
-        (and (= board-slug "following")
-             (= (dis/current-sort-type) dis/recent-activity-sort))
-        (activity-actions/recent-following-get org-data)
-
-        (and (= board-slug "unfollowing")
-             (= (dis/current-sort-type) dis/recently-posted-sort))
-        (activity-actions/unfollowing-get org-data)
-
-        (and (= board-slug "unfollowing")
-             (= (dis/current-sort-type) dis/recent-activity-sort))
-        (activity-actions/recent-unfollowing-get org-data)
-
-        :default
-        (let [fixed-board-data (or board-data
-                                   (dis/org-board-data org-data board-slug))
-              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
-          (when board-link
-            (section-actions/section-get (:slug fixed-board-data) board-link)))))))
-
-(defn- refresh-board-data []
-  (when-not (dis/current-activity-id)
-    (let [current-board-slug (dis/current-board-slug)
-          current-contrib-id (dis/current-contributions-id)
-          org-data (dis/org-data)
-          container-data (current-container-data)
-          board-kw (keyword current-board-slug)]
-       (cond (= board-kw :topics)
-             (user-actions/load-explore-data)
-             (= board-kw :all-posts)
-             (activity-actions/all-posts-refresh org-data)
-             (= board-kw :bookmarks)
-             (activity-actions/bookmarks-refresh org-data)
-             (= board-kw :replies)
-             (activity-actions/replies-refresh org-data true)
-             (= board-kw :following)
-             (activity-actions/following-refresh org-data true)
-             (= board-kw :unfollowing)
-             (activity-actions/unfollowing-refresh org-data true)
-             (seq current-contrib-id)
-             (contributions-actions/contributions-refresh org-data current-contrib-id)
-             (not (dis/is-container? current-board-slug))
-             (section-actions/section-refresh current-board-slug)
-             :else
-             (reload-board-data)))))
-
 (defn nav-to-url!
   ([e board-slug url]
   (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
@@ -200,7 +111,7 @@
                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]}])
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
-           (reload-board-data))
+           (activity-actions/reload-current-container))
          ;; Let's change the QP section if it's not active and going to an editable section
          (when (and (not is-container?)
                     (not is-drafts-board?)
@@ -219,7 +130,7 @@
         contributions-id (dis/current-contributions-id)
         is-contributions? (seq contributions-id)
         to-url (or (:back-to route) (oc-urls/following))
-        cont-data (current-container-data)
+        cont-data (dis/current-container-data)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
                                  (:refresh route)
                                  (not cont-data))
@@ -232,7 +143,7 @@
       (nav-to-author! e contributions-id to-url back-y false)
       (nav-to-url! e board to-url back-y false))
     (when should-refresh-data?
-      (utils/after 180 refresh-board-data))))
+      (utils/after 180 activity-actions/refresh-current-container))))
 
 (defn open-post-modal
   ([entry-data dont-scroll]

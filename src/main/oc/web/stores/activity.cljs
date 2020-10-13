@@ -325,16 +325,19 @@
 (defmethod dispatcher/action :entry-save/finish
   [db [_ activity-data edit-key]]
   (let [org-slug (utils/post-org-slug activity-data)
+        org-data (dispatcher/org-data db org-slug)
         board-slug (:board-slug activity-data)
+        change-data (dispatcher/change-data db org-slug)
         activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         activity-board-data (dispatcher/board-data db org-slug board-slug)
-        fixed-activity-data (au/parse-entry activity-data activity-board-data (dispatcher/change-data db org-slug))
-        next-db (assoc-in db activity-key fixed-activity-data)
-        with-edited-key (if edit-key
-                          (update-in next-db [edit-key] dissoc :loading)
-                          next-db)
-        without-entry-save-on-exit (dissoc with-edited-key :entry-toggle-save-on-exit)]
-    (dissoc without-entry-save-on-exit :section-editing)))
+        fixed-activity-data (au/parse-entry activity-data activity-board-data change-data)]
+    (as-> db ndb
+      (assoc-in ndb activity-key fixed-activity-data)
+      (if edit-key
+        (update-in ndb [edit-key] dissoc :loading)
+        ndb)
+      (dissoc ndb :entry-toggle-save-on-exit)
+      (dissoc ndb :section-editing))))
 
 (defmethod dispatcher/action :entry-save/failed
   [db [_ edit-key]]

@@ -584,9 +584,6 @@
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (dis/current-org-slug) notification]))
 
-(defn load-explore-data []
-  (org-actions/get-org (dis/org-data) true user-utils/load-follow-data))
-
 (defn refresh-follow-containers []
   (let [org-data (dis/org-data)
         current-board-slug (dis/current-board-slug)
