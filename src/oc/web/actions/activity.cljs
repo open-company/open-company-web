@@ -16,6 +16,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.user :as user-utils]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
@@ -563,6 +564,93 @@
                                      :activity-uuid (:uuid entry-data)}])
       (api/get-entry entry-link (partial cmail-actions/get-entry-finished org-slug (:uuid entry-data))))))
 
+(defn get-org [org-data cb]
+  (let [fixed-org-data (or org-data (dis/org-data))
+        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+    (api/get-org org-link (fn [{:keys [status body success]}]
+                            (let [org-data (json->cljs body)]
+                              (dis/dispatch! [:org-loaded org-data])
+                              (cb success))))))
+
+(defn load-explore-data []
+  (get-org (dis/org-data) user-utils/load-follow-data))
+
+(defn- reload-current-container []
+  (when-not (dis/current-activity-id)
+    (let [board-slug (dis/current-board-slug)
+          org-data (dis/org-data)
+          board-data (dis/current-container-data)]
+      (cond
+
+        (= board-slug "topics")
+        (load-explore-data)
+
+        (= board-slug "inbox")
+        (inbox-get org-data)
+
+        (= board-slug "replies")
+        (replies-get org-data true nil)
+
+        (and (= board-slug "all-posts")
+             (= (dis/current-sort-type) dis/recently-posted-sort))
+        (all-posts-get org-data)
+
+        (and (= board-slug "all-posts")
+             (= (dis/current-sort-type) dis/recent-activity-sort))
+        (recent-all-posts-get org-data)
+
+        (= board-slug "bookmarks")
+        (bookmarks-get org-data)
+
+        (and (= board-slug "following")
+             (= (dis/current-sort-type) dis/recently-posted-sort))
+        (following-get org-data true nil)
+
+        (and (= board-slug "following")
+             (= (dis/current-sort-type) dis/recent-activity-sort))
+        (recent-following-get org-data)
+
+        (and (= board-slug "unfollowing")
+             (= (dis/current-sort-type) dis/recently-posted-sort))
+        (unfollowing-get org-data)
+
+        (and (= board-slug "unfollowing")
+             (= (dis/current-sort-type) dis/recent-activity-sort))
+        (recent-unfollowing-get org-data)
+
+        :default
+        (let [fixed-board-data (or board-data
+                                   (dis/org-board-data org-data board-slug))
+              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
+          (when board-link
+            (sa/section-get (:slug fixed-board-data) board-link)))))))
+
+(defn refresh-current-container []
+  (when-not (dis/current-activity-id)
+    (let [current-board-slug (dis/current-board-slug)
+          current-contrib-id (dis/current-contributions-id)
+          org-data (dis/org-data)
+          container-data (dis/current-container-data)
+          board-kw (keyword current-board-slug)]
+      (cond (= board-kw :topics)
+            (load-explore-data)
+            (= board-kw :all-posts)
+            (all-posts-refresh org-data)
+            (= board-kw :bookmarks)
+            (bookmarks-refresh org-data)
+            (= board-kw :replies)
+            (replies-refresh org-data true)
+            (= board-kw :following)
+            (following-refresh org-data true)
+            (= board-kw :unfollowing)
+            (unfollowing-refresh org-data true)
+            (seq current-contrib-id)
+            (contrib-actions/contributions-refresh org-data current-contrib-id)
+            (not (dis/is-container? current-board-slug))
+            (sa/section-refresh current-board-slug)
+            :else
+            (reload-current-container)))))
+
 (declare entry-revert)
 
 (defn entry-clear-local-cache [item-uuid edit-key item]
@@ -738,7 +826,10 @@
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
     (dis/dispatch! [:activity-move activity-data (dis/current-org-slug) board-data])
-    (api/patch-entry patch-entry-link fixed-activity-data nil create-update-entry-cb)))
+    (api/patch-entry patch-entry-link fixed-activity-data nil
+                     (fn [entry-data edit-key resp]
+                       (create-update-entry-cb entry-data edit-key resp)
+                       (refresh-current-container)))))
 
 (defn activity-share-show [activity-data & [element-id share-medium]]
   (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
@@ -790,14 +881,6 @@
         org-data (org-data-from-secure-activity secure-activity-data)]
     (cmail-actions/get-entry-finished (:slug org-data) nil resp secure-uuid)
     (dis/dispatch! [:org-loaded org-data])))
-
-(defn get-org [org-data cb]
-  (let [fixed-org-data (or org-data (dis/org-data))
-        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (fn [{:keys [status body success]}]
-      (let [org-data (json->cljs body)]
-        (dis/dispatch! [:org-loaded org-data])
-        (cb success))))))
 
 (defn- build-secure-activity-link [org-slug secure-activity-id]
   {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)

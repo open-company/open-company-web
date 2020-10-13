@@ -901,6 +901,19 @@
   ([data org-slug board-slug sort-type]
     (get-in data (container-key org-slug board-slug sort-type))))
 
+(defn ^:explore current-container-data []
+  (let [board-slug (current-board-slug)
+        contributions-id (current-contributions-id)]
+    (cond
+      (seq contributions-id)
+      (contributions-data @app-state (current-org-slug) contributions-id)
+      (is-container? board-slug)
+      (container-data @app-state (current-org-slug) board-slug)
+      (= (keyword board-slug) :topic)
+      nil
+      :else
+      (board-data @app-state (current-org-slug) board-slug))))
+
 (defn ^:export all-posts-data
   "Get all-posts container data."
   ([]
