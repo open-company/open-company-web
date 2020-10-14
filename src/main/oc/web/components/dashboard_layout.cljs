@@ -150,10 +150,13 @@
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      member?)
-            (mobile-tabbar {:mobile-user-notifications mobile-user-notifications
-                            :is-following is-following
-                            :is-topics is-topics
-                            :is-replies is-replies
+            (mobile-tabbar {:active-tab (cond mobile-user-notifications     :user-notifications
+                                              is-following                  :following
+                                              is-replies                    :replies
+                                              (or is-topics
+                                                  (seq current-board-slug)
+                                                  (not is-container?))      :topics
+                                              :else                         :none)
                             :can-compose? can-compose?
                             :user-notifications-data user-notifications-data
                             :show-add-post-tooltip add-post-tooltip}))

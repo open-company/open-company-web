@@ -3,12 +3,9 @@
   (:require [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.shared.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.org :as org-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
@@ -50,7 +47,7 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (when ua/mobile?
+  (when (responsive/is-mobile-size?)
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
     (notif-actions/hide-mobile-user-notifications))
   (utils/after 0 (fn []
@@ -85,7 +82,7 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (when ua/mobile?
+  (when (responsive/is-mobile-size?)
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
     (notif-actions/hide-mobile-user-notifications))
   (utils/after 0 (fn []
