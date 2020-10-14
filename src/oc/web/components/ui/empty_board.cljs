@@ -63,18 +63,8 @@
            is-bookmarks? "No updates are bookmarked"
            is-following?
            [:div.empty-following
-             "Home is where you'll find updates for the topics you're following."
-             ; (when (:can-compose? org-data)
-             ;   [:button.mlb-reset.create-bt
-             ;     {:on-click #(nav-actions/show-follow-picker)}
-             ;     "New update"])
-             ]
+             "Home is where you'll find updates for the topics you're following."]
            is-unfollowing?
            [:div.empty-following
-             "Here is where you'll find updates that you decided to not follow."
-             ; (when (:can-compose? org-data)
-             ;   [:button.mlb-reset.create-bt
-             ;     {:on-click #(nav-actions/show-follow-picker)}
-             ;     "Create update"])
-             ]
+             "Here is where you'll find updates that you decided to not follow."]
            :else "This topic has no updates")]]]))
