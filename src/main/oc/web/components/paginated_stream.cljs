@@ -181,13 +181,10 @@
 ;;      0
 ;;      (range (count replies-data)))))
 
- (defn- unique-row-string [replies? item]
+ (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
         static-part (str (name (:resource-type item)) "-" (:uuid item))
-        ;; rep-key (replies-unique-key item)
         variable-part (cond
-                        ;; (and entry? replies?)
-                        ;; (str (-> item :replies-data last :updated-at) "-" rep-key)
                         entry?
                         (or (:updated-at item) (:created-at item))
                         :else
@@ -216,18 +213,6 @@
       (clear-cell-measure s idx 0))
     (reset! resource-types next-row-keys)))
 
-(defn- setup-onload-recalc [s]
-  (when (-> s :rum/args first :container-data :container-slug (= :replies))
-    (let [dom-node (rum/dom-node s)]
-      (when dom-node
-        (let [parent-sel (str "div." dom-utils/onload-recalc-measure-class)
-              nodes (array-seq (.querySelectorAll dom-node (str parent-sel " img, " parent-sel " iframe")))]
-          (doseq [el nodes]
-             (let [comment-node (.closest el parent-sel)
-                   row-index (.. comment-node -dataset -rowIndex)]
-               (clear-cell-measure s row-index 0)
-               (set! (.-onload el) #(clear-cell-measure s row-index 0)))))))))
-
 (rum/defcs virtualized-stream < rum/static
                                 (seen-mixins/container-nav-mixin)
                                 (rum/local nil ::row-keys)
@@ -237,7 +222,7 @@
                                 {:will-mount (fn [s]
                                   (let [props (-> s :rum/args s first)
                                         replies? (-> props :container-data :container-slug (= :replies))
-                                        next-row-keys (mapv (partial unique-row-string replies?) (:items props))]
+                                        next-row-keys (mapv unique-row-string (:items props))]
                                     (reset! (::force-re-render s) (utils/activity-uuid))
                                     (reset! (::cache s)
                                      (RVCellMeasurerCache.
@@ -246,16 +231,11 @@
                                                 :fixedWidth true})))
                                     (reset! (::row-keys s) next-row-keys))
                                   s)
-                                 :did-mount (fn [s]
-                                  (setup-onload-recalc s)
-                                  s)
                                  :did-remount (fn [_ s]
                                   (let [props (-> s :rum/args first)
-                                        replies? (-> props :container-data :container-slug (= :replies))
-                                        next-row-keys (mapv (partial unique-row-string replies?) (:items props))]
+                                        next-row-keys (mapv unique-row-string (:items props))]
                                     (when-not (= @(::row-keys s) next-row-keys)
-                                      (clear-changed-cells-cache s next-row-keys))
-                                    (setup-onload-recalc s))
+                                      (clear-changed-cells-cache s next-row-keys)))
                                   s)}
   [s {:keys [items
              activities-read
