@@ -364,7 +364,7 @@
    (refresh-org-data-cb (dis/current-board-slug) (dis/current-sort-type) resp))
 
   ([board-slug sort-type {:keys [status body success]}]
-  (let [org-data (json->cljs body)
+  (let [org-data (when success (json->cljs body))
         board-kw (keyword board-slug)
         is-all-posts (= board-kw :all-posts)
         is-bookmarks (= board-kw :bookmarks)
@@ -380,8 +380,8 @@
                      (utils/link-for (:links board-data) ["item" "self"] "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
-      ; is-inbox
-      ; (inbox-get org-data)
+      is-inbox
+      (inbox-get org-data)
 
       (and is-all-posts
            (= sort-type dis/recently-posted-sort))
@@ -568,7 +568,7 @@
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
     (api/get-org org-link (fn [{:keys [status body success]}]
-                            (let [org-data (json->cljs body)]
+                            (let [org-data (when success (json->cljs body))]
                               (dis/dispatch! [:org-loaded org-data])
                               (cb success))))))
 
@@ -961,16 +961,16 @@
             container-id (:item-id change-data)
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
-        ; (when (= (dis/current-board-slug) "all-posts")
-        ;   (all-posts-get (dis/org-data)))
+        (when (= (dis/current-board-slug) "all-posts")
+          (all-posts-get (dis/org-data)))
         (when (= (dis/current-board-slug) "bookmarks")
           (bookmarks-get (dis/org-data)))
         ; (when (= (dis/current-board-slug) "following")
         ;   (following-get (dis/org-data)))
         (when (= (dis/current-board-slug) "unfollowing")
           (unfollowing-get (dis/org-data)))
-        ; (when (= (dis/current-board-slug) "inbox")
-        ;   (inbox-get (dis/org-data)))
+        (when (= (dis/current-board-slug) "inbox")
+          (inbox-get (dis/org-data)))
         )))
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
@@ -1072,14 +1072,14 @@
               (following-did-change)
               ;; Refresh specific containers/sections
               (cond
-                ; (= current-board-slug "inbox")
-                ; (inbox-get org-data dispatch-unread)
-                ; (= current-board-slug "all-posts")
-                ; (all-posts-get org-data dispatch-unread)
-                ; (= current-board-slug "bookmarks")
-                ; (bookmarks-get org-data dispatch-unread)
-                ; (= current-board-slug "following")
-                ; (following-get org-data dispatch-unread)
+                (= current-board-slug "inbox")
+                (inbox-get org-data dispatch-unread)
+                (= current-board-slug "all-posts")
+                (all-posts-get org-data dispatch-unread)
+                (= current-board-slug "bookmarks")
+                (bookmarks-get org-data dispatch-unread)
+                ;; (= current-board-slug "following")
+                ;; (following-get org-data dispatch-unread)
                 (= current-board-slug "unfollowing")
                 (unfollowing-get org-data dispatch-unread)
                 ;; If it's not one of the previous containers then load
@@ -1343,27 +1343,14 @@
   (let [org-slug (dis/current-org-slug)
         activity-data (dis/activity-data entry-uuid)
         follow-link (utils/link-for (:links activity-data) "follow")]
-    (api/inbox-follow follow-link
-     (fn [{:keys [status success body]}]
-       (if (and (= status 404)
-                (= (:uuid activity-data) (dis/current-activity-id)))
-         (do
-           (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
-           (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))))))
+    (api/inbox-follow follow-link (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
 
 (defn entry-unfollow [entry-uuid]
   (let [org-slug (dis/current-org-slug)
         activity-data (dis/activity-data entry-uuid)
         unfollow-link (utils/link-for (:links activity-data) "unfollow")]
     (api/inbox-unfollow unfollow-link
-     (fn [{:keys [status success body]}]
-       (if (and (= status 404)
-                (= (:uuid activity-data) (dis/current-activity-id)))
-         (do
-           (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
-           (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))))))
+     (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
 
 (defn inbox-dismiss [entry-uuid]
   (let [org-slug (dis/current-org-slug)
@@ -1373,15 +1360,10 @@
     (when dismiss-link
       (dis/dispatch! [:inbox/dismiss org-slug entry-uuid dismiss-at])
       (api/inbox-dismiss dismiss-link dismiss-at
-       (fn [{:keys [status success body]}]
-         (if (and (= status 404)
-                  (= (:uuid activity-data) (dis/current-activity-id)))
-           (do
-             (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
-             (routing-actions/maybe-404))
-           (dis/dispatch! [:activity-get/finish org-slug (json->cljs body) nil]))
-          ; (inbox-get (dis/org-data))
-          )))))
+       (fn [{:keys [status success body] :as resp}]
+         (cmail-actions/get-entry-finished org-slug entry-uuid resp)
+       ; (inbox-get (dis/org-data))
+         )))))
 
 (declare inbox-unread)
 
@@ -1402,14 +1384,9 @@
     (let [org-slug (dis/current-org-slug)]
       (dis/dispatch! [:inbox/unread org-slug (dis/current-board-slug) (:uuid activity-data)])
       (api/inbox-unread unread-link
-                        (fn [{:keys [status success body]}]
-                          (if (and (= status 404)
-                                   (= (:uuid activity-data) (dis/current-activity-id)))
-                            (do
-                              (dis/dispatch! [:activity-get/not-found org-slug (:uuid activity-data) nil])
-                              (routing-actions/maybe-404))
-                            (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) nil]))
-                            ; (inbox-get (dis/org-data))
+                        (fn [{:keys [status success body] :as resp}]
+                          (cmail-actions/get-entry-finished org-slug (:uuid activity-data) resp)
+                        ; (inbox-get (dis/org-data))
                           )))))
 
 (defn- inbox-real-dismiss-all []
