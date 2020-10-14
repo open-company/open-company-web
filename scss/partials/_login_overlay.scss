@@ -286,8 +286,8 @@ div.login-overlay-container {
         height: 40px;
         // background-color: $carrot_orange;
         // color: white;
-        background-color: var(--primary-color);
-        color: var(--secondary-color);
+        background-color: $primary_color;
+        color: $secondary_color;
         @include OC_Body_Bold();
         font-size: 18px;
         line-height: 23px;

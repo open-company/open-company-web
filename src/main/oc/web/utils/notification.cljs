@@ -10,26 +10,11 @@
 
 (defn notification-title [notification]
   (let [mention? (:mention? notification)
-        reminder? (:reminder? notification)
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
-        reminder (when reminder?
-                   (:reminder notification))
-        notification-type (when reminder?
-                            (:notification-type reminder))
-        reminder-assignee (when reminder?
-                            (:assignee reminder))
         entry-publisher (:entry-publisher notification)
         user-id (:user-id notification)]
     (cond
-      ;; A reminder was created for current user
-      (and reminder
-           (= notification-type "reminder-notification"))
-      (str first-name " created a new reminder for you")
-      ;; A reminder has been triggered for the current user
-      (and reminder
-           (= notification-type "reminder-alert"))
-      (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
       ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
       (str first-name " mentioned you")
@@ -46,25 +31,6 @@
       (str first-name " commented on your post")
       :else
       nil)))
-
-(defn notification-content [notification]
-  (let [reminder? (:reminder? notification)
-        reminder (when reminder?
-                   (:reminder notification))
-        notification-type (when reminder?
-                            (:notification-type reminder))]
-    (cond
-      (and reminder
-           (= notification-type "reminder-notification"))
-      (str
-       (:headline reminder) ": "
-       (:frequency reminder) " starting "
-       (activity-utils/post-date (:next-send reminder)))
-      (and reminder
-           (= notification-type "reminder-alert"))
-      (:headline reminder)
-      :else
-      (:content notification))))
 
 (defn- load-item-if-needed [board-slug entry-uuid interaction-uuid]
   (when (and entry-uuid
@@ -96,8 +62,6 @@
         is-interaction (seq (:interaction-id notification))
         created-at (:notify-at notification)
         title (notification-title notification)
-        reminder-data (:reminder notification)
-        reminder? (:reminder? notification)
         entry-uuid (:entry-id notification)
         interaction-uuid (:interaction-id notification)]
     (when (seq title)
@@ -107,20 +71,11 @@
        :is-interaction is-interaction
        :unread unread
        :mention? (:mention? notification)
-       :reminder? reminder?
-       :reminder reminder-data
        :created-at (:notify-at notification)
-       :body (notification-content notification)
+       :body (:content notification)
        :title title
        :author (:author notification)
-       :click (if reminder?
-                (when-not (responsive/is-mobile-size?)
-                  ;; (if (and reminder-data
-                  ;;          (= (:notification-type reminder-data) "reminder-notification"))
-                  ;;   #(oc.web.actions.nav-sidebar/show-reminders)
-                  ;;   #(ui-compose)))
-                  #(ui-compose))
-                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid))})))
+       :click (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))

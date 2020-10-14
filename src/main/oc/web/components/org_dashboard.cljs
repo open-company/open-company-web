@@ -1,8 +1,6 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
             [clojure.string :as s]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
@@ -21,7 +19,7 @@
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.ui.follow-picker :refer (follow-picker)]
+            ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -166,7 +164,7 @@
         show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
-        show-follow-picker (= open-panel :follow-picker)
+        ;; show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
                             search-active)
         should-show-expanded-post? (and (not entry-not-found)
@@ -250,8 +248,8 @@
           show-user-info?
           (user-info-modal {:user-data user-info-data :org-data org-data})
           ;; Follow user picker
-          show-follow-picker
-          (follow-picker)
+          ;; show-follow-picker
+          ;; (follow-picker)
           ;; Mobile fullscreen search
           mobile-search?
           (search-box))

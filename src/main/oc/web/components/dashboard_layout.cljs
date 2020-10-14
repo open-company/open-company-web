@@ -1,43 +1,26 @@
 (ns oc.web.components.dashboard-layout
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
-            [oc.lib.user :as lib-user]
-            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.shared.useragent :as ua]
-            [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
-            [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.user :as user-store]
-            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.actions.notifications :as notif-actions]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
-            [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
-            [oc.web.components.ui.poll :refer (poll-portal)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.mobile-tabbar :refer (mobile-tabbar)]
+            [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]))
 
 (rum/defcs dashboard-layout < rum/static
                               rum/reactive
@@ -76,8 +59,6 @@
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (:can-compose? org-data)
                                     (cmail-actions/cmail-reopen?)))
-                                ;; Preload reminders
-                                (reminder-actions/load-reminders)
                                 (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
                                 s)}
   [s]
@@ -97,6 +78,7 @@
         current-user-data (drv/react s :current-user-data)
         mobile-user-notifications (drv/react s :mobile-user-notifications)
         user-notifications-data (drv/react s :user-notifications)
+        add-post-tooltip (drv/react s :show-add-post-tooltip)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
@@ -134,13 +116,6 @@
                                      (not (:read-only container-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        show-expanded-post (and current-activity-id
-                                activity-data
-                                (not= activity-data :404)
-                                ;; Do not show the post under the wrong board slug/uuid
-                                (or (= (:board-slug activity-data) current-board-slug)
-                                    (= (:board-uuid activity-data) current-board-slug)))
-        no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
         member? (:member? org-data)
@@ -175,61 +150,20 @@
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      member?)
-            [:div.dashboard-layout-mobile-tabbar
-              {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-app-tabbar (and ua/mobile-app?
-                                                             no-phisical-home-button)
-                                        :ios-web-tabbar (and (not ua/mobile-app?)
-                                                             no-phisical-home-button)})}
-              [:button.mlb-reset.tab-button.following-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "following" (oc-urls/following)))
-                 :class (when (and is-following (not mobile-user-notifications))
-                          "active")}
-                [:span.tab-icon]
-                [:span.tab-label "Home"]]
-              [:button.mlb-reset.tab-button.topics-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
-                 :class (when (and is-topics (not mobile-user-notifications))
-                          "active")}
-                [:span.tab-icon]
-                [:span.tab-label "Explore"]]
-              [:button.mlb-reset.tab-button.replies-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "replies" (oc-urls/replies)))
-                 :class (when (and is-replies (not mobile-user-notifications))
-                          "active")}
-                [:span.tab-icon]
-                [:span.tab-label "Activity"]]
-              [:button.mlb-reset.tab-button.notifications-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (notif-actions/toggle-mobile-user-notifications))
-                 :class (when mobile-user-notifications
-                          "active")}
-                [:span.tab-icon
-                  (when (user-notifications/has-new-content? user-notifications-data)
-                    [:span.unread-dot])]
-                [:span.tab-label "Alerts"]]
-              (when can-compose?
-                [:button.mlb-reset.tab-button.new-post-tab
-                  {:on-click #(do
-                                (.stopPropagation %)
-                                (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                  [:span.tab-icon]
-                  [:span.tab-label "New"]])])
+            (mobile-tabbar {:mobile-user-notifications mobile-user-notifications
+                            :is-following is-following
+                            :is-topics is-topics
+                            :is-replies is-replies
+                            :can-compose? can-compose?
+                            :user-notifications-data user-notifications-data
+                            :show-add-post-tooltip add-post-tooltip}))
           (when (and is-mobile?
                      mobile-user-notifications)
             (user-notifications/user-notifications))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
-            ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-            ;       non-admin-tooltip (str ls/product-name " is where you'll find key announcements, updates, and "
+            ; (let [non-admin-tooltip (str ls/product-name " is where you'll find key announcements, updates, and "
             ;                              "decisions to keep you and your team pulling in the same direction.")
             ;       is-second-user (= add-post-tooltip :is-second-user)]
             ;   (when (and (not is-drafts-board)
@@ -280,11 +214,7 @@
                     [:div.board-name-with-icon.contributions
                       [:div.board-name-with-icon-internal
                         ; (str (:total-count container-data) " posts")
-                        (str "Latest from " (:short-name contributions-user-data))
-                        ; (if is-own-contributions
-                        ;   "You"
-                        ;   (lib-user/name-for contributions-user-data))
-                        ]]
+                        (str "Latest from " (:short-name contributions-user-data))]]
                     :else
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
@@ -364,16 +294,7 @@
                        :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
                        :data-container "body"
-                       :title "Dismiss all"}])
-                  ; (when (and is-following
-                  ;            member?)
-                  ;   [:button.mlb-reset.curate-feed-bt
-                  ;     {:on-click #(nav-actions/show-follow-picker)
-                  ;      :data-toggle (when-not is-mobile? "tooltip")
-                  ;      :data-placement "top"
-                  ;      :data-container "body"
-                  ;      :title "Curate your Home feed"}])
-                  ]])
+                       :title "Dismiss all"}])]])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view
                 (cond
