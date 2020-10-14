@@ -48,7 +48,7 @@ div.onboard-email-container {
   }
 
   &.error {
-    color: $primary_color;
+    color: $carrot_orange;
   }
 
   &.email-wall {
@@ -89,7 +89,7 @@ div.onboard-email-container {
     width: 100%;
     height: 40px;
     background-color: $primary_color;
-    color: white;
+    color: $secondary_color;
     @include OC_Body_Bold();
     font-size: 16px;
     line-height: 20px;
@@ -186,7 +186,7 @@ div.onboard-container-inner {
       width: 100%;
       height: 40px;
       background-color: $primary_color;
-      color: white;
+      color: $secondary_color;
       @include OC_Body_Bold();
       font-size: 16px;
       line-height: 20px;
@@ -587,7 +587,7 @@ div.onboard-container-inner {
 
       span.error {
         margin-left: 16px;
-        color: $primary_color;
+        color: $carrot_orange;
       }
     }
 
@@ -690,7 +690,7 @@ div.onboard-container-inner {
       height: 40px;
       max-width: 320px;
       background-color: $primary_color;
-      color: white;
+      color: $secondary_color;
       @include OC_Body_Bold();
       font-size: 16px;
       line-height: 20px;
@@ -707,10 +707,11 @@ div.onboard-container-inner {
 
       &.start-using-carrot {
         background-color: $primary_color;
-        color: white;
+        color: $secondary_color;
 
-        &.disabled {
-          background-color: rgba($primary_color, 0.2);
+        &.disabled, &:disabled {
+          background-color: rgba($deep_navy, 0.16);
+          color: $ui_grey;
         }
       }
 
