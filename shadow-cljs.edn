@@ -21,7 +21,7 @@
   [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
 
   ;; Library for OC projects https://github.com/open-company/open-company-lib
-  [open-company/lib "0.17.29-alpha49" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+  [open-company/lib "0.17.29-alpha50" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
   ;; In addition to common functions, brings in the following common dependencies used by this project:
   ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
   ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
@@ -47,17 +47,17 @@
                   :handler oc.dev/handler
                   }}
  :builds
- {:webapp
-  {:target :browser
-   :devtools {:ignore-warnings true
-              :before-load oc.web.core/on-js-reload
-              :repl-pprint true
-              :repl-init-ns oc.web.core}
-   :modules {:oc {:init-fn oc.web.core/init}}
-   :repl-pprint true
-   :dev {:compiler-options {:optimizations :none}}
-   :compiler-options {:infer-externs :auto}
-   :release {:compiler-options {:optimizations :advanced
-                                :source-map true
-                                :source-map-include-sources-content true
-                                :source-map-detail-level :symbols}}}}}
+ ;; Web app
+ {:webapp {:target :browser
+           :devtools {:ignore-warnings true
+                      :before-load oc.web.core/on-js-reload
+                      :repl-pprint true
+                      :repl-init-ns oc.web.core}
+           :modules {:oc {:init-fn oc.web.core/init}}
+           :repl-pprint true
+           :dev {:compiler-options {:optimizations :none}}
+           :compiler-options {:infer-externs :auto}
+           :release {:compiler-options {:optimizations :advanced
+                                        :source-map true
+                                        :source-map-include-sources-content true
+                                        :source-map-detail-level :symbols}}}}}
