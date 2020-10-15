@@ -13,7 +13,8 @@
     "scss:clean": "rm -fd public/css/app.main.css",
     "cljs:build": "npx shadow-cljs compile webapp",
     "cljs:watch": "npx shadow-cljs watch webapp",
-    "cljs:clean": "rm -dfR node_modules/ public/js/* package-lock.lock && npm install"
+    "cljs:clean-packages": "npm run cljs:clean && rm -dfR package-lock.json && npm install",
+    "cljs:clean": "rm -dfR node_modules/ public/js/* target/ && npm install"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
