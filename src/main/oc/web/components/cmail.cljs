@@ -1,6 +1,7 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [oops.core :refer (oget ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -102,7 +103,7 @@
 
 (defn- cleaned-body []
   (when-let [body-el (body-element)]
-    (utils/clean-body-html (.-innerHTML body-el))))
+    (utils/clean-body-html (oget body-el "innerHTML"))))
 
 (defn real-close []
   (cmail-actions/cmail-hide))
@@ -129,11 +130,11 @@
 
 (defn debounced-autosave!
   [s]
-  (.fire @(::debounced-autosave s)))
+  (.fire ^js @(::debounced-autosave s)))
 
 (defn cancel-autosave!
   [s]
-  (.stop @(::debounced-autosave s)))
+  (.stop ^js @(::debounced-autosave s)))
 
 ;; Close dismiss handling
 
@@ -172,7 +173,7 @@
   (dis/dispatch! [:input (conj dis/cmail-data-key :has-changes) true])
   (debounced-autosave! state)
   (when-let [body-el (body-element)]
-    (reset! (::last-body state) (.-innerHTML body-el))))
+    (reset! (::last-body state) (oget body-el "innerHTML"))))
 
 (defn- setup-top-padding [s]
   (when-let [headline (headline-element s)]
@@ -181,7 +182,7 @@
 
 (defn- headline-on-change [state]
   (when-let [headline (headline-element state)]
-    (let [clean-headline (fix-headline (.-innerText headline))
+    (let [clean-headline (fix-headline (oget headline "innerText"))
           post-button-title (when-not (seq clean-headline) :title)]
       (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline clean-headline
                                                             :has-changes true})])
@@ -207,13 +208,13 @@
   [state e]
   ; Prevent the normal paste behavior
   (utils/event-stop e)
-  (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
-        pasted-data   (.getData clipboardData "text/plain")]
+  (let [clipboardData (or (oget e "clipboardData") (oget js/window "clipboardData"))
+        pasted-data   (ocall clipboardData "getData" "text/plain")]
     ; replace the selected text of headline with the text/plain data of the clipboard
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when (= (.-activeElement js/document) (.-body js/document))
+    (when (= (oget js/document "activeElement") (oget js/document "body"))
       (when-let [headline-el (headline-element state)]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
@@ -302,8 +303,8 @@
       (cmail-actions/cmail-hide))))
 
 (defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
-      (.-innerWidth js/window)))
+  (or (oget js/document "documentElement.clientWidth")
+      (oget js/window "innerWidth")))
 
 (defn calc-video-height [s]
   (when (responsive/is-mobile-size?)
@@ -662,11 +663,11 @@
                  :on-key-down (fn [e]
                                 (utils/after 10 #(headline-on-change s))
                                 (cond
-                                  (and (.-metaKey e)
-                                       (= "Enter" (.-key e)))
+                                  (and (oget e "metaKey")
+                                       (= "Enter" (oget e "key")))
                                   (post-clicked s)
-                                  (and (= (.-key e) "Enter")
-                                       (not (.-metaKey e)))
+                                  (and (= (oget e "key") "Enter")
+                                       (not (oget e "metaKey")))
                                   (do
                                     (utils/event-stop e)
                                     (utils/to-end-of-content-editable (body-element)))))

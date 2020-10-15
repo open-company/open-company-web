@@ -25,8 +25,8 @@
 
 (defn get-media-picker-extension [s]
   (let [body-el (rum/ref-node s "editor-node")
-        editor (.getEditorFromElement medium-editor body-el)
-        media-picker-ext (.getExtensionByName editor "media-picker")]
+        editor (.getEditorFromElement ^js medium-editor body-el)
+        media-picker-ext (.getExtensionByName ^js editor "media-picker")]
     media-picker-ext))
 
 ;; Polls
@@ -301,7 +301,7 @@
               :comment-parent-uuid (:comment-parent-uuid options)}])
             (iu/upload-file! file
               (fn [url]
-                (.insertImageFile editor-ext file url nil)
+                (.insertImageFile ^js editor-ext file url nil)
                 (utils/after 500
                  (fn []
                    (dis/dispatch! [:input [:attachment-uploading] nil])
@@ -461,16 +461,16 @@
                                         }]}}
             body-editor  (new medium-editor body-el (clj->js options))]
         (reset! (::media-picker-ext s) media-picker-ext)
-        (.subscribe body-editor
+        (.subscribe ^js body-editor
                     "editableInput"
                     (fn [event editable]
                       (body-on-change s)))
-        (.subscribe body-editor
+        (.subscribe ^js body-editor
                     "editableKeydown"
                     (fn [e editable]
                       (when (and (fn? (:cmd-enter-cb options))
-                                   (.-metaKey e)
-                                   (= "Enter" (.-key e)))
+                                   (oget e "metaKey")
+                                   (= "Enter" (oget e "key")))
                           ((:cmd-enter-cb options) e))))
         (reset! (::editor s) body-editor)
         ;; Setup autocomplete

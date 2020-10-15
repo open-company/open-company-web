@@ -1,7 +1,7 @@
 (ns oc.web.actions.notifications
   (:require [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dis]
-            [oc.shared.useragent :as ua]))
+            [oc.lib.cljs.useragent :as ua]))
 
 ;; Default time to disappeara notification
 (def default-expiration-time 3)

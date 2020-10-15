@@ -6,7 +6,7 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.drafts :as du]
-            [oc.shared.useragent :as ua]))
+            [oc.lib.cljs.useragent :as ua]))
 
 (defonce ^{:export true} app-state (atom {:loading false
                                           :show-login-overlay false}))

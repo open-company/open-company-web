@@ -1,6 +1,7 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oops.core :refer (oget oset!)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
@@ -281,7 +282,7 @@
                          :isScrolling isScrolling
                          :onScroll onChildScroll
                          :rowCount (count items)
-                         :rowHeight (.-rowHeight @(::cache s))
+                         :rowHeight (oget @(::cache s) "rowHeight")
                          :cellRenderer (partial cell-measurer-renderer {:cache @(::cache s)})
                          :scrollTop scrollTop
                          ; :overscanRowCount 20
@@ -298,7 +299,7 @@
   ([s] (did-scroll s (responsive/is-mobile-size?) nil))
   ([s mobile?] (did-scroll s mobile? nil))
   ([s mobile? e]
-  (let [scroll-top (or (.. js/document -scrollingElement -scrollTop) (.-pageYOffset js/window))
+  (let [scroll-top (or (oget js/document "scrollingElement.?scrollTop") (oget js/window "pageYOffset"))
         direction (if (> @last-scroll-top scroll-top)
                     :up
                     (if (< @last-scroll-top scroll-top)

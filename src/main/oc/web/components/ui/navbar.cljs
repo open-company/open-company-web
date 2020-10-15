@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as lib-user]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -46,13 +47,13 @@
                     (rum/local false ::scrolled)
                     (ui-mixins/on-window-scroll-mixin (fn [s e]
                      (when @(::throttled-scroll-check s)
-                       (.fire @(::throttled-scroll-check s)))))
+                       (.fire ^js @(::throttled-scroll-check s)))))
                     (drv/drv search/search-active?)
                     {:will-mount (fn [s]
                       (reset! (::throttled-scroll-check s) (Throttle. (partial check-scroll s) 500))
                      s)
                      :did-mount (fn [s]
-                      (.fire @(::throttled-scroll-check s))
+                      (.fire ^js @(::throttled-scroll-check s))
                      s)
                      :will-unmount (fn [s]
                       (when @(::throttled-scroll-check s)

@@ -5,8 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.shared.interval :as interval]
-            [oc.shared.useragent :as ua]))
+            [oc.lib.cljs.interval :as interval]
+            [oc.lib.cljs.useragent :as ua]))
 
 (declare web-app-update-interval)
 

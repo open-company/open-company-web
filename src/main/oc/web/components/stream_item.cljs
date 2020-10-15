@@ -9,7 +9,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]

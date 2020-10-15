@@ -7,10 +7,10 @@
             [oc.web.components.ui.custom-tag :refer (CustomizedTagComponent)]))
 
 (defn- destroy [editor-node]
-  (let [me-editor (.getEditorFromElement medium-editor editor-node)
+  (let [me-editor (.getEditorFromElement ^js medium-editor editor-node)
         mention-extention (me-editor.base.getExtensionByName "mention")]
     (when mention-extention
-      (.hidePanel mention-extention))))
+      (.hidePanel ^js mention-extention))))
 
 (defn mention-ext [editor-node users-list]
   (let [mention-props {:tagName "span"

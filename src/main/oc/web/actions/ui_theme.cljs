@@ -6,7 +6,7 @@
             [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.cookies :as cook]))
 
 (def ^:private ui-theme-cookie-name-suffix :ui-theme)

@@ -9,7 +9,7 @@
             [oops.core :refer (oget ocall oset!)]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]

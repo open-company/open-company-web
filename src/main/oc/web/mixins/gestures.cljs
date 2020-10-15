@@ -22,8 +22,8 @@
                   s))
    :will-unmount (fn [s]
                    (when-let [hr (::hammer-recognizer s)]
-                     (.remove hr "swipeleft")
-                     (.remove hr "swiperight")
-                     (.remove hr "pressup")
-                     (.destroy hr))
+                     (.remove ^js hr "swipeleft")
+                     (.remove ^js hr "swiperight")
+                     (.remove ^js hr "pressup")
+                     (.destroy ^js hr))
                    s)})

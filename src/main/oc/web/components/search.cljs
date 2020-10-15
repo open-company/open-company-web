@@ -1,5 +1,6 @@
 (ns oc.web.components.search
   (:require [rum.core :as rum]
+            [oops.core :refer (oget ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [dommy.core :as dommy :refer-macros (sel1)]
@@ -133,10 +134,10 @@
   (search/query @(::query s) true))
 
 (defn- debounced-auto-search! [s]
-  (.fire @(::debounced-auto-search s)))
+  (.fire ^js @(::debounced-auto-search s)))
 
 (defn- cancel-auto-search! [s]
-  (.stop @(::debounced-auto-search s)))
+  (.stop ^js @(::debounced-auto-search s)))
 
 (defn search-reset [s]
   (cancel-auto-search! s)
@@ -191,7 +192,7 @@
                      (fn [e]
                        (when (and (not search-active?)
                                   (not (utils/event-inside? e (rum/ref-node s :search-close))))
-                         (.focus (rum/ref-node s "search-input")))))}
+                         (ocall (rum/ref-node s "search-input") "focus"))))}
         (when is-mobile?
           [:div.mobile-header
            [:div.mobile-header-title
@@ -213,7 +214,7 @@
         [:div.search-box-container
           [:div.search-box-form-container
             [:form
-              {:on-submit #(.preventDefault %)
+              {:on-submit #(ocall % "preventDefault")
               :action "."}
               [:input.search.oc-input
                 {:class (utils/class-set {:inactive (not search-active?)
@@ -225,15 +226,15 @@
                 :placeholder "Search"
                 :on-focus #(search/active)
                 :on-change (fn [e]
-                              (let [v (.-value (.-target e))]
+                              (let [v (oget e "target.value")]
                                 (reset! (::query s) v)
                                 ;; Auto search
                                 (debounced-auto-search! s)))
                 :on-key-press (fn [e]
-                                (when (or (= (.-key e) "Enter")
-                                          (= (.-keyCode e) 13))
+                                (when (or (= (oget e "key") "Enter")
+                                          (= (oget e "keyCode") 13))
                                   (cancel-auto-search! s)
                                   (search/query @(::query s) false)
-                                  (.blur (rum/ref-node s "search-input"))))}]]]
+                                  (ocall (rum/ref-node s "search-input") "blur")))}]]]
         [:div.search-box-results-container
           (search-results-view {:did-select-history-item #(reset! (::query s) %)})]]])))

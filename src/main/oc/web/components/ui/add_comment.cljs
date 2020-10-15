@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -153,7 +153,7 @@
     (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
     (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)
     (when-let [throttled-did-change @(::did-change-throttled s)]
-      (.fire throttled-did-change))))
+      (.fire ^js throttled-did-change))))
 
 (defn- should-focus? [s]
   (let [add-comment-focus @(drv/get-ref s :add-comment-focus)
@@ -338,7 +338,7 @@
                            s)
                           :will-unmount (fn [s]
                            (when @(::me-media-utils/editor s)
-                             (.destroy @(::me-media-utils/editor s))
+                             (.destroy ^js @(::me-media-utils/editor s))
                              (reset! (::me-media-utils/editor s) nil))
                            (when-let [throttled-did-change @(::did-change-throttled s)]
                              (.dispose ^js throttled-did-change))

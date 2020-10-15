@@ -60,7 +60,7 @@
                                  (me-media-utils/setup-editor s body-on-change (first (:rum/args s)))
                                  (when (not= (:cmail-key (first (:rum/args o))) (:cmail-key (first (:rum/args s))))
                                    (when @(::me-media-utils/editor s)
-                                     (.destroy @(::me-media-utils/editor s)))
+                                     (.destroy ^js @(::me-media-utils/editor s)))
                                    (reset! (::me-media-utils/editor s) nil)
                                    (reset! (::me-media-utils/media-picker-ext s) nil)
                                    (reset! (::did-change s) false)
@@ -82,7 +82,7 @@
                                  s)
                                 :will-unmount (fn [s]
                                  (when @(::me-media-utils/editor s)
-                                   (.destroy @(::me-media-utils/editor s)))
+                                   (.destroy ^js @(::me-media-utils/editor s)))
                                  s)}
   [s {:keys [initial-body
              on-change
