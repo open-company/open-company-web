@@ -385,13 +385,13 @@
               [:div.org-settings-advanced-title
                 "Advanced settings"]
               [:div.org-settings-advanced-row.digest-links.group
-                (carrot-checkbox {:selected (:disallow-secure-links content-visibility-data)
+                (carrot-checkbox {:selected (not (:disallow-secure-links content-visibility-data))
                                   :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links %)})
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links (not %))})
                 [:div.checkbox-label
-                  {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
+                  {:class (when (:disallow-secure-links content-visibility-data) "unselected")
                    :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
-                  "Do not allow secure links to open posts from email or Slack"
+                  "Allow secure links to open posts from email or Slack"
                   [:i.mdi.mdi-information-outline
                     {:title (str
                              "When team members receive " ls/product-name " posts via an email or Slack morning digest, secure "
@@ -402,18 +402,18 @@
                      :data-placement "top"
                      :data-container "body"}]]]
               [:div.org-settings-advanced-row.public-sections.group
-                (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
+                (carrot-checkbox {:selected (not (:disallow-public-board content-visibility-data))
                                   :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board %)})
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board (not %))})
                 [:div.checkbox-label
-                  {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
+                  {:class (when (:disallow-public-board content-visibility-data) "unselected")
                    :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
-                  "Do not allow public topics"]]
+                  "Allow public topics"]]
               [:div.org-settings-advanced-row.public-share.group
-                (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
+                (carrot-checkbox {:selected (not (:disallow-public-share content-visibility-data))
                                   :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share %)})
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share (not %))})
                 [:div.checkbox-label
-                  {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
+                  {:class (when (:disallow-public-share content-visibility-data) "unselected")
                    :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
-                  "Do not allow public share links"]]])]]]))
+                  "Allow public share links"]]])]]]))

@@ -147,6 +147,10 @@ div.onboard-container-inner {
         line-height: 20px;
         color: $deep_navy;
         margin-right: auto;
+
+        @include mac_electron() {
+          margin-left: 60px;
+        }
       }
     }
 

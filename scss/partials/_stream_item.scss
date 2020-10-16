@@ -596,7 +596,7 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         float: left;
-        margin-right: 32px;
+        margin-right: 16px;
 
         @include mobile() {
           margin-top: 1px;
@@ -608,7 +608,7 @@ div.stream-item {
 
       div.reactions {
         float: left;
-        margin-right: 32px;
+        margin-right: 16px;
 
         div.reactions-picker-container {
 
@@ -665,7 +665,7 @@ div.stream-item {
 
       div.stream-item-attachments {
         float: left;
-        margin-right: 32px;
+        margin-right: 16px;
         height: 26px;
         position: relative;
 
@@ -769,7 +769,7 @@ div.stream-item {
       div.stream-item-wrt {
         float: left;
         position: relative;
-        margin-right: 32px;
+        margin-right: 16px;
       }
 
       div.stream-item-mobile-view-more {

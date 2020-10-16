@@ -330,3 +330,19 @@
     }
   }
 }
+
+@mixin mac_electron(){
+  @at-root body.electron.mac-electron {
+    #{&} {
+      @content
+    }
+  }
+}
+
+@mixin win_electron(){
+  @at-root body.electron.win-electron {
+    #{&} {
+      @content
+    }
+  }
+}
