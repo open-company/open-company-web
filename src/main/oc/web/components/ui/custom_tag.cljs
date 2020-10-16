@@ -9,7 +9,7 @@
             ["react-dom" :as react-dom :refer (findDOMNode)]
             [goog.events :as events]
             [goog.events.EventType :as EventType])
-  (:use-macros [oc.lib.cljs.macros :only [goog-extend]]))
+  (:use-macros [oc.web.macros :only [goog-extend]]))
 
 (defn- user-display-name [user]
   (if (seq (oget user "?name"))
