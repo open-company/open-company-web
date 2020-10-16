@@ -75,9 +75,10 @@ div.search-box {
   }
 
   div.search-box-container {
-    padding: 0 16px;
+    padding: 0;
 
     @include mobile() {
+      padding: 0 16px;
       min-height: calc(100% - #{$mobile_navbar_height}px);
     }
 
@@ -85,9 +86,6 @@ div.search-box {
       @include mobile() {
         padding: 16px 0;
       }
-    }
-
-    div.search-box-results-container {
     }
   }
 
@@ -324,7 +322,7 @@ div.search-results {
   border: 1px solid var(--divider-line);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   border-radius: 5px;
-  margin: 48px 0px 0px 0px;
+  margin: 40px 0 0;
   width: 430px;
   text-align: left;
   background-color: var(--overlay-background-color);
