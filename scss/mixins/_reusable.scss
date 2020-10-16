@@ -331,17 +331,19 @@
   }
 }
 
-@mixin mac_electron(){
+@mixin mac_electron() {
+  $cur_sel: #{&};
   @at-root body.electron.mac-electron {
-    #{&} {
+    #{$cur_sel} {
       @content
     }
   }
 }
 
-@mixin win_electron(){
-  @at-root body.electron.win-electron {
-    #{&} {
+@mixin win_electron() {
+  $cur_sel: #{&};
+  @at-root body.electron.mac-electron {
+    #{$cur_sel} {
       @content
     }
   }
