@@ -276,29 +276,29 @@
      [:div.pricing-column-row
       "Unlimited posts"]
      [:div.pricing-column-row.has-tooltip
-      {:title "Create updates that are private for select users, or public for people outside the team."
-       :data-toggle "tooltip"
-       :data-placement "top"}
-      "Team, private and public updates"
-      [:i.mdi.mdi-information-outline]]
+      [:span.pricing-column-copy
+       {:title "Create updates that are private for select users, or public for people outside the team."
+        :data-toggle "tooltip"
+        :data-placement "top"}
+       "Team, private and public updates"]]
      [:div.pricing-column-row.has-tooltip
-      {:title "In the free version, everyone on the team can add updates. With premium, admins can assign editor and view-only roles."
-       :data-toggle "tooltip"
-       :data-placement "top"}
-      "View-only users"
-      [:i.mdi.mdi-information-outline]]
+      [:span.pricing-column-copy
+       {:title "In the free version, everyone on the team can add updates. With premium, admins can assign editor and view-only roles."
+        :data-toggle "tooltip"
+        :data-placement "top"}
+       "View-only users"]]
      [:div.pricing-column-row.has-tooltip
-      {:title "In the free version, everyone receives a morning digest at 7AM. With premium, users can add periodic digests at noon and 5PM to stay in sync through the day."
-       :data-toggle "tooltip"
-       :data-placement "top"}
-      "Custom digest schedule"
-      [:i.mdi.mdi-information-outline]]
+      [:span.pricing-column-copy
+       {:title "In the free version, everyone receives a morning digest at 7AM. With premium, users can add periodic digests at noon and 5PM to stay in sync through the day."
+        :data-toggle "tooltip"
+        :data-placement "top"}
+       "Custom digest schedule"]]
      [:div.pricing-column-row.has-tooltip
-      {:title "Know who saw your update, and easily remind those that missed it."
-       :data-toggle "tooltip"
-       :data-placement "top"}
-      "Analytics"
-      [:i.mdi.mdi-information-outline]]
+      [:span.pricing-column-copy
+       {:title "Know who saw your update, and easily remind those that missed it."
+        :data-toggle "tooltip"
+        :data-placement "top"}
+       "Analytics"]]
      [:div.pricing-column-row
       "Custom colors and branding"]
     ;;  [:div.pricing-column-row.coming-feature

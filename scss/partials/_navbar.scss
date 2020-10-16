@@ -60,6 +60,10 @@ nav.oc-navbar {
       justify-content: center;
       align-items: center;
 
+      @include mac_electron() {
+        padding-left: 60px;
+      }
+
       @include mobile(){
         height: 24px;
         display: initial;
@@ -222,7 +226,7 @@ nav.oc-navbar {
         }
 
         div.user-notifications {
-          margin-right: 8px;
+          margin-right: 4px;
           margin-left: auto;
 
           @include mobile() {
@@ -234,7 +238,7 @@ nav.oc-navbar {
           min-width: 24px;
           height: 24px;
           position: relative;
-          margin-left: 8px;
+          margin-left: 4px;
 
           div.user-menu-button {
             position: relative;

@@ -110,11 +110,11 @@
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
     (when ua/desktop-app?
-      (dommy/add-class! body :electron)
+      (dommy/add-class! body "electron")
       (when ua/mac?
-        (dommy/add-class! body :mac-electron))
+        (dommy/add-class! body "mac-electron"))
       (when ua/windows?
-        (dommy/add-class! body :win-electron))))
+        (dommy/add-class! body "win-electron"))))
   ;; Setup timbre log level
   (when (-> params :query-params :log-level)
     (logging/config-log-level! (-> params :query-params :log-level)))

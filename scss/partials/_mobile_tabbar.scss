@@ -199,7 +199,7 @@ div.mobile-tabbar {
           width: 16px;
           height: 16px;
           position: relative;
-          @include svgBgColor("/img/ML/notification_bell.svg", center, 16px 16px, var(--color));
+          @include svgBgColor("/img/ML/notification_bell.svg", center, 13px 16px, var(--color));
 
           span.unread-dot {
             display: block;
@@ -215,7 +215,7 @@ div.mobile-tabbar {
         }
 
         &.active span.tab-icon {
-          @include svgBgColor("/img/ML/notification_bell.svg", center, 16px 16px, var(--primary-color));
+          @include svgBgColor("/img/ML/notification_bell.svg", center, 13px 16px, var(--primary-color));
         }
       }
 

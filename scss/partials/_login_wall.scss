@@ -46,6 +46,10 @@ div.login-wall-container {
         color: $deep_navy;
         padding-left: 22px;
         margin-right: auto;
+
+        @include mac_electron() {
+          margin-left: 60px;
+        }
       }
     }
 
