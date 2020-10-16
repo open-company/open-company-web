@@ -34,6 +34,8 @@ div.login-wall-container {
     div.top-back-button-container {
       flex: 1;
       display: flex;
+      align-items: center;
+      justify-content: center;
 
       button.top-back-button {
         background-position: top 6px left 0;
