@@ -221,6 +221,12 @@ nav.oc-navbar {
           right: 16px;
         }
 
+        &.anonymous-user {
+          div.login-button-container {
+            margin-left: auto;
+          }
+        }
+
         div.user-notifications {
           margin-right: 8px;
           margin-left: auto;
