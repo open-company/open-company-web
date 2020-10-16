@@ -49,7 +49,7 @@
            current-user-contrib? "Updates you write and share with the team will be shown here."
            is-replies? 
            [:div.empty-replies
-             "When people reply to you or mention your name you’ll see it here."]
+             "When people comment on updates you're watching or they mention your name you’ll see it here."]
            is-contributions? (str (:short-name contrib-user-data) " hasn't posted anything yet")
            is-all? (str "This is a feed of what's happening at " (:name org-data) ".")
            is-drafts-board?

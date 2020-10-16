@@ -315,9 +315,7 @@
       "Analytics"
       [:i.mdi.mdi-information-outline]]
      [:div.pricing-column-row
-      "Custom colors"]
-     [:div.pricing-column-row
-      "Remove Carrot branding"]
+      "Custom colors and branding"]
     ;;  [:div.pricing-column-row.coming-feature
     ;;   "Assign roles for team onboarding (coming)"]
      ]]

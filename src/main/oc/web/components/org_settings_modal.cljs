@@ -233,15 +233,10 @@
       (reset-form s)
       ;; Auto-expand the content visibility settings (aka advanced settings)
       ;; only if the org tweaked them from default values:
-      ;; {:disallow-public-board true
+      ;; {:disallow-public-board false
       ;;  :disallow-public-share false
       ;;  :disallow-secure-links false}
-      (reset! (::show-advanced-settings s) (some #(case %
-                                                    :disallow-public-board
-                                                    (not (content-visibility-data %))
-                                                    ;; else
-                                                    (content-visibility-data %))
-                                                 (keys content-visibility-data)))
+      (reset! (::show-advanced-settings s) (some content-visibility-data (keys content-visibility-data)))
       (reset! (::primary-color-value s) (-> org-data :brand-color current-theme :primary :hex)))
     s)
    :will-update (fn [s]
