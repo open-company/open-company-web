@@ -105,4 +105,7 @@
                     (= (get-ui-theme-setting) :auto))
             (set-ui-theme :auto)))))))
 
+(defn handle-url-change []
+  (set-ui-theme-class (computed-value (get-ui-theme-setting))))
+
 (setup-ui-theme)
