@@ -19,7 +19,6 @@
             [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            (oc.web.lib.emoji-autocomplete :as emoji-autocomplete)
             ["medium-editor" :as medium-editor]
             ["@bago2k4/medium-editor-media-picker" :refer (default) :rename {default MediaPicker}]))
 
@@ -472,9 +471,4 @@
                                    (oget e "metaKey")
                                    (= "Enter" (oget e "key")))
                           ((:cmd-enter-cb options) e))))
-        (reset! (::editor s) body-editor)
-        ;; Setup autocomplete
-        (let [classes (:classes options)]
-          (when (and (string/includes? classes "emoji-autocomplete")
-                     (not (:paywall? options)))
-            (emoji-autocomplete/autocomplete body-el)))))))
+        (reset! (::editor s) body-editor)))))

@@ -7,6 +7,7 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.utils.medium-editor-media :as me-media-utils]
+            (oc.web.lib.emoji-autocomplete :as emoji-autocomplete)
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]))
 
@@ -30,6 +31,7 @@
                                (rum/local false ::me-media-utils/media-attachment-did-success)
                                (rum/local false ::me-media-utils/showing-media-video-modal)
                                (rum/local false ::me-media-utils/showing-gif-selector)
+                               (rum/local nil ::body-autocomplete)
                                ;; Image upload lock
                                (rum/local false ::me-media-utils/upload-lock)
                                ;; Derivatives
@@ -54,7 +56,10 @@
                                   (reset! (::me-media-utils/showing-gif-selector s) false))))
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
-                                   (utils/after 300 #(me-media-utils/setup-editor s body-on-change (first (:rum/args s)))))
+                                   (utils/after 300 (fn [_]
+                                                      (me-media-utils/setup-editor s body-on-change (first (:rum/args s)))
+                                                      (when-let [el (rum/ref-node s "editor-node")]
+                                                        (reset! (::body-autocomplete s) (emoji-autocomplete/autocomplete el))))))
                                  s)
                                 :did-remount (fn [o s]
                                  (me-media-utils/setup-editor s body-on-change (first (:rum/args s)))
@@ -83,6 +88,8 @@
                                 :will-unmount (fn [s]
                                  (when @(::me-media-utils/editor s)
                                    (.destroy ^js @(::me-media-utils/editor s)))
+                                 (when-let [tc @(::body-autocomplete s)]
+                                   (emoji-autocomplete/destroy tc))
                                  s)}
   [s {:keys [initial-body
              on-change

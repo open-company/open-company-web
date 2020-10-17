@@ -340,6 +340,8 @@
 (defn- reset-cmail [s]
   (when @(::unlock-scroll s)
     (dom-utils/unlock-page-scroll))
+  (when-let [tc @(::headline-autocomplete s)]
+    (emoji-autocomplete/destroy tc))
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
         initial-body (if (seq (:body cmail-data))
@@ -364,7 +366,7 @@
     (reset! (::latest-key s) (:key cmail-state))
     (utils/after 300 (fn []
                       (setup-headline s)
-                      (emoji-autocomplete/autocomplete (rum/dom-node s) ".emoji-autocomplete")))
+                      (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete (rum/ref-node s "headline")))))
     (reset! (::unlock-scroll s) scroll-lock?)
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
@@ -431,6 +433,7 @@
                    (rum/local 68 ::top-padding)
                    (rum/local false ::last-fullscreen-state)
                    (rum/local false ::unlock-scroll)
+                   (rum/local nil ::headline-autocomplete)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -653,7 +656,7 @@
                                     :force-show-tooltip @(::show-post-tooltip s)})]])
             ; Headline element
             [:div.cmail-content-headline-container.group
-              [:div.cmail-content-headline.emoji-autocomplete.emojiable
+              [:div.cmail-content-headline.emojiable
                 {:class utils/hide-class
                  :content-editable true
                  :key (str "cmail-headline-" (:key cmail-state))
@@ -692,7 +695,7 @@
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["poll" "code" "gif" "photo" "video"]
-                               :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
+                               :classes (str "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments

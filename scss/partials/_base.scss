@@ -229,14 +229,6 @@ div#wrap {
   }
 }
 
-// Textcomplete dropdown for emojis
-
-.dropdown-menu.textcomplete-dropdown {
-  max-height: 300px;
-  top: 0px;
-  overflow: scroll;
-}
-
 .oc-input {
   &.active, &:active, &:focus {
     opacity: 0.9;

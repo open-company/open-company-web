@@ -235,6 +235,7 @@
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
+                         (emoji-autocomplete/autocomplete-mixin ["editor-node"])
 
                          (ui-mixins/on-window-click-mixin (fn [s e]
                           (when (and @(::me-media-utils/showing-media-video-modal s)
