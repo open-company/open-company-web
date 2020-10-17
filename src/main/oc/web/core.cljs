@@ -42,7 +42,7 @@
             [oc.web.actions.web-app-update :as web-app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
-            [oc.web.actions.ui-theme]
+            [oc.web.actions.ui-theme :as theme-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -694,6 +694,7 @@
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
+      (theme-actions/handle-url-change)
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
   (do
