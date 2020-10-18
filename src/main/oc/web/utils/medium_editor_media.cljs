@@ -19,12 +19,14 @@
             [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            ["medium-editor" :as medium-editor]
-            ["@bago2k4/medium-editor-media-picker" :refer (default) :rename {default MediaPicker}]))
+            ["medium-editor" :as MediumEditor]
+            ["@bago2k4/medium-editor-media-picker" :refer (default) :rename {default MediaPicker}]
+            ["@bago2k4/medium-editor-filedragging" :refer (default) :rename {default FileDragging}]
+            ["@open-company/medium-editor-extentions" :refer (AutoCode AutoInlineCode AutoList AutoQuote InlineCodeButton HighlighterButton PasteHandler)]))
 
 (defn get-media-picker-extension [s]
   (let [body-el (rum/ref-node s "editor-node")
-        editor (.getEditorFromElement ^js medium-editor body-el)
+        editor (.getEditorFromElement ^js MediumEditor body-el)
         media-picker-ext (.getExtensionByName ^js editor "media-picker")]
     media-picker-ext))
 
@@ -382,39 +384,42 @@
                                                              }
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
-            media-picker-ext (when-not mobile-editor (MediaPicker. (clj->js media-picker-opts)))
+            media-picker-ext (when-not mobile-editor
+                               (MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
-                                (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
+                                (FileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
             buttons ["bold" "italic" "unorderedlist" "anchor" "quote" "highlighter" "h1" "h2"]
-            paste-ext-options #js {:forcePlainText false
-                                   :cleanPastedHTML true
-                                   :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
-                                   :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
-                                                   "textarea" "style" "javascript"]
-                                   :unwrapTags (clj->js (remove nil?
-                                                ["!doctype" "abbr" "acronym" "address" "applet" "area" "article"
-                                                 "aside" "base" "basefont" "bb" "bdo" "big" "body" "br" "caption"
-                                                 "center" "cite" "col" "colgroup" "command" "datagrid" "datalist"
-                                                 "dd" "del" "details" "dfn" "dialog" "dir" "div" "dl" "dt" "em"
-                                                 "embed" "eventsource" "fieldset" "figcaption" "font" "footer" "form"
-                                                 "frame" "frameset" "h3" "h4" "h5"
-                                                 "h6" "head" "header" "hgroup" "hr" "html" "iframe" "ins" "isindex"
-                                                 "kbd" "keygen" "label" "legend" "link"  "main" "map" "mark" "menu" "meter"
-                                                 "nav" "noframes" "noscript" "object" "ol" "optgroup" "option"
-                                                 "output" "p" "param" "progress" "q" "rp" "rt" "ruby" "s" "samp"
-                                                 "script" "section" "select" "small" "source" "span" "strike"
-                                                 "strong" "sub" "summary" "sup" "table" "tbody" "td" "tfoot" "th"
-                                                 "thead" "time" "title" "tr" "track" "tt" "u" "var" "wbr"]))}
-            extensions (cond-> {"autolist" (js/AutoList.)
+            paste-ext-options (when-not mobile-editor
+                                (PasteHandler. (clj->js {:forcePlainText false
+                                                         :cleanPastedHTML true
+                                                         :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                                                         :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
+                                                                         "textarea" "style" "javascript"]
+                                                         :unwrapTags (clj->js (remove nil?
+                                                                                      ["!doctype" "abbr" "acronym" "address" "applet" "area" "article"
+                                                                                       "aside" "base" "basefont" "bb" "bdo" "big" "body" "br" "caption"
+                                                                                       "center" "cite" "col" "colgroup" "command" "datagrid" "datalist"
+                                                                                       "dd" "del" "details" "dfn" "dialog" "dir" "div" "dl" "dt" "em"
+                                                                                       "embed" "eventsource" "fieldset" "figcaption" "font" "footer" "form"
+                                                                                       "frame" "frameset" "h3" "h4" "h5"
+                                                                                       "h6" "head" "header" "hgroup" "hr" "html" "iframe" "ins" "isindex"
+                                                                                       "kbd" "keygen" "label" "legend" "link"  "main" "map" "mark" "menu" "meter"
+                                                                                       "nav" "noframes" "noscript" "object" "ol" "optgroup" "option"
+                                                                                       "output" "p" "param" "progress" "q" "rp" "rt" "ruby" "s" "samp"
+                                                                                       "script" "section" "select" "small" "source" "span" "strike"
+                                                                                       "strong" "sub" "summary" "sup" "table" "tbody" "td" "tfoot" "th"
+                                                                                       "thead" "time" "title" "tr" "track" "tt" "u" "var" "wbr"]))})))
+            extensions (cond-> {"autolist" (AutoList.)
                                 "mention" (mention-utils/mention-ext body-el users-list)
                                 "fileDragging" false}
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
-                                                    "autoquote" (js/AutoQuote.)
-                                                    "autocode" (js/AutoCode.)
-                                                    "autoinlinecode" (js/AutoInlinecode.)
-                                                    "inlinecode" (js/InlineCodeButton.)
-                                                    "highlighter" (js/HighlighterButton.)
-                                                    "carrotFileDragging" file-dragging-ext)
+                                                    "autoquote" (AutoQuote.)
+                                                    "autocode" (AutoCode.)
+                                                    "autoinlinecode" (AutoInlineCode.)
+                                                    "inlinecode" (InlineCodeButton.)
+                                                    "highlighter" (HighlighterButton.)
+                                                    "carrotFileDragging" file-dragging-ext
+                                                    "paste" paste-ext-options)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)
                                                            :allowMultiParagraphSelection false})
@@ -435,7 +440,7 @@
                      :placeholder #js {:text placeholder
                                        :hideOnClick false
                                        :hide-on-click false}
-                     :paste paste-ext-options
+                    ;  :paste paste-ext-options
                      :keyboardCommands #js {:commands #js [
                                         #js {
                                           :command "bold"
@@ -458,7 +463,7 @@
                                           :shift false
                                           :alt false
                                         }]}}
-            body-editor  (new medium-editor body-el (clj->js options))]
+            body-editor  (new MediumEditor body-el (clj->js options))]
         (reset! (::media-picker-ext s) media-picker-ext)
         (.subscribe ^js body-editor
                     "editableInput"
