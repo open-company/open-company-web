@@ -73,10 +73,6 @@
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
-          ;; Rangy
-          [:script {:type "text/javascript" :src "/lib/rangy/rangy-core.js"}]
-          [:script {:type "text/javascript" :src "/lib/rangy/rangy-classapplier.js"}]
-          [:script {:type "text/javascript" :src "/lib/rangy/rangy-selectionsaverestore.js"}]
           ;; WURFL used for mobile/tablet detection
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           shared/bootstrap-js
@@ -85,34 +81,7 @@
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
-          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
-          ;; MediumEditor
-          [:script {:src "/lib/MediumEditor/index.js" :type "text/javascript"}]
-          ;; MediumEditorToolbar
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorToolbar/toolbar.js"}]
-          ;; MediumEditorPaste
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorPaste/paste.js"}]
-          ;; MediumEditorAutolist
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
-          ;; MediumEditorAutoquote
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutoquote/autoquote.js"}]
-          ;; MediumEditorAutocode
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutocode/autocode.js"}]
-          ;; MediumEditorAutocode
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutoInlinecode/autoinlinecode.js"}]
-          ;; MediumEditorAutocode
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorInlineCodeButton/inlinecodebutton.js"}]
-          ;; MediumEditorMediaPicker
-          ;; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
-          ;; MediumEditorFileDragging
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js"}]
-          ;; MediumEditorHighlighterButton
-          ; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorHighlighterButton/highlighterbutton.js"}]
-          ;; MediumEditorTCMention
-          ;; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js"}]
-          ;; ;; MediumEditorTCMention Panel
-          ;; [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorTCMention/CustomizedTagComponent.js"}]
-          ]})
+          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]]})
 
 (def prod-app-shell
   {:head [:head
