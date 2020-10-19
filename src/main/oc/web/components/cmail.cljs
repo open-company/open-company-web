@@ -198,8 +198,8 @@
                headline-el)
       (utils/to-end-of-content-editable headline-el))))
 
-(defn- setup-headline [state]
-  (when-let [headline-el  (headline-element state)]
+(defn- setup-headline [state headline-el]
+  (when headline-el
     (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
     (fullscreen-focus-headline state)))
 
@@ -365,8 +365,9 @@
     (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
     (reset! (::latest-key s) (:key cmail-state))
     (utils/after 300 (fn []
-                      (setup-headline s)
-                      (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete (rum/ref-node s "headline")))))
+                      (when-let [headline-el (headline-element s)]
+                        (setup-headline s headline-el)
+                        (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete headline-el)))))
     (reset! (::unlock-scroll s) scroll-lock?)
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))

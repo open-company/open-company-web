@@ -10,7 +10,9 @@
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
             [oc.lib.cljs.useragent :as ua]
-            ["emoji-mart" :as emoji-mart :refer (Picker)]))
+            ["emoji-mart" :as emoji-mart :refer (Picker)]
+            ["@rangy/core" :refer (getSelection)]
+            ["@rangy/selectionsaverestore" :refer (saveSelection restoreSelection removeMarkers)]))
 
 (def emojiable-class "emojiable")
 
@@ -21,7 +23,7 @@
 (defn remove-markers [s]
   (when-let  [caret-pos @(::caret-pos s)]
     (when (= (:type caret-pos) "rangy")
-      (.removeMarkers js/rangy (:selection caret-pos)))))
+      (removeMarkers (:selection caret-pos)))))
 
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
@@ -45,14 +47,14 @@
         (reset! caret-pos
          (if (#{"TEXTAREA" "INPUT"} (.-tagName active-element))
            {:type "default" :selection (js/OCStaticTextareaSaveSelection)}
-           {:type "rangy" :selection (.saveSelection js/rangy js/window)})))
+           {:type "rangy" :selection (saveSelection js/window)})))
       (reset! caret-pos nil))))
 
 (defn replace-with-emoji [s emoji]
   (when-let [caret-pos @(::caret-pos s)]
     (if (= (:type caret-pos) "rangy")
-      (do (.restoreSelection js/rangy (:selection caret-pos))
-          (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false))
+      (do (restoreSelection (:selection caret-pos))
+          (js/pasteHtmlAtCaret (gobj/get emoji "native") (getSelection js/window) false))
       (do (js/OCStaticTextareaRestoreSelection (:selection caret-pos))
           (js/pasteTextAtSelection @(::last-active-element s) (gobj/get emoji "native"))))))
 
@@ -79,8 +81,7 @@
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
   (on-window-click-mixin on-click-out)
-  {:init (fn [s p] (js/rangy.init) s)
-   :will-mount (fn [s]
+  {:will-mount (fn [s]
                  (check-focus s nil)
                  (let [focusin (events/listen
                                 js/document

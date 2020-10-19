@@ -3,7 +3,7 @@
             ["react" :as react :refer (createElement)]
             ["react-dom" :as react-dom]
             ["medium-editor" :as medium-editor]
-            ["medium-editor-tc-mention" :as tc-mention]
+            ["@open-company/medium-editor-extentions" :refer (TCMention)]
             [oc.web.components.ui.custom-tag :refer (CustomizedTagComponent)]))
 
 (defn- destroy [editor-node]
@@ -26,7 +26,7 @@
                                                                        }))
                                               panel-el))
                        :activeTriggerList ["@"]}]
-    (tc-mention/TCMention. (clj->js mention-props))))
+    (TCMention. (clj->js mention-props))))
 
 (defn- get-slack-usernames [user]
   (let [slack-display-name [(:slack-display-name user)]

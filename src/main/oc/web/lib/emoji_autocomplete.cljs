@@ -19,8 +19,11 @@
   ([element :guard (partial instance? js/Node) selector :guard string?]
    (for [el (sel element selector)]
      (autocomplete el)))
+  ([nil]
+   (js/console.warn "Emoji autocomplete not initialized, called with undefined element or selector.")
+   nil)
   ([element]
-   (throw (js/Error. "Emoji autocomplete called on unknown object" (clj->js {:object element :type (type element)})))))
+   (throw (js/Error. (str "Emoji autocomplete called on unknown object. Type" (type element))))))
 
 (defun destroy
   ([tcs :guard coll?]
@@ -31,8 +34,11 @@
      (destroy tc)))
   ([tc :guard #(.-destroy %)]
    (.-destroy ^js tc))
+  ([nil]
+   (js/console.warn "Emoji autocomplete not destroyed, passed TextComplete object is null.")
+   nil)
   ([tc]
-   (throw (js/Error. "Emoji autocomplete destroy called on unknown object" (clj->js {:object tc :type (type tc)})))))
+   (throw (js/Error. (str "Emoji autocomplete destroy called on unknown object. Type:" (type tc))))))
 
 (defn autocomplete-mixin [refs]
   {:did-mount (fn [s]
