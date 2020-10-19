@@ -46,7 +46,7 @@ div.mobile-tabbar {
       align-items: center;
 
       span.tab-icon {
-        background-size: 18px 18px;
+        background-size: 18px 16px;
         background-repeat: no-repeat;
         margin-bottom: 6px;
       }
@@ -79,8 +79,8 @@ div.mobile-tabbar {
       &.topics-tab {
         order: 2;
         span.tab-icon {
-          width: 14px;
-          height: 14px;
+          width: 18px;
+          height: 16px;
           text-align: center;
           display: block;
           @include svgBgColor("/img/ML/nav_explore.svg", center, 18px 16px, var(--color));
@@ -95,13 +95,13 @@ div.mobile-tabbar {
         order: 1;
         span.tab-icon {
           width: 18px;
-          height: 18px;
-          @include svgBgColor("/img/ML/nav_home.svg", center, 18px 18px, var(--color));
+          height: 16px;
+          @include svgBgColor("/img/ML/nav_home.svg", center, 16px 16px, var(--color));
 
         }
 
         &.active span.tab-icon {
-          @include svgBgColor("/img/ML/nav_home.svg", center, 18px 18px, var(--primary-color));
+          @include svgBgColor("/img/ML/nav_home.svg", center, 16px 16px, var(--primary-color));
         }
       }
 
