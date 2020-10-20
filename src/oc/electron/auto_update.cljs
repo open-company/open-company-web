@@ -11,7 +11,7 @@
 
   Upon restarting the app, the update will be installed."
   (:require [taoensso.timbre :as timbre]
-            [oc.shared.interval :as interval]))
+            [oc.lib.cljs.interval :as interval]))
 
 ;; See https://www.electron.build/auto-update for details on the `electron-updater` API
 (def auto-updater (.-autoUpdater (js/require "electron-updater")))

@@ -4,7 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.shared.useragent  :as ua]
+            [oc.lib.cljs.useragent  :as ua]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.utils.reaction :as reaction-utils]

@@ -3,7 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.drafts :as du]
             [oc.web.dispatcher :as dis]

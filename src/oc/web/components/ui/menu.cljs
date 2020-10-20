@@ -7,7 +7,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]

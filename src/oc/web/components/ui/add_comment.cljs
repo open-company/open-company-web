@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]

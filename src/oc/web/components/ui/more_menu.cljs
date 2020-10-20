@@ -4,7 +4,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :as uu]
             [oc.web.mixins.ui :as ui-mixins]

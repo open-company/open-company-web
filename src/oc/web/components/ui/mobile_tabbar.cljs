@@ -1,6 +1,6 @@
 (ns oc.web.components.ui.mobile-tabbar
   (:require [rum.core :as rum]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :refer (ui-compose)]

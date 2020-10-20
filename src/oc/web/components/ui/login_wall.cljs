@@ -9,7 +9,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.expo :as expo]))
 
 (def default-title (str "Login to " ls/product-name))
