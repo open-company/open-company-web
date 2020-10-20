@@ -135,8 +135,11 @@ div.is-comments {
       color: var(--color);
 
       div.is-comments-summary-inner {
+        color: var(--light-color);
+        @include OC_Body_Book();
+        line-height: 26px;
+
         span.new-comments-count {
-          display: initial;
           color: var(--primary-color);
           @include OC_Body_Bold();
           margin-left: 6px;
