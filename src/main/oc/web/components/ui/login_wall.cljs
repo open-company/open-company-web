@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.user :as user-actions]
+            [oc.web.mixins.theme :as theme-mixins]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.lib.cljs.useragent :as ua]
@@ -17,6 +18,7 @@
 
 (rum/defcs login-wall < rum/reactive
                         (drv/drv :jwt)
+                        (drv/drv :theme)
                         (drv/drv :auth-settings)
                         (drv/drv :org-slug)
                         (drv/drv :board-slug)
@@ -24,8 +26,10 @@
                         (drv/drv :expo-deep-link-origin)
                         (rum/local "" ::email)
                         (rum/local "" ::pswd)
+                        (theme-mixins/theme-mixin)
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
+        theme-data (drv/react s :theme)
         current-org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
         deep-link-origin (drv/react s :expo-deep-link-origin)

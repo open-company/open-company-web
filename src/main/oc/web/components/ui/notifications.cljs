@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.notifications
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.notifications :as notification-actions]))
@@ -119,14 +120,16 @@
 (rum/defcs notifications < rum/static
                            rum/reactive
                            (drv/drv :notifications-data)
+                           (drv/drv :org-slug)
                            (drv/drv :panel-stack)
-                           (drv/drv :ui-theme)
+                           (drv/drv :theme)
   [s]
   (let [notifications-data (drv/react s :notifications-data)
+        org-slug (drv/react s :org-slug)
         panel-stack (drv/react s :panel-stack)
-        {:keys [computed-value]} (drv/react s :ui-theme)
+        theme-data (drv/react s :theme)
         light-theme? (or (pos? (count panel-stack))
-                         (= computed-value :dark))]
+                         (= (get theme-data dis/theme-computed-key) :dark))]
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]

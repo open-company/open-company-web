@@ -29,7 +29,6 @@
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
-            [oc.lib.cljs.useragent :as ua]
             [goog.dom :as gdom]
             [goog.events :as events]
             [goog.events.EventType :as EventType]

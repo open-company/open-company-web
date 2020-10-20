@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.theme :as theme-actions]
             [oc.lib.cljs.useragent :as ua]))
 
 (defn post-routing []
@@ -24,3 +25,7 @@
   (du/force-unlock-page-scroll)
   (dis/dispatch! [:org-nav-out (dis/current-org-slug) (:slug org)])
   (router/nav! (oc-urls/default-landing (:slug org))))
+
+(defn routing! [next-route-map]
+  (dis/dispatch! [:routing next-route-map])
+  (theme-actions/post-routing!))
