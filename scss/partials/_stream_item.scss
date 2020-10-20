@@ -117,7 +117,7 @@ div.stream-item {
     border-bottom: 1px solid var(--foc-divider-line-color);
     border-left: none;
     background-color: var(--mobile-foc-background-color);
-    padding: 16px 16px;
+    padding: 16px 16px 13px;
     max-height: #{$mobile_foc_height}px;
   }
 
@@ -373,15 +373,21 @@ div.stream-item {
       cursor: pointer;
 
       &.has-preview {
-        height: #{$thumbnail_height}px;
+        min-height: #{$thumbnail_height}px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
         align-items: flex-end;
 
+        @include mobile() {
+          min-height: #{$mobile_thumbnail_height}px;
+          align-items: center;
+        }
+
         div.body-thumbnail-wrapper {
           width: #{$thumbnail_width}px;
-          max-height: #{$thumbnail_height}px;
+          min-height: #{$thumbnail_height}px;
+          height: auto;
           background-repeat: no-repeat;
           background-size: contain;
           background-position: center;
@@ -400,8 +406,7 @@ div.stream-item {
 
           @include mobile() {
             width: #{$mobile_thumbnail_width}px;
-            height: #{$mobile_thumbnail_height}px;
-            max-height: initial;
+            min-height: #{$mobile_thumbnail_height}px;
 
             img.body-thumbnail {
               max-height: #{$mobile_thumbnail_height}px;
@@ -435,19 +440,13 @@ div.stream-item {
 
         div.stream-body-left {
           position: relative;
-          height: #{$thumbnail_height}px;
           width: calc(100% - #{$thumbnail_width}px - 8px);
           order: 1;
           margin-right: 8px;
 
           @include mobile() {
             width: calc(100% - #{$mobile_thumbnail_width}px - 8px);
-            height: #{$mobile_thumbnail_height}px;
           }
-        }
-
-        @include mobile() {
-          height: #{$mobile_thumbnail_height}px;
         }
       }
     }
@@ -476,7 +475,6 @@ div.stream-item {
         margin-top: 8px;
 
         @include mobile() {
-          margin-top: 2px;
           height: 23px;
           @include activity-title(18px, 23px);
         }
@@ -554,8 +552,6 @@ div.stream-item {
         height: auto;
         overflow: hidden;
         margin-top: 2px;
-        min-height: 20px;
-        height: 20px;
         width: 100%;
       }
 
@@ -567,7 +563,8 @@ div.stream-item {
 
       div.stream-item-footer-mobile-group {
         @include mobile() {
-          display: inline-block;
+          float: left;
+          height: 26px;
         }
       }
 
@@ -599,7 +596,6 @@ div.stream-item {
         margin-right: 16px;
 
         @include mobile() {
-          margin-top: 1px;
           position: relative;
           top: initial;
           left: initial;

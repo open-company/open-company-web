@@ -49,7 +49,7 @@ nav.oc-navbar {
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
-      padding: 16px;
+      padding: 12px 16px;
     }
 
     div.oc-navbar-header-container{
@@ -64,11 +64,6 @@ nav.oc-navbar {
         padding-left: 60px;
       }
 
-      @include mobile(){
-        height: 24px;
-        display: initial;
-      }
-
       div.navbar-center {
         text-align: center;
         width: 320px;
@@ -79,19 +74,14 @@ nav.oc-navbar {
         flex: 0 0 auto;
 
         @include mobile() {
-          position: absolute;
-          top: 15px;
-          left: 50%;
-          width: 60vw;
-          height: 24px;
-          margin: 0 0 0 -30vw;
+          width: calc(100vw - 16px - 24px - 16px - 32px - 16px); // viewport width less external padding, left and right buttons and their margins btw the center
           text-align: center;
 
           div.navbar-mobile-title {
             @include OC_Body_Book();
             font-size: 16px;
             color: var(--color);
-            line-height: 24px;
+            line-height: 32px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -115,27 +105,19 @@ nav.oc-navbar {
         margin-right: auto;
         text-align: left;
 
-        @include mobile() {
-          height: 24px;
-          float: left;
-        }
-
         button.mobile-ham-menu {
           display: none;
 
           @include mobile() {
             display: block;
             width: 24px;
-            height: 24px;
+            height: 32px;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 4px;
-            position: absolute;
             padding: 0;
-            top: 18px;
-            left: 12px;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
@@ -223,6 +205,12 @@ nav.oc-navbar {
           top: 16px;
           left: unset;
           right: 16px;
+        }
+
+        &.anonymous-user {
+          div.login-button-container {
+            margin-left: auto;
+          }
         }
 
         div.user-notifications {
