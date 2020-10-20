@@ -14,7 +14,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.ui-theme :as ui-theme]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -111,6 +110,7 @@
                  (drv/drv :wrt-activity-data)
                  (drv/drv :current-user-data)
                  (drv/drv :org-slug)
+                 (drv/drv :theme)
                  ;; Locals
                  (rum/local false ::search-active)
                  (rum/local false ::search-focused)
@@ -135,19 +135,20 @@
                    s)}
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
+        theme-data (drv/react s :theme)
         current-user-data (drv/react s :current-user-data)
         current-org-slug (drv/react s :org-slug)
         is-author? (:publisher? activity-data)
         read-data* (drv/react s :wrt-read-data)
         read-data (as-> read-data* rd
-                   (update rd :unreads (fn [unreads]
-                                         (if is-author?
-                                           (filter #(not= (:user-id %) (:user-id current-user-data)) unreads)
-                                           unreads)))
-                   (update rd :reads (fn [reads]
-                                       (if is-author?
-                                         (filter #(not= (:user-id %) (:user-id current-user-data)) reads)
-                                         reads))))
+                    (update rd :unreads (fn [unreads]
+                                          (if is-author?
+                                            (filter #(not= (:user-id %) (:user-id current-user-data)) unreads)
+                                            unreads)))
+                    (update rd :reads (fn [reads]
+                                        (if is-author?
+                                          (filter #(not= (:user-id %) (:user-id current-user-data)) reads)
+                                          reads))))
         item-id (:uuid activity-data)
         seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
@@ -168,7 +169,7 @@
         slack-bot-data (first (jwt/team-has-bot? team-id))
         remind-all-users (filterv #(and (not (get @(::sending-notice s) (:user-id %)))
                                         (not= (:user-id %) (:user-id current-user-data)))
-                          unseen-users)]
+                                  unseen-users)]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -207,7 +208,7 @@
                      :cy "58px"
                      :r "50px"
                      :fill "transparent"
-                     :stroke (if (= (ui-theme/computed-value (ui-theme/get-ui-theme-setting)) :dark) "#DDDDDD" "#ECECEC")
+                     :stroke (if (= (get theme-data dis/theme-computed-key) :dark) "#DDDDDD" "#ECECEC")
                      :stroke-width "16px"}]
                   [:circle.wrt-donut-segment
                     {:cx "58"

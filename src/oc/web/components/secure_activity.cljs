@@ -7,6 +7,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.mixins.theme :as theme-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.mention :as mention-mixins]
@@ -38,9 +39,11 @@
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
+                             (drv/drv :theme)
                              (drv/drv :comments-data)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
+                             (theme-mixins/theme-mixin)
                              ui-mixins/refresh-tooltips-mixin
                              {:did-mount (fn [s]
                                (maybe-load-comments s)
@@ -57,6 +60,7 @@
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         id-token (drv/react s :id-token)
+        theme-data (drv/react s :theme)
         org-data (-> activity-data
                   (select-keys [:org-slug :org-name :org-logo-url])
                   (clojure.set/rename-keys {:org-slug :slug

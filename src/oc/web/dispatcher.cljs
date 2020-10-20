@@ -6,7 +6,7 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.drafts :as du]
-            [oc.shared.useragent :as ua]))
+            [oc.lib.cljs.useragent :as ua]))
 
 (defonce ^{:export true} app-state (atom {:loading false
                                           :show-login-overlay false}))
@@ -317,7 +317,12 @@
                 container-posts)]
     (vec items)))
 
-(def ui-theme-key [:ui-theme])
+(def theme-key [:theme])
+(def theme-computed-key :computed-value)
+(def theme-setting-key :setting-value)
+(def theme-expo-key :expo-value)
+(def expo-theme-key (conj theme-key theme-expo-key))
+(def computed-theme-key (conj theme-key theme-expo-key))
 
 ;; Functions needed by derivatives
 
@@ -651,7 +656,7 @@
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
-   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
+   :theme                 [[:base] (fn [base] (get-in base theme-key))]
    :users-info-hover      [[:base :org-slug] (fn [base org-slug] (get-in base (users-info-hover-key org-slug)))]
    :active-users          [[:base :org-slug] (fn [base org-slug] (get-in base (active-users-key org-slug)))]
    :mention-users         [[:base :org-slug] (fn [base org-slug] (get-in base (mention-users-key org-slug)))]

@@ -4,6 +4,7 @@
   See https://github.com/open-company/open-company-mobile/blob/master/src/nativeWebBridge.js
   for the native side of the bridge."
   (:require [oc.web.actions.user :as user-actions]
+            [oc.web.actions.theme :as theme-actions]
             [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dis]))
 
@@ -99,3 +100,22 @@
     (bridge-log! (str "on-app-version " av))
     (reset! app-version av)
     (dis/dispatch! [:input dis/expo-app-version-key av])))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Grabbing the color scheme from the expo wrapper
+
+(defonce ^:private -color-scheme (atom nil))
+
+(defn ^:expo brige-get-color-scheme
+  ""
+  []
+  (bridge-call! "get-color-scheme" nil))
+
+(defn- ^:export on-color-scheme-change
+  ""
+  [color-scheme]
+  (when color-scheme
+    (bridge-log! (str "on-color-scheme-change " color-scheme))
+    (reset! -color-scheme color-scheme)
+    (dis/dispatch! [:input dis/expo-theme-key color-scheme])
+    (theme-actions/expo-color-scheme-changed! color-scheme)))

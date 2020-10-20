@@ -2,7 +2,8 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.actions.ui-theme :as theme-actions]
+            [oc.web.utils.theme :as theme-utils]
+            [oc.web.actions.theme :as theme-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]))
@@ -29,20 +30,20 @@
             {:on-click #(nav-actions/hide-theme-settings)}
             "Back"]]
         [:div.theme-settings-body
-          (when (theme-actions/support-system-dark-mode?)
+          (when (theme-utils/electron-mac-theme-supported?)
             [:div.theme-settings-auto-container
               (carrot-checkbox {:selected (= setting-value :auto)
-                                :did-change-cb #(theme-actions/set-ui-theme (if % :auto computed-value))})
+                                :did-change-cb #(theme-actions/set-theme (if % :auto computed-value))})
               [:span.auto-label
-                {:on-click #(theme-actions/set-ui-theme (if (= setting-value :auto) computed-value :auto))}
+                {:on-click #(theme-actions/set-theme (if (= setting-value :auto) computed-value :auto))}
                 "Sync with OS settings"]])
           [:div.theme-settings-rows
             [:button.mlb-reset.theme-settings-row.light-theme
               {:class (when (= computed-value :light) "active")
-               :on-click #(theme-actions/set-ui-theme :light)}
+               :on-click #(theme-actions/set-theme :light)}
               (carrot-option-button {:selected (= setting-value :light)
                                      :disabled false
-                                     :did-change-cb #(theme-actions/set-ui-theme :light)})
+                                     :did-change-cb #(theme-actions/set-theme :light)})
               [:span.theme-name "Light"]
               [:span.theme-icon]
               (when (and (= computed-value :light)
@@ -50,10 +51,10 @@
                 automatically-chosen-copy)]
             [:button.mlb-reset.theme-settings-row.dark-theme
               {:class (when (= computed-value :dark) "active")
-               :on-click #(theme-actions/set-ui-theme :dark)}
+               :on-click #(theme-actions/set-theme :dark)}
               (carrot-option-button {:selected (= setting-value :dark)
                                      :disabled false
-                                     :did-change-cb #(theme-actions/set-ui-theme :dark)})
+                                     :did-change-cb #(theme-actions/set-theme :dark)})
               [:span.theme-name "Dark"]
               [:span.theme-icon]
               (when (and (= computed-value :dark)

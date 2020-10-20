@@ -3,14 +3,16 @@
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.mixins.theme :as theme-mixins]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
+            [oc.web.actions.theme :as theme-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.actions.payments :as payments-actions]
@@ -50,9 +52,10 @@
                            rum/reactive
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
+                           (drv/drv :theme)
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
-                           (drv/drv :ui-theme)
+                           (theme-mixins/theme-mixin)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-scrollingElement js/document)) (utils/page-scroll-top)))
@@ -88,6 +91,7 @@
                 active-users
                 current-user-data
                 search-active]} (drv/react s :org-dashboard-data)
+        theme-data (drv/react s :theme)
         is-mobile? (responsive/is-mobile-size?)
         loading? (or ;; force loading screen
                   app-loading
@@ -243,7 +247,7 @@
           (wrt org-data)
           ;; UI Theme settings panel
           (= open-panel :theme)
-          (theme-settings-modal (drv/react s :ui-theme))
+          (theme-settings-modal theme-data)
           ;; User info modal
           show-user-info?
           (user-info-modal {:user-data user-info-data :org-data org-data})

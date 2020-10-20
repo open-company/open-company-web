@@ -12,9 +12,9 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.utils.theme :as theme-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.ui-theme :as ui-theme]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -209,6 +209,7 @@
 (rum/defcs org-settings-modal <
   ;; Mixins
   rum/reactive
+  (drv/drv :theme)
   (drv/drv :org-data)
   (drv/drv :team-data)
   (drv/drv :org-editing)
@@ -228,7 +229,8 @@
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)
           content-visibility-data (:content-visibility org-data)
-          current-theme (ui-theme/computed-theme)]
+          theme @(drv/get-ref s :theme)
+          current-theme (get theme dis/theme-computed-key)]
       (org-actions/get-org org-data true)
       (reset-form s)
       ;; Auto-expand the content visibility settings (aka advanced settings)
@@ -254,6 +256,7 @@
     s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        theme-data (drv/react s :theme)
         org-avatar-editing (drv/react s :org-avatar-editing)
         org-data-for-avatar (merge org-data org-avatar-editing)
         org-editing (drv/react s :org-editing)
@@ -265,7 +268,7 @@
          :as team-management-data}
                     (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})
-        current-theme (ui-theme/computed-theme)
+        current-theme (get theme-data dis/theme-computed-key)
         current-brand-color (get (:brand-color org-editing) current-theme)]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt

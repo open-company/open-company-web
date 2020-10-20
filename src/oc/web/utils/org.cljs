@@ -4,7 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dis]
-            [oc.web.actions.ui-theme :as theme]))
+            [oc.web.actions.theme :as theme-actions]))
 
 (def org-avatar-filestack-config
   {:accept "image/*"
@@ -52,7 +52,7 @@
     (str "rgba(" rgbs ", " opacity ")")))
 
 (defn default-brand-color []
-  (when-let [theme-kw (theme/computed-theme)]
+  (when-let [theme-kw (theme-actions/computed-theme)]
     (get ls/default-brand-color theme-kw)))
 
 (defn css-color [color-map]
@@ -103,7 +103,7 @@
            :rgba-08 (rgb->rgba (:rgb (:secondary brand-color-map)) "0.8")}))
 
   ([brand-colors-map :guard #(and (:dark %) (:light %))]
-   (when-let [theme-key (theme/computed-theme)]
+   (when-let [theme-key (theme-actions/computed-theme)]
      (recur (get brand-colors-map theme-key))))
 
   ([org-data :guard map?]
@@ -111,6 +111,6 @@
 
 (defn current-brand-color
   ([org-data]
-   (when-let [theme-kw (theme/computed-theme)]
+   (when-let [theme-kw (theme-actions/computed-theme)]
      (-> org-data :brand-color theme-kw)))
   ([] (current-brand-color (dis/org-data))))

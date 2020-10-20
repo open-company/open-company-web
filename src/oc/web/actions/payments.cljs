@@ -3,7 +3,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.stripe :as stripe-client]

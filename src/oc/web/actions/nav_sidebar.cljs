@@ -63,12 +63,12 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (dis/dispatch! [:routing {:org org-slug
-                                   :contributions author-uuid
-                                   :sort-type sort-type
-                                   :scroll-y back-y
-                                   :query-params (dis/query-params)
-                                   :route [org-slug author-uuid sort-type "dashboard"]}])
+         (routing-actions/routing! {:org org-slug
+                                    :contributions author-uuid
+                                    :sort-type sort-type
+                                    :scroll-y back-y
+                                    :query-params (dis/query-params)
+                                    :route [org-slug author-uuid sort-type "dashboard"]})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
@@ -100,12 +100,12 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (dis/dispatch! [:routing {:org org-slug
-                                   :board board-slug
-                                   :sort-type sort-type
-                                   :scroll-y back-y
-                                   :query-params (dis/query-params)
-                                   :route [org-slug (if is-container? "dashboard" board-slug) sort-type]}])
+         (routing-actions/routing! {:org org-slug
+                                    :board board-slug
+                                    :sort-type sort-type
+                                    :scroll-y back-y
+                                    :query-params (dis/query-params)
+                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
            (activity-actions/reload-current-container))
@@ -182,7 +182,7 @@
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)
                      route-path*)]
-    (dis/dispatch! [:routing route-path])
+    (routing-actions/routing! route-path)
     (cmail-actions/cmail-hide)
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)
     ;; Refresh the post data

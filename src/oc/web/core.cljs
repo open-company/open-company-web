@@ -8,10 +8,11 @@
             [oc.web.rum-utils :as ru]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]
-            [oc.shared.useragent :as ua]
+            [oc.lib.cljs.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
+            [oc.web.stores.theme]
             [oc.web.stores.jwt]
             [oc.web.stores.org]
             [oc.web.stores.team]
@@ -41,7 +42,7 @@
             [oc.web.actions.web-app-update :as web-app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
-            [oc.web.actions.ui-theme :as theme-actions]
+            [oc.web.actions.theme :as theme-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -123,7 +124,7 @@
     (when (not= pathname (s/lower pathname))
       (let [lower-location (str (s/lower pathname) (.. js/window -location -search) (.. js/window -location -hash))]
         (set! (.-location js/window) lower-location))))
-  (dis/dispatch! [:routing {}])
+  (routing-actions/routing! {})
   (when (and (contains? (:query-params params) :jwt)
              (map? (js->clj (jwt/decode (-> params :query-params :jwt)))))
     ; contains :jwt, so saving it
@@ -211,11 +212,11 @@
       (do
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (dis/dispatch! [:routing {:org org
-                                  :board board
-                                  :sort-type sort-type
-                                  :query-params (:query-params params)
-                                  :route [org route]}])
+        (routing-actions/routing! {:org org
+                                    :board board
+                                    :sort-type sort-type
+                                    :query-params (:query-params params)
+                                    :route [org route]})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -229,7 +230,7 @@
   ;; save route
   (let [org (:org params)
         route (vec (remove nil? [route-name org]))]
-    (dis/dispatch! [:routing {:org org :query-params (:query-params params) :route route}]))
+    (routing-actions/routing! {:org org :query-params (:query-params params) :route route}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     ; remove rum component if mounted to the same node
@@ -249,15 +250,15 @@
         has-at-param (contains? query-params :at)]
     (pre-routing params true {:query-params query-params :keep-params [:at]})
     ;; save the route
-    (dis/dispatch! [:routing {:org org
-                              :board board
-                              :sort-type sort-type
-                              :entry-board entry-board
-                              :activity entry
-                              :comment comment
-                              :query-params query-params
-                              :route (vec (remove nil?
-                                      [org board (when entry entry) (when comment comment) route]))}])
+    (routing-actions/routing! {:org org
+                               :board board
+                               :sort-type sort-type
+                               :entry-board entry-board
+                               :activity entry
+                               :comment comment
+                               :query-params query-params
+                               :route (vec (remove nil?
+                                                   [org board (when entry entry) (when comment comment) route]))})
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -271,11 +272,11 @@
         query-params (:query-params params)]
     (pre-routing params true {:query-params query-params})
     ;; save the route
-    (dis/dispatch! [:routing {:org org
-                              :contributions contributions
-                              :sort-type sort-type
-                              :query-params query-params
-                              :route [org contributions route]}])
+    (routing-actions/routing! {:org org
+                               :contributions contributions
+                               :sort-type sort-type
+                               :query-params query-params
+                               :route [org contributions route]})
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -289,13 +290,13 @@
     (when pre-routing?
       (pre-routing params true))
     ;; save the route
-    (dis/dispatch! [:routing {:org org
-                              :activity (:entry params)
-                              :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
-                              :comment (:comment params)
-                              :query-params query-params
-                              :route (vec (remove nil?
-                                      [org route secure-id]))}])
+    (routing-actions/routing! {:org org
+                               :activity (:entry params)
+                               :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+                               :comment (:comment params)
+                               :query-params query-params
+                               :route (vec (remove nil?
+                                                   [org route secure-id]))})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
               (not (dis/board-data))
@@ -689,7 +690,7 @@
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
-      (theme-actions/handle-url-change)
+      ; (theme-actions/handle-url-change)
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
   (do
