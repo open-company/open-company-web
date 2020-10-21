@@ -2,15 +2,20 @@
   (:require [oc.lib.cljs.useragent :as ua]
             [oc.web.dispatcher :as dis]))
 
+(def dark-theme-not-allowed-routes [:sign-up
+                                    :login
+                                    :password-reset
+                                    :email-verification
+                                    :confirm-invitation
+                                    :email-wall
+                                    :login-wall])
+
 (def theme-default-value :auto)
 
 (def theme-values #{:dark :light theme-default-value})
 
 (defn dark-allowed-path? []
-  (-> (.. js/window -location -pathname)
-      (.match (.-OCWebUIThemeAllowedPathRegExp js/window))
-      seq
-      not))
+  (not (some dark-theme-not-allowed-routes (dis/route-param [dis/router-opts-key dis/router-dark-allowed-key]))))
 
 (defn electron-mac-theme-supported? []
   (or ;; Electron wrapper on mac has always support for auto dark mode
@@ -36,7 +41,8 @@
 (defn computed-value
   [theme-map]
   (let [theme-setting (get theme-map dis/theme-setting-key)]
-    (if (dark-allowed-path?)
+    (if (or ua/pseudo-native?
+            (dark-allowed-path?))
       (if (= theme-setting :auto)
         (cond
           (electron-mac-theme-supported?)

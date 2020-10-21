@@ -53,6 +53,7 @@
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
                            (drv/drv :theme)
+                           (drv/drv :route/dark-allowed)
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
                            (theme-mixins/theme-mixin)
@@ -92,6 +93,7 @@
                 current-user-data
                 search-active]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
+        route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
         loading? (or ;; force loading screen
                   app-loading

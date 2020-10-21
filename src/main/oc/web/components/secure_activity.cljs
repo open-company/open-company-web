@@ -40,6 +40,7 @@
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :theme)
+                             (drv/drv :route/dark-allowed)
                              (drv/drv :comments-data)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
@@ -61,6 +62,7 @@
         is-mobile? (responsive/is-mobile-size?)
         id-token (drv/react s :id-token)
         theme-data (drv/react s :theme)
+        route-dark-allowed (drv/react s :route/dark-allowed)
         org-data (-> activity-data
                   (select-keys [:org-slug :org-name :org-logo-url])
                   (clojure.set/rename-keys {:org-slug :slug

@@ -69,6 +69,8 @@
           shared/ie-jquery-fix
           ;; Static js files
           (shared/static-js)
+          (when-let [react-native-devtools-url (env :react-native-devtools-url)]
+            [:script {:src react-native-devtools-url}])
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]

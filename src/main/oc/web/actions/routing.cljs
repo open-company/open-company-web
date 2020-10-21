@@ -8,6 +8,9 @@
             [oc.web.actions.theme :as theme-actions]
             [oc.lib.cljs.useragent :as ua]))
 
+(defn pre-routing []
+  (theme-actions/pre-routing!))
+
 (defn post-routing []
   ;; Re-dispatch the current change data
   (dis/dispatch! [:container/status (dis/change-data) true]))
@@ -27,5 +30,4 @@
   (router/nav! (oc-urls/default-landing (:slug org))))
 
 (defn routing! [next-route-map]
-  (dis/dispatch! [:routing next-route-map])
-  (theme-actions/post-routing!))
+  (dis/dispatch! [:routing next-route-map]))

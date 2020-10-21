@@ -71,7 +71,7 @@
 (defn expo-color-scheme-changed! [new-expo-color-theme]
   (dis/dispatch! [:theme/expo-theme new-expo-color-theme]))
 
-(defn post-routing! []
+(defn pre-routing! []
   (dis/dispatch! [:theme/set-setting (read-theme-cookie)]))
 
 (defn handle-url-change []

@@ -8,6 +8,10 @@
             [oc.web.utils.drafts :as du]
             [oc.lib.cljs.useragent :as ua]))
 
+
+(defn- s-or-k? [x]
+  (or (keyword? x) (string? x)))
+
 (defonce ^{:export true} app-state (atom {:loading false
                                           :show-login-overlay false}))
 
@@ -32,6 +36,8 @@
 ;; Data key paths
 
 (def router-key :router-path)
+(def router-opts-key :opts)
+(def router-dark-allowed-key :dark-allowed)
 
 (def checkout-result-key :checkout-success-result)
 (def checkout-update-plan-key :checkout-update-plan)
@@ -340,6 +346,7 @@
 (defn drv-spec [db]
   {:base                [[] db]
    :route               [[:base] (fn [base] (get base router-key))]
+   :route/dark-allowed  [[:route] (fn [route] (boolean (get-in route [router-opts-key router-dark-allowed-key])))]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :contributions-id    [[:route] (fn [route] (:contributions route))]
@@ -740,9 +747,10 @@
   ([k] (query-param @app-state k))
   ([data k] (get-in data [router-key :query-params k])))
 
-(defn ^:export route-param
+(defun ^:export route-param
   ([k] (route-param @app-state k))
-  ([data k] (get-in data [router-key k])))
+  ([data k :guard s-or-k?] (route-param [k]))
+  ([data ks :guard coll?] (get-in data (concat [router-key] ks))))
 
 (defn ^:export route-set
   ([] (route-set @app-state))
@@ -823,9 +831,6 @@
     (posts-data data (current-org-slug data)))
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
-
-(defn- s-or-k? [x]
-  (or (keyword? x) (string? x)))
 
 (defun org-board-data
   "Get board data from org data map: mostly used to edit the board infos."
