@@ -74,17 +74,20 @@ nav.oc-navbar {
         flex: 0 0 auto;
 
         @include mobile() {
-          width: calc(100vw - 16px - 24px - 16px - 32px - 16px); // viewport width less external padding, left and right buttons and their margins btw the center
+          max-width: calc(100vw - 16px - 24px - 16px - 32px - 16px); // viewport width less external padding, left and right buttons and their margins btw the center
           text-align: center;
+          flex-shrink: 1;
 
           div.navbar-mobile-title {
             @include OC_Body_Book();
             font-size: 16px;
             color: var(--color);
-            line-height: 32px;
+            line-height: 24px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-left: 24px;
+            margin-right: 16px;
           }
         }
 
@@ -118,6 +121,7 @@ nav.oc-navbar {
             background-repeat: no-repeat;
             border-radius: 4px;
             padding: 0;
+            margin-right: auto;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
@@ -189,7 +193,6 @@ nav.oc-navbar {
       }
 
       div.navbar-right {
-        margin-right: 0px;
         margin-right: 0;
         flex: 1;
         margin-left: auto;
@@ -197,15 +200,6 @@ nav.oc-navbar {
         justify-content: center;
         align-items: center;
         flex-flow: row nowrap;
-
-        @include mobile() {
-          min-width: unset;
-          display: initial;
-          position: absolute;
-          top: 16px;
-          left: unset;
-          right: 16px;
-        }
 
         &.anonymous-user {
           div.login-button-container {
@@ -226,7 +220,6 @@ nav.oc-navbar {
           min-width: 24px;
           height: 24px;
           position: relative;
-          margin-left: 4px;
 
           div.user-menu-button {
             position: relative;
