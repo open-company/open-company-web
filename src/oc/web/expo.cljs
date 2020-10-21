@@ -106,7 +106,7 @@
 
 (defonce ^:private -color-scheme (atom nil))
 
-(defn ^:expo brige-get-color-scheme
+(defn ^:expo bridge-get-color-scheme
   ""
   []
   (bridge-call! "get-color-scheme" nil))
@@ -119,3 +119,11 @@
     (reset! -color-scheme color-scheme)
     (dis/dispatch! [:input dis/expo-theme-key color-scheme])
     (theme-actions/expo-color-scheme-changed! color-scheme)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initialize bridge
+
+(defn bridge-init []
+  (bridge-get-deep-link-origin)
+  (bridge-get-app-version)
+  (bridge-get-color-scheme))

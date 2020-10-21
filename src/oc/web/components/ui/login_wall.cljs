@@ -19,6 +19,7 @@
 (rum/defcs login-wall < rum/reactive
                         (drv/drv :jwt)
                         (drv/drv :theme)
+                        (drv/drv :route/dark-allowed)
                         (drv/drv :auth-settings)
                         (drv/drv :org-slug)
                         (drv/drv :board-slug)
@@ -30,6 +31,7 @@
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         theme-data (drv/react s :theme)
+        router-dark-allowed (drv/react s :route/dark-allowed)
         current-org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
         deep-link-origin (drv/react s :expo-deep-link-origin)

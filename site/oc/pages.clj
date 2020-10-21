@@ -214,6 +214,9 @@
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ie-jquery-fix
+          ;; Debug React native
+          (when-let [react-native-devtools-url (env :react-native-devtools-url)]
+            [:script {:src react-native-devtools-url}])
           ;; Static js files
           [:script {:type "text/javascript" :src (shared/cdn "/js/static-js.js")}]
           ;; Google Analytics

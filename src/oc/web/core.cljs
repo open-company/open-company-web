@@ -108,6 +108,7 @@
       (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
 (defn pre-routing [params & [should-rewrite-url rewrite-params]]
+  (routing-actions/pre-routing)
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
     (when ua/desktop-app?
@@ -213,10 +214,11 @@
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
         (routing-actions/routing! {:org org
-                                    :board board
-                                    :sort-type sort-type
-                                    :query-params (:query-params params)
-                                    :route [org route]})
+                                   :board board
+                                   :sort-type sort-type
+                                   :query-params (:query-params params)
+                                   :route [org route]
+                                   dis/router-opts-key [dis/router-dark-allowed-key]})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -230,7 +232,9 @@
   ;; save route
   (let [org (:org params)
         route (vec (remove nil? [route-name org]))]
-    (routing-actions/routing! {:org org :query-params (:query-params params) :route route}))
+    (routing-actions/routing! {:org org
+                               :query-params (:query-params params)
+                               :route route}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
     ; remove rum component if mounted to the same node
@@ -258,7 +262,8 @@
                                :comment comment
                                :query-params query-params
                                :route (vec (remove nil?
-                                                   [org board (when entry entry) (when comment comment) route]))})
+                                                   [org board (when entry entry) (when comment comment) route]))
+                               dis/router-opts-key [dis/router-dark-allowed-key]})
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -276,7 +281,8 @@
                                :contributions contributions
                                :sort-type sort-type
                                :query-params query-params
-                               :route [org contributions route]})
+                               :route [org contributions route]
+                               dis/router-opts-key [dis/router-dark-allowed-key]})
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -296,7 +302,8 @@
                                :comment (:comment params)
                                :query-params query-params
                                :route (vec (remove nil?
-                                                   [org route secure-id]))})
+                                                   [org route secure-id]))
+                               dis/router-opts-key [dis/router-dark-allowed-key]})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
               (not (dis/board-data))
@@ -715,9 +722,7 @@
   (user-actions/recall-expo-push-token)
   ;; Get the mobile app deep link origin if we're on mobile
   (when ua/mobile-app?
-    (expo/bridge-get-deep-link-origin)
-    (expo/bridge-get-app-version))
-
+    (expo/bridge-init))
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
