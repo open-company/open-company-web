@@ -38,6 +38,8 @@ nav.oc-navbar {
 
   z-index: $navbar_zindex;
   margin: 0px;
+  $mobile_vertical_padding: 12;
+  $mobile_navbar_content_height: $mobile_navbar_height - ($mobile_vertical_padding * 2);
 
   div.oc-navbar-header {
     position: relative;
@@ -49,7 +51,7 @@ nav.oc-navbar {
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
-      padding: 12px 16px;
+      padding: #{$mobile_vertical_padding}px 16px;
     }
 
     div.oc-navbar-header-container{
@@ -81,10 +83,13 @@ nav.oc-navbar {
             @include OC_Body_Book();
             font-size: 16px;
             color: var(--color);
-            line-height: 32px;
+            line-height: #{$mobile_navbar_content_height}px;
+            height: #{$mobile_navbar_content_height}px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-left: 16px;
+            margin-right: 16px;
           }
         }
 

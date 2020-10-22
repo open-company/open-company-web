@@ -55,6 +55,13 @@ div.wrt-count-container {
     background-color: transparent;
     border-radius: 4px;
 
+    @include mobile() {
+      padding: 0 6px 0 21px;
+      height: 26px;
+      line-height: 26px;
+      vertical-align: baseline;
+    }
+
     &:hover {
       opacity: 1;
     }

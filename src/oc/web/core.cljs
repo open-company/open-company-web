@@ -154,8 +154,8 @@
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
-                              (contains? query-params :org-settings)
-                              (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
+                                (contains? query-params :org-settings)
+                                (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and ls/reminders-enabled?
                              (not org-settings)
@@ -175,6 +175,8 @@
         next-app-state (merge {:panel-stack panel-stack
                                :bot-access bot-access}
                         billing-checkout-map)]
+    (when (seq panel-stack)
+      (dom-utils/lock-page-scroll))
     (swap! dis/app-state merge next-app-state)))
 
 (defn- read-sort-type-from-cookie

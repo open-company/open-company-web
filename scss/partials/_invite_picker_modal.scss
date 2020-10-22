@@ -14,10 +14,18 @@ div.invite-picker-modal {
   opacity: 1;
   transition: opacity 180ms ease-in;
 
+  @include mobile() {
+    padding: 0;
+  }
+
   button.modal-close-bt {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.invite-picker {
@@ -33,6 +41,15 @@ div.invite-picker-modal {
     overflow-x: hidden;
     overflow-y: auto;
 
+    @include mobile() {
+      width: 100%;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      margin-top: 0;
+      z-index: 1;
+    }
+
     div.invite-picker-header {
       width: 320px;
       height: #{$navbar_height}px;
@@ -42,13 +59,32 @@ div.invite-picker-modal {
       top: 0;
       right: 0;
       z-index: 100;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: center;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        right: unset;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px;
+        margin: 0;
+        z-index: 2;
+      }
 
       div.invite-picker-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
         color: var(--color);
         line-height: 32px;
-        float: left;
+        width: 70%;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       button.cancel-bt {
@@ -57,13 +93,39 @@ div.invite-picker-modal {
         @include OC_Body_Book();
         font-size: 14px;
         color: var(--light-color);
-        float: right;
+        position: absolute;
+        top: 12px;
+        right: 24px;
+
+        @include mobile() {
+          width: 24px;
+          height: 24px;
+          left: 12px;
+          top: 16px;
+          right: unset;
+          padding: 0;
+          color: rgba(0, 0, 0, 0);
+
+          &:after {
+            content: "";
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            @include svgBgColor("/img/ML/mobile_close_x.svg", center, 12px 12px, var(--light-color));
+          }
+        }
       }
     }
 
     div.invite-picker-body {
       width: 272px;
       margin: 24px auto 0;
+
+      @include mobile() {
+        width: 100%;
+      }
 
       div.invite-picker-body-title {
         @include OC_Body_Bold();

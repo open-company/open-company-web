@@ -17,16 +17,6 @@ div.mobile-tabbar {
     width: 100vw;
     z-index: #{$navbar_zindex + 5};
 
-    &.ios-app-tabbar {
-      height: #{$mobile_navbar_height + 24}px;
-      padding-bottom: 24px;
-    }
-
-    &.ios-web-tabbar {
-      height: #{$mobile_navbar_height + 8}px;
-      padding-bottom: 8px;
-    }
-
     &.can-compose {
       button.tab-button.new-post-tab {
         display: flex;

@@ -279,6 +279,11 @@ div.stream-item {
         @include mobile() {
           color: var(--light-color);
           margin-left: 6px;
+
+          time {
+            vertical-align: baseline;
+            line-height: 24px;
+          }
         }
       }
 
@@ -790,7 +795,7 @@ div.stream-item {
             background-size: 8px 4px;
             background-repeat: no-repeat;
             position: absolute;
-            top: 11px;
+            top: 12px;
             left: 0;
             transform: rotate(-90deg);
             display: block;
