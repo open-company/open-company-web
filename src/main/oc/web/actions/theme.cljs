@@ -39,7 +39,7 @@
 (defn computed-theme []
   (theme-utils/computed-value {dis/theme-setting-key (get-theme-setting)}))
 
-(defn ^:export set-theme [v]
+(defn ^:export set-theme-setting [v]
   (let [fixed-value (or v :auto)]
     (save-theme-cookie fixed-value)
     ; (set-theme-class (theme-utils/computed-value {dis/theme-setting-key fixed-value}))
@@ -59,20 +59,29 @@
   (when (theme-utils/electron-mac-theme-supported?)
     (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
           #(when (= (get-theme-setting) :auto)
-             (set-theme :auto)))
+             (set-theme-setting :auto)))
     (when @visibility-change-listener
       (events/unlistenByKey @visibility-change-listener))
     (reset! visibility-change-listener
             (events/listen js/document EventType/VISIBILITYCHANGE
                            #(when (and (= (.-visibilityState js/document) "visible")
                                        (= (get-theme-setting) :auto))
-                              (set-theme :auto))))))
+                              (set-theme-setting :auto))))))
 
 (defn expo-color-scheme-changed! [new-expo-color-theme]
-  (dis/dispatch! [:theme/expo-theme new-expo-color-theme]))
+  (dis/dispatch! [:theme/expo-theme new-expo-color-theme (read-theme-cookie)]))
 
 (defn pre-routing! []
   (dis/dispatch! [:theme/set-setting (read-theme-cookie)]))
 
 (defn handle-url-change []
   (dis/dispatch! [:theme/routing]))
+
+(defn ^:export early-get-theme
+  "Insert the computed theme in the app-state directly without using dispatch! since it might not be initialized yet."
+  []
+  (let [setting-value (read-theme-cookie)
+        theme-map (assoc (get @dis/app-state dis/theme-key)
+                         dis/theme-setting-key setting-value)
+        computed-value (theme-utils/computed-value theme-map)]
+    (swap! dis/app-state update-in dis/computed-theme-key computed-theme)))

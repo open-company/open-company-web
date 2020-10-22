@@ -327,7 +327,6 @@
 (def theme-computed-key :computed-value)
 (def theme-setting-key :setting-value)
 (def theme-expo-key :expo-value)
-(def expo-theme-key (conj theme-key theme-expo-key))
 (def computed-theme-key (conj theme-key theme-expo-key))
 
 ;; Functions needed by derivatives

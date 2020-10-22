@@ -117,8 +117,7 @@
   (when color-scheme
     (bridge-log! (str "on-color-scheme-change " color-scheme))
     (reset! -color-scheme color-scheme)
-    (dis/dispatch! [:input dis/expo-theme-key color-scheme])
-    (theme-actions/expo-color-scheme-changed! color-scheme)))
+    (theme-actions/expo-color-scheme-changed! (keyword color-scheme))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize bridge

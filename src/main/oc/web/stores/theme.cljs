@@ -16,12 +16,12 @@
 
 (defmethod dispatcher/action :theme/routing
   [db [_]]
-  (let [next-theme (with-computed-theme (get-in db dispatcher/theme-key))]
-    (assoc-in db dispatcher/theme-key next-theme)))
+  (update-in db dispatcher/theme-key with-computed-theme))
 
 (defmethod dispatcher/action :theme/expo-theme
-  [db [_ expo-theme]]
+  [db [_ expo-theme setting-theme]]
   (let [cur-value (get-in db dispatcher/theme-key)
-        with-expo-theme (assoc cur-value dispatcher/theme-expo-key expo-theme)
+        with-expo-theme (assoc cur-value dispatcher/theme-expo-key expo-theme
+                                         dispatcher/theme-setting-key setting-theme)
         next-theme (with-computed-theme with-expo-theme)]
     (assoc-in db dispatcher/theme-key next-theme)))
