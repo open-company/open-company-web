@@ -9,11 +9,12 @@
     {:will-mount (fn [s]
                    (let [theme-computed-value (-> s (drv/get-ref :theme) deref dis/theme-computed-key)
                          route-dark-allowed-value @(drv/get-ref s :route/dark-allowed)]
-                     (reset! last-theme-computed-value theme-computed-value)
-                     (theme-actions/set-theme-class theme-computed-value)
-                     (reset! last-route-dark-allowed-value route-dark-allowed-value))
+                     (when theme-computed-value
+                      (reset! last-theme-computed-value theme-computed-value)
+                      (theme-actions/set-theme-class theme-computed-value)
+                      (reset! last-route-dark-allowed-value route-dark-allowed-value)))
                    s)
-    :did-update (fn [s]
+    :will-update (fn [s]
                   (let [theme-computed-value (-> s (drv/get-ref :theme) deref dis/theme-computed-key)
                         route-dark-allowed-value @(drv/get-ref s :route/dark-allowed)]
                     (when (or (not= theme-computed-value @last-theme-computed-value)

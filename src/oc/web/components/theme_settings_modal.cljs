@@ -33,17 +33,17 @@
           (when (theme-utils/electron-mac-theme-supported?)
             [:div.theme-settings-auto-container
               (carrot-checkbox {:selected (= setting-value :auto)
-                                :did-change-cb #(theme-actions/set-theme (if % :auto computed-value))})
+                                :did-change-cb #(theme-actions/set-theme-setting (if % :auto computed-value))})
               [:span.auto-label
-                {:on-click #(theme-actions/set-theme (if (= setting-value :auto) computed-value :auto))}
+                {:on-click #(theme-actions/set-theme-setting (if (= setting-value :auto) computed-value :auto))}
                 "Sync with OS settings"]])
           [:div.theme-settings-rows
             [:button.mlb-reset.theme-settings-row.light-theme
               {:class (when (= computed-value :light) "active")
-               :on-click #(theme-actions/set-theme :light)}
+               :on-click #(theme-actions/set-theme-setting :light)}
               (carrot-option-button {:selected (= setting-value :light)
                                      :disabled false
-                                     :did-change-cb #(theme-actions/set-theme :light)})
+                                     :did-change-cb #(theme-actions/set-theme-setting :light)})
               [:span.theme-name "Light"]
               [:span.theme-icon]
               (when (and (= computed-value :light)
@@ -51,10 +51,10 @@
                 automatically-chosen-copy)]
             [:button.mlb-reset.theme-settings-row.dark-theme
               {:class (when (= computed-value :dark) "active")
-               :on-click #(theme-actions/set-theme :dark)}
+               :on-click #(theme-actions/set-theme-setting :dark)}
               (carrot-option-button {:selected (= setting-value :dark)
                                      :disabled false
-                                     :did-change-cb #(theme-actions/set-theme :dark)})
+                                     :did-change-cb #(theme-actions/set-theme-setting :dark)})
               [:span.theme-name "Dark"]
               [:span.theme-icon]
               (when (and (= computed-value :dark)

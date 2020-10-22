@@ -686,6 +686,9 @@
         (router/redirect! (str urls/login-wall "?login-redirect=" (js/encodeURIComponent (router/get-token))))))
 
     (defn handle-url-change [e]
+      ;; Get the mobile app deep link origin if we're on mobile
+      (when ua/mobile-app?
+        (expo/bridge-get-color-scheme))
       ;; we are checking if this event is due to user action,
       ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
@@ -717,12 +720,12 @@
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
-
-  ;; Recall Expo push token into app state (push notification permission)
-  (user-actions/recall-expo-push-token)
+  (theme-actions/early-get-theme)
   ;; Get the mobile app deep link origin if we're on mobile
   (when ua/mobile-app?
     (expo/bridge-init))
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)

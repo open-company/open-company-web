@@ -26,12 +26,14 @@
         (or (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
             (.-matches (.matchMedia js/window "(prefers-color-scheme: light)"))))))
 
-(defn electron-mac-dark-theme-enabled? []
-  (if (and ua/mac?
-           ua/desktop-app?
-           (exists? js/OCCarrotDesktop.isDarkMode))
-    (js/OCCarrotDesktop.isDarkMode)
-    (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))))
+(defn electron-mac-theme []
+  (if (and ua/desktop-app?
+           ua/mac?
+           (or (and (exists? js/OCCarrotDesktop.isDarkMode)
+                    (js/OCCarrotDesktop.isDarkMode))
+               (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))))
+    :dark
+    :auto))
 
 (defn- expo-theme-supported? []
   (and ua/mobile-app?
@@ -45,14 +47,10 @@
             (dark-allowed-path?))
       (if (= theme-setting :auto)
         (cond
-          (electron-mac-theme-supported?)
-          (if (electron-mac-dark-theme-enabled?)
-            :dark
-            :light)
           (expo-theme-supported?)
-          (if (= (get theme-map dis/expo-key) :dark)
-            :dark
-            :light)
+          (or (get theme-map dis/theme-expo-key) :light)
+          (electron-mac-theme-supported?)
+          (or (electron-mac-theme) :light)
           :else
           theme-default-value)
         theme-setting)

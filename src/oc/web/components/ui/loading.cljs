@@ -1,5 +1,7 @@
 (ns oc.web.components.ui.loading
   (:require [rum.core :as rum]
+            [oc.web.mixins.theme :as theme-mixins]
+            [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]))
 
 (rum/defc shaky-carrot < rum/static
@@ -34,8 +36,15 @@
       [:div.oc-loading-tabbar-item]
       [:div.oc-loading-tabbar-item]]]]])
 
-(rum/defc loading < rum/static
-  [{:keys [current-org-slug current-board-slug jwt loading]}]
+(rum/defcs loading <
+
+  rum/static
+  rum/reactive
+  (drv/drv :theme)
+  (drv/drv :route/dark-allowed)
+  (theme-mixins/theme-mixin)
+
+  [s {:keys [current-org-slug current-board-slug jwt loading]}]
   (if (and current-org-slug
            jwt)
     (ghost-screen {:loading loading :current-board-slug current-board-slug})
