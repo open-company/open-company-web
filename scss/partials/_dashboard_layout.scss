@@ -80,6 +80,91 @@ div.dashboard-layout {
       padding-bottom: #{$mobile_navbar_height}px;
       left: unset;
       background-color: var(--mobile-background-color);
+
+      &.ios-app-tabbar {
+        padding-bottom: #{$mobile_navbar_height + 24}px;
+
+        div.mobile-tabbar {
+          height: #{$mobile_navbar_height + 24}px;
+          padding-bottom: 24px;
+        }
+
+        &.has-mobile-invite-box {
+          padding-bottom: #{$mobile_navbar_height + 24 + $mobile_navbar_height}px;
+
+          div.mobile-invite-box {
+            bottom: #{$mobile_navbar_height + 24}px;
+          }
+        }
+      }
+
+      &.ios-web-tabbar {
+        padding-bottom: #{$mobile_navbar_height + 8}px;
+
+        div.mobile-tabbar {
+          height: #{$mobile_navbar_height + 8}px;
+          padding-bottom: 8px;
+        }
+
+        &.has-mobile-invite-box {
+          padding-bottom: #{$mobile_navbar_height + 8 + $mobile_navbar_height}px;
+
+          div.mobile-invite-box {
+            bottom: #{$mobile_navbar_height + 8}px;
+          }
+        }
+      }
+
+      &.has-mobile-invite-box {
+        padding-bottom: #{$mobile_navbar_height * 2}px;
+
+        div.mobile-invite-box {
+          display: flex;
+          width: 100vw;
+          height: #{$mobile_navbar_height}px;
+          position: fixed;
+          left: 0;
+          bottom: #{$mobile_navbar_height}px;
+          flex-flow: row nowrap;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--primary-color);
+          z-index: #{$navbar_zindex + 5};
+          padding: 12px 16px;
+
+          button.mobile-invite-box-bt {
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 24px;
+            color: var(--secondary-color);
+            text-align: center;
+            text-decoration: none;
+
+            span.invite-teammates {
+              text-decoration: underline;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 24px;
+              color: var(--secondary-color);
+              text-align: center;
+            }
+          }
+
+          button.close-mobile-invite-box {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            @include svgBgColor("/img/ML/mobile_close_x.svg", center, 8px 8px, var(--secondary-color-06));
+            position: absolute;
+            right: 12px;
+            top: 16px;
+          }
+        }
+      }
+    }
+
+    div.mobile-invite-box {
+      display: none;
     }
 
     div.board-container {

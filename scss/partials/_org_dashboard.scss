@@ -148,7 +148,8 @@ div.org-dashboard {
           padding-top: #{$navbar_height}px;
         }
 
-        @include mobile(){
+        @include mobile() {
+          padding-bottom: 0;
           background-color: var(--mobile-background-color);
           min-height: calc(100vh - #{$mobile_navbar_height}px);
         }

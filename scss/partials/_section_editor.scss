@@ -14,10 +14,18 @@ div.section-editor-container {
   opacity: 1;
   transition: opacity 180ms ease-in;
 
+  @include mobile(){
+    padding: 0;
+  }
+
   button.modal-close-bt {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.section-editor {
@@ -32,6 +40,15 @@ div.section-editor-container {
     overflow-x: hidden;
     overflow-y: auto;
 
+    @include mobile() {
+      width: 100%;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      margin-top: 0;
+      z-index: 1;
+    }
+
     div.section-editor-header {
       width: 320px;
       height: 56px;
@@ -42,47 +59,100 @@ div.section-editor-container {
       z-index: 1000;
       top: 0;
       right: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: center;
 
-      div.section-editor-header-title {
-        @include OC_Body_Bold();
-        font-size: 14px;
-        color: var(--color);
-        line-height: 32px;
-        float: left;
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        right: unset;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px;
+        margin: 0;
+        z-index: 2;
       }
 
-      button.cancel-bt {
-        height: 32px;
-        padding: 0 8px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: var(--light-color);
+      div.section-editor-header-left {
+        order: 2;
+        margin-left: auto;
         margin-right: 8px;
-        float: right;
+        display: flex;
+
+        @include mobile() {
+          order: 1;
+          margin-left: 0;
+          margin-right: 0;
+          flex: 1;
+        }
+
+        button.cancel-bt {
+          height: 32px;
+          padding: 0 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--light-color);
+
+          @include mobile() {
+            margin-right: auto;
+          }
+        }
+      }
+
+      div.section-editor-header-center {
+        order: 1;
+        margin-right: auto;
+
+        @include mobile() {
+          order: 2;
+          margin-right: initial;
+          width: 40vw;
+          text-align: center;;
+        }
+
+        div.section-editor-header-title {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: var(--color);
+          line-height: 32px;
+        }
       }
       
-      button.save-bt {
-        height: 32px;
-        padding: 7px 12px;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        background-color: var(--primary-color);
-        border-radius: 4px;
-        color: var(--secondary-color);
-        line-height: 18px;
-        float: right;
+      div.section-editor-header-right {
+        order: 3;
+        display: flex;
 
-        &.disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
+        @include mobile() {
+          margin-right: 0;
+          flex: 1;
+        }
+
+        button.save-bt {
+          height: 32px;
+          padding: 7px 12px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          background-color: var(--primary-color);
+          border-radius: 4px;
+          color: var(--secondary-color);
+          line-height: 18px;
+
+          @include mobile() {
+            margin-left: auto;
+          }
+  
+          &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+          }
         }
       }
     }
 
     div.section-editor-add {
-      @include mobile() {
-        margin-top: 64px;
-      }
 
       div.section-editor-error-label {
         margin-top: 8px;

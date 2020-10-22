@@ -4,8 +4,10 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
@@ -48,6 +50,7 @@
                               (drv/drv :comment-reply-to)
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :user-notifications)
+                              (drv/drv :show-invite-box)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -79,6 +82,14 @@
         mobile-user-notifications (drv/react s :mobile-user-notifications)
         user-notifications-data (drv/react s :user-notifications)
         add-post-tooltip (drv/react s :show-add-post-tooltip)
+        show-invite-box (drv/react s :show-invite-box)
+        is-mobile? (responsive/is-mobile-size?)
+        is-admin-or-author (#{:admin :author} (:role current-user-data))
+        show-mobile-invite-people? true
+        ;; (and is-mobile?
+        ;;                                 current-org-slug
+        ;;                                 is-admin-or-author
+        ;;                                 show-invite-box)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
@@ -93,7 +104,6 @@
         is-topics (= current-board-slug "topics")
         is-contributions (seq current-contributions-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
-        is-mobile? (responsive/is-mobile-size?)
         is-container? (dis/is-container? current-board-slug)
         container-data (if (and (not is-contributions)
                                 (not is-container?)
@@ -109,7 +119,6 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-drafts (pos? (:count drafts-link))
-        is-admin-or-author (#{:admin :author} (:role current-user-data))
         should-show-settings-bt (and current-board-slug
                                      (not is-container?)
                                      (not is-topics)
@@ -140,12 +149,28 @@
                                 (str "-" (:last-seen-at container-data))))
         show-feed? (or (not is-contributions)
                        (not= (:role contributions-user-data) :viewer)
-                       (pos? (count (:posts-list contributions-data))))]
+                       (pos? (count (:posts-list contributions-data))))
+        no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
+          {:class (utils/class-set {:has-mobile-invite-box show-mobile-invite-people?
+                                    :ios-app-tabbar (and ua/mobile-app?
+                                                         no-phisical-home-button)
+                                    :ios-web-tabbar (and (not ua/mobile-app?)
+                                                         no-phisical-home-button)})}
           (navigation-sidebar)
+          (when show-mobile-invite-people?
+            [:div.mobile-invite-box
+              [:button.mlb-reset.mobile-invite-box-bt
+                {:on-click #(nav-actions/show-org-settings :invite-picker)}
+                "Explore together - "
+                [:span.invite-teammates
+                  "Invite your teammates"]
+                "!"]
+              [:button.mlb-reset.close-mobile-invite-box
+                {:on-click #(user-actions/dismiss-invite-box (:user-id current-user-data) true)}]])
           (when (and is-mobile?
                      (or (:collapsed cmail-state)
                          (not cmail-state))

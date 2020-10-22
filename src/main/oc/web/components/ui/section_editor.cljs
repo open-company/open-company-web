@@ -210,33 +210,36 @@
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-private-users"))
                        (reset! (::show-edit-user-dropdown s) nil)))}
         [:div.section-editor-header
-          [:div.section-editor-header-title
-            (if editing-existing-section?
-              "Topic settings"
-              "Create topic")]
-          (let [disable-bt (or @(::saving s)
-                               (< (count @(::section-name s)) section-actions/min-section-name-length)
-                               @(::pre-flight-check s)
-                               (:pre-flight-loading section-editing)
-                               (seq (:section-name-error section-editing))
-                               (and @(::slack-enabled s)
-                                    (some #(-> section-editing :slack-mirror % seq not) [:channel-id :slack-org-id])))]
-            [:button.mlb-reset.save-bt
-             {:on-click (fn [_]
-                          (when (and (not disable-bt)
-                                     (compare-and-set! (::saving s) false true))
-                            (let [section-node (rum/ref-node s "section-name")
-                                  section-name (clojure.string/trim (.-value section-node))
-                                  personal-note-node (rum/ref-node s "personal-note")
-                                  personal-note (when personal-note-node (.-innerText personal-note-node))
-                                  success-cb #(when (fn? on-change)
-                                                (on-change % personal-note nav-actions/hide-section-editor))]
-                              (section-actions/section-save-create section-editing section-name success-cb))))
-              :class (when disable-bt "disabled")}
-             "Save"])
-          [:button.mlb-reset.cancel-bt
-            {:on-click #(wrapped-on-change nav-actions/hide-section-editor)}
-            "Back"]]
+          [:div.section-editor-header-center
+            [:div.section-editor-header-title
+              (if editing-existing-section?
+                "Topic settings"
+                "Create topic")]]
+          [:div.section-editor-header-right
+            (let [disable-bt (or @(::saving s)
+                                (< (count @(::section-name s)) section-actions/min-section-name-length)
+                                @(::pre-flight-check s)
+                                (:pre-flight-loading section-editing)
+                                (seq (:section-name-error section-editing))
+                                (and @(::slack-enabled s)
+                                      (some #(-> section-editing :slack-mirror % seq not) [:channel-id :slack-org-id])))]
+              [:button.mlb-reset.save-bt
+              {:on-click (fn [_]
+                            (when (and (not disable-bt)
+                                      (compare-and-set! (::saving s) false true))
+                              (let [section-node (rum/ref-node s "section-name")
+                                    section-name (clojure.string/trim (.-value section-node))
+                                    personal-note-node (rum/ref-node s "personal-note")
+                                    personal-note (when personal-note-node (.-innerText personal-note-node))
+                                    success-cb #(when (fn? on-change)
+                                                  (on-change % personal-note nav-actions/hide-section-editor))]
+                                (section-actions/section-save-create section-editing section-name success-cb))))
+                :class (when disable-bt "disabled")}
+              "Save"])]
+          [:div.section-editor-header-left
+            [:button.mlb-reset.cancel-bt
+             {:on-click #(wrapped-on-change nav-actions/hide-section-editor)}
+             "Back"]]]
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Topic name"]]

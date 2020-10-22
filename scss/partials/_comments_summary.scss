@@ -139,6 +139,13 @@ div.is-comments {
         @include OC_Body_Book();
         line-height: 26px;
 
+        @include mobile() {
+          padding: 0;
+          height: 26px;
+          line-height: 26px;
+          vertical-align: baseline;
+        }
+
         span.new-comments-count {
           color: var(--primary-color);
           @include OC_Body_Bold();

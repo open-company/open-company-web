@@ -25,7 +25,7 @@
         {:ref :theme-settings}
         [:div.theme-settings-header
           [:div.theme-settings-header-title
-            "Theme"]
+            "Dark mode"]
           [:button.mlb-reset.cancel-bt
             {:on-click #(nav-actions/hide-theme-settings)}
             "Back"]]

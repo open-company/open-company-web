@@ -185,7 +185,7 @@
         [:a
           {:href "#"
            :on-click (partial theme-settings-click s)}
-          "Theme"]
+          "Dark mode"]
         ;; Reminders separator
         (when (and show-reminders?
                    (not is-mobile?))
@@ -214,8 +214,7 @@
             [:div.oc-menu-item.digest-settings
               "Admin settings"]])
         ;; Invite
-        (when (and (not is-mobile?)
-                   show-invite-people?)
+        (when show-invite-people?
           [:a
             {:href "#"
              :on-click #(invite-team-click s %)}
