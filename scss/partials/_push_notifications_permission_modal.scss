@@ -7,16 +7,15 @@ div.push-notifications-permission-modal {
   display: flex;
   flex-direction: column;
   z-index: #{$navbar_zindex + 180};
-  background-color: $grey_num_4;
+  background-color: var(--mobile-background-color);
 
   .modal-header {
     display: flex;
     width: 100%;
-    height: 7%;
+    height: #{$mobile_navbar_height}px;
     justify-content: center;
     align-items: center;
-    margin-top: 2%;
-    background-color: white;
+    background-color: var(--mobile-background-color);
 
     .modal-close-bt {
       width: 32px;
@@ -26,12 +25,10 @@ div.push-notifications-permission-modal {
       background-position: center;
       background-repeat: no-repeat;
       background-size: 12px 12px;
-      background-color: $ultra_light_grey;
+      background-color: var(--opac-background-color-2);
       border-radius: 4px;
       border: none;
-      position: absolute;
-      left: 16px;
-      top: 11px;
+      margin-right: auto;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -39,8 +36,9 @@ div.push-notifications-permission-modal {
     }
 
     .modal-title {
-      flex: 99;
+      flex-grow: 1;
       text-align: center;
+      margin-right: 32px;
     }
   }
 
@@ -57,11 +55,12 @@ div.push-notifications-permission-modal {
       width: 120px;
       height: 120px;
       border-radius: 26px;
-      box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.24);
+      box-shadow: 0px 2px 10px 0px var(--push-notifications-wall-shadow);
       background-image: cdnUrl("/img/ML/carrot_logo.svg");
       background-size: 80% 80%;
       background-position: center;
       background-repeat: no-repeat;
+      background-color: white;
 
       .notification-bubble {
         position: absolute;
@@ -100,7 +99,7 @@ div.push-notifications-permission-modal {
 
     .no-thanks-btn {
       @include OC_Body_Book();
-      color:var(--primary-color-08); // 0.8
+      color:var(--light-color);
       height: 48px;
       width: 100%;
       max-width: 280px;

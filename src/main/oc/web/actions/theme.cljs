@@ -4,7 +4,9 @@
   (:require [goog.events :as events]
             [goog.events.EventType :as EventType]
             [taoensso.timbre :as timbre]
+            [cuerdas.core :as cstr]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.theme :as theme-utils]
             [oc.web.lib.cookies :as cook]))
@@ -27,10 +29,10 @@
       theme-utils/theme-default-value)))
 
 (defn set-theme-class [mode]
-  (let [html-el (sel1 [:html])]
-    (dommy/remove-class! (sel1 [:html]) (str (name theme-class-name-prefix) "-dark"))
-    (dommy/remove-class! (sel1 [:html]) (str (name theme-class-name-prefix) "-light"))
-    (dommy/add-class! (sel1 [:html]) (str (name theme-class-name-prefix) "-" (name mode)))))
+  (when-let [html-el (.-documentElement ^js js/document)]
+    (dommy/remove-class! html-el (str (name theme-class-name-prefix) "-dark"))
+    (dommy/remove-class! html-el (str (name theme-class-name-prefix) "-light"))
+    (dommy/add-class! html-el (str (name theme-class-name-prefix) "-" (name mode)))))
 
 (defn get-theme-setting []
   (let [current-mode (read-theme-cookie)]
@@ -42,31 +44,9 @@
 (defn ^:export set-theme-setting [v]
   (let [fixed-value (or v :auto)]
     (save-theme-cookie fixed-value)
-    ; (set-theme-class (theme-utils/computed-value {dis/theme-setting-key fixed-value}))
     (dis/dispatch! [:theme/set-setting fixed-value])))
 
 (defonce visibility-change-listener (atom nil))
-
-(defn setup-theme []
-  ; (let [cur-val (get-theme-setting)
-  ;       computed-val (theme-utils/computed-value cur-val)]
-  ;   (timbre/info "Theme:" (name cur-val) "->" (name computed-val))
-  ;   ; (set-theme-class computed-val)
-  ;   ;; FIXME: use swap! instead of dis/dispatch! since the multimethod have not been intialized yet
-  ;   ;; at this point.
-  ;   (swap! dis/app-state #(assoc-in % dis/theme-key {dis/theme-setting-key cur-val dis/theme-computed-key computed-val})))
-  (timbre/info "Setup UI theme actions")
-  (when (theme-utils/electron-mac-theme-supported?)
-    (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
-          #(when (= (get-theme-setting) :auto)
-             (set-theme-setting :auto)))
-    (when @visibility-change-listener
-      (events/unlistenByKey @visibility-change-listener))
-    (reset! visibility-change-listener
-            (events/listen js/document EventType/VISIBILITYCHANGE
-                           #(when (and (= (.-visibilityState js/document) "visible")
-                                       (= (get-theme-setting) :auto))
-                              (set-theme-setting :auto))))))
 
 (defn expo-color-scheme-changed! [new-expo-color-theme]
   (dis/dispatch! [:theme/expo-theme new-expo-color-theme (read-theme-cookie)]))
@@ -77,11 +57,41 @@
 (defn handle-url-change []
   (dis/dispatch! [:theme/routing]))
 
-(defn ^:export early-get-theme
+(defn setup-change-listeners []
+  (when (theme-utils/prefers-color-scheme-supported?)
+    (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
+          #(dis/dispatch! [:theme/routing])))
+  (when @visibility-change-listener
+    (events/unlistenByKey @visibility-change-listener))
+  (reset! visibility-change-listener
+          (events/listen js/document EventType/VISIBILITYCHANGE
+                         #(when (= (.-visibilityState js/document) "visible")
+                            (dis/dispatch! [:theme/routing])))))
+
+(def dark-not-allowed-routes ["sign-up"
+                              "login"
+                              "password-reset"
+                              "email-verification"
+                              "confirm-invitation"
+                              "email-wall"])
+
+(defn- exclude-signup [computed-value]
+  (if (and (= computed-value :dark)
+           (re-matches (re-pattern (str "^\\/(" (cstr/join "|" dark-not-allowed-routes) ")(\\/|\\?|#|$)")) (router/get-token)))
+    :light
+    computed-value))
+
+(defn ^:export setup-theme
   "Insert the computed theme in the app-state directly without using dispatch! since it might not be initialized yet."
   []
+  (timbre/info "Setup UI theme data and listeners")
   (let [setting-value (read-theme-cookie)
         theme-map (assoc (get @dis/app-state dis/theme-key)
                          dis/theme-setting-key setting-value)
         computed-value (theme-utils/computed-value theme-map)]
-    (swap! dis/app-state update-in dis/computed-theme-key computed-theme)))
+    (timbre/info "Theme:" (name setting-value) "->" (name computed-value))
+    ;; FIXME: use swap! instead of dis/dispatch! since the multimethod have not been intialized yet
+    ;; at this point.
+    (swap! dis/app-state update-in dis/computed-theme-key computed-theme)
+    (set-theme-class (exclude-signup computed-value))
+    (setup-change-listeners)))

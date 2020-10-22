@@ -30,7 +30,9 @@
             {:on-click #(nav-actions/hide-theme-settings)}
             "Back"]]
         [:div.theme-settings-body
-          (when (theme-utils/electron-mac-theme-supported?)
+          (when (or (theme-utils/electron-mac-theme-supported?)
+                    (theme-utils/prefers-color-scheme-supported?)
+                    (theme-utils/expo-theme-supported?))
             [:div.theme-settings-auto-container
               (carrot-checkbox {:selected (= setting-value :auto)
                                 :did-change-cb #(theme-actions/set-theme-setting (if % :auto computed-value))})

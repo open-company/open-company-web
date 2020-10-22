@@ -144,6 +144,9 @@ $dark_mode: "dark";
   --explore-hover-border-color: #{rgba($deep_navy, 0.32)};
   --explore-hover-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
 
+  // Push notifications wall
+  --push-notifications-wall-shadow: rgba(0, 0, 0, 0.24);
+
   html, body {
     scrollbar-color: light;
   }
@@ -282,6 +285,9 @@ $dark_mode: "dark";
   // Explore
   --explore-hover-border-color: #{rgba(white, 0.32)};
   --explore-hover-box-shadow: 0 2px 4px 0 #{rgba(white, 0.08)};
+
+  // Push notifications wall
+  --push-notifications-wall-shadow: rgba(255, 255, 255, 0.12);
 
   &, body {
     scrollbar-color: dark;
