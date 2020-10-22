@@ -108,9 +108,9 @@
 
 ;; Primary color
 (def default-color
-  {:primary {:rgb {:r 104 :g 51 :b 241}
+  {:primary {:rgb {:r 98 :g 39 :b 32}
              :hex "#6833F1"}
-   :secondary {:rgb {:r 244 :g 244 :b 244}
+   :secondary {:rgb {:r 254 :g 254 :b 254}
                :hex "#FFFFFF"}})
 
 (def default-brand-color
