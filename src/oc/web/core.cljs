@@ -689,6 +689,7 @@
       ;; Get the mobile app deep link origin if we're on mobile
       (when ua/mobile-app?
         (expo/bridge-get-color-scheme))
+
       ;; we are checking if this event is due to user action,
       ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
@@ -700,7 +701,7 @@
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
-      ; (theme-actions/handle-url-change)
+      (theme-actions/handle-url-change)
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
   (do
@@ -720,7 +721,7 @@
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
-  (theme-actions/early-get-theme)
+  (theme-actions/setup-theme)
   ;; Get the mobile app deep link origin if we're on mobile
   (when ua/mobile-app?
     (expo/bridge-init))

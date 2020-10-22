@@ -327,7 +327,7 @@
 (def theme-computed-key :computed-value)
 (def theme-setting-key :setting-value)
 (def theme-expo-key :expo-value)
-(def computed-theme-key (conj theme-key theme-expo-key))
+(def computed-theme-key (conj theme-key theme-computed-key))
 
 ;; Functions needed by derivatives
 
@@ -345,7 +345,10 @@
 (defn drv-spec [db]
   {:base                [[] db]
    :route               [[:base] (fn [base] (get base router-key))]
-   :route/dark-allowed  [[:route] (fn [route] (boolean (get-in route [router-opts-key router-dark-allowed-key])))]
+   :route/dark-allowed  [[:route] (fn [route] (-> (get-in route [router-opts-key])
+                                                   set
+                                                   router-dark-allowed-key
+                                                   boolean))]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :contributions-id    [[:route] (fn [route] (:contributions route))]
@@ -764,6 +767,12 @@
   ([routes route-name]
   (when route-name
     (routes (keyword route-name)))))
+
+;; Theme
+
+(defn ^:export theme-map
+  ([] (theme-map @app-state))
+  ([data] (get-in data theme-key)))
 
 ;; Payments
 
