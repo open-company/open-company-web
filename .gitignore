@@ -24,10 +24,12 @@ forms-emitted.txt
 forms-read.txt
 forms-analyzed.txt
 
+.vscode/
 .calva/
 
 # See resources/electron-builder.example.env
 resources/electron-builder.env
 
 # Local env file used only in local development
-resources/public/js/local-env.js
+resources/public/lib/local-env.js
+public/lib/local-env.js
