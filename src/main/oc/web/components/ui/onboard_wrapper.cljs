@@ -660,7 +660,7 @@
        (if auth-settings
          (if (:team auth-settings)
            [:div.title
-            (str "Your team is using " ls/product-name " to share updates")]
+            (str "Your team is using the " ls/product-name " news feed to share the latest updates.")]
            [:div.title
             "Oh oh..."])
          [:div.title
