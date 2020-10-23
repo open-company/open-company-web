@@ -202,10 +202,9 @@
               [:div.oc-menu-item.reminders
                 "Recurring updates"]])
           ;; Settings separator
-          (when (and (not is-mobile?)
-                    (or current-org-slug
-                        show-invite-people?
-                        show-billing?))
+          (when (or current-org-slug
+                    show-invite-people?
+                    show-billing?)
             [:div.oc-menu-separator])
           ;; Admin settings
           (when (and (not is-mobile?)
@@ -216,8 +215,6 @@
               :on-click #(team-settings-click s %)}
               [:div.oc-menu-item.digest-settings
                 "Admin settings"]])
-          (when is-mobile?
-            [:div.oc-menu-separator])
           ;; Invite
           (when show-invite-people?
             [:a
