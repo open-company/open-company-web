@@ -56,6 +56,8 @@ div.menu {
     flex-flow: column nowrap;
     align-items: flex-start;
     justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     @include mobile() {
       top: 0;
@@ -76,8 +78,6 @@ div.menu {
     }
 
     div.menu-container {
-      overflow-x: hidden;
-      overflow-y: auto;
       flex: 1 0 auto;
 
       div.menu-header {
