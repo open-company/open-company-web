@@ -18,7 +18,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 (def oc-github "https://github.com/open-company")
 (def anonymous-title "Start free")
-(def your-digest-title "Your digest")
+(def your-digest-title "Your updates")
 
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to
