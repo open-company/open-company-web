@@ -5,15 +5,12 @@
             [goog.events.EventType :as EventType]
             [taoensso.timbre :as timbre]
             [cuerdas.core :as cstr]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.theme :as theme-utils]
             [oc.web.lib.cookies :as cook]))
 
 (def ^:private theme-cookie-name-suffix :ui-theme)
-
-(def ^:private theme-class-name-prefix :theme-mode)
 
 (defn theme-cookie-name []
   (str (name theme-cookie-name-suffix)))
@@ -28,18 +25,9 @@
       (keyword cookie-val)
       theme-utils/theme-default-value)))
 
-(defn set-theme-class [mode]
-  (when-let [html-el (.-documentElement ^js js/document)]
-    (dommy/remove-class! html-el (str (name theme-class-name-prefix) "-dark"))
-    (dommy/remove-class! html-el (str (name theme-class-name-prefix) "-light"))
-    (dommy/add-class! html-el (str (name theme-class-name-prefix) "-" (name mode)))))
-
 (defn get-theme-setting []
   (let [current-mode (read-theme-cookie)]
     (or current-mode theme-utils/theme-default-value)))
-
-(defn computed-theme []
-  (theme-utils/computed-value {dis/theme-setting-key (get-theme-setting)}))
 
 (defn ^:export set-theme-setting [v]
   (let [fixed-value (or v :auto)]
@@ -48,25 +36,25 @@
 
 (defonce visibility-change-listener (atom nil))
 
-(defn expo-color-scheme-changed! [new-expo-color-theme]
-  (dis/dispatch! [:theme/expo-theme new-expo-color-theme (read-theme-cookie)]))
+(defn expo-color-scheme-changed! [new-mobile-color-theme]
+  (dis/dispatch! [:theme/mobile-theme-changed new-mobile-color-theme (read-theme-cookie)]))
 
 (defn pre-routing! []
   (dis/dispatch! [:theme/set-setting (read-theme-cookie)]))
 
-(defn handle-url-change []
-  (dis/dispatch! [:theme/routing]))
-
 (defn setup-change-listeners []
-  (when (theme-utils/prefers-color-scheme-supported?)
+  (when (theme-utils/web-theme-supported?)
     (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
-          #(dis/dispatch! [:theme/routing])))
+          #(dis/dispatch! [:theme/web-theme (theme-utils/web-theme)])))
   (when @visibility-change-listener
     (events/unlistenByKey @visibility-change-listener))
   (reset! visibility-change-listener
           (events/listen js/document EventType/VISIBILITYCHANGE
                          #(when (= (.-visibilityState js/document) "visible")
-                            (dis/dispatch! [:theme/routing])))))
+                            (let [web-value (when (theme-utils/web-theme-supported?) (theme-utils/web-theme))
+                                  mobile-value (when (theme-utils/mobile-theme-supported?) (theme-utils/mobile-theme))
+                                  desktop-value (when (theme-utils/desktop-theme-supported?) (theme-utils/desktop-theme))]
+                              (dis/dispatch! [:theme/visibility-changed web-value desktop-value mobile-value (read-theme-cookie)]))))))
 
 (def dark-not-allowed-routes ["sign-up"
                               "login"
@@ -87,11 +75,15 @@
   (timbre/info "Setup UI theme data and listeners")
   (let [setting-value (read-theme-cookie)
         theme-map (assoc (get @dis/app-state dis/theme-key)
-                         dis/theme-setting-key setting-value)
+                         dis/theme-setting-key setting-value
+                         dis/theme-web-key     (theme-utils/web-theme))
         computed-value (theme-utils/computed-value theme-map)]
     (timbre/info "Theme:" (name setting-value) "->" (name computed-value))
     ;; FIXME: use swap! instead of dis/dispatch! since the multimethod have not been intialized yet
     ;; at this point.
-    (swap! dis/app-state update-in dis/computed-theme-key computed-theme)
-    (set-theme-class (exclude-signup computed-value))
+    (swap! dis/app-state update-in dis/theme-key #(merge % theme-map))
+    (theme-utils/set-theme-class (exclude-signup computed-value))
     (setup-change-listeners)))
+
+(defn ^:export desktop-theme-changed []
+  (dis/dispatch! [:theme/desktop-theme-changed (theme-utils/desktop-theme) (read-theme-cookie)]))

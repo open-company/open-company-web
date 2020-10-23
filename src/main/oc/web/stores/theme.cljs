@@ -2,26 +2,29 @@
   (:require [oc.web.dispatcher :as dispatcher]
             [oc.web.utils.theme :as theme-utils]))
 
-(defn- with-computed-theme [cur-theme]
-  (let [fixed-cur-theme (if (map? cur-theme) cur-theme {})
-        computed-value (theme-utils/computed-value fixed-cur-theme)]
-    (merge fixed-cur-theme {dispatcher/theme-computed-key computed-value})))
-
 (defmethod dispatcher/action :theme/set-setting
   [db [_ setting-theme]]
-  (let [cur-value (get-in db dispatcher/theme-key)
-        with-setting-theme (assoc cur-value dispatcher/theme-setting-key setting-theme)
-        next-theme (with-computed-theme with-setting-theme)]
-    (assoc-in db dispatcher/theme-key next-theme)))
+    (update-in db dispatcher/theme-key merge {dispatcher/theme-setting-key setting-theme}))
 
-(defmethod dispatcher/action :theme/routing
-  [db [_]]
-  (update-in db dispatcher/theme-key with-computed-theme))
+(defmethod dispatcher/action :theme/mobile-theme-changed
+  [db [_ mobile-theme setting-theme]]
+  (update-in db dispatcher/theme-key merge {dispatcher/theme-mobile-key  mobile-theme
+                                            dispatcher/theme-setting-key setting-theme}))
 
-(defmethod dispatcher/action :theme/expo-theme
-  [db [_ expo-theme setting-theme]]
-  (let [cur-value (get-in db dispatcher/theme-key)
-        with-expo-theme (assoc cur-value dispatcher/theme-expo-key expo-theme
-                                         dispatcher/theme-setting-key setting-theme)
-        next-theme (with-computed-theme with-expo-theme)]
-    (assoc-in db dispatcher/theme-key next-theme)))
+(defmethod dispatcher/action :theme/desktop-theme-changed
+  [db [_ desktop-theme setting-theme]]
+  (update-in db dispatcher/theme-key merge {dispatcher/theme-desktop-key desktop-theme
+                                            dispatcher/theme-setting-key setting-theme}))
+
+(defmethod dispatcher/action :theme/web-theme-changed
+  [db [_ web-theme setting-theme]]
+  (update-in db dispatcher/theme-key merge {dispatcher/theme-web-key     web-theme
+                                            dispatcher/theme-setting-key setting-theme}))
+
+(defmethod dispatcher/action :theme/visibility-changed
+  [db [_ web-theme desktop-theme mobile-theme setting-theme]]
+  (let [theme-map (cond-> {dispatcher/theme-setting-key setting-theme}
+                    web-theme (assoc dispatcher/theme-web-key web-theme)
+                    mobile-theme (assoc dispatcher/theme-mobile-key mobile-theme)
+                    desktop-theme (assoc dispatcher/theme-desktop-key desktop-theme))]
+    (update-in db dispatcher/theme-key merge theme-map)))

@@ -1,6 +1,9 @@
 (ns oc.web.utils.theme
   (:require [oc.lib.cljs.useragent :as ua]
-            [oc.web.dispatcher :as dis]))
+            [oc.web.dispatcher :as dis]
+            [oops.core :refer (oget ocall)]))
+
+(def ^:private theme-class-name-prefix :theme-mode)
 
 (def theme-default-value :auto)
 
@@ -12,58 +15,52 @@
       set
       dis/router-dark-allowed-key))
 
-(defn prefers-color-scheme-supported? []
+(defn web-theme-supported? []
   (and (exists? js/window.matchMedia)
        (or (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
            (.-matches (.matchMedia js/window "(prefers-color-scheme: light)")))))
 
-(defn- prefers-color-scheme []
+(defn web-theme []
   (if (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
     :dark
     :light))
 
-(defn electron-mac-theme-supported? []
+(defn desktop-theme-supported? []
   (and ua/desktop-app?
-      ua/mac?
-      (exists? js/window.matchMedia)
-      (or (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
-          (.-matches (.matchMedia js/window "(prefers-color-scheme: light)")))))
+       ua/mac?))
 
-(defn- electron-mac-theme []
+(defn desktop-theme []
   (if (and (exists? js/OCCarrotDesktop.isDarkMode)
            (js/OCCarrotDesktop.isDarkMode))
     :dark
     :light))
 
-(defn expo-theme-supported? []
+(defn mobile-theme-supported? []
   (and ua/mobile-app?
        (or ua/ios?
            ua/android?)))
 
-(defn- expo-theme [theme-map]
-  (if (= (get theme-map dis/theme-expo-key) :dark)
+(defn mobile-theme []
+  (if (= (get-in @dis/app-state (conj dis/theme-key dis/theme-mobile-key)) :dark)
     :dark
     :light))
 
-(defn dark-allowed-device? []
-  (or (electron-mac-theme-supported?)
-      (expo-theme-supported?)
-      (prefers-color-scheme-supported?)))
+(defn set-theme-class [mode]
+  (when-let [html-el (oget js/window "document.documentElement")]
+    (ocall html-el "classList.remove" (str (name theme-class-name-prefix) "-dark"))
+    (ocall html-el "classList.remove" (str (name theme-class-name-prefix) "-light"))
+    (ocall html-el "classList.add" (str (name theme-class-name-prefix) "-" (name mode)))))
 
 (defn computed-value
   [theme-map]
   (let [theme-setting (get theme-map dis/theme-setting-key)]
-    (if (and (dark-allowed-device?)
-            (dark-allowed-path?))
+    ;; If path supports dark mode
+    (if (dark-allowed-path?)
+      ;; If user has never changed theme or has set it to auto
       (if (= theme-setting :auto)
-        (cond
-          (expo-theme-supported?)
-          (expo-theme theme-map)
-          (electron-mac-theme-supported?)
-          (electron-mac-theme)
-          (prefers-color-scheme-supported?)
-          (prefers-color-scheme)
-          :else
-          :light)
+        ;; Get first available btw: desktop/mobile/web themes
+        (or (some theme-map [dis/theme-mobile-key dis/theme-desktop-key dis/theme-web-key]) :light)
+        ;; Fallback to the user preference
         theme-setting)
+      ;; Fallback to light
       :light)))

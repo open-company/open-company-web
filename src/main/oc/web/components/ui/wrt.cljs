@@ -10,6 +10,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.theme :as theme-utils]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -136,6 +137,7 @@
   [s org-data]
   (let [activity-data (drv/react s :wrt-activity-data)
         theme-data (drv/react s :theme)
+        current-theme (theme-utils/computed-value theme-data)
         current-user-data (drv/react s :current-user-data)
         current-org-slug (drv/react s :org-slug)
         is-author? (:publisher? activity-data)
@@ -208,7 +210,7 @@
                      :cy "58px"
                      :r "50px"
                      :fill "transparent"
-                     :stroke (if (= (get theme-data dis/theme-computed-key) :dark) "#DDDDDD" "#ECECEC")
+                     :stroke (if (= current-theme :dark) "#DDDDDD" "#ECECEC")
                      :stroke-width "16px"}]
                   [:circle.wrt-donut-segment
                     {:cx "58"

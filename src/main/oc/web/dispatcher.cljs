@@ -324,10 +324,10 @@
     (vec items)))
 
 (def theme-key [:theme])
-(def theme-computed-key :computed-value)
 (def theme-setting-key :setting-value)
-(def theme-expo-key :expo-value)
-(def computed-theme-key (conj theme-key theme-computed-key))
+(def theme-mobile-key :mobile-value)
+(def theme-desktop-key :desktop-value)
+(def theme-web-key :web-value)
 
 ;; Functions needed by derivatives
 

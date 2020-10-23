@@ -708,7 +708,6 @@
           (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
-      (theme-actions/handle-url-change)
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
   (do
@@ -755,4 +754,5 @@
 (defn on-js-reload []
   (ocall js/console "clear")
   (dom-utils/force-unlock-page-scroll)
-  (secretary/dispatch! (router/get-token)))
+  (secretary/dispatch! (router/get-token))
+  (theme-actions/setup-theme))

@@ -230,7 +230,7 @@
     (let [org-data @(drv/get-ref s :org-data)
           content-visibility-data (:content-visibility org-data)
           theme @(drv/get-ref s :theme)
-          current-theme (get theme dis/theme-computed-key)]
+          current-theme (theme-utils/computed-value theme)]
       (org-actions/get-org org-data true)
       (reset-form s)
       ;; Auto-expand the content visibility settings (aka advanced settings)
@@ -268,7 +268,7 @@
          :as team-management-data}
                     (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})
-        current-theme (get theme-data dis/theme-computed-key)
+        current-theme (theme-utils/computed-value theme-data)
         current-brand-color (get (:brand-color org-editing) current-theme)]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt

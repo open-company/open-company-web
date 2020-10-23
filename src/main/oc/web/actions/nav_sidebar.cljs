@@ -68,7 +68,8 @@
                                     :sort-type sort-type
                                     :scroll-y back-y
                                     :query-params (dis/query-params)
-                                    :route [org-slug author-uuid sort-type "dashboard"]})
+                                    :route [org-slug author-uuid sort-type "dashboard"]
+                                    dis/router-opts-key [dis/router-dark-allowed-key]})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
@@ -105,7 +106,8 @@
                                     :sort-type sort-type
                                     :scroll-y back-y
                                     :query-params (dis/query-params)
-                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]})
+                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
+                                    dis/router-opts-key [dis/router-dark-allowed-key]})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (when refresh?
            (activity-actions/reload-current-container))
