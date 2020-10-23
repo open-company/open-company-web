@@ -240,7 +240,12 @@ div.stream-collapsed-item {
 
       div.new-item-tag {
         flex: 0 0 auto;
+        margin-top: 2px;
         margin-left: 8px;
+
+        @include mobile() {
+          margin-top: 0;
+        }
       }
 
       div.muted-activity {
@@ -344,6 +349,11 @@ div.stream-collapsed-item {
     display: none;
     padding-left: 8px;
 
+    @include big_web() {
+      min-width: 80px;
+    }
+    
+
     &:before {
       width: 24px;
       height: 32px;
@@ -356,6 +366,12 @@ div.stream-collapsed-item {
 
     ul.more-menu-list {
       z-index: 102;
+    }
+
+    @include big_web() {
+      button {
+        float: right;
+      }
     }
   }
 
