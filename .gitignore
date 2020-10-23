@@ -23,6 +23,7 @@ forms-emitted.txt
 forms-read.txt
 forms-analyzed.txt
 
+.vscode/
 .calva/
 .vscode/
 public/js/
@@ -33,3 +34,6 @@ public/*.html
 
 # See electron-builder.example.env
 electron-builder.env
+
+# Local env file used only in local development
+resources/public/lib/local-env.js
