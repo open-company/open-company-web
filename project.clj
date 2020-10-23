@@ -121,7 +121,7 @@
             "prod-build" ["do" "clean," "deps," "prod-site" ] ; clean and build code
             "prod-site" ["run" "prod"]
             ;; Development
-            "start" ["pdo" ["watch-site"]
+            "start" ["pdo" ["auto" "build-site"]
                            ["ocweb"]] ; Site & cljs dev
             ; "watch-ocweb" ["auto" "ocweb"]
             "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
