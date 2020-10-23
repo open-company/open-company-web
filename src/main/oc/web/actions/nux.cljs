@@ -32,12 +32,13 @@
 
 (defn new-user-registered [user-type]
   (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
-   true (* 60 60 24 7))
-  (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true)
+                    true (* 60 60 24 7))
+  (when (not= user-type :viewer)
+    (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
   (set-nux-cookie user-type
-    {:show-add-post-tooltip true
-     :show-post-added-tooltip false
-     :show-edit-tooltip true}))
+                  {:show-add-post-tooltip true
+                   :show-post-added-tooltip false
+                   :show-edit-tooltip true}))
 
 (defn nux-end
   "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
