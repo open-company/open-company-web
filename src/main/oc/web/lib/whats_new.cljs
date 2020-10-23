@@ -24,20 +24,21 @@
   "Until it's found look for the selector. When found wait for the headway internal
    initialization to read the number of new items."
   []
-  (reset! latest-timeout nil)
-  (if (and (not @initialized)
-             (pos? (.-length (js/$ whats-new-selector))))
-    (do
-      (reset! initialized true)
-      (let [headway-config (clj->js {
-                            :selector whats-new-selector
-                            :account "xGYD6J"
-                            :position {:y "bottom"}
-                            :translations {:title "What's New"
-                                           :footer "👉 Show me more new stuff"}})]
-        (.init js/Headway headway-config)
-        (reset! latest-timeout (utils/after 1000 check-whats-new-badge))))
-    (reset! latest-timeout (utils/after 1000 #(initialize whats-new-selector)))))
+  (when (exists? js/Headway)
+    (reset! latest-timeout nil)
+    (if (and (not @initialized)
+                (pos? (.-length (js/$ whats-new-selector))))
+      (do
+        (reset! initialized true)
+        (let [headway-config (clj->js {
+                              :selector whats-new-selector
+                              :account "xGYD6J"
+                              :position {:y "bottom"}
+                              :translations {:title "What's New"
+                                              :footer "👉 Show me more new stuff"}})]
+          (.init js/Headway headway-config)
+          (reset! latest-timeout (utils/after 1000 check-whats-new-badge))))
+      (reset! latest-timeout (utils/after 1000 #(initialize whats-new-selector))))))
 
 (defn init
   "Reset the initializations vars and start looking for the selector."

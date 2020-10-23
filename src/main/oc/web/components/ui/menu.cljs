@@ -123,10 +123,12 @@
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?)
         desktop-app-data (detect-desktop-app)
+        web-app-main-version "3.0"
+        web-app-version (str ls/product-name " " web-app-main-version (when (seq ls/sentry-release-deploy) (str " build: " ls/sentry-release-deploy)))
         app-version (cond
-                      ua/mobile-app? (str "Version " expo-app-version)
-                      ua/desktop-app? (get-desktop-version)
-                      :else "")
+                      ua/mobile-app? (str "Version " expo-app-version " (" web-app-version ")")
+                      ua/desktop-app? (str (get-desktop-version) " (" web-app-version ")")
+                      :else web-app-version)
         show-billing? (and ls/payments-enabled
                            (= (:role current-user-data) :admin)
                            current-org-slug)]
@@ -136,164 +138,167 @@
                     (menu-close s))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close s)}]
-      [:div.menu-container
-        {:ref :menu-container}
-        [:div.menu-header.group
-          [:button.mlb-reset.mobile-close-bt
-            {:on-click #(menu-close s)}]
+      [:div.menu-container-outer
+        [:div.menu-container
+          {:ref :menu-container}
+          [:div.menu-header.group
+            [:button.mlb-reset.mobile-close-bt
+              {:on-click #(menu-close s)}]
+            (when is-mobile?
+              (user-avatar-image current-user-data))
+            [:div.user-name
+              {:class utils/hide-class}
+              (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
+            (when-not is-mobile?
+              (user-avatar-image current-user-data))]
+          ;; Profile
+          (when (and (jwt/jwt)
+                    current-user-data)
+            [:a
+              {:href "#"
+              :on-click (partial profile-edit-click s)}
+              [:div.oc-menu-item.personal-profile
+                "My profile"]])
+          ;; Show user's posts link
+          ; (when (and (jwt/jwt)
+          ;            current-user-data)
+          ;   [:a
+          ;     {:href (oc-urls/contributions (:user-id current-user-data))
+          ;      :on-click (partial my-posts-click s (:user-id current-user-data))}
+          ;     [:div.oc-menu-item.my-posts.group
+          ;       [:span.oc-menu-item-label
+          ;         (if (pos? (:contributions-count org-data))
+          ;           "My updates"
+          ;           "My profile")]
+          ;       (when (pos? (:contributions-count org-data))
+          ;         [:span.count
+          ;           (:contributions-count org-data)])]])
+          ;; Notifications
+          (when (and (jwt/jwt)
+                    (not is-mobile?))
+            [:a
+              {:href "#"
+              :on-click (partial notifications-settings-click s)}
+              [:div.oc-menu-item.notifications-settings
+                "Notifications"]])
+          ;; Theme switcher separator
+          (when (jwt/jwt)
+            [:div.oc-menu-separator])
+          ;; Theme switcher
+          [:a
+            {:href "#"
+            :on-click (partial theme-settings-click s)}
+            "Dark mode"]
+          ;; Reminders separator
+          (when (and show-reminders?
+                    (not is-mobile?))
+            [:div.oc-menu-separator])
+          ;; Reminders
+          (when (and show-reminders?
+                    (not is-mobile?))
+            [:a
+              {:href "#"
+              :on-click #(reminders-click s %)}
+              [:div.oc-menu-item.reminders
+                "Recurring updates"]])
+          ;; Settings separator
+          (when (and (not is-mobile?)
+                    (or current-org-slug
+                        show-invite-people?
+                        show-billing?))
+            [:div.oc-menu-separator])
+          ;; Admin settings
+          (when (and (not is-mobile?)
+                    (= (:role current-user-data) :admin)
+                    current-org-slug)
+            [:a
+              {:href "#"
+              :on-click #(team-settings-click s %)}
+              [:div.oc-menu-item.digest-settings
+                "Admin settings"]])
           (when is-mobile?
-            (user-avatar-image current-user-data))
-          [:div.user-name
-            {:class utils/hide-class}
-            (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
-          (when-not is-mobile?
-            (user-avatar-image current-user-data))]
-        ;; Profile
-        (when (and (jwt/jwt)
-                   current-user-data)
+            [:div.oc-menu-separator])
+          ;; Invite
+          (when show-invite-people?
+            [:a
+              {:href "#"
+              :on-click #(invite-team-click s %)}
+              [:div.oc-menu-item.invite-team
+                "Invite people"]])
+          ;; Manage team
+          (when (and (not is-mobile?)
+                    current-org-slug)
+            [:a
+              {:href "#"
+              :on-click #(manage-team-click s %)}
+              [:div.oc-menu-item.manage-team
+                (if (= (:role current-user-data) :admin)
+                  "Manage team"
+                  "View team")]])
+          ;; Integrations
+          (when (and (not is-mobile?)
+                    current-org-slug
+                    (= (:role current-user-data) :admin))
+            [:a
+              {:href "#"
+              :on-click #(integrations-click s %)}
+              [:div.oc-menu-item.team-integrations
+                "Integrations"]])
+          ;; Billing
+          (when (and (not is-mobile?)
+                    show-billing?)
+            [:a.payments
+              {:href "#"
+              :on-click payments-click}
+              [:div.oc-menu-item
+                "Billing"]])
+          ;; What's new & Support separator
+          [:div.oc-menu-separator]
+          ;; What's new
+          [:a.whats-new-link
+            (if ua/mobile?
+              {:href oc-urls/what-s-new
+              :target "_blank"}
+              {:on-click (partial whats-new-click s)})
+            [:div.oc-menu-item.whats-new
+              "What’s new"]]
+          ;; Support
           [:a
-            {:href "#"
-             :on-click (partial profile-edit-click s)}
-            [:div.oc-menu-item.personal-profile
-              "My profile"]])
-        ;; Show user's posts link
-        ; (when (and (jwt/jwt)
-        ;            current-user-data)
-        ;   [:a
-        ;     {:href (oc-urls/contributions (:user-id current-user-data))
-        ;      :on-click (partial my-posts-click s (:user-id current-user-data))}
-        ;     [:div.oc-menu-item.my-posts.group
-        ;       [:span.oc-menu-item-label
-        ;         (if (pos? (:contributions-count org-data))
-        ;           "My updates"
-        ;           "My profile")]
-        ;       (when (pos? (:contributions-count org-data))
-        ;         [:span.count
-        ;           (:contributions-count org-data)])]])
-        ;; Notifications
-        (when (and (jwt/jwt)
-                   (not is-mobile?))
-          [:a
-            {:href "#"
-             :on-click (partial notifications-settings-click s)}
-            [:div.oc-menu-item.notifications-settings
-              "Notifications"]])
-        ;; Theme switcher separator
-        (when (jwt/jwt)
-          [:div.oc-menu-separator])
-        ;; Theme switcher
-        [:a
-          {:href "#"
-           :on-click (partial theme-settings-click s)}
-          "Dark mode"]
-        ;; Reminders separator
-        (when (and show-reminders?
-                   (not is-mobile?))
-          [:div.oc-menu-separator])
-        ;; Reminders
-        (when (and show-reminders?
-                   (not is-mobile?))
-          [:a
-            {:href "#"
-             :on-click #(reminders-click s %)}
-            [:div.oc-menu-item.reminders
-              "Recurring updates"]])
-        ;; Settings separator
-        (when (and (not is-mobile?)
-                   (or current-org-slug
-                       show-invite-people?
-                       show-billing?))
-          [:div.oc-menu-separator])
-        ;; Admin settings
-        (when (and (not is-mobile?)
-                   (= (:role current-user-data) :admin)
-                   current-org-slug)
-          [:a
-            {:href "#"
-             :on-click #(team-settings-click s %)}
-            [:div.oc-menu-item.digest-settings
-              "Admin settings"]])
-        ;; Invite
-        (when show-invite-people?
-          [:a
-            {:href "#"
-             :on-click #(invite-team-click s %)}
-            [:div.oc-menu-item.invite-team
-              "Invite people"]])
-        ;; Manage team
-        (when (and (not is-mobile?)
-                   current-org-slug)
-          [:a
-            {:href "#"
-             :on-click #(manage-team-click s %)}
-            [:div.oc-menu-item.manage-team
-              (if (= (:role current-user-data) :admin)
-                "Manage team"
-                "View team")]])
-        ;; Integrations
-        (when (and (not is-mobile?)
-                   current-org-slug
-                   (= (:role current-user-data) :admin))
-          [:a
-            {:href "#"
-             :on-click #(integrations-click s %)}
-            [:div.oc-menu-item.team-integrations
-              "Integrations"]])
-        ;; Billing
-        (when (and (not is-mobile?)
-                   show-billing?)
-          [:a.payments
-            {:href "#"
-             :on-click payments-click}
-            [:div.oc-menu-item
-              "Billing"]])
-        ;; What's new & Support separator
-        [:div.oc-menu-separator]
-        ;; What's new
-        [:a.whats-new-link
-          (if ua/mobile?
-            {:href oc-urls/what-s-new
-             :target "_blank"}
-            {:on-click (partial whats-new-click s)})
-          [:div.oc-menu-item.whats-new
-            "What’s new"]]
-        ;; Support
-        [:a
-          {:class "intercom-chat-link"
-           :href oc-urls/contact-mail-to}
-          [:div.oc-menu-item.support
-            "Get support"]]
-        ;; Mobile billing
-        (when (and is-mobile?
-                   show-billing?)
-          [:a.payments
-            {:href "#"
-             :on-click payments-click}
-            [:div.oc-menu-item
-              "Billing"]])
-        ;; Desktop app
-        (when desktop-app-data
-          [:a
-            {:href (:href desktop-app-data)
-             :target "_blank"}
-            [:div.oc-menu-item.native-app
-              (:title desktop-app-data)
-              [:span.beta "BETA"]]])
-        ;; Logout separator
-        [:div.oc-menu-separator]
-        ;; Logout
-        (if (jwt/jwt)
-          [:a.sign-out
-            {:href oc-urls/logout :on-click (partial logout-click s)}
-            [:div.oc-menu-item.logout
-              "Sign out"]]
-          [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
-            [:div.oc-menu-item
-              "Sign in / Sign up"]])
-        ;; Version separator
-        (when ua/pseudo-native?
-          [:div.oc-menu-separator])
+            {:class "intercom-chat-link"
+            :href oc-urls/contact-mail-to}
+            [:div.oc-menu-item.support
+              "Get support"]]
+          ;; Mobile billing
+          (when (and is-mobile?
+                    show-billing?)
+            [:a.payments
+              {:href "#"
+              :on-click payments-click}
+              [:div.oc-menu-item
+                "Billing"]])
+          ;; Desktop app
+          (when desktop-app-data
+            [:a
+              {:href (:href desktop-app-data)
+              :target "_blank"}
+              [:div.oc-menu-item.native-app
+                (:title desktop-app-data)
+                [:span.beta "BETA"]]])
+          ;; Logout separator
+          [:div.oc-menu-separator]
+          ;; Logout
+          (if (jwt/jwt)
+            [:a.sign-out
+              {:href oc-urls/logout :on-click (partial logout-click s)}
+              [:div.oc-menu-item.logout
+                "Sign out"]]
+            [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
+              [:div.oc-menu-item
+                "Sign in / Sign up"]])
+          ;; Version separator
+          (when ua/pseudo-native?
+            [:div.oc-menu-separator])]
         ;; Version
-        (when ua/pseudo-native?
-          [:div.oc-menu-item.app-version
+        (when (seq app-version)
+          [:div.app-version
              app-version])]]))

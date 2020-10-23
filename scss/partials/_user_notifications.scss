@@ -30,6 +30,7 @@ div.user-notifications {
     background-color: var(--opac-background-color-1);
     border: none;
     transition: backgorund-color 180ms ease-in;
+    display: block;
 
     span.bell-icon {
       position: absolute;
