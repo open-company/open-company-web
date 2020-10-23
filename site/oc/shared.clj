@@ -750,7 +750,7 @@
         (cond
           is-slack-page?
           [:div.site-navbar-right
-            [:a.login.anonymous-after.your-digest-after
+            [:a.signup.anonymous-after.your-digest-after
               {:href (env :slack-signup-url)
                :data-anonymous-title "Add to Slack"
                :data-your-digest-title your-digest-title}
