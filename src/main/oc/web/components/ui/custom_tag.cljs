@@ -58,10 +58,10 @@
                              :data-slack-username slack-username
                              :onMouseEnter (fn [e]
                                              (when (fn? (oget props "?hoverItem"))
-                                               (props.hoverItem e (oget props "?index"))))
+                                               (ocall props "hoverItem" e (oget props "?index"))))
                              :onClick (fn [_]
                                         (when (fn? (oget props "?clickCb"))
-                                          (props.clickCb user)))})
+                                          (ocall props "clickCb" user)))})
                    (createElement "div"
                                   (clj->js {:className "oc-mention-option-avatar"
                                             :style avatar-style}))
