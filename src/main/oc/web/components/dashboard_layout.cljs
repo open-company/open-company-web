@@ -85,11 +85,10 @@
         show-invite-box (drv/react s :show-invite-box)
         is-mobile? (responsive/is-mobile-size?)
         is-admin-or-author (#{:admin :author} (:role current-user-data))
-        show-mobile-invite-people? true
-        ;; (and is-mobile?
-        ;;                                 current-org-slug
-        ;;                                 is-admin-or-author
-        ;;                                 show-invite-box)
+        show-mobile-invite-people? (and is-mobile?
+                                        current-org-slug
+                                        is-admin-or-author
+                                        show-invite-box)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
         route (drv/react s :route)
