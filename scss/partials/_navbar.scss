@@ -206,10 +206,6 @@ nav.oc-navbar {
         @include mobile() {
           min-width: unset;
           display: initial;
-          position: absolute;
-          top: 16px;
-          left: unset;
-          right: 16px;
         }
 
         &.anonymous-user {

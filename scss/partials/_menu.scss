@@ -34,26 +34,28 @@ div.menu {
   }
 
   &.expanded-user-menu {
-    div.menu-container {
+    div.menu-container-outer {
       @include mobile() {
-        display: block;
+        display: flex;
         opacity: 1;
       }
     }
   }
 
-  div.menu-container {
-    width: 320px;
-    background-color: var(--overlay-background-color);
+  div.menu-container-outer {
+    display: flex;
     position: absolute;
     top: 0;
-    height: calc(100vh - #{$navbar_height}px);
     right: 0;
-    margin-top: #{$navbar_height}px;
-    padding: 0 24px 16px;
+    width: 320px;
+    height: calc(100vh - #{$navbar_height}px);
+    background-color: var(--overlay-background-color);
     transition: right 180ms ease-in;
-    overflow-x: hidden;
-    overflow-y: auto;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
 
     @include mobile() {
       top: 0;
@@ -73,217 +75,226 @@ div.menu {
       margin-top: -2px;
     }
 
-    div.menu-header {
-      width: 320px;
-      height: #{$navbar_height}px;
-      background-color: var(--panel-header-background);
-      padding: 12px 16px 12px 24px;
-      margin-bottom: 24px;
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 100;
+    div.menu-container {
+      overflow-x: hidden;
+      overflow-y: auto;
+      flex: 1 0 auto;
 
-      @include mobile() {
-        height: #{$mobile_navbar_height}px;
+      div.menu-header {
+        width: 320px;
+        height: #{$navbar_height}px;
+        background-color: var(--panel-header-background);
+        padding: 12px 16px 12px 24px;
+        margin-bottom: 24px;
         position: fixed;
         top: 0;
-        left: 0;
-        width: 100%;
-        border-bottom: 1px solid var(--divider-line);
-        background-color: var(--mobile-background-color);
-        padding: 15px 16px 15px 16px;
-        margin: 0;
-        z-index: 2;
-      }
-
-      button.mobile-close-bt {
-        display: none;
+        right: 0;
+        z-index: 100;
 
         @include mobile() {
-          display: block;
-          position: absolute;
-          right: 16px;
-          top: 11px;
-          width: 32px;
-          height: 32px;
-          padding: 0;
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          border-radius: 4px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
+          height: #{$mobile_navbar_height}px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          border-bottom: 1px solid var(--divider-line);
+          background-color: var(--mobile-background-color);
+          padding: 15px 16px 15px 16px;
+          margin: 0;
+          z-index: 2;
         }
-      }
 
-      @include user-profile(32);
-
-      @include mobile() {
-        @include user-profile(24);
-      }
-
-      div.user-avatar-img-container {
-        float: right;
-        @include mobile() {
-          float: left;
-        }
-      }
-
-      div.user-name {
-        @include OC_Body_Bold();
-        font-size: 14px;
-        color: var(--color);
-        line-height: 32px;
-        float: left;
-
-        @include mobile() {
-          margin-left: 8px;
-          font-size: 16px;
-          line-height: 24px;
-        }
-      }
-    }
-
-    div.oc-menu-separator {
-      height: 1px;
-      background-color: var(--divider-line);
-      margin: 16px 0;
-
-      @include mobile() {
-        margin: 24px 0;
-      }
-    }
-
-    a {
-      display: block;
-      background-color: transparent;
-      padding: 0px;
-      @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 18px;
-      color: var(--color);
-      text-align: left;
-      margin: 16px 0;
-
-      @include big_web() {
-        &:hover {
-          opacity: 1;
-        }
-      }
-
-      &.app-version {
-        cursor: default;
-
-        div.oc-menu-item {
-          color: var(--light-color);
-        }
-      }
-    }
-
-    @include mobile() {
-      // Remove the last bottom line on mobile
-      & > *:last-child div.oc-menu-item:after{
-        display: none;
-      }
-    }
-
-    div.oc-menu-item {
-      padding: 0;
-      position: relative;
-      @include OC_Body_Book();
-      font-size: 16px;
-
-      @include mobile() {
-        font-size: 16px;
-        line-height: 24px;
-      }
-
-      &.app-version {
-        display: block;
-        background-color: transparent;
-        padding: 0px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--light-color);
-        text-align: left;
-        margin: 16px 0;
-      }
-
-      &.whats-new {
-        #HW_badge_cont {
-          display: inline;
-        }
-        #HW_badge {
-          top: 1px;
-          width: 16px;
-          height: 16px;
-          background-color: var(--primary-color);
-          border-radius: 4px;
-        }
-      }
-
-      &.native-app span.beta {
-        @include OC_Body_Bold();
-        margin-left: 0.5em;
-        padding: 0.3em 0.5em;
-        color: var(--color);
-        background-color: var(--opac-background-color-2);
-        border-radius: 4px;
-        opacity: 0.5;
-        font-size: 0.8em;
-      }
-
-      &.my-posts {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-content: center;
-        flex-wrap: nowrap;
-        align-items: center;
-
-        span.oc-menu-item-label {
-          @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 20px;
-          color: var(--color);
-          flex: 0 1 auto;
-          width: auto;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        button.mobile-close-bt {
+          display: none;
 
           @include mobile() {
+            display: block;
+            position: absolute;
+            right: 16px;
+            top: 11px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+            background-size: 12px 12px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+            }
+          }
+        }
+
+        @include user-profile(32);
+
+        @include mobile() {
+          @include user-profile(24);
+        }
+
+        div.user-avatar-img-container {
+          float: right;
+          @include mobile() {
+            float: left;
+          }
+        }
+
+        div.user-name {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: var(--color);
+          line-height: 32px;
+          float: left;
+
+          @include mobile() {
+            margin-left: 8px;
             font-size: 16px;
             line-height: 24px;
           }
         }
+      }
 
-        span.count {
-          @include OC_Body_Book();
-          font-size: 12px;
-          line-height: 16px;
-          text-align: center;
-          color: var(--color);
-          min-width: 16px;
-          height: 16px;
-          background-color: var(--opac-background-color-05);
-          border-radius: 4px;
-          margin: 2px 0 0 8px;
-          padding: 0 4px;
-          flex: 0 0 auto;
+      div.oc-menu-separator {
+        height: 1px;
+        background-color: var(--divider-line);
+        margin: 16px 0;
 
-          @include mobile() {
-            float: left;
-            margin-top: 5px;
-            margin-left: 8px;
+        @include mobile() {
+          margin: 24px 0;
+        }
+      }
+
+      a {
+        display: block;
+        background-color: transparent;
+        padding: 0px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 18px;
+        color: var(--color);
+        text-align: left;
+        margin: 16px 0;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        &.app-version {
+          cursor: default;
+
+          div.oc-menu-item {
+            color: var(--light-color);
           }
         }
       }
+
+      @include mobile() {
+        // Remove the last bottom line on mobile
+        & > *:last-child div.oc-menu-item:after{
+          display: none;
+        }
+      }
+
+      div.oc-menu-item {
+        padding: 0;
+        position: relative;
+        @include OC_Body_Book();
+        font-size: 16px;
+
+        @include mobile() {
+          font-size: 16px;
+          line-height: 24px;
+        }
+
+        &.whats-new {
+          #HW_badge_cont {
+            display: inline;
+          }
+          #HW_badge {
+            top: 1px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+          }
+        }
+
+        &.native-app span.beta {
+          @include OC_Body_Bold();
+          margin-left: 0.5em;
+          padding: 0.3em 0.5em;
+          color: var(--color);
+          background-color: var(--opac-background-color-2);
+          border-radius: 4px;
+          opacity: 0.5;
+          font-size: 0.8em;
+        }
+
+        &.my-posts {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          align-content: center;
+          flex-wrap: nowrap;
+          align-items: center;
+
+          span.oc-menu-item-label {
+            @include OC_Body_Book();
+            font-size: 16px;
+            line-height: 20px;
+            color: var(--color);
+            flex: 0 1 auto;
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            @include mobile() {
+              font-size: 16px;
+              line-height: 24px;
+            }
+          }
+
+          span.count {
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 16px;
+            text-align: center;
+            color: var(--color);
+            min-width: 16px;
+            height: 16px;
+            background-color: var(--opac-background-color-05);
+            border-radius: 4px;
+            margin: 2px 0 0 8px;
+            padding: 0 4px;
+            flex: 0 0 auto;
+
+            @include mobile() {
+              float: left;
+              margin-top: 5px;
+              margin-left: 8px;
+            }
+          }
+        }
+      }
+    }
+
+    div.app-version {
+      text-align: right;
+      display: block;
+      background-color: transparent;
+      padding: 0px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      line-height: 18px;
+      color: var(--light-color);
+      text-align: left;
+      margin-top: auto;
+      margin-left: auto;
+      margin-bottom: 16px;
     }
   }
 }
