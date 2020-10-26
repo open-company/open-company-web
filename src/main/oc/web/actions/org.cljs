@@ -157,7 +157,8 @@
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
         contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
-        route (dis/route-param :route)]
+        route (dis/route-param :route)
+        logged-in? (jwt/jwt)]
     (ou/set-brand-color! org-data)
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
@@ -209,6 +210,8 @@
       is-topics?
       ;; No-op
       true
+      (not current-board-slug)
+      (check-org-404)
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
       (when (or (and is-inbox?
@@ -245,7 +248,8 @@
           (when-not (dis/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
-      (and (not (dis/in-route? :org-settings-invite))
+      (and (map? org-data) ;; Make sure the org was
+           (not (dis/in-route? :org-settings-invite))
            (not (dis/in-route? :org-settings-team))
            (not (dis/in-route? :org-settings))
            (not (dis/in-route? :email-verification))
