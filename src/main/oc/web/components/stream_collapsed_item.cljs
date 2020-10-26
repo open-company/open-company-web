@@ -152,9 +152,9 @@
                "Mute")]])
         (if is-mobile?
           [:div.stream-collapsed-item-fillers
+           [:div.stream-collapsed-item-avatar
+            (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
            [:div.stream-collapsed-item-fill
-            [:div.stream-collapsed-item-avatar
-             (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
             [:div.stream-item-context
              (-> activity-data :for-you-context :label)]
             [:div.stream-collapsed-item-dot.muted-dot]
@@ -172,7 +172,7 @@
                  :data-title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]]
             [:div.stream-collapsed-item-fill
-             [:div.stream-item-arrow]
+              ;;  [:div.stream-item-arrow]
               [:div.stream-item-headline.ap-seen-item-headline
                {:ref "activity-headline"
                 :data-itemuuid (:uuid activity-data)

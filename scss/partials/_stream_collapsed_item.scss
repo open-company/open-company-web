@@ -94,7 +94,6 @@ div.stream-collapsed-item {
   border: 1px solid var(--foc-divider-line-color);
   background-color: var(--foc-background-color);
   overflow: visible;
-  height: #{$collapsed_foc_height}px;
   padding: 12px;
   display: block;
   position: relative;
@@ -167,6 +166,22 @@ div.stream-collapsed-item {
         div.new-item-tag {
           display: block;
         }
+
+        @include mobile() {
+          div.stream-item-context {
+            @include OC_Body_Bold();
+          }
+        }
+      }
+    }
+
+    div.stream-collapsed-item-avatar {
+      display: none;
+
+      @include mobile() {
+        height: 40px;
+        display: block;
+        @include face-pile(40);
       }
     }
 
@@ -178,9 +193,17 @@ div.stream-collapsed-item {
       overflow: hidden;
       text-overflow: ellipsis;
 
+      @include mobile() {
+        margin-top: 8px;
+      }
+
       div.stream-collapsed-item-avatar {
         flex: 0 0 auto;
         @include face-pile(24);
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.stream-item-context {
@@ -195,6 +218,13 @@ div.stream-collapsed-item {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow-wrap: break-word;
+
+        @include mobile() {
+          margin-left: 0;
+          height: 18px;
+          font-size: 14px;
+          line-height: 18px;
+        }
       }
 
       div.stream-item-arrow {
@@ -224,6 +254,13 @@ div.stream-collapsed-item {
         line-height: 24px;
         color: var(--color);
         margin-left: 4px;
+
+        @include mobile() {
+          margin-left: 0;
+          height: 18px;
+          font-size: 14px;
+          line-height: 18px;
+        }
       }
 
       @include bookmark-tag();
@@ -267,6 +304,12 @@ div.stream-collapsed-item {
         margin-left: auto;
         flex: 0 0 auto;
         padding-left: 8px;
+
+        @include mobile() {
+          font-size: 12px;
+          height: 18px;
+          line-height: 18px;
+        }
       }
 
       div.stream-item-break {
