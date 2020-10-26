@@ -13,11 +13,17 @@ function OCStaticGetCookie(name) {
 }
 
 function OCStaticCookieName(name){
-  var domainParts = window.location.hostname.split("."),
+  var hostname = window.location.hostname,
+      domainParts = hostname.split("."),
       h = domainParts[0],
       prefix = "";
   switch(h) {
     case "192":
+    case "127":
+    case "10":
+    case "172":
+      prefix = hostname + "-";
+      break;
     case "localhost":
       prefix = "localhost-";
       break;
@@ -75,6 +81,7 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
 
 // Get the jwt cookie to know if the user is logged in
 var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
+console.log("DBG DOM ready JWT:", jwt);
 if (jwt) {
   var decoded_jwt = OCStaticGetDecodedJWT(jwt),
       your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
