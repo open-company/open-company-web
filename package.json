@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "release": "npm ci && npm run scss:build && npx shadow-cljs release webapp",
-    "dev:build": "npm run css:copyAssets & npm run scss:build npm run cljs:build",
-    "dev:watch": "npm run css:copyAssets && concurrently --kill-others \"npm run scss:watch\" \"npm run cljs:watch\"",
+    "dev:build": "npm run css:copyAssets && npm run scss:build & npm run cljs:build",
+    "dev:watch": "npm run css:copyAssets && npm run scss:watch & npm run cljs:watch",
     "dev:clean": "npm run scss:clean & npm run cljs:clean",
     "scss:build": "node-sass --include-paths scss scss/app.main.scss public/css/app.main.css",
-    "scss:watch": "nodemon -e scss -x \"npm run scss:build\"",
+    "scss:watch": "node-sass --watch --recursive scss/app.main.scss public/css/app.main.css",
     "css:copyAssets": "bin/copy_assets",
     "scss:clean": "rm -fd public/css/app.main.css",
     "cljs:build": "npx shadow-cljs compile webapp",
@@ -17,7 +17,6 @@
     "cljs:clean": "rm -dfR node_modules/ public/js/* target/ .shadow-cljs/"
   },
   "devDependencies": {
-    "concurrently": "^5.3.0",
     "node-sass": "^4.14.1",
     "nodemon": "^2.0.4",
     "normalize.scss": "^0.1.0",

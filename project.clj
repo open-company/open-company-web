@@ -34,7 +34,7 @@
             ;; Call shell from within Leiningen. https://github.com/hypirion/lein-shell
             [lein-shell "0.5.0"]]
   
-  :auto {:start {:file-pattern #"\. (clj|cljs|cljx|cljc|edn) $"}}
+  :auto {"build-site" {:file-pattern #"\.(clj|cljs|cljx|cljc|edn)$"}}
 
   :profiles {
 

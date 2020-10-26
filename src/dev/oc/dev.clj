@@ -49,8 +49,6 @@
   (fn [request]
     (let [response (handler request)
           content-type? (ring-response/get-header response "Content-Type")]
-      ;; (println "DBG wrap-default-content initial response:" response)
-      ;; (println "DBG    returning response:" (ring-response/content-type response "text/html;charset=UTF-8"))
       (cond
         (and (not content-type?)
              (re-seq #"(?i).svg$" (:uri request)))
@@ -62,28 +60,9 @@
         :else
         response))))
 
-(defn dbg [handler txt]
-  (println "DBG Adding" txt "handler" handler)
-  (fn [request]
-    (println "DBG  start" txt)
-    (println "DBG    request" request)
-    (let [response (handler request)]
-      (println "DBG   handled" txt)
-      (clojure.pprint/pprint response)
-      response)))
-
 (def handler ;[req]
-  ;; (println "DBG handler started" req)
   (-> (routes)
-      ;; (dbg "routes")
       (wrap-params)
-      ;; (dbg "wrap-params")
       (wrap-resource "public")
-      ;; (dbg "wrap-resource")
       (wrap-file "public")
-      ;; (dbg "wrap-file")
-      (wrap-reload {:dirs "site"})
-      ;; (dbg "wrap-reload")
-      (wrap-default-content-type)
-      ;; (dbg "wrap-default-content-type")
-      ))
+      (wrap-default-content-type)))
