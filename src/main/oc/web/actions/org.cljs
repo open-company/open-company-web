@@ -210,7 +210,8 @@
       is-topics?
       ;; No-op
       true
-      (not current-board-slug)
+      (and (not current-board-slug)
+           (not (map? org-data)))
       (check-org-404)
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
