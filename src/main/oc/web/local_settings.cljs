@@ -108,8 +108,8 @@
 
 ;; Primary color
 (def default-color
-  {:primary {:rgb {:r 63 :g 189 :b 124}
-             :hex "#3FBD7C"}
+  {:primary {:rgb {:r 33 :g 178 :b 104}
+             :hex "#21B268"}
    :secondary {:rgb {:r 254 :g 254 :b 254}
                :hex "#FFFFFF"}})
 
