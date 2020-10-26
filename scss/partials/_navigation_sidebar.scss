@@ -609,8 +609,8 @@ div.left-navigation-sidebar {
       padding: 8px;
       text-align: center;
       border-radius: 4px;
-      background-color: var(--navigation-sidebar-invite-bt-background);
-      color: var(--navigation-sidebar-invite-bt-color);
+      background-color: $carrot_green;
+      color: white;
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
