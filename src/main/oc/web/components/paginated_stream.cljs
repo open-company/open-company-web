@@ -32,7 +32,7 @@
 (def collapsed-foc-height 56)
 (def foc-height 204)
 (def mobile-foc-height 166)
-(def mobile-collapsed-foc-height 83)
+(def mobile-collapsed-foc-height 131)
 
 (defn- calc-card-height [mobile? collapsed?]
   (cond (and mobile? collapsed?)
