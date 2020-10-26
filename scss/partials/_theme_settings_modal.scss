@@ -153,26 +153,17 @@ div.theme-settings-modal {
           padding: 18px 16px;
           display: block;
           width: 100%;
-          vertical-align: top;
 
           &.light-theme {
             margin-bottom: 8px;
 
             span.theme-icon {
-              background-image: cdnUrl("/img/ML/dark_mode_light.svg");
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg");
-              }
+              @include svgBgColor("/img/ML/dark_mode_light.svg", center, 16px 16px, var(--light-color));
             }
 
             &.active {
               span.theme-icon {
-                @include svgBgColor("/img/ML/wut_dark_mode_light_active.svg");
-
-                @include dark_mode() {
-                  @include svgBgColor("/img/ML/wut_dark_mode_light_active.svg");
-                }
+                @include svgBgColor("/img/ML/dark_mode_light.svg", center, 16px 16px, var(--primary-color));
               }
 
               div.carrot-option-button:not(.selected) {
@@ -188,20 +179,12 @@ div.theme-settings-modal {
 
           &.dark-theme {
             span.theme-icon {
-              background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg");
-              }
+              @include svgBgColor("/img/ML/dark_mode_dark.svg", center, 16px 16px, var(--light-color));
             }
 
             &.active {
               span.theme-icon {
-                @include svgBgColor("/img/ML/wut_dark_mode_dark_active.svg");
-
-                @include dark_mode() {
-                  @include svgBgColor("/img/ML/wut_dark_mode_dark_active.svg");
-                }
+                @include svgBgColor("/img/ML/dark_mode_dark.svg", center, 16px 16px, var(--primary-color));
               }
 
               div.carrot-option-button:not(.selected) {
@@ -255,9 +238,6 @@ div.theme-settings-modal {
             right: 16px;
             width: 16px;
             height: 16px;
-            background-position: center;
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
             opacity: 0.5;
           }
               

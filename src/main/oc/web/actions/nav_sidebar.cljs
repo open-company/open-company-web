@@ -180,6 +180,7 @@
                      :activity entry-uuid
                      :back-to back-to
                      :query-params query-params
+                     dis/router-opts-key [dis/router-dark-allowed-key]
                      :route route}
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)

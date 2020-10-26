@@ -15,7 +15,8 @@
 (rum/defcs theme-settings-modal <
   rum/static
   [s theme-data]
-  (let [{:keys [setting-value computed-value]} theme-data]
+  (let [{:keys [setting-value]} theme-data
+        computed-value (theme-utils/computed-value theme-data)]
     [:div.theme-settings-modal
       {:on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :theme-settings))
                     (nav-actions/close-all-panels))}
