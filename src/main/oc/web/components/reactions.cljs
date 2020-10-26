@@ -15,6 +15,7 @@
             ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (def default-reaction-number 3)
+(def default-comment-reaction-number 5)
 
 (defn- thumb-reaction? [r]
   (= (:reaction r) "👍"))
@@ -28,7 +29,7 @@
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
   (let [first-reactions (when (or thumb-first? only-thumb?)
-                          (filter thumb-reaction?  (:reactions entity-data)))
+                          (filter thumb-reaction? (:reactions entity-data)))
         rest-reactions (cond thumb-first?
                              (filter (comp not thumb-reaction?) (:reactions entity-data))
                              only-thumb?
@@ -77,7 +78,7 @@
                                                           (inc (:count reaction-data)))
                                                   :reacted (not reacted)})
                             reaction-data)
-                        thumb? (thumb-reaction? r)]]
+                        thumb? (and (or only-thumb? thumb-first?) (thumb-reaction? r))]]
 
               [:button.reaction-btn.btn-reset
                 {:key (str "reaction-" (:uuid entity-data) "-" idx)

@@ -27,6 +27,8 @@
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)]
             ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
+(def max-reactions-count 5)
+
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
 
@@ -190,7 +192,7 @@
                                                :edit-cb edit-cb
                                                :show-delete? true
                                                :delete-cb delete-cb
-                                               :can-react? true
+                                               :can-react? (fn? did-react-cb)
                                                :react-cb react-cb
                                                :can-reply? true
                                                :reply-cb reply-cb})
@@ -225,14 +227,15 @@
                        :on-click reply-cb
                        :title "Reply"}])
                   ;; React container
-                  [:div.react-bt-container
-                    [:button.mlb-reset.floating-bt.react-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Add reaction"
-                       :on-click react-cb}]
-                    emoji-picker]])]]
+                  (when did-react-cb
+                    [:div.react-bt-container
+                      [:button.mlb-reset.floating-bt.react-bt
+                        {:data-toggle "tooltip"
+                        :data-placement "top"
+                        :data-container "body"
+                        :title "Add reaction"
+                        :on-click react-cb}]
+                      emoji-picker])])]]
           [:div.stream-comment-content
             [:div.stream-comment-body.oc-mentions.oc-mentions-hover
               {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
@@ -244,6 +247,7 @@
               (reactions {:entity-data comment-data
                           :hide-picker (zero? (count (:reactions comment-data)))
                           :did-react-cb did-react-cb
+                          :max-reactions max-reactions-count
                           :optional-activity-data activity-data})])]]]])
 
 (rum/defcs stream-comments < rum/reactive
@@ -324,6 +328,7 @@
                       add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:reply-parent root-comment-data)
                                               (:uuid root-comment-data))
                       edit-comment-key (get-in add-comment-force-update* add-comment-string-key)
+                      can-react? (< (count (:reactions root-comment-data)) max-reactions-count)
                       showing-picker? (and (seq @(::show-picker s))
                                            (= @(::show-picker s) (:uuid root-comment-data)))]]
             [:div.stream-comment-thread
@@ -343,9 +348,10 @@
                                :can-show-delete-bt? (:can-delete root-comment-data)
                                :edit-cb (partial start-editing s)
                                :delete-cb (partial delete-clicked s activity-data)
-                               :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
+                               :react-cb (when can-react? #(reset! (::show-picker s) (:uuid root-comment-data)))
                                :reply-cb #(comment-actions/reply-to reply-focus-value (:body root-comment-data) true)
-                               :did-react-cb #(comment-mark-read s (:uuid root-comment-data))
+                               :did-react-cb (when can-react?
+                                               #(comment-mark-read s (:uuid root-comment-data)))
                                :emoji-picker (when showing-picker?
                                                (emoji-picker-container s root-comment-data))
                                :showing-picker? showing-picker?
