@@ -346,7 +346,7 @@
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      pricing-headline]    
+      pricing-headline]
 
     pricing-table
     
@@ -799,6 +799,11 @@
   "Static hiccup for the site footer."
   [options]
   [:footer.navbar.navbar-default.navbar-bottom
+    [:section.try-carrot-footer
+      [:h2 "Ready to stay focused with less noise?"]
+      [:a.get-started-button.get-started-action
+       {:href "/sign-up"}
+       "Try Carrot for free"]]
     [:div.container-fluid.group
       [:div.right-column.group
 
