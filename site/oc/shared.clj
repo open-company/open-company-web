@@ -246,79 +246,96 @@
 
 (def pricing-table
   [:div.pricing-table.group
-   ;; Free
-   [:div.pricing-table-column
-    [:div.pricing-table-column-inner
-     [:div.pricing-column-header
-      "Free"]
-     [:div.pricing-column-value
-      [:div.price-value
-       "$0"]
-      [:div.price-desc
-       "per user"
-       [:br]
-       "per month"]]
-     [:a.pricing-column-right-link
-      {:href "/sign-up"}
-      "Try for free"]
-     [:div.pricing-column-row
-      "Unlimited users"]
-     [:div.pricing-column-row
-      "Unlimited posts"]
-     [:div.pricing-column-row
-      "Team-level access to all updates"]
-     [:div.pricing-column-row
-      "Everyone can add an update"]]
-    [:div.pricing-column-footer-note.big-web-tablet-only
-     "Nonprofits and K-12 education are always free."]]
-   ;; Premium
-   [:div.pricing-table-column
-    [:div.pricing-table-column-inner
-     [:div.pricing-column-header
-      "Premium"]
-     [:div.pricing-column-value
-      [:div.price-value
-       "$5"]
-      [:div.price-desc
-       "per user"
-       [:br]
-       "per month"]]
-     [:a.pricing-column-right-link
-      {:href "/sign-up"}
-      "Try for free"]
-     [:div.pricing-column-row
-      "Unlimited users"]
-     [:div.pricing-column-row
-      "Unlimited posts"]
-     [:div.pricing-column-row.has-tooltip
-      [:span.pricing-column-copy
-       {:title "Create updates that are private for select users, or public for people outside the team."
-        :data-toggle "tooltip"
-        :data-placement "top"}
-       "Team, private and public updates"]]
-     [:div.pricing-column-row.has-tooltip
-      [:span.pricing-column-copy
-       {:title "In the free version, everyone on the team can add updates. With premium, admins can assign editor and view-only roles."
-        :data-toggle "tooltip"
-        :data-placement "top"}
-       "View-only users"]]
-     [:div.pricing-column-row.has-tooltip
-      [:span.pricing-column-copy
-       {:title "In the free version, everyone receives a morning digest at 7AM. With premium, users can add periodic digests at noon and 5PM to stay in sync through the day."
-        :data-toggle "tooltip"
-        :data-placement "top"}
-       "Custom digest schedule"]]
-     [:div.pricing-column-row.has-tooltip
-      [:span.pricing-column-copy
-       {:title "Know who saw your update, and easily remind those that missed it."
-        :data-toggle "tooltip"
-        :data-placement "top"}
-       "Analytics"]]
-     [:div.pricing-column-row
-      "Custom colors and branding"]
-    ;;  [:div.pricing-column-row.coming-feature
-    ;;   "Assign roles for team onboarding (coming)"]
-     ]]
+   [:div.pricing-table-inner
+    ;; Free
+    [:div.pricing-table-column
+      [:div.pricing-table-column-inner
+      [:div.pricing-column-header
+        "Free"]
+      [:div.pricing-column-value
+        [:div.price-value
+        "$0"]
+        [:div.price-desc
+        "per user"
+        [:br]
+        "per month"]]
+      [:a.pricing-column-right-link
+        {:href "/sign-up"}
+        "Try for free"]
+      [:div.pricing-column-row
+        "Unlimited users"]
+      [:div.pricing-column-row
+        "Unlimited posts"]
+      [:div.pricing-column-row
+        "Team-level access to all updates"]
+      [:div.pricing-column-row
+        "Everyone can add an update"]]
+      [:div.pricing-column-footer-note.big-web-tablet-only
+      "Nonprofits and K-12 education are always free."]]
+    ;; Premium
+    [:div.pricing-table-column
+      [:div.pricing-table-column-inner
+      [:div.pricing-column-header
+        "Premium"]
+      [:div.pricing-column-value
+        [:div.price-value
+        "$5"]
+        [:div.price-desc
+        "per user"
+        [:br]
+        "per month"]]
+      [:a.pricing-column-right-link
+        {:href "/sign-up"}
+        "Try for free"]
+      [:div.pricing-column-row
+        "Unlimited users"]
+      [:div.pricing-column-row
+        "Unlimited posts"]
+      [:div.pricing-column-row.has-tooltip
+        [:span.pricing-column-copy
+        {:title "Create updates that are private for select users, or public for people outside the team."
+          :data-toggle "tooltip"
+          :data-placement "top"}
+        "Team, private and public updates"]]
+      [:div.pricing-column-row.has-tooltip
+        [:span.pricing-column-copy
+        {:title "In the free version, everyone on the team can add updates. With premium, admins can assign editor and view-only roles."
+          :data-toggle "tooltip"
+          :data-placement "top"}
+        "View-only users"]]
+      [:div.pricing-column-row.has-tooltip
+        [:span.pricing-column-copy
+        {:title "In the free version, everyone receives a morning digest at 7AM. With premium, users can add periodic digests at noon and 5PM to stay in sync through the day."
+          :data-toggle "tooltip"
+          :data-placement "top"}
+        "Custom digest schedule"]]
+      [:div.pricing-column-row.has-tooltip
+        [:span.pricing-column-copy
+        {:title "Know who saw your update, and easily remind those that missed it."
+          :data-toggle "tooltip"
+          :data-placement "top"}
+        "Analytics"]]
+      [:div.pricing-column-row
+        "Custom colors and branding"]
+      ;;  [:div.pricing-column-row.coming-feature
+      ;;   "Assign roles for team onboarding (coming)"]
+      ]]
+    ;; Custom
+    [:div.pricing-table-column
+      [:div.pricing-table-column-inner
+      [:div.pricing-column-header
+        "Custom"]
+      [:div.pricing-column-value
+        [:span.pricing-column-value-copy
+         "Tweak Carrot to meet your specific requirements."]]
+      [:a.pricing-column-right-link.chat-with-us-link
+        {:class "intercom-chat-link"
+        :href "mailto:hello@carrot.io"}
+        "Chat with us"]
+      [:div.pricing-column-row
+        "If you feel a special, unique feature can make an important difference for your team, "
+        "let us know. We're always happy to discuss your ideas, and if it’s not on our roadmap "
+        "we can propose custom services to design and develop it for you."]]]]
    [:div.pricing-column-footer-note.mobile-only
     "Nonprofits and K-12 education are always free."]])
 
