@@ -129,6 +129,8 @@
                       ua/mobile-app? (str "Version " expo-app-version " (" web-app-version ")")
                       ua/desktop-app? (str (get-desktop-version) " (" web-app-version ")")
                       :else web-app-version)
+        env-endpoint (when (not= ls/sentry-env "production")
+                       (str "Endpoint: " ls/web-hostname))
         show-billing? (and ls/payments-enabled
                            (= (:role current-user-data) :admin)
                            current-org-slug)]
@@ -297,5 +299,8 @@
             [:div.oc-menu-separator])]
         ;; Version
         (when (seq app-version)
-          [:div.app-version
-             app-version])]]))
+          [:div.app-info.app-version
+             app-version])
+        (when (seq env-endpoint)
+          [:div.app-info.env-endpoint
+            env-endpoint])]]))
