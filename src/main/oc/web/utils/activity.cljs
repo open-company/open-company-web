@@ -460,11 +460,13 @@
          (not (.match plain-text is-text-message?)))))
 
 (defun parse-comment
+  ([nil _ _]
+   {})
+  
+  ([_ nil _]
+   {})
 
-  ([org-data activity-data nil]
-    {})
-
-  ([org-data activity-data nil _]
+  ([_ _ nil & x]
     {})
 
   ([org-data activity-data comments-map :guard :sorted-comments container-seen-at]
