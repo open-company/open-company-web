@@ -755,4 +755,6 @@
   (ocall js/console "clear")
   (dom-utils/force-unlock-page-scroll)
   (secretary/dispatch! (router/get-token))
+  (when ua/mobile-app?
+    (expo/bridge-get-color-scheme))
   (theme-actions/setup-theme))
