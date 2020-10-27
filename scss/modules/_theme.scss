@@ -111,6 +111,10 @@ $dark_mode: "dark";
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.1);
 
+  // Org avatar
+  --org-avatar-background-color: white;
+  --org-avatar-border-color: #{rgba($deep_navy, 0.08)};
+
   // General settings
   --selected-row-background-color: #EBF8F1;
   --selected-row-color: var(--primary-color);
@@ -250,6 +254,10 @@ $dark_mode: "dark";
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.1);
+
+  // Org avatar
+  --org-avatar-background-color: white;
+  --org-avatar-border-color: #{rgba(white, 0.04)};
 
   // General settings
   --selected-row-background-color: #{rgba(white, 0.2)};
