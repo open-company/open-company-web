@@ -104,7 +104,7 @@
 (def seen-replies-container-id "2222-2222-2222")
 
 ;; Digest times
-(def digest-times #{:700 :1200 :1700})
+(def digest-times [:700 :1200 :1700])
 
 ;; Primary color
 (def default-color
