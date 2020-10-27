@@ -200,6 +200,7 @@ div.stream-collapsed-item {
       div.stream-collapsed-item-avatar {
         flex: 0 0 auto;
         @include face-pile(24);
+        display: block;
 
         @include mobile() {
           display: none;

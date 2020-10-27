@@ -153,7 +153,7 @@
         (if is-mobile?
           [:div.stream-collapsed-item-fillers
            [:div.stream-collapsed-item-avatar
-            (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
+            (face-pile {:width 40 :max-faces 10 :faces (:authors (:for-you-context activity-data))})]
            [:div.stream-collapsed-item-fill
             [:div.stream-item-context
              (-> activity-data :for-you-context :label)]
