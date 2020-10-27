@@ -148,7 +148,7 @@
                             :else (str "Version " web-app-version))
         long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
-                       (str "Endpoint: " ls/web-hostname))
+                       (str "Endpoint: " ls/web-server))
         show-billing? (and ls/payments-enabled
                            (= (:role current-user-data) :admin)
                            current-org-slug)]
