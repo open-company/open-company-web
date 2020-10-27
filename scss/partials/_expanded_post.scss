@@ -401,7 +401,7 @@ div.expanded-post {
           display: inline-block;
           width: auto; //136px;
           height: 32px;
-          padding: 5px 8px 5px 33px;
+          padding: 5px 8px 5px 32px;
           @include OC_Body_Book();
           color: var(--color);
           position: relative;
@@ -426,7 +426,7 @@ div.expanded-post {
             border-radius: 50%;
             position: absolute;
             top: 8px;
-            left: 19px;
+            left: 8px;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/plus_button_icon.svg");

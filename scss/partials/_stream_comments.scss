@@ -422,14 +422,19 @@ div.stream-comments {
               }
               div.stream-comment-author-name {
                 @include OC_Body_Bold();
-                font-size: 14px;
                 color: var(--color);
-                line-height: 18px;
                 float: left;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 height: 18px;
+                font-size: 12px;
+                line-height: 22px;
+
+                @include mobile() {
+                  font-size: 14px;
+                  line-height: 24px;
+                }
               }
 
               div.stream-comment-author-timestamp {
@@ -469,7 +474,7 @@ div.stream-comments {
 
             div.stream-comment-body {
               display: inline;
-              @include activity-comment(15, 18, 12);
+              @include activity-comment(17, 22, 16);
 
               @include mobile() {
                 @include activity-comment(18, 24, 16);
