@@ -314,6 +314,7 @@ div.expanded-post {
       div.expanded-post-headline {
         @include activity-title(26px, 33px);
         min-height: 0;
+        margin-bottom: 16px;
 
         @include mobile() {
           @include activity-title(22px, 28px);
@@ -397,16 +398,21 @@ div.expanded-post {
 
         div.expand-button-inner {
           margin: 16px auto 24px;
-          width: 132px;
+          display: inline-block;
+          width: auto; //136px;
           height: 32px;
-          padding: 7px 18px 7px 43px;
+          padding: 5px 8px 5px 33px;
           @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 18px;
           color: var(--color);
           position: relative;
           border-radius: 4px;
           background-color: var(--reaction-bt-background);
+          font-size: 17px;
+          line-height: 22px;
+
+          @include mobile() {
+            font-size: 18px;
+          }
 
           &:before {
             content: "";
