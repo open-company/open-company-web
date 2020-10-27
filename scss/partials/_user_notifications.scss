@@ -14,10 +14,6 @@ div.user-notifications {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     height: calc(100vh - #{$mobile_navbar_height * 2}px);
-
-    button.notification-bell-bt {
-      display: none;
-    }
   }
 
   button.notification-bell-bt {
@@ -31,6 +27,10 @@ div.user-notifications {
     border: none;
     transition: backgorund-color 180ms ease-in;
     display: block;
+
+    @include mobile() {
+      display: none;
+    }
 
     span.bell-icon {
       position: absolute;
