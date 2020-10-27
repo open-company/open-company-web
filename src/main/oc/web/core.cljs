@@ -567,19 +567,23 @@
 
     (defroute inbox-route (urls/inbox ":org") {:as params}
       (timbre/info "Routing inbox-route" (urls/inbox ":org"))
-      (org-handler "inbox" target org-dashboard (assoc params :board "inbox")))
+      (router/redirect! (urls/following (:org params))))
 
     (defroute inbox-slash-route (str (urls/inbox ":org") "/") {:as params}
       (timbre/info "Routing inbox-slash-route" (str (urls/inbox ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "inbox")))
+      (router/redirect! (urls/following (:org params))))
 
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+      (if (seq (:old (:query-params params)))
+        (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts"))
+        (router/redirect! (urls/following (:org params)))))
 
     (defroute all-posts-slash-route (str (urls/all-posts ":org") "/") {:as params}
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+      (if (seq (:old (:query-params params)))
+        (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts"))
+        (router/redirect! (urls/following (:org params)))))
 
     (defroute following-route (urls/following ":org") {:as params}
       (timbre/info "Routing following-route" (urls/following ":org"))
