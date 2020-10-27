@@ -1,6 +1,6 @@
 (ns oc.web.mixins.gestures
   (:require [rum.core :as rum]
-            ["hammerjs" :as hammer]))
+            ["hammerjs" :as Hammer]))
 
 (defn swipe-gesture-manager [{:keys [swipe-right swipe-left long-press disabled] :as options}]
   {:did-mount (fn [s]
@@ -10,7 +10,7 @@
                              (fn? swipe-left)
                              (fn? long-press)))
                   (let [el (rum/dom-node s)
-                        hr (js/Hammer. el)]
+                        hr (Hammer. el)]
                     (when (fn? swipe-left)
                       (.on hr "swipeleft" (partial swipe-left s)))
                     (when (fn? swipe-right)
