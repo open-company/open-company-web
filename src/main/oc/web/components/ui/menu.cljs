@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.menu
   (:require [rum.core :as rum]
+            ["hammerjs" :as Hammer]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel sel1)]
             [oc.web.expo :as expo]
@@ -88,26 +89,42 @@
                    :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
+(def client-version "3.0")
+
 (defn- get-desktop-version
   []
   (if (.-getElectronAppVersion js/OCCarrotDesktop)
-    (str "Version " (.getElectronAppVersion js/OCCarrotDesktop))
-    ""))
+    (.getElectronAppVersion js/OCCarrotDesktop)
+    client-version))
 
 (defn- theme-settings-click [s e]
   (.preventDefault e)
   (nav-actions/show-theme-settings))
 
+(defn- setup-env-clicks [s]
+  (when-not @(::hr s)
+    (when-let [el (rum/ref-node s :app-version)]
+      (let [hr (Hammer/Manager. el #js {})]
+        (reset! (::hr s) hr)
+        (.add hr (Hammer/Tap. #js {:event "fivetaps"
+                                   :taps 5
+                                   :pointers 1}))
+        (.on hr "fivetaps" (fn [_] (reset! (::complete-info s) true)))))))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
+                  (rum/local nil ::hr)
+                  (rum/local false ::complete-info)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
+   (setup-env-clicks s)
    s)
    :did-remount (fn [_ s]
+   (setup-env-clicks s)
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
     s)}
@@ -123,12 +140,13 @@
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?)
         desktop-app-data (detect-desktop-app)
-        web-app-main-version "3.0"
-        web-app-version (str ls/product-name " " web-app-main-version (when (seq ls/sentry-release-deploy) (str " build: " ls/sentry-release-deploy)))
-        app-version (cond
-                      ua/mobile-app? (str "Version " expo-app-version " (" web-app-version ")")
-                      ua/desktop-app? (str (get-desktop-version) " (" web-app-version ")")
-                      :else web-app-version)
+        web-app-version client-version
+        build-version (when (seq ls/sentry-release-deploy) (str " build: " ls/sentry-release-deploy))
+        short-app-version (cond
+                            ua/mobile-app? (str "Version " expo-app-version)
+                            ua/desktop-app? (get-desktop-version)
+                            :else (str "Version " web-app-version))
+        long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
                        (str "Endpoint: " ls/web-hostname))
         show-billing? (and ls/payments-enabled
@@ -141,8 +159,8 @@
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close s)}]
       [:div.menu-container-outer
+        {:ref :menu-container}
         [:div.menu-container
-          {:ref :menu-container}
           [:div.menu-header.group
             [:button.mlb-reset.mobile-close-bt
               {:on-click #(menu-close s)}]
@@ -298,9 +316,12 @@
           (when ua/pseudo-native?
             [:div.oc-menu-separator])]
         ;; Version
-        (when (seq app-version)
+        (when (seq short-app-version)
           [:div.app-info.app-version
-             app-version])
-        (when (seq env-endpoint)
+             {:ref :app-version}
+             (if @(::complete-info s)
+               long-app-version
+               short-app-version)])
+        (when (and @(::complete-info s) (seq env-endpoint))
           [:div.app-info.env-endpoint
             env-endpoint])]]))
