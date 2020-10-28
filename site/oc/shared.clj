@@ -672,8 +672,8 @@
     (intercom-js)
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
-    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/autotrack.js")}]
-    [:script {:type "text/javascript" :src (cdn "/lib/autotrack/google-analytics.js")}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
+    [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
     (google-analytics-init)
     ;; TODO: enable when we want to use full story for static pages.
     ;;(when (= (env :fullstory) "true")
