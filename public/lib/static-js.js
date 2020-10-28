@@ -81,7 +81,6 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
 
 // Get the jwt cookie to know if the user is logged in
 var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
-console.log("DBG DOM ready JWT:", jwt);
 if (jwt) {
   var decoded_jwt = OCStaticGetDecodedJWT(jwt),
       your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
