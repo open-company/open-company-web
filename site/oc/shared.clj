@@ -584,21 +584,17 @@
   [:script {:src (cdn "/lib/intercom.js")}])
 
 (def tag-manager-head
-  [:script"
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5D4DTSB');"])
+  [:script
+   {:async true
+    :src (str "https://www.googletagmanager.com/gtag/js?id=" (env :ga-tracking-id))}])
 
 (def tag-manager-body
-  [:noscript
-    [:iframe
-      {:src "https://www.googletagmanager.com/ns.html?id=GTM-5D4DTSB"
-       :height "0"
-       :width "0"
-       :style {:display "none"
-               :visibility "hidden"}}]])
+  [:script
+   (str "window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '" (env :ga-tracking-id) "');")])
 
 (def ph-banner
   [:div.ph-banner
@@ -639,6 +635,7 @@
 (defn head [page options]
   [:head
     tag-manager-head
+    tag-manager-body
     ;; -------------
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
@@ -671,7 +668,7 @@
     ;; Intercom (Support chat)
     (intercom-js)
     ;; Google Analytics
-    [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+    ;; [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     [:script {:type "text/javascript" :src (cdn "/lib/autotrack/autotrack.js")}]
     [:script {:type "text/javascript" :src (cdn "/lib/autotrack/google-analytics.js")}]
     ;; TODO: enable when we want to use full story for static pages.

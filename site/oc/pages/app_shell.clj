@@ -11,6 +11,7 @@
 (def app-shell
   {:head [:head
           shared/tag-manager-head
+          shared/tag-manager-body
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta
@@ -58,7 +59,6 @@
           ;; Stripe
           shared/stripe-js]
    :body [:body
-          shared/tag-manager-body
           [:div#app
            oc-loading]
           [:div#oc-notifications-container]
@@ -72,7 +72,7 @@
           (when-let [react-native-devtools-url (env :react-native-devtools-url)]
             [:script {:src react-native-devtools-url}])
           ;; Google Analytics
-          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+          ;; [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           ;; WURFL used for mobile/tablet detection
@@ -83,11 +83,13 @@
           ;; Utilities
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
-          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]]})
+          [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
+          (shared/google-analytics-init)]})
 
 (def prod-app-shell
   {:head [:head
           shared/tag-manager-head
+          shared/tag-manager-body
           [:meta {:charset "utf-8"}]
           [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
           [:meta
@@ -119,7 +121,6 @@
           ;; Stripe
           shared/stripe-js]
    :body [:body
-          shared/tag-manager-body
           [:div#app
            [:div.oc-loading.active
             [:div.oc-loading-inner
@@ -134,7 +135,7 @@
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           shared/bootstrap-js
           ;; Google Analytics
-          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+          ;; [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
           [:script {:type "text/javascript" :src (shared/cdn "/lib/autotrack/autotrack.js")}]
           [:script {:type "text/javascript" :src (shared/cdn "/lib/autotrack/google-analytics.js")}]
           ;; Intercom (Support)
