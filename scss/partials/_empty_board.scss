@@ -71,7 +71,7 @@ div.empty-board {
         }
 
         &.replies {
-          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+          background-image: cdnUrl("/img/ML/nav_actvity.svg");
           background-size: 24px 24px;
         }
 
@@ -95,7 +95,7 @@ div.empty-board {
           }
 
           &.replies {
-            background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+            background-image: cdnUrl("/img/ML/nav_actvity@dark.svg");
           }
         }
       }
