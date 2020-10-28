@@ -38,7 +38,8 @@
     (shared/nav (name page) opts)
     (shared/mobile-menu (name page) opts)]
    (if (fn? body) (body opts) body)
-   (shared/footer opts)])
+   (shared/footer opts)
+   (shared/google-analytics-init)])
 
 (def pages [{:page-name "404"
              :page :404
