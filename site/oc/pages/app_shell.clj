@@ -134,7 +134,10 @@
           [:script {:type "text/javascript" :src "//wurfl.io/wurfl.js"}]
           shared/bootstrap-js
           ;; Google Analytics
-          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
+          [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
+          [:script {:type "text/javascript" :src (shared/cdn "/lib/autotrack/autotrack.js")}]
+          [:script {:type "text/javascript" :src (shared/cdn "/lib/autotrack/google-analytics.js")}]
+          (shared/google-analytics-init)
           ;; Intercom (Support)
           (shared/intercom-js)
           ;; Headway (What's New)
@@ -143,6 +146,8 @@
           (shared/oc-js)
           ;; Compiled assets
           (shared/oc-assets-js)
+          ;; Fullstory
           (when (= (env :fullstory) "true")
-            (shared/fullstory-init))
-          (shared/google-analytics-init)]})
+            [:script {:type "text/javascript" :src (shared/cdn "/lib/fullstory.js")}])
+          (when (= (env :fullstory) "true")
+            (shared/fullstory-init))]})
