@@ -56,16 +56,14 @@
         (login-overlays-handler)
         [:header.login-wall-header
          [:div.top-back-button-container
-          [:button.mlb-reset.top-back-button
-            {:on-touch-start identity
-             :class (when ua/mobile-app? "mobile-app")
-             :on-click #(if ua/mobile-app?
-                          (router/redirect! oc-urls/home)
-                          (do
-                            (.preventDefault %)
-                            (router/redirect! oc-urls/home)))
-             :aria-label "Back"}
-            "Back"]]
+          (when-not ua/pseudo-native?
+            [:button.mlb-reset.top-back-button
+              {:on-touch-start identity
+              :on-click #(do
+                          (.preventDefault %)
+                          (router/redirect! oc-urls/home))
+              :aria-label "Back"}
+              "Back"])]
           [:div.title
             (or title default-title)]
           [:div.top-continue-container

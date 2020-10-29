@@ -81,10 +81,11 @@
     [:div.onboard-container-inner.lander.group
       [:header.main-cta
         [:div.top-back-button-container
-         [:button.mlb-reset.top-back-button
-           {:on-touch-start identity
-            :on-click #(router/history-back!)}
-           "Back"]]
+         (when-not ua/pseudo-native?
+          [:button.mlb-reset.top-back-button
+            {:on-touch-start identity
+              :on-click #(router/history-back!)}
+            "Back"])]
         [:div.title.main-lander
           "Let’s get started!"]
         [:div.top-continue-container
@@ -652,7 +653,7 @@
     [:div.onboard-container-inner.invitee-team-lander
       [:header.main-cta
        [:div.top-back-button-container
-        (when-not ua/mobile-app?
+        (when-not ua/pseudo-native?
           [:button.mlb-reset.top-back-button
            {:on-touch-start identity
             :on-click #(router/history-back!)}
