@@ -79,14 +79,18 @@
   (.preventDefault e)
   (nav-actions/show-org-settings :payments))
 
-(defn- detect-desktop-app
+(defn- detect-native-app
   []
-  (when-not ua/desktop-app?
+  (when-not ua/pseudo-native?
     (cond
-      ua/mac? {:title "Download Mac app"
-               :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      ua/mac?     {:title "Download Mac app"
+                   :href ls/mac-app-url}
       ua/windows? {:title "Download Windows app"
-                   :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+                   :href ls/win-app-url}
+      ua/android? {:title "Download Android app"
+                   :href ls/android-app-url}
+      ua/ios?     {:title "Download Android app"
+                   :href ls/ios-app-url}
       :default nil)))
 
 (def client-version "3.0")
@@ -139,7 +143,7 @@
         expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?)
-        desktop-app-data (detect-desktop-app)
+        native-app-data (detect-native-app)
         web-app-version client-version
         build-version (when (seq ls/sentry-release-deploy) (str " build: " ls/sentry-release-deploy))
         short-app-version (cond
@@ -294,12 +298,12 @@
               [:div.oc-menu-item
                 "Billing"]])
           ;; Desktop app
-          (when desktop-app-data
+          (when native-app-data
             [:a
-              {:href (:href desktop-app-data)
+              {:href (:href native-app-data)
               :target "_blank"}
               [:div.oc-menu-item.native-app
-                (:title desktop-app-data)
+                (:title native-app-data)
                 [:span.beta "BETA"]]])
           ;; Logout separator
           [:div.oc-menu-separator]
