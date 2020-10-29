@@ -89,7 +89,7 @@
                    :href ls/win-app-url}
       ua/android? {:title "Download Android app"
                    :href ls/android-app-url}
-      ua/ios?     {:title "Download Android app"
+      ua/ios?     {:title "Download iOS app"
                    :href ls/ios-app-url}
       :default nil)))
 
