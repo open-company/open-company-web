@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oops.core :refer (oget oset!)]
             [oc.web.lib.utils :as utils]
+            [oc.web.urls :as oc-urls]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.info-hover-views :refer (user-info-otf)]
             [goog.events :as events]
@@ -61,7 +62,7 @@
                          (events/listen this EventType/CLICK
                           (fn [e]
                             (when-let [user-id (oget this "dataset.?userId")]
-                              (nav-actions/show-user-info user-id)))))]
+                              (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))))))]
           (swap! events-list concat [enter-ev leave-ev click-ev]))
         (when click?
           (.add (.-classList this) "expand-profile")))))))
