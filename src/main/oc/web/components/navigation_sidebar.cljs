@@ -76,8 +76,10 @@
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
         show-invite-box (drv/react s :show-invite-box)
-        filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
-                                                    (not= % (:uuid org-data))) change-data))
+        filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
+                                                 (and (not (s/starts-with? container-uuid drafts-board-prefix))
+                                                      (not (= container-uuid (:uuid org-data)))))
+                                              change-data))
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         user-is-part-of-the-team? (:member? org-data)
