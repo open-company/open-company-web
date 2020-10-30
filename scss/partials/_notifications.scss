@@ -224,63 +224,7 @@ div.notifications {
       color: white;
       margin-top: 8px;
       overflow-wrap: break-word;
-
-      blockquote {
-        padding: 1px 0 1px 8px;
-        border-left: 2px solid rgba(255, 255, 255, 0.5);
-        @include OC_Body_Book();
-        font-weight: normal;
-        font-size: 14px;
-        color: white;
-        text-decoration: none;
-        font-style: normal;
-      }
-
-      code, pre {
-        background-color: transparent;
-        padding: 0;
-        margin: 0;
-        color: white;
-        font-size: 14px;
-        line-height: normal;
-        min-height: unset;
-        border: none;
-        border-radius: 0;
-        @include OC_Body_Book();
-        overflow-x: hidden;
-        white-space: pre-wrap;
-      }
-
-      ul {
-        @include OC_Body_Book();
-        font-size: 14px;
-        font-weight: normal;
-        color: white;
-        text-decoration: none;
-        font-style: normal;
-        padding-left: 20px;
-      }
-
-      &.oc-mentions span.oc-mention[data-found="true"] {
-        background-color: transparent !important;
-        color: white !important;
-        @include OC_Body_Book();
-      }
-
-      a {
-        color: $carrot_green;
-        text-decoration: none;
-
-        @include big_web() {
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      img, iframe {
-        display: none;
-      }
+      @include activity-body-preview(14, 18, var(--color), 3);
     }
 
     button.notification-button {

@@ -266,36 +266,9 @@ div.user-notifications {
           margin-top: 4px;
           width: calc(100% - 40px);
           padding-right: 8px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 18px;
-          color: var(--color);
-          float: right;
           overflow-wrap: break-word;
-
-          p {
-            margin: 0px;
-            padding: 0px;
-          }
-
-          a {
-            color: $carrot_green;
-          }
-
-          img {
-            display: none;
-          }
-
-          // truncate
-          overflow: hidden;
-          text-overflow: ellipsis;
-          // Truncate last line of text preview
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          /*! autoprefixer: off */
-          -webkit-box-orient: vertical;
-          /* autoprefixer: on */
-          max-height: 36px;
+          @include activity-body-preview(14, 18, var(--color), 2);
+          float: right;
         }
 
         button.read-bt {
