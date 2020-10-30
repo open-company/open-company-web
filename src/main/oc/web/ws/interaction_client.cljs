@@ -201,3 +201,8 @@
             (start-router!)))
       (when (pos? (count @last-board-uuids))
         (boards-watch)))))
+
+(defn reset-connection! []
+  (stop-router!)
+  (reset! last-ws-link nil)
+  (reset! last-board-uuids nil))

@@ -315,3 +315,10 @@
       (do
         (timbre/debug "Connection already up, watch containers")
         (container-watch)))))
+
+(defn reset-connection! []
+  (stop-router!)
+  (reset! last-ws-link nil)
+  (reset! current-org nil)
+  (reset! current-uid nil)
+  (reset! container-ids nil))

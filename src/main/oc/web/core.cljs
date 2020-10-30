@@ -29,7 +29,9 @@
             [oc.web.stores.reminder]
             [oc.web.stores.contributions]
             ;; Pull in the needed file for the ws interaction events
-            [oc.web.ws.interaction-client]
+            [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.notify-client :as ws-nc]
             [oc.web.actions.team]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
@@ -758,6 +760,9 @@
 (defn on-js-reload []
   (ocall js/console "clear")
   (dom-utils/force-unlock-page-scroll)
+  (ws-ic/reset-connection!)
+  (ws-nc/reset-connection!)
+  (ws-cc/reset-connection!)
   (secretary/dispatch! (router/get-token))
   (when ua/mobile-app?
     (expo/bridge-get-color-scheme))
