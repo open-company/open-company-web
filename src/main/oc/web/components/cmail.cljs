@@ -587,14 +587,16 @@
                                  (and (not (some :publisher-board editable-boards))
                                       ls/publisher-board-enabled?
                                       (pos? (count editable-boards)))
-                                 (> (count editable-boards) 1))]
+                                 (> (count editable-boards) 1))
+        expanded-state? (and (contains? cmail-state :collapsed)
+                             (not (:collapsed cmail-state)))]
     [:div.cmail-outer
-      {:class (utils/class-set {:quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
+      {:class (utils/class-set {:quick-post-collapsed (or (not expanded-state?) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?
-                                :fullscreen (and (not (:collapsed cmail-state))
+                                :fullscreen (and expanded-state?
                                                  (:fullscreen cmail-state))})
        :on-click (when (and (not is-mobile?)
-                            (:collapsed cmail-state)
+                            (not expanded-state?)
                             (not show-paywall-alert?)
                             (not (:fullscreen cmail-state)))
                    (fn [e]
@@ -604,7 +606,7 @@
                        #(when-let [el (headline-element s)]
                           (utils/to-end-of-content-editable el)))))}
       (when (and show-paywall-alert?
-                 (:collapsed cmail-state))
+                 (not expanded-state?))
         (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
         {:ref :cmail-container}
