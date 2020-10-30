@@ -264,61 +264,62 @@
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
   (timbre/info "Connection estabilished")
-  (ws-utils/reconnected last-interval "Change" chsk-send! ch-state
-   #(reconnect @last-ws-link @current-uid @current-org @container-ids)))
+  (ws-utils/reconnected last-interval "Change" chsk-send! ch-state reconnect))
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the change service"
-  [ws-link uid org-slug containers]
-  (timbre/debug "Change service reconnect" (:href ws-link) uid org-slug containers)
-  (let [ws-uri (guri/parse (:href ws-link))
-        ws-port (.getPort ^js ws-uri)
-        ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
-        ws-org-path (.getPath ^js ws-uri)]
-    ;; Save passed parameters
-    (reset! last-ws-link ws-link)
-    (reset! container-ids containers)
-    (reset! current-org org-slug)
-    (reset! current-uid uid)
-    (if (or (not @ch-state)
-            (not (:open? @@ch-state))
-            (not= @current-org org-slug))
-      ;; Need a connection to change service
-      (do
-        (timbre/debug "Connection is down, reconnecting. Current state:" @ch-state)
-        ; if the path is different it means
-        (when (and @ch-state
-                   (:open? @@ch-state))
-          (timbre/info "Closing previous connection for:" @current-org)
-          (stop-router!))
-        (timbre/info "Attempting change service connection to:" ws-domain "for org:" org-slug)
-        (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
-                                                          {:type :auto
-                                                           :host ws-domain
-                                                           :protocol (if ls/jwt-cookie-secure :https :http)
-                                                           :packer :edn
-                                                           :uid uid
-                                                           :params {:user-id uid}})]
-            
-            (reset! channelsk chsk)
-            (reset! ch-chsk ch-recv)
-            (reset! chsk-send! send-fn)
-            (when @ch-state
-              (remove-watch @ch-state :change-client-state-watcher))
-            (reset! ch-state state)
-            (add-watch @ch-state :change-client-state-watcher
-             (fn [key a old-state new-state]
-               (reset! ws-client-ids/change-client-id (:uid new-state))))
-            (start-router!)))
+  ([ws-link uid org-slug containers]
+   (when ws-link
+     (reset! last-ws-link ws-link)
+     (reset! current-uid uid)
+     (reset! current-org org-slug)
+     (reset! container-ids containers)
+     (reconnect)))
+  ([]
+   (timbre/debug "Change service reconnect" (:href @last-ws-link) @current-uid @current-org @container-ids)
+   (when-let [ws-link @last-ws-link]
+     (let [ws-uri (guri/parse (:href ws-link))
+           ws-port (.getPort ^js ws-uri)
+           ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
+           ws-org-path (.getPath ^js ws-uri)]
+       ;; Save passed parameters
+       (if (or (not @ch-state)
+               (not (:open? @@ch-state)))
+         ;; Need a connection to change service
+         (do
+           (timbre/debug "Connection is down, reconnecting. Current state:" @ch-state)
+           ;; if the path is different it means
+           (when (and @ch-state
+                      (:open? @@ch-state))
+             (timbre/info "Closing previous connection for:" @current-org)
+             (stop-router!))
+           (timbre/info "Attempting Change service connection to:" ws-domain "for org:" @current-org)
+           (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
+                                                                                    {:type :auto
+                                                                                     :host ws-domain
+                                                                                     :protocol (if ls/jwt-cookie-secure :https :http)
+                                                                                     :packer :edn
+                                                                                     :uid @current-uid
+                                                                                     :params {:user-id @current-uid}})]
 
-      ;; already connected, make sure we're watching all the current containers
-      (do
-        (timbre/debug "Connection already up, watch containers")
-        (container-watch)))))
+             (reset! channelsk chsk)
+             (reset! ch-chsk ch-recv)
+             (reset! chsk-send! send-fn)
+             (when @ch-state
+               (remove-watch @ch-state :change-client-state-watcher))
+             (reset! ch-state state)
+             (add-watch @ch-state :change-client-state-watcher
+                        (fn [key a old-state new-state]
+                          (reset! ws-client-ids/change-client-id (:uid new-state))))
+             (start-router!)))
+         ;; already connected, make sure we're watching all the current containers
+         (do
+           (timbre/debug "Connection already up, watch containers")
+           (container-watch)))))))
 
 (defn reset-connection! []
   (stop-router!)
   (reset! last-ws-link nil)
-  (reset! current-org nil)
   (reset! current-uid nil)
+  (reset! current-org nil)
   (reset! container-ids nil))

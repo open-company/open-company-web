@@ -131,8 +131,7 @@
           ;; retry in 10 seconds if sente is not trying reconnecting
           (when (and @ch-state
                      (not (:udt-next-reconnect @@ch-state)))
-            (utils/after (* 10 1000)
-             (reconnect-cb))))
+            (utils/after (* 10 1000) reconnect-cb)))
         (or (= rep :chsk/closed)
             (= rep "closed"))
         (do
@@ -142,8 +141,7 @@
           ;; retry in 10 seconds if sente is not trying reconnecting
           (when (and @ch-state
                      (not (:udt-next-reconnect @@ch-state)))
-            (utils/after (* 10 1000)
-             (reconnect-cb))))
+            (utils/after (* 10 1000) reconnect-cb)))
         :else
         (report-invalid-jwt service-name ch-state rep)))))
 

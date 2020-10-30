@@ -20,6 +20,7 @@
 (defonce ch-pub (chan))
 
 (defonce last-ws-link (atom nil))
+(defonce current-uid (atom nil))
 
 (defonce last-interval (atom nil))
 
@@ -107,7 +108,7 @@
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (let [auth-cb (partial ws-utils/auth-check "Notify" ch-state chsk-send!
-                 channelsk ja/jwt-refresh #(reconnect @last-ws-link (j/user-id)) notifications-watch)]
+                 channelsk ja/jwt-refresh reconnect notifications-watch)]
     (ws-utils/post-handshake-auth ja/jwt-refresh
      #(send! chsk-send! [:auth/jwt {:jwt (j/jwt)}] 60000 auth-cb)))
   (let [[?uid ?csrf-token ?handshake-data] ?data]
@@ -123,48 +124,52 @@
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
   (timbre/info "Connection estabilished")
-  (ws-utils/reconnected last-interval "Notify" chsk-send! ch-state
-   #(reconnect @last-ws-link (j/user-id))))
+  (ws-utils/reconnected last-interval "Notify" chsk-send! ch-state reconnect))
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the notify service"
-  [ws-link uid]
-  (let [ws-uri (guri/parse (:href ws-link))
-        ws-port (.getPort ^js ws-uri)
-        ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
-        ws-org-path (.getPath ^js ws-uri)]
-    (reset! last-ws-link ws-link)
-    (if (or (not @ch-state)
-            (not (:open? @@ch-state)))
+  ([ws-link uid]
+   (reset! last-ws-link ws-link)
+   (reset! current-uid uid)
+   (reconnect))
+  ([]
+   (when-let [ws-link @last-ws-link]
+     (let [ws-uri (guri/parse (:href ws-link))
+           ws-port (.getPort ^js ws-uri)
+           ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
+           ws-org-path (.getPath ^js ws-uri)]
+       (if (or (not @ch-state)
+               (not (:open? @@ch-state)))
 
-      ;; Need a connection to notification service
-      (do
-        (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state)
+      ;; Need a connection to Notify service
+         (do
+           (timbre/debug "Reconnect for" (:href ws-link) "and" @current-uid "current state:" @ch-state)
         ; if the path is different it means
-        (when (and @ch-state
-                   (:open? @@ch-state))
-          (timbre/info "Closing previous connection")
-          (stop-router!))
-        (timbre/info "Attempting notification service connection to:" ws-domain)
-        (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
-                                                          {:type :auto
-                                                           :host ws-domain
-                                                           :protocol (if ls/jwt-cookie-secure :https :http)
-                                                           :packer :edn
-                                                           :uid uid
-                                                           :params {:user-id uid}})]
-            (reset! channelsk chsk)
-            (reset! ch-chsk ch-recv)
-            (reset! chsk-send! send-fn)
-            (when @ch-state
-              (remove-watch @ch-state :notify-client-state-watcher))
-            (reset! ch-state state)
-            (add-watch @ch-state :notify-client-state-watcher
-             (fn [key a old-state new-state]
-               (reset! ws-client-ids/notify-client-id (:uid new-state))))
-            (start-router!)))
-      (notifications-watch))))
+           (when (and @ch-state
+                      (:open? @@ch-state))
+             (timbre/info "Closing previous connection")
+             (stop-router!))
+           (timbre/info "Attempting Notify service connection to:" ws-domain)
+           (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
+                                                                                    {:type :auto
+                                                                                     :host ws-domain
+                                                                                     :protocol (if ls/jwt-cookie-secure :https :http)
+                                                                                     :packer :edn
+                                                                                     :uid @current-uid
+                                                                                     :params {:user-id @current-uid}})]
+             (reset! channelsk chsk)
+             (reset! ch-chsk ch-recv)
+             (reset! chsk-send! send-fn)
+             (when @ch-state
+               (remove-watch @ch-state :notify-client-state-watcher))
+             (reset! ch-state state)
+             (add-watch @ch-state :notify-client-state-watcher
+                        (fn [key a old-state new-state]
+                          (reset! ws-client-ids/notify-client-id (:uid new-state))))
+             (start-router!)))
+         (notifications-watch))))))
 
 (defn reset-connection! []
   (stop-router!)
-  (reset! last-ws-link nil))
+  (reset! last-ws-link nil)
+  (reset! current-uid nil))
