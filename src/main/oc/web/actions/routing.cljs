@@ -6,7 +6,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.theme :as theme-actions]
-            [oc.lib.cljs.useragent :as ua]))
+            [oc.lib.cljs.useragent :as ua]
+            [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.notify-client :as ws-nc]))
 
 (defn pre-routing []
   (theme-actions/pre-routing!))
@@ -27,6 +30,9 @@
 (defn switch-org-dashboard [org]
   (du/force-unlock-page-scroll)
   (dis/dispatch! [:org-nav-out (dis/current-org-slug) (:slug org)])
+  (ws-ic/reset-connection!)
+  (ws-cc/reset-connection!)
+  (ws-nc/reset-connection!)
   (router/nav! (oc-urls/default-landing (:slug org))))
 
 (defn routing! [next-route-map]

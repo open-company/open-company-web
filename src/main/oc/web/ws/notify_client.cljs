@@ -133,6 +133,7 @@
         ws-port (.getPort ^js ws-uri)
         ws-domain (str (.getDomain ^js ws-uri) (when ws-port (str ":" ws-port)))
         ws-org-path (.getPath ^js ws-uri)]
+    (reset! last-ws-link ws-link)
     (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 
@@ -163,3 +164,7 @@
                (reset! ws-client-ids/notify-client-id (:uid new-state))))
             (start-router!)))
       (notifications-watch))))
+
+(defn reset-connection! []
+  (stop-router!)
+  (reset! last-ws-link nil))
