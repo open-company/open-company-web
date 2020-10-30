@@ -250,6 +250,12 @@
                           :max-reactions max-reactions-count
                           :optional-activity-data activity-data})])]]]])
 
+(defn- quoted-reply-header [comment-data]
+  (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>"))
+
+(defn- reply-to [comment-data add-comment-focus-key]
+  (comment-actions/reply-to add-comment-focus-key (str (quoted-reply-header comment-data) (:body comment-data)) true))
+
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :add-comment-data)
@@ -349,7 +355,7 @@
                                :edit-cb (partial start-editing s)
                                :delete-cb (partial delete-clicked s activity-data)
                                :react-cb (when can-react? #(reset! (::show-picker s) (:uuid root-comment-data)))
-                               :reply-cb #(comment-actions/reply-to reply-focus-value (:body root-comment-data) true)
+                               :reply-cb #(reply-to root-comment-data reply-focus-value)
                                :did-react-cb (when can-react?
                                                #(comment-mark-read s (:uuid root-comment-data)))
                                :emoji-picker (when showing-picker?
