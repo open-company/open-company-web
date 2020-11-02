@@ -32,22 +32,6 @@
      :ref :item-body
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
-(defn- stream-item-activity-preview [is-mobile? for-you-context]
-  [:div.stream-item-activity-preview
-    {:key (str "stream-item-activity-preview-" (:timestamp for-you-context))}
-    [:span.for-you-body-label
-     (:label for-you-context)]
-    [:div.separator-dot]
-    [:span.time-since
-      {:data-toggle (when-not is-mobile? "tooltip")
-       :data-placement "top"
-       :data-container "body"
-       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-       :data-title (utils/activity-date-tooltip (:timestamp for-you-context))}
-      [:time
-        {:date-time (:timestamp for-you-context)}
-        (utils/time-since (:timestamp for-you-context) [:short :lower-case])]]])
-
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
@@ -255,92 +239,91 @@
               (rum/portal (more-menu-comp) mobile-more-menu-el))
             (more-menu-comp)))
         [:div.activity-share-container]]
-      [:div.stream-item-body-ext.group
-        [:div.thumbnail-container.group
-          {:class (when show-body-thumbnail? "has-preview")}
-          (when show-body-thumbnail?
-            [:div.body-thumbnail-wrapper
-              {:class (:type (:body-thumbnail activity-data))}
-              [:img.body-thumbnail
-                {:data-image (:thumbnail (:body-thumbnail activity-data))
-                 :src (-> activity-data
-                          :body-thumbnail
-                          :thumbnail
-                          (img/optimize-image-url (* 102 3)))}]])
-          [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (and show-body-thumbnail?
-                                                          (not (:fixed-video-id activity-data)))
-                                      :has-video (and show-body-thumbnail?
-                                                      (:fixed-video-id activity-data))
-                                      utils/hide-class true})}
-            [:div.stream-item-headline.ap-seen-item-headline
-              {:ref "activity-headline"
-               :data-itemuuid (:uuid activity-data)
-               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (stream-item-summary activity-data)]]
-          (if-not is-published?
-            [:div.stream-item-footer.group
-              [:div.stream-body-draft-edit
-                [:button.mlb-reset.edit-draft-bt
-                  {:on-click #(activity-actions/activity-edit activity-data)}
-                  "Continue editing"]]
-              [:div.stream-body-draft-delete
-                [:button.mlb-reset.delete-draft-bt
-                  {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
-                  "Delete draft"]]]
-            [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
+      [:div.thumbnail-container.group
+        {:class (when show-body-thumbnail? "has-preview")}
+        (when show-body-thumbnail?
+          [:div.body-thumbnail-wrapper
+            {:class (:type (:body-thumbnail activity-data))}
+            [:img.body-thumbnail
+              {:data-image (:thumbnail (:body-thumbnail activity-data))
+                :src (-> activity-data
+                        :body-thumbnail
+                        :thumbnail
+                        (img/optimize-image-url (* 102 3)))}]])
+        [:div.stream-body-left.group
+          {:class (utils/class-set {:has-thumbnail (and show-body-thumbnail?
+                                                        (not (:fixed-video-id activity-data)))
+                                    :has-video (and show-body-thumbnail?
+                                                    (:fixed-video-id activity-data))
+                                    utils/hide-class true})}
+          [:div.stream-item-headline.ap-seen-item-headline
+            {:ref "activity-headline"
+              :data-itemuuid (:uuid activity-data)
+              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          (stream-item-summary activity-data)]]
+        (if-not is-published?
+          [:div.stream-item-footer.group
+            [:div.stream-body-draft-edit
+              [:button.mlb-reset.edit-draft-bt
+                {:on-click #(activity-actions/activity-edit activity-data)}
+                "Continue editing"]]
+            [:div.stream-body-draft-delete
+              [:button.mlb-reset.delete-draft-bt
+                {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+                "Delete draft"]]]
+          [:div.stream-item-footer.group
+            {:ref "stream-item-reactions"}
+            (when member?
+              (reactions {:entity-data activity-data
+                          :only-thumb? true
+                          :hide-picker true}))
+            [:div.stream-item-footer-mobile-group
               (when member?
-                (reactions {:entity-data activity-data
-                            :only-thumb? true
-                            :hide-picker true}))
-              [:div.stream-item-footer-mobile-group
-                (when member?
-                  [:div.stream-item-comments-summary
-                    (foc-comments-summary {:entry-data activity-data
-                                           :add-comment-focus-prefix "main-comment"
-                                           :current-activity-id current-activity-id
-                                           :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
-                (when show-wrt?
-                  [:div.stream-item-wrt
-                    {:ref :stream-item-wrt}
-                    ; (when show-post-added-tooltip?
-                    ;   [:div.post-added-tooltip-container
-                    ;     {:ref :post-added-tooltip}
-                    ;     [:div.post-added-tooltip-title
-                    ;       "Post analytics"]
-                    ;     [:div.post-added-tooltip
-                    ;       (str "Invite your team to " ls/product-name " so you can know who read your "
-                    ;        "post and when. Click here to access your post analytics anytime.")]
-                    ;     [:button.mlb-reset.post-added-tooltip-bt
-                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                    ;       "OK, got it"]])
-                    (wrt-count {:activity-data activity-data
-                                :read-data read-data})])
-                (when (seq activity-attachments)
-                  (if-not is-mobile?
-                    [:div.stream-item-attachments
-                      {:ref :stream-item-attachments}
-                      [:div.stream-item-attachments-count
-                        {:data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
-                        (count activity-attachments)]
-                      [:div.stream-item-attachments-list
-                        (for [atc activity-attachments]
-                          [:a.stream-item-attachments-item
-                            {:href (:file-url atc)
-                             :target "_blank"}
-                            [:div.stream-item-attachments-item-desc
-                              [:span.file-name
-                                (:file-name atc)]
-                              [:span.file-size
-                                (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
-                    [:div.stream-item-mobile-attachments
-                      [:span.mobile-attachments-icon]
-                      [:span.mobile-attachments-count
-                        (count activity-attachments)]]))]
-              (when is-mobile?
-                [:div.stream-item-mobile-view-more
-                  "View more"])])]]))
+                [:div.stream-item-comments-summary
+                  (foc-comments-summary {:entry-data activity-data
+                                          :add-comment-focus-prefix "main-comment"
+                                          :current-activity-id current-activity-id
+                                          :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
+              (when show-wrt?
+                [:div.stream-item-wrt
+                  {:ref :stream-item-wrt}
+                  ; (when show-post-added-tooltip?
+                  ;   [:div.post-added-tooltip-container
+                  ;     {:ref :post-added-tooltip}
+                  ;     [:div.post-added-tooltip-title
+                  ;       "Post analytics"]
+                  ;     [:div.post-added-tooltip
+                  ;       (str "Invite your team to " ls/product-name " so you can know who read your "
+                  ;        "post and when. Click here to access your post analytics anytime.")]
+                  ;     [:button.mlb-reset.post-added-tooltip-bt
+                  ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                  ;       "OK, got it"]])
+                  (wrt-count {:activity-data activity-data
+                              :read-data read-data})])
+              (when (seq activity-attachments)
+                (if-not is-mobile?
+                  [:div.stream-item-attachments
+                    {:ref :stream-item-attachments}
+                    [:div.stream-item-attachments-count
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                        :data-placement "top"
+                        :data-container "body"
+                        :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
+                      (count activity-attachments)]
+                    [:div.stream-item-attachments-list
+                      (for [atc activity-attachments]
+                        [:a.stream-item-attachments-item
+                          {:href (:file-url atc)
+                            :target "_blank"}
+                          [:div.stream-item-attachments-item-desc
+                            [:span.file-name
+                              (:file-name atc)]
+                            [:span.file-size
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
+                  [:div.stream-item-mobile-attachments
+                    [:span.mobile-attachments-icon]
+                    [:span.mobile-attachments-count
+                      (count activity-attachments)]]))]
+            (when is-mobile?
+              [:div.stream-item-mobile-view-more
+                "View more"])])]))
