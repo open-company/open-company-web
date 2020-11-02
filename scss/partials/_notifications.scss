@@ -224,7 +224,7 @@ div.notifications {
       color: white;
       margin-top: 8px;
       overflow-wrap: break-word;
-      @include activity-body-preview(14, 18, var(--color), 3);
+      @include activity-body-foc(14, 18, var(--color), 3);
     }
 
     button.notification-button {
