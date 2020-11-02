@@ -16,7 +16,7 @@
 (defn- filter-sort-items [s items]
   (->> items
    (filterv #(filter-item s %))
-   (sort-by :short-name)))
+   (sort-by :name)))
 
 (rum/defcs explore-view <
   rum/reactive
