@@ -14,7 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.stream-reply-item :refer (replies-refresh-button)]
+            [oc.web.components.ui.activity-refresh-button :refer (activity-refresh-button)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
@@ -431,8 +431,8 @@
         [:div.paginated-stream-cards-inner.group
           (when replies?
             (rum/with-key
-             (replies-refresh-button {:items-to-render items})
-             (str "replies-refresh-button-" (:last-seen-at container-data))))
+             (activity-refresh-button {:items-to-render items})
+             (str "activity-refresh-button-" (:last-seen-at container-data))))
           (window-scroller
            {}
            (partial virtualized-stream {:org-data org-data

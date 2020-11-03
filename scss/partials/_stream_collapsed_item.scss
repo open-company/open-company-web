@@ -1,9 +1,3 @@
-// --foc-background-color: rgba($deep_navy, 0.05);
-// --mobile-foc-background-color: rgba($deep_navy, 0.05);
-// --foc-hover-color: rgba($deep_navy, 0.10);
-// --foc-new-color: white;
-// --foc-divider-line-color: rgba($deep_navy, 0.15);
-
 div.virtualized-list-separator:not(.expanded-list) {
   &+div.virtualized-list-row.collapsed-item div.stream-collapsed-item {
     border-top-left-radius: 4px;
