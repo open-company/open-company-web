@@ -303,8 +303,7 @@
               {:href (:href native-app-data)
               :target "_blank"}
               [:div.oc-menu-item.native-app
-                (:title native-app-data)
-                [:span.beta "BETA"]]])
+                (:title native-app-data)]])
           ;; Logout separator
           [:div.oc-menu-separator]
           ;; Logout
