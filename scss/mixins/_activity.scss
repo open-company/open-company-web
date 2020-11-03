@@ -218,6 +218,8 @@ $header_top_margin: 24;
     /*! autoprefixer: off */
     -webkit-box-orient: vertical;
     /* autoprefixer: on */
+  } @else {
+    white-space: nowrap;
   }
 
   color: $color;
@@ -1264,6 +1266,8 @@ $header_top_margin: 24;
     /*! autoprefixer: off */
     -webkit-box-orient: vertical;
     /* autoprefixer: on */
+  } @else {
+    white-space: nowrap;
   }
 
   color: $color;
@@ -1283,6 +1287,10 @@ $header_top_margin: 24;
     line-height: #{$line_height}px;
     color: $color;
     font-size: #{$font_size}px;
+
+    &:empty {
+      display: none!important;
+    }
   }
 
   h1, h2, mark, mark.highlight {

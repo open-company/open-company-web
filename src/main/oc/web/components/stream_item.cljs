@@ -103,7 +103,7 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? foc-menu-open]}]
+             current-user-data container-slug show-new-comments? foc-menu-open clear-cell-measure-cb]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -223,28 +223,22 @@
               (rum/portal (more-menu-comp) mobile-more-menu-el))
             (more-menu-comp)))
         [:div.activity-share-container]]
-      [:div.thumbnail-container.group
+      [:div.stream-item-content
         {:class (when show-body-thumbnail? "has-preview")}
+        [:div.stream-item-headline.ap-seen-item-headline
+          {:ref "activity-headline"
+            :data-itemuuid (:uuid activity-data)
+            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+        (stream-item-summary activity-data)
         (when show-body-thumbnail?
-          [:div.body-thumbnail-wrapper
-            {:class (:type (:body-thumbnail activity-data))}
-            [:img.body-thumbnail
-              {:data-image (:thumbnail (:body-thumbnail activity-data))
-                :src (-> activity-data
-                        :body-thumbnail
-                        :thumbnail
-                        (img/optimize-image-url (* 102 3)))}]])
-        [:div.stream-body-left.group
-          {:class (utils/class-set {:has-thumbnail (and show-body-thumbnail?
-                                                        (not (:fixed-video-id activity-data)))
-                                    :has-video (and show-body-thumbnail?
-                                                    (:fixed-video-id activity-data))
-                                    utils/hide-class true})}
-          [:div.stream-item-headline.ap-seen-item-headline
-            {:ref "activity-headline"
-              :data-itemuuid (:uuid activity-data)
-              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-          (stream-item-summary activity-data)]]
+          [:div.stream-item-preview-container
+            [:img.stream-item-preview
+             {:data-image (:thumbnail (:body-thumbnail activity-data))
+              :on-load clear-cell-measure-cb
+              :src (-> activity-data
+                       :body-thumbnail
+                       :thumbnail
+                       (img/optimize-image-url (* 102 3)))}]])]
         (if-not is-published?
           [:div.stream-item-footer.group
             [:div.stream-body-draft-edit

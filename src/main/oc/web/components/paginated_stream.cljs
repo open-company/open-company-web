@@ -1,7 +1,6 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
-            [oops.core :refer (oget oset!)]
+            [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
@@ -15,7 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.stream-reply-item :refer (replies-refresh-button stream-reply-item)]
+            [oc.web.components.stream-reply-item :refer (replies-refresh-button)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
@@ -84,6 +83,7 @@
                                :show-wrt?         show-wrt?
                                :editable-boards   editable-boards
                                :current-user-data current-user-data
+                               :clear-cell-measure-cb clear-cell-measure-cb
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open})
        :else
@@ -94,6 +94,7 @@
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
+                     :clear-cell-measure-cb clear-cell-measure-cb
                      :editable-boards    editable-boards
                      :container-slug     (:container-slug container-data)
                      :foc-board          (not (activity-utils/board? container-data))
