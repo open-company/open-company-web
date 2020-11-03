@@ -1293,6 +1293,12 @@ $header_top_margin: 24;
     }
   }
 
+  & > blockquote {
+    padding-left: 8px!important;
+    padding-right: 0!important;
+    min-height: #{$line_height}px;
+  }
+
   h1, h2, mark, mark.highlight {
     color: $color;
     @include OC_Body_Book();

@@ -12,7 +12,7 @@ div.notifications {
 
   div.notification {
     width: 320px;
-    background-color: $light_navy;
+    background-color: var(--notification-background-color);
     border-radius: 6px;
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
     margin-top: 8px;
@@ -43,43 +43,11 @@ div.notifications {
 
       div.notification-description {
         color: white;
+        @include activity-body-foc(14, 18, white, 3);
       }
 
       button.notification-dismiss-bt {
         color: white;
-      }
-    }
-
-    @include big_web() {
-      &:not(.server-error).light-theme {
-        background-color: white;
-
-        span.slack-icon {
-          background-image: cdnUrl("/img/ML/slack_normal.svg");
-        }
-
-        div.notification-title {
-          color: $light_navy;
-        }
-
-        div.notification-description {
-          color: $light_navy;
-
-          &.oc-mentions span.oc-mention[data-found="true"] {
-            color: $light_navy !important;
-          }
-        }
-
-        button.notification-button {
-          &.solid-green {
-            color: $carrot_green;
-            background-color: $feint_emerald;
-          }
-
-          &.default-link {
-            color: $light_navy;
-          }
-        }
       }
     }
 
@@ -184,7 +152,8 @@ div.notifications {
     div.notification-title {
       @include OC_Body_Bold();
       font-size: 14px;
-      color: white;
+      line-height: 18px;
+      color: var(--notification-color);
 
       &.no-description {
         @include OC_Body_Book();
@@ -221,10 +190,10 @@ div.notifications {
       @include OC_Body_Book();
       font-size: 14px;
       font-weight: normal;
-      color: white;
-      margin-top: 8px;
+      color: var(--notification-color);
+      margin-top: 4px;
       overflow-wrap: break-word;
-      @include activity-body-foc(14, 18, var(--color), 3);
+      @include activity-body-foc(14, 18, var(--notification-color), 3);
     }
 
     button.notification-button {
@@ -272,7 +241,7 @@ div.notifications {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
-        color: white;
+        color: var(--notification-color);
         background-color: transparent;
         opacity: 0.6;
       }
