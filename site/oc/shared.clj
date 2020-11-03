@@ -712,22 +712,18 @@
     "Desktop apps"]
    [:a.app-item
     {:href "/apps/mac"}
-    [:span "Mac"]
-    [:span.beta-app-label "BETA"]]
+    [:span "Mac"]]
    [:a.app-item
     {:href "/apps/win"}
-    [:span "Windows"]
-    [:span.beta-app-label "BETA"]]
+    [:span "Windows"]]
    [:div.app-items-group
     "Mobile apps"]
    [:a.app-item
     {:href "/apps/android"}
-    [:span "Android"]
-    [:span.beta-app-label "BETA"]]
+    [:span "Android"]]
    [:a.app-item
     {:href "/apps/ios"}
-    [:span "iPhone"]
-    [:span.beta-app-label "BETA"]]])
+    [:span "iPhone"]]])
 
 (defn nav
   "Static hiccup for the site header."
