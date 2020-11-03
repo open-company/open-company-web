@@ -6,11 +6,8 @@
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.images :as img]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.lib.cljs.useragent :as ua]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -21,7 +18,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]))
@@ -115,19 +111,7 @@
         current-activity-id (drv/react s :activity-uuid)
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
-        publisher (if is-published?
-                    (:publisher activity-data)
-                    (first (:author activity-data)))
         dom-node-class (str "stream-item-" (:uuid activity-data))
-        has-video (seq (:fixed-video-id activity-data))
-        uploading-video (dis/uploading-video-data (:video-id activity-data))
-        video-player-show (and (:publisher? activity-data) uploading-video)
-        video-size (when has-video
-                     (if is-mobile?
-                       {:width (win-width)
-                        :height @(::mobile-video-height s)}
-                       {:width 136
-                        :height (utils/calc-video-height 136)}))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
