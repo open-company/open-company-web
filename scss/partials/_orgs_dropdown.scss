@@ -23,7 +23,7 @@ div.orgs-dropdown {
 
         &:after {
           content: "";
-          @include svgBgColor("/img/ML/mobile_comments_chevron.svg", center, 8px 4px, var(--light-color));
+          @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
           width: 8px;
           height: 32px;
           opacity: 1;

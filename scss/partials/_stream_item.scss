@@ -791,18 +791,12 @@ div.stream-item {
             content: "";
             width: 8px;
             height: 4px;
-            background-image: cdnUrl("/img/ML/mobile_comments_chevron.svg");
-            background-size: 8px 4px;
-            background-repeat: no-repeat;
+            @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
             position: absolute;
             top: 12px;
             left: 0;
             transform: rotate(-90deg);
             display: block;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/mobile_comments_chevron@dark.svg");
-            }
           }
         }
       }
