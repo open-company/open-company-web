@@ -88,12 +88,10 @@
        [:div.pricing-apps-app-links.mac-and-windows
         [:a.mac-icon
          {:href "/apps/mac"}
-         "Mac"
-         [:span.beta-app-label "BETA"]]
+         "Mac"]
         [:a.win-icon
          {:href "/apps/windows"}
-         "Windows"
-         [:span.beta-app-label "BETA"]]]]
+         "Windows"]]]
       [:div.pricing-apps-separator]
       [:div.pricing-apps-app-block
        [:div.pricing-apps-app-header
@@ -108,8 +106,7 @@
         " & "
         [:a
          {:href "/apps/android"}
-         [:span.app-label "Android"]]
-        [:span.beta-app-label "BETA"]]]]]
+         [:span.app-label "Android"]]]]]]
 
     [:section.pricing-apps.mobile-only
      [:div.pricing-apps-block.group
@@ -119,8 +116,7 @@
        [:div.pricing-apps-app-links
         [:a
          {:href "/apps/detect"}
-         [:span.app-label "Download the app"]
-         [:span.beta-app-label "BETA"]]]
+         [:span.app-label "Download the app"]]]
        [:img.pricing-apps-mobile-screenshot
         {:src (shared/cdn "/img/ML/pricing_apps_mobile_mobile.png")
          :srcSet (str
