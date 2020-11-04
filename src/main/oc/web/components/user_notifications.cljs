@@ -1,12 +1,9 @@
 (ns oc.web.components.user-notifications
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notif-actions]
@@ -87,7 +84,7 @@
      [:div.user-notifications-tray
       {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
       [:div.user-notifications-tray-header.group
-       (when-not has-new-content
+       (when has-new-content
          [:button.mlb-reset.all-read-bt
           {:on-click #(user-actions/read-notifications)
            :data-toggle (when-not is-mobile? "tooltip")
