@@ -64,6 +64,7 @@ div.notifications {
 
         div.notification-description {
           color: $light_navy;
+          @include activity-body-preview(14, 18, $light_navy, 3);
 
           &.oc-mentions span.oc-mention[data-found="true"] {
             color: $light_navy !important;
