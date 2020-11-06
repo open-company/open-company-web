@@ -162,10 +162,7 @@ div.integrations-settings-modal {
             button.remove-slack-team-bt {
               width: 32px;
               height: 32px;
-              background-image: cdnUrl("/img/ML/remove_slack_team.svg");
-              background-size: 10px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
+              @include svgBgColor("/img/ML/remove_slack_team.svg", center, 10px 10px, var(--light-color));
               float: right;
             }
           }
