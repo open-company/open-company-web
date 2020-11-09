@@ -1,20 +1,18 @@
 (ns oc.web.actions.user
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [clojure.string :as s]
             [oc.web.api :as api]
-            [cuerdas.core :as s]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
-            [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
@@ -90,7 +88,7 @@
   (api/get-entry-point (dis/current-org-slug)
    (fn [success body]
      (entry-point-get-finished success body
-       (fn [orgs collection]
+       (fn [orgs _collection]
          (if org-slug
            (if-let [org-data (first (filter #(or (= (:slug %) org-slug)
                                                  (= (:uuid %) org-slug)) orgs))]
@@ -208,7 +206,7 @@
 (defn refresh-slack-user []
   (let [refresh-link (utils/link-for (:links (dis/auth-settings)) "refresh")]
     (api/refresh-slack-user refresh-link
-     (fn [status body success]
+     (fn [_status body success]
       (if success
         (jwt-actions/update-jwt body)
         (router/redirect! oc-urls/logout))))))
@@ -219,11 +217,11 @@
 ;; User Timezone preset
 
 (defn- patch-timezone-if-needed [user-map]
-  (when-let* [_notz (clojure.string/blank? (:timezone user-map))
+  (when-let* [_notz (s/blank? (:timezone user-map))
               user-profile-link (utils/link-for (:links user-map) "partial-update" "PATCH")
               guessed-timezone (.. moment-timezone -tz guess)]
     (api/patch-user user-profile-link {:timezone guessed-timezone}
-     (fn [status body success]
+     (fn [_status body success]
        (when success
         (dis/dispatch! [:user-data (json->cljs body)]))))))
 
@@ -278,7 +276,7 @@
 ;; Token authentication
 (defn auth-with-token-success [token-type jwt]
   (api/get-auth-settings
-   (fn [auth-body]
+   (fn [_auth-body]
      (api/get-entry-point (dis/current-org-slug)
       (fn [success body]
         (entry-point-get-finished success body)
@@ -335,7 +333,7 @@
         (api/get-entry-point current-org-slug
          (fn [success body]
            (entry-point-get-finished success body
-             (fn [orgs collection]
+             (fn [orgs _collection]
                (when (pos? (count orgs))
                  (router/nav! (oc-urls/default-landing (:slug (get-default-org orgs))))))))))
       :else ;; Valid signup let's collect user data
@@ -368,7 +366,7 @@
   (dis/dispatch! [:input [:signup-with-email] {}]))
 
 (defn pswd-collect [form-data password-reset?]
-  (let [update-link (utils/link-for (:links (:current-user-data @dis/app-state)) "partial-update" "PATCH")]
+  (let [update-link (utils/link-for (:links (dis/current-user-data)) "partial-update" "PATCH")]
     (api/collect-password update-link (:pswd form-data)
       (fn [status body success]
         (when success
@@ -428,7 +426,7 @@
    (let [user-data (clean-user-data current-user-data (or (:user-data edit-data) edit-data))
          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
      (user-profile-patch user-data user-profile-link
-      (fn [success resp status]
+      (fn [success resp _status]
         (when success
           (utils/after 100 #(jwt-actions/jwt-refresh)))
         (when (fn? save-cb)
@@ -444,7 +442,7 @@
          user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
      (dis/dispatch! [:user-profile-save])
      (user-profile-patch user-data user-profile-link
-      (fn [success resp status]
+      (fn [success _resp _status]
         (if-not success
           (notification-actions/show-notification {:title "An error occurred"
                                                    :description "Please try again"
@@ -467,7 +465,7 @@
         current-user-data (dis/current-user-data)
         user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
     (api/patch-user user-profile-link user-avatar-data
-     (fn [status body success]
+     (fn [_status body success]
        (if-not success
          (do
            (dis/dispatch! [:user-profile-avatar-update/failed])
@@ -545,7 +543,7 @@
         (api/add-expo-push-token
          add-token-link
          push-token
-         (fn [success]
+         (fn [_success]
            (dispatch-expo-push-token push-token)
            (timbre/info "Successfully saved Expo push notification token")))))))
 
@@ -557,10 +555,7 @@
 ;; Initial loading
 
 (defn initial-loading [& [force-refresh?]]
-  (let [force-refresh (or force-refresh?
-                          (dis/in-route? :org)
-                          (dis/in-route? :login))
-        latest-entry-point (if (or force-refresh?
+  (let [latest-entry-point (if (or force-refresh?
                                    (nil? (:latest-entry-point @dis/app-state)))
                              0
                              (:latest-entry-point @dis/app-state))

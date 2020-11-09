@@ -1,25 +1,20 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
-            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.ui :as ui-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
@@ -30,8 +25,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.dom :as gdom]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
 (defn- submit-on-enter [submit-cb e]
@@ -195,7 +188,7 @@
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
         teams-data @(drv/get-ref s :teams-data)]
-    (if (and (zero? (count (:name org-editing)))
+    (when (and (zero? (count (:name org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
                         (first teams-data)
@@ -224,7 +217,7 @@
                                     :position "top"
                                     :container "body"}))))
 
-(defn error-cb [s res error]
+(defn error-cb [s _res _error]
   (notification-actions/show-notification
     {:title "Image upload error"
      :description "An error occurred while processing your image. Please retry."
@@ -240,7 +233,7 @@
       (dis/dispatch! [:input [:edit-user-profile :avatar-url] url]))
     (update-tooltip s)))
 
-(defn progress-cb [res progress])
+(defn progress-cb [_res _progress])
 
 (defn upload-user-profile-picture-clicked [s]
   (iu/upload! user-utils/user-avatar-filestack-config (partial success-cb s) progress-cb (partial error-cb s)))
@@ -262,7 +255,7 @@
                               (delay-focus-field-with-ref s "first-name")
                               (update-tooltip s)
                              s)
-                             :did-remount (fn [o s]
+                             :did-remount (fn [_ s]
                               (update-tooltip s)
                               s)
                              :will-update (fn [s]
@@ -278,7 +271,7 @@
   (let [has-org? (pos? (count (drv/react s :orgs)))
         edit-user-profile (drv/react s :edit-user-profile)
         current-user-data (drv/react s :current-user-data)
-        teams-data (drv/react s :teams-data)
+        _teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         user-data (:user-data edit-user-profile)
         invalid-first-name (not (valid-first-last-name? (:first-name user-data)))
@@ -397,7 +390,7 @@
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
         teams-data @(drv/get-ref s :teams-data)]
-    (if (and (zero? (count (:name org-editing)))
+    (when (and (zero? (count (:name org-editing)))
              (zero? (count (:logo-url org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
@@ -427,7 +420,7 @@
                            (setup-team-data s)
                            s)}
   [s]
-  (let [teams-data (drv/react s :teams-data)
+  (let [_teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
         continue-disabled (-> org-editing :name clean-org-name count (< 3))
@@ -547,8 +540,6 @@
   [s]
   (let [_ (drv/react s :invite-users)
         org-data (drv/react s :org-data)
-        valid-rows (filter #(and (seq (:user %))
-                                 (not (:error %))) @(::invite-rows s))
         error-rows (filter #(and (seq (:user %))
                                  (:error %)) @(::invite-rows s))
         continue-fn (fn []
@@ -638,7 +629,6 @@
   [s]
   (let [team-invite-drv (drv/react s :team-invite)
         auth-settings (:auth-settings team-invite-drv)
-        email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
         team-data (:team auth-settings)
         signup-with-email (drv/react s user-store/signup-with-email)
         continue-fn (fn []
@@ -787,8 +777,7 @@
         continue-disabled? (<= (count (:pswd collect-pswd)) 7)
         continue-fn #(if continue-disabled?
                       (reset! (::password-error s) true)
-                      (user-actions/pswd-collect collect-pswd false))
-        is-mobile? (responsive/is-mobile-size?)]
+                      (user-actions/pswd-collect collect-pswd false))]
     [:div.onboard-container-inner.invitee-lander-password
       [:header.main-cta
        [:div.top-back-button-container]

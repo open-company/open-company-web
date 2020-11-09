@@ -1,10 +1,9 @@
 (ns oc.web.stores.activity
   (:require [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
+            [clojure.set :as clj-set]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.notification :as notif-util]
             [oc.web.utils.org :as ou]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]))
@@ -19,7 +18,7 @@
    only to posts the user publishes we can avoid all the unread and cap window related cals."
   [sort-type item]
   (update item :sort-value
-   (fn [v]
+   (fn [_]
     (let [sort-key (case sort-type
                     dispatcher/recent-activity-sort :last-activity-at
                     :bookmarked-at :bookmarked-at
@@ -49,7 +48,7 @@
                                 (conj ap-ra-without-uuid (item-from-entity activity-data))
                                 ap-ra-without-uuid))
           new-ap-rp-with-sort-value (map (partial sort-value dispatcher/recently-posted-sort) new-ap-rp-list)
-          new-ap-ra-with-sort-value (map (partial sort-value dispatcher/recent-activity-sort) new-ap-rp-list)
+          new-ap-ra-with-sort-value (map (partial sort-value dispatcher/recent-activity-sort) new-ap-ra-list)
           sorted-new-ap-rp-uuids (reverse (sort-by :sort-value new-ap-rp-with-sort-value))
           sorted-new-ap-ra-uuids (reverse (sort-by :sort-value new-ap-ra-with-sort-value))
           next-ap-rp-data (assoc old-ap-rp-data :posts-list sorted-new-ap-rp-uuids)
@@ -94,7 +93,7 @@
                              (conj ra-board-without-uuid (item-from-entity activity-data))
                              ra-board-without-uuid))
           new-rp-with-sort-value (map (partial sort-value dispatcher/recently-posted-sort) new-rp-list)
-          new-ra-with-sort-value (map (partial sort-value dispatcher/recent-activity-sort) new-rp-list)
+          new-ra-with-sort-value (map (partial sort-value dispatcher/recent-activity-sort) new-ra-list)
           sorted-new-rp-uuids (reverse (sort-by :sort-value new-rp-with-sort-value))
           sorted-new-ra-uuids (reverse (sort-by :sort-value new-ra-with-sort-value))
           change-data (dispatcher/change-data db org-slug)
@@ -315,7 +314,7 @@
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
-  [db [_ edit-key]]
+  [db [_ _edit-key]]
   (dissoc db :entry-save-on-exit))
 
 (defmethod dispatcher/action :entry-save
@@ -325,7 +324,6 @@
 (defmethod dispatcher/action :entry-save/finish
   [db [_ activity-data edit-key]]
   (let [org-slug (utils/post-org-slug activity-data)
-        org-data (dispatcher/org-data db org-slug)
         board-slug (:board-slug activity-data)
         change-data (dispatcher/change-data db org-slug)
         activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
@@ -449,7 +447,6 @@
         with-fixed-contribs (reduce
                              (fn [ndb ckey]
                                (let [contrib-data-key (dispatcher/contributions-key org-slug ckey)
-                                     contrib-posts-list-key (conj contrib-data-key :posts-list)
                                      contrib-data (get-in ndb contrib-data-key)
                                      updated-contrib-data (update contrib-data :posts-list (fn [posts-list]
                                                                                             (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
@@ -463,7 +460,6 @@
         with-fixed-boards (reduce
                            (fn [ndb ckey]
                              (let [board-data-key (dispatcher/board-data-key org-slug ckey)
-                                   posts-list-key (conj board-data-key :posts-list)
                                    board-data (get-in ndb board-data-key)
                                    updated-board-data (update board-data :posts-list (fn [posts-list]
                                                                                       (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
@@ -480,7 +476,7 @@
       (assoc-in with-fixed-boards posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
-  [db [_ activity-data org-slug board-data]]
+  [db [_ activity-data _org-slug _board-data]]
   (update db :foc-menu-open #(if (= % (:uuid activity-data)) nil %)))
 
 (defmethod dispatcher/action :activity-share-show
@@ -513,7 +509,7 @@
       (au/parse-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
       {:error true})))
 
-(defmethod dispatcher/action :entry-revert [db [_ entry]]
+(defmethod dispatcher/action :entry-revert [db [_ _entry]]
   ;; do nothing for now
   db)
 
@@ -593,9 +589,7 @@
                                     (:bookmarked-at activity-data))
                                (dec current-bookmarks-count)
                                :else
-                               current-bookmarks-count)
-        tmp (add-remove-item-from-bookmarks next-db org-slug next-activity-data)
-        bk-key (dispatcher/container-key org-slug :bookmarks)]
+                               current-bookmarks-count)]
       (-> next-db
        (add-remove-item-from-bookmarks org-slug next-activity-data)
        (assoc-in bookmarks-count-key next-bookmarks-count))))
@@ -665,7 +659,7 @@
 
 ;; Bookmarks
 
-(defn- bookmarks-get-finish [db org-slug sort-type bookmarks-data]
+(defn- bookmarks-get-finish [db org-slug _sort-type bookmarks-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -690,7 +684,7 @@
   (bookmarks-get-finish db org-slug sort-type bookmarks-data))
 
 (defmethod dispatcher/action :bookmarks-more
-  [db [_ org-slug sort-type]]
+  [db [_ org-slug _sort-type]]
   (let [container-key (dispatcher/container-key org-slug :bookmarks)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)
@@ -700,7 +694,7 @@
      (update-in bookmarks-count-key #(ou/disappearing-count-value % (:total-count next-posts-data))))))
 
 (defmethod dispatcher/action :bookmarks-more/finish
-  [db [_ org sort-type direction posts-data]]
+  [db [_ org _sort-type direction posts-data]]
   (if posts-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
@@ -726,8 +720,6 @@
 (defmethod dispatcher/action :remove-bookmark
   [db [_ org-slug entry-data]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
-        bookmarks-key (dispatcher/container-key org-slug :bookmarks)
-        bookmarks-data (get-in db bookmarks-key)
         org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
       (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (dec %)))
@@ -735,7 +727,7 @@
       (add-remove-item-from-bookmarks org-slug entry-data))))
 
 (defmethod dispatcher/action :add-bookmark
-  [db [_ org-slug activity-data]]
+  [db [_ org-slug _activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)]
     (update-in db (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (inc %)))))
 
@@ -748,8 +740,7 @@
                           (get-in old-reads-data [(:item-id %) :reads])
                           (:item-id %)]) items-count)
         new-items-count (zipmap ks vs)
-        last-read-at-map (zipmap ks (map :last-read-at items-count))
-        activities-key (dispatcher/posts-data-key org-slug)]
+        last-read-at-map (zipmap ks (map :last-read-at items-count))]
     (as-> db tdb
      (reduce (fn [tdb [activity-uuid activity-last-read-at]]
                (let [entry-data (dispatcher/entry-data org-slug activity-uuid tdb)]
@@ -777,13 +768,12 @@
                           (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)
         all-ids         (set (map :user-id filtered-users))
-        unseen-ids      (clojure.set/difference all-ids seen-ids)
+        unseen-ids      (clj-set/difference all-ids seen-ids)
         unseen-users    (vec (map (fn [user-id]
                          (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
-        last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))
-        current-posts-uuids (map :uuid (dispatcher/filtered-posts-data db))]
+        last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
     (as-> db tdb
      (assoc-in tdb (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                   :reads fixed-read-data
@@ -852,8 +842,7 @@
         next-activity-data (-> db
                             (get-in activity-key)
                             (assoc :unread true)
-                            (dissoc :last-read-at))
-        activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
+                            (dissoc :last-read-at))]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
       (assoc-in activity-key next-activity-data))))
@@ -876,8 +865,7 @@
                                                                                  (compare (:last-activity-at old-activity-data))
                                                                                  pos?))
                                                                          (-> comments-data last :created-at)
-                                                                         (:last-activity-at old-activity-data))})
-        activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
+                                                                         (:last-activity-at old-activity-data))})]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (assoc-in activity-key next-activity-data))))
@@ -934,7 +922,7 @@
 
 (defmethod dispatcher/action :inbox/dismiss
   [db [_ org-slug item-id]]
-  (if-let [activity-data (dispatcher/activity-data item-id)]
+  (if (dispatcher/activity-data item-id)
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (-> inbox-data
@@ -948,7 +936,7 @@
     db))
 
 (defmethod dispatcher/action :inbox/unread
-  [db [_ org-slug current-board-slug item-id]]
+  [db [_ org-slug _current-board-slug item-id]]
   (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           posts-list-key (conj inbox-key :posts-list)
@@ -989,9 +977,6 @@
       (assoc-in (conj org-data-key :following-inbox-count) 0))))
 
 ;; Following
-
-(defn- latest-seen-at [new-seen-at old-seen-at]
-  (if (pos? (compare new-seen-at old-seen-at)) new-seen-at old-seen-at))
 
 (defn- following-get-finish
   [db org-slug sort-type current-container-slug keep-seen-at? following-data]
@@ -1200,14 +1185,14 @@
   (assoc-in db (dispatcher/replies-badge-key org-slug) false))
 
 (defmethod dispatcher/action :container-seen
-  [db [_ org-slug container-id seen-at]]
+  [db [_ _org-slug _container-id _seen-at]]
   ; (if org-slug
   ;   (assoc-in db (dispatcher/container-seen-key org-slug container-id) seen-at)
   ;   db)
   db)
 
 (defmethod dispatcher/action :container-nav-in
-  [db [_ org-slug container-slug sort-type]]
+  [db [_ org-slug container-slug _sort-type]]
   (cond
    (= container-slug :replies)
    (assoc-in db (dispatcher/replies-badge-key org-slug) false)
@@ -1228,7 +1213,7 @@
      (au/update-container container-slug org-data change-data active-users))))
 
 (defmethod dispatcher/action :update-replies-comments
-  [db [_ org-slug current-board-slug]]
+  [db [_ org-slug _current-board-slug]]
   (let [org-data (dispatcher/org-data db org-slug)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)]

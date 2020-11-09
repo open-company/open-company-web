@@ -1,10 +1,9 @@
 (ns oc.web.actions.cmail
-  (:require [defun.core :refer (defun)]
+  (:require [clojure.string :as string]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -13,8 +12,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.routing :as routing-actions]))
+            [oc.web.lib.responsive :as responsive]))
 
 ;; Cached items
 
@@ -164,11 +162,10 @@
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-fullscreen []
-  (let [current-state (dis/cmail-state)]
-    (cmail-fullscreen-save true)
-    (utils/scroll-to-y 0 0)
-    (dom-utils/lock-page-scroll)
-    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen true :collapsed false})])))
+  (cmail-fullscreen-save true)
+  (utils/scroll-to-y 0 0)
+  (dom-utils/lock-page-scroll)
+  (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen true :collapsed false})]))
 
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (dis/cmail-state)))]
@@ -214,7 +211,7 @@
                   ;; If it's simply true open a new post with the data saved in the local DB
                   (cmail-show {} cmail-state)
                   ;; If it's composed by board-slug/activity-uuid
-                  (let [[board-slug activity-uuid] (clojure.string/split edit-activity-param #"/")
+                  (let [[board-slug activity-uuid] (string/split edit-activity-param #"/")
                         edit-activity-data (dis/activity-data activity-uuid)]
                     (if edit-activity-data
                       ;; Open the activity in edit if it's already present in the app-state
@@ -222,6 +219,6 @@
                       ;; Load it from the server if it's not
                       (when (and board-slug activity-uuid)
                         (get-entry-with-uuid board-slug activity-uuid
-                         (fn [success status]
+                         (fn [success _status]
                            (when success
                              (cmail-show (dis/activity-data activity-uuid) cmail-state)))))))))))))))

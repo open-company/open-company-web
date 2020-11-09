@@ -1,18 +1,17 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
+            [clojure.set :as clj-set]
             [defun.core :refer (defun)]
             [cljs-time.format :as time-format]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
             [oc.web.urls :as oc-urls]
-            [oc.lib.user :as user-lib]
             [oc.lib.html :as html-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.utils.poll :as pu]
             [oc.web.utils.comment :as cu]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
@@ -133,10 +132,6 @@
                         (.setMinutes 59)
                         (.setSeconds 59)
                         (.setMilliseconds 999))
-
-         last-date (-> items-list
-                       last
-                       date-time-key)
          separators-data (loop [separators []
                                 posts items-list]
                            (if (empty? posts)
@@ -405,7 +400,7 @@
      (vec items-list))))
 
 (defn get-comments-finished
-  [org-slug comments-key activity-data {:keys [status success body]}]
+  [org-slug comments-key activity-data {:keys [success body]}]
   (when success
     (dis/dispatch! [:comments-get/finish {:success success
                                           :error (when-not success body)
@@ -486,7 +481,6 @@
           delete-comment-link (utils/link-for (:links comment-map) "delete")
           can-react? (boolean (utils/link-for (:links comment-map) "react" "POST"))
           reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
-          is-root-comment (empty? (:parent-uuid comment-map))
           author? (is-author? comment-map)
           unread? (and (not author?)
                        (cu/comment-unread? comment-map (:last-read-at activity-data)))
@@ -530,53 +524,51 @@
       new-sorted-comments)))
 
 (defn for-you-context [entry-data current-user-id]
-   (let [replies-data (:replies-data entry-data)
-         unseen-comments (filter :unseen replies-data)
-         comments (if (seq unseen-comments)
-                    unseen-comments
-                    replies-data)
-         last-comment (last comments)
-         old-context (:for-you-context entry-data)]
-     (if (= (:timestamp old-context) (:created-at last-comment))
-       old-context
-       (let [user-name #(if (:self? %)
-                          "you"
-                          (or (:pointed-name %) (:first-name %) (:name %)))
-             authors-list (->> comments
-                               (map :author)
-                               (group-by :user-id)
-                               vals
-                               (map first)
-                               (sort-by (juxt :self? :created-at))
-                               (reverse))
-             commenters (->> authors-list
-                             (map user-name)
-                             (remove s/blank?))
-             mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
-             mention? (and (not (:self? (:author last-comment)))
-                           (.match (:body last-comment) mention-regexp))
-             commenters-count (count commenters)
-             subject (cond
-                       mention?               (user-name (:author last-comment))
-                       (= 0 commenters-count) ""
-                       (= 1 commenters-count) (first commenters)
-                       (= 2 commenters-count) (str (first commenters) " and " (second commenters))
-                       (= 3 commenters-count) (str (first commenters) ", " (second commenters) " + 1 other")
-                       :else                  (str (first commenters) ", " (second commenters) " + " (- (count commenters) 2) " others"))
-             multiple-comments? (> (count comments) 1)
-             verb (if mention?
-                    " mentioned you"
-                    " replied")]
-         {:label (s/capital (str subject verb))
-          :authors authors-list
-          :timestamp (:created-at last-comment)}))))
+  (js/console.log "DBG for-your-context entry-data" entry-data "current-user-id" current-user-id)
+  (let [replies-data (:replies-data entry-data)
+        unseen-comments (filter :unseen replies-data)
+        comments (if (seq unseen-comments)
+                   unseen-comments
+                   replies-data)
+        last-comment (last comments)
+        old-context (:for-you-context entry-data)]
+    (if (= (:timestamp old-context) (:created-at last-comment))
+      old-context
+      (let [user-name #(if (:self? %)
+                         "you"
+                         (or (:pointed-name %) (:first-name %) (:name %)))
+            authors-list (->> comments
+                              (map :author)
+                              (group-by :user-id)
+                              vals
+                              (map first)
+                              (sort-by (juxt :self? :created-at))
+                              (reverse))
+            commenters (->> authors-list
+                            (map user-name)
+                            (remove s/blank?))
+            _ (js/console.log "DBG for-you-context body:" (:body last-comment) (type (:body last-comment)))
+            mention? (and (not (:self? (:author last-comment)))
+                          (re-matches (re-pattern (str "data-user-id=\"" current-user-id "\"")) (:body last-comment)))
+            commenters-count (count commenters)
+            subject (cond
+                      mention?               (user-name (:author last-comment))
+                      (= 0 commenters-count) ""
+                      (= 1 commenters-count) (first commenters)
+                      (= 2 commenters-count) (str (first commenters) " and " (second commenters))
+                      (= 3 commenters-count) (str (first commenters) ", " (second commenters) " + 1 other")
+                      :else                  (str (first commenters) ", " (second commenters) " + " (- (count commenters) 2) " others"))
+            verb (if mention?
+                   " mentioned you"
+                   " replied")]
+        {:label (s/capital (str subject verb))
+         :authors authors-list
+         :timestamp (:created-at last-comment)}))))
 
 (defn entry-replies-data [entry-data org-data fixed-items container-seen-at]
   (let [comments (dis/activity-sorted-comments-data (:uuid entry-data))
         full-entry (get fixed-items (:uuid entry-data))
         comments-count (:count (utils/link-for (:links full-entry) "comments"))
-        fallback-to-inline? (and (pos? comments-count)
-                                 (empty? comments))
         temp-comments (if (seq comments) comments (:comments full-entry))
         comments-loaded? (boolean (or (zero? comments-count) (seq comments)))
         ;; Let's force a collapse recalc if user didn't expand the replies yet
@@ -618,7 +610,6 @@
                                (or (:board-access entry-data) (:access board-data))
                                "private")
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
-          is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
           fixed-publisher (when published?
                             (get active-users (-> entry-data :publisher :user-id)))
@@ -838,7 +829,7 @@
   ([container-data change-data org-data active-users sort-type]
    (parse-container container-data change-data org-data active-users sort-type nil))
 
-  ([container-data change-data org-data active-users sort-type {:keys [direction load-comments?] :as options}]
+  ([container-data change-data org-data active-users sort-type {:keys [direction]}]
     (when container-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -913,7 +904,7 @@
   [item-ids activities-read-data]
   (let [all-items (set (keys activities-read-data))
         request-set (set item-ids)
-        diff-ids (clojure.set/difference request-set all-items)]
+        diff-ids (clj-set/difference request-set all-items)]
     (vec diff-ids)))
 
 ;; Last used section

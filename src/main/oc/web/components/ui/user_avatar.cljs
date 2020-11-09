@@ -1,5 +1,4 @@
 (ns oc.web.components.ui.user-avatar
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -39,8 +38,7 @@
                          rum/reactive
                          (drv/drv :current-user-data)
   [s {:keys [click-cb]}]
-  (let [is-mobile? (responsive/is-mobile-size?)
-        user-data (drv/react s :current-user-data)]
+  (let [user-data (drv/react s :current-user-data)]
     [:button.mlb-reset.user-avatar-button.group
       {:type "button"
        :on-click #(when (fn? click-cb) (click-cb))

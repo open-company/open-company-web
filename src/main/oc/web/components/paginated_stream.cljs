@@ -1,6 +1,7 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
             [oops.core :refer (oget)]
+            [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
@@ -61,11 +62,13 @@
         show-wrt? member?
         show-new-comments? replies?
         collapsed-item? replies?]
-   [:div.virtualized-list-row
+    (js/console.log "DBG wrapped-stream-item" item)
+    [:div.virtualized-list-row
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
                                :close-item (:close-item item)
                                :foc-menu-open foc-menu-open})}
+     (js/console.log "DBG   collapsed-item?" collapsed-item?)
      (cond
       ;;  (= (:container-slug container-data) :replies)
       ;;  (stream-reply-item {:reply-data            item
@@ -87,7 +90,7 @@
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open})
        :else
-       (stream-item {:activity-data item
+       (stream-item {:activity-data      item
                      :read-data          read-data
                      :show-wrt?          show-wrt?
                      :foc-menu-open      foc-menu-open
@@ -136,7 +139,7 @@
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
-  (let [{:keys [registerChild measure] :as clj-props} (js->clj props :keywordize-keys true)
+  (let [{:keys [registerChild]} (js->clj props :keywordize-keys true)
         item (get items rowIndex)
         entry? (activity-utils/entry? item)
         read-data (when entry?
@@ -147,7 +150,7 @@
                                                             (cond replies?
                                                                   (str (:uuid item) "-" (:last-activity-at item) "-" (count (:replies-data item)))
                                                                   :else
-                                                                  (clojure.string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
+                                                                  (string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
                                                             (str (:uuid item)
                                                                  (:sort-value item)
                                                                  (:last-activity-at item))))
@@ -204,10 +207,8 @@
 
 (defn- clear-changed-cells-cache [s next-row-keys]
   (let [props (-> s :rum/args first)
-        container-data (:container-data props)
         items (:items props)
-        resource-types (::row-keys s)
-        cache @(::cache s)]
+        resource-types (::row-keys s)]
     (doseq [idx (range (count items))
             :let [old-resource-type (get @resource-types idx)
                   new-resource-type (get next-row-keys idx)]
@@ -255,15 +256,15 @@
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         key-prefix (if is-mobile? "mobile" foc-layout)
         cell-measurer-renderer (fn [{:keys [cache]} props]
-                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
-                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
-                                     (cell-measurer (clj->js {:cache cache
-                                                              :columnIndex columnIndex
-                                                              :rowIndex rowIndex
-                                                              :index rowIndex
-                                                              :key key
-                                                              :parent parent})
-                                      (partial list-item derived-props row-props)))))
+                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)
+                                       derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
+                                    (cell-measurer (clj->js {:cache cache
+                                                            :columnIndex columnIndex
+                                                            :rowIndex rowIndex
+                                                            :index rowIndex
+                                                            :key key
+                                                            :parent parent})
+                                    (partial list-item derived-props row-props))))
         width (if is-mobile?
                 js/window.innerWidth
                 620)
@@ -299,7 +300,7 @@
   "Scroll listener, load more activities when the scroll is close to a margin."
   ([s] (did-scroll s (responsive/is-mobile-size?) nil))
   ([s mobile?] (did-scroll s mobile? nil))
-  ([s mobile? e]
+  ([s _mobile? _e]
   (let [scroll-top (or (oget js/document "scrollingElement.?scrollTop") (oget js/window "pageYOffset"))
         direction (if (> @last-scroll-top scroll-top)
                     :up
@@ -308,7 +309,6 @@
                       :stale))
         win-height (dom-utils/viewport-height)
         max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) win-height)
-        is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
 
         ;; Calculate the Point of No Return based on the card height
         ; card-height (calc-card-height is-mobile? @(drv/get-ref s :foc-layout))
@@ -319,7 +319,7 @@
         ;; Let's use the viewport height as point of no return
         pnr (- max-scroll win-height)
         current-board-slug @(drv/get-ref s :board-slug)
-        current-contributions-id @(drv/get-ref s :contributions-id)
+        _current-contributions-id @(drv/get-ref s :contributions-id)
         current-contributions-id @(drv/get-ref s :contributions-id)
         board-kw (keyword current-board-slug)]
     ;; scrolling down
@@ -420,10 +420,7 @@
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
-        add-comment-force-update (drv/react s :add-comment-force-update)
-        viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
-        member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)]
     [:div.paginated-stream.group

@@ -1,6 +1,5 @@
 (ns oc.web.components.ui.section-editor
   (:require [rum.core :as rum]
-            [goog.object :as gobj]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
@@ -133,7 +132,7 @@
                               (section-for-editing initial-section-data))]
      (reset! (::editing-existing-section? s) (not new-section?))
      (when (string? (:name fixed-section-data))
-       (reset! (::section-name s) (clojure.string/trim
+       (reset! (::section-name s) (string/trim
         (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
      (dis/dispatch! [:input [:section-editing] fixed-section-data])
      (reset! (::slack-enabled s)
@@ -228,7 +227,7 @@
                             (when (and (not disable-bt)
                                       (compare-and-set! (::saving s) false true))
                               (let [section-node (rum/ref-node s "section-name")
-                                    section-name (clojure.string/trim (.-value section-node))
+                                    section-name (string/trim (.-value section-node))
                                     personal-note-node (rum/ref-node s "personal-note")
                                     personal-note (when personal-note-node (.-innerText personal-note-node))
                                     success-cb #(when (fn? on-change)

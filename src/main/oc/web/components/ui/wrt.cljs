@@ -8,10 +8,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
             [oc.web.utils.theme :as theme-utils]
-            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -67,7 +65,7 @@
     (swap! (::sending-notice s) merge (zipmap (keys wrt-share) (repeat (count wrt-share) :loading)))
     (reset! (::show-remind-all-bt s) false)
     (activity-actions/activity-share activity-data (vals wrt-share)
-     (fn [{:keys [success body]}]
+     (fn [{:keys [success]}]
        (reset! (::show-remind-all-bt s) true)
        (if success
          (let [noticed-users (apply merge
@@ -151,14 +149,10 @@
                                         (if is-author?
                                           (filter #(not= (:user-id %) (:user-id current-user-data)) reads)
                                           reads))))
-        item-id (:uuid activity-data)
         seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
-        seen-ids (set (map :user-id seen-users))
         unseen-users (vec (sort-by user-lib/name-for (:unreads read-data)))
         all-users (sort-by user-lib/name-for (concat seen-users unseen-users))
-        read-count (:count read-data)
         query (::query s)
-        lower-query (string/lower @query)
         list-view (::list-view s)
         filtered-users (case @list-view
                          :all (filterv #(filter-by-query % (string/lower (or @query ""))) all-users)
@@ -288,8 +282,7 @@
             [:div.wrt-popup-list
               (for [u sorted-filtered-users
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
-                          is-self-user?       (= (:user-id current-user-data) (:user-id u))
-                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
+                          is-self-user?       (= (:user-id current-user-data) (:user-id u))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
@@ -320,12 +313,6 @@
                                                 :users-list [u]
                                                 :slack-bot-data slack-bot-data})}
                       "Remind"])])]])]]))
-
-(defn- under-middle-screen? [el]
-  (let [el-offset-top (aget (.offset (js/$ el)) "top")
-        fixed-top-position (- el-offset-top (.-scrollTop (.-scrollingElement js/document)))
-        win-height (.-innerHeight js/window)]
-    (>= fixed-top-position (/ win-height 2))))
 
 (rum/defc wrt-count < rum/static
   [{:keys [activity-data read-data]}]

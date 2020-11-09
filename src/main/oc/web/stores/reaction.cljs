@@ -16,7 +16,7 @@
   (keyword (str "comment-" uuid)))
 
 ;; Reducers used to watch for reaction dispatch data
-(defmulti reducer (fn [db [action-type & _]]
+(defmulti reducer (fn [_db [action-type & _]]
                     (when-not (some #{action-type} [:update :input])
                       (timbre/debug "Dispatching reaction reducer:" action-type))
                     action-type))
@@ -30,8 +30,7 @@
 ;; Handle dispatch events
 (defn handle-reaction-to-entry-finish
   [db activity-data reaction reaction-data activity-key]
-  (let [activity-uuid (:uuid activity-data)
-        next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)]
+  (let [next-reactions-loading (utils/vec-dissoc (:reactions-loading activity-data) reaction)]
     (if (nil? reaction-data)
       (let [updated-activity-data (assoc activity-data :reactions-loading next-reactions-loading)]
         (assoc-in db activity-key updated-activity-data))
@@ -58,7 +57,7 @@
   (handle-reaction-to-entry-finish db activity-data (:reaction reaction-data) {(keyword (:reaction reaction-data)) reaction-data} activity-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
-  [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]
+  [db [_ {:keys [status activity-data _reaction reaction-data activity-key]}]]
   (if (and (>= status 200)
            (< status 300))
     (let [reaction-key (first (keys reaction-data))

@@ -121,14 +121,14 @@
                   (update-in db active-user-key merge fixed-user-data)
                   db)]
     (-> next-db
-     (assoc :current-user-data fixed-user-data)
+     (assoc (first dispatcher/current-user-key) fixed-user-data)
      (update :edit-user-profile #(editable-user-data (if force-edit-reset? nil %) fixed-user-data))
      (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
      (dissoc :edit-user-profile-failed)))))
 
 (defmethod dispatcher/action :user-profile-avatar-update/failed
   [db [_]]
-  (assoc db :edit-user-profile-avatar (:avatar-url (:current-user-data db))))
+  (assoc db :edit-user-profile-avatar (:avatar-url (dispatcher/current-user-data db))))
 
 (defmethod dispatcher/action :user-data
   [db [_ user-data]]
@@ -220,7 +220,7 @@
 
 (defmethod dispatcher/action :user-profile-reset
   [db [_]]
-  (update-user-data db (:current-user-data db) true))
+  (update-user-data db (get-in db dispatcher/current-user-key) true))
 
 (defmethod dispatcher/action :user-profile-save
   [db [_]]

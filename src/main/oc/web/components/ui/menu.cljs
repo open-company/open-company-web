@@ -2,12 +2,8 @@
   (:require [rum.core :as rum]
             ["hammerjs" :as Hammer]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel sel1)]
-            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.chat :as chat]
-            [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -17,61 +13,60 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn menu-close [& [s]]
+(defn menu-close []
   (nav-actions/menu-close))
 
-(defn logout-click [s e]
+(defn logout-click [e]
   (.preventDefault e)
-  (menu-close s)
+  (menu-close)
   (jwt-actions/logout))
 
-(defn profile-edit-click [s e]
+(defn profile-edit-click [e]
   (.preventDefault e)
   ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
   (nav-actions/show-user-settings :profile))
 
-(defn my-profile [s cur-user-id e]
+(defn my-profile [cur-user-id e]
   (.preventDefault e)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
-(defn my-posts-click [s cur-user-id e]
+(defn my-posts-click [cur-user-id e]
   (.preventDefault e)
-  (menu-close s)
+  (menu-close)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
-(defn notifications-settings-click [s e]
+(defn notifications-settings-click [e]
   (.preventDefault e)
   (nav-actions/show-user-settings :notifications))
 
-(defn team-settings-click [s e]
+(defn team-settings-click [e]
   (.preventDefault e)
   (nav-actions/show-org-settings :org))
 
-(defn manage-team-click [s e]
+(defn manage-team-click [e]
   (.preventDefault e)
   (nav-actions/show-org-settings :team))
 
-(defn invite-team-click [s e]
+(defn invite-team-click [e]
   (.preventDefault e)
   (nav-actions/show-org-settings :invite-picker))
 
-(defn integrations-click [s e]
+(defn integrations-click [e]
   (.preventDefault e)
   (nav-actions/show-org-settings :integrations))
 
-(defn sign-in-sign-up-click [s e]
-  (menu-close s)
+(defn sign-in-sign-up-click [e]
+  (menu-close)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
-(defn whats-new-click [s e]
+(defn whats-new-click [e]
   (.preventDefault e)
   (whats-new/show))
 
-(defn reminders-click [s e]
+(defn reminders-click [e]
   (.preventDefault e)
   (nav-actions/show-reminders))
 
@@ -91,7 +86,7 @@
                    :href ls/android-app-url}
       ua/ios?     {:title "Download iOS app"
                    :href ls/ios-app-url}
-      :default nil)))
+      :else nil)))
 
 (def client-version "3.0")
 
@@ -101,7 +96,7 @@
     (.getElectronAppVersion js/OCCarrotDesktop)
     client-version))
 
-(defn- theme-settings-click [s e]
+(defn- theme-settings-click [e]
   (.preventDefault e)
   (nav-actions/show-theme-settings))
 
@@ -133,7 +128,7 @@
      (whats-new/check-whats-new-badge))
     s)}
   [s]
-  (let [{:keys [panel-stack org-data board-data current-org-slug]} (drv/react s :navbar-data)
+  (let [{:keys [panel-stack org-data current-org-slug]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         show-reminders? (when ls/reminders-enabled?
@@ -159,15 +154,15 @@
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
-                    (menu-close s))}
+                    (menu-close))}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(menu-close s)}]
+        {:on-click menu-close}]
       [:div.menu-container-outer
         {:ref :menu-container}
         [:div.menu-container
           [:div.menu-header.group
             [:button.mlb-reset.mobile-close-bt
-              {:on-click #(menu-close s)}]
+              {:on-click menu-close}]
             (when is-mobile?
               (user-avatar-image current-user-data))
             [:div.user-name
@@ -222,7 +217,7 @@
                     (not is-mobile?))
             [:a
               {:href "#"
-              :on-click #(reminders-click s %)}
+              :on-click reminders-click}
               [:div.oc-menu-item.reminders
                 "Recurring updates"]])
           ;; Settings separator
@@ -236,14 +231,14 @@
                     current-org-slug)
             [:a
               {:href "#"
-              :on-click #(team-settings-click s %)}
+              :on-click team-settings-click}
               [:div.oc-menu-item.digest-settings
                 "Admin settings"]])
           ;; Invite
           (when show-invite-people?
             [:a
               {:href "#"
-              :on-click #(invite-team-click s %)}
+              :on-click invite-team-click}
               [:div.oc-menu-item.invite-team
                 "Invite people"]])
           ;; Manage team
@@ -251,7 +246,7 @@
                     current-org-slug)
             [:a
               {:href "#"
-              :on-click #(manage-team-click s %)}
+              :on-click manage-team-click}
               [:div.oc-menu-item.manage-team
                 (if (= (:role current-user-data) :admin)
                   "Manage team"
@@ -262,7 +257,7 @@
                     (= (:role current-user-data) :admin))
             [:a
               {:href "#"
-              :on-click #(integrations-click s %)}
+              :on-click integrations-click}
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
           ;; Billing

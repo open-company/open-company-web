@@ -1,28 +1,18 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
-            [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
-            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.user :as user-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
-            [oc.web.components.ui.menu :as menu]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
@@ -69,18 +59,11 @@
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
-        change-data (drv/react s :change-data)
         org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
         show-invite-box (drv/react s :show-invite-box)
-        filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
-                                                 (and (not (s/starts-with? container-uuid drafts-board-prefix))
-                                                      (not (= container-uuid (:uuid org-data)))))
-                                              change-data))
-        left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
@@ -92,9 +75,6 @@
                            (not is-drafts-board)))
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
         is-contributions (seq current-contributions-id)
-        is-self-profile? (and is-contributions
-                              (= current-contributions-id (:user-id current-user-data)))
-        create-link (utils/link-for (:links org-data) "create")
         ; show-boards (or create-link (pos? (count boards)))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -110,7 +90,6 @@
                          is-contributions)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
-        all-unread-items (mapcat :unread (vals filtered-change-data))
         following-badge (drv/react s :following-badge)
         replies-badge (drv/react s :replies-badge)
         ; show-you (and user-is-part-of-the-team?
@@ -120,7 +99,7 @@
                                  is-admin-or-author?
                                  show-invite-box)
         show-topics user-is-part-of-the-team?
-        show-add-post-tooltip (drv/react s :show-add-post-tooltip)
+        _show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
         show-plus-button? (:can-compose? org-data)]
     [:div.left-navigation-sidebar.group
@@ -187,21 +166,20 @@
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile
-          (let [contrib-user-id (if is-contributions current-contributions-id (:user-id current-user-data))]
-            [:div.left-navigation-sidebar-top
-              {:class (when (and (or show-following show-topics)
-                                 (not show-replies))
-                        "top-border")}
-              [:a.nav-link.profile.hover-item.group
-                {:class (utils/class-set {:item-selected is-contributions})
-                 :href (oc-urls/contributions (:user-id current-user-data))
-                 :on-click (fn [e]
-                             (utils/event-stop e)
-                             (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
-                [:div.nav-link-icon]
-                [:div.nav-link-label
-                  ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                  "Profile"]]]))
+          [:div.left-navigation-sidebar-top
+            {:class (when (and (or show-following show-topics)
+                                (not show-replies))
+                      "top-border")}
+            [:a.nav-link.profile.hover-item.group
+              {:class (utils/class-set {:item-selected is-contributions})
+                :href (oc-urls/contributions (:user-id current-user-data))
+                :on-click (fn [e]
+                            (utils/event-stop e)
+                            (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
+              [:div.nav-link-icon]
+              [:div.nav-link-label
+                ; {:class (utils/class-set {:new (seq all-unread-items)})}
+                "Profile"]]])
         ;; You
         ; (when show-you
         ;   [:div.left-navigation-sidebar-top.top-border

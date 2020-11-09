@@ -4,7 +4,7 @@
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
-            [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.user-cache :as uc]
             [oc.web.utils.drafts :as du]
             [oc.lib.cljs.useragent :as ua]))
 
@@ -172,6 +172,8 @@
 (defn activity-sorted-comments-key [org-slug activity-uuid]
   (vec (concat (comments-key org-slug) [activity-uuid sorted-comments-key])))
 
+(def current-user-key [:current-user-data])
+
 (def teams-data-key [:teams-data :teams])
 
 (defn team-data-key [team-id]
@@ -278,8 +280,7 @@
 ;; Boards helpers
 
 (defn get-posts-for-board [posts-data board-slug]
-  (let [posts-list (vals posts-data)
-        filter-fn (if (= board-slug du/default-drafts-board-slug)
+  (let [filter-fn (if (= board-slug du/default-drafts-board-slug)
                     #(not= (:status %) "published")
                     #(and (= (:board-slug %) board-slug)
                           (= (:status %) "published")))]
@@ -398,7 +399,7 @@
                                      (:id-token base)
                                      (current-secure-activity-id base))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
-                              (:current-user-data base)))]
+                              (get-in base current-user-key)))]
    :payments        [[:base :org-slug] (fn [base org-slug] (get-in base (payments-key org-slug)))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
@@ -430,14 +431,14 @@
                               (get-in base (team-roster-key (:team-id org-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
-                          (fn [base team-data current-user-data team-roster invite-users]
+                          (fn [_base team-data current-user-data team-roster invite-users]
                             {:team-data team-data
                              :invite-users invite-users
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
                         [[:base :query-params :org-data :team-data :auth-settings]
-                          (fn [base query-params org-data team-data]
+                          (fn [base query-params _org-data team-data]
                             {:um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
@@ -468,7 +469,7 @@
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
    :container-data      [[:base :org-slug :board-slug :contributions-id :activity-uuid :sort-type]
-                         (fn [base org-slug board-slug contributions-id activity-uuid sort-type]
+                         (fn [base org-slug board-slug contributions-id _activity-uuid sort-type]
                            (when (and org-slug
                                       (or board-slug
                                           contributions-id))
@@ -481,14 +482,14 @@
                                                  (board-data-key org-slug board-slug))]
                                (get-in base cnt-key))))]
    :contributions-data    [[:base :org-slug :contributions-id]
-                         (fn [base org-slug contributions-id]
+                         (fn [_base org-slug contributions-id]
                            (when (and org-slug contributions-id)
                              (contributions-data org-slug contributions-id)))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
    :contributions-user-data [[:base :active-users :contributions-id]
-                             (fn [base active-users contributions-id]
+                             (fn [_base active-users contributions-id]
                               (when (and active-users contributions-id)
                                 (get active-users contributions-id)))]
    :activity-data       [[:base :org-slug :activity-uuid]
@@ -551,7 +552,7 @@
                                :token (:token (:query-params route))
                                :jwt jwt})]
    :team-invite           [[:base :route :auth-settings :jwt]
-                            (fn [base route auth-settings jwt]
+                            (fn [_base route auth-settings jwt]
                               {:auth-settings auth-settings
                                :invite-token (:invite-token (:query-params route))
                                :jwt jwt})]
@@ -608,17 +609,17 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :user-info-data        [[:base :active-users :panel-stack]
-                            (fn [base active-users panel-stack]
+                            (fn [_base active-users panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
-                            :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data :current-user-data
+   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data
+                            :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
-                            (fn [base orgs org-data contributions-data container-data posts-data activity-data
-                                 entry-editing jwt wrt-show loading payments search-active user-info-data current-user-data
+                            (fn [base orgs org-data contributions-data container-data posts-data
+                                 entry-editing jwt loading payments search-active user-info-data current-user-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
@@ -684,20 +685,60 @@
 
 ;; Action Loop =================================================================
 
-(defmulti action (fn [db [action-type & _]]
+(defmulti action (fn [_db [action-type & _]]
                    (when (and (not= action-type :input)
                               (not= action-type :update)
                               (not= action-type :entry-toggle-save-on-exit))
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
+(defmethod action :set-cached-app-state
+  [db [_ app-state]]
+  (let [x (as-> db tdb
+            (merge tdb app-state)
+            (dissoc tdb :loading))]
+    (js/console.log "DBG set-cached-app-state from" db)
+    (js/console.log "DBG    to" x)
+    x))
+
 (def actions (flux/dispatcher))
+
+(declare app-state-for-cache)
+
+(def db-cache-key "db-cache")
+
+(defn async-cache-app-state [action]
+  (when (get-in @app-state current-user-key)
+    (js/setTimeout (fn []
+                      ;; If actions is one of the following cache the app state
+                     (when (#{:jwt
+                              :auth-settings
+                              :entry-point
+                              :user-data
+                              :org-loaded
+                              :following-get/finish
+                              :bookmarks-get/finish
+                              :all-posts-get/finish
+                              :inbox-get/finish
+                              :section-get/finish
+                              :activity-get/finish
+                              :replies-get/finish
+                              :comments-get/finish} action)
+                       (js/console.log "DBG   saving trigger:" action)
+                       (uc/set-item db-cache-key
+                                    (app-state-for-cache)
+                                    (fn [err]
+                                      (if err
+                                        (js/console.log "DBG   err" err)
+                                        (js/console.log "DBG   saved!"))))))
+                   250)))
 
 (def actions-dispatch
   (flux/register
    actions
    (fn [payload]
      ;; (prn payload) ; debug :)
+     (async-cache-app-state (first payload))
      (swap! app-state action payload))))
 
 (defn dispatch! [payload]
@@ -816,7 +857,7 @@
 (defn current-user-data
   "Get the current logged in user info."
   ([] (current-user-data @app-state))
-  ([data] (get-in data [:current-user-data])))
+  ([data] (get-in data current-user-key)))
 
 (defn ^:export orgs-data
   ([] (orgs-data @app-state))
@@ -1011,7 +1052,7 @@
   ([data org-slug]
     (items-to-render-data data org-slug (current-board-slug data) (current-sort-type data)))
   ([data org-slug board-slug]
-    (items-to-render-data data org-slug (current-board-slug data) (current-sort-type data)))
+    (items-to-render-data data org-slug board-slug (current-sort-type data)))
   ([data org-slug board-slug sort-type]
     (let [posts-data (get-in data (posts-data-key org-slug))]
      (get-container-posts data posts-data org-slug board-slug sort-type :items-to-render)))
@@ -1218,7 +1259,7 @@
 
 (defn org-seens-data
   ([] (org-seens-data @app-state (current-org-slug)))
-  ([org-slug] (org-seens-data @app-state (current-org-slug)))
+  ([org-slug] (org-seens-data @app-state org-slug))
   ([data org-slug] (get-in data (org-seens-key org-slug))))
 
 ; (defn container-seen-data
@@ -1388,3 +1429,43 @@
                                     :map cljs.core.map
                                     :clj__GT_js cljs.core.clj__GT_js
                                     :js__GT_clj cljs.core.js__GT_clj})
+
+
+
+;; ----- Cache org
+
+(defn app-state-for-cache
+  "Return a subset of the app-state map with only values worth saving.
+   Keys:
+    - auth-settings-key
+    - latest-auth-settings
+    - latest-entry-point
+    - api-entry-point-key
+    - orgs-key
+    - org-key
+   "
+  []
+  (js/console.log "DBG app-state-for-cache")
+  (let [db @app-state
+        org (current-org-slug)
+        cur-org-key (org-key org)
+        cache-db (select-keys db [:jwt
+                                  (first auth-settings-key)
+                                  (first api-entry-point-key)
+                                  (first current-user-key)
+                                  orgs-key
+                                  (first cur-org-key)
+                                  :latest-auth-settings
+                                  :latest-entry-point])
+        cleaned-cache-db (update-in cache-db cur-org-key dissoc (last (user-notifications-key org)))]
+    (js/console.log "DBG   cache-db:" cleaned-cache-db)
+    cleaned-cache-db))
+
+(defn set-app-state-from-cache! []
+  (js/console.log "DBG set-app-state-from-cache! cache-key:" db-cache-key)
+  (uc/get-item db-cache-key
+               (fn [cached-app-state error]
+                 (js/console.log "DBG   get-item error:" error)
+                 (js/console.log "DBG   get-item cached-app-state" cached-app-state)
+                 (when cached-app-state
+                   (dispatch! [:set-cached-app-state cached-app-state])))))

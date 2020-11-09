@@ -1,13 +1,9 @@
 (ns oc.web.stores.comment
-  (:require [taoensso.timbre :as timbre]
-            [defun.core :refer (defun)]
-            [cuerdas.core :as string]
+  (:require [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
-            [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :add-comment/reply
@@ -35,8 +31,7 @@
 (defmethod dispatcher/action :add-comment-reset
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid]]
   (let [add-comment-key (dispatcher/add-comment-key org-slug)
-        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)
-        add-comment-activity-key (dispatcher/add-comment-activity-key org-slug comment-key)]
+        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)]
     (-> db
       ;; Lose the cached body
       (update-in add-comment-key dissoc comment-key)
@@ -52,14 +47,13 @@
   (update db :add-comment-focus #(if (= focus-uuid %) nil %)))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]
+  [db [_ org-slug activity-data comment-data comments-key]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         new-comment-data (au/parse-comment (dispatcher/org-data db org-slug) activity-data comment-data)
         all-comments (concat comments-data [new-comment-data])
-        sorted-comments (cu/sort-comments all-comments)
-        current-user-id (jwt/user-id)]
+        sorted-comments (cu/sort-comments all-comments)]
     (-> db
      (assoc-in sorted-comments-key sorted-comments)
      ;; Reset new comments count
@@ -84,11 +78,11 @@
     (assoc-in db sorted-comments-key sorted-all-comments)))
 
 (defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [activity-data body]}]]
+  [db [_ _resp]]
   (assoc db :comment-add-finish true))
 
 (defmethod dispatcher/action :comment-add/failed
-  [db [_ activity-data comment-data comments-key]]
+  [db [_ _activity-data comment-data comments-key]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         all-comments (cu/ungroup-comments (get-in db sorted-comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
@@ -96,7 +90,7 @@
     (assoc-in db sorted-comments-key sorted-filtered-comments)))
 
 (defmethod dispatcher/action :comment-save/failed
-  [db [_ activity-data comment-data comments-key]]
+  [db [_ _activity-data comment-data comments-key]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         all-comments (cu/ungroup-comments  (get-in db sorted-comments-key))
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
@@ -104,11 +98,11 @@
     (assoc-in db sorted-comments-key sorted-filtered-comments)))
 
 (defmethod dispatcher/action :comments-get
-  [db [_ comments-key activity-data]]
+  [db [_ comments-key _activity-data]]
   (assoc-in db (vec (conj comments-key :loading)) true))
 
 (defmethod dispatcher/action :comments-get/finish
-  [db [_ {:keys [success error comments-key body secure-activity-uuid activity-uuid]}]]
+  [db [_ {:keys [success _error comments-key body secure-activity-uuid activity-uuid]}]]
   (if success
     (let [org-data (dispatcher/org-data db)
           activity-data (if secure-activity-uuid
@@ -123,7 +117,7 @@
     (assoc-in db (vec (conj comments-key :loading)) false)))
 
 (defmethod dispatcher/action :comment-delete
-  [db [_ activity-uuid comment-data comments-key]]
+  [db [_ _activity-uuid comment-data comments-key]]
   (let [item-uuid (:uuid comment-data)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
@@ -134,7 +128,7 @@
     (assoc-in db sorted-comments-key sorted-comments)))
 
 (defmethod dispatcher/action :comment-reaction-toggle
-  [db [_ comments-key activity-uuid comment-uuid reaction-data reacting?]]
+  [db [_ comments-key _activity-uuid comment-uuid reaction-data _reacting?]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         comment-data (some #(when (= comment-uuid (:uuid %)) %) comments-data)]
@@ -163,7 +157,7 @@
       db)))
 
 (defmethod dispatcher/action :comment-react-from-picker
-  [db [_ comments-key activity-uuid comment-uuid reaction]]
+  [db [_ comments-key _activity-uuid comment-uuid reaction]]
   (let [sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
         comment-data (some #(when (= (:uuid %) comment-uuid) %) comments-data)]
@@ -200,7 +194,7 @@
       db)))
 
 (defmethod dispatcher/action :comment-save
-  [db [_ org-slug comments-key updated-comment-map*]]
+  [db [_ _org-slug comments-key updated-comment-map*]]
   (let [updated-comment-map (dissoc updated-comment-map* :thread-children)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         all-comments (cu/ungroup-comments (get-in db sorted-comments-key))
@@ -210,10 +204,7 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-update
   [db [_ comments-key interaction-data]]
-  (let [activity-uuid (:resource-uuid interaction-data)
-        org-data (dispatcher/org-data db)
-        activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
-        ws-comment-data (:interaction interaction-data)
+  (let [ws-comment-data (:interaction interaction-data)
         item-uuid (:uuid ws-comment-data)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
@@ -295,8 +286,6 @@
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
           all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
           replies-badge-key (dispatcher/replies-badge-key org-slug)
-          follow-boards-list (dispatcher/follow-boards-list org-slug db)
-          follow-boards-set (set (map :uuid follow-boards-list))
           replies-data (dispatcher/replies-data org-slug db)
           should-badge-replies? (and (not (:author? comment-data))
                                      ;; If unfollow link is present it means the user is following the entry

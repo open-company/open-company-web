@@ -3,7 +3,6 @@
             [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
             [oops.core :refer (oget ocall oset!)]
@@ -57,7 +56,6 @@
             [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.secure-activity :refer (secure-activity)]
@@ -106,7 +104,7 @@
                               keep-params)))
         with-search (if (pos? (count search-values))
                       (str rewrite-to "?"
-                        (clojure.string/join "&" search-values))
+                        (s/join "&" search-values))
                       rewrite-to)
         doc-title (oget js/document "title")]
     ;; Push state only if the query string has parameters or the history will have duplicates.
@@ -156,8 +154,7 @@
   (user-actions/initial-loading true))
 
 (defn check-nux [query-params]
-  (let [has-at-param (contains? query-params :at)
-        user-settings (when (and (contains? query-params :user-settings)
+  (let [user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
@@ -259,8 +256,7 @@
         sort-type (read-sort-type-from-cookie params)
         entry (:entry params)
         comment (:comment params)
-        query-params (:query-params params)
-        has-at-param (contains? query-params :at)]
+        query-params (:query-params params)]
     (pre-routing params true {:query-params query-params :keep-params [:at]})
     ;; save the route
     (routing-actions/routing! {:org org
@@ -721,6 +717,7 @@
     (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn ^:export init []
+  (dis/set-app-state-from-cache!)
   ;; Setup timbre log level
   (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
   ;; Setup API requests

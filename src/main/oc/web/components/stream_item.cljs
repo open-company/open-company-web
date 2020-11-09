@@ -139,6 +139,7 @@
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
         show-body-thumbnail? (:body-thumbnail activity-data)]
+    (js/console.log "DBG stream-item/render activity-data" activity-data)
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
