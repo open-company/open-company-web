@@ -1294,6 +1294,12 @@ $header_top_margin: 24;
     display: none;
   }
 
+  blockquote, pre, code, h1, h2, h3, h4, h5, h6, div, ul, li {
+    &:empty {
+      display: none;
+    }
+  }
+
   @include poll-preview($font_size, $line_height, $color);
 }
 

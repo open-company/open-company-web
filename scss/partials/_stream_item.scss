@@ -376,13 +376,14 @@ div.stream-item {
     div.thumbnail-container {
       position: relative;
       cursor: pointer;
+      margin-top: 8px;
 
       &.has-preview {
         min-height: #{$thumbnail_height}px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
-        align-items: flex-end;
+        align-items: flex-start;
 
         @include mobile() {
           min-height: #{$mobile_thumbnail_height}px;
@@ -477,7 +478,6 @@ div.stream-item {
         max-width: 100%;
         white-space: nowrap;
         overflow-wrap: break-word;
-        margin-top: 8px;
 
         @include mobile() {
           height: 23px;
