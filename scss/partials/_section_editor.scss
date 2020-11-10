@@ -325,13 +325,30 @@ div.section-editor-container {
         }
       }
 
-      div.section-editor-add-slack-channel {
+      div.section-editor-add-slack-channel-container {
         margin-top: 8px;
 
-        &.disabled {
-          opacity: 0.5;
-          div.slack-channels-dropdown {
-            pointer-events: none;
+        div.section-editor-add-slack-channel {
+          &.disabled {
+            opacity: 0.5;
+            div.slack-channels-dropdown {
+              pointer-events: none;
+            }
+          }
+        }
+
+        div.section-editor-info {
+          margin-top: 8px;
+          padding: 0;
+
+          a.private-announcement-channels {
+            @include OC_Body_Book();
+            font-size: 13px;
+
+            &, &:hover {
+              text-decoration: underline;
+              color: var(--light-color);
+            }
           }
         }
       }
