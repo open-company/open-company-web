@@ -27,7 +27,7 @@
 
 (def ^:private auth-endpoint ls/auth-server-domain)
 
-(def ^:private pay-endpoint ls/pay-server-domain)
+(def ^:private payments-endpoint ls/pay-server-domain)
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
@@ -205,7 +205,7 @@
 
 (def ^:private auth-http (partial req auth-endpoint))
 
-(def ^:private pay-http (partial req pay-endpoint))
+(def ^:private payments-http (partial req payments-endpoint))
 
 (def ^:private interaction-http (partial req interaction-endpoint))
 
@@ -291,7 +291,7 @@
 
 (defn get-payments [payments-link callback]
   (if payments-link
-    (auth-http (method-for-link payments-link) (relative-href payments-link)
+    (payments-http (method-for-link payments-link) (relative-href payments-link)
      {:headers (headers-for-link payments-link)}
      callback)
     (handle-missing-link "get-payments" payments-link callback)))
@@ -310,7 +310,7 @@
 
 (defn get-checkout-session-id [checkout-link success-url cancel-url callback]
   (if checkout-link
-    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+    (payments-http (method-for-link checkout-link) (relative-href checkout-link)
      {:headers (headers-for-link checkout-link)
       :json-params (cljs->json {:success-url success-url
                                 :cancel-url cancel-url})}
