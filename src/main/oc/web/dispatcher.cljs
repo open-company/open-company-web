@@ -40,7 +40,7 @@
 (def router-dark-allowed-key :dark-allowed)
 
 (def checkout-result-key :checkout-success-result)
-(def checkout-update-plan-key :checkout-update-plan)
+(def checkout-update-price-key :checkout-update-price)
 
 (def expo-key [:expo])
 
@@ -378,7 +378,7 @@
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
    :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
-   checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
+   checkout-update-price-key [[:base] (fn [base] (get base checkout-update-price-key))]
    :expo                [[:base] (fn [base] (get-in base expo-key))]
    :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
    :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]

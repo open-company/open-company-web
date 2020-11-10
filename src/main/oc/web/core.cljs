@@ -178,7 +178,7 @@
         billing-checkout-map (when (and (= org-settings :payments)
                                         (contains? query-params :result))
                                {dis/checkout-result-key (= (:result query-params) "true")
-                                dis/checkout-update-plan-key (:update-plan query-params)})
+                                dis/checkout-update-price-key (:update-price query-params)})
         next-app-state (merge {:panel-stack panel-stack
                                :bot-access bot-access}
                         billing-checkout-map)]
