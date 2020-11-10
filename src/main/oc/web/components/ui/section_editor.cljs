@@ -4,6 +4,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
@@ -328,19 +329,29 @@
                                                      #(merge % {:slack-mirror nil
                                                                 :has-changes true})])))}))])
           (if show-slack-channels?
-            [:div.section-editor-add-slack-channel.group
-              {:class (when-not @(::slack-enabled s) "disabled")}
-              (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
-                                        :on-change (fn [team channel]
-                                                     (dis/dispatch!
-                                                      [:update
-                                                       [:section-editing]
-                                                       #(merge %
-                                                         {:slack-mirror
-                                                           {:channel-id (:id channel)
-                                                            :channel-name (:name channel)
-                                                            :slack-org-id (:slack-org-id team)}
-                                                          :has-changes true})]))})]
+            [:div.section-editor-add-slack-channel-container
+              [:div.section-editor-add-slack-channel.group
+                {:class (when-not @(::slack-enabled s) "disabled")}
+                (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
+                                          :on-change (fn [team channel]
+                                                      (dis/dispatch!
+                                                        [:update
+                                                        [:section-editing]
+                                                        #(merge %
+                                                          {:slack-mirror
+                                                            {:channel-id (:id channel)
+                                                              :channel-name (:name channel)
+                                                              :slack-org-id (:slack-org-id team)}
+                                                            :has-changes true})]))})]
+             [:div.section-editor-info
+              [:a.private-announcement-channels
+               {:href oc-urls/slack-private-announcement-share
+                :target "_blank"
+                :data-toggle "tooltip"
+                :data-title "Tips for auto-share into private or announcement channels"
+                :data-placement "top"
+                :data-container "body"}
+               "Can't find a channel?"]]]
             ;; If they don't have bot installed already but have slack org associated to the team
             ;; and user has a slack user (if not they can't add the bot) let's prompt to add the bot
             (when (and (not (jwt/team-has-bot? (:team-id team-data)))

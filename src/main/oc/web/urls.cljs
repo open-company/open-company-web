@@ -233,3 +233,7 @@
   (if-let [org-slug (dis/current-org-slug)]
     (following org-slug)
     login))
+
+;; Help articles
+
+(def slack-private-announcement-share "http://help.carrot.io/en/articles/4602513-auto-share-to-private-and-announcement-only-slack-channels")
