@@ -152,8 +152,7 @@
     (= show-login-overlay :signup-with-email)
     (-> db
       (assoc dispatcher/show-login-overlay-key show-login-overlay)
-      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""})
-      (dissoc :signup-with-email-error))
+      (assoc :signup-with-email {:firstname "" :lastname "" :email "" :pswd ""}))
     :else
     (assoc db dispatcher/show-login-overlay-key show-login-overlay)))
 
@@ -242,17 +241,18 @@
 
 (defmethod dispatcher/action :signup-with-email
   [db [_]]
-  (-> db
-    (dissoc :signup-with-email-error :latest-auth-settings :latest-entry-point)
-    (assoc-in [:signup-with-email :error] nil)))
+  (update db :signup-with-email merge {:error nil
+                                       :loading true}))
 
 (defmethod dispatcher/action :signup-with-email/failed
   [db [_ status]]
-  (assoc-in db [:signup-with-email :error] status))
+  (update db :signup-with-email merge {:error status
+                                       :loading false}))
 
 (defmethod dispatcher/action :signup-with-email/success
   [db [_]]
-  (dissoc db :signup-with-email-error))
+  (update db :signup-with-email merge {:loading false
+                                       :error nil}))
 
 ;; Logout action
 

@@ -595,8 +595,15 @@ div.onboard-container-inner {
       }
 
       span.error {
-        margin-left: 16px;
+        margin-left: 8px;
         color: $carrot_orange;
+
+        a.underline {
+          &, &:hover {
+            color: $carrot_orange;
+            text-decoration: underline;
+          }
+        }
       }
     }
 
