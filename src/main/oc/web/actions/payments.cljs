@@ -38,27 +38,27 @@
 
 ;; Subscription handling
 
-(defn create-plan-subscription [payments-data plan-id & [callback]]
+(defn create-price-subscription [payments-data price-id & [callback]]
   (let [create-subscription-link (utils/link-for (:links payments-data) "create")
         org-slug (dis/current-org-slug)]
     (when create-subscription-link
-      (api/update-plan-subscription create-subscription-link plan-id
+      (api/update-price-subscription create-subscription-link price-id
        (fn [{:keys [status body success] :as resp}]
         (get-payments-cb org-slug resp)
         (callback success))))))
 
-(defn delete-plan-subscription [payments-data & [callback]]
+(defn delete-price-subscription [payments-data & [callback]]
   (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")
         org-slug (dis/current-org-slug)]
     (when delete-subscription-link
-      (api/update-plan-subscription delete-subscription-link nil
+      (api/update-price-subscription delete-subscription-link nil
        (fn [{:keys [status body success] :as resp}]
         (get-payments-cb org-slug resp)
         (callback success))))))
 
 ;; Checkout
 
-(defn add-payment-method [payments-data & [change-plan-data]]
+(defn add-payment-method [payments-data & [change-price-data]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
         base-domain (if ua/mobile-app?
@@ -68,8 +68,8 @@
                       ls/web-server-domain)
         base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
-                               (when change-plan-data
-                                 (str "&update-plan=" (:id change-plan-data))))
+                               (when change-price-data
+                                 (str "&update-price=" (:id change-price-data))))
         cancel-redirect-url (str base-redirect-url "false")]
     (api/get-checkout-session-id checkout-link success-redirect-url cancel-redirect-url
      (fn [{:keys [success body status]}]
@@ -119,6 +119,6 @@
              ;; FIXME: added to fix a race condition where users were seeing the
              ;; paywall after signup until refresh (Sean on FF with Slack signup)
              (and (map? subscription-data)
-                  ;; or the org is on a non active plan
+                  ;; or the org is on a non active price
                   (not (default-positive-statuses subscription-status)))))
     false))

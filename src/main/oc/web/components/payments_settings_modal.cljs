@@ -23,45 +23,41 @@
   ;; Change tab
   (reset! (::payments-tab s) tab))
 
-(defn- plan-amount-to-human [amount currency]
-  (let [int-plan-amount (int (/ amount 100))
-        decimal-plan-amount* (mod amount 100)
-        decimal-plan-amount (if (= (-> decimal-plan-amount* str count) 1)
-                             (str "0" decimal-plan-amount*)
-                             (str decimal-plan-amount*))
+(defn- price-amount-to-human [amount currency]
+  (let [int-price-amount (int (/ amount 100))
+        decimal-price-amount* (mod amount 100)
+        decimal-price-amount (if (= (-> decimal-price-amount* str count) 1)
+                             (str "0" decimal-price-amount*)
+                             (str decimal-price-amount*))
         currency-symbol (case currency
                          "usd" "$"
                          "eur" "€"
                          (str currency " "))]
-    (str currency-symbol int-plan-amount "." decimal-plan-amount)))
+    (str currency-symbol int-price-amount "." decimal-price-amount)))
 
-(defn- plan-price [plan-data quantity]
-  (if-not (seq (:tiers plan-data))
-    (plan-amount-to-human (* (:amount plan-data) quantity) (:currency plan-data))
+(defn- price-value [price-data quantity]
+  (if-not (seq (:tiers price-data))
+    (price-amount-to-human (* (:amount price-data) quantity) (:currency price-data))
     (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %))) (not (:up-to %)))
-                (:tiers plan-data)))
+                (:tiers price-data)))
           tier-price (if (:up-to tier)
                        (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
                        (* quantity (:unit-amount tier)))]
-      (plan-amount-to-human tier-price (:currency plan-data)))))
+      (price-amount-to-human tier-price (:currency price-data)))))
 
-(defn- plan-minimum-price [plan-data]
-  (let [tier (first (:tiers plan-data))]
-    (plan-amount-to-human (:flat-amount tier) (:currency plan-data))))
+(defn- price-per-user [price-data]
+  (let [tier (second (:tiers price-data))]
+    (price-amount-to-human (:unit-amount tier) (:currency price-data))))
 
-(defn- price-per-user [plan-data]
-  (let [tier (second (:tiers plan-data))]
-    (plan-amount-to-human (:unit-amount tier) (:currency plan-data))))
-
-(defn- plan-description [plan-interval]
-  (case plan-interval
+(defn- price-description [price-interval]
+  (case price-interval
    "month" "monthly"
    "annual"))
 
-(defn- plan-label [plan-nickname]
-  (case plan-nickname
-   "Annual" (str plan-nickname " (save 20%)")
-   plan-nickname))
+(defn- price-label [price-nickname]
+  (case price-nickname
+   "Annual" (str price-nickname " (save 20%)")
+   price-nickname))
 
 (defn- date-string [linux-epoch]
   (.toDateString (utils/js-date (* linux-epoch 1000))))
@@ -89,35 +85,35 @@
                     :solid-button-title "Yes, cancel it"
                     :solid-button-cb (fn [_]
                                          (reset! (::canceling-subscription s) true)
-                                         (payments-actions/delete-plan-subscription payments-data
+                                         (payments-actions/delete-price-subscription payments-data
                                           #(reset! (::canceling-subscription s) false))
                                          (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
-(defn- plan-summary [s payments-data]
+(defn- price-summary [s payments-data]
   (let [subscription-data (payments-actions/get-active-subscription payments-data)
         next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
-        current-plan (:plan subscription-data)
+        current-price (:price subscription-data)
         checkout-result @(::checkout-result s)
         quantity (:quantity subscription-data)] ;; Number of active/unverified users
-    [:div.plan-summary
+    [:div.price-summary
       (when subscription-data
         (if (:cancel-at-period-end? subscription-data)
-          [:div.plan-summary-details.success.bottom-margin
+          [:div.price-summary-details.success.bottom-margin
             [:div.emoji-icon "🗓"]
-            (str "Your " (s/lower (:nickname current-plan)) " plan is set to cancel on " (date-string (:current-period-end subscription-data)) ".")]
-          [:div.plan-summary-details.success.bottom-margin
+            (str "Your " (s/lower (:nickname current-price)) " plan is set to cancel on " (date-string (:current-period-end subscription-data)) ".")]
+          [:div.price-summary-details.success.bottom-margin
             [:div.emoji-icon "👍"]
-            (str "Your " (s/lower (:nickname current-plan)) " plan is active.")]))
+            (str "Your " (s/lower (:nickname current-price)) " plan is active.")]))
       (when subscription-data
-        [:div.plan-summary-separator.bottom-margin])
+        [:div.price-summary-separator.bottom-margin])
       (if (seq (:payment-methods payments-data))
-        [:div.plan-summary-details
+        [:div.price-summary-details
           [:strong "Payment methods"]
           [:br]
           (for [c (:payment-methods payments-data)
                 :let [card (:card c)]]
-            [:div.plan-summary-details-card-row
+            [:div.price-summary-details-card-row
               {:key (str "pay-method-" (:id c))
                :class (when-not (:default? c) "hidden")}
               (case (:brand card)
@@ -131,22 +127,22 @@
               [:button.mlb-reset.change-pay-method-bt
                 {:on-click #(payments-actions/add-payment-method payments-data)}
                 "Update payment information"]]
-        [:div.plan-summary-details
+        [:div.price-summary-details
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(payments-actions/add-payment-method payments-data)}
             (str "Subscribe to " ls/product-name)]])
       (when (or (is-trial? subscription-data)
                 (is-trial-expired? subscription-data))
-        [:div.plan-summary-details.bottom-margin
+        [:div.price-summary-details.bottom-margin
           [:strong "Trial"]
           [:br]
           (trial-remaining-days-string subscription-data)])
       (when subscription-data
-        [:div.plan-summary-details.bottom-margin
+        [:div.price-summary-details.bottom-margin
           [:strong "Billing period"]
           [:br]
           "Plan billed "
-          (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
+          (price-description (:interval current-price)) " (" (price-value current-price quantity) ")"
           [:br]
           (if (:cancel-at-period-end? subscription-data)
             (str "Your plan is scheduled to cancel on " (date-string (:current-period-end subscription-data)))
@@ -156,19 +152,19 @@
             "Change"]])
       (when (and subscription-data
                  (not (:cancel-at-period-end? subscription-data)))
-        [:div.plan-summary-details
+        [:div.price-summary-details
           [:button.mlb-reset.cancel-subscription-bt
             {:on-click #(cancel-subscription s payments-data)}
             "Cancel subscription"]
           (when @(::canceling-subscription s)
             (small-loading))])
       (comment
-        [:div.plan-summary-separator]
-        [:div.plan-summary-details
+        [:div.price-summary-separator]
+        [:div.price-summary-details
           [:button.mlb-reset.history-bt
             "Lookup billing history"]]
-        [:div.plan-summary-separator]
-        [:div.plan-summary-details
+        [:div.price-summary-separator]
+        [:div.price-summary-details
           "Have a team of 250+"
           [:a.chat-with-us
             {:class "intercom-chat-link"
@@ -186,24 +182,24 @@
 
 (def default-minimum-price 6000)
 
-(defn- save-plan-change [s payments-data current-plan-data]
-  (payments-actions/create-plan-subscription payments-data (:id current-plan-data)
+(defn- save-price-change [s payments-data current-price-data]
+  (payments-actions/create-price-subscription payments-data (:id current-price-data)
    (fn [success]
-     (reset! (::saving-plan s) false)
+     (reset! (::saving-price s) false)
      (if success
        (do
          (change-tab s :summary)
-         (reset! (::initial-plan s) (:nickname current-plan-data))
-         (reset! (::payments-plan s) (:nickname current-plan-data)))
+         (reset! (::initial-price s) (:nickname current-price-data))
+         (reset! (::payments-price s) (:nickname current-price-data)))
        (show-error-alert s)))))
 
-(defn- different-plans-price [plans-data quantity]
-  (let [annual-plan-data (first (filter #(= (:interval %) "year") plans-data))
-        monthly-plan-data (first (filter #(= (:interval %) "month") plans-data))
+(defn- different-prices-price [prices-data quantity]
+  (let [annual-price-data (first (filter #(= (:interval %) "year") prices-data))
+        monthly-price-data (first (filter #(= (:interval %) "month") prices-data))
         annual-tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
-                                         (not (:up-to %))) (:tiers annual-plan-data)))
+                                         (not (:up-to %))) (:tiers annual-price-data)))
         monthly-tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
-                                          (not (:up-to %))) (:tiers monthly-plan-data)))
+                                          (not (:up-to %))) (:tiers monthly-price-data)))
         annual-price (if-not (nil? (:up-to annual-tier))
                        (+ (:flat-amount annual-tier) (* quantity (:unit-amount annual-tier)))
                        (* (int quantity) (int (:unit-amount annual-tier))))
@@ -213,67 +209,67 @@
         diff-price (- (* monthly-price 12) annual-price)]
     (when (pos? diff-price)
       [:span " An annual plan saves you "
-        [:strong (plan-amount-to-human diff-price (:currency annual-plan-data))]
+        [:strong (price-amount-to-human diff-price (:currency annual-price-data))]
         " per year."])))
 
-(defn- plan-change [s payments-data]
-  (let [initial-plan @(::initial-plan s)
-        current-plan (::payments-plan s)
+(defn- price-change [s payments-data]
+  (let [initial-price @(::initial-price s)
+        current-price (::payments-price s)
         subscription-data (payments-actions/get-active-subscription payments-data)
         quantity (:quantity subscription-data) ;; Number of active/unverified users
-        monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
-        annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
-        current-plan-data (if (and @(::plan-has-changed s)
-                                   (not= @current-plan initial-plan))
-                            (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
-                            (:plan subscription-data))
-        total-plan-price (plan-price current-plan-data quantity)
-        different-plans-price-span (different-plans-price (:available-plans payments-data) quantity)
-        up-to (-> current-plan-data :tiers first :up-to)
-        flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
-        unit-amount (if (seq (:tiers current-plan-data))
-                      (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
-                      (plan-amount-to-human (:amount current-plan-data) (:currency current-plan-data)))
-        available-plans* (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
-        contains-current-subscription? (some #(= (:value %) (:nickname (:plan subscription-data))) available-plans*)
-        available-plans (if contains-current-subscription?
-                          available-plans*
+        monthly-price (first (filter #(= (:interval %) "month") (:available-prices payments-data)))
+        annual-price (first (filter #(= (:interval %) "year") (:available-prices payments-data)))
+        current-price-data (if (and @(::price-has-changed s)
+                                   (not= @current-price initial-price))
+                            (first (filter #(= (:nickname %) @current-price) (:available-prices payments-data)))
+                            (:price subscription-data))
+        total-price-value (price-value current-price-data quantity)
+        different-prices-price-span (different-prices-price (:available-prices payments-data) quantity)
+        up-to (-> current-price-data :tiers first :up-to)
+        flat-amount (price-amount-to-human (-> current-price-data :tiers first :flat-amount) (:currency current-price-data))
+        unit-amount (if (seq (:tiers current-price-data))
+                      (price-amount-to-human (-> current-price-data :tiers second :unit-amount) (:currency current-price-data))
+                      (price-amount-to-human (:amount current-price-data) (:currency current-price-data)))
+        available-prices* (mapv #(hash-map :value (:nickname %) :label (price-label (:nickname %))) (:available-prices payments-data))
+        contains-current-subscription? (some #(= (:value %) (:nickname (:price subscription-data))) available-prices*)
+        available-prices (if contains-current-subscription?
+                          available-prices*
                           (concat
-                           [{:value (:nickname (:plan subscription-data)) :label (plan-label (:nickname (:plan subscription-data)))}]
-                           available-plans*))
+                           [{:value (:nickname (:price subscription-data)) :label (price-label (:nickname (:price subscription-data)))}]
+                           available-prices*))
         has-payment-info? (seq (:payment-methods payments-data))
-        is-annual-default-plan? (= (:nickname current-plan-data) "Annual")
+        is-annual-default-price? (= (:nickname current-price-data) "Annual")
         is-under-up-to? (< quantity up-to)]
-    [:div.plan-change
+    [:div.price-change
       (when (and (or (is-trial? subscription-data)
                      (is-trial-expired? subscription-data))
                  (not has-payment-info?))
-        [:div.plan-change-details.expiration-trial.bottom-margin
+        [:div.price-change-details.expiration-trial.bottom-margin
           [:div.emoji-icon "🗓"]
           (trial-remaining-days-string subscription-data)])
       (when (and (is-trial? subscription-data)
                  (not has-payment-info?))
-        [:div.plan-change-separator.bottom-margin])
-      [:button.mlb-reset.plans-dropdown-bt
-        {:on-click #(reset! (::show-plans-dropdown s) true)}
-        (or (:nickname current-plan-data) "Free")]
-      [:div.plan-change-dropdown
-        (when @(::show-plans-dropdown s)
-          (dropdown-list {:items available-plans
-                          :value @current-plan
-                          :on-blur #(reset! (::show-plans-dropdown s) false)
+        [:div.price-change-separator.bottom-margin])
+      [:button.mlb-reset.prices-dropdown-bt
+        {:on-click #(reset! (::show-prices-dropdown s) true)}
+        (or (:nickname current-price-data) "Free")]
+      [:div.price-change-dropdown
+        (when @(::show-prices-dropdown s)
+          (dropdown-list {:items available-prices
+                          :value @current-price
+                          :on-blur #(reset! (::show-prices-dropdown s) false)
                           :on-change (fn [selected-item]
-                                       (reset! (::plan-has-changed s) true)
-                                       (reset! (::show-plans-dropdown s) false)
-                                       (reset! current-plan (:value selected-item)))}))]
+                                       (reset! (::price-has-changed s) true)
+                                       (reset! (::show-prices-dropdown s) false)
+                                       (reset! current-price (:value selected-item)))}))]
       (if is-under-up-to?
-        [:div.plan-change-description
+        [:div.price-change-description
           (str
             "The "
-            (s/lower (:nickname current-plan-data))
+            (s/lower (:nickname current-price-data))
             " plan "
-            (when is-annual-default-plan?
-              (str "is 20% lower than monthly. The " (s/lower (:nickname current-plan-data)) " plan "))
+            (when is-annual-default-price?
+              (str "is 20% lower than monthly. The " (s/lower (:nickname current-price-data)) " plan "))
             "starts at ")
           [:strong flat-amount]
           (str
@@ -282,9 +278,9 @@
             ". Then it's ")
           [:strong unit-amount ]
           " per additional person."
-          (when is-annual-default-plan?
-            different-plans-price-span)]
-        [:div.plan-change-description
+          (when is-annual-default-price?
+            different-prices-price-span)]
+        [:div.price-change-description
           (str
             "For your team of "
             quantity
@@ -292,20 +288,20 @@
               " people"
               " person")
             ", your plan will cost ")
-          [:strong total-plan-price]
+          [:strong total-price-value]
           (str 
-            " per " (:interval current-plan-data)
+            " per " (:interval current-price-data)
             " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ").")
-          (when is-annual-default-plan?
-            different-plans-price-span)])
+          (when is-annual-default-price?
+            different-prices-price-span)])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
-        [:div.plan-change-title
-          (str "Due today: " total-plan-price)])
+        [:div.price-change-title
+          (str "Due today: " total-price-value)])
       [:button.mlb-reset.payment-info-bt
-        {:disabled (or @(::saving-plan s)
+        {:disabled (or @(::saving-price s)
                        @(::canceling-subscription s)
                        (and has-payment-info?
-                            (= @current-plan initial-plan)
+                            (= @current-price initial-price)
                             (not (:cancel-at-period-end? subscription-data))))
          :on-click (fn []
                     (if has-payment-info?
@@ -313,8 +309,8 @@
                         ;; If user cancelled we don't ask for confirmation,
                         ;; let's restart the subscription immediately
                         (do
-                          (reset! (::saving-plan s) true)
-                          (save-plan-change s payments-data current-plan-data))
+                          (reset! (::saving-price s) true)
+                          (save-price-change s payments-data current-price-data))
                         (let [alert-data {:title "Are you sure?"
                                           :message "Are you sure you want to change your current plan?"
                                           :link-button-style :red
@@ -323,31 +319,31 @@
                                           :solid-button-style :green
                                           :solid-button-title "Yes, change it"
                                           :solid-button-cb (fn [_]
-                                                               (reset! (::saving-plan s) true)
-                                                               (save-plan-change s payments-data current-plan-data)
+                                                               (reset! (::saving-price s) true)
+                                                               (save-price-change s payments-data current-price-data)
                                                                (alert-modal/hide-alert))}]
                           (alert-modal/show-alert alert-data)))
                       (payments-actions/add-payment-method payments-data
-                       ;; In case user changed the plan let's add it to the callback
+                       ;; In case user changed the price let's add it to the callback
                        ;; so we save once payment method is added
-                       (when (not= initial-plan @current-plan)
-                        current-plan-data))))}
+                       (when (not= initial-price @current-price)
+                        current-price-data))))}
         (if has-payment-info?
           (if (:cancel-at-period-end? subscription-data)
             (str "Subscribe to " ls/product-name)
             "Change plan")
           (str "Subscribe to " ls/product-name))]
-      (when @(::saving-plan s)
+      (when @(::saving-price s)
         (small-loading))
-     [:div.plan-change-separator]
-     [:div.plan-change-details
+     [:div.price-change-separator]
+     [:div.price-change-details
        "Have a question about billing?"
        [:br]
        [:a.chat-with-us
          {:class "intercom-chat-link"
           :href oc-urls/contact-mail-to}
          "Chat with us"]]
-     [:div.plan-change-details
+     [:div.price-change-details
        "Team of 250+? "
        [:a.chat-with-us
          {:class "intercom-chat-link"
@@ -372,17 +368,17 @@
                payments-data)
       (reset! (::initial-setup s) true)
       (let [subscription-data (payments-actions/get-active-subscription payments-data)
-            initial-plan-nickname (or (-> subscription-data :plan :nickname) "Monthly") ;; Default to the monthly default plan
+            initial-price-nickname (or (-> subscription-data :price :nickname) "Monthly") ;; Default to the monthly default price
             checkout-result @(drv/get-ref s dis/checkout-result-key)
             has-payment-info? (seq (:payment-methods payments-data))
-            updating-plan (when checkout-result
-                            @(drv/get-ref s dis/checkout-update-plan-key))]
+            updating-price (when checkout-result
+                            @(drv/get-ref s dis/checkout-update-price-key))]
         (reset! (::payments-tab s) (if (or (not (payments-actions/get-active-subscription payments-data))
                                            (not has-payment-info?))
                                      :change
                                      :summary))
-        (reset! (::payments-plan s) initial-plan-nickname)
-        (reset! (::initial-plan s) initial-plan-nickname)
+        (reset! (::payments-price s) initial-price-nickname)
+        (reset! (::initial-price s) initial-price-nickname)
         (reset! (::checkout-result s) checkout-result)))))
 
 (rum/defcs payments-settings-modal <
@@ -392,17 +388,17 @@
   (drv/drv :payments)
   (drv/drv :current-user-data)
   (drv/drv dis/checkout-result-key)
-  (drv/drv dis/checkout-update-plan-key)
+  (drv/drv dis/checkout-update-price-key)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::initial-setup)
   (rum/local :summary ::payments-tab)
-  (rum/local nil ::payments-plan)
-  (rum/local false ::show-plans-dropdown)
-  (rum/local nil ::initial-plan)
-  (rum/local false ::plan-has-changed)
+  (rum/local nil ::payments-price)
+  (rum/local false ::show-prices-dropdown)
+  (rum/local nil ::initial-price)
+  (rum/local false ::price-has-changed)
   (rum/local false ::checkout-result)
-  (rum/local false ::saving-plan)
+  (rum/local false ::saving-price)
   (rum/local false ::canceling-subscription)
   {:will-mount (fn [s]
     ;; Force refresh subscription data
@@ -438,7 +434,7 @@
                      (nil? @(::checkout-result s)))
             [:button.mlb-reset.save-bt
               {:on-click #(change-tab s :change)
-               :disabled (or @(::saving-plan s)
+               :disabled (or @(::saving-price s)
                              @(::canceling-subscription s))}
               "Change plan"])
           (when (and payments-data
@@ -453,5 +449,5 @@
           (if-not payments-data
             (small-loading)
             (if is-change-tab?
-              (plan-change s payments-data)
-              (plan-summary s payments-data)))]]]))
+              (price-change s payments-data)
+              (price-summary s payments-data)))]]]))

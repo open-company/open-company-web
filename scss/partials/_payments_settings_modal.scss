@@ -131,7 +131,7 @@ div.payments-settings-modal {
     div.payments-settings-body {
       margin-top: 24px;
 
-      div.plan-summary-separator {
+      div.price-summary-separator {
         margin-top: 16px;
         height: 1px;
         width: 100%;
@@ -142,10 +142,10 @@ div.payments-settings-modal {
         margin-bottom: 24px;
       }
 
-      div.plan-summary {
+      div.price-summary {
         margin-top: 24px;
 
-        div.plan-summary-details {
+        div.price-summary-details {
           margin-top: 16px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -208,10 +208,10 @@ div.payments-settings-modal {
         }
       }
 
-      div.plan-change {
+      div.price-change {
         position: relative;
 
-        button.plans-dropdown-bt {
+        button.prices-dropdown-bt {
           width: 100%;
           padding: 7px 8px;
           height: 32px;
@@ -253,7 +253,7 @@ div.payments-settings-modal {
           }
         }
 
-        div.plan-change-dropdown {
+        div.price-change-dropdown {
           position: relative;
           width: 100%;
 
@@ -315,7 +315,7 @@ div.payments-settings-modal {
           }
         }
 
-        div.plan-change-description {
+        div.price-change-description {
           margin-top: 16px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -323,7 +323,7 @@ div.payments-settings-modal {
           color: var(--color);
         }
 
-        div.plan-change-details {
+        div.price-change-details {
           margin-top: 16px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -365,14 +365,14 @@ div.payments-settings-modal {
           }
         }
 
-        div.plan-change-separator {
+        div.price-change-separator {
           margin-top: 16px;
           height: 1px;
           width: 100%;
           background-color: var(--opac-background-color-1);
         }
 
-        div.plan-change-title {
+        div.price-change-title {
           margin-top: 16px;
           @include OC_Body_Bold();
           font-size: 14px;
@@ -405,7 +405,7 @@ div.payments-settings-modal {
     }
 
     div.payments-settings-modal-container div.payments-settings-body
-    div.plan-change button.plans-dropdown-bt:after {
+    div.price-change button.prices-dropdown-bt:after {
       background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
   }
