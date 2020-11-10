@@ -45,7 +45,7 @@
 (defn setup-change-listeners []
   (when (theme-utils/web-theme-supported?)
     (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
-          #(dis/dispatch! [:theme/web-theme (theme-utils/web-theme)])))
+          #(dis/dispatch! [:theme/web-theme-changed (theme-utils/web-theme)])))
   (when @visibility-change-listener
     (events/unlistenByKey @visibility-change-listener))
   (reset! visibility-change-listener
