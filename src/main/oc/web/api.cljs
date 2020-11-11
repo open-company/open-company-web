@@ -27,7 +27,7 @@
 
 (def ^:private auth-endpoint ls/auth-server-domain)
 
-(def ^:private payments-endpoint ls/pay-server-domain)
+(def ^:private payments-endpoint ls/payments-server-domain)
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
