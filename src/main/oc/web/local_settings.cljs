@@ -30,7 +30,7 @@
 (def auth-server-domain (str "http://" web-hostname ":3003"))
 
 ;; Pay location
-(def pay-server-domain (str "http://" web-hostname ":3004"))
+(def payments-server-domain (str "http://" web-hostname ":3004"))
 
 ;; Interaction location
 (def interaction-server-domain (str "http://" web-hostname ":3002"))
