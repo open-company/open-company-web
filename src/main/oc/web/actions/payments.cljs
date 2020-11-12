@@ -1,5 +1,6 @@
 (ns oc.web.actions.payments
   (:require [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -7,7 +8,9 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.stripe :as stripe-client]
-            [oc.web.components.ui.alert-modal :as alert-modal]))
+            [oc.web.components.ui.alert-modal :as alert-modal]
+            [oops.core :refer (oset!)]
+            [goog.dom :as gDom]))
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
@@ -16,12 +19,18 @@
 
 ;; Payments data handling
 
-(defn get-payments-cb [org-slug {:keys [body success status]}]
+(defn parse-payments-data [{:keys [status body success]}]
   (let [payments-data (cond
                         success (json->cljs body)
                         (= status 404) :404
-                        :else nil)]
-    (dis/dispatch! [:payments org-slug payments-data])))
+                        :else nil)
+        portal-link (utils/link-for (:links payments-data) "portal" "POST")]
+    (merge payments-data {:can-open-portal? (map? portal-link)
+                          :portal-link portal-link})))
+
+(defn get-payments-cb [org-slug resp]
+  (let [parsed-payments-data (parse-payments-data resp)]
+    (dis/dispatch! [:payments org-slug parsed-payments-data])))
 
 (defn get-payments [payments-link]
   (when ls/payments-enabled
@@ -122,3 +131,26 @@
                   ;; or the org is on a non active price
                   (not (default-positive-statuses subscription-status)))))
     false))
+
+
+;; Customer portal redirect
+
+(defn open-portal! [payments-data]
+  (when-let [portal-link (:portal-link payments-data)]
+    (let [client-url (str ls/web-server-domain (router/get-token) "?org_settings=payments")
+          form (gDom/createElement "form")
+          _ (.add (.-classList form) "hidden")
+          _ (oset! form "method" "POST")
+          _ (oset! form "action" (:href portal-link))
+          redirect-input (gDom/createElement "input")
+          _ (oset! redirect-input "type" "hidden")
+          _ (oset! redirect-input "value" client-url)
+          _ (oset! redirect-input "name" "client-url")
+          _ (.appendChild form redirect-input)
+          authorization-input (gDom/createElement "input")
+          _ (oset! authorization-input "type" "hidden")
+          _ (oset! authorization-input "value" (str "Bearer " (jwt/jwt)))
+          _ (oset! authorization-input "name" "authorization")
+          _ (.appendChild form authorization-input)
+          _ (.appendChild (.-body js/document) form)]
+      (.submit form))))

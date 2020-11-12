@@ -556,9 +556,6 @@
   ;; Google fonts Muli
   [:link {:href "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Muli&family=PT+Serif:wght@700&display=swap" :rel "stylesheet"}])
 
-(def stripe-js
-  [:script {:src "https://js.stripe.com/v3/"}])
-
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")

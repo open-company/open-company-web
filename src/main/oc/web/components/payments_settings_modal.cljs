@@ -413,41 +413,61 @@
      s)}
   [s {:keys [org-data]}]
   (let [org-data (drv/react s :org-data)
-        payments-tab (::payments-tab s)
-        is-change-tab? (= @payments-tab :change)
-        payments-data (drv/react s :payments)
+        ;; payments-tab (::payments-tab s)
+        ;; is-change-tab? (= @payments-tab :change)
+        {:keys [portal-link can-open-portal?] :as payments-data} (drv/react s :payments)
         has-payment-info? (seq (:payment-methods payments-data))]
     [:div.payments-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
-      [:div.payments-settings-modal-container
-        [:div.payments-settings-header.group
-          [:div.payments-settings-header-title
-            (if (and is-change-tab?
-                     payments-data)
-             (if has-payment-info?
-               "Change plan"
-               "Select a plan")
-             "Billing")]
-          (when (and payments-data
-                     (not is-change-tab?)
-                     (nil? @(::checkout-result s)))
-            [:button.mlb-reset.save-bt
-              {:on-click #(change-tab s :change)
-               :disabled (or @(::saving-price s)
-                             @(::canceling-subscription s))}
-              "Change plan"])
-          (when (and payments-data
-                     (nil? @(::checkout-result s))
-                     has-payment-info?)
-            [:button.mlb-reset.cancel-bt
-              {:on-click #(if is-change-tab?
-                            (change-tab s :summary)
-                            (nav-actions/show-org-settings nil))}
-              "Back"])]
-        [:div.payments-settings-body
-          (if-not payments-data
-            (small-loading)
-            (if is-change-tab?
-              (price-change s payments-data)
-              (price-summary s payments-data)))]]]))
+      ;; -------- Old code with internal payments handling -------
+      ;; [:div.payments-settings-modal-container
+      ;;   [:div.payments-settings-header.group
+      ;;     [:div.payments-settings-header-title
+      ;;       (if (and is-change-tab?
+      ;;                payments-data)
+      ;;        (if has-payment-info?
+      ;;          "Change plan"
+      ;;          "Select a plan")
+      ;;        "Billing")]
+      ;;     (when (and payments-data
+      ;;                (not is-change-tab?)
+      ;;                (nil? @(::checkout-result s)))
+      ;;       [:button.mlb-reset.save-bt
+      ;;         {:on-click #(change-tab s :change)
+      ;;          :disabled (or @(::saving-price s)
+      ;;                        @(::canceling-subscription s))}
+      ;;         "Change plan"])
+      ;;     (when (and payments-data
+      ;;                (nil? @(::checkout-result s))
+      ;;                has-payment-info?)
+      ;;       [:button.mlb-reset.cancel-bt
+      ;;         {:on-click #(if is-change-tab?
+      ;;                       (change-tab s :summary)
+      ;;                       (nav-actions/show-org-settings nil))}
+      ;;         "Back"])]
+      ;;   [:div.payments-settings-body
+      ;;     (if-not payments-data
+      ;;       (small-loading)
+      ;;       (if is-change-tab?
+      ;;         (price-change s payments-data)
+      ;;         (price-summary s payments-data)))]]
+      ;; ---------------------------------------------------------
+
+     [:div.payments-settings-modal-container
+      [:div.payments-settings-header.group
+       [:div.payments-settings-header-title
+        "Billing"]
+       (when (and payments-data
+                  (nil? @(::checkout-result s))
+                  has-payment-info?)
+         [:button.mlb-reset.cancel-bt
+          {:on-click #(nav-actions/show-org-settings nil)}
+          "Back"])]
+      [:div.payments-settings-body
+       (when (:can-open-portal? payments-data)
+         [:div.payments-settings-header-title
+          "Change your plan:"]
+         [:button.mlb-reset.go-premium-button
+          {:on-click #(payments-actions/open-portal! payments-data)}
+          "Go Premium!"])]]]))

@@ -306,7 +306,7 @@
           options (if price-id (assoc options* :json-params update-subscription-body) options*)]
       (auth-http (method-for-link update-link) (relative-href update-link)
        options callback))
-    (handle-missing-link "update-price-subscription" update-link callback)))
+    (handle-missing-link "update-price-subscription" update-link callback {:price-id price-id})))
 
 (defn get-checkout-session-id [checkout-link success-url cancel-url callback]
   (if checkout-link
@@ -315,7 +315,7 @@
       :json-params (cljs->json {:success-url success-url
                                 :cancel-url cancel-url})}
      callback)
-    (handle-missing-link "get-checkout-session-id" checkout-link callback)))
+    (handle-missing-link "get-checkout-session-id" checkout-link callback {:success-url success-url :cancel-url cancel-url})))
 
 ;; Org
 
