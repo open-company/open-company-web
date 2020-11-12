@@ -131,6 +131,18 @@ div.payments-settings-modal {
     div.payments-settings-body {
       margin-top: 24px;
 
+      button.go-premium-button {
+        height: 34px;
+        padding: 8px;
+        text-align: center;
+        border-radius: 4px;
+        background-color: $carrot_green;
+        color: white;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+      }
+
       div.price-summary-separator {
         margin-top: 16px;
         height: 1px;
