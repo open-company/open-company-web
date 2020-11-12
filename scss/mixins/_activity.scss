@@ -193,11 +193,11 @@ $header_top_margin: 24;
   }
 }
 
-@mixin activity-title($font_size: 26px, $line_height: 30px){
+@mixin activity-title($font_size: 26, $line_height: 30){
   @include OC_Title();
-  font-size: $font_size;
+  font-size: #{$font_size}px;
   color: var(--color);
-  line-height: $line_height;
+  line-height: #{$line_height}px;
   white-space: normal;
   overflow-wrap: break-word;
 
@@ -206,17 +206,28 @@ $header_top_margin: 24;
   }
 }
 
-@mixin activity-headline(){
-  @include OC_Title();
-  font-size: 22px;
-  color: var(--color);
-  line-height: 28px;
-  white-space: normal;
-  overflow-wrap: break-word;
+@mixin activity-title-foc($font_size: 22, $line_height: 28, $color: var(--color), $preview_lines: 2) {
+  @include activity-title($font_size, $line_height);
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-  .emojione {
-    @include emoji-size(18);
+  @if ($preview_lines > 1) {
+    // Truncate last line of text preview
+    display: -webkit-box;
+    -webkit-line-clamp: $preview_lines;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+  } @else {
+    white-space: nowrap;
   }
+
+  color: $color;
+  @include OC_Body_Bold();
+  line-height: #{$line_height}px;
+  font-size: #{$font_size}px;
+
+  max-height: #{$line_height * $preview_lines}px;
 }
 
 @mixin poll($paragraph_spacing) {
@@ -967,10 +978,10 @@ $header_top_margin: 24;
   }
 }
 
-@mixin activity-comment($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height){
+@mixin activity-comment($font_size: 18, $line_height: 24, $paragraph_spacing: $line_height, $color: var(--color)){
   @include OC_Body_Book();
   font-size: #{$font_size}px;
-  color: var(--color);
+  color: $color;
   white-space: normal;
   overflow-wrap: break-word;
   line-height: #{$line_height}px;
@@ -1002,7 +1013,7 @@ $header_top_margin: 24;
   a.read-more {
     @include OC_Body_Book();
     font-size: 12px;
-    color: var(--color);
+    color: $color;
   }
 
   margin-bottom: 0px;
@@ -1129,12 +1140,16 @@ $header_top_margin: 24;
     padding: 0 8px;
     min-height: #{$line_height}px;
     border-left: 4px solid $ultra_light_grey;
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    color: $color;
 
     span.oc-replying-to {
       @include OC_Body_Book();
       font-size: 12px;
       line-height: 14px;
-      color: var(--light-color);
+      color: $color;
+      opacity: 0.5;
 
       & + * {
         margin-top: 4px;
@@ -1238,7 +1253,7 @@ $header_top_margin: 24;
   }
 }
 
-@mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
+@mixin activity-body-foc($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
 
   @include activity-body($font_size, $line_height, $color, 0);
   overflow: hidden;
@@ -1251,6 +1266,8 @@ $header_top_margin: 24;
     /*! autoprefixer: off */
     -webkit-box-orient: vertical;
     /* autoprefixer: on */
+  } @else {
+    white-space: nowrap;
   }
 
   color: $color;
@@ -1268,7 +1285,18 @@ $header_top_margin: 24;
     display: block!important;
     @include OC_Body_Book();
     line-height: #{$line_height}px;
+    color: $color;
     font-size: #{$font_size}px;
+
+    &:empty {
+      display: none!important;
+    }
+  }
+
+  & > blockquote {
+    padding-left: 8px!important;
+    padding-right: 0!important;
+    min-height: #{$line_height}px;
   }
 
   h1, h2, mark, mark.highlight {

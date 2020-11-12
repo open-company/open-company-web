@@ -1,6 +1,7 @@
 (ns oc.web.components.expanded-post
   (:require [rum.core :as rum]
-            [dommy.core :as dom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -10,7 +11,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -39,10 +39,6 @@
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
-
-(defn set-mobile-video-height! [s]
-  (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
@@ -88,6 +84,7 @@
   rum/reactive
   (drv/drv :route)
   (drv/drv :org-data)
+  (drv/drv :panel-stack)
   (drv/drv :activity-data)
   (drv/drv :comments-data)
   (drv/drv :add-comment-focus)
@@ -102,38 +99,54 @@
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
-  (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
+  (rum/local nil ::esc-listener)
   ;; Mixins
   (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   mixins/no-scroll-mixin
   {:will-mount (fn [s]
-    (check-collapse-post s)
-    (save-initial-read-data s)
-    s)
+                 (check-collapse-post s)
+                 (save-initial-read-data s)
+                 s)
    :did-mount (fn [s]
-    (save-fixed-comment-height! s)
-    (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
-    (load-comments s true)
-    (mark-read s)
-    s)
+                (save-fixed-comment-height! s)
+                (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
+                (load-comments s true)
+                (mark-read s)
+                (reset! (::esc-listener s)
+                        (events/listen js/window
+                                       EventType/KEYUP
+                                       (fn [e]
+                                         (when (= (.-key e) "Escape")
+                                           (cond
+                                             ;; If more menu is open let's close it
+                                             @(::force-show-menu s)
+                                             (reset! (::force-show-menu s) false)
+                                             ;; If there is a sidepanel open do nothing
+                                             (not (seq @(drv/get-ref s :panel-stack)))
+                                             (close-expanded-post e))))))
+                s)
    :did-remount (fn [_ s]
-    (save-initial-read-data s)
-    (load-comments s false)
-    s)
+                  (save-initial-read-data s)
+                  (load-comments s false)
+                  s)
    :will-unmount (fn [s]
-    (mark-read s)
-    (comment-actions/add-comment-blur (cu/add-comment-focus-value add-comment-prefix @(::activity-uuid s)))
-    (reset! (::activity-uuid s) nil)
-    s)}
+                   (mark-read s)
+                   (comment-actions/add-comment-blur (cu/add-comment-focus-value add-comment-prefix @(::activity-uuid s)))
+                   (reset! (::activity-uuid s) nil)
+                   (when @(::esc-listener s)
+                     (events/unlistenByKey @(::esc-listener s))
+                     (reset! (::esc-listener s) nil))
+                   s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
+        _panel-stack (drv/react s :panel-stack)
         _add-comment-focus (drv/react s :add-comment-focus)
         _users-info-hover (drv/react s :users-info-hover)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -144,24 +157,12 @@
         comments-data (au/activity-comments activity-data comments-drv)
         dom-element-id (str "expanded-post-" (:uuid activity-data))
         dom-node-class (str "expanded-post-" (:uuid activity-data))
-        publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
-        route (drv/react s :route)
+        _route (drv/react s :route)
         org-data (drv/react s :org-data)
-        has-video (seq (:fixed-video-id activity-data))
-        uploading-video (dis/uploading-video-data (:video-id activity-data))
         current-user-data (drv/react s :current-user-data)
         current-user-id (:user-id current-user-data)
-        is-publisher? (:publisher? publisher)
-        video-player-show (and is-publisher? uploading-video)
-        video-size (when has-video
-                     (if is-mobile?
-                       {:width (win-width)
-                        :height @(::mobile-video-height s)}
-                       {:width 638
-                        :height (utils/calc-video-height 638)}))
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)
         add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
@@ -184,9 +185,7 @@
                                                   (fn [] (reset! (::force-show-menu s) false)))
                                     :current-user-data current-user-data}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
-        comments-link (utils/link-for (:links activity-data) "comments")
-        bm-ms-tag? (or (:must-see activity-data)
-                       (:bookmarked-at activity-data))]
+        comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :bookmark-item (:bookmarked-at activity-data)
@@ -211,7 +210,7 @@
               {:on-click close-expanded-post
                :data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
-               :title "Close"}]]
+               :title "Close or press Esc"}]]
           [:div.expanded-post-header-center
             (post-authorship {:activity-data activity-data
                               :user-avatar? true

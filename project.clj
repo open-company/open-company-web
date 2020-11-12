@@ -16,9 +16,9 @@
 
   ;; All profile dependencies
   :dependencies [;; Lisp on the JVM http://clojure.org/documentation
-                 [org.clojure/clojure "1.10.2-alpha1"]
+                 [org.clojure/clojure "1.10.2-alpha3"]
                  ;; Library for OC projects https://github.com/open-company/open-company-lib
-                 [open-company/lib "0.17.29-alpha32"]
+                 [open-company/lib "0.17.29-alpha52"]
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]
                  ;; HTML rendering https://github.com/weavejester/hiccup
@@ -28,7 +28,7 @@
   
   ;; All profile plugins
   :plugins [;; Get environment settings from different sources https://github.com/weavejester/environ
-            [lein-environ "1.1.0"]
+            [lein-environ "1.2.0"]
             ;; Automatic restart task https://github.com/weavejester/lein-auto
             [lein-auto "0.1.3"]
             ;; Call shell from within Leiningen. https://github.com/hypirion/lein-shell

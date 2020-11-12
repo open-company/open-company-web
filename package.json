@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "release": "npm ci && npm run scss:build && npx shadow-cljs release webapp",
-    "dev:build": "npm run css:copyAssets && npm run scss:build & npm run cljs:build",
-    "dev:watch": "npm run css:copyAssets && npm run scss:watch & npm run cljs:watch",
+    "dev:build": "npm run scss:build & npm run cljs:build",
+    "dev:watch": "npm run scss:watch & npm run cljs:watch",
     "dev:clean": "npm run scss:clean & npm run cljs:clean",
-    "scss:watch": "npm run scss:build && node-sass --watch --recursive scss/app.main.scss public/css/app.main.css",
-    "scss:build": "node-sass --recursive scss/app.main.scss public/css/app.main.css",
+    "scss:build": "npm run css:copyAssets && node-sass --include-paths scss scss/app.main.scss public/css/app.main.css",
+    "scss:watch": "npm run css:copyAssets && node-sass --include-paths scss scss/app.main.scss public/css/app.main.css && node-sass --watch --recursive scss/app.main.scss public/css/app.main.css",
     "css:copyAssets": "bin/copy_assets",
     "scss:clean": "rm -fd public/css/app.main.css",
     "cljs:build": "npx shadow-cljs compile webapp",
@@ -20,7 +20,7 @@
     "node-sass": "^4.14.1",
     "nodemon": "^2.0.4",
     "normalize.scss": "^0.1.0",
-    "shadow-cljs": "2.11.1"
+    "shadow-cljs": "^2.11.6"
   },
   "dependencies": {
     "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete",
@@ -32,7 +32,7 @@
     "@rangy/selectionsaverestore": "^2.1.0",
     "@sentry/browser": "^5.27.1",
     "clipboard": "2.0.6",
-    "create-react-class": "15.6.3",
+    "create-react-class": "^15.7.0",
     "emoji-mart": "^3.0.0",
     "emojione": "4.5.0",
     "filestack-js": "0.9.9",

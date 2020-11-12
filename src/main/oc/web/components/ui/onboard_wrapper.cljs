@@ -1,25 +1,20 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
-            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.ui :as ui-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
@@ -30,8 +25,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [goog.dom :as gdom]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
 (defn- submit-on-enter [submit-cb e]
@@ -62,22 +55,34 @@
                     (rum/local false ::password-error)
                     (rum/local "" ::email)
                     (rum/local "" ::pswd)
+                    (rum/local false ::saving)
                     {:will-mount (fn [s]
                       (user-actions/signup-with-email-reset-errors)
-                      s)}
+                      s)
+                     :will-update (fn [s]
+                                    (let [signup-with-email @(drv/get-ref s user-store/signup-with-email)]
+                                      (when (and @(::saving s)
+                                                 (not (:loading signup-with-email)))
+                                        (reset! (::saving s) false)))
+                                    s)}
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)
         auth-settings (drv/react s :auth-settings)
         deep-link-origin (drv/react s :expo-deep-link-origin)
-        continue-disabled? (or (not (utils/valid-email? @(::email s)))
-                               (<= (count @(::pswd s)) 7))
-        continue-fn (if continue-disabled?
-                      (fn [_]
-                        (when-not (utils/valid-email? @(::email s))
-                          (reset! (::email-error s) true))
-                        (when (<= (count @(::pswd s)) 7)
-                          (reset! (::password-error s) true)))
-                      #(user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))]
+        can-continue? (and (utils/valid-email? @(::email s))
+                           (> (count @(::pswd s)) 7))
+        disabled? (or (not can-continue?)
+                      @(::saving s))
+        continue-fn (when-not @(::saving s)
+                      (if can-continue?
+                        (fn [_]
+                          (reset! (::saving s) true)
+                          (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))
+                        (fn [_]
+                          (when-not (utils/valid-email? @(::email s))
+                            (reset! (::email-error s) true))
+                          (when (<= (count @(::pswd s)) 7)
+                            (reset! (::password-error s) true)))))]
     [:div.onboard-container-inner.lander.group
       [:header.main-cta
         [:div.top-back-button-container
@@ -90,7 +95,7 @@
           "Let’s get started!"]
         [:div.top-continue-container
          [:button.mlb-reset.top-continue
-           {:class (when continue-disabled? "disabled")
+           {:class (when disabled? "disabled")
             :on-click continue-fn}
            "Continue"]]]
       [:div.onboard-form
@@ -132,6 +137,10 @@
             (cond
               (= (:error signup-with-email) 409)
               [:span.error "Email already exists"]
+              (> 399 (:error signup-with-email) 500)
+              [:span.error "Error, try again or "
+               [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
+               "."]
               @(::email-error s)
               [:span.error "Email is not valid"])]
           [:input.field.oc-input
@@ -161,7 +170,7 @@
                            (reset! (::email-error s) false)
                            (reset! (::pswd s) v))}]
           [:button.continue
-            {:class (when continue-disabled? "disabled")
+            {:class (when disabled? "disabled")
              :on-touch-start identity
              :on-click continue-fn}
             "Continue"]
