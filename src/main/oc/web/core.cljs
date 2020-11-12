@@ -169,7 +169,7 @@
                              (contains? query-params :reminders))
                     :reminders)
         panel-stack (cond
-                      :x [:payments] ;org-settings [org-settings]
+                      org-settings [org-settings]
                       user-settings [user-settings]
                       reminders [reminders]
                       :else [])
