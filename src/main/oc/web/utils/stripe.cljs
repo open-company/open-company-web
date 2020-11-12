@@ -1,11 +1,11 @@
 (ns oc.web.utils.stripe
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.local-settings :as ls]))
+  (:require [oc.web.local-settings :as ls]
+            ["stripe" :as Stripe]))
 
 (def stripe-obj (atom nil))
 
 (defn- init []
-  (reset! stripe-obj (js/Stripe. ls/stripe-api-key)))
+  (reset! stripe-obj (Stripe. ls/stripe-api-key)))
 
 (defn stripe []
   (when (nil? @stripe-obj)
