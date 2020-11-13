@@ -45,7 +45,6 @@
     "react-color": "^2.18.1",
     "react-dom": "16.11.0",
     "react-virtualized": "^9.22.2",
-    "stripe": "^8.121.0",
     "xregexp": "4.3.0"
   }
 }
