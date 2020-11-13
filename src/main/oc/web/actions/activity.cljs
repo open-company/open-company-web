@@ -24,7 +24,6 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.routing :as routing-actions]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -668,7 +667,7 @@
      (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
   ([edit-key edited-data section-editing entry-save-cb]
-     (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
+     (when-not (:paywall? (dis/payments-data))
        (let [publisher-board (some #(when (:publisher-board %) %) (dis/editable-boards-data))
              fixed-edited-data (merge edited-data {:status (or (:status edited-data) "draft")
                                                    :board-slug (if (and publisher-board
@@ -779,7 +778,7 @@
     (entry-publish-with-board-finish entry-uuid edit-key (when success (json->cljs body)))))
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
-  (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
+  (when-not (:paywall? (dis/payments-data))
     (let [fixed-edit-key (or edit-key :entry-editing)]
       (if (get-in dis/app-state [edit-key :auto-saving])
         (utils/after 1000 #(entry-publish entry-editing section-editing edit-key))

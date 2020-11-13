@@ -1,11 +1,10 @@
 (ns oc.web.utils.stripe
-  (:require [oc.web.local-settings :as ls]
-            ["stripe" :as Stripe]))
+  (:require [oc.web.local-settings :as ls]))
 
 (def stripe-obj (atom nil))
 
 (defn- init []
-  (reset! stripe-obj (Stripe. ls/stripe-api-key)))
+  (reset! stripe-obj (js/Stripe. ls/stripe-api-key)))
 
 (defn stripe []
   (when (nil? @stripe-obj)
@@ -13,9 +12,7 @@
   @stripe-obj)
 
 (defn redirect-to-checkout [session-data & [callback]]
-  (let [s (stripe)
-        checkout-promise (.redirectToCheckout ^js s
-                          (clj->js session-data))]
+  (let [checkout-promise (.redirectToCheckout ^js (stripe) (clj->js session-data))]
     (.then checkout-promise
      (fn [res]
       (when (fn? callback)

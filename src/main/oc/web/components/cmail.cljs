@@ -6,7 +6,6 @@
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
@@ -14,17 +13,14 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
-            [oc.web.utils.ui :as ui-utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
@@ -33,8 +29,6 @@
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
-            [goog.dom :as gdom]
-            [goog.Uri :as guri]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
@@ -539,7 +533,7 @@
                        self-board-name
                        %))
         payments-data (drv/react s :payments)
-        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
+        show-paywall-alert? (:paywall? payments-data)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -605,8 +599,8 @@
                       (utils/after 280
                        #(when-let [el (headline-element s)]
                           (utils/to-end-of-content-editable el)))))}
-      (when (and show-paywall-alert?
-                 (not expanded-state?))
+      (when true ;(and show-paywall-alert?
+                 ;(not expanded-state?))
         (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
         {:ref :cmail-container}
