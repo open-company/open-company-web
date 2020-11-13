@@ -1,6 +1,5 @@
 (ns oc.web.components.payments-settings-modal
   (:require [rum.core :as rum]
-            [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.urls :as oc-urls]
@@ -125,11 +124,11 @@
                  (str " ending in " (:last-4 card)))
                ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
               [:button.mlb-reset.change-pay-method-bt
-                {:on-click #(payments-actions/add-payment-method payments-data)}
+                {:on-click #(payments-actions/open-checkout! payments-data)}
                 "Update payment information"]]
         [:div.price-summary-details
           [:button.mlb-reset.change-pay-method-bt
-            {:on-click #(payments-actions/add-payment-method payments-data)}
+            {:on-click #(payments-actions/open-checkout! payments-data)}
             (str "Subscribe to " ls/product-name)]])
       (when (or (is-trial? subscription-data)
                 (is-trial-expired? subscription-data))
@@ -323,7 +322,7 @@
                                                                (save-price-change s payments-data current-price-data)
                                                                (alert-modal/hide-alert))}]
                           (alert-modal/show-alert alert-data)))
-                      (payments-actions/add-payment-method payments-data
+                      (payments-actions/open-checkout! payments-data
                        ;; In case user changed the price let's add it to the callback
                        ;; so we save once payment method is added
                        (when (not= initial-price @current-price)
@@ -370,9 +369,7 @@
       (let [subscription-data (payments-actions/get-active-subscription payments-data)
             initial-price-nickname (or (-> subscription-data :price :nickname) "Monthly") ;; Default to the monthly default price
             checkout-result @(drv/get-ref s dis/checkout-result-key)
-            has-payment-info? (seq (:payment-methods payments-data))
-            updating-price (when checkout-result
-                            @(drv/get-ref s dis/checkout-update-price-key))]
+            has-payment-info? (:payment-method-on-file? payments-data)]
         (reset! (::payments-tab s) (if (or (not (payments-actions/get-active-subscription payments-data))
                                            (not has-payment-info?))
                                      :change
@@ -413,47 +410,11 @@
      s)}
   [s {:keys [org-data]}]
   (let [org-data (drv/react s :org-data)
-        ;; payments-tab (::payments-tab s)
-        ;; is-change-tab? (= @payments-tab :change)
         {:keys [portal-link can-open-portal?] :as payments-data} (drv/react s :payments)
         has-payment-info? (seq (:payment-methods payments-data))]
     [:div.payments-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
-      ;; -------- Old code with internal payments handling -------
-      ;; [:div.payments-settings-modal-container
-      ;;   [:div.payments-settings-header.group
-      ;;     [:div.payments-settings-header-title
-      ;;       (if (and is-change-tab?
-      ;;                payments-data)
-      ;;        (if has-payment-info?
-      ;;          "Change plan"
-      ;;          "Select a plan")
-      ;;        "Billing")]
-      ;;     (when (and payments-data
-      ;;                (not is-change-tab?)
-      ;;                (nil? @(::checkout-result s)))
-      ;;       [:button.mlb-reset.save-bt
-      ;;         {:on-click #(change-tab s :change)
-      ;;          :disabled (or @(::saving-price s)
-      ;;                        @(::canceling-subscription s))}
-      ;;         "Change plan"])
-      ;;     (when (and payments-data
-      ;;                (nil? @(::checkout-result s))
-      ;;                has-payment-info?)
-      ;;       [:button.mlb-reset.cancel-bt
-      ;;         {:on-click #(if is-change-tab?
-      ;;                       (change-tab s :summary)
-      ;;                       (nav-actions/show-org-settings nil))}
-      ;;         "Back"])]
-      ;;   [:div.payments-settings-body
-      ;;     (if-not payments-data
-      ;;       (small-loading)
-      ;;       (if is-change-tab?
-      ;;         (price-change s payments-data)
-      ;;         (price-summary s payments-data)))]]
-      ;; ---------------------------------------------------------
-
      [:div.payments-settings-modal-container
       [:div.payments-settings-header.group
        [:div.payments-settings-header-title
@@ -469,5 +430,7 @@
          [:div.payments-settings-header-title
           "Change your plan:"]
          [:button.mlb-reset.go-premium-button
-          {:on-click #(payments-actions/open-portal! payments-data)}
+          {:on-click  #(if has-payment-info?
+                         (payments-actions/open-portal! payments-data)
+                         (payments-actions/open-checkout! payments-data))}
           "Go Premium!"])]]]))

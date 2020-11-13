@@ -17,6 +17,31 @@
 (def default-trial-expired-status "past_due")
 (def default-positive-statuses #{default-trial-status default-active-status})
 
+;; Subscriptions data retrieve
+
+(defn get-active-subscription [payments-data]
+  (last (:subscriptions payments-data)))
+
+(defn get-current-subscription [payments-data]
+  (first (:subscriptions payments-data)))
+
+;; Paywall
+
+(defn- premium-customer?
+  "Given the loaded payments data return true if the UI needs to show the paywall."
+  [payments-data]
+  (let [fixed-payments-data (or payments-data
+                                (dis/payments-data))
+        has-valid-subscription? (some (comp default-positive-statuses :status) (:subscriptions fixed-payments-data))]
+    (js/console.log "DBG premium-customer?" fixed-payments-data)
+    (js/console.log "DBG    has-valid-subscription?" has-valid-subscription?)
+    (or ;; in case payments is disabled every user is a premium user
+        (not ls/payments-enabled)
+        ;; the payments data have been loaded
+        (and (map? fixed-payments-data)
+             ;; there is at least an active/trialing subscription
+             has-valid-subscription?))))
+
 ;; Payments data handling
 
 (defn parse-payments-data [{:keys [status body success]}]
@@ -24,9 +49,15 @@
                         success (json->cljs body)
                         (= status 404) :404
                         :else nil)
-        portal-link (utils/link-for (:links payments-data) "portal" "POST")]
+        portal-link (utils/link-for (:links payments-data) "portal" "POST")
+        premium? (premium-customer? payments-data)
+        has-payments-data? (not (zero? (count (:payment-methods payments-data))))]
+    (js/console.log "DBG premium?" premium? "-> paywall?" (not premium?))
     (merge payments-data {:can-open-portal? (map? portal-link)
-                          :portal-link portal-link})))
+                          :portal-link portal-link
+                          :premium? premium?
+                          :paywall? (not premium?)
+                          :payment-method-on-file? has-payments-data?})))
 
 (defn get-payments-cb [org-slug resp]
   (let [parsed-payments-data (parse-payments-data resp)]
@@ -67,7 +98,7 @@
 
 ;; Checkout
 
-(defn add-payment-method [payments-data & [change-price-data]]
+(defn open-checkout! [payments-data & [change-price-data]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
         base-domain (if ua/mobile-app?
@@ -95,43 +126,6 @@
                                :solid-button-title "OK, got it"
                                :solid-button-cb alert-modal/hide-alert}]
               (alert-modal/show-alert alert-data)))))))))))
-
-;; Subscriptions data retrieve
-
-(defn get-active-subscription [payments-data]
-  (last (:subscriptions payments-data)))
-
-(defn get-current-subscription [payments-data]
-  (first (:subscriptions payments-data)))
-
-;; Paywall
-
-(defn show-paywall-alert?
-  "Given the loaded payments data return true if the UI needs to show the paywall and prevent any publish.
-  Condition to show the paywall, or:
-  - status different than trialing/active"
-  [payments-data]
-  (let [fixed-payments-data (or payments-data
-                                (dis/payments-data))
-        subscription-data (get-current-subscription fixed-payments-data)
-        subscription-status (:status subscription-data)
-        is-trial? (= (:status fixed-payments-data) default-trial-status)
-        trial-expired? (> (* (:trial-end fixed-payments-data) 1000) (.getDate (js/Date.)))
-        period-expired? (> (* (:current-period-end fixed-payments-data) 1000) (.getDate (js/Date.)))]
-    (and ;; payments service is enabled
-         ls/payments-enabled
-         ;; Do not show paywall until payments data are loaded
-         fixed-payments-data
-         (or ;; the payments data are not available yet
-             (= fixed-payments-data :404)
-             ;; If customer has no subscription yet
-             ;; FIXME: added to fix a race condition where users were seeing the
-             ;; paywall after signup until refresh (Sean on FF with Slack signup)
-             (and (map? subscription-data)
-                  ;; or the org is on a non active price
-                  (not (default-positive-statuses subscription-status)))))
-    false))
-
 
 ;; Customer portal redirect
 

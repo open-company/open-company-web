@@ -167,7 +167,7 @@
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
-        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
+        show-trial-expired? (:paywall? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
         ;; show-follow-picker (= open-panel :follow-picker)
@@ -292,8 +292,8 @@
                        (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
-            (when show-trial-expired?
-              (trial-expired-banner))
+            ; (when show-trial-expired?
+            ;   (trial-expired-banner))
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner

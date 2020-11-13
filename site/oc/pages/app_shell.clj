@@ -55,7 +55,9 @@
           ;; Intercom (Support)
           (shared/intercom-js)
           ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
+          ;; Stripe
+          shared/stripe-js]
    :body [:body
           [:div#app
            oc-loading]
@@ -115,7 +117,9 @@
           shared/ie-jquery-fix
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
-          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]]
+          [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
+          ;; Stripe
+          shared/stripe-js]
    :body [:body
           [:div#app
            [:div.oc-loading.active
