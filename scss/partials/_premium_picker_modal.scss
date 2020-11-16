@@ -1,0 +1,213 @@
+div.premium-picker-modal {
+  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  z-index: #{$navbar_zindex + 199};
+  background-color: $carrot_modal_bg;
+
+  div.premium-picker-modal-inner {
+    position: relative;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    width: 720px;
+    background-color: var(--overlay-background-color);
+    border-radius: 6px;
+    box-shadow: var(--box-shadow);
+    display: flex;
+
+    button.close-modal-bt {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      background-size: 12px 12px;
+      background-color: var(--color);
+      border-radius: 50%;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 1;
+      display: block;
+      border: none;
+      position: absolute;
+      right: -16px;
+      top: -16px;
+  
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      }
+  
+      &:not(.disabled):hover {
+        opacity: 0.9;
+      }
+    }
+
+    div.premium-picker-modal-content {
+      width: 50%;
+      margin: 40px 0;
+      padding: 0 40px;
+      border-right: 1px solid var(--opac-background-color-2);
+    
+      @include mobile() {
+        margin: 24px 0;
+        padding: 0 24px;
+      }
+
+      h3.premium-picker-modal-title {
+        @include OC_Body_Bold();
+        color: var(--color);
+        font-size: 22px;
+        line-height: 28px;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    div.premium-picker-modal-quote {
+      width: 50%;
+      margin: 40px 0;
+      padding: 0 40px;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+      justify-content: center;
+    
+      @include mobile() {
+        margin: 24px 0;
+        padding: 0 24px;
+      }
+
+      div.quote-copy {
+        margin-top: auto;
+        @include OC_Body_Book();
+        color: var(--color);
+        font-size: 16px;
+        line-height: 21px;
+        text-align: center;
+      }
+
+      div.quote-avatar {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        @include image-4x("/img/ML/premium_picker_quote_avatar");
+        background-size: 40px 40px;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin: 16px auto 0;
+      }
+
+      div.quote-name {
+        margin-top: 8px;
+        @include OC_Body_Bold();
+        color: var(--color);
+        font-size: 14px;
+        line-height: 18px;
+        text-align: center;
+      }
+
+      div.quote-link {
+        color: $carrot_green;
+        font-size: 14px;
+        line-height: 18px;
+        @include OC_Body_Book();
+        text-align: center;
+        margin-bottom: auto;
+      }
+    }
+  }
+}
+
+div.premium-picker {
+  margin-top: 8px;
+
+  div.premium-picker-plans-container {
+    display: flex;
+
+    div.premium-picker-plan {
+      padding: 0;
+      margin: 0;
+      border-radius: 6px;
+      border: 2px solid var(--opac-background-color-2);
+      padding: 0 8px;
+      display: block;
+      height: 32px;
+      margin-right: 8px;
+      cursor: pointer;
+      
+      input.plan-radio-input {
+        display: none;
+      }
+
+      div.premium-picker-plan-name {
+        padding: 0;
+        line-height: 28px;
+        font-size: 14px;
+        @include OC_Body_Book();
+        color: var(--opac-background-color-2);
+      }
+
+      &.selected {
+        border: 2px solid var(--color);
+
+        div.premium-picker-plan-name {
+          color: var(--color);
+        }
+      }
+    }
+  }
+
+  div.premium-picker-price {
+    font-size: 16px;
+    line-height: 21px;
+    color: var(--light-color);
+    @include OC_Body_Book();
+    margin-top: 8px;
+  }
+
+  ul.premium-picker-features-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 24px 0 0 0;
+
+    li {
+      border-top: 1px solid var(--opac-background-color-08);
+      padding: 8px 0 8px 24px;
+      @include OC_Body_Book();
+      font-size: 16px;
+      line-height: 20px;
+      color: var(--color);
+      position: relative;
+
+      &:before {
+        width: 16px;
+        height: 16px;
+        content: "";
+        display: block;
+        @include svgBgColor("/img/ML/poll_voted_check.svg", center, 16px 16px, $carrot_green);
+        position: absolute;
+        left: 0;
+        top: 12px;
+      }
+    }
+  }
+
+  button.continue {
+    background-color: $carrot_green;
+    color: white;
+    border-radius: 6px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    padding: 9px 24px;
+    height: 34px;
+    margin-top: 16px;
+  }
+}

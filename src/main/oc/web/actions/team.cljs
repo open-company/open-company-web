@@ -1,13 +1,11 @@
 (ns oc.web.actions.team
   (:require [clojure.string :as string]
-            [taoensso.timbre :as timbre]
             [oc.web.api :as api]
-            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
@@ -60,11 +58,18 @@
   (let [current-panel (last (:panel-stack @dis/app-state))
         load-delay (if (#{:org :integrations :team :invite-picker :invite-email :invite-slack} current-panel)
                      0
-                     2500)]
+                     2500)
+        org-data (dis/org-data)]
+    (js/console.log "DBG read-teams with org-data" org-data)
     (doseq [team teams
-            :let [team-link (utils/link-for (:links team) "item")
+            :let [current-team? (= (:team-id team) (:team-id org-data))
+                  team-link (utils/link-for (:links team) "item")
                   channels-link (utils/link-for (:links team) "channels")
-                  roster-link (utils/link-for (:links team) "roster")]]
+                  roster-link (utils/link-for (:links team) "roster")
+                  payments-link (utils/link-for (:links team) "payments")]]
+      (when (and current-team?
+                 payments-link)
+        (payments-actions/maybe-load-payments-data payments-link false))
       ; team link may not be present for non-admins, if so they can still get team users from the roster
       (if team-link
         (utils/maybe-after load-delay #(team-get team-link))
