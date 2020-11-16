@@ -24,6 +24,7 @@
 ;; :invite-email
 ;; :invite-slack
 ;; :payments
+;; :premium-picker
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -280,7 +281,8 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (when (or (not= panel :payments)
+    (when (or (and (not= panel :payments)
+                   (not= panel :premium-picker))
               ls/payments-enabled)
       (push-panel panel))
     (pop-panel)))

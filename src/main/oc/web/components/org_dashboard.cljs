@@ -33,10 +33,10 @@
             [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
             [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.web.components.premium-picker-modal :refer (premium-picker-modal)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
-            [oc.web.components.payments-settings-modal :refer (payments-settings-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
@@ -198,8 +198,8 @@
           ;; Activity not found
           show-login-wall
           (login-wall)
-          (= open-panel :payments)
-          (payments-settings-modal {:org-data org-data})
+          (= open-panel :premium-picker)
+          (premium-picker-modal)
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
