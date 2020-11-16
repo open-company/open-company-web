@@ -60,7 +60,6 @@
                      0
                      2500)
         org-data (dis/org-data)]
-    (js/console.log "DBG read-teams with org-data" org-data)
     (doseq [team teams
             :let [current-team? (= (:team-id team) (:team-id org-data))
                   team-link (utils/link-for (:links team) "item")

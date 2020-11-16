@@ -164,13 +164,13 @@
                                (:can-open-checkout? payments-data))
                            current-org-slug)
         billing-label (when show-billing?
-                        (if (:can-open-checkout? payments-data)
-                          "Go premium!"
-                          "Manage subscription"))
+                        (if (:can-open-portal? payments-data)
+                          "Manage subscription"
+                          "Go premium!"))
         billing-click (when show-billing?
-                        (if (:can-open-checkout? payments-data)
-                          premium-picker-click
-                          (partial manage-subscription-click payments-data)))]
+                        (if (:can-open-portal? payments-data)
+                          (partial manage-subscription-click payments-data)
+                          premium-picker-click))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))

@@ -1,6 +1,6 @@
 (ns oc.web.actions.payments
   (:require [oc.web.api :as api]
-            [clojure.string :as string]
+            [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -34,8 +34,6 @@
   (let [fixed-payments-data (or payments-data
                                 (dis/payments-data))
         has-valid-subscription? (some (comp default-positive-statuses :status) (:subscriptions fixed-payments-data))]
-    (js/console.log "DBG premium-customer?" fixed-payments-data)
-    (js/console.log "DBG    has-valid-subscription?" has-valid-subscription?)
     (or ;; in case payments is disabled every user is a premium user
         (not ls/payments-enabled)
         ;; the payments data have been loaded
@@ -44,6 +42,34 @@
              has-valid-subscription?))))
 
 ;; Payments data handling
+
+(defn- price-name [price-interval]
+  (cond (= price-interval "month")
+        "Monthly"
+        (= price-interval "year")
+        "Yearly"))
+
+(defn- price-to-human [amount currency]
+  (let [int-price-amount (int (/ amount 100))
+        decimal-price-amount* (mod amount 100)
+        decimal-price-amount (if (= (-> decimal-price-amount* str count) 1)
+                               (str "0" decimal-price-amount*)
+                               (str decimal-price-amount*))
+        currency-symbol (case currency
+                          "usd" "$"
+                          "eur" "€"
+                          (str currency " "))]
+    (str currency-symbol int-price-amount "." decimal-price-amount)))
+
+(defn- price-description [{:keys [unit-amount currency estimated-amount interval]} seat-count]
+  (str (price-to-human unit-amount currency) " per user, per " interval
+       (when (not= seat-count 1)
+         (str " (" (price-to-human estimated-amount currency) " for " seat-count " users)"))))
+
+(defn- parse-price [price seat-count]
+  (-> price
+      (assoc :description-label (price-description price seat-count))
+      (assoc :name-label (price-name (:interval price)))))
 
 (defn parse-payments-data [{:keys [status body success]}]
   (let [payments-data (cond
@@ -54,13 +80,18 @@
         checkout-link (utils/link-for (:links payments-data) "checkout")
         premium? (premium-customer? payments-data)
         has-payments-data? (not (zero? (count (:payment-methods payments-data))))]
-    (merge payments-data {:can-open-portal? (map? portal-link)
-                          :can-open-checkout? (map? checkout-link)
-                          :portal-link portal-link
-                          :checkout-link checkout-link
-                          :premium? premium?
-                          :paywall? (not premium?)
-                          :payment-method-on-file? has-payments-data?})))
+    (-> payments-data
+        (merge {:can-open-portal? (map? portal-link)
+                :can-open-checkout? (map? checkout-link)
+                :portal-link portal-link
+                :checkout-link checkout-link
+                :premium? premium?
+                :paywall? (not premium?)
+                :payment-method-on-file? has-payments-data?})
+        (update :available-prices (fn [prices] (->> prices
+                                                    (map #(parse-price % (:seat-count payments-data)))
+                                                    (sort-by :unit-amount)
+                                                    vec))))))
 
 (defn get-payments-cb [org-slug resp]
   (let [parsed-payments-data (parse-payments-data resp)]
@@ -84,29 +115,9 @@
                      force-refresh?))
         (get-payments payments-link))))))
 
-;; Subscription handling
-
-(defn create-price-subscription [payments-data price-id & [callback]]
-  (let [create-subscription-link (utils/link-for (:links payments-data) "create")
-        org-slug (dis/current-org-slug)]
-    (when create-subscription-link
-      (api/update-price-subscription create-subscription-link price-id
-       (fn [{:keys [status body success] :as resp}]
-        (get-payments-cb org-slug resp)
-        (callback success))))))
-
-(defn delete-price-subscription [payments-data & [callback]]
-  (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")
-        org-slug (dis/current-org-slug)]
-    (when delete-subscription-link
-      (api/update-price-subscription delete-subscription-link nil
-       (fn [{:keys [success] :as resp}]
-        (get-payments-cb org-slug resp)
-        (callback success))))))
-
 ;; Checkout
 
-(defn open-checkout! [payments-data & [change-price-data]]
+(defn open-checkout! [payments-data change-price-id]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         base-domain (if ua/mobile-app?
                       ;; Get the deep link url but strip out the last slash to avoid
@@ -114,9 +125,7 @@
                       (string/join "" (butlast (dis/expo-deep-link-origin)))
                       ls/web-server-domain)
         base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
-        success-redirect-url (str base-redirect-url "true"
-                               (when change-price-data
-                                 (str "&update-price=" (:id change-price-data))))
+        success-redirect-url (str base-redirect-url "true" "&picked-price=" change-price-id)
         cancel-redirect-url (str base-redirect-url "false")]
     (api/get-checkout-session-id (:checkout-link fixed-payments-data) success-redirect-url cancel-redirect-url
      (fn [{:keys [success body]}]
@@ -143,6 +152,7 @@
           _ (.add (.-classList form) "hidden")
           _ (oset! form "method" "POST")
           _ (oset! form "action" (:href portal-link))
+          _ (oset! form "target" "_blank")
           redirect-input (gDom/createElement "input")
           _ (oset! redirect-input "type" "hidden")
           _ (oset! redirect-input "value" client-url)

@@ -1,5 +1,6 @@
 (ns oc.web.components.premium-picker-modal
   (:require [rum.core :as rum]
+            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.mixins.ui :as ui-mixins]))
@@ -8,33 +9,32 @@
   rum/reactive
   (rum/local :monthly ::selected-price)
   (drv/drv :payments)
+  {:will-mount (fn [s]
+                 (let [prices (-> s (drv/get-ref :payments) deref :available-prices)
+                       monthly-plan (some #(when (= (:interval %) "month") %) prices)]
+                   (reset! (::selected-price s) (:id monthly-plan)))
+                 s)}
   [s]
-  (let [payments-data (drv/react s :payments)]
+  (let [payments-data (drv/react s :payments)
+        available-prices (:available-prices payments-data)
+        selected-price (::selected-price s)
+        current-price (some #(when (= (:id %) @selected-price) %) available-prices)]
     [:div.premium-picker
      [:div.premium-picker-plans-container
-      [:div.premium-picker-plan
-       {:class (when (= @(::selected-price s) :monthly) "selected")
-        :on-click #(reset! (::selected-price s) :monthly)}
-       [:input.plan-radio-input
-        {:checked (= @(::selected-price s) :monthly)
-         :value ""
-         :ref :monthly-plan-radio}]
-       [:div.premium-picker-plan-name
-        "Monthly"]]
-      [:div.premium-picker-plan
-       {:class (when (= @(::selected-price s) :yearly) "selected")
-        :on-click #(reset! (::selected-price s) :yearly)}
-       [:input.plan-radio-input
-        {:checked (= @(::selected-price s) :yearly)
-         :value ""
-         :ref :yearly-plan-radio}]
-       [:div.premium-picker-plan-name
-        "Yearly"]]]
+      (for [price available-prices
+            :let [selected? (= @selected-price (:id price))]]
+        [:div.premium-picker-plan
+         {:key (:id price)
+          :class (when selected? "selected")
+          :on-click #(reset! (::selected-price s) (:id price))}
+         [:input.plan-radio-input
+          {:checked selected?
+           :value ""}]
+         [:div.premium-picker-plan-name
+          (:name-label price)]])]
 
      [:div.premium-picker-price
-      (if (= @(::selected-price s) :monthly)
-        "$5 per user, per month"
-        "$50 per user, per year")]
+      (:description-label current-price)]
 
      [:ul.premium-picker-features-list
       [:li "Private/public topics"]
@@ -43,7 +43,7 @@
       [:li "Custom colors and branding"]]
      
      [:button.continue.mlb-reset
-      {:on-click #(payments-actions/open-checkout! payments-data nil)}
+      {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
       "Upgrade to premium"]]))
 
 (rum/defc premium-picker-modal <
