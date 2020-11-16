@@ -1,5 +1,6 @@
 (ns oc.web.actions.payments
   (:require [oc.web.api :as api]
+            [clojure.string :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -50,11 +51,13 @@
                         (= status 404) :404
                         :else nil)
         portal-link (utils/link-for (:links payments-data) "portal" "POST")
+        checkout-link (utils/link-for (:links payments-data) "checkout")
         premium? (premium-customer? payments-data)
         has-payments-data? (not (zero? (count (:payment-methods payments-data))))]
-    (js/console.log "DBG premium?" premium? "-> paywall?" (not premium?))
     (merge payments-data {:can-open-portal? (map? portal-link)
+                          :can-open-checkout? (map? checkout-link)
                           :portal-link portal-link
+                          :checkout-link checkout-link
                           :premium? premium?
                           :paywall? (not premium?)
                           :payment-method-on-file? has-payments-data?})))
@@ -67,14 +70,19 @@
   (when ls/payments-enabled
     (api/get-payments payments-link (partial get-payments-cb (dis/current-org-slug)))))
 
-(defn maybe-load-payments-data [org-data & [force-refresh?]]
+(defn maybe-load-payments-data
+  ([force-refresh?]
+   (let [teams-data (dis/teams-data)
+         org-data (dis/org-data)
+         payments-link (some #(when (= (:team-id %) (:team-id org-data)) (utils/link-for (:links %) "payments")) teams-data)]
+     (maybe-load-payments-data payments-link force-refresh?)))
+  ([payments-link force-refresh?]
   (when ls/payments-enabled
     (let [payments-data (dis/payments-data)]
-      (when (and org-data
+      (when (and payments-link
                  (or (not payments-data)
                      force-refresh?))
-        (when-let [payments-link (utils/link-for (:links org-data) "payments")]
-          (get-payments payments-link))))))
+        (get-payments payments-link))))))
 
 ;; Subscription handling
 
@@ -92,7 +100,7 @@
         org-slug (dis/current-org-slug)]
     (when delete-subscription-link
       (api/update-price-subscription delete-subscription-link nil
-       (fn [{:keys [status body success] :as resp}]
+       (fn [{:keys [success] :as resp}]
         (get-payments-cb org-slug resp)
         (callback success))))))
 
@@ -100,19 +108,18 @@
 
 (defn open-checkout! [payments-data & [change-price-data]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
-        checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
         base-domain (if ua/mobile-app?
                       ;; Get the deep link url but strip out the last slash to avoid
                       ;; a double slash
-                      (clojure.string/join "" (butlast (dis/expo-deep-link-origin)))
+                      (string/join "" (butlast (dis/expo-deep-link-origin)))
                       ls/web-server-domain)
         base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
                                (when change-price-data
                                  (str "&update-price=" (:id change-price-data))))
         cancel-redirect-url (str base-redirect-url "false")]
-    (api/get-checkout-session-id checkout-link success-redirect-url cancel-redirect-url
-     (fn [{:keys [success body status]}]
+    (api/get-checkout-session-id (:checkout-link fixed-payments-data) success-redirect-url cancel-redirect-url
+     (fn [{:keys [success body]}]
       (when success
        (let [session-data (json->cljs body)]
          (dis/dispatch! [:payments-checkout-session-id session-data])

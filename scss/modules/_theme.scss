@@ -35,6 +35,8 @@ $dark_mode: "dark";
   --divider-line: #{rgba($deep_navy, 0.15)};
   --overlay-background-color: white;
   --highlighter-bg-color: #FEDF95;
+  --box-shadow-color: rgba(0, 0, 0, 0.07);
+  --box-shadow: 0 2px 4px 0 var(--box-shadow-color);
 
   --opac-background-color-04: #{rgba($deep_navy, 0.04)};
   --opac-background-color-05: #{rgba($deep_navy, 0.05)};
@@ -66,7 +68,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(white, 0)}; // #{rgba(241, 240, 240, 0)};
   --foc-new-menu-gradient-from: white;
   --foc-new-menu-gradient-to: #{rgba(white, 0)};
-  --foc-box-shadow: rgba(0, 0, 0, 0.07);
+  --foc-box-shadow: --box-shadow-color;
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -97,7 +99,7 @@ $dark_mode: "dark";
   --comments-floating-bt-border: #DCDDE1;
   --add-comment-background: white;
   --add-comment-border-color: --divider-line;
-  --add-comment-box-shadow: rgba(0, 0, 0, 0.07);
+  --add-comment-box-shadow: --box-shadow-color;
   --mobile-add-comment-background: white;
 
   // Cmail
@@ -108,9 +110,9 @@ $dark_mode: "dark";
   --cmail-fullscreen-background-color: white;
   --cmail-background-color: white;
   --cmail-border: 1px solid #{rgba($deep_navy, 0.24)};
-  --cmail-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  --cmail-box-shadow: --box-shadow;
   --cmail-active-border: 1px solid #DCDDE1;
-  --cmail-active-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  --cmail-active-box-shadow: --box-shadow;
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
@@ -129,7 +131,7 @@ $dark_mode: "dark";
 
   // Polls
   --poll-background-color: white;
-  --poll-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+  --poll-box-shadow: 0 2px 8px 0 var(--box-shadow-color);
 
   // Code blocks
   --code-background-color: #{rgba($deep_navy, 0.08)};
@@ -149,7 +151,7 @@ $dark_mode: "dark";
 
   // Explore
   --explore-hover-border-color: #{rgba($deep_navy, 0.32)};
-  --explore-hover-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  --explore-hover-box-shadow: --box-shadow;
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(0, 0, 0, 0.24);
@@ -185,6 +187,8 @@ $dark_mode: "dark";
   --divider-line: #{rgba(white, 0.16)};
   --overlay-background-color: #1B202A;
   --highlighter-bg-color: #FEDF95;
+  --box-shadow-color: rgba(255, 255, 255, 0.11);
+  --box-shadow: 0 2px 4px 0 var(--box-shadow-color);
 
   --opac-background-color-04: #{rgba(white, 0.04)};
   --opac-background-color-05: #{rgba(white, 0.05)};
@@ -215,7 +219,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(45, 49, 59, 0)}; // #{rgba(36, 41, 50, 0)};
   --foc-new-menu-gradient-from: #{rgba(45, 49, 59, 1)};
   --foc-new-menu-gradient-to: #{rgba(45, 49, 59, 0)};
-  --foc-box-shadow: rgba(255, 255, 255, 0.11);
+  --foc-box-shadow: --box-shadow-color;
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.11)};
@@ -246,7 +250,7 @@ $dark_mode: "dark";
   --comments-floating-bt-border: #{rgba(white, 0.08)};
   --add-comment-background: rgb(27, 32, 42);
   --add-comment-border-color: --divider-line;
-  --add-comment-box-shadow: rgba(255, 255, 255, 0.07);
+  --add-comment-box-shadow: --box-shadow-color;
   --mobile-add-comment-background: #1B202A;
 
   // Cmail
@@ -257,9 +261,9 @@ $dark_mode: "dark";
   --cmail-background-color: #{rgba(white, 0.09)};
   --cmail-fullscreen-background-color: rgb(27, 32, 42);
   --cmail-border: 1px solid #{rgba(white, 0.16)};
-  --cmail-box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
+  --cmail-box-shadow: --box-shadow;
   --cmail-active-border: 1px solid #{rgba(white, 0.08)};
-  --cmail-active-box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.21);
+  --cmail-active-box-shadow: --box-shadow;
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
@@ -278,7 +282,7 @@ $dark_mode: "dark";
 
   // Polls
   --poll-background-color: #2c313a;
-  --poll-box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.16);
+  --poll-box-shadow: 0px 2px 8px 0px var(--box-shadow-color);
 
   // Code blocks
   --code-background-color: #2C313A;
@@ -298,7 +302,7 @@ $dark_mode: "dark";
 
   // Explore
   --explore-hover-border-color: #{rgba(white, 0.32)};
-  --explore-hover-box-shadow: 0 2px 4px 0 #{rgba(white, 0.08)};
+  --explore-hover-box-shadow: --box-shadow;
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(255, 255, 255, 0.12);

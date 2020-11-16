@@ -1,7 +1,6 @@
 (ns oc.web.actions.org
   (:require-macros [if-let.core :refer (when-let*)])
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.api :as api]
+  (:require [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -11,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
@@ -287,7 +285,7 @@
   (fullstory/track-org org-data)
   (chat/identify) ; Intercom
 
-  (payments-actions/maybe-load-payments-data org-data complete-refresh?)
+  (payments-actions/maybe-load-payments-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
   (set! (.-title js/document) (str ls/product-name  " | " (:name org-data))))

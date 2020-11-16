@@ -15,6 +15,7 @@
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
@@ -75,9 +76,13 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
-(defn payments-click [e]
+(defn premium-picker-click [e]
   (.preventDefault e)
-  (nav-actions/show-org-settings :payments))
+  (nav-actions/show-org-settings :premium-picker))
+
+(defn manage-subscription-click [payments-data e]
+  (.preventDefault e)
+  (payments-actions/open-portal! payments-data))
 
 (defn- detect-native-app
   []
@@ -116,6 +121,7 @@
         (.on hr "fivetaps" (fn [_] (reset! (::complete-info s) true)))))))
 
 (rum/defcs menu < rum/reactive
+                  (drv/drv :payments)
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
@@ -133,7 +139,8 @@
      (whats-new/check-whats-new-badge))
     s)}
   [s]
-  (let [{:keys [panel-stack org-data board-data current-org-slug]} (drv/react s :navbar-data)
+  (let [{:keys [panel-stack org-data current-org-slug]} (drv/react s :navbar-data)
+        payments-data (drv/react s :payments)
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         show-reminders? (when ls/reminders-enabled?
@@ -153,9 +160,17 @@
         long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
                        (str "Endpoint: " ls/web-server))
-        show-billing? (and ls/payments-enabled
-                           (= (:role current-user-data) :admin)
-                           current-org-slug)]
+        show-billing? (and (or (:can-open-portal? payments-data)
+                               (:can-open-checkout? payments-data))
+                           current-org-slug)
+        billing-label (when show-billing?
+                        (if (:can-open-checkout? payments-data)
+                          "Go premium!"
+                          "Manage subscription"))
+        billing-click (when show-billing?
+                        (if (:can-open-checkout? payments-data)
+                          premium-picker-click
+                          (partial manage-subscription-click payments-data)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -270,9 +285,9 @@
                     show-billing?)
             [:a.payments
               {:href "#"
-              :on-click payments-click}
+              :on-click billing-click}
               [:div.oc-menu-item
-                "Billing"]])
+                billing-label]])
           ;; What's new & Support separator
           [:div.oc-menu-separator]
           ;; What's new
@@ -294,9 +309,9 @@
                     show-billing?)
             [:a.payments
               {:href "#"
-              :on-click payments-click}
+              :on-click billing-click}
               [:div.oc-menu-item
-                "Billing"]])
+                billing-label]])
           ;; Desktop app
           (when native-app-data
             [:a
