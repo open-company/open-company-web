@@ -1,10 +1,8 @@
 (ns oc.web.lib.jwt
   (:require [oc.web.lib.cookies :as cook]
             [taoensso.timbre :as timbre]
-            [goog.date.DateTime :as gdt]
             [oc.lib.schema :as lib-schema]
             [oc.web.local-settings :as ls]
-            ;; [goog.date :as gd]
             [cljs-time.coerce :as tc]
             [cljs-time.core :as t]
             [schema.core :as schema]
@@ -123,7 +121,7 @@
     (get contents k)))
 
 (defn ^:export expired? []
-  (let [epoch (gdt/fromTimestamp (get-key :expire))
+  (let [epoch (get-key :expire)
         ;; local-expired? (= expire (gd/min (js/Date.) expire))
         local-expired? (not (t/before? (t/now) (tc/from-long epoch)))
         schema-expired? (schema/validate lib-schema/NotExpired epoch)
@@ -132,8 +130,14 @@
     (js/console.log "DBG   local check: expired:" local-expired?)
     (js/console.log "DBG   lib check: expired:" lib-expired?)
     (js/console.log "DBG   schema check: expired:" schema-expired?)
-    (js/console.log "DBG   validate JWT:" (schema/validate lib-schema/ValidJWTClaims (get-contents)))
+    (js/console.log "DBG   lib validate JWT:" (lib-schema/valid? lib-schema/ValidJWTClaims (get-contents)))
+    (js/console.log "DBG   schema validate JWT:" (schema/validate lib-schema/ValidJWTClaims (get-contents)))
     local-expired?))
+
+(def ^:export schema-validate schema/validate)
+(def ^:export t_before? t/before?)
+(def ^:export t_now t/now)
+(def ^:export tc_from-long tc/from-long)
 
 (defn is-slack-org? []
   (= (get-key :auth-source) "slack"))
