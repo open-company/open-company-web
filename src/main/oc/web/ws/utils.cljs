@@ -123,7 +123,7 @@
       (timbre/warn "Disconnecting client due to invalid JWT!" rep)
       (s/chsk-disconnect! @channelsk)
       (cond
-        (j/expired?)
+        (j/refresh?)
         (jwt-refresh-cb reconnect-cb)
         (= rep :chsk/timeout)
         (do
@@ -147,7 +147,7 @@
 
 (defn post-handshake-auth [jwt-refresh-cb auth-cb]
   (timbre/debug "Trying post handshake jwt auth")
-  (if (j/expired?)
+  (if (j/refresh?)
     (jwt-refresh-cb auth-cb)
     (auth-cb)))
 
