@@ -2,8 +2,23 @@
   (:require [oc.web.lib.cookies :as cook]
             [taoensso.timbre :as timbre]
             [goog.date.DateTime :as gdt]
+            [oc.lib.schema :as lib-schema]
+            [oc.web.local-settings :as ls]
             [goog.date :as gd]
+            [oc.lib.cljs.interval :as interval]
+            [oops.core :refer (oget)]
             ["jwt-decode" :as jwt-decode]))
+
+(defonce ^:private -jwt (atom nil))
+(defonce ^:private -jwt-content (atom nil))
+
+(defonce ^:private -id-token (atom nil))
+(defonce ^:private -id-token-content (atom nil))
+
+(def ^:private jwt-cookie-name :jwt)
+(def ^:private id-token-cookie-name :id-token)
+
+(def ^:private auto-updater (atom nil))
 
 ;; jwt_decode
 
@@ -14,25 +29,91 @@
       (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
       nil)))
 
-;; ID Token
+;; Read ID Token
 
-(defn id-token []
-  (cook/get-cookie :id-token))
+(defn- read-id-token-cookie []
+  (cook/get-cookie id-token-cookie-name))
 
-(defn get-id-token-contents
-  ([] (get-id-token-contents (id-token)))
-  ([token]
-     (some-> token
-             decode
-             (js->clj :keywordize-keys true))))
+(defn ^:export id-token []
+  (if @-id-token
+    @-id-token
+    (reset! -id-token (read-id-token-cookie))))
 
-;; JWT
+(defn get-id-token-contents []
+  (if @-id-token-content
+    @-id-token-content
+    (reset! -id-token-content
+            (some-> (id-token)
+                    decode
+                    (js->clj :keywordize-keys true)))))
+
+(defn- refresh-id-token []
+  (reset! -id-token nil)
+  (reset! -id-token-content nil)
+  (id-token)
+  (get-id-token-contents))
+
+;; Read JWT
+
+(defn- read-jwt-cookie []
+  (cook/get-cookie jwt-cookie-name))
 
 (defn jwt []
-  (cook/get-cookie :jwt))
+  (if @-jwt
+    @-jwt
+    (reset! -jwt (read-jwt-cookie))))
 
-(defn get-contents []
-  (some-> (jwt) decode (js->clj :keywordize-keys true)))
+(defn ^:export get-contents []
+  (if @-jwt-content
+    @-jwt-content
+    (reset! -jwt-content (some-> (jwt) decode (js->clj :keywordize-keys true)))))
+
+(defn- refresh-jwt []
+  (reset! -jwt nil)
+  (reset! -jwt-content nil)
+  (jwt)
+  (get-contents))
+
+;; Validation
+
+(defn ^:export valid?
+  ([token-claims]
+   (lib-schema/valid? token-claims lib-schema/ValidJWTClaims))
+  ([]
+   (valid? (get-contents))))
+
+(defn refresh?
+  ([]
+   (not (valid?))))
+
+;; Write/delete ID Token
+
+(defn set-id-token! [id-token-data]
+  (cook/set-cookie! id-token-cookie-name id-token-data -1 (oget js/window "location.pathname") ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (id-token)
+  (get-id-token-contents))
+
+(defn remove-id-token! []
+  (cook/remove-cookie! id-token-cookie-name)
+  (reset! -id-token nil)
+  (reset! -id-token-content nil))
+
+;; Write/delete JWT
+
+(defn set-jwt! [jwt]
+  (interval/stop-interval! auto-updater)
+  (cook/set-cookie! jwt-cookie-name jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (refresh-jwt)
+  (interval/start-interval! auto-updater))
+
+(defn remove-jwt! []
+  (interval/stop-interval! auto-updater)
+  (cook/remove-cookie! jwt-cookie-name)
+  (reset! -jwt nil)
+  (reset! -jwt-content nil)
+  (interval/start-interval! auto-updater))
+
+;; Keys
 
 (defn get-key [k]
   (let [contents (if (jwt) (get-contents) (get-id-token-contents))]
@@ -73,4 +154,11 @@
     ;; for the team value
     (some (fn [[k v]] (when (= (slack-bots-team-key team-id) k) v)) slack-bots)))
 
-(set! (.-OCWebPrintJWTContents js/window) get-contents)
+(defn init []
+  (refresh-jwt)
+  (refresh-id-token)
+  ;; Refresh the JWT every second
+  (interval/start-interval! auto-updater))
+
+(defn premium? [team-id]
+  (-> (get-key :premium-teams) set team-id))
