@@ -134,6 +134,7 @@
     (js/console.log "DBG   schema validate JWT:" (schema/validate lib-schema/ValidJWTClaims (get-contents)))
     local-expired?))
 
+(def ^:export lib-schema_NotExpired lib-schema/NotExpired)
 (def ^:export schema-validate schema/validate)
 (def ^:export t_before? t/before?)
 (def ^:export t_now t/now)
