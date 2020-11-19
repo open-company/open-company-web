@@ -37,11 +37,11 @@ div.premium-picker-modal {
       position: absolute;
       right: -16px;
       top: -16px;
-  
+
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
       }
-  
+
       &:not(.disabled):hover {
         opacity: 0.9;
       }
@@ -52,7 +52,7 @@ div.premium-picker-modal {
       margin: 40px 0;
       padding: 0 38px 0 40px;
       border-right: 1px solid var(--opac-background-color-2);
-    
+
       @include mobile() {
         margin: 24px 0;
         padding: 0 24px;
@@ -76,7 +76,7 @@ div.premium-picker-modal {
       flex-flow: column nowrap;
       align-items: center;
       justify-content: center;
-    
+
       @include mobile() {
         margin: 24px 0;
         padding: 0 24px;
@@ -141,7 +141,7 @@ div.premium-picker {
       height: 32px;
       margin-right: 8px;
       cursor: pointer;
-      
+
       input.plan-radio-input {
         display: none;
       }
@@ -194,7 +194,7 @@ div.premium-picker {
         }
       }
 
-      div.premium-picker-feature-item
+      div.premium-picker-feature-item {
 
         &.has-tooltip {
           span.premium-picker-feature-item:after {
@@ -205,7 +205,7 @@ div.premium-picker {
             font-size: 14px;
           }
         }
-        
+
         span.premium-picker-feature-item {
           @include OC_Body_Book();
           font-size: 16px;
