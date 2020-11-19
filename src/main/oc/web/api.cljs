@@ -1,13 +1,12 @@
 (ns oc.web.api
-  (:require-macros [cljs.core.async.macros :refer (go)]
-                   [if-let.core :refer (when-let*)])
+  (:require-macros [cljs.core.async.macros :refer (go)])
   (:require [goog.Uri :as guri]
-            [clojure.string :as s]
             [cljs-http.client :as http]
             [defun.core :refer (defun-)]
             [taoensso.timbre :as timbre]
             [cljs.core.async :as async :refer (<!)]
             [oc.web.lib.jwt :as j]
+            [oc.lib.schema :as lib-schema]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
@@ -21,21 +20,21 @@
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
-(def ^:private web-endpoint ls/web-server-domain)
+(def ^:private web-origin ls/web-server-domain)
 
-(def ^:private storage-endpoint ls/storage-server-domain)
+(def ^:private storage-origin ls/storage-server-domain)
 
-(def ^:private auth-endpoint ls/auth-server-domain)
+(def ^:private auth-origin ls/auth-server-domain)
 
-(def ^:private payments-endpoint ls/payments-server-domain)
+(def ^:private payments-origin ls/payments-server-domain)
 
-(def ^:private interaction-endpoint ls/interaction-server-domain)
+(def ^:private interaction-origin ls/interaction-server-domain)
 
-(def ^:private change-endpoint ls/change-server-domain)
+(def ^:private change-origin ls/change-server-domain)
 
-(def ^:private search-endpoint ls/search-server-domain)
+(def ^:private search-origin ls/search-server-domain)
 
-(def ^:private reminders-endpoint ls/reminder-server-domain)
+(def ^:private reminders-origin ls/reminder-server-domain)
 
 (defun- relative-href
   "Given a link map or a link string return the relative href."
@@ -121,8 +120,8 @@
                       refresh-link)
         headers (if (map? refresh-link) {:headers (headers-for-link refresh-link)} {})
         method (if (map? refresh-link)
-                  (method-for-link refresh-link)
-                  http/get)]
+                 (method-for-link refresh-link)
+                 http/get)]
   (method refresh-url (complete-params headers))))
 
 ;; Async version of jwt-refresh
@@ -157,63 +156,75 @@
     (= method http/put)
     "PUT"))
 
-(defn- req [endpoint method path params on-complete]
-  (timbre/debug "Req:" (method-name method) (str endpoint path))
-  (let [jwt (j/jwt)
-        expired? (j/expired?)]
+(defn- real-refresh-jwt [token-content & [retry-request-cb]]
+  (if (:refresh-url token-content)
     (go
-     ;; sync refresh
-     (when (and jwt expired?)
-       (if-let [refresh-url (j/get-key :refresh-url)]
-         (let [res (<! (refresh-jwt refresh-url))]
-            (timbre/debug "jwt-refresh" res)
-            (if (:success res)
-             (jwt-refresh-handler (:body res))
-              (jwt-refresh-error-hn)))
-          (jwt-refresh-error-hn)))
+      (let [res (<! (refresh-jwt (:refresh-url token-content)))]
+        (timbre/debug "jwt-refresh" res)
+        (if (:success res)
+          (do
+            (jwt-refresh-handler (:body res))
+            ;; If token refresh succeeded, retry the current request if there is one
+            (when (fn? retry-request-cb)
+              (utils/after 10 retry-request-cb)))
+          (jwt-refresh-error-hn))))
+    (jwt-refresh-error-hn)))
 
+(defn- req [origin method path params on-complete & [second-attempt?]]
+  (timbre/debug "Req:" (method-name method) (str origin path))
+  (let [token-content (j/get-contents)]
+    (when (and token-content
+                (j/refresh?))
+      (real-refresh-jwt token-content))
+    (go
+      (let [{:keys [status] :as response} (<! (method (str origin path) (complete-params params)))]
+        (timbre/debug "Resp:" (method-name method) (str origin path) status response)
+      ; When a request gets a 440, it means the token needs to be refreshed
+        (if (and token-content
+                 (= status 440)
+                 (not second-attempt?))
+          (do
+            (real-refresh-jwt token-content
+                              #(req origin method path params on-complete true)))
+          (do ; when a request gets a 401, redirect the user to logout
+            ; (presumably they are using an old token, or attempting anonymous access),
+            ; but only if they are already logged in
+            (when (and token-content
+                       (= status 401))
+              (router/redirect! oc-urls/logout))
+          ; If it was a 5xx or a 0 show a banner for network issues
+            (when (or (zero? status)
+                      (<= 500 status 599))
+              (network-error-handler))
+          ; report all 5xx to sentry
+            (when (or (<= 500 status 599)
+                      (= status 400)
+                      (= status 422))
+              (let [report {:response response
+                            :path path
+                            :method (method-name method)
+                            :jwt (j/jwt)
+                            :params params
+                            :sessionURL (fullstory/session-url)}]
+                (timbre/error "xhr response error:" (method-name method) ":" (str origin path) " -> " status)
+                (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
+            (on-complete response)))))))
 
-      (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
-        (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
-        ; when a request gets a 401, redirect the user to logout
-        ; (presumably they are using an old token, or attempting anonymous access),
-        ; but only if they are already logged in
-        (when (and jwt
-                   (= status 401))
-          (router/redirect! oc-urls/logout))
-        ; If it was a 5xx or a 0 show a banner for network issues
-        (when (or (zero? status)
-                  (<= 500 status 599))
-          (network-error-handler))
-        ; report all 5xx to sentry
-        (when (or (<= 500 status 599)
-                  (= status 400)
-                  (= status 422))
-          (let [report {:response response
-                        :path path
-                        :method (method-name method)
-                        :jwt (j/jwt)
-                        :params params
-                        :sessionURL (fullstory/session-url)}]
-            (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
-            (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
-        (on-complete response)))))
+(def ^:private web-http (partial req web-origin))
 
-(def ^:private web-http (partial req web-endpoint))
+(def ^:private storage-http (partial req storage-origin))
 
-(def ^:private storage-http (partial req storage-endpoint))
+(def ^:private auth-http (partial req auth-origin))
 
-(def ^:private auth-http (partial req auth-endpoint))
+(def ^:private payments-http (partial req payments-origin))
 
-(def ^:private payments-http (partial req payments-endpoint))
+(def ^:private interaction-http (partial req interaction-origin))
 
-(def ^:private interaction-http (partial req interaction-endpoint))
+(def ^:private change-http (partial req change-origin))
 
-(def ^:private change-http (partial req change-endpoint))
+(def ^:private search-http (partial req search-origin))
 
-(def ^:private search-http (partial req search-endpoint))
-
-(def ^:private reminders-http (partial req reminders-endpoint))
+(def ^:private reminders-http (partial req reminders-origin))
 
 ;; Report failed api request
 
