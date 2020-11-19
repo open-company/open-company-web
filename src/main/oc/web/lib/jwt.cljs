@@ -22,7 +22,7 @@
 
 ;; jwt_decode
 
-(defn decode [encoded-jwt]
+(defn ^:export decode [encoded-jwt]
   (try
     (jwt-decode encoded-jwt)
     (catch js/Object e
@@ -58,7 +58,7 @@
 (defn- read-jwt-cookie []
   (cook/get-cookie jwt-cookie-name))
 
-(defn jwt []
+(defn  ^:export jwt []
   (if @-jwt
     @-jwt
     (reset! -jwt (read-jwt-cookie))))
@@ -68,7 +68,7 @@
     @-jwt-content
     (reset! -jwt-content (some-> (jwt) decode (js->clj :keywordize-keys true)))))
 
-(defn- refresh-jwt []
+(defn- ^:export refresh-jwt []
   (reset! -jwt nil)
   (reset! -jwt-content nil)
   (jwt)
@@ -82,7 +82,7 @@
   ([]
    (valid? (get-contents))))
 
-(defn refresh?
+(defn ^:export refresh?
   ([]
    (not (valid?))))
 
@@ -115,11 +115,11 @@
 
 ;; Keys
 
-(defn get-key [k]
+(defn ^:export get-key [k]
   (let [contents (if (jwt) (get-contents) (get-id-token-contents))]
     (get contents k)))
 
-(defn expired? []
+(defn ^:export expired? []
   (let [expire (gdt/fromTimestamp (get-key :expire))]
     (= expire (gd/min (js/Date.) expire))))
 
@@ -160,5 +160,5 @@
   ;; Refresh the JWT every second
   (interval/start-interval! auto-updater))
 
-(defn premium? [team-id]
+(defn ^:export premium? [team-id]
   (-> (get-key :premium-teams) set team-id))
