@@ -123,7 +123,8 @@
       (timbre/warn "Disconnecting client due to invalid JWT!" rep)
       (s/chsk-disconnect! @channelsk)
       (cond
-        (j/refresh?)
+        (and (j/get-contents)
+             (j/refresh?))
         (jwt-refresh-cb reconnect-cb)
         (= rep :chsk/timeout)
         (do
