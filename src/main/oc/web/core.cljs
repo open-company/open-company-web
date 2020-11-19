@@ -57,7 +57,6 @@
             [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.secure-activity :refer (secure-activity)]
@@ -721,6 +720,7 @@
     (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn ^:export init []
+  (jwt/init)
   ;; Setup timbre log level
   (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
   ;; Setup API requests

@@ -5,7 +5,8 @@
 (rum/defc carrot-option-button < rum/static
   [{:keys [selected disabled did-change-cb]}]
   [:div.carrot-option-button
-    {:on-click #(when-not disabled
+    {:on-click #(when (and (not disabled)
+                           (fn? did-change-cb))
                   (did-change-cb (not selected)))
      :class (utils/class-set {:selected selected
                               :disabled disabled})}])
