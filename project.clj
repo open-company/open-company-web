@@ -18,7 +18,13 @@
   :dependencies [;; Lisp on the JVM http://clojure.org/documentation
                  [org.clojure/clojure "1.10.2-alpha1"]
                  ;; Library for OC projects https://github.com/open-company/open-company-lib
-                 [open-company/lib "0.17.29-alpha32"]
+                 ;; ************************************************************************
+                 ;; ****************** NB: don't go under 0.17.29-alpha56 ******************
+                 ;; ***************** (JWT schema changes, more info here: *****************
+                 ;; ******* https://github.com/open-company/open-company-lib/pull/82) ******
+                 ;; ************************************************************************
+                 [open-company/lib "0.17.29-alpha57"]
+                 ;; ************************************************************************
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]
                  ;; HTML rendering https://github.com/weavejester/hiccup
