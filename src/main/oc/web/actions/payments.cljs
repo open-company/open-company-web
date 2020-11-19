@@ -124,8 +124,8 @@
                       ;; a double slash
                       (string/join "" (butlast (dis/expo-deep-link-origin)))
                       ls/web-server-domain)
-        base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
-        success-redirect-url (str base-redirect-url "true" "&picked-price=" change-price-id)
+        base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&picked-price=" change-price-id "&result=")
+        success-redirect-url (str base-redirect-url "true")
         cancel-redirect-url (str base-redirect-url "false")]
     (api/get-checkout-session-id (:checkout-link fixed-payments-data) success-redirect-url cancel-redirect-url
      (fn [{:keys [success body]}]
@@ -147,7 +147,12 @@
 
 (defn open-portal! [payments-data]
   (when-let [portal-link (:portal-link payments-data)]
-    (let [client-url (str ls/web-server-domain (router/get-token) "?org_settings=payments")
+    (let [base-domain (if ua/mobile-app?
+                      ;; Get the deep link url but strip out the last slash to avoid
+                      ;; a double slash
+                        (string/join "" (butlast (dis/expo-deep-link-origin)))
+                        ls/web-server-domain)
+          client-url (str base-domain (router/get-token) "?org_settings=payments")
           form (gDom/createElement "form")
           _ (.add (.-classList form) "hidden")
           _ (oset! form "method" "POST")
