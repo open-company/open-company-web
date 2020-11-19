@@ -19,7 +19,7 @@
              oc-urls/native-login
              oc-urls/home)))
   ([location]
-   (cook/remove-cookie! :jwt)
+   (jwt/remove-jwt!)
    (router/redirect! location)
    (dis/dispatch! [:logout])))
 
@@ -32,19 +32,14 @@
     (when id-token-contents
       (fullstory/identify))))
 
-(defn update-id-token-cookie [id-token]
-  (cook/set-cookie! :id-token id-token -1 (.. js/window -location -pathname) ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
 (defn update-id-token [token-body]
   (timbre/info "Updating id-token:" token-body)
   (when token-body
-    (update-id-token-cookie token-body)
+    (jwt/set-id-token! token-body)
     (dispatch-id-token)))
 
 ;; JWT
-
-(defn update-jwt-cookie [jwt]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
 
 (defn dispatch-jwt []
   (when (and (cook/get-cookie :show-login-overlay)
@@ -61,7 +56,7 @@
 (defn update-jwt [jbody]
   (timbre/info "Updating jwt:" jbody)
   (when jbody
-    (update-jwt-cookie jbody)
+    (jwt/set-jwt! jbody)
     (dispatch-jwt)))
 
 (defn jwt-refresh
