@@ -4,7 +4,10 @@
             [goog.date.DateTime :as gdt]
             [oc.lib.schema :as lib-schema]
             [oc.web.local-settings :as ls]
-            [goog.date :as gd]
+            ;; [goog.date :as gd]
+            [cljs-time.coerce :as tc]
+            [cljs-time.core :as t]
+            [schema.core :as schema]
             [oc.lib.cljs.interval :as interval]
             [oops.core :refer (oget)]
             ["jwt-decode" :as jwt-decode]))
@@ -120,8 +123,17 @@
     (get contents k)))
 
 (defn ^:export expired? []
-  (let [expire (gdt/fromTimestamp (get-key :expire))]
-    (= expire (gd/min (js/Date.) expire))))
+  (let [epoch (gdt/fromTimestamp (get-key :expire))
+        ;; local-expired? (= expire (gd/min (js/Date.) expire))
+        local-expired? (not (t/before? (t/now) (tc/from-long epoch)))
+        schema-expired? (schema/validate lib-schema/NotExpired epoch)
+        lib-expired? (lib-schema/valid? lib-schema/NotExpired epoch)]
+    (js/console.log "DBG expired? value:" epoch)
+    (js/console.log "DBG   local check: expired:" local-expired?)
+    (js/console.log "DBG   lib check: expired:" lib-expired?)
+    (js/console.log "DBG   schema check: expired:" schema-expired?)
+    (js/console.log "DBG   validate JWT:" (schema/validate lib-schema/ValidJWTClaims (get-contents)))
+    local-expired?))
 
 (defn is-slack-org? []
   (= (get-key :auth-source) "slack"))
