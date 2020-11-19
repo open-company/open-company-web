@@ -78,7 +78,7 @@
 
 (defn ^:export valid?
   ([token-claims]
-   (lib-schema/valid? token-claims lib-schema/ValidJWTClaims))
+   (lib-schema/valid? lib-schema/ValidJWTClaims token-claims))
   ([]
    (valid? (get-contents))))
 

@@ -172,31 +172,33 @@
 
 (defn- req [origin method path params on-complete & [second-attempt?]]
   (timbre/debug "Req:" (method-name method) (str origin path))
-  (let [token-content (j/get-contents)]
-    (when (and token-content
-                (j/refresh?))
-      (real-refresh-jwt token-content))
+  (if (and (j/get-contents)
+           (j/refresh?)
+           (not second-attempt?))
+    (real-refresh-jwt (j/get-contents)
+                      #(req origin method path params on-complete true))
     (go
       (let [{:keys [status] :as response} (<! (method (str origin path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str origin path) status response)
-      ; When a request gets a 440, it means the token needs to be refreshed
-        (if (and token-content
+        ; When a request gets a 440, it means the token needs to be refreshed
+        (if (and (j/get-contents)
                  (= status 440)
                  (not second-attempt?))
-          (do
-            (real-refresh-jwt token-content
-                              #(req origin method path params on-complete true)))
+          (real-refresh-jwt (j/get-contents)
+                            #(req origin method path params on-complete true))
           (do ; when a request gets a 401, redirect the user to logout
-            ; (presumably they are using an old token, or attempting anonymous access),
-            ; but only if they are already logged in
-            (when (and token-content
-                       (= status 401))
+              ; (presumably they are using an old token, or attempting anonymous access),
+              ; but only if they are already logged in
+            (when (and (j/get-contents)
+                       (or (= status 401)
+                           (and (= status 440)
+                                second-attempt?)))
               (router/redirect! oc-urls/logout))
-          ; If it was a 5xx or a 0 show a banner for network issues
+            ; If it was a 5xx or a 0 show a banner for network issues
             (when (or (zero? status)
                       (<= 500 status 599))
               (network-error-handler))
-          ; report all 5xx to sentry
+            ; report all 5xx to sentry
             (when (or (<= 500 status 599)
                       (= status 400)
                       (= status 422))
