@@ -15,7 +15,6 @@ function OCWebHelp(){
               "OCWebPrintContainerData()\n" +
               "OCWebPrintEntryEditingData()\n" +
               "OCWebPrintFilteredPostsData()\n" +
-              "OCWebPrintJWTContents(): to print the content of the JWT\n" +
               "OCWebPrintOrgData(): to print the current org data\n" +
               "OCWebPrintPanelStack(): to print the right side panel state\n" +
               "OCWebPrintPostsData()\n"+

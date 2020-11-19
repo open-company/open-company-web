@@ -174,7 +174,7 @@
       (if (empty? body)
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
-          (jwt-actions/update-jwt-cookie body)
+          (jwt-actions/update-jwt body)
           (lander-check-team-redirect)))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
@@ -340,7 +340,7 @@
                  (router/nav! (oc-urls/default-landing (:slug (get-default-org orgs))))))))))
       :else ;; Valid signup let's collect user data
       (do
-        (jwt-actions/update-jwt-cookie jwt)
+        (jwt-actions/update-jwt jwt)
         (nux-actions/new-user-registered "email")
         (utils/after 200 #(router/nav! signup-redirect))
         (api/get-entry-point (dis/current-org-slug) entry-point-get-finished)

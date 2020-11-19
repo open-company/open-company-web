@@ -667,7 +667,9 @@
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
           previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
           previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))
-          can-compose? (boolean (seq (some #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST")) (:boards org-data))))]
+          can-compose? (boolean (seq (some #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST")) (:boards org-data))))
+          create-public-board-link (utils/link-for (:links org-data) "create-public")
+          create-private-board-link (utils/link-for (:links org-data) "create-private")]
       (-> org-data
           (update :brand-color #(or % ls/default-brand-color))
           (assoc :read-only (readonly-org? (:links org-data)))
@@ -677,7 +679,9 @@
           (assoc :drafts-count (ou/disappearing-count-value previous-org-drafts-count (:count drafts-link)))
           (assoc :bookmarks-count (ou/disappearing-count-value previous-bookmarks-count (:bookmarks-count org-data)))
           (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data)))
-          (assoc :can-compose? can-compose?)))))
+          (assoc :can-compose? can-compose?)
+          (assoc :can-create-public-board? (map? create-public-board-link))
+          (assoc :can-create-private-board? (map? create-private-board-link))))))
 
 (defn parse-board
   "Parse board data coming from the API."

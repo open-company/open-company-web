@@ -194,7 +194,9 @@
                                 :solid-button-cb #(do
                                                     (alert-modal/hide-alert)
                                                     (on-change nil nil exit-cb))})
-                              (on-change nil nil exit-cb)))]
+                              (on-change nil nil exit-cb)))
+        private-allowed? (:can-create-private-board? org-data)
+        public-allowed? (:can-create-public-board? org-data)]
     [:div.section-editor-container
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
                     (utils/event-stop %)
@@ -294,26 +296,40 @@
                                                                                    :has-changes true})]))}
                 team-access]
               [:div.access-list-row
-                {:on-click (fn [e]
-                              (utils/event-stop e)
-                              (reset! (::show-access-list s) false)
-                              (when show-slack-channels?
-                                (reset! (::slack-enabled s) false))
-                              (dis/dispatch! [:update [:section-editing]
-                                              #(merge % {:access "private"
-                                                         :has-changes true
-                                                         :authors (conj (set (:authors section-editing)) current-user-id)
-                                                         :slack-mirror (if show-slack-channels?
-                                                                         nil
-                                                                         (:slack-mirror section-editor))})]))}
+                {:class (when-not private-allowed? "disabled")
+                 :data-toggle (when-not private-allowed? "tooltip")
+                 :title "Private topics are allowed only on Premium."
+                 :data-placement "top"
+                 :on-click (fn [e]
+                             (if private-allowed?
+                               (do
+                                 (utils/event-stop e)
+                                 (reset! (::show-access-list s) false)
+                                 (when show-slack-channels?
+                                   (reset! (::slack-enabled s) false))
+                                 (dis/dispatch! [:update [:section-editing]
+                                                 #(merge % {:access "private"
+                                                            :has-changes true
+                                                            :authors (conj (set (:authors section-editing)) current-user-id)
+                                                            :slack-mirror (if show-slack-channels?
+                                                                            nil
+                                                                            (:slack-mirror section-editor))})]))
+                               (nav-actions/show-org-settings :premium-picker)))}
                 private-access]
               (when-not disallow-public-board?
                 [:div.access-list-row
-                  {:on-click (fn [e]
-                                (utils/event-stop e)
-                                (reset! (::show-access-list s) false)
-                                (dis/dispatch! [:update [:section-editing] #(merge % {:access "public"
-                                                                                      :has-changes true})]))}
+                  {:class (when-not public-allowed? "disabled")
+                   :data-toggle (when-not public-allowed? "tooltip")
+                   :title "Public topics are allowed only on Premium."
+                   :data-placement "top"
+                   :on-click (fn [e]
+                               (if public-allowed?
+                                 (do
+                                   (utils/event-stop e)
+                                   (reset! (::show-access-list s) false)
+                                   (dis/dispatch! [:update [:section-editing] #(merge % {:access "public"
+                                                                                         :has-changes true})]))
+                                 (nav-actions/show-org-settings :premium-picker)))}
                   public-access])])
           (when show-slack-channels?
             [:div.section-editor-add-label.top-separator
