@@ -164,4 +164,5 @@
   (interval/start-interval! auto-updater))
 
 (defn ^:export premium? [team-id]
-  (-> (get-key :premium-teams) set team-id))
+  (let [team-id-kw (keyword team-id)]
+    (some->> (get-key :premium-teams) (map keyword) set team-id-kw boolean)))

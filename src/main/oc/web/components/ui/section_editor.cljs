@@ -1,6 +1,5 @@
 (ns oc.web.components.ui.section-editor
   (:require [rum.core :as rum]
-            [goog.object :as gobj]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
@@ -101,7 +100,7 @@
 
 (rum/defcs section-editor <
   ;; Mixins
-  mixins/refresh-tooltips-mixin
+  mixins/strict-refresh-tooltips-mixin
   rum/reactive
   ;; Locals
   (rum/local "" ::query)
@@ -124,6 +123,7 @@
   (drv/drv :team-channels)
   (drv/drv :team-roster)
   (drv/drv :current-user-data)
+  (drv/drv :payments)
   (mixins/autoresize-textarea :section-description)
   {:will-mount (fn [s]
    (team-actions/teams-get)
@@ -195,8 +195,11 @@
                                                     (alert-modal/hide-alert)
                                                     (on-change nil nil exit-cb))})
                               (on-change nil nil exit-cb)))
-        private-allowed? (:can-create-private-board? org-data)
-        public-allowed? (:can-create-public-board? org-data)]
+        private-allowed? (or (= (:access initial-section-data) "private")
+                              (:can-create-private-board? org-data))
+        public-allowed? (or (= (:access initial-section-data) "public")
+                            (:can-create-public-board? org-data))
+        premium? (:premium? (drv/react s :payments))]
     [:div.section-editor-container
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
                     (utils/event-stop %)

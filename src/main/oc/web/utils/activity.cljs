@@ -6,13 +6,11 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
             [oc.web.urls :as oc-urls]
-            [oc.lib.user :as user-lib]
             [oc.lib.html :as html-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.utils.poll :as pu]
             [oc.web.utils.comment :as cu]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
@@ -667,11 +665,13 @@
                         (utils/link-for (:links drafts-board) ["item" "self"] "GET"))
           previous-org-drafts-count (get-in db (conj (dis/org-data-key (:slug org-data)) :drafts-count))
           previous-bookmarks-count (get-in db (conj (dis/org-data-key (:slug org-data)) :bookmarks-count))
+          premium? (jwt/premium? (:team-id org-data))
           can-compose? (boolean (seq (some #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST")) (:boards org-data))))
           create-public-board-link (utils/link-for (:links org-data) "create-public")
           create-private-board-link (utils/link-for (:links org-data) "create-private")]
       (-> org-data
           (update :brand-color #(or % ls/default-brand-color))
+          (assoc :premium? premium?)
           (assoc :read-only (readonly-org? (:links org-data)))
           (assoc :boards fixed-boards)
           (assoc :author? (is-author? org-data))
