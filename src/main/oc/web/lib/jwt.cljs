@@ -78,8 +78,10 @@
 ;; Validation
 
 (defn ^:export valid?
-  ([token-claims]
-   (lib-schema/valid? lib-schema/ValidJWTClaims token-claims))
+  ([_token-claims]
+  ;;  (lib-schema/valid? lib-schema/ValidJWTClaims token-claims))
+  ;; FIXME: force validity of token locally for now, let server trigger a refresh if needed
+  true)
   ([]
    (valid? (get-contents))))
 
@@ -123,22 +125,8 @@
 (defn ^:export expired? []
   (let [epoch (get-key :expire)
         ;; local-expired? (= expire (gd/min (js/Date.) expire))
-        local-expired? (not (t/before? (t/now) (tc/from-long epoch)))
-        schema-expired? (schema/validate lib-schema/NotExpired epoch)
-        lib-expired? (lib-schema/valid? lib-schema/NotExpired epoch)]
-    (js/console.log "DBG expired? value:" epoch)
-    (js/console.log "DBG   local check: expired:" local-expired?)
-    (js/console.log "DBG   lib check: expired:" lib-expired?)
-    (js/console.log "DBG   schema check: expired:" schema-expired?)
-    (js/console.log "DBG   lib validate JWT:" (lib-schema/valid? lib-schema/ValidJWTClaims (get-contents)))
-    (js/console.log "DBG   schema validate JWT:" (schema/validate lib-schema/ValidJWTClaims (get-contents)))
-    local-expired?))
-
-(def ^:export lib-schema_NotExpired lib-schema/NotExpired)
-(def ^:export schema-validate schema/validate)
-(def ^:export t_before? t/before?)
-(def ^:export t_now t/now)
-(def ^:export tc_from-long tc/from-long)
+        ]
+    (not (t/before? (t/now) (tc/from-long epoch)))))
 
 (defn is-slack-org? []
   (= (get-key :auth-source) "slack"))
