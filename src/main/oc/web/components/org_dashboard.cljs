@@ -12,10 +12,8 @@
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
-            [oc.web.actions.theme :as theme-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
@@ -36,7 +34,6 @@
             [oc.web.components.premium-picker-modal :refer (premium-picker-modal)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
-            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
@@ -167,7 +164,6 @@
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
-        show-trial-expired? (:paywall? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))
         ;; show-follow-picker (= open-panel :follow-picker)
@@ -187,7 +183,6 @@
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity current-activity-id
-                                  :trial-expired show-trial-expired?
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -292,8 +287,6 @@
                        (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
-            ; (when show-trial-expired?
-            ;   (trial-expired-banner))
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner

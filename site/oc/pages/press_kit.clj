@@ -99,8 +99,6 @@
             :target "_blank"}
            "Visit us on Github"]]
          [:li
-          "Carrot has a 14-day free trial. After that, it’s $5 per user per month. 50% off for approved nonprofits."]
-         [:li
           "Press contact: "
           [:a
            {:href "mailto:stuart.levinson@carrot.io"}
