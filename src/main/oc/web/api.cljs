@@ -172,13 +172,11 @@
 
 (defn- req [origin method path params on-complete & [second-attempt?]]
   (timbre/debug "Req:" (method-name method) (str origin path))
-  (js/console.log "DBG api/ref refresh?" (j/refresh?))
   (if (and (j/get-contents)
            (j/refresh?)
            (not second-attempt?))
     
     (do
-      (js/console.log "DBG   refreshing token after local check")
       (timbre/info "Expired token, force JWToken refresh.")
       (real-refresh-jwt (j/get-contents)
                       #(req origin method path params on-complete true)))
@@ -190,7 +188,6 @@
                  (= status 440)
                  (not second-attempt?))
           (do
-            (js/console.log "DBG   refresh token after 440 response")
             (timbre/info "440 response, force JWToken refresh.")
             (real-refresh-jwt (j/get-contents)
                             #(req origin method path params on-complete true)))
