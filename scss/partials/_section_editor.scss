@@ -418,6 +418,10 @@ div.section-editor-container {
             opacity: 1;
           }
 
+          &.disabled {
+            cursor: help!important;
+          }
+
           &:last-child {
             border-bottom: none;
           }

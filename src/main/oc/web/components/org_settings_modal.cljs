@@ -312,28 +312,29 @@
             (when (= (:error org-editing) :name-field)
               [:div.error "Must be between 3 and 50 characters"])
             (email-domains)]
-          [:div.org-settings-fields.field-group
-            [:div.field-label
+          (when (:premium? org-data)
+            [:div.org-settings-fields.field-group
+             [:div.field-label
               "Customize your team's colors"]
-            [:div.field-description
+             [:div.field-description
               "Button/link color"]
-            [:input.field-value.oc-input
-             {:type "text"
-              :class (when (= (:error org-editing) :primary-color-field) "error")
-              :value @(::primary-color-value s)
-              :pattern colors-reg-exp
-              :placeholder "Ie: red, green or #0000ff"
-              :on-focus #(reset! (::show-color-picker s) true)
-              :on-change (fn [e]
-                           (let [v (string/lower (.. e -target -value))]
-                             (reset! (::primary-color-value s) v)
-                             (when (.. e -target checkValidity)
-                               (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
-                                     hex-color (if is-hex-color? v (-> v keyword default-css-color-names))
-                                     rgb-color (rgb-from-hex hex-color)]
-                                 (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
-            (when @(::show-color-picker s)
-              [:div.color-picker-container
+             [:input.field-value.oc-input
+              {:type "text"
+               :class (when (= (:error org-editing) :primary-color-field) "error")
+               :value @(::primary-color-value s)
+               :pattern colors-reg-exp
+               :placeholder "Ie: red, green or #0000ff"
+               :on-focus #(reset! (::show-color-picker s) true)
+               :on-change (fn [e]
+                            (let [v (string/lower (.. e -target -value))]
+                              (reset! (::primary-color-value s) v)
+                              (when (.. e -target checkValidity)
+                                (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
+                                      hex-color (if is-hex-color? v (-> v keyword default-css-color-names))
+                                      rgb-color (rgb-from-hex hex-color)]
+                                  (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
+             (when @(::show-color-picker s)
+               [:div.color-picker-container
                 {:ref :color-picker-container}
                 (color-picker {:color @(::primary-color-value s) ;; (-> current-brand-color :primary :hex)
                                :onChangeComplete (fn [color]
@@ -342,41 +343,40 @@
                                                            rgb-colors (-> color (oget "?rgb") (js->clj :keywordize-keys true) (select-keys [:r :g :b]))]
                                                        (reset! (::primary-color-value s) hex-color)
                                                        (change-brand-color {:hex hex-color :rgb rgb-colors} (:secondary current-brand-color)))))})])
-            [:div.field-description.colors-preset.group
-             [:span.color-preset-label "Presets:"]
-             [:div.colors-list.group
-              (for [c color-presets
-                    :let [lower-hex (comp string/lower :hex)
-                          active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
-                [:button.mlb-reset.color-preset-bt
+             [:div.field-description.colors-preset.group
+              [:span.color-preset-label "Presets:"]
+              [:div.colors-list.group
+               (for [c color-presets
+                     :let [lower-hex (comp string/lower :hex)
+                           active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
+                 [:button.mlb-reset.color-preset-bt
                   {:key (str "color-preset-" (:hex c))
                    :on-click #(do
                                 (reset! (::primary-color-value s) (:hex c))
                                 (change-brand-color (select-keys c [:hex :rgb])
                                                     (:secondary current-brand-color)))
                    :class (when active? "active")}
-                 [:span.dot
-                  {:data-color-hex (:hex c)
-                   :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
-                   :style {:background-color (:hex c)}
-                   }]])]]
-            [:div.field-description
-             "Button text color"]
-            [:select.oc-input.field-value.button-text-color
-             {:value (-> current-brand-color :secondary :hex)
-              :on-change (fn [e]
-                           (let [v (.. e -target -value)
-                                 color-data (some #(when (= (:value %) v) %) brand-colors-list)]
-                             (change-brand-color (:primary current-brand-color) {:hex (:value color-data) :rgb (:rgb color-data)})))}
-             (for [c brand-colors-list]
-               [:option
-                {:key (str "button-text-color-" (:value c))
-                 :value (:value c)}
-                (:label c)])]
-            [:div.theme-previews
-             {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
-             (theme-preview (:brand-color org-editing) :light)
-             (theme-preview (:brand-color org-editing) :dark)]]
+                  [:span.dot
+                   {:data-color-hex (:hex c)
+                    :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
+                    :style {:background-color (:hex c)}}]])]]
+             [:div.field-description
+              "Button text color"]
+             [:select.oc-input.field-value.button-text-color
+              {:value (-> current-brand-color :secondary :hex)
+               :on-change (fn [e]
+                            (let [v (.. e -target -value)
+                                  color-data (some #(when (= (:value %) v) %) brand-colors-list)]
+                              (change-brand-color (:primary current-brand-color) {:hex (:value color-data) :rgb (:rgb color-data)})))}
+              (for [c brand-colors-list]
+                [:option
+                 {:key (str "button-text-color-" (:value c))
+                  :value (:value c)}
+                 (:label c)])]
+             [:div.theme-previews
+              {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
+              (theme-preview (:brand-color org-editing) :light)
+              (theme-preview (:brand-color org-editing) :dark)]])
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt

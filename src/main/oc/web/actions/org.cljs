@@ -446,9 +446,12 @@
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
-        with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))]
+        with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))
+        with-premium-filter (if (:premium? org-data)
+                              with-trimmed-name
+                              (dissoc with-trimmed-name :brand-color))]
     (dis/dispatch! [:org-edit-save])
-    (api/patch-org org-patch-link with-trimmed-name
+    (api/patch-org org-patch-link with-premium-filter
       (fn [{:keys [success status] :as resp}]
         (if success
           (org-edit-save-cb resp)

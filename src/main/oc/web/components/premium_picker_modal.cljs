@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.nav-sidebar :as nav-sidebar]
             [oc.web.mixins.ui :as ui-mixins]))
 
 (def premium-features-list
@@ -65,24 +66,24 @@
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin
   []
-  (let []
-    [:div.premium-picker-modal
+  [:div.premium-picker-modal
 
-     [:div.premium-picker-modal-inner
+    [:div.premium-picker-modal-inner
 
-      [:button.close-modal-bt]
+    [:button.close-modal-bt
+      {:on-click #(nav-sidebar/show-org-settings nil)}]
 
-      [:div.premium-picker-modal-content
-       [:h3.premium-picker-modal-title
-        "Carrot Premium"]
+    [:div.premium-picker-modal-content
+      [:h3.premium-picker-modal-title
+      "Carrot Premium"]
 
-       (premium-picker)]
+      (premium-picker)]
 
-      [:div.premium-picker-modal-quote
-       [:div.quote-copy
-        "“We use Carrot to make sure team updates and announcements don't get lost in Slack conversations. It keeps our remote teams in sync.”"]
-       [:div.quote-avatar]
-       [:div.quote-name
-        "Camilo Alvarez, Operations Lead"]
-       [:div.quote-link
-        "Hopper.com"]]]]))
+    [:div.premium-picker-modal-quote
+      [:div.quote-copy
+      "“We use Carrot to make sure team updates and announcements don't get lost in Slack conversations. It keeps our remote teams in sync.”"]
+      [:div.quote-avatar]
+      [:div.quote-name
+      "Camilo Alvarez, Operations Lead"]
+      [:div.quote-link
+      "Hopper.com"]]]])

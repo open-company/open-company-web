@@ -23,7 +23,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
@@ -401,7 +400,6 @@
                    (drv/drv :section-editing)
                    (drv/drv :show-edit-tooltip)
                    (drv/drv :current-user-data)
-                   (drv/drv :payments)
                    (drv/drv :follow-boards-list)
                    (drv/drv :editable-boards)
                    (drv/drv :board-slug)
@@ -532,8 +530,6 @@
                     #(if (:publisher-board cmail-data*)
                        self-board-name
                        %))
-        payments-data (drv/react s :payments)
-        show-paywall-alert? (:paywall? payments-data)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -546,7 +542,6 @@
         show-post-bt-tooltip? (not publishable?)
         post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
-                      show-paywall-alert?
                       (not publishable?)
                       @(::publishing s)
                       @(::disable-post s))
@@ -585,13 +580,11 @@
         expanded-state? (and (contains? cmail-state :collapsed)
                              (not (:collapsed cmail-state)))]
     [:div.cmail-outer
-      {:class (utils/class-set {:quick-post-collapsed (or (not expanded-state?) show-paywall-alert?)
-                                :show-trial-expired-alert show-paywall-alert?
+      {:class (utils/class-set {:quick-post-collapsed (not expanded-state?)
                                 :fullscreen (and expanded-state?
                                                  (:fullscreen cmail-state))})
        :on-click (when (and (not is-mobile?)
                             (not expanded-state?)
-                            (not show-paywall-alert?)
                             (not (:fullscreen cmail-state)))
                    (fn [e]
                       (nux-actions/dismiss-add-post-tooltip)
@@ -599,9 +592,6 @@
                       (utils/after 280
                        #(when-let [el (headline-element s)]
                           (utils/to-end-of-content-editable el)))))}
-      (when true ;(and show-paywall-alert?
-                 ;(not expanded-state?))
-        (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
         {:ref :cmail-container}
         [:div.cmail-mobile-header
@@ -685,7 +675,7 @@
                                :show-h2 true
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
-                               :paywall? show-paywall-alert?
+                               :paywall? false
                                :placeholder (str utils/default-body-placeholder "...")
                                :dispatch-input-key (first dis/cmail-data-key)
                                :cmd-enter-cb #(post-clicked s)
