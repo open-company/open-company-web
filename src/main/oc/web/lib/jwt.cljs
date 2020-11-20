@@ -78,10 +78,8 @@
 ;; Validation
 
 (defn ^:export valid?
-  ([_token-claims]
-  ;;  (lib-schema/valid? lib-schema/ValidJWTClaims token-claims))
-  ;; FIXME: force validity of token locally for now, let server trigger a refresh if needed
-  true)
+  ([token-claims]
+  (lib-schema/valid? lib-schema/ValidJWTClaims token-claims))
   ([]
    (valid? (get-contents))))
 
