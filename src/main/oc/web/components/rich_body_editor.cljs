@@ -99,8 +99,7 @@
              dispatch-input-key
              attachment-dom-selector
              fullscreen
-             cmail-key
-             paywall?]}]
+             cmail-key]}]
   (let [_mention-users (drv/react s :mention-users)
         _media-input (drv/react s :media-input)
         _users-info-hover (drv/react s :users-info-hover)
@@ -109,12 +108,11 @@
         _followers-publishers-count (drv/react s :followers-publishers-count)
         hide-placeholder? (or (not show-placeholder) @(::did-change s))]
     [:div.rich-body-editor-outer-container
-      {:key (str "rich-body-editor-" cmail-key)
-       :class (when paywall? "block-edit")}
+      {:key (str "rich-body-editor-" cmail-key)}
       [:div.rich-body-editor-container
         [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
           {:ref "editor-node"
-           :content-editable (not paywall?)
+           :content-editable true
            :class (str classes
                    (utils/class-set {:medium-editor-placeholder-hidden hide-placeholder?
                                      :medium-editor-placeholder-relative (not hide-placeholder?)

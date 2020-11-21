@@ -379,9 +379,7 @@
                                                              :staticPositioning (:static-positioned-media-picker options)
                                                              :mediaPickerContainerSelector (:media-picker-container-selector options)
                                                              :alwaysExpanded (:use-inline-media-picker options)
-                                                             :initiallyVisible (:media-picker-initially-visible options)
-                                                             :disableButtons (:paywall? options)
-                                                             }
+                                                             :initiallyVisible (:media-picker-initially-visible options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
             media-picker-ext (when-not mobile-editor
@@ -426,7 +424,6 @@
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
                      :extensions extensions
-                     :disableEditing (:paywall? options)
                      :imageDragging false
                      :targetBlank true
                      :autoLink true
