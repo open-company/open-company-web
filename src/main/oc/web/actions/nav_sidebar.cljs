@@ -281,10 +281,7 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (when (or (and (not= panel :payments)
-                   (not= panel :premium-picker))
-              ls/payments-enabled)
-      (push-panel panel))
+    (push-panel panel)
     (pop-panel)))
 
 (defn show-user-settings [panel]
@@ -347,3 +344,9 @@
   (when e
     (utils/event-stop e))
   (push-panel :invite-picker))
+
+;; Show premium picker
+
+(defn ^:export toggle-premium-picker! []
+  (when ls/payments-enabled
+    (dis/dispatch! [:update [dis/premium-picker-modal] not])))

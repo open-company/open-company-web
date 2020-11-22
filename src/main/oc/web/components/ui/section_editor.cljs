@@ -317,7 +317,7 @@
                                                             :slack-mirror (if show-slack-channels?
                                                                             nil
                                                                             (:slack-mirror section-editor))})]))
-                               (nav-actions/show-org-settings :premium-picker)))}
+                               (nav-actions/toggle-premium-picker!)))}
                 private-access]
               (when-not disallow-public-board?
                 [:div.access-list-row
@@ -332,7 +332,7 @@
                                    (reset! (::show-access-list s) false)
                                    (dis/dispatch! [:update [:section-editing] #(merge % {:access "public"
                                                                                          :has-changes true})]))
-                                 (nav-actions/show-org-settings :premium-picker)))}
+                                 (nav-actions/toggle-premium-picker!)))}
                   public-access])])
           (when show-slack-channels?
             [:div.section-editor-add-label.top-separator
