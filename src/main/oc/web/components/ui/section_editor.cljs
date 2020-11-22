@@ -198,8 +198,7 @@
         private-allowed? (or (= (:access initial-section-data) "private")
                               (:can-create-private-board? org-data))
         public-allowed? (or (= (:access initial-section-data) "public")
-                            (:can-create-public-board? org-data))
-        premium? (:premium? (drv/react s :payments))]
+                            (:can-create-public-board? org-data))]
     [:div.section-editor-container
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
                     (utils/event-stop %)
@@ -300,7 +299,9 @@
                 team-access]
               [:div.access-list-row
                 {:class (when-not private-allowed? "disabled")
-                 :data-toggle (when-not private-allowed? "tooltip")
+                 :data-toggle (when (and (not (:premium? org-data))
+                                         (not private-allowed?))
+                                "tooltip")
                  :title "Private topics are allowed only on Premium."
                  :data-placement "top"
                  :on-click (fn [e]
@@ -322,7 +323,9 @@
               (when-not disallow-public-board?
                 [:div.access-list-row
                   {:class (when-not public-allowed? "disabled")
-                   :data-toggle (when-not public-allowed? "tooltip")
+                   :data-toggle (when (and (not (:premium? org-data))
+                                           (not public-allowed?))
+                                  "tooltip")
                    :title "Public topics are allowed only on Premium."
                    :data-placement "top"
                    :on-click (fn [e]
