@@ -1,13 +1,11 @@
 (ns oc.web.stores.user
-  (:require [taoensso.timbre :as timbre]
-            [oc.lib.user :as user-lib]
+  (:require [oc.lib.user :as user-lib]
+            [clojure.set :as clj-set]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
-            [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
-            [oc.web.utils.notification :as notif-utils]
             ["moment-timezone" :as moment-timezone]))
 
 (defonce default-avatar-url (uu/random-avatar))
@@ -47,7 +45,7 @@
 
 (def default-invite-type "email")
 
-(defn- pointed-name [{:keys [first-name last-name] :as user}]
+(defn- pointed-name [{:keys [first-name last-name]}]
   (str first-name " " (first last-name) "."))
 
 (defn parse-users [users-list org-data follow-publishers-list]
@@ -70,7 +68,9 @@
      users-list)))
 
 (defn parse-user-data [user-data org-data active-users]
-  (let [active-user-data (get active-users (:user-id user-data))]
+  (let [active-user-data (get active-users (:user-id user-data))
+        fixed-digest-delivery (map #(update % :digest-times (partial mapv keyword))
+                                   (:digest-delivery user-data))]
     (as-> user-data u
       (merge active-user-data u)
       (assoc u :role (uu/get-user-type u org-data))
@@ -79,7 +79,7 @@
       (assoc u :auth-source (or (j/get-key :auth-source) default-invite-type))
       (assoc u :name (user-lib/name-for user-data))
       (assoc u :short-name (user-lib/short-name-for user-data))
-      (assoc u :digest-delivery (set (map keyword (or (:digest-delivery user-data) [])))))))
+      (assoc u :digest-delivery fixed-digest-delivery))))
 
 (def ^:private empty-user*
  {:first-name ""
@@ -194,7 +194,7 @@
     (assoc db :email-verification-error error)))
 
 (defmethod dispatcher/action :auth-with-token/success
-  [db [_ jwt]]
+  [db [_ _jwt]]
   (assoc db :email-verification-success true))
 
 (defmethod dispatcher/action :pswd-collect
@@ -348,7 +348,7 @@
 (defn enrich-boards-list [unfollow-board-uuids org-boards]
   (when (seq org-boards)
     (let [all-board-uuids (->> org-boards filter-org-boards (map :uuid) set)
-          follow-board-uuids (clojure.set/difference all-board-uuids (set unfollow-board-uuids))
+          follow-board-uuids (clj-set/difference all-board-uuids (set unfollow-board-uuids))
           boards-map (zipmap (map :uuid org-boards) org-boards)]
        (->> follow-board-uuids
             (map boards-map)
@@ -393,13 +393,12 @@
        (keys (get-in db boards-key)))))
 
 (defmethod dispatcher/action :follow/loaded
-  [db [_ org-slug {:keys [follow-publisher-uuids unfollow-board-uuids user-id] :as resp}]]
+  [db [_ org-slug {:keys [follow-publisher-uuids unfollow-board-uuids] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [org-data-key (dispatcher/org-data-key org-slug)
           org-data (get-in db org-data-key)
           unfollow-boards-uuids-set (set unfollow-board-uuids)
           updated-org-data (update org-data :boards (fn [boards] (map #(assoc % :following (not (unfollow-boards-uuids-set (:uuid %)))) boards)))
-          follow-publisher-uuids-set (set follow-publisher-uuids)
           active-users (dispatcher/active-users org-slug db)
           follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
@@ -492,6 +491,6 @@
     db))
 
 (defmethod dispatcher/action :follow-list-last-added
-  [db [_ org-slug {:keys [last-added-uuid resource-type] :as x}]]
+  [db [_ org-slug {:keys [last-added-uuid resource-type]}]]
   (let [follow-list-last-added-key (conj (dispatcher/follow-list-last-added-key org-slug) resource-type)]
     (assoc-in db follow-list-last-added-key last-added-uuid)))
