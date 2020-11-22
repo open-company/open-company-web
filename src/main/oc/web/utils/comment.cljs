@@ -1,9 +1,5 @@
 (ns oc.web.utils.comment
-  (:require [defun.core :refer (defun defun-)]
-            [goog.object :as gobj]
-            [cuerdas.core :as string]
-            [oc.web.api :as api]
-            [oc.web.lib.jwt :as jwt]
+  (:require [defun.core :refer (defun)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.mention :as mention-utils]

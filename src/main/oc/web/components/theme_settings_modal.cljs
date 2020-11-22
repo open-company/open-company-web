@@ -1,6 +1,5 @@
 (ns oc.web.components.theme-settings-modal
   (:require [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.theme :as theme-utils]
             [oc.web.actions.theme :as theme-actions]
