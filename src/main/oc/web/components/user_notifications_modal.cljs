@@ -13,9 +13,10 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(defn change! [s k v]
-  (dis/dispatch! [:input [:edit-user-profile k] v])
-  (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
+(defn change! [k v]
+  (let [ks (if (keyword? k) [k] k)]
+    (dis/dispatch! [:input (concat [:edit-user-profile] ks) v])
+    (dis/dispatch! [:input [:edit-user-profile :has-changes] true])))
 
 (defn save-clicked [s]
   (when (compare-and-set! (::loading s) false true)
@@ -23,8 +24,8 @@
           current-user-data @(drv/get-ref s :current-user-data)]
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
-(defn close-clicked [current-user-data dismiss-action]
-  (if (:has-changes current-user-data)
+(defn close-clicked [editing-user-data dismiss-action]
+  (if (:has-changes editing-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "user-profile-unsaved-edits"
                       :message "Leave without saving your changes?"
@@ -69,47 +70,54 @@
    new-state)}
   [s]
   (let [org-data (drv/react s :org-data)
+        _current-user-data (drv/react s :current-user-data)
         user-profile-drv (drv/react s :edit-user-profile)
-        current-user-data (:user-data user-profile-drv)
+        editing-user-data (:user-data user-profile-drv)
         bots-data (jwt/team-has-bot? (:team-id org-data))
         team-roster (drv/react s :team-roster)
-        slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
+        slack-enabled? (user-utils/user-has-slack-with-bot? editing-user-data bots-data team-roster)
+        digest-delivery (:digest-delivery editing-user-data)
+        team-digest-delivery (some #(when (= (:team-id %) (:team-id org-data))
+                                      %)
+                                   digest-delivery)
+        digest-times-set (set (:digest-times team-digest-delivery))
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.user-notifications-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked current-user-data nav-actions/close-all-panels)}]
+        {:on-click #(close-clicked editing-user-data nav-actions/close-all-panels)}]
       [:div.user-notifications-modal
         [:div.user-notifications-header
           [:div.user-notifications-header-title
             "Notification settings"]
           [:button.mlb-reset.save-bt
-            {:on-click #(if (:has-changes current-user-data)
+            {:on-click #(if (:has-changes editing-user-data)
                           (save-clicked s)
                           (nav-actions/show-user-settings nil))
-             :class (when (or (not (:has-changes current-user-data))
+             :class (when (or (not (:has-changes editing-user-data))
                               @(::show-success s)
                               @(::loading s))
                       "disabled")}
-           (if (:loading current-user-data)
+           (if (:loading editing-user-data)
              "Saving..."
              (if @(::show-success s)
                "Saved!"
                "Save"))]
           [:button.mlb-reset.cancel-bt
-            {:on-click (fn [_] (close-clicked current-user-data #(nav-actions/show-user-settings nil)))}
+            {:on-click (fn [_] (close-clicked editing-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-notifications-body
           ; [:div.user-profile-modal-fields
           ;   [:div.field-label "Daily digest"]
           ;   [:select.field-value.oc-input
-          ;     {:value (:digest-medium current-user-data)
+          ;     {:value (:digest-medium editing-user-data)
           ;      :disabled (and (not slack-enabled?)
-          ;                     (not= (:digest-medium current-user-data) "slack"))
-          ;      :on-change #(change! s :digest-medium (.. % -target -value))}
+          ;                     (not= (:digest-medium editing-user-data) "slack"))
+          ;      :on-change #(change! :digest-medium (.. % -target -value))}
           ;     [:option
           ;       {:value "email"}
           ;       "Via email"]
           ;     (when (or slack-enabled?
-          ;               (= (:digest-medium current-user-data) "slack"))
+          ;               (= (:digest-medium editing-user-data) "slack"))
           ;       [:option
           ;         {:value "slack"
           ;          :disabled (not slack-enabled?)}
@@ -119,17 +127,40 @@
           [:div.user-profile-modal-fields
             [:div.field-label
               "The latest updates will be sent to you in a digest at your preferred times."]
-            [:div.field-value-group
-              (for [t ls/digest-times
-                    :let [selected? ((:digest-delivery current-user-data) t)
-                          change-cb #(change! s :digest-delivery (if selected? (disj (:digest-delivery current-user-data) t) (conj (:digest-delivery current-user-data) t)))]]
+            [:div.field-value-group.digest-times
+              (for [t ls/premium-digest-times
+                    :let [selected? (digest-times-set t)
+                          premium-locked? (and (not (:premium? org-data))
+                                               (not ((set ls/digest-times) t)))
+                          change-cb (fn [_]
+                                      (let [times (if selected?
+                                                    (disj digest-times-set t)
+                                                    (conj digest-times-set t))
+                                            next-digest-delivery (map #(if (= (:team-id %) (:team-id org-data))
+                                                                         {:digest-times times
+                                                                          ;; add a flag so the server can distinguish what
+                                                                          ;; is changing to filter out not-allowed times
+                                                                          ;; if the team has no premium plan
+                                                                          :changed true
+                                                                          :team-id (:team-id org-data)}
+                                                                         %)
+                                                                       digest-delivery)]
+                                        (change! [:digest-delivery] next-digest-delivery)))]]
                 [:div.field-value.group
-                  {:key (name t)}
+                  {:key (name t)
+                   :class (when premium-locked? "premium-lock")
+                   :title (when premium-locked?
+                            "You can get multiple digest per day only on Premium")
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :on-click (if premium-locked?
+                               #(nav-actions/toggle-premium-picker!)
+                               change-cb)}
                   (carrot-checkbox {:selected selected?
-                                    :disabled false
-                                    :did-change-cb change-cb})
+                                    :disabled premium-locked?})
                   [:span.digest-time
-                    {:on-click change-cb}
+                    {:class (when premium-locked? "disabled")}
                     (digest-time-label t)]])]
             [:div.field-description
               "Your timezone is "
@@ -138,22 +169,22 @@
                  :on-click #(do
                               (utils/event-stop %)
                               (nav-actions/show-user-settings :profile))
-                 :data-toggle (when-not (responsive/is-mobile-size?) "tooltip")
+                 :data-toggle (when-not is-mobile? "tooltip")
                  :data-placement "top"
                  :data-container "body"
                  :title "Change your timezone"}
-                (user-utils/readable-tz (:timezone current-user-data))]
+                (user-utils/readable-tz (:timezone editing-user-data))]
               "."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Comments and mentions:"]
             [:select.field-value.oc-input
-              {:value (:notification-medium current-user-data)
-               :on-change #(change! s :notification-medium (.. % -target -value))}
+              {:value (:notification-medium editing-user-data)
+               :on-change #(change! :notification-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]
               (when (or slack-enabled?
-                        (= (:notification-medium current-user-data) "slack"))
+                        (= (:notification-medium editing-user-data) "slack"))
                 [:option
                   {:value "slack"
                    :disabled (not slack-enabled?)}
@@ -167,13 +198,13 @@
             [:div.user-profile-modal-fields
               [:div.field-label "Recurring update reminders"]
               [:select.field-value.oc-input
-                {:value (:reminder-medium current-user-data)
-                 :on-change #(change! s :reminder-medium (.. % -target -value))}
+                {:value (:reminder-medium editing-user-data)
+                 :on-change #(change! :reminder-medium (.. % -target -value))}
                 [:option
                   {:value "email"}
                   "Via email"]
                 (when (or slack-enabled?
-                          (= (:reminder-medium current-user-data) "slack"))
+                          (= (:reminder-medium editing-user-data) "slack"))
                   [:option
                     {:value "slack"
                      :disabled (not slack-enabled?)}
