@@ -71,26 +71,22 @@
                 current-contributions-id
                 current-entry-board-slug
                 current-activity-id
-                contributions-data
                 initial-section-editing
-                container-data
                 posts-data
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
                 activity-share-container
                 cmail-state
-                wrt-read-data
                 force-login-wall
                 panel-stack
                 app-loading
-                payments-data
                 user-info-data
                 active-users
-                current-user-data
-                search-active]} (drv/react s :org-dashboard-data)
+                search-active
+                show-premium-picker?]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
-        route-dark-allowed (drv/react s :route/dark-allowed)
+        _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
         loading? (or ;; force loading screen
                   app-loading
@@ -154,7 +150,6 @@
         show-reminders? (= open-panel :reminders)
         show-reminder-edit? (and open-panel
                                  (s/starts-with? (name open-panel) "reminder-"))
-        show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))
         show-mobile-cmail? (and cmail-state
@@ -193,8 +188,6 @@
           ;; Activity not found
           show-login-wall
           (login-wall)
-          (= open-panel :premium-picker)
-          (premium-picker-modal)
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
@@ -277,6 +270,8 @@
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
           (push-notifications-permission-modal))
+        (when show-premium-picker?
+          (premium-picker-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))

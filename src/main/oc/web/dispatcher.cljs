@@ -4,7 +4,6 @@
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
-            [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.drafts :as du]
             [oc.lib.cljs.useragent :as ua]))
 
@@ -20,6 +19,8 @@
 
 (def default-foc-layout :expanded)
 (def other-foc-layout :collapsed)
+
+(def premium-picker-modal :show-premium-picker?)
 
 ;; Pre-declare some routing functions
 
@@ -278,8 +279,7 @@
 ;; Boards helpers
 
 (defn get-posts-for-board [posts-data board-slug]
-  (let [posts-list (vals posts-data)
-        filter-fn (if (= board-slug du/default-drafts-board-slug)
+  (let [filter-fn (if (= board-slug du/default-drafts-board-slug)
                     #(not= (:status %) "published")
                     #(and (= (:board-slug %) board-slug)
                           (= (:status %) "published")))]
@@ -430,14 +430,14 @@
                               (get-in base (team-roster-key (:team-id org-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
-                          (fn [base team-data current-user-data team-roster invite-users]
+                          (fn [_ team-data current-user-data team-roster invite-users]
                             {:team-data team-data
                              :invite-users invite-users
                              :current-user-data current-user-data
                              :team-roster team-roster})]
    :org-settings-team-management
-                        [[:base :query-params :org-data :team-data :auth-settings]
-                          (fn [base query-params org-data team-data]
+                        [[:base :query-params :team-data :auth-settings]
+                          (fn [base query-params team-data]
                             {:um-domain-invite (:um-domain-invite base)
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
@@ -467,8 +467,8 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributions-id :activity-uuid :sort-type]
-                         (fn [base org-slug board-slug contributions-id activity-uuid sort-type]
+   :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
+                         (fn [base org-slug board-slug contributions-id sort-type]
                            (when (and org-slug
                                       (or board-slug
                                           contributions-id))
@@ -480,15 +480,15 @@
                                                  :else
                                                  (board-data-key org-slug board-slug))]
                                (get-in base cnt-key))))]
-   :contributions-data    [[:base :org-slug :contributions-id]
-                         (fn [base org-slug contributions-id]
+   :contributions-data    [[:org-slug :contributions-id]
+                         (fn [org-slug contributions-id]
                            (when (and org-slug contributions-id)
                              (contributions-data org-slug contributions-id)))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
-   :contributions-user-data [[:base :active-users :contributions-id]
-                             (fn [base active-users contributions-id]
+   :contributions-user-data [[:active-users :contributions-id]
+                             (fn [active-users contributions-id]
                               (when (and active-users contributions-id)
                                 (get active-users contributions-id)))]
    :activity-data       [[:base :org-slug :activity-uuid]
@@ -550,8 +550,8 @@
                                :auth-settings auth-settings
                                :token (:token (:query-params route))
                                :jwt jwt})]
-   :team-invite           [[:base :route :auth-settings :jwt]
-                            (fn [base route auth-settings jwt]
+   :team-invite           [[:route :auth-settings :jwt]
+                            (fn [route auth-settings jwt]
                               {:auth-settings auth-settings
                                :invite-token (:invite-token (:query-params route))
                                :jwt jwt})]
@@ -607,18 +607,18 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :user-info-data        [[:base :active-users :panel-stack]
-                            (fn [base active-users panel-stack]
+   :user-info-data        [[:active-users :panel-stack]
+                            (fn [active-users panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :activity-data
-                            :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data :current-user-data
+   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data
+                            :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
-                            (fn [base orgs org-data contributions-data container-data posts-data activity-data
-                                 entry-editing jwt wrt-show loading payments search-active user-info-data current-user-data
+                            (fn [base orgs org-data contributions-data container-data posts-data
+                                 entry-editing jwt loading payments search-active user-info-data current-user-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
@@ -649,7 +649,8 @@
                                :current-user-data current-user-data
                                :active-users active-users
                                :follow-publishers-list follow-publishers-list
-                               :follow-boards-list follow-boards-list})]
+                               :follow-boards-list follow-boards-list
+                               :show-premium-picker? (:show-premium-picker? base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -684,7 +685,7 @@
 
 ;; Action Loop =================================================================
 
-(defmulti action (fn [db [action-type & _]]
+(defmulti action (fn [_db [action-type & _]]
                    (when (and (not= action-type :input)
                               (not= action-type :update)
                               (not= action-type :entry-toggle-save-on-exit))
@@ -1011,7 +1012,7 @@
   ([data org-slug]
     (items-to-render-data data org-slug (current-board-slug data) (current-sort-type data)))
   ([data org-slug board-slug]
-    (items-to-render-data data org-slug (current-board-slug data) (current-sort-type data)))
+    (items-to-render-data data org-slug board-slug (current-sort-type data)))
   ([data org-slug board-slug sort-type]
     (let [posts-data (get-in data (posts-data-key org-slug))]
      (get-container-posts data posts-data org-slug board-slug sort-type :items-to-render)))
@@ -1218,7 +1219,7 @@
 
 (defn org-seens-data
   ([] (org-seens-data @app-state (current-org-slug)))
-  ([org-slug] (org-seens-data @app-state (current-org-slug)))
+  ([org-slug] (org-seens-data @app-state org-slug))
   ([data org-slug] (get-in data (org-seens-key org-slug))))
 
 ; (defn container-seen-data
