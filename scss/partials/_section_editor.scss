@@ -419,7 +419,7 @@ div.section-editor-container {
           }
 
           &.disabled {
-            cursor: help!important;
+            @include premium_lock();
           }
 
           &:last-child {
