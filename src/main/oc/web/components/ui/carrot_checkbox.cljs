@@ -12,7 +12,7 @@
                                   (.tooltip "fixTitle")
                                   (.tooltip "hide")))
                               s)}
-  [{:keys [selected disabled did-change-cb tooltip tooltip-placement]}]
+  [{:keys [selected disabled did-change-cb tooltip tooltip-placement class-map]}]
   [:div.carrot-checkbox
     {:on-click #(when (and (not disabled)
                            (fn? did-change-cb))
@@ -21,5 +21,6 @@
      :data-placement (if tooltip (or tooltip-placement "top") "")
      :data-container "body"
      :title tooltip
-     :class (utils/class-set {:selected selected
-                              :disabled disabled})}])
+     :class (utils/class-set (merge {:selected selected
+                                     :disabled disabled}
+                                    class-map))}])

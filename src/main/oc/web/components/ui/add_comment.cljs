@@ -2,14 +2,12 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.lib.cljs.useragent :as ua]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.utils.mention :as mention-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :as ui-mixins]
@@ -20,9 +18,7 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)])
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)])
   (:import [goog.async Throttle]))
 
 (defn- focus-value [s]
@@ -46,7 +42,7 @@
 
 (defn- enable-post-button? [s]
   (let [{:keys [edit-comment-data]} (first (:rum/args s))
-        activity-add-comment-data (add-comment-data s)
+        _activity-add-comment-data (add-comment-data s)
         comment-text (add-comment-body s)]
     (boolean (and (not= comment-text (:body edit-comment-data))
                   (not (au/empty-body? comment-text))))))
@@ -69,16 +65,16 @@
       (reset! (::multiple-lines s) (or (> (.-scrollWidth f) @(::inline-reply-max-width s))
                                        (> (.-scrollHeight f) 20))))))
 
-(defn- fix-selection [s]
-  (let [el (add-comment-field s)
-        sel (js/OCStaticTextareaSaveSelection)]
-    (when (and el sel
-               (= (.-anchorTarget sel) el)
-               (.-firstElementChild el)
-               (.. el -firstElementChild -firstElementChild)
-               (au/empty-body? (.-innerHTML el)))
-      (.removeAllRanges sel)
-      (.addRange sel (js/Range. (.-firstElementChild el) 0)))))
+;; (defn- fix-selection [s]
+;;   (let [el (add-comment-field s)
+;;         sel (js/OCStaticTextareaSaveSelection)]
+;;     (when (and el sel
+;;                (= (.-anchorTarget sel) el)
+;;                (.-firstElementChild el)
+;;                (.. el -firstElementChild -firstElementChild)
+;;                (au/empty-body? (.-innerHTML el)))
+;;       (.removeAllRanges sel)
+;;       (.addRange sel (js/Range. (.-firstElementChild el) 0)))))
 
 (defn- focus [s]
   ; (when (and @(::collapsed s)
@@ -98,7 +94,7 @@
       (reset! (::collapsed s) true)
       (reset! (::multiple-lines s) false))))
 
-(defn- send-clicked [event s]
+(defn- send-clicked [_ s]
   (reset! (::collapsed s) true)
   (reset! (::multiple-lines s) false)
   (let [add-comment-div (add-comment-field s)
@@ -269,9 +265,6 @@
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))
                                  me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))
-                                 add-comment-internal (rum/ref-node s :add-comment-internal)
-                                 bounding-box (.getBoundingClientRect add-comment-internal)
-                                 computed-style (.getComputedStyle js/window add-comment-internal)
                                  max-width (- (:internal-max-width props) 140)]
                              (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
@@ -283,7 +276,7 @@
                            (let [props (-> s :rum/args first)
                                  reply-to @(drv/get-ref s :comment-reply-to)
                                  focus-val (focus-value s)
-                                 {:keys [focus body] :as r} (get reply-to focus-val)]
+                                 {:keys [focus body]} (get reply-to focus-val)]
                              (when (string? body)
                                (let [body-field (add-comment-field s)
                                      current-body (.-innerHTML body-field)
@@ -312,19 +305,18 @@
                                  (reset! (::collapsed s) false)
                                  (reset! (::post-enabled s) true)
                                  (comment-actions/reset-reply-to focus-val))))
-                           (let [props (first (:rum/args s))]
-                             (let [data @(drv/get-ref s :media-input)
-                                   video-data (:media-video data)]
-                                (when (and @(::me-media-utils/media-video s)
-                                           (or (= video-data :dismiss)
-                                               (map? video-data)))
-                                  (when (or (= video-data :dismiss)
-                                            (map? video-data))
-                                    (reset! (::me-media-utils/media-video s) false)
-                                    (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
-                                  (if (map? video-data)
-                                    (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) video-data)
-                                    (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)))))
+                           (let [data @(drv/get-ref s :media-input)
+                                 video-data (:media-video data)]
+                             (when (and @(::me-media-utils/media-video s)
+                                        (or (= video-data :dismiss)
+                                            (map? video-data)))
+                               (when (or (= video-data :dismiss)
+                                         (map? video-data))
+                                 (reset! (::me-media-utils/media-video s) false)
+                                 (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
+                               (if (map? video-data)
+                                 (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) video-data)
+                                 (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil))))
                            s)
                           :did-update (fn [s]
                            (let [add-comment-focus @(drv/get-ref s :add-comment-focus)]
@@ -332,7 +324,7 @@
                                (maybe-focus s)
                                (reset! (::last-add-comment-focus s) add-comment-focus)))
                            s)
-                          :did-remount (fn [o s]
+                          :did-remount (fn [_ s]
                            (let [props (first (:rum/args s))
                                  me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))]
                              (me-media-utils/setup-editor s did-change me-opts))
@@ -354,9 +346,8 @@
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
         _reply-to (drv/react s :comment-reply-to)
-        current-user-data (drv/react s :current-user-data)
+        _current-user-data (drv/react s :current-user-data)
         container-class (add-comment-unique-class s)
-        is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
@@ -375,8 +366,7 @@
                       (focus! s)))}
       [:div.add-comment-box
         [:div.add-comment-internal
-          {:ref :add-comment-internal
-           :on-click #(when ())}
+          {:ref :add-comment-internal}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true

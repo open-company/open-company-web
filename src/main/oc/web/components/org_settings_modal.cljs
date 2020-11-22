@@ -1,7 +1,7 @@
 (ns oc.web.components.org-settings-modal
   (:require [rum.core :as rum]
             [goog.dom :as gdom]
-            [oops.core :refer (oget oset!)]
+            [oops.core :refer (oget)]
             [cuerdas.core :as string]
             [oc.web.lib.react-utils :as rutils]
             [org.martinklepsch.derivatives :as drv]
@@ -114,8 +114,7 @@
          (empty? (:domain um-domain-invite)))))
 
 (defn reset-form [s]
-  (let [org-data @(drv/get-ref s :org-data)
-        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
+  (let [org-data @(drv/get-ref s :org-data)]
     (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
@@ -129,7 +128,7 @@
   (let [new-content-visibility (merge content-visibility-data {k v})]
     (on-change :content-visibility new-content-visibility)))
 
-(defn logo-on-load [org-avatar-editing url img]
+(defn logo-on-load [_ url img]
   (org-actions/org-avatar-edit-save {:logo-url url})
   (gdom/removeNode img))
 
@@ -145,19 +144,6 @@
   (when img
     (gdom/removeNode img)))
 
-(defn- update-tooltip [s]
-  (utils/after 100
-   #(let [header-logo (rum/ref-node s "org-settings-header-logo")
-          $header-logo (js/$ header-logo)
-          org-avatar-editing @(drv/get-ref s :org-avatar-editing)
-          title (if (empty? (:logo-url org-avatar-editing))
-                  "Add a logo"
-                  "Change logo")]
-      (.tooltip $header-logo #js {:title title
-                                  :trigger "hover focus"
-                                  :position "top"
-                                  :container "body"}))))
-
 (defn logo-on-click [org-avatar-editing]
   (iu/upload! org-utils/org-avatar-filestack-config
     (fn [res]
@@ -169,7 +155,7 @@
         (gdom/append (.-body js/document) img)
         (set! (.-src img) url)))
     nil
-    (fn [err]
+    (fn [_]
       (logo-add-error nil))))
 
 (defn- change-brand-color [primary-color secondary-color]
@@ -223,7 +209,7 @@
   (rum/local false ::primary-color-value)
   ;; Mixins
   (ui-mixins/on-click-out :color-picker-container
-   (fn [s e]
+   (fn [s _]
      (when @(::show-color-picker s)
        (reset! (::show-color-picker s) false))))
   {:will-mount (fn [s]
@@ -260,13 +246,8 @@
         org-avatar-editing (drv/react s :org-avatar-editing)
         org-data-for-avatar (merge org-data org-avatar-editing)
         org-editing (drv/react s :org-editing)
-        is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
-        {:keys [query-params
-                um-domain-invite
-                add-email-domain-team-error
-                team-data]
-         :as team-management-data}
-                    (drv/react s :org-settings-team-management)
+        is-mobile? (responsive/is-mobile-size?)
+        _team-management-data (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})
         current-theme (theme-utils/computed-value theme-data)
         current-brand-color (get (:brand-color org-editing) current-theme)]
@@ -312,71 +293,81 @@
             (when (= (:error org-editing) :name-field)
               [:div.error "Must be between 3 and 50 characters"])
             (email-domains)]
-          (when (:premium? org-data)
-            [:div.org-settings-fields.field-group
-             [:div.field-label
-              "Customize your team's colors"]
-             [:div.field-description
-              "Button/link color"]
-             [:input.field-value.oc-input
-              {:type "text"
-               :class (when (= (:error org-editing) :primary-color-field) "error")
-               :value @(::primary-color-value s)
-               :pattern colors-reg-exp
-               :placeholder "Ie: red, green or #0000ff"
-               :on-focus #(reset! (::show-color-picker s) true)
-               :on-change (fn [e]
-                            (let [v (string/lower (.. e -target -value))]
-                              (reset! (::primary-color-value s) v)
-                              (when (.. e -target checkValidity)
-                                (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
-                                      hex-color (if is-hex-color? v (-> v keyword default-css-color-names))
-                                      rgb-color (rgb-from-hex hex-color)]
-                                  (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
-             (when @(::show-color-picker s)
-               [:div.color-picker-container
-                {:ref :color-picker-container}
-                (color-picker {:color @(::primary-color-value s) ;; (-> current-brand-color :primary :hex)
-                               :onChangeComplete (fn [color]
-                                                   (when color
-                                                     (let [hex-color (oget color "?hex")
-                                                           rgb-colors (-> color (oget "?rgb") (js->clj :keywordize-keys true) (select-keys [:r :g :b]))]
-                                                       (reset! (::primary-color-value s) hex-color)
-                                                       (change-brand-color {:hex hex-color :rgb rgb-colors} (:secondary current-brand-color)))))})])
-             [:div.field-description.colors-preset.group
-              [:span.color-preset-label "Presets:"]
-              [:div.colors-list.group
-               (for [c color-presets
-                     :let [lower-hex (comp string/lower :hex)
-                           active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
-                 [:button.mlb-reset.color-preset-bt
-                  {:key (str "color-preset-" (:hex c))
-                   :on-click #(do
-                                (reset! (::primary-color-value s) (:hex c))
-                                (change-brand-color (select-keys c [:hex :rgb])
-                                                    (:secondary current-brand-color)))
-                   :class (when active? "active")}
-                  [:span.dot
-                   {:data-color-hex (:hex c)
-                    :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
-                    :style {:background-color (:hex c)}}]])]]
-             [:div.field-description
-              "Button text color"]
-             [:select.oc-input.field-value.button-text-color
-              {:value (-> current-brand-color :secondary :hex)
-               :on-change (fn [e]
-                            (let [v (.. e -target -value)
-                                  color-data (some #(when (= (:value %) v) %) brand-colors-list)]
-                              (change-brand-color (:primary current-brand-color) {:hex (:value color-data) :rgb (:rgb color-data)})))}
-              (for [c brand-colors-list]
-                [:option
-                 {:key (str "button-text-color-" (:value c))
-                  :value (:value c)}
-                 (:label c)])]
-             [:div.theme-previews
-              {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
-              (theme-preview (:brand-color org-editing) :light)
-              (theme-preview (:brand-color org-editing) :dark)]])
+          [:div.org-settings-fields.field-group
+           {:class (utils/class-set {:premium-lock (not (:premium? org-data))})
+            :data-toggle (when (and (not is-mobile?)
+                                    (not (:premium? org-data)))
+                           "tooltip")
+            :title "Brand color customization is available only on Premium"
+            :data-placement "top"
+            :data-container "body"
+            :on-click (when-not (:premium? org-data)
+                        #(do
+                           (utils/event-stop %)
+                           (nav-actions/toggle-premium-picker!)))}
+           [:div.field-label
+            "Customize your team's colors"]
+           [:div.field-description
+            "Button/link color"]
+           [:input.field-value.oc-input
+            {:type "text"
+             :class (when (= (:error org-editing) :primary-color-field) "error")
+             :value @(::primary-color-value s)
+             :pattern colors-reg-exp
+             :placeholder "Ie: red, green or #0000ff"
+             :on-focus #(reset! (::show-color-picker s) true)
+             :on-change (fn [e]
+                          (let [v (string/lower (.. e -target -value))]
+                            (reset! (::primary-color-value s) v)
+                            (when (.. e -target checkValidity)
+                              (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
+                                    hex-color (if is-hex-color? v (-> v keyword default-css-color-names))
+                                    rgb-color (rgb-from-hex hex-color)]
+                                (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
+           (when @(::show-color-picker s)
+             [:div.color-picker-container
+              {:ref :color-picker-container}
+              (color-picker {:color @(::primary-color-value s) ;; (-> current-brand-color :primary :hex)
+                             :onChangeComplete (fn [color]
+                                                 (when color
+                                                   (let [hex-color (oget color "?hex")
+                                                         rgb-colors (-> color (oget "?rgb") (js->clj :keywordize-keys true) (select-keys [:r :g :b]))]
+                                                     (reset! (::primary-color-value s) hex-color)
+                                                     (change-brand-color {:hex hex-color :rgb rgb-colors} (:secondary current-brand-color)))))})])
+           [:div.field-description.colors-preset.group
+            [:span.color-preset-label "Presets:"]
+            [:div.colors-list.group
+             (for [c color-presets
+                   :let [lower-hex (comp string/lower :hex)
+                         active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
+               [:button.mlb-reset.color-preset-bt
+                {:key (str "color-preset-" (:hex c))
+                 :on-click #(do
+                              (reset! (::primary-color-value s) (:hex c))
+                              (change-brand-color (select-keys c [:hex :rgb])
+                                                  (:secondary current-brand-color)))
+                 :class (when active? "active")}
+                [:span.dot
+                 {:data-color-hex (:hex c)
+                  :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
+                  :style {:background-color (:hex c)}}]])]]
+           [:div.field-description
+            "Button text color"]
+           [:select.oc-input.field-value.button-text-color
+            {:value (-> current-brand-color :secondary :hex)
+             :on-change (fn [e]
+                          (let [v (.. e -target -value)
+                                color-data (some #(when (= (:value %) v) %) brand-colors-list)]
+                            (change-brand-color (:primary current-brand-color) {:hex (:value color-data) :rgb (:rgb color-data)})))}
+            (for [c brand-colors-list]
+              [:option
+               {:key (str "button-text-color-" (:value c))
+                :value (:value c)}
+               (:label c)])]
+           [:div.theme-previews
+            {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
+            (theme-preview (:brand-color org-editing) :light)
+            (theme-preview (:brand-color org-editing) :dark)]]
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt
@@ -401,17 +392,25 @@
                              "links allow them to read the post without first logging in. A login is still required "
                              "to access additional posts. If you turn off secure links, your team will always need to "
                              "be logged in to view posts.")
-                     :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                     :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
                      :data-container "body"}]]]
-              [:div.org-settings-advanced-row.public-sections.group
-                (carrot-checkbox {:selected (not (:disallow-public-board content-visibility-data))
-                                  :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board (not %))})
-                [:div.checkbox-label
+              (let [did-change-cb (when (:premium? org-data)
+                                    #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data))))
+                    premium-lock-click (when-not (:premium? org-data)
+                                         (fn [e]
+                                           (utils/event-stop e)
+                                           (nav-actions/toggle-premium-picker!)))]
+                [:div.org-settings-advanced-row.public-sections.group
+                 {:class (utils/class-set {:premium-lock (not (:premium? org-data))})
+                  :on-click premium-lock-click}
+                 (carrot-checkbox {:selected (not (:disallow-public-board content-visibility-data))
+                                   :disabled false
+                                   :did-change-cb did-change-cb})
+                 [:div.checkbox-label
                   {:class (when (:disallow-public-board content-visibility-data) "unselected")
-                   :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
-                  "Allow public topics"]]
+                   :on-click did-change-cb}
+                  "Allow public topics"]])
               [:div.org-settings-advanced-row.public-share.group
                 (carrot-checkbox {:selected (not (:disallow-public-share content-visibility-data))
                                   :disabled false

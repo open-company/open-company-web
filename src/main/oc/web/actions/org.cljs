@@ -1,6 +1,7 @@
 (ns oc.web.actions.org
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
+            [clojure.string :as clj-str]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -446,7 +447,7 @@
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
-        with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))
+        with-trimmed-name (assoc org-data :name (clj-str/trim (:name org-data)))
         with-premium-filter (if (:premium? org-data)
                               with-trimmed-name
                               (dissoc with-trimmed-name :brand-color))]

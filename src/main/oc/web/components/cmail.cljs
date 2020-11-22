@@ -116,9 +116,8 @@
 (defn autosave
   ([s] (autosave s false))
   ([s reset-cmail?]
-  (let [cmail-data @(drv/get-ref s :cmail-data)
-        section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body) section-editing
+  (let [cmail-data @(drv/get-ref s :cmail-data)]
+    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body)
      (when reset-cmail? #(when % (cmail-actions/cmail-reset)))))))
 
 (defn debounced-autosave!
@@ -225,14 +224,13 @@
 (declare real-post-action)
 
 (defn- maybe-publish [s retry]
-  (let [latest-cmail-data @(drv/get-ref s :cmail-data)
-        section-editing @(drv/get-ref s :section-editing)]
+  (let [latest-cmail-data @(drv/get-ref s :cmail-data)]
     (if (and (:auto-saving latest-cmail-data)
              (< retry 10))
       (utils/after 250 #(real-post-action s (inc retry)))
       (do
         (reset! (::publishing s) true)
-        (activity-actions/entry-publish (dissoc latest-cmail-data :status) section-editing (first dis/cmail-data-key))))))
+        (activity-actions/entry-publish (dissoc latest-cmail-data :status) (first dis/cmail-data-key))))))
 
 (defn- real-post-action
   ([s] (real-post-action s 0))
@@ -242,12 +240,11 @@
          published? (= (:status cmail-data) "published")]
      (if (is-publishable? cmail-data)
        (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
-             updated-cmail-data @(drv/get-ref s :cmail-data)
-             section-editing @(drv/get-ref s :section-editing)]
+             updated-cmail-data @(drv/get-ref s :cmail-data)]
          (if published?
            (do
              (reset! (::saving s) true)
-             (activity-actions/entry-save (first dis/cmail-data-key) updated-cmail-data section-editing))
+             (activity-actions/entry-save (first dis/cmail-data-key) updated-cmail-data))
            (maybe-publish s retry)))
         (do
           (reset! (::show-post-tooltip s) true)
@@ -397,7 +394,6 @@
                    ;; Derivatives
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
-                   (drv/drv :section-editing)
                    (drv/drv :show-edit-tooltip)
                    (drv/drv :current-user-data)
                    (drv/drv :follow-boards-list)
@@ -673,9 +669,6 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
-                               ;; Block the rich-body-editor component when
-                               ;; the current editing post has been created already
-                               :paywall? false
                                :placeholder (str utils/default-body-placeholder "...")
                                :dispatch-input-key (first dis/cmail-data-key)
                                :cmd-enter-cb #(post-clicked s)

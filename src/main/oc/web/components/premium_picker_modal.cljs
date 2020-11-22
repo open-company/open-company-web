@@ -71,7 +71,7 @@
     [:div.premium-picker-modal-inner
 
     [:button.close-modal-bt
-      {:on-click #(nav-sidebar/show-org-settings nil)}]
+      {:on-click #(nav-sidebar/toggle-premium-picker!)}]
 
     [:div.premium-picker-modal-content
       [:h3.premium-picker-modal-title

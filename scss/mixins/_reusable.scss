@@ -374,3 +374,18 @@
     }
   }
 }
+
+@mixin premium_cursor($important: true) {
+  @if $important == true {
+    cursor: help !important;
+  } @else {
+    cursor: help;
+  }
+}
+
+@mixin premium_lock() {
+  @include premium_cursor();
+  opacity: 0.7 !important;
+
+  @content
+}

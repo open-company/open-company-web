@@ -6,7 +6,7 @@ div.premium-picker-modal {
   width: 100vw;
   height: 100vh;
   display: flex;
-  z-index: #{$navbar_zindex + 199};
+  z-index: #{$navbar_zindex + 205};
   background-color: $carrot_modal_bg;
 
   div.premium-picker-modal-inner {

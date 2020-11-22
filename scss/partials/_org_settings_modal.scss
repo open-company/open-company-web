@@ -140,6 +140,18 @@ div.org-settings-modal {
       border-top: 1px solid var(--divider-line);
       position: relative;
 
+      &.premium-lock {
+        @include premium_lock() {
+          &, & * {
+            @include premium_cursor();
+          }
+        }
+
+        button, select, input {
+          pointer-events: none !important;
+        }
+      }
+
       div.org-settings-description {
         @include OC_Body_Book();
         font-size: 14px;
@@ -391,6 +403,14 @@ div.org-settings-modal {
 
       div.org-settings-advanced-row {
         margin-top: 8px;
+
+        &.premium-lock {
+          @include premium_lock();
+
+          div.carrot-checkbox, div.checkbox-label {
+            @include premium_cursor();
+          }
+        }
 
         div.carrot-checkbox {
           float: left;

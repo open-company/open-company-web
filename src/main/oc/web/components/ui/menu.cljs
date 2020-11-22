@@ -78,7 +78,7 @@
 
 (defn premium-picker-click [e]
   (.preventDefault e)
-  (nav-actions/show-org-settings :premium-picker))
+  (nav-actions/toggle-premium-picker!))
 
 (defn manage-subscription-click [payments-data e]
   (.preventDefault e)
