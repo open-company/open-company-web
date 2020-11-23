@@ -75,7 +75,8 @@
       ;;                      :show-wrt?             show-wrt?
       ;;                      :current-user-data     current-user-data
       ;;                      :clear-cell-measure-cb clear-cell-measure-cb
-      ;;                      :add-comment-force-update add-comment-force-update})
+      ;;                      :add-comment-force-update add-comment-force-update
+      ;;                      :premium?              (:premium? org-data)})
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
                                :member?           member?
@@ -85,7 +86,8 @@
                                :current-user-data current-user-data
                                :clear-cell-measure-cb clear-cell-measure-cb
                                :replies?           replies?
-                               :foc-menu-open      foc-menu-open})
+                               :foc-menu-open      foc-menu-open
+                               :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data
@@ -99,7 +101,8 @@
                      :container-slug     (:container-slug container-data)
                      :foc-board          (not (activity-utils/board? container-data))
                      :current-user-data  current-user-data
-                     :boards-count       (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))}))]))
+                     :boards-count       (count (filter #(not= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
+                     :premium?           (:premium? org-data)}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [item]}]

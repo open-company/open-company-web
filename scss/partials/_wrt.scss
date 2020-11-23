@@ -31,6 +31,14 @@ $circ: #{2 * $pi * $chart_radius};
 div.wrt-count-container {
   position: relative;
 
+  &.premium-lock {
+    @include premium_lock();
+
+    div.wrt-count {
+      @include premium_cursor();
+    }
+  }
+
   &:hover {
     div.wrt-count {
       opacity: 1;

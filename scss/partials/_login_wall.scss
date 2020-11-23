@@ -7,6 +7,11 @@ div.login-wall-container {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+  padding: 90px 0;
+
+  @include mobile() {
+    padding: 0;
+  }
 
   @include mobile() {
     min-height: calc(100vh - #{$mobile_navbar_height}px);

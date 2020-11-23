@@ -16,16 +16,25 @@
     :tooltip "Know who saw your update, and easily remind those that missed it."}
    {:title "Custom colors and branding"}])
 
+(defn- setup-selected-price [s]
+  (when-not @(::selected-price s)
+    (let [prices (-> s (drv/get-ref :payments) deref :available-prices)
+          monthly-plan* (some #(when (= (:interval %) "month") (:id %)) prices)
+          monthly-plan (or monthly-plan* (-> prices first :id))]
+      (reset! (::selected-price s) monthly-plan))))
+
 (rum/defcs premium-picker <
   rum/reactive
-  (rum/local :monthly ::selected-price)
+  (rum/local nil ::selected-price)
   (drv/drv :payments)
   ui-mixins/refresh-tooltips-mixin
   {:will-mount (fn [s]
-                 (let [prices (-> s (drv/get-ref :payments) deref :available-prices)
-                       monthly-plan (some #(when (= (:interval %) "month") %) prices)]
-                   (reset! (::selected-price s) (:id monthly-plan)))
-                 s)}
+                 (payments-actions/maybe-load-payments-data true)
+                 (setup-selected-price s)
+                 s)
+   :will-update (fn [s]
+                  (setup-selected-price s)
+                  s)}
   [s]
   (let [payments-data (drv/react s :payments)
         available-prices (:available-prices payments-data)
@@ -61,7 +70,7 @@
  
       [:button.continue.mlb-reset
        {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
-       "Upgrade to premium"]]))
+       "Upgrade"]]))
 
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin
