@@ -493,59 +493,6 @@ div.stream-item {
           @include activity-body-preview(16, 20, var(--color), 2);
         }
       }
-
-      div.stream-item-activity-preview {
-        @include OC_Body_Book();
-        font-size: 16px;
-        line-height: 22px;
-        display: flex;
-        flex-flow: row wrap;
-        justify-items: center;
-        align-items: center;
-
-        &.unseen-replies {
-
-          span.for-you-body-label {
-            @include OC_Body_Bold_Italic();
-          }
-
-          div.separator-dot {
-            background-color: var(--color);
-          }
-
-          span.time-since {
-            color: var(--color);
-          }
-        }
-
-        div.for-you-authors {
-          flex: 0 0 auto;
-          margin-right: 8px;
-          & > {
-            @include face-pile(20);
-          }
-        }
-
-        span.for-you-body-label {
-          color: var(--color);
-          @include OC_Body_Book_Italic();
-          flex: 0 0 auto;
-        }
-
-        div.separator-dot {
-          width: 3px;
-          height: 3px;
-          background-color: var(--light-color);
-          border-radius: 50%;
-          margin: 1px 5px 0 5px;
-          flex: 0 0 auto;
-        }
-
-        span.time-since {
-          color: var(--light-color);
-          flex: 0 0 auto;
-        }
-      }
     }
 
     div.stream-item-footer {
