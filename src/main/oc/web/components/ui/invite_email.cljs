@@ -4,9 +4,10 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown user-type-premium-descriptions)]))
 
 (def default-row-num 1)
 (def default-user "")
@@ -93,11 +94,11 @@
         org-data (drv/react s :org-data)
         is-admin? (jwt/is-admin? (:team-id org-data))]
     [:div.invite-email-container
-      [:div.invite-email
+      [:div.invite-email.group
         {:key "org-settings-invite-table"}
         (for [i (range (count invite-users))
               :let [user-data (get invite-users i)
-                    key-string (str "invite-users-tabe-" i)]]
+                    key-string (str "invite-users-table-" i)]]
           [:div.invite-email-item-outer
             {:key key-string}
             [:div.invite-email-item.group
@@ -115,6 +116,7 @@
                     (user-type-dropdown {:user-id (utils/guid)
                                          :user-type (:role user-data)
                                          :hide-admin (not is-admin?)
+                                         :premium? (:premium? org-data)
                                          :on-change
                                           #(dis/dispatch! [:input [:invite-users]
                                              (assoc invite-users i (merge user-data {:role % :error nil}))])})])]
@@ -141,4 +143,6 @@
          :class (when (= (saved-button-cta s) @(::send-bt-cta s)) "no-disable")
          :disabled (or (not (has-valid-user? invite-users))
                        (pos? @(::sending s)))}
-        @(::send-bt-cta s)]]))
+        @(::send-bt-cta s)]
+      (when-not (:premium? org-data)
+        user-type-premium-descriptions)]))
