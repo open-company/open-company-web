@@ -6,11 +6,8 @@
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.images :as img]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.lib.cljs.useragent :as ua]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -21,7 +18,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]))
@@ -31,22 +27,6 @@
     {:data-itemuuid (:uuid activity-data)
      :ref :item-body
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
-
-(defn- stream-item-activity-preview [is-mobile? for-you-context]
-  [:div.stream-item-activity-preview
-    {:key (str "stream-item-activity-preview-" (:timestamp for-you-context))}
-    [:span.for-you-body-label
-     (:label for-you-context)]
-    [:div.separator-dot]
-    [:span.time-since
-      {:data-toggle (when-not is-mobile? "tooltip")
-       :data-placement "top"
-       :data-container "body"
-       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-       :data-title (utils/activity-date-tooltip (:timestamp for-you-context))}
-      [:time
-        {:date-time (:timestamp for-you-context)}
-        (utils/time-since (:timestamp for-you-context) [:short :lower-case])]]])
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -123,7 +103,7 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? foc-menu-open]}]
+             current-user-data container-slug show-new-comments? foc-menu-open premium?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -316,6 +296,7 @@
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
+                                :premium? premium?
                                 :read-data read-data})])
                 (when (seq activity-attachments)
                   (if-not is-mobile?
