@@ -112,8 +112,13 @@ div.onboard-container-inner {
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  min-height: 100vh;
   box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+  min-height: 100vh;
+  padding: 90px 0;
+
+  @include mobile() {
+    padding: 0;
+  }
 
   header.main-cta {
     position: fixed;

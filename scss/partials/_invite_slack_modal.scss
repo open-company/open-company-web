@@ -82,9 +82,15 @@ div.invite-slack-modal {
         color: var(--color);
         line-height: 32px;
         width: 70%;
-        text-align: center;
-        margin-left: auto;
+        text-align: left;
+        margin-left: 0;
         margin-right: auto;
+
+        @include mobile() {
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+        }
       }
 
       button.cancel-bt {
@@ -370,7 +376,7 @@ div.invite-slack-modal {
         border-radius: 4px;
         display: block;
         margin-top: 16px;
-        float: left;
+        float: none;
 
         &:disabled {
           opacity: 1 !important;
