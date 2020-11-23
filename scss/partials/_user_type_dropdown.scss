@@ -9,6 +9,10 @@ div.dropdown {
     line-height: 24px;
     text-align: right;
 
+    &.premium-lock {
+      @include premium_lock();
+    }
+
     &:after {
       content: "";
       width: 8px;
@@ -71,5 +75,24 @@ div.dropdown {
     button.user-type-btn:after {
       background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
+  }
+}
+
+div.user-type-premium-lock-description {
+  @include premium_cursor();
+  opacity: 1;
+  margin-top: 16px;
+
+  strong {
+    @include OC_Body_Bold();
+    font-size: 14px;
+    color: var(--color);
+  }
+
+  span {
+    margin-left: 6px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
   }
 }

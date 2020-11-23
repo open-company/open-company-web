@@ -22,6 +22,12 @@ div.explore-view {
       height: 190px;
       width: calc(50% - 8px);
 
+      &.premium-lock {
+        @include premium_lock() {
+          opacity: 1 !important;
+        }
+      }
+
       @include mobile() {
         // min-height: 190px;
         height: auto;

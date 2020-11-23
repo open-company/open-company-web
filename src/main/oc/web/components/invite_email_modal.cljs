@@ -2,18 +2,14 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.lib.user :as user-lib]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.invite-email :refer (invite-email)]
-            [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
+            [oc.web.actions.notifications :as notification-actions]))
 
 (defn close-clicked [s dismiss-action]
   (let [invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-data)))
