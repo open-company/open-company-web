@@ -157,7 +157,7 @@
           _ (.add (.-classList form) "hidden")
           _ (oset! form "method" "POST")
           _ (oset! form "action" (:href portal-link))
-          _ (oset! form "target" "_blank")
+          ;; _ (oset! form "target" "_blank")
           redirect-input (gDom/createElement "input")
           _ (oset! redirect-input "type" "hidden")
           _ (oset! redirect-input "value" client-url)
