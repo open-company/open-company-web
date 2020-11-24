@@ -50,7 +50,8 @@
     (utils/after 1
                  #(do
                     (dis/dispatch! [:jwt jwt-contents])
-                    (dis/dispatch! [:org-loaded (dis/org-data)])))
+                    (when-let [org-data (dis/org-data)]
+                      (dis/dispatch! [:org-loaded org-data]))))
     (dis/dispatch! [:input [dis/show-invite-box-key] (seq (cook/get-cookie (router/show-invite-box-cookie (:user-id jwt-contents))))])
     ;; User identifications for third party services
     (when jwt-contents
