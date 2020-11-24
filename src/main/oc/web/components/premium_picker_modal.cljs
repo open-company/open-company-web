@@ -67,10 +67,11 @@
            :title tooltip}
           [:span.premium-picker-feature-item
            title]]])]
- 
+
+     (when (seq available-prices)
       [:button.continue.mlb-reset
        {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
-       "Upgrade"]]))
+       "Upgrade"])]))
 
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin
