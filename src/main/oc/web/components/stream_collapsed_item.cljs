@@ -169,7 +169,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
+                 :title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]]
             [:div.stream-collapsed-item-fill
               ;;  [:div.stream-item-arrow]
@@ -204,7 +204,7 @@
                   :data-placement "top"
                   :data-container "body"
                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                  :data-title (utils/activity-date-tooltip activity-data)}
+                  :title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]])]
       [:div.activity-share-container]
       (when (and is-published?

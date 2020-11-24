@@ -118,7 +118,7 @@
                     :data-placement "top"
                     :data-container "body"
                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                    :data-title (utils/activity-date-tooltip activity-data)}
+                    :title (utils/activity-date-tooltip activity-data)}
                    (utils/date-string (utils/js-date (:published-at activity-data)) [:year])]]]
             (when (:body activity-data)
               [:div.activity-body.oc-mentions.oc-mentions-hover

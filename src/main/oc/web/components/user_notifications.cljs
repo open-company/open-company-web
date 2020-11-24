@@ -42,7 +42,7 @@
       :data-placement "top"
       :data-delay     "{\"show\":\"1000\", \"hide\":\"0\"}"
       :data-container "body"
-      :data-title     (utils/tooltip-date (:created-at n))}
+      :title          (utils/tooltip-date (:created-at n))}
      (utils/time-since (:created-at n) [:short])]]
    [:div.user-notification-body.oc-mentions.oc-mentions-hover
     {:dangerouslySetInnerHTML (utils/emojify (:body n))}]])

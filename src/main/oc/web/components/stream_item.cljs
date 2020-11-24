@@ -205,7 +205,7 @@
                :data-placement "top"
                :data-container "body"
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :data-title (utils/activity-date-tooltip activity-data)}
+               :title (utils/activity-date-tooltip activity-data)}
               [:time
                 {:date-time t}
                 (utils/time-since t [:short :lower-case])]])

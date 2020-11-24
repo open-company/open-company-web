@@ -2,6 +2,7 @@
   (:require [taoensso.timbre :as timbre]
             [taoensso.sente :as s]
             [oc.web.lib.jwt :as j]
+            [oc.lib.time :as lib-time]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
@@ -97,7 +98,7 @@
                             @@ch-state)
         ctx {:jwt (j/jwt)
              :connection-status connection-status
-             :timestamp (.getTime (new js/Date))
+             :timestamp (lib-time/now-ts)
              :rep rep
              :sessionURL (fullstory/session-url)}]
     (sentry/capture-message-with-extra-context! ctx (str service-name " WS: not valid JWT"))

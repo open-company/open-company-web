@@ -150,7 +150,7 @@
                   {:key (name t)
                    :class (when premium-locked? "premium-lock")
                    :title (when premium-locked?
-                            "This is a premium feature. Please upgrade to have multiple digests each day.")
+                            "Premium accounts can change when digests are sent each day.  Click for details")
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"

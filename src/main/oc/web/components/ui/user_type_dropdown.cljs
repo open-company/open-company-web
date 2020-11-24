@@ -3,10 +3,12 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (rum/defc user-type-dropdown < rum/static
+                               ui-mixins/refresh-tooltips-mixin
   [{:keys [user-id user-type on-change hide-admin on-remove disabled? premium?]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
@@ -27,7 +29,7 @@
           :data-toggle (when-not premium? "tooltip")
           :data-placement "top"
           :data-container "body"
-          :title "This is a premium feature. Please upgrade to assign view-only access to some of your teammates."
+          :title "Premium accounts can assign view-only access to teammates. Click for details"
           :class (utils/class-set {:selected (= user-type :viewer)
                                    :premium-lock (not premium?)})}
          "Viewer"]

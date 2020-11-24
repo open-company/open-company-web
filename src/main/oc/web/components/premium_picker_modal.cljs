@@ -71,13 +71,20 @@
            [:div.premium-picker-plan-name
             (:name-label price)]])])
 
-     (when (and current-subscription
-                (:cancel-at-period-end? current-subscription))
-       [:div.cancel-period-end
-        "* This subscription is set to cancel at the end of the current paid period."])
-
      [:div.premium-picker-price
       (:description-label current-price)]
+
+     (when current-subscription
+       [:div.subscription-end-date
+        {:class (when (:cancel-at-period-end? current-subscription) "cancelling")}
+        (str
+         "Your subscription "
+         (if (:cancel-at-period-end? current-subscription)
+           "is set to cancel"
+           "will renew")
+         " on the "
+         (:end-date-label current-subscription)
+         ".")])
 
      [:ul.premium-picker-features-list
       (for [{:keys [title tooltip]} premium-features-list]
@@ -93,10 +100,10 @@
      (when (seq available-prices)
       (if current-subscription
         [:button.continue.mlb-reset
-         {:on-click #(payments-actions/open-portal! payments-data)}
+         {:on-click #(payments-actions/manage-subscription! payments-data)}
          "Manage subscription"]
         [:button.continue.mlb-reset
-         {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
+         {:on-click #(payments-actions/create-subscription! payments-data @selected-price)}
          "Upgrade"]))]))
 
 (rum/defc premium-picker-modal <
