@@ -3,7 +3,6 @@
             [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
-            [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
             [oops.core :refer (oget ocall oset!)]
@@ -46,6 +45,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.theme :as theme-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.api :as api]
             [oc.web.urls :as urls]
             [oc.web.router :as router]
@@ -152,7 +152,8 @@
 
 (defn post-routing []
   (routing-actions/post-routing)
-  (user-actions/initial-loading true))
+  (user-actions/initial-loading true)
+  (payments-actions/initial-loading))
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
