@@ -28,10 +28,17 @@
 
 ;; Subscriptions data retrieve
 
-(defn get-active-subscription [payments-data]
+(defn get-active-subscription
+  "The active subscription is always the last in the subs list.
+   If there is only 1 subscription is also the current one, if not it means it's the subs
+   the user is going to switch to when the current one finishes."
+  [payments-data]
   (last (:subscriptions payments-data)))
 
-(defn get-current-subscription [payments-data]
+(defn get-current-subscription
+  "The current subscription is the one the user paid for and is using.
+   Its :current-period-start is in the past and :current-period-end is in the future."
+  [payments-data]
   (first (:subscriptions payments-data)))
 
 ;; Paywall
@@ -95,7 +102,9 @@
                 :checkout-link checkout-link
                 :premium? premium?
                 :paywall? (not premium?)
-                :payment-method-on-file? has-payments-data?})
+                :payment-method-on-file? has-payments-data?
+                :subscriptions (mapv #(assoc % :price (parse-price (:price %) (:quantity %)))
+                                     (:subscriptions payments-data))})
         (update :available-prices (fn [prices] (->> prices
                                                     (map #(parse-price % (:seat-count payments-data)))
                                                     (sort-by :unit-amount)
@@ -147,6 +156,9 @@
 
 ;; Customer portal redirect
 
+(def portal-session-cookie :portal-session-open)
+(def portal-session-return-parameter "customer-portal")
+
 (defn open-portal! [payments-data]
   (when-let [portal-link (:portal-link payments-data)]
         (let [base-domain (if ua/mobile-app?
@@ -154,7 +166,7 @@
                             ;; a double slash
                             (string/join "" (butlast (dis/expo-deep-link-origin)))
                             ls/web-server-domain)
-              client-url (str base-domain (router/get-token) "?customer-portal=1")]
+              client-url (str base-domain (router/get-token) "?" portal-session-return-parameter "=1")]
           (api/post-customer-portal portal-link client-url
                                     (fn [{:keys [success body]}]
                                       (let [resp (when success (json->cljs body))
@@ -164,6 +176,16 @@
                                           (do
                                             ;; Add a session cookie to make sure we show an error message if
                                             ;; user come back here w/o a response from the portal
-                                            (cook/set-cookie! :portal-session-open (lib-time/now-ts))
+                                            (cook/set-cookie! portal-session-cookie (lib-time/now-ts))
                                             (router/redirect! redirect-url))
                                           (error-modal "An error occurred, please try again."))))))))
+
+(defn initial-loading []
+  (let [return-session-cookie (cook/get-cookie portal-session-cookie)
+        return-parameter (dis/query-param portal-session-return-parameter)]
+    (cook/remove-cookie! portal-session-cookie)
+    ;; Show an error message only if the user is returning to carrot from the same session it has been opened
+    ;; and the return url is not right
+    (when (and (pos? return-session-cookie)
+               (not return-parameter))
+      (error-modal "An error occurred during the portal session, please try again."))))

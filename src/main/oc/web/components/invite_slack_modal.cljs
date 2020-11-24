@@ -15,7 +15,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]
-            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown user-type-premium-descriptions)]))
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn close-clicked [s dismiss-action]
   (let [invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-data)))
@@ -251,9 +251,7 @@
                  :class (when (= "Slack invitations sent!" @(::send-bt-cta s)) "no-disable")
                  :disabled (or (not (has-valid-user? invite-users))
                                (pos? @(::sending s)))}
-                @(::send-bt-cta s)]
-              (when-not (:premium? org-data)
-                user-type-premium-descriptions)]
+                @(::send-bt-cta s)]]
             ;; Only admins can add the bot
             (when is-admin?
               [:div.invites-list.top-border

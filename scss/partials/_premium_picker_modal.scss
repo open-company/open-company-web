@@ -128,8 +128,33 @@ div.premium-picker-modal {
 div.premium-picker {
   margin-top: 8px;
 
+  div.cancel-period-end {
+    margin-top: 8px;
+    @include OC_Body_Book();
+    font-size: 12px;
+    color: $carrot_orange;
+    line-height: 14px;
+  }
+
   div.premium-picker-plans-container {
     display: flex;
+
+    &.has-active-subscription {
+
+      span.current-label {
+        @include OC_Body_Book();
+        color: var(--color);
+        font-size: 14px;
+        display: inline-block;
+        line-height: 32px;
+      }
+
+      div.premium-picker-plan {
+        margin-left: 8px;
+        cursor: default !important;
+      }
+    }
+
 
     div.premium-picker-plan {
       padding: 0;
@@ -159,6 +184,14 @@ div.premium-picker {
 
         div.premium-picker-plan-name {
           color: var(--color);
+        }
+
+        &.active {
+          border: 2px solid $carrot_green;
+
+          div.premium-picker-plan-name {
+            color: $carrot_green;
+          }
         }
       }
     }

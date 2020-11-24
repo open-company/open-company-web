@@ -1,6 +1,7 @@
 (ns oc.web.components.premium-picker-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.utils :as utils]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.nav-sidebar :as nav-sidebar]
             [oc.web.mixins.ui :as ui-mixins]))
@@ -39,20 +40,41 @@
   (let [payments-data (drv/react s :payments)
         available-prices (:available-prices payments-data)
         selected-price (::selected-price s)
-        current-price (some #(when (= (:id %) @selected-price) %) available-prices)]
+        current-price (some #(when (= (:id %) @selected-price) %) available-prices)
+        current-subscription (payments-actions/get-current-subscription payments-data)
+        current-sub-price (:price current-subscription)]
     [:div.premium-picker
-     [:div.premium-picker-plans-container
-      (for [price available-prices
-            :let [selected? (= @selected-price (:id price))]]
+     (if current-subscription
+       [:div.premium-picker-plans-container.has-active-subscription
+        [:span.current-label "Your plan: "]
         [:div.premium-picker-plan
-         {:key (:id price)
-          :class (when selected? "selected")
-          :on-click #(reset! (::selected-price s) (:id price))}
-         [:input.plan-radio-input
-          {:checked selected?
-           :value ""}]
+         {:key (or (:id current-sub-price) (rand 1000)) ;; fallback to not leave this empty
+          :class (utils/class-set {:selected true
+                                   :active true})}
          [:div.premium-picker-plan-name
-          (:name-label price)]])]
+          (:name-label current-sub-price)]]]
+       [:div.premium-picker-plans-container
+        (for [price available-prices
+              :let [selected? (= @selected-price (:id price))
+                    active? (and current-subscription
+                                 (= (:id price) (:id (:price current-subscription))))
+                    change-cb (when-not current-subscription
+                                #(reset! (::selected-price s) (:id price)))]]
+          [:div.premium-picker-plan
+           {:key (or (:id price) (rand 1000)) ;; fallback to not leave this empty
+            :class (utils/class-set {:selected selected?
+                                     :active active?})
+            :on-click change-cb}
+           [:input.plan-radio-input
+            {:checked selected?
+             :value ""}]
+           [:div.premium-picker-plan-name
+            (:name-label price)]])])
+
+     (when (and current-subscription
+                (:cancel-at-period-end? current-subscription))
+       [:div.cancel-period-end
+        "* This subscription is set to cancel at the end of the current paid period."])
 
      [:div.premium-picker-price
       (:description-label current-price)]
@@ -69,9 +91,13 @@
            title]]])]
 
      (when (seq available-prices)
-      [:button.continue.mlb-reset
-       {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
-       "Upgrade"])]))
+      (if current-subscription
+        [:button.continue.mlb-reset
+         {:on-click #(payments-actions/open-portal! payments-data)}
+         "Manage subscription"]
+        [:button.continue.mlb-reset
+         {:on-click #(payments-actions/open-checkout! payments-data @selected-price)}
+         "Upgrade"]))]))
 
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin

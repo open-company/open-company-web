@@ -15,7 +15,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown user-type-premium-descriptions)]))
+            [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
 (defn user-action [team-id user action method other-link-params remove-cb]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -242,6 +242,4 @@
                                      :on-remove (if (and (not= "pending" (:status user))
                                                          (not= (:user-id user) (:user-id cur-user-data)))
                                                   remove-fn
-                                                  nil)}))]])]
-         (when-not (:premium? org-data)
-           user-type-premium-descriptions)]]]))
+                                                  nil)}))]])]]]]))

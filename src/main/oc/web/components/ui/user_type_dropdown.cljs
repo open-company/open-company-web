@@ -6,12 +6,6 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
-(def user-type-premium-descriptions
-  [:div.user-type-premium-lock-description
-     {:on-click #(nav-actions/toggle-premium-picker!)}
-     [:strong "*"]
-     [:span "You can invite viewers but all users are authors except for Premium plans."]])
-
 (rum/defc user-type-dropdown < rum/static
   [{:keys [user-id user-type on-change hide-admin on-remove disabled? premium?]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
@@ -26,13 +20,17 @@
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
         [:li
-         {:on-click #(when (fn? on-change)
-                       (on-change :viewer))
+         {:on-click #(if premium?
+                       (when (fn? on-change)
+                         (on-change :viewer))
+                       (nav-actions/toggle-premium-picker!))
+          :data-toggle (when-not premium? "tooltip")
+          :data-placement "top"
+          :data-container "body"
+          :title "This is a premium feature. Please upgrade to assign view-only access to some of your teammates."
           :class (utils/class-set {:selected (= user-type :viewer)
                                    :premium-lock (not premium?)})}
-         "Viewer"
-         (when-not premium?
-           "*")]
+         "Viewer"]
         [:li
           {:on-click #(when (fn? on-change)
                         (on-change :author))
