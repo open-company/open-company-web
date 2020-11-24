@@ -80,10 +80,6 @@
   (.preventDefault e)
   (nav-actions/toggle-premium-picker!))
 
-(defn manage-subscription-click [payments-data e]
-  (.preventDefault e)
-  (payments-actions/open-portal! payments-data))
-
 (defn- detect-native-app
   []
   (when-not ua/pseudo-native?
@@ -160,17 +156,15 @@
         long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
                        (str "Endpoint: " ls/web-server))
-        show-billing? (and (or (:can-open-portal? payments-data)
-                               (:can-open-checkout? payments-data))
+        show-billing? (and (or (:can-manage-subsription? payments-data)
+                               (:can-create-subscription? payments-data))
                            current-org-slug)
         billing-label (when show-billing?
-                        (if (:can-open-portal? payments-data)
+                        (if (:can-manage-subsription? payments-data)
                           "Manage subscription"
-                          "Go premium!"))
+                          "Go premium"))
         billing-click (when show-billing?
-                        (if (:can-open-portal? payments-data)
-                          (partial manage-subscription-click payments-data)
-                          premium-picker-click))]
+                        premium-picker-click)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))

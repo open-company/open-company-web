@@ -276,6 +276,10 @@
 
 (def cmail-data-key [:cmail-data])
 
+;; Payments keys
+
+(def payments-checkout-session-result :checkout-session-result)
+
 ;; Boards helpers
 
 (defn get-posts-for-board [posts-data board-slug]

@@ -302,7 +302,7 @@
                  :data-toggle (when (and (not (:premium? org-data))
                                          (not private-allowed?))
                                 "tooltip")
-                 :title "This is a premium feature. Please upgrade to create topics for invited users only."
+                 :title "Premium accounts can create private topics for invited users only. Click for details"
                  :data-placement "top"
                  :on-click (fn [e]
                              (if private-allowed?
@@ -326,7 +326,7 @@
                    :data-toggle (when (and (not (:premium? org-data))
                                            (not public-allowed?))
                                   "tooltip")
-                   :title "This is a premium feature. Please upgrade to create topics meant for sharing publicly beyond your team."
+                   :title "Premium accounts can create public topics for sharing beyond your team. Click for details"
                    :data-placement "top"
                    :on-click (fn [e]
                                (if public-allowed?
@@ -369,8 +369,8 @@
               [:a.private-announcement-channels
                {:href oc-urls/slack-private-announcement-share
                 :target "_blank"
+                :title "Tips for auto-share into private or announcement channels"
                 :data-toggle "tooltip"
-                :data-title "Tips for auto-share into private or announcement channels"
                 :data-placement "top"
                 :data-container "body"}
                "Can't find a channel?"]]]

@@ -7,8 +7,10 @@
             [oc.lib.cljs.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.lib.time :as lib-time]
+            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.stripe :as stripe-client]
+            [oc.web.actions.notifications :as notif-actions]
             [oc.web.lib.cookies :as cook]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -86,32 +88,41 @@
       (assoc :description-label (price-description price seat-count))
       (assoc :name-label (price-name (:interval price)))))
 
-(defn parse-payments-data [{:keys [status body success]}]
+(defn parse-payments-data [{:keys [status body success]} & [old-payments-data]]
   (let [payments-data (cond
                         success (json->cljs body)
                         (= status 404) :404
                         :else nil)
-        portal-link (utils/link-for (:links payments-data) "portal" "POST")
-        checkout-link (utils/link-for (:links payments-data) "checkout")
+        manage-subscription-link (utils/link-for (:links payments-data) "manage-subscription" "POST")
+        create-subscription-link (utils/link-for (:links payments-data) "create-subscription")
         premium? (premium-customer? payments-data)
-        has-payments-data? (not (zero? (count (:payment-methods payments-data))))]
-    (-> payments-data
-        (merge {:can-open-portal? (map? portal-link)
-                :can-open-checkout? (map? checkout-link)
-                :portal-link portal-link
-                :checkout-link checkout-link
+        has-payments-data? (not (zero? (count (:payment-methods payments-data))))
+        available-prices (if (:available-prices payments-data)
+                           (->> (:available-prices payments-data)
+                                (map #(parse-price % (:seat-count payments-data)))
+                                (sort-by :unit-amount)
+                                vec)
+                           (:available-prices old-payments-data))]
+    (-> old-payments-data
+        (merge payments-data
+               {:can-manage-subsription? (map? manage-subscription-link)
+                :can-create-subscription? (map? create-subscription-link)
+                :manage-subscription manage-subscription-link
+                :create-subscription create-subscription-link
                 :premium? premium?
                 :paywall? (not premium?)
                 :payment-method-on-file? has-payments-data?
-                :subscriptions (mapv #(assoc % :price (parse-price (:price %) (:quantity %)))
+                :subscriptions (mapv #(-> %
+                                          (assoc :price (parse-price (:price %) (:quantity %)))
+                                          (assoc :end-date-label (.toDateString (utils/js-date (* (:current-period-end %) 1000)))))
                                      (:subscriptions payments-data))})
-        (update :available-prices (fn [prices] (->> prices
-                                                    (map #(parse-price % (:seat-count payments-data)))
-                                                    (sort-by :unit-amount)
-                                                    vec))))))
+        (assoc :available-prices available-prices))))
+
+(declare checkout-session-return-result)
 
 (defn get-payments-cb [org-slug resp]
   (let [parsed-payments-data (parse-payments-data resp)]
+    (checkout-session-return-result parsed-payments-data)
     (dis/dispatch! [:payments org-slug parsed-payments-data])))
 
 (defn get-payments [payments-link]
@@ -134,58 +145,101 @@
 
 ;; Checkout
 
-(defn open-checkout! [payments-data change-price-id]
+(def checkout-session-cookie :checkout-session-open)
+(def checkout-session-return-param :stripe-checkout)
+(def checkout-session-return-result-param :result)
+
+(defn- notify-subscription-created [success?]
+  (notif-actions/show-notification {:title (if success?
+                                             "Thank you, your subscription will be active in a few minutes"
+                                             "An error occurred during checkout. Please try again")
+                                    :dismiss true
+                                    :expire 3
+                                    :id (if success?
+                                          :subscription-created-positive
+                                          :subscription-created-negative)}))
+
+(defn create-subscription! [payments-data price-id]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         base-domain (if ua/mobile-app?
                       ;; Get the deep link url but strip out the last slash to avoid
                       ;; a double slash
                       (string/join "" (butlast (dis/expo-deep-link-origin)))
                       ls/web-server-domain)
-        base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&picked-price=" change-price-id "&result=")
-        success-redirect-url (str base-redirect-url "true")
-        cancel-redirect-url (str base-redirect-url "false")]
-    (api/get-checkout-session-id (:checkout-link fixed-payments-data) success-redirect-url cancel-redirect-url
+        base-redirect-url (str base-domain (router/get-token) "?" checkout-session-return-param "=true&picked-price=" price-id)
+        success-redirect-url (str base-redirect-url "&" checkout-session-return-result-param "=true")
+        cancel-redirect-url (str base-redirect-url "&" checkout-session-return-result-param "=false")]
+    (api/create-subscription (:checkout-link fixed-payments-data) price-id success-redirect-url cancel-redirect-url
      (fn [{:keys [success body]}]
       (when success
-       (let [session-data (json->cljs body)]
-         (dis/dispatch! [:payments-checkout-session-id session-data])
-         (stripe-client/redirect-to-checkout session-data
-          (fn [res]
-           (when-not res
-             (error-modal "An error occurred, please try again."))))))))))
+       (let [response-data (parse-payments-data (json->cljs body) fixed-payments-data)
+             new-subscription (:new-subscription response-data)
+             checkout-session (:checkout-session response-data)]
+         (dis/dispatch! [:payments-create-subscription/finished (dis/current-org-slug) response-data new-subscription checkout-session])
+         (if new-subscription
+           ;; If we have a new subscription it means the user had already a payment method on file
+           ;; and we can notify the subscription!
+           (notify-subscription-created true)
+           (stripe-client/redirect-to-checkout checkout-session
+                                               (fn [res]
+                                                 (when-not res
+                                                   (error-modal "An error occurred, please try again.")))))))))))
+
+(defn- checkout-session-return-result []
+  (let [show-checkout-session? (contains? @dis/app-state dis/payments-checkout-session-result)
+        session-result (get @dis/app-state dis/payments-checkout-session-result)]
+    (when show-checkout-session?
+      (when show-checkout-session?
+        (jwt-actions/jwt-refresh))
+      (notify-subscription-created session-result))))
 
 ;; Customer portal redirect
 
 (def portal-session-cookie :portal-session-open)
-(def portal-session-return-parameter "customer-portal")
+(def portal-session-return-param :customer-portal)
 
-(defn open-portal! [payments-data]
-  (when-let [portal-link (:portal-link payments-data)]
+(defn manage-subscription! [payments-data]
+  (when-let [manage-subscription-link (:manage-subsription payments-data)]
         (let [base-domain (if ua/mobile-app?
                             ;; Get the deep link url but strip out the last slash to avoid
                             ;; a double slash
                             (string/join "" (butlast (dis/expo-deep-link-origin)))
                             ls/web-server-domain)
-              client-url (str base-domain (router/get-token) "?" portal-session-return-parameter "=1")]
-          (api/post-customer-portal portal-link client-url
-                                    (fn [{:keys [success body]}]
-                                      (let [resp (when success (json->cljs body))
-                                            redirect-url (-> resp :portal :url)]
-                                        (if (and success
-                                                 redirect-url)
-                                          (do
+              client-url (str base-domain (router/get-token) "?" portal-session-return-param "=1")]
+          (api/manage-subscription manage-subscription-link client-url
+                                   (fn [{:keys [success body]}]
+                                     (let [resp (when success (json->cljs body))
+                                           redirect-url (-> resp :portal :url)]
+                                       (if (and success
+                                                redirect-url)
+                                         (do
                                             ;; Add a session cookie to make sure we show an error message if
                                             ;; user come back here w/o a response from the portal
-                                            (cook/set-cookie! portal-session-cookie (lib-time/now-ts))
-                                            (router/redirect! redirect-url))
-                                          (error-modal "An error occurred, please try again."))))))))
+                                           (cook/set-cookie! portal-session-cookie (lib-time/now-ts))
+                                           (router/redirect! redirect-url))
+                                         (error-modal "An error occurred, please try again."))))))))
+
+;; Initialization
 
 (defn initial-loading []
-  (let [return-session-cookie (cook/get-cookie portal-session-cookie)
-        return-parameter (dis/query-param portal-session-return-parameter)]
-    (cook/remove-cookie! portal-session-cookie)
-    ;; Show an error message only if the user is returning to carrot from the same session it has been opened
-    ;; and the return url is not right
-    (when (and (pos? return-session-cookie)
-               (not return-parameter))
-      (error-modal "An error occurred during the portal session, please try again."))))
+  ;; Check come back from checkout session
+  (let [checkout-session-cookie (cook/get-cookie checkout-session-cookie)
+        checkout-return-result-param (js/Boolean. (dis/query-param checkout-session-return-result-param))
+        checkout-return-param (.parseInt ^js js/window (dis/query-param checkout-session-return-param) 10)]
+    (when checkout-session-cookie
+      (cook/remove-cookie! checkout-session-cookie)
+      ;; Force refresh of the JWToken to make sure the changes are pulled
+      (jwt-actions/jwt-refresh)
+      ;; Show an error message only if the user is returning to carrot from a checkout session
+      (when checkout-return-param
+        (dis/dispatch! [:checkout-session-return checkout-return-result-param]))))
+  ;; Check come back from customer portal
+  (let [portal-cookie (cook/get-cookie portal-session-cookie)
+        portal-param (.parseInt ^js js/window (dis/query-param portal-session-return-param))]
+    (when portal-cookie
+      (cook/remove-cookie! portal-session-cookie)
+      ;; Force refresh of the JWToken to make sure the changes are pulled
+      (jwt-actions/jwt-refresh)
+      ;; Show an error message only if the user is returning to carrot from a customer portal session
+      (when-not portal-param
+        (error-modal "An error occurred during the portal session, please try again.")))))

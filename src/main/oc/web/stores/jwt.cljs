@@ -9,12 +9,13 @@
 ;; Store JWT in App DB so it can be easily accessed in actions etc.
 (defmethod dispatcher/action :jwt
   [db [_]]
-  (let [jwt-data (j/get-contents)
-        next-db (if (cook/get-cookie :show-login-overlay)
-                  (assoc db dispatcher/show-login-overlay-key (keyword (cook/get-cookie :show-login-overlay)))
-                  db)]
+  (let [jwt-data (j/get-contents)]
     (timbre/debug jwt-data)
-    (assoc next-db :jwt jwt-data)))
+    (as-> db tdb
+      (if (cook/get-cookie :show-login-overlay)
+        (assoc tdb dispatcher/show-login-overlay-key (keyword (cook/get-cookie :show-login-overlay)))
+        tdb)
+      (assoc tdb :jwt jwt-data))))
 
 
 (defmethod dispatcher/action :id-token

@@ -326,22 +326,23 @@
        options callback))
     (handle-missing-link "update-price-subscription" update-link callback {:price-id price-id})))
 
-(defn get-checkout-session-id [checkout-link success-url cancel-url callback]
-  (if checkout-link
-    (payments-http (method-for-link checkout-link) (relative-href checkout-link)
-     {:headers (headers-for-link checkout-link)
+(defn create-subscription [create-subscription-link price-id success-url cancel-url callback]
+  (if create-subscription-link
+    (payments-http (method-for-link create-subscription-link) (relative-href create-subscription-link)
+     {:headers (headers-for-link create-subscription-link)
       :json-params (cljs->json {:success-url success-url
+                                :price-id price-id
                                 :cancel-url cancel-url})}
      callback)
-    (handle-missing-link "get-checkout-session-id" checkout-link callback {:success-url success-url :cancel-url cancel-url})))
+    (handle-missing-link "create-subscription" create-subscription-link callback {:success-url success-url :cancel-url cancel-url})))
 
-(defn post-customer-portal [customer-portal-link client-url callback]
-  (if customer-portal-link
-    (payments-http (method-for-link customer-portal-link) (relative-href customer-portal-link)
-     {:headers (headers-for-link customer-portal-link)
+(defn manage-subscription [manage-subscription-link client-url callback]
+  (if manage-subscription-link
+    (payments-http (method-for-link manage-subscription-link) (relative-href manage-subscription-link)
+     {:headers (headers-for-link manage-subscription-link)
       :json-params (cljs->json {:client-url client-url})}
      callback)
-    (handle-missing-link "post-customer-portal" customer-portal-link callback {:client-url client-url})))
+    (handle-missing-link "manage-subscription" manage-subscription-link callback {:client-url client-url})))
 
 ;; Org
 
