@@ -181,7 +181,7 @@
                      :data-placement "top"
                      :data-container "body"
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip comment-data)}
+                     :title (utils/activity-date-tooltip comment-data)}
                     (utils/foc-date-time (:created-at comment-data))]]]
               (when (:unread comment-data)
                 [:div.new-comment-tag])
