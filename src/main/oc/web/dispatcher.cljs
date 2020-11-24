@@ -703,7 +703,10 @@
    actions
    (fn [payload]
      ;; (prn payload) ; debug :)
-     (swap! app-state action payload))))
+     (let [next-db (swap! app-state action payload)]
+       (when (get next-db nil)
+         (timbre/warn "Nil key in app-state! Content:" (get next-db nil)))
+       next-db))))
 
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
