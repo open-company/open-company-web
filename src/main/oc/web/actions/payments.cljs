@@ -1,22 +1,30 @@
 (ns oc.web.actions.payments
   (:require [oc.web.api :as api]
             [cuerdas.core :as string]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.local-settings :as ls]
+            [oc.lib.time :as lib-time]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.stripe :as stripe-client]
-            [oc.web.components.ui.alert-modal :as alert-modal]
-            [oops.core :refer (oset!)]
-            [goog.dom :as gDom]))
+            [oc.web.lib.cookies :as cook]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
 (def default-trial-expired-status "past_due")
 (def default-positive-statuses #{default-trial-status default-active-status})
+
+(defn- error-modal [msg]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :title "Oops"
+                    :message msg
+                    :solid-button-style :red
+                    :solid-button-title "OK, got it"
+                    :solid-button-cb alert-modal/hide-alert}]
+    (alert-modal/show-alert alert-data)))
 
 ;; Subscriptions data retrieve
 
@@ -135,38 +143,27 @@
          (stripe-client/redirect-to-checkout session-data
           (fn [res]
            (when-not res
-             (let [alert-data {:icon "/img/ML/trash.svg"
-                               :title "Oops"
-                               :message "An error occurred, please try again."
-                               :solid-button-style :red
-                               :solid-button-title "OK, got it"
-                               :solid-button-cb alert-modal/hide-alert}]
-              (alert-modal/show-alert alert-data)))))))))))
+             (error-modal "An error occurred, please try again."))))))))))
 
 ;; Customer portal redirect
 
 (defn open-portal! [payments-data]
   (when-let [portal-link (:portal-link payments-data)]
-    (let [base-domain (if ua/mobile-app?
-                      ;; Get the deep link url but strip out the last slash to avoid
-                      ;; a double slash
-                        (string/join "" (butlast (dis/expo-deep-link-origin)))
-                        ls/web-server-domain)
-          client-url (str base-domain (router/get-token) "?org_settings=payments")
-          form (gDom/createElement "form")
-          _ (.add (.-classList form) "hidden")
-          _ (oset! form "method" "POST")
-          _ (oset! form "action" (:href portal-link))
-          ;; _ (oset! form "target" "_blank")
-          redirect-input (gDom/createElement "input")
-          _ (oset! redirect-input "type" "hidden")
-          _ (oset! redirect-input "value" client-url)
-          _ (oset! redirect-input "name" "client-url")
-          _ (.appendChild form redirect-input)
-          authorization-input (gDom/createElement "input")
-          _ (oset! authorization-input "type" "hidden")
-          _ (oset! authorization-input "value" (str "Bearer " (jwt/jwt)))
-          _ (oset! authorization-input "name" "authorization")
-          _ (.appendChild form authorization-input)
-          _ (.appendChild (.-body js/document) form)]
-      (.submit form))))
+        (let [base-domain (if ua/mobile-app?
+                            ;; Get the deep link url but strip out the last slash to avoid
+                            ;; a double slash
+                            (string/join "" (butlast (dis/expo-deep-link-origin)))
+                            ls/web-server-domain)
+              client-url (str base-domain (router/get-token) "?customer-portal=1")]
+          (api/post-customer-portal portal-link client-url
+                                    (fn [{:keys [success body]}]
+                                      (let [resp (when success (json->cljs body))
+                                            redirect-url (-> resp :portal :url)]
+                                        (if (and success
+                                                 redirect-url)
+                                          (do
+                                            ;; Add a session cookie to make sure we show an error message if
+                                            ;; user come back here w/o a response from the portal
+                                            (cook/set-cookie! :portal-session-open (lib-time/now-ts))
+                                            (router/redirect! redirect-url))
+                                          (error-modal "An error occurred, please try again."))))))))
