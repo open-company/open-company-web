@@ -302,7 +302,7 @@
                  :data-toggle (when (and (not (:premium? org-data))
                                          (not private-allowed?))
                                 "tooltip")
-                 :title "Private topics are allowed only on Premium."
+                 :title "This is a premium feature. Please upgrade to create topics for invited users only."
                  :data-placement "top"
                  :on-click (fn [e]
                              (if private-allowed?
@@ -326,7 +326,7 @@
                    :data-toggle (when (and (not (:premium? org-data))
                                            (not public-allowed?))
                                   "tooltip")
-                   :title "Public topics are allowed only on Premium."
+                   :title "This is a premium feature. Please upgrade to create topics meant for sharing publicly beyond your team."
                    :data-placement "top"
                    :on-click (fn [e]
                                (if public-allowed?
