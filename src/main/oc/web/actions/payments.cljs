@@ -169,7 +169,7 @@
         base-redirect-url (str base-domain (router/get-token) "?" checkout-session-return-param "=true&picked-price=" price-id)
         success-redirect-url (str base-redirect-url "&" checkout-session-return-result-param "=true")
         cancel-redirect-url (str base-redirect-url "&" checkout-session-return-result-param "=false")]
-    (api/create-subscription (:checkout-link fixed-payments-data) price-id success-redirect-url cancel-redirect-url
+    (api/create-subscription (:create-subscription-link fixed-payments-data) price-id success-redirect-url cancel-redirect-url
      (fn [{:keys [success body]}]
       (when success
        (let [response-data (parse-payments-data (json->cljs body) fixed-payments-data)
