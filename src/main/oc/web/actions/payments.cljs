@@ -105,7 +105,7 @@
                            (:available-prices old-payments-data))]
     (-> old-payments-data
         (merge payments-data
-               {:can-manage-subsription? (map? manage-subscription-link)
+               {:can-manage-subscription? (map? manage-subscription-link)
                 :can-create-subscription? (map? create-subscription-link)
                 :manage-subscription manage-subscription-link
                 :create-subscription create-subscription-link
@@ -199,7 +199,7 @@
 (def portal-session-return-param :customer-portal)
 
 (defn manage-subscription! [payments-data]
-  (when-let [manage-subscription-link (:manage-subsription payments-data)]
+  (when-let [manage-subscription-link (:manage-subscription payments-data)]
         (let [base-domain (if ua/mobile-app?
                             ;; Get the deep link url but strip out the last slash to avoid
                             ;; a double slash

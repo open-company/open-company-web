@@ -156,11 +156,11 @@
         long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
                        (str "Endpoint: " ls/web-server))
-        show-billing? (and (or (:can-manage-subsription? payments-data)
+        show-billing? (and (or (:can-manage-subscription? payments-data)
                                (:can-create-subscription? payments-data))
                            current-org-slug)
         billing-label (when show-billing?
-                        (if (:can-manage-subsription? payments-data)
+                        (if (:can-manage-subscription? payments-data)
                           "Manage subscription"
                           "Go premium"))
         billing-click (when show-billing?

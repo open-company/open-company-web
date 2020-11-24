@@ -87,8 +87,10 @@
          ".")])
 
      [:ul.premium-picker-features-list
-      (for [{:keys [title tooltip]} premium-features-list]
+      (for [idx (range (count premium-features-list))
+            :let [{:keys [title tooltip]} (get premium-features-list idx)]]
         [:li
+         {:key (str "premium-feature-" idx)}
          [:div.premium-picker-feature-item
           {:class (when tooltip "has-tooltip")
            :data-toggle (when tooltip "tooltip")
