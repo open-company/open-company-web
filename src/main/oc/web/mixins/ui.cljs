@@ -5,8 +5,7 @@
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.dom :as dom-utils]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.utils.dom :as dom-utils]))
 
 (def refresh-tooltips-mixin
   {:did-mount (fn [s]

@@ -128,12 +128,16 @@ div.premium-picker-modal {
 div.premium-picker {
   margin-top: 8px;
 
-  div.cancel-period-end {
+  div.subscription-end-date {
     margin-top: 8px;
     @include OC_Body_Book();
     font-size: 12px;
-    color: $carrot_orange;
+    color: var(--light-color);
     line-height: 14px;
+
+    &.cancelling {
+      color: $carrot_orange;
+    }
   }
 
   div.premium-picker-plans-container {

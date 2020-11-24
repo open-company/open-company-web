@@ -93,11 +93,6 @@
                    (org-actions/get-org org-data true)
                    (team-actions/teams-get))
                 s)
-   :after-render (fn [s]
-                   (doto (js/$ "[data-toggle=\"tooltip\"]")
-                      (.tooltip "fixTitle")
-                      (.tooltip "hide"))
-                   s)
    :will-update (fn [s]
                   (let [sending (::sending s)
                         initial-sending (::initial-sending s)]

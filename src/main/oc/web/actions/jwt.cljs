@@ -47,7 +47,10 @@
              (not= (cook/get-cookie :show-login-overlay) "collect-password"))
     (cook/remove-cookie! :show-login-overlay))
   (let [jwt-contents (jwt/get-contents)]
-    (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
+    (utils/after 1
+                 #(do
+                    (dis/dispatch! [:jwt jwt-contents])
+                    (dis/dispatch! [:org-loaded (dis/org-data)])))
     (dis/dispatch! [:input [dis/show-invite-box-key] (seq (cook/get-cookie (router/show-invite-box-cookie (:user-id jwt-contents))))])
     ;; User identifications for third party services
     (when jwt-contents
