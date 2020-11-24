@@ -28,10 +28,17 @@
 
 ;; Subscriptions data retrieve
 
-(defn get-active-subscription [payments-data]
+(defn get-active-subscription
+  "The active subscription is always the last in the subs list.
+   If there is only 1 subscription is also the current one, if not it means it's the subs
+   the user is going to switch to when the current one finishes."
+  [payments-data]
   (last (:subscriptions payments-data)))
 
-(defn get-current-subscription [payments-data]
+(defn get-current-subscription
+  "The current subscription is the one the user paid for and is using.
+   Its :current-period-start is in the past and :current-period-end is in the future."
+  [payments-data]
   (first (:subscriptions payments-data)))
 
 ;; Paywall
@@ -95,7 +102,9 @@
                 :checkout-link checkout-link
                 :premium? premium?
                 :paywall? (not premium?)
-                :payment-method-on-file? has-payments-data?})
+                :payment-method-on-file? has-payments-data?
+                :subscriptions (mapv #(assoc % :price (parse-price (:price %) (:quantity %)))
+                                     (:subscriptions payments-data))})
         (update :available-prices (fn [prices] (->> prices
                                                     (map #(parse-price % (:seat-count payments-data)))
                                                     (sort-by :unit-amount)
