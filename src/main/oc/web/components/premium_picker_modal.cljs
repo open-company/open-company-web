@@ -2,9 +2,12 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.nav-sidebar :as nav-sidebar]
             [oc.web.mixins.ui :as ui-mixins]))
+
+(def yearly-plan-discount-copy "20% discount for annual plan.")
 
 (def premium-features-list
   [{:title "Team, private and public updates"
@@ -27,6 +30,7 @@
 (rum/defcs premium-picker <
   rum/reactive
   (rum/local nil ::selected-price)
+  (rum/local false ::working)
   (drv/drv :payments)
   ui-mixins/refresh-tooltips-mixin
   {:will-mount (fn [s]
@@ -72,7 +76,10 @@
             (:name-label price)]])])
 
      [:div.premium-picker-price
-      (:description-label current-price)]
+      (:description-label current-price)
+      (when (= (:interval current-price) "year")
+        [:div.premium-picker-price-discount
+         yearly-plan-discount-copy])]
 
      (when current-subscription
        [:div.subscription-end-date
@@ -82,7 +89,7 @@
          (if (:cancel-at-period-end? current-subscription)
            "is set to cancel"
            "will renew")
-         " on the "
+         " on "
          (:end-date-label current-subscription)
          ".")])
 
@@ -102,11 +109,21 @@
      (when (seq available-prices)
       (if current-subscription
         [:button.continue.mlb-reset
-         {:on-click #(payments-actions/manage-subscription! payments-data)}
-         "Manage subscription"]
+         {:on-click (fn [_]
+                      (reset! (::working s) true)
+                      (payments-actions/manage-subscription! payments-data #(reset! (::working s) false)))
+          :disabled @(::working s)}
+         "Manage subscription"
+         (when @(::working s)
+           (small-loading))]
         [:button.continue.mlb-reset
-         {:on-click #(payments-actions/create-subscription! payments-data @selected-price)}
-         "Upgrade"]))]))
+         {:on-click (fn [_]
+                      (reset! (::working s) true)
+                      (payments-actions/create-subscription! payments-data @selected-price #(reset! (::working s) false)))
+          :disabled @(::working s)}
+         "Upgrade"
+         (when @(::working s)
+           (small-loading))]))]))
 
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin
