@@ -21,6 +21,17 @@
         (string/capital (user-utils/user-role-string user-type))]
       [:ul.dropdown-menu.user-type-dropdown-menu
         {:aria-labelledby user-dropdown-id}
+       (when-not hide-admin
+         [:li
+          {:on-click #(when (fn? on-change)
+                        (on-change :admin))
+           :class (when (= user-type :admin) "selected")}
+          "Admin"])
+        [:li
+          {:on-click #(when (fn? on-change)
+                        (on-change :author))
+           :class (when (= user-type :author) "selected")}
+          "Contributor"]
         [:li
          {:on-click #(if premium?
                        (when (fn? on-change)
@@ -33,17 +44,6 @@
           :class (utils/class-set {:selected (= user-type :viewer)
                                    :premium-lock (not premium?)})}
          "Viewer"]
-        [:li
-          {:on-click #(when (fn? on-change)
-                        (on-change :author))
-           :class (when (= user-type :author) "selected")}
-          "Contributor"]
-        (when-not hide-admin
-          [:li
-            {:on-click #(when (fn? on-change)
-                        (on-change :admin))
-             :class (when (= user-type :admin) "selected")}
-            "Admin"])
         (when (fn? on-remove)
           [:li.remove-li
             {:on-click #(on-remove)}
