@@ -81,6 +81,10 @@ div.org-settings-modal {
         height: 32px;
         cursor: pointer;
 
+        &.premium-lock {
+          @include premium_lock();
+        }
+
         div.org-avatar.missing-logo {
           position: relative;
           width: 32px;

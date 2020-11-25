@@ -201,7 +201,7 @@
   (drv/drv :org-editing)
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
-  ui-mixins/refresh-tooltips-mixin
+  ui-mixins/strict-refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
@@ -250,7 +250,13 @@
         _team-management-data (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})
         current-theme (theme-utils/computed-value theme-data)
-        current-brand-color (get (:brand-color org-editing) current-theme)]
+        current-brand-color (get (:brand-color org-editing) current-theme)
+        premium-lock? (not (:premium? org-data))
+        premium-lock-click (when premium-lock?
+                             (fn [e]
+                               (utils/event-stop e)
+                               (nav-actions/toggle-premium-picker!)))
+        premium-tooltip "Premium accounts can customize logo and team colors.Click for details."]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]
@@ -274,8 +280,18 @@
           [:div.org-settings-header-avatar.group
             {:ref "org-settings-header-logo"
              :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
-                                      utils/hide-class true})
-             :on-click logo-on-click}
+                                      utils/hide-class true
+                                      :premium-lock premium-lock?})
+             :data-toggle (when (and (not is-mobile?)
+                                     premium-lock?)
+                            "tooltip")
+             :title (when premium-lock?
+                      premium-tooltip)
+             :data-placement "top"
+             :data-container "body"
+             :on-click (if premium-lock?
+                         premium-lock-click
+                         logo-on-click)}
             (org-avatar org-data-for-avatar false :never)
             [:span.edit-company-logo
               "Edit company logo"]]
@@ -294,17 +310,15 @@
               [:div.error "Must be between 3 and 50 characters"])
             (email-domains)]
           [:div.org-settings-fields.field-group
-           {:class (utils/class-set {:premium-lock (not (:premium? org-data))})
+           {:class (utils/class-set {:premium-lock premium-lock?})
             :data-toggle (when (and (not is-mobile?)
-                                    (not (:premium? org-data)))
+                                    premium-lock?)
                            "tooltip")
-            :title "Brand color customization is available only on Premium"
+            :title (when premium-lock?
+                     premium-tooltip)
             :data-placement "top"
             :data-container "body"
-            :on-click (when-not (:premium? org-data)
-                        #(do
-                           (utils/event-stop %)
-                           (nav-actions/toggle-premium-picker!)))}
+            :on-click premium-lock-click}
            [:div.field-label
             "Customize your team's colors"]
            [:div.field-description
@@ -395,14 +409,10 @@
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
                      :data-container "body"}]]]
-              (let [did-change-cb (when (:premium? org-data)
-                                    #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data))))
-                    premium-lock-click (when-not (:premium? org-data)
-                                         (fn [e]
-                                           (utils/event-stop e)
-                                           (nav-actions/toggle-premium-picker!)))]
+              (let [did-change-cb (when-not premium-lock?
+                                    #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data))))]
                 [:div.org-settings-advanced-row.public-sections.group
-                 {:class (utils/class-set {:premium-lock (not (:premium? org-data))})
+                 {:class (utils/class-set {:premium-lock premium-lock?})
                   :on-click premium-lock-click}
                  (carrot-checkbox {:selected (not (:disallow-public-board content-visibility-data))
                                    :disabled false
