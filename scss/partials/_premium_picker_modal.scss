@@ -207,6 +207,14 @@ div.premium-picker {
     color: var(--light-color);
     @include OC_Body_Book();
     margin-top: 8px;
+
+    div.premium-picker-price-discount {
+      font-size: 14px;
+      line-height: 18px;
+      color: var(--light-color);
+      @include OC_Body_Book();
+      margin-top: 4px;
+    }
   }
 
   ul.premium-picker-features-list {
@@ -274,5 +282,15 @@ div.premium-picker {
     padding: 9px 24px;
     height: 34px;
     margin-top: 16px;
+
+    div.small-loading {
+      margin: 0 0 0 6px;
+      padding: 0;
+    }
+
+    &:disabled {
+      opacity: 0.8 !important;
+      cursor: not-allowed;
+    }
   }
 }

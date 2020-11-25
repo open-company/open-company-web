@@ -162,7 +162,7 @@
         billing-label (when show-billing?
                         (if (:can-manage-subscription? payments-data)
                           "Manage subscription"
-                          "Go premium"))
+                          "Try premium"))
         billing-click (when show-billing?
                         premium-picker-click)]
     [:div.menu
