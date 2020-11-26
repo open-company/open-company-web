@@ -187,34 +187,35 @@
 (def payments-notify-db-key :payments-result-notification)
 
 (defn- check-notify-user [new-payments-data]
-  (let [{team-id :team-id success? :success? old-data :cookie-data} (get @dis/app-state payments-notify-db-key)]
-    (dis/dispatch! [:input [payments-notify-db-key] nil])
-    (if success?
-      (let [new-premium (jwt/premium? team-id)
-            new-sub (get-current-subscription new-payments-data)]
-        (when (or new-sub
-                  (:price-id old-data))
-                ;; Notify user of an upgrade
-          (cond (and new-premium
-                     (not (:price-id old-data))
-                     (not= (:premium? old-data) new-premium))
-                (notify-user :sub-upgrade-success upgrade-message)
-                ;; Notify user of a downgrade
-                (and (:price-id old-data)
-                     (not= (:premium? old-data) new-premium)
-                     (not new-premium))
-                (notify-user :sub-downgrade-success downgrade-message)
-                ;; Notify user of a plan change if the price-id of the current sub changed
-                ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
-                (or (not= (:price-id old-data) (-> new-sub :price :id))
-                    (not= (:subs-count old-data) (count (:subscriptions new-payments-data))))
-                (notify-user :price-change-success plan-change-message)
-                ;; Notify user of a cancel/renew
-                (not= (boolean (:cancel-at-period-end? new-sub)) (:cancel-at-period-end? old-data))
-                (if (:cancel-at-period-end? new-sub)
-                  (notify-user :sub-cancel-success (string/format cancel-message (.toDateString (js/Date. (:current-period-end new-sub)))))
-                  (notify-user :sub-renew-success renew-message)))))
-      (notify-user :sub-change-error generic-error-message))))
+  (when-let [stored-session-data (get @dis/app-state payments-notify-db-key)]
+    (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
+      (dis/dispatch! [:input [payments-notify-db-key] nil])
+      (if success?
+        (let [new-premium (jwt/premium? team-id)
+              new-sub (get-current-subscription new-payments-data)]
+          (when (or new-sub
+                    (:price-id old-data))
+                  ;; Notify user of an upgrade
+            (cond (and new-premium
+                      (not (:price-id old-data))
+                      (not= (:premium? old-data) new-premium))
+                  (notify-user :sub-upgrade-success upgrade-message)
+                  ;; Notify user of a downgrade
+                  (and (:price-id old-data)
+                      (not= (:premium? old-data) new-premium)
+                      (not new-premium))
+                  (notify-user :sub-downgrade-success downgrade-message)
+                  ;; Notify user of a plan change if the price-id of the current sub changed
+                  ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
+                  (or (not= (:price-id old-data) (-> new-sub :price :id))
+                      (not= (:subs-count old-data) (count (:subscriptions new-payments-data))))
+                  (notify-user :price-change-success plan-change-message)
+                  ;; Notify user of a cancel/renew
+                  (not= (boolean (:cancel-at-period-end? new-sub)) (:cancel-at-period-end? old-data))
+                  (if (:cancel-at-period-end? new-sub)
+                    (notify-user :sub-cancel-success (string/format cancel-message (.toDateString (js/Date. (:current-period-end new-sub)))))
+                    (notify-user :sub-renew-success renew-message)))))
+        (notify-user :sub-change-error generic-error-message)))))
 
 (defn- maybe-notify-user
   "Cookie data keep the subscription data before redirecting to Stripe:
@@ -222,9 +223,10 @@
     :premium? true/false
     :sub-id 'subscription-id'}"
   [team-id success? cookie-data]
-  (dis/dispatch! [:input [payments-notify-db-key] {:team-id team-id
-                                                   :success? success?
-                                                   :cookie-data cookie-data}]))
+  (when cookie-data
+    (dis/dispatch! [:input [payments-notify-db-key] {:team-id team-id
+                                                     :success? success?
+                                                     :cookie-data cookie-data}])))
 
 (defn create-subscription! [payments-data price-id & [cb]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
