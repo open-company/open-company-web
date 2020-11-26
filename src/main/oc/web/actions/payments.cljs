@@ -237,8 +237,14 @@
                       ls/web-server-domain)
         base-redirect-url (str base-domain (router/get-token) "?" (name checkout-session-return-param) "=" (:team-id fixed-payments-data) "&picked-price=" price-id)
         success-redirect-url (str base-redirect-url "&" (name checkout-session-result-param) "=true")
-        cancel-redirect-url (str base-redirect-url "&" (name checkout-session-result-param) "=false")]
-    (api/create-subscription (:create-subscription-link fixed-payments-data) price-id success-redirect-url cancel-redirect-url
+        cancel-redirect-url (str base-redirect-url "&" (name checkout-session-result-param) "=false")
+        org-data (dis/org-data)
+        json-data {:org-uuid (:uuid org-data)
+                   :org-slug (:slug org-data)
+                   :success-url success-redirect-url
+                   :cancel-url cancel-redirect-url
+                   :price-id price-id}]
+    (api/create-subscription (:create-subscription-link fixed-payments-data) json-data
      (fn [{:keys [success body]}]
       (when success
         (let [response-data (parse-payments-data (json->cljs body))

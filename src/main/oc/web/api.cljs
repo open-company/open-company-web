@@ -326,11 +326,13 @@
        options callback))
     (handle-missing-link "update-price-subscription" update-link callback {:price-id price-id})))
 
-(defn create-subscription [create-subscription-link price-id success-url cancel-url callback]
+(defn create-subscription [create-subscription-link {:keys [org-uuid org-slug price-id success-url cancel-url]} callback]
   (if create-subscription-link
     (payments-http (method-for-link create-subscription-link) (relative-href create-subscription-link)
      {:headers (headers-for-link create-subscription-link)
-      :json-params (cljs->json {:success-url success-url
+      :json-params (cljs->json {:org-uuid org-uuid
+                                :org-slug org-slug
+                                :success-url success-url
                                 :price-id price-id
                                 :cancel-url cancel-url})}
      callback)
