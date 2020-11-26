@@ -1,7 +1,5 @@
 (ns oc.web.mixins.theme
   (:require [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]
-            [oc.web.actions.theme :as theme-actions]
             [oc.web.utils.theme :as theme-utils]))
 
 (defn theme-mixin []

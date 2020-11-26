@@ -49,7 +49,8 @@
   (when-let [html-el (oget js/window "document.documentElement")]
     (ocall html-el "classList.remove" (str (name theme-class-name-prefix) "-dark"))
     (ocall html-el "classList.remove" (str (name theme-class-name-prefix) "-light"))
-    (ocall html-el "classList.add" (str (name theme-class-name-prefix) "-" (name mode)))))
+    (when mode
+      (ocall html-el "classList.add" (str (name theme-class-name-prefix) "-" (name mode))))))
 
 (defn computed-value
   [theme-map]
