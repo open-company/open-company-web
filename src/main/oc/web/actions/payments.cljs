@@ -187,7 +187,7 @@
 (def payments-notify-db-key :payments-result-notification)
 
 (defn- check-notify-user [new-payments-data]
-  (when-let [{team-id :team-id success? :success? old-data :cookie-data} (get @dis/app-state payments-notify-db-key)]
+  (let [{team-id :team-id success? :success? old-data :cookie-data} (get @dis/app-state payments-notify-db-key)]
     (dis/dispatch! [:input [payments-notify-db-key] nil])
     (if success?
       (let [new-premium (jwt/premium? team-id)
@@ -223,8 +223,8 @@
     :sub-id 'subscription-id'}"
   [team-id success? cookie-data]
   (dis/dispatch! [:input [payments-notify-db-key] {:team-id team-id
-                                                          :success? success?
-                                                          :cookie-data cookie-data}]))
+                                                   :success? success?
+                                                   :cookie-data cookie-data}]))
 
 (defn create-subscription! [payments-data price-id & [cb]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
@@ -293,17 +293,19 @@
 
 (defn initial-loading []
   ;; Check come back from checkout session
-  (let [checkout-session-cookie (parse-sub-cookie-data (cook/get-cookie checkout-session-cookie))
+  (let [checkout-cookie-value (cook/get-cookie checkout-session-cookie)
+        checkout-session-value (when checkout-cookie-value (parse-sub-cookie-data checkout-cookie-value))
         checkout-session-result-param (parse-boolean-string (dis/query-param checkout-session-result-param))
         team-id (dis/query-param checkout-session-return-param)]
-    (when checkout-session-cookie
+    (when checkout-session-value
       (cook/remove-cookie! checkout-session-cookie)
       ;; Force refresh the JWToken and check if premium changed for the current team
-      (jwt-actions/jwt-refresh #(maybe-notify-user team-id checkout-session-result-param checkout-session-cookie))))
+      (jwt-actions/jwt-refresh #(maybe-notify-user team-id checkout-session-result-param checkout-session-value))))
   ;; Check come back from customer portal
-  (let [portal-cookie (parse-sub-cookie-data (cook/get-cookie portal-session-cookie))
+  (let [portal-cookie-value (cook/get-cookie portal-session-cookie)
+        portal-session-value (when portal-cookie-value (parse-sub-cookie-data portal-cookie-value))
         team-id (dis/query-param portal-session-return-param)]
-    (when portal-cookie
+    (when portal-session-value
       (cook/remove-cookie! portal-session-cookie)
       ;; Force refresh of the JWToken to make sure the changes are pulled
-      (jwt-actions/jwt-refresh #(maybe-notify-user team-id true portal-cookie)))))
+      (jwt-actions/jwt-refresh #(maybe-notify-user team-id true portal-session-value)))))
