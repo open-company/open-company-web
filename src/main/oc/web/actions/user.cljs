@@ -2,19 +2,17 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
-            [cuerdas.core :as s]
+            [defun.core :refer (defun-)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
-            [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
@@ -642,15 +640,30 @@
       (ws-cc/board-unfollow board-uuid))
     (refresh-follow-containers)))
 
+;; Check if there is a premium notification and trigger a JWT refresh if needed
+
+(defun- maybe-refresh-token
+  "Check if notification include a refresh-token-at property and
+   force refresh the JWT in case that date is after the token creation date"
+  ([notifications :guard sequential?]
+   (doseq [n notifications]
+     (maybe-refresh-token n)))
+
+  ([notification :guard map?]
+   (when (jwt/before? (:refresh-token-at notification))
+     (utils/after 10 jwt-actions/jwt-refresh))))
+
 ;; subscribe to websocket events
 
 (defn subscribe []
   (ws-nc/subscribe :user/notifications
     (fn [{:keys [data]}]
+      (maybe-refresh-token (:notifications data))
       (let [fixed-notifications (notif-utils/fix-notifications (:notifications data))]
         (dis/dispatch! [:user-notifications (dis/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
+      (maybe-refresh-token data)
       (when-let [fixed-notification (notif-utils/fix-notification data true)]
         (dis/dispatch! [:user-notification (dis/current-org-slug) fixed-notification])
         (notification-actions/show-notification
