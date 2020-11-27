@@ -10,7 +10,7 @@
 
 (defn notification-title [notification]
   (let [mention? (:mention? notification)
-        payments? (:payments? notification)
+        team? (:team? notification)
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
         entry-publisher (:entry-publisher notification)
@@ -20,7 +20,7 @@
       mention?
       (str first-name " mentioned you")
       ;; Premium notification
-      (and payments? (:premium-action notification))
+      (and team? (:premium-action notification))
       (:content notification)
       ;; A comment was added to a post the current is involved in
       (and ;; if is a commnet
