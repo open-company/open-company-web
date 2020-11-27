@@ -59,7 +59,7 @@
           initial-sending (::initial-sending s)]
       (when (pos? @sending)
         (let [invite-users @(drv/get-ref s :invite-users)
-              no-error-invites (filter #(not (:error %)) invite-users)
+              no-error-invites (filter (comp not :error) invite-users)
               error-invites (filter :error invite-users)
               hold-initial-sending @initial-sending]
           (reset! sending (count no-error-invites))
@@ -127,7 +127,11 @@
                                     fixed-next-invite-users (if (zero? (count next-invite-users))
                                                               [(assoc default-user-row :type (:type user-data))]
                                                               next-invite-users)]
-                                (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}])]])]
+                                (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}])]
+            (when (and (seq (:error user-data))
+                      (string? (:error user-data)))
+              [:div.invite-email-item-error
+              (:error user-data)])])]
       [:button.mlb-reset.add-button
         {:on-click #(dis/dispatch! [:input [:invite-users]
                      (conj invite-users (assoc default-user-row :type "email"))])}

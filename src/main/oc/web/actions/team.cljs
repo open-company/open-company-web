@@ -198,6 +198,27 @@
       (invite-user-success invite-data))
     (invite-user-failed invite-data)))
 
+(defn- split-full-name [full-name slack-user invite-medium]
+  (let [splitted-name (string/split full-name #"\s" 2)
+        name-size (count splitted-name)
+        splittable-name? (> name-size 1)
+        first-name (cond
+                     (and (= invite-medium "email") (= name-size 1)) full-name
+                     (and (= invite-medium "email") splittable-name?) (first splitted-name)
+                     (and (= invite-medium "slack") (seq (:first-name slack-user))) (:first-name slack-user)
+                     :else "")
+        last-name (cond
+                    (and (= invite-medium "email") splittable-name?) (second splitted-name)
+                    (and (= invite-medium "slack") (seq (:last-name slack-user))) (:last-name slack-user)
+                    :else "")]
+    {:first-name first-name
+     :last-name last-name}))
+
+(defn invite-email-link []
+  (let [team-data (dis/team-data)]
+    (utils/link-for (:links team-data) "add" "POST"
+                    {:content-type "application/vnd.open-company.team.invite.v1"})))
+
 (defn invite-user [org-data team-data invite-data note]
   (let [invite-from (:type invite-data)
         email (:user invite-data)
@@ -211,36 +232,20 @@
         user (when (= invite-from "email")
                (first (filter #(= (:email %) email-address) (:users team-data))))
         old-user-type (when user (uu/get-user-type user org-data))]
-    ;; Send the invitation only if the user is not part of the team already
+    ;; Send the invitation only if the user is not part of the team already (ie user found in roster)
     ;; or if it's still pending, ie resend the invitation email
-    (if (or (not user)
-            (and user
-                 (= (string/lower-case (:status user)) "pending")))
-      (let [splitted-name (string/split email-name #"\s")
-            name-size (count splitted-name)
-            splittable-name? (= name-size 2)
-            first-name (cond
-                        (and (= invite-from "email") (= name-size 1)) email-name
-                        (and (= invite-from "email") splittable-name?) (first splitted-name)
-                        (and (= invite-from "slack") (seq (:first-name slack-user))) (:first-name slack-user)
-                        :else "")
-            last-name (cond
-                        (and (= invite-from "email") splittable-name?) (second splitted-name)
-                        (and (= invite-from "slack") (seq (:last-name slack-user))) (:last-name slack-user)
-                        :else "")
-            user-value (if (= invite-from "email") email-address slack-user)]
-        ;; If the user is already in the list
-        ;; but the type changed we need to change the user type too
-        (when (and user
-                  (not= old-user-type user-type))
-          (switch-user-type invite-data old-user-type user-type user))
-        (let [team-data (or (dis/team-data)
-                            (first (filter #(= (:team-id org-data) (:team-id %))
-                                           (dis/teams-data))))
-              invitation-link (utils/link-for (:links team-data) "add" "POST"
-                               {:content-type "application/vnd.open-company.team.invite.v1"})]
-          (api/send-invitation invitation-link user-value invite-from user-type
-           first-name last-name note (partial send-invitation-cb invite-data user-type)))))))
+    (cond (and (= (:status user) "pending")
+               (not= old-user-type user-type))
+          ;; Change user type in case it's different
+          (switch-user-type invite-data old-user-type user-type user)
+          user
+          (invite-user-failed invite-data)
+          :else
+          (let [invitation-link (invite-email-link)
+                {:keys [first-name last-name]} (split-full-name email-name slack-user invite-from)
+                user-value (if (= invite-from "email") email-address slack-user)]
+            (api/send-invitation invitation-link user-value invite-from user-type first-name last-name
+                                 note org-data (partial send-invitation-cb invite-data user-type))))))
 
 ;; Invite user helpers
 
@@ -278,7 +283,17 @@
                             (not valid?)
                             (merge user {:error true :success false})
                             team-duplicated?
-                            (merge user {:error "User already active" :success false})
+                            (merge user {:error (str "This user is already "
+                                                     (case (:role user)
+                                                       :admin
+                                                       "an admin of"
+                                                       :viewer
+                                                       "a viewer of"
+                                                       :author
+                                                       "a contributor of"
+                                                       "part of")
+                                                     " your team.")
+                                         :success false})
                             intive-duplicated?
                             (merge user {:error "Duplicated email address" :success false})
                             :else

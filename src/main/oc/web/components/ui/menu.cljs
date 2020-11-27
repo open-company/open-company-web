@@ -2,23 +2,18 @@
   (:require [rum.core :as rum]
             ["hammerjs" :as Hammer]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel sel1)]
-            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.chat :as chat]
-            [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.actions.jwt :as jwt-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn menu-close [& [s]]
@@ -145,7 +140,8 @@
         is-admin-or-author? (#{:admin :author} (:role current-user-data))
         expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and current-org-slug
-                                 is-admin-or-author?)
+                                 is-admin-or-author?
+                                 (team-actions/invite-email-link))
         native-app-data (detect-native-app)
         web-app-version client-version
         build-version (when (seq ls/sentry-release-deploy) (str "build: " ls/sentry-release-deploy))
