@@ -10,6 +10,7 @@
 
 (defn notification-title [notification]
   (let [mention? (:mention? notification)
+        payments? (:payments? notification)
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
         entry-publisher (:entry-publisher notification)
@@ -18,6 +19,9 @@
       ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
       (str first-name " mentioned you")
+      ;; Premium notification
+      (and payments? (:premium-action notification))
+      (:content notification)
       ;; A comment was added to a post the current is involved in
       (and ;; if is a commnet
        (:interaction-id notification)
@@ -63,7 +67,9 @@
         created-at (:notify-at notification)
         title (notification-title notification)
         entry-uuid (:entry-id notification)
-        interaction-uuid (:interaction-id notification)]
+        interaction-uuid (:interaction-id notification)
+        team-id (:team-id notification)
+        premium-action (:premium-action notification)]
     (when (seq title)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
@@ -72,9 +78,12 @@
        :unread unread
        :mention? (:mention? notification)
        :created-at (:notify-at notification)
-       :body (:content notification)
+       :body (when-not premium-action (:content notification))
        :title title
        :author (:author notification)
+       :team-id team-id
+       :premium-action premium-action
+       :refresh-token-at (:refresh-token-at notification)
        :click (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)})))
 
 (defn sorted-notifications [notifications]
