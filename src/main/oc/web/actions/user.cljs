@@ -651,6 +651,7 @@
 
   ([notification :guard map?]
    (when (jwt/before? (:refresh-token-at notification))
+     (timbre/info "Force refresh token for notification" (:refresh-token-at notification))
      (utils/after 10 jwt-actions/jwt-refresh))))
 
 ;; subscribe to websocket events
