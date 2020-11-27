@@ -48,7 +48,7 @@
 
 (defmethod dispatcher/action :section-edit-save
   [db [_ org-slug section-data]]
-  (assoc db :section-editing {:loading true}))
+  (assoc-in db [:section-editing :loading] true))
 
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ org-slug section-data]]

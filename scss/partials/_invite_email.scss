@@ -9,6 +9,15 @@ div.invite-email-container {
         padding-top: 16px;
       }
 
+      div.invite-email-item-error {
+        color: $carrot_orange;
+        width: 100%;
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 14px;
+        margin-bottom: 8px;
+      }
+
       div.invite-email-item {
         position: relative;
         display: flex;

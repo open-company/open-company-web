@@ -19,8 +19,8 @@
       ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
       (str first-name " mentioned you")
-      ;; Premium notification
-      (and team? (:premium-action notification))
+      ;; Team related notification: premium changes or add existing user to team
+      team?
       (:content notification)
       ;; A comment was added to a post the current is involved in
       (and ;; if is a commnet
@@ -78,7 +78,7 @@
        :unread unread
        :mention? (:mention? notification)
        :created-at (:notify-at notification)
-       :body (when-not premium-action (:content notification))
+       :body (when-not (:team? notification) (:content notification))
        :title title
        :author (:author notification)
        :team-id team-id

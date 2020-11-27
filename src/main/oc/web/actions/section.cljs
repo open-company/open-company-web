@@ -120,7 +120,7 @@
   (let [section-data (dispatcher/org-board-data (dis/current-org-slug) section-slug)
         delete-section-link (utils/link-for (:links section-data) "delete")]
     (api/delete-board delete-section-link section-slug
-                      (fn [status success body]
+                      (fn [{:keys [status success body]}]
                         (if success
                           (let [org-slug (dis/current-org-slug)
                                 last-used-section-slug (au/last-used-section)]
@@ -138,7 +138,7 @@
   ;; Board name exists or too short
   (dispatcher/dispatch! [:update [:section-editing]
    #(-> %
-     (assoc :section-name-error (when (= status 409) "Team name already exists or isn't allowed"))
+     (assoc :section-name-error (when (= status 409) "Topic name already exists or isn't allowed"))
      (assoc :section-error (when-not (= status 409) "An error occurred, please retry."))
      (dissoc :loading))]))
 
@@ -149,9 +149,14 @@
   ([section-data note success-cb error-cb]
    (timbre/debug section-data)
    (let [org-slug (dis/current-org-slug)
-         board-link (if (contains? section-data :links)
-                      (utils/link-for (:links section-data) "partial-update")
-                      (utils/link-for (:links (dispatcher/org-data)) "create"))]
+         board-link (cond (contains? section-data :links)
+                          (utils/link-for (:links section-data) "partial-update")
+                          (= (:access section-data) "public")
+                          (utils/link-for (:links (dispatcher/org-data)) "create-public")
+                          (= (:access section-data) "private")
+                          (utils/link-for (:links (dispatcher/org-data)) "create-private")
+                          :else
+                          (utils/link-for (:links (dispatcher/org-data)) "create"))]
      (dis/dispatch! [:section-edit-save org-slug section-data])
      (if (empty? (:links section-data))
        (api/create-board board-link section-data note
@@ -177,7 +182,7 @@
                                  (when (fn? success-cb)
                                    (success-cb section-data)))))))
        (api/patch-board board-link section-data note
-                        (fn [success body status]
+                        (fn [{:keys [success body status]}]
                           (let [section-data (when success (json->cljs body))]
                             (if-not success
                               (when (fn? error-cb)
@@ -272,7 +277,7 @@
   (dispatcher/dispatch! [:update [:section-editing] #(merge % {:has-changes true
                                                                :pre-flight-loading true})])
   (let [org-data (dispatcher/org-data)
-        pre-flight-link (utils/link-for (:links org-data) "pre-flight-create")]
+        pre-flight-link (utils/link-for (:links org-data) "create-preflight")]
     (api/pre-flight-section-check pre-flight-link section-slug section-name
      (fn [{:keys [success body status]}]
        (when-not success

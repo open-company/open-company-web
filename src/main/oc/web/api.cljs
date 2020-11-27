@@ -416,8 +416,7 @@
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
-        (fn [{:keys [success body status]}]
-          (callback success body status))))
+        callback))
     (handle-missing-link "patch-board" board-patch-link callback {:note note :data data})))
 
 (defn create-board [create-board-link board-data note callback]
@@ -455,8 +454,7 @@
   (if (and delete-board-link board-slug)
     (storage-http (method-for-link delete-board-link) (relative-href delete-board-link)
       {:headers (headers-for-link delete-board-link)}
-      (fn [{:keys [status success body]}]
-        (callback status success body)))
+      callback)
     (handle-missing-link "delete-board" delete-board-link callback {:board-slug board-slug})))
 
 (defn remove-user-from-private-board [remove-user-link callback]
@@ -578,13 +576,17 @@
   "Give a user email and type of user send an invitation to the team.
    If the team has only one company, checked via API entry point links, send the company name of that.
    Add the company's logo and its size if possible."
-  [invitation-link invited-user invite-from user-type first-name last-name note callback]
+  [invitation-link invited-user invite-from user-type first-name last-name note org-data callback]
   (if (and invitation-link invited-user invite-from user-type)
-    (let [org-data (dispatcher/org-data)
-          json-params {:first-name first-name
+    (let [json-params {:first-name first-name
                        :last-name last-name
                        :note note
-                       :admin (= user-type :admin)}
+                       :admin (= user-type :admin)
+                       :team-id (:team-id org-data)
+                       :org-name (:name org-data)
+                       :org-uuid (:uuid org-data)
+                       :org-slug (:slug org-data)
+                       :org-logo-url (:logo-url org-data)}
           with-invited-user (if (= invite-from "slack")
                               (merge
                                json-params
@@ -592,13 +594,9 @@
                                 :slack-org-id (:slack-org-id invited-user)
                                 :avatar-url (:avatar-url invited-user)
                                 :email (:email invited-user)})
-                              (assoc json-params :email invited-user))
-          with-company-name (merge with-invited-user {:org-name (:name org-data)
-                                                      :logo-url (:logo-url org-data)
-                                                      :logo-width (:logo-width org-data)
-                                                      :logo-height (:logo-height org-data)})]
+                              (assoc json-params :email invited-user))]
       (auth-http (method-for-link invitation-link) (relative-href invitation-link)
-        {:json-params (cljs->json with-company-name)
+        {:json-params (cljs->json with-invited-user)
          :headers (headers-for-link invitation-link)}
         callback))
     (handle-missing-link "send-invitation" invitation-link callback
