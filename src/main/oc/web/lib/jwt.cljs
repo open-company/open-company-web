@@ -2,6 +2,7 @@
   (:require [oc.web.lib.cookies :as cook]
             [taoensso.timbre :as timbre]
             [oc.lib.schema :as lib-schema]
+            [oc.lib.time :as lib-time]
             [oc.web.local-settings :as ls]
             [cljs-time.coerce :as tc]
             [cljs-time.core :as t]
@@ -166,3 +167,10 @@
 (defn ^:export premium? [team-id]
   (let [team-id-kw (keyword team-id)]
     (some->> (get-key :premium-teams) (map keyword) set team-id-kw boolean)))
+
+(defn before? [iso-date]
+  (when iso-date
+    (let [date (lib-time/from-iso iso-date)
+          token-created-at (or (get-key :token-created-at) 0) ;; fallback to 0 = refresh
+          jwt-created (lib-time/from-millis token-created-at)]
+      (t/before? jwt-created date))))
