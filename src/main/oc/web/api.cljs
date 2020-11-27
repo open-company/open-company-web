@@ -416,8 +416,7 @@
       (storage-http (method-for-link board-patch-link) (relative-href board-patch-link)
         {:json-params json-data
          :headers (headers-for-link board-patch-link)}
-        (fn [{:keys [success body status]}]
-          (callback success body status))))
+        callback))
     (handle-missing-link "patch-board" board-patch-link callback {:note note :data data})))
 
 (defn create-board [create-board-link board-data note callback]
@@ -455,8 +454,7 @@
   (if (and delete-board-link board-slug)
     (storage-http (method-for-link delete-board-link) (relative-href delete-board-link)
       {:headers (headers-for-link delete-board-link)}
-      (fn [{:keys [status success body]}]
-        (callback status success body)))
+      callback)
     (handle-missing-link "delete-board" delete-board-link callback {:board-slug board-slug})))
 
 (defn remove-user-from-private-board [remove-user-link callback]
