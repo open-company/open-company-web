@@ -2,7 +2,7 @@
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [clojure.set :as clj-set]
+            [clojure.string :as clj-str]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.utils.activity :as activity-utils]
@@ -12,7 +12,7 @@
   (let [mention? (:mention? notification)
         team? (:team? notification)
         author (:author notification)
-        first-name (or (:first-name author) (first (clj-set/split (:name author) #"\s")))
+        first-name (or (:first-name author) (first (clj-str/split (:name author) #"\s")))
         entry-publisher (:entry-publisher notification)
         user-id (:user-id notification)]
     (cond
