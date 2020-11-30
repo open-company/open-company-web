@@ -10,8 +10,8 @@
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn roster-get [roster-link]
-  (api/get-team roster-link
-   (fn [{:keys [success body status]}]
+  (api/get-team-roster roster-link
+   (fn [{:keys [success body]}]
      (let [fixed-body (when success (json->cljs body))]
        (if success
          (let [users (-> fixed-body :collection :items)

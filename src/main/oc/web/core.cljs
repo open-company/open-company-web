@@ -729,7 +729,8 @@
    #(ja/update-jwt %) ;; success jwt refresh after expire
    #(ja/logout) ;; failed to refresh jwt
    ;; network error
-   #(notification-actions/show-notification (assoc utils/network-error :expire 5)))
+   #(when %
+      (notification-actions/show-notification (assoc utils/network-error :expire 5))))
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
