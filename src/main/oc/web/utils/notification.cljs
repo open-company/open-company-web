@@ -2,8 +2,8 @@
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.utils.ui :refer (ui-compose)]
-            [oc.web.lib.responsive :as responsive]
+            [clojure.set :as clj-set]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -12,7 +12,7 @@
   (let [mention? (:mention? notification)
         team? (:team? notification)
         author (:author notification)
-        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
+        first-name (or (:first-name author) (first (clj-set/split (:name author) #"\s")))
         entry-publisher (:entry-publisher notification)
         user-id (:user-id notification)]
     (cond
@@ -61,7 +61,8 @@
                                                     (alert-modal/show-alert alert-data))))))))))
 
 (defn fix-notification [notification & [unread]]
-  (let [board-id (:board-id notification)
+  (let [team? (:team? notification)
+        board-id (:board-id notification)
         board-data (activity-utils/board-by-uuid board-id)
         is-interaction (seq (:interaction-id notification))
         created-at (:notify-at notification)
@@ -77,14 +78,17 @@
        :is-interaction is-interaction
        :unread unread
        :mention? (:mention? notification)
-       :created-at (:notify-at notification)
-       :body (when-not (:team? notification) (:content notification))
+       :created-at created-at
+       :body (when-not team? (:content notification))
        :title title
        :author (:author notification)
        :team-id team-id
        :premium-action premium-action
        :refresh-token-at (:refresh-token-at notification)
-       :click (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)})))
+       :click (if team?
+                #(when (not= (-> notification :org :slug) (dis/current-org-slug))
+                   (routing-actions/switch-org-dashboard (:org notification)))
+                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
