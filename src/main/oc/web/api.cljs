@@ -170,7 +170,7 @@
           (jwt-refresh-error-hn))))
     (jwt-refresh-error-hn)))
 
-(defn- req [origin method path params on-complete & [second-attempt?]]
+(defn- req [origin method path params on-complete & [{:keys [report-errors? second-attempt?] :as opts}]]
   (timbre/debug "Req:" (method-name method) (str origin path))
   (if (and (j/get-contents)
            (j/refresh?)
@@ -179,7 +179,7 @@
     (do
       (timbre/info "Expired token, force JWToken refresh.")
       (real-refresh-jwt (j/get-contents)
-                      #(req origin method path params on-complete true)))
+                      #(req origin method path params on-complete (merge opts {:second-attempt? true}))))
     (go
       (let [{:keys [status] :as response} (<! (method (str origin path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str origin path) status response)
@@ -190,7 +190,7 @@
           (do
             (timbre/info "440 response, force JWToken refresh.")
             (real-refresh-jwt (j/get-contents)
-                            #(req origin method path params on-complete true)))
+                            #(req origin method path params on-complete (merge opts {:second-attempt? true}))))
           (do ; when a request gets a 401, redirect the user to logout
               ; (presumably they are using an old token, or attempting anonymous access),
               ; but only if they are already logged in
@@ -202,7 +202,7 @@
             ; If it was a 5xx or a 0 show a banner for network issues
             (when (or (zero? status)
                       (<= 500 status 599))
-              (network-error-handler))
+              (network-error-handler report-errors?))
             ; report all 5xx to sentry
             (when (or (<= 500 status 599)
                       (= status 400)
@@ -556,11 +556,20 @@
       callback)
     (handle-missing-link "get-team" team-link callback)))
 
+(defn get-team-roster [roster-link callback]
+  (if roster-link
+    (auth-http (method-for-link roster-link) (relative-href roster-link)
+               {:headers (headers-for-link roster-link)}
+               callback
+               {:report-errors? false})
+    (handle-missing-link "get-team-roster" roster-link callback)))
+
 (defn enumerate-channels [enumerate-link callback]
   (if enumerate-link
     (auth-http (method-for-link enumerate-link) (relative-href enumerate-link)
                {:headers (headers-for-link enumerate-link)}
-               callback)
+               callback
+               {:report-errors? false})
     (handle-missing-link "enumerate-channels" enumerate-link callback)))
 
 (defn patch-team [team-patch-link team-id new-team-data callback]
@@ -947,8 +956,8 @@
 (defn get-reminders-roster [roster-link callback]
   (if roster-link
     (reminders-http (method-for-link roster-link) (relative-href roster-link)
-     {:headers (headers-for-link roster-link)}
-     callback)
+                    {:headers (headers-for-link roster-link)}
+                    callback)
     (handle-missing-link "get-reminders-roster" roster-link callback)))
 
 ;; Bookmarks
