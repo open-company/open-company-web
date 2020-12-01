@@ -178,9 +178,9 @@
                         #(nav-actions/toggle-premium-picker!))
         remind-all-tooltip (if (:premium? org-data)
                              "Send a reminder to everyone that hasn’t opened it"
-                             "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details")
+                             "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details.")
         remind-tooltip (when-not (:premium? org-data)
-                         "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details")
+                         "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details.")
         jelly-head (uu/random-avatar)]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)

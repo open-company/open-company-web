@@ -302,7 +302,7 @@
                  :data-toggle (when (and (not (:premium? org-data))
                                          (not private-allowed?))
                                 "tooltip")
-                 :title "Premium accounts can create private topics for invited users only. Click for details"
+                 :title "Premium accounts can create private topics for invited users only. Click for details."
                  :data-placement "top"
                  :on-click (fn [e]
                              (if private-allowed?
@@ -326,7 +326,7 @@
                    :data-toggle (when (and (not (:premium? org-data))
                                            (not public-allowed?))
                                   "tooltip")
-                   :title "Premium accounts can create public topics for sharing beyond your team. Click for details"
+                   :title "Premium accounts can create public topics for sharing beyond your team. Click for details."
                    :data-placement "top"
                    :on-click (fn [e]
                                (if public-allowed?
