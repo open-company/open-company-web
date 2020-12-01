@@ -72,6 +72,9 @@
 (defn payments-key [org-slug]
   (vec (conj (org-key org-slug) :payments)))
 
+(defn payments-notify-cache-key [org-slug]
+  (vec (conj (org-key org-slug) :payments-notify-cache)))
+
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
@@ -791,6 +794,16 @@
    (payments-data @app-state org-slug))
   ([data org-slug]
    (get-in data (payments-key org-slug))))
+
+;; Payments cached data
+
+(defn payments-notify-cache-data
+  ([]
+    (payments-notify-cache-data @app-state (current-org-slug)))
+  ([org-slug]
+   (payments-notify-cache-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (payments-notify-cache-key org-slug))))
 
 ;; Data
 
