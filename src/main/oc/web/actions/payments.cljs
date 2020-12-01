@@ -188,16 +188,16 @@
 
 (defn- check-notify-user [new-payments-data]
   (js/console.log "DBG check-notify-user")
-  (js/console.log "DBG    new-payments-data" new-payments-data)
-  (js/console.log "DBG    current-payments-data" (dis/payments-data))
-  (js/console.log "DBG    stored-session-data" (get @dis/app-state payments-notify-db-key))
+  (js/console.log "DBG    new-payments-data" (clj->js new-payments-data))
+  (js/console.log "DBG    current-payments-data" (clj->js (dis/payments-data)))
+  (js/console.log "DBG    stored-session-data" (clj->js (get @dis/app-state payments-notify-db-key)))
   (when-let [stored-session-data (get @dis/app-state payments-notify-db-key)]
     (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
       (dis/dispatch! [:input [payments-notify-db-key] nil])
       (if success?
         (let [new-premium (jwt/premium? team-id)
               new-sub (get-current-subscription new-payments-data)]
-          (js/console.log "DBG new-payments-data" new-payments-data)
+          (js/console.log "DBG new-payments-data" (clj->js new-payments-data))
           (when (or new-sub
                     (:price-id old-data))
                   ;; Notify user of an upgrade
@@ -210,9 +210,9 @@
                       (not= (:premium? old-data) new-premium)
                       (not new-premium))
                   (do
-                    (js/console.log "DBG old-data" old-data)
-                    (js/console.log "DBG    new-sub" new-sub)
-                    (js/console.log "DBG    new premium?" new-premium)
+                    (js/console.log "DBG old-data" (clj->js old-data))
+                    (js/console.log "DBG    new-sub" (clj->js new-sub))
+                    (js/console.log "DBG    new premium?" (clj->js new-premium))
                     (notify-user :sub-downgrade-success downgrade-message))
                   ;; Notify user of a plan change if the price-id of the current sub changed
                   ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
