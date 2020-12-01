@@ -21,3 +21,12 @@
 (defmethod dispatcher/action :checkout-session-return
   [db [_ success?]]
   (assoc db dispatcher/payments-checkout-session-result success?))
+
+(defmethod dispatcher/action :notify-cache/store
+  [db [_ org-slug cache-data]]
+  (assoc-in db (dispatcher/payments-notify-cache-key org-slug) cache-data))
+
+(defmethod dispatcher/action :notify-cache/reset
+  [db [_ org-slug]]
+  (let [cache-key (dispatcher/payments-notify-cache-key org-slug)]
+    (update-in db (butlast cache-key) dissoc (last cache-key))))

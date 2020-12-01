@@ -184,16 +184,14 @@
                                     :expire 3
                                     :id id}))
 
-(def payments-notify-db-key :payments-result-notification)
-
 (defn- check-notify-user [new-payments-data]
   (js/console.log "DBG check-notify-user")
   (js/console.log "DBG    new-payments-data" (clj->js new-payments-data))
   (js/console.log "DBG    current-payments-data" (clj->js (dis/payments-data)))
-  (js/console.log "DBG    stored-session-data" (clj->js (get @dis/app-state payments-notify-db-key)))
-  (when-let [stored-session-data (get @dis/app-state payments-notify-db-key)]
+  (js/console.log "DBG    stored-session-data" (clj->js (dis/payments-notify-cache-data)))
+  (when-let [stored-session-data (get-in @dis/app-state (dis/payments-notify-cache-data))]
     (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
-      (dis/dispatch! [:input [payments-notify-db-key] nil])
+      (dis/dispatch! [:notify-cache/reset (dis/current-org-slug)])
       (if success?
         (let [new-premium (jwt/premium? team-id)
               new-sub (get-current-subscription new-payments-data)]
@@ -233,9 +231,9 @@
     :sub-id 'subscription-id'}"
   [team-id success? cookie-data]
   (when cookie-data
-    (dis/dispatch! [:input [payments-notify-db-key] {:team-id team-id
-                                                     :success? success?
-                                                     :cookie-data cookie-data}])))
+    (dis/dispatch! [:notify-cache/store (dis/current-org-slug) {:team-id team-id
+                                                                :success? success?
+                                                                :cookie-data cookie-data}])))
 
 (defn create-subscription! [payments-data price-id & [cb]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
