@@ -256,7 +256,7 @@
                              (fn [e]
                                (utils/event-stop e)
                                (nav-actions/toggle-premium-picker!)))
-        premium-tooltip "Premium accounts can customize logo and team colors.Click for details."]
+        premium-tooltip "Premium accounts can customize logo and team colors. Click for details."]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]

@@ -40,7 +40,7 @@
           :data-toggle (when-not premium? "tooltip")
           :data-placement "top"
           :data-container "body"
-          :title "Premium accounts can assign view-only access to teammates. Click for details"
+          :title "Premium accounts can assign view-only access to teammates. Click for details."
           :class (utils/class-set {:selected (= user-type :viewer)
                                    :premium-lock (not premium?)})}
          "Viewer"]
