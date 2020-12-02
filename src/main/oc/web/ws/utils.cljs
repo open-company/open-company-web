@@ -1,6 +1,6 @@
 (ns oc.web.ws.utils
   (:require [taoensso.timbre :as timbre]
-            [taoensso.sente :as s]
+            [taoensso.sente :as sente]
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as lib-time]
             [oc.web.lib.utils :as utils]
@@ -116,13 +116,13 @@
 
 (defn auth-check [service-name ch-state chsk-send! channelsk jwt-refresh-cb reconnect-cb success-cb rep]
   (timbre/debug "Auth-check" service-name)
-  (if (and (s/cb-success? rep)
+  (if (and (sente/cb-success? rep)
            (:valid rep))
     (when (fn? success-cb)
       (success-cb rep))
     (do
       (timbre/warn "Disconnecting client due to invalid JWT!" rep)
-      (s/chsk-disconnect! @channelsk)
+      (sente/chsk-disconnect! @channelsk)
       (cond
         (and (j/get-contents)
              (j/refresh?))

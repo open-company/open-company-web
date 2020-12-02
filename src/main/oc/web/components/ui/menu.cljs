@@ -14,6 +14,8 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn menu-close [& [s]]
@@ -71,9 +73,15 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
-(defn premium-picker-click [e]
+(defn premium-picker-click [_ e]
   (.preventDefault e)
   (nav-actions/toggle-premium-picker!))
+
+(defn manage-subscription-click [s payments-data e]
+  (.preventDefault e)
+  (when-not @(::loading-manage-sub s)
+    (reset! (::loading-manage-sub s) true)
+    (payments-actions/manage-subscription! payments-data #(reset! (::loading-manage-sub s) false))))
 
 (defn- detect-native-app
   []
@@ -118,6 +126,7 @@
                   (drv/drv :expo-app-version)
                   (rum/local nil ::hr)
                   (rum/local false ::complete-info)
+                  (rum/local false ::loading-manage-sub)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
@@ -160,7 +169,9 @@
                           "Manage subscription"
                           "Try premium"))
         billing-click (when show-billing?
-                        premium-picker-click)]
+                        (if (:can-manage-subscription? payments-data)
+                          (partial manage-subscription-click s payments-data)
+                          (partial premium-picker-click s)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -277,7 +288,9 @@
               {:href "#"
               :on-click billing-click}
               [:div.oc-menu-item
-                billing-label]])
+                billing-label
+               (when @(::loading-manage-sub s)
+                 (small-loading))]])
           ;; What's new & Support separator
           [:div.oc-menu-separator]
           ;; What's new

@@ -3,10 +3,9 @@
                    [taoensso.encore :refer (have)])
   (:require [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
             [goog.Uri :as guri]
-            [taoensso.sente :as s]
+            [taoensso.sente :as sente]
             [taoensso.timbre :as timbre]
             [oc.web.lib.jwt :as j]
-            [oc.lib.time :as time]
             [oc.web.actions.jwt :as ja]
             [oc.web.local-settings :as ls]
             [oc.web.ws.utils :as ws-utils]
@@ -118,11 +117,11 @@
 
 (defn  stop-router! []
   (when @channelsk
-    (s/chsk-disconnect! @channelsk)
+    (sente/chsk-disconnect! @channelsk)
     (timbre/info "Connection closed")))
 
 (defn start-router! []
-  (s/start-client-chsk-router! @ch-chsk event-msg-handler)
+  (sente/start-client-chsk-router! @ch-chsk event-msg-handler)
   (timbre/info "Connection estabilished")
   (ws-utils/reconnected last-interval "Notify" chsk-send! ch-state reconnect))
 
@@ -150,7 +149,7 @@
              (timbre/info "Closing previous connection")
              (stop-router!))
            (timbre/info "Attempting Notify service connection to:" ws-domain)
-           (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
+           (let [{:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket! ws-org-path
                                                                                     {:type :auto
                                                                                      :host ws-domain
                                                                                      :protocol (if ls/jwt-cookie-secure :https :http)

@@ -185,17 +185,12 @@
                                     :id id}))
 
 (defn- check-notify-user [new-payments-data]
-  (js/console.log "DBG check-notify-user")
-  (js/console.log "DBG    new-payments-data" (clj->js new-payments-data))
-  (js/console.log "DBG    current-payments-data" (clj->js (dis/payments-data)))
-  (js/console.log "DBG    stored-session-data" (clj->js (dis/payments-notify-cache-data)))
   (when-let [stored-session-data (dis/payments-notify-cache-data)]
     (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
       (dis/dispatch! [:notify-cache/reset (dis/current-org-slug)])
       (if success?
         (let [new-premium (jwt/premium? team-id)
               new-sub (get-current-subscription new-payments-data)]
-          (js/console.log "DBG new-payments-data" (clj->js new-payments-data))
           (when (or new-sub
                     (:price-id old-data))
                   ;; Notify user of an upgrade
@@ -207,11 +202,7 @@
                   (and (:price-id old-data)
                       (not= (:premium? old-data) new-premium)
                       (not new-premium))
-                  (do
-                    (js/console.log "DBG old-data" (clj->js old-data))
-                    (js/console.log "DBG    new-sub" (clj->js new-sub))
-                    (js/console.log "DBG    new premium?" (clj->js new-premium))
-                    (notify-user :sub-downgrade-success downgrade-message))
+                  (notify-user :sub-downgrade-success downgrade-message)
                   ;; Notify user of a plan change if the price-id of the current sub changed
                   ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
                   (or (not= (:price-id old-data) (-> new-sub :price :id))
