@@ -189,7 +189,7 @@
   (js/console.log "DBG    new-payments-data" (clj->js new-payments-data))
   (js/console.log "DBG    current-payments-data" (clj->js (dis/payments-data)))
   (js/console.log "DBG    stored-session-data" (clj->js (dis/payments-notify-cache-data)))
-  (when-let [stored-session-data (get-in @dis/app-state (dis/payments-notify-cache-data))]
+  (when-let [stored-session-data (dis/payments-notify-cache-data)]
     (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
       (dis/dispatch! [:notify-cache/reset (dis/current-org-slug)])
       (if success?
