@@ -142,21 +142,21 @@
                                                                           "Yes, cancel"
                                                                           "Yes, remove")
                                                     :solid-button-cb
-                                                    #(do
-                                                       (real-remove-fn s author user (:team-id team-data)
-                                                                       (fn [{:keys [success]}]
-                                                                         (when success
-                                                                           (notification-actions/show-notification
-                                                                            {:title (if pending?
-                                                                                      "Invitation cancelled"
-                                                                                      "Member removed from team")
-                                                                             :primary-bt-title "OK"
-                                                                             :primary-bt-dismiss true
-                                                                             :expire 3
-                                                                             :id (if pending?
-                                                                                   :cancel-invitation
-                                                                                   :member-removed-from-team)}))))
-                                                       (alert-modal/hide-alert))}]
+                                                    (fn []
+                                                      (alert-modal/hide-alert)
+                                                      (real-remove-fn s author user (:team-id team-data)
+                                                                      (fn [{:keys [success]}]
+                                                                        (when success
+                                                                          (notification-actions/show-notification
+                                                                           {:title (if pending?
+                                                                                     "Invitation cancelled"
+                                                                                     "Member removed from team")
+                                                                            :primary-bt-title "OK"
+                                                                            :primary-bt-dismiss true
+                                                                            :expire 3
+                                                                            :id (if pending?
+                                                                                  :cancel-invitation
+                                                                                  :member-removed-from-team)})))))}]
                                     (alert-modal/show-alert alert-data)))
                       roster-user (first (filterv #(= (:user-id %) (:user-id user)) (:users team-roster)))
                       resend-fn (fn []

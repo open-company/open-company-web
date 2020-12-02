@@ -101,7 +101,7 @@
              :timestamp (lib-time/now-ts)
              :rep rep
              :sessionURL (fullstory/session-url)}]
-    (sentry/capture-message-with-extra-context! ctx (str service-name " WS: not valid JWT"))
+    (sentry/capture-message-with-extra-context! ctx (str service-name " WS: not valid JWT, force refresh and retry!"))
     (timbre/error service-name "WS: not valid JWT" ctx)))
 
 (defn report-connect-timeout [service-name ch-state]
@@ -145,7 +145,8 @@
                      (not (:udt-next-reconnect @@ch-state)))
             (utils/after (* 10 1000) reconnect-cb)))
         :else
-        (report-invalid-jwt service-name ch-state rep)))))
+        (do (report-invalid-jwt service-name ch-state rep)
+            (jwt-refresh-cb reconnect-cb))))))
 
 (defn post-handshake-auth [jwt-refresh-cb auth-cb]
   (timbre/debug "Trying post handshake jwt auth")
