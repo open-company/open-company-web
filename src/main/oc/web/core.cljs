@@ -761,6 +761,12 @@
 
 (defn on-js-reload []
   (ocall js/console "clear")
+  (api/config-request
+   #(ja/update-jwt %) ;; success jwt refresh after expire
+   #(ja/logout) ;; failed to refresh jwt
+   ;; network error
+   #(when %
+      (notification-actions/show-notification (assoc utils/network-error :expire 5))))
   (dom-utils/force-unlock-page-scroll)
   (ws-ic/reset-connection!)
   (ws-nc/reset-connection!)
