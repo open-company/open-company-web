@@ -59,7 +59,8 @@
         load-delay (if (#{:org :integrations :team :invite-picker :invite-email :invite-slack} current-panel)
                      0
                      2500)
-        org-data (dis/org-data)]
+        org-data (dis/org-data)
+        load-users-info? (seq (dis/current-org-slug))]
     (doseq [team teams
             :let [current-team? (= (:team-id team) (:team-id org-data))
                   team-link (utils/link-for (:links team) "item")
@@ -69,15 +70,16 @@
       (when (and current-team?
                  payments-link)
         (payments-actions/maybe-load-payments-data payments-link false))
-      ; team link may not be present for non-admins, if so they can still get team users from the roster
-      (if team-link
-        (utils/maybe-after load-delay #(team-get team-link))
-        (when channels-link
-          (utils/maybe-after load-delay #(enumerate-channels team))))
-      ;; Do not delay the roster load since it's needed for the mentions extention
-      ;; that needs to be initialized with the rich-body-editor or the add-comment components
-      (when roster-link
-        (roster-get roster-link)))))
+      (when load-users-info?
+        ; team link may not be present for non-admins, if so they can still get team users from the roster
+        (if team-link
+          (utils/maybe-after load-delay #(team-get team-link))
+          (when channels-link
+            (utils/maybe-after load-delay #(enumerate-channels team))))
+        ;; Do not delay the roster load since it's needed for the mentions extention
+        ;; that needs to be initialized with the rich-body-editor or the add-comment components
+        (when roster-link
+          (roster-get roster-link))))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]
