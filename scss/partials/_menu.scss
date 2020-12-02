@@ -205,6 +205,11 @@ div.menu {
         @include OC_Body_Book();
         font-size: 16px;
 
+        div.small-loading {
+          padding: 0 2px;
+          margin: 0 0 0 6px;
+        }
+
         @include mobile() {
           font-size: 16px;
           line-height: 24px;
