@@ -135,7 +135,8 @@
 
 (defmethod dispatcher/action :user-action
   [db [_ team-id idx]]
-  (assoc-in db (concat (dispatcher/team-data-key team-id) [:users idx :loading]) true))
+  (let [team-key (dispatcher/team-data-key team-id)]
+    (assoc-in db (concat team-key [:users idx :loading]) true)))
 
 (defmethod dispatcher/action :email-domain-team-add
   [db [_]]
