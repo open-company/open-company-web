@@ -165,8 +165,15 @@
   (interval/start-interval! auto-updater))
 
 (defn ^:export premium? [team-id]
-  (let [team-id-kw (keyword team-id)]
-    (some->> (get-key :premium-teams) (map keyword) set team-id-kw boolean)))
+  (when team-id
+    (let [team-id-kw (keyword team-id)]
+      (some->> (get-key :premium-teams)
+               (map keyword)
+               set
+               team-id-kw
+               boolean))))
+
+(some->> ["123" "321"] (map keyword) set :123 boolean)
 
 (defn before? [iso-date]
   (when iso-date
