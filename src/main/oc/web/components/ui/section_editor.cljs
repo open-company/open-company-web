@@ -427,13 +427,9 @@
                               (:name user)]])
                         [:div.section-editor-private-users-result.no-more-invites
                           [:div.name
-                            (str
-                             "Looks like you'll need to invite more people before you can add them. "
-                             "You can do that in ")
                             [:a
                               {:on-click #(nav-actions/show-org-settings :invite)}
-                              (str ls/product-name " topic settings")]
-                            "."]])])])))
+                              (str ls/product-name "Invite your teammates")]]])])])))
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))

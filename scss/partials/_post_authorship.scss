@@ -33,6 +33,19 @@ div.post-authorship {
         }
       }
     }
+    
+    @include mobile() {
+      @include activity-author(32) {
+        a.publisher-name {
+          line-height: 32px;        
+        }
+
+        .publisher-name {
+          font-size: 14px;
+          line-height: 32px;
+        }
+      }
+    }
   }
 
   span.in {
@@ -45,6 +58,11 @@ div.post-authorship {
     line-height: 24px;
     margin-right: 4px;
     flex: 0 0 auto;
+
+    @include mobile() {
+      font-size: 14px;
+      line-height: 32px;
+    }
   }
 
   div.board-hover-container {
@@ -67,6 +85,11 @@ div.post-authorship {
         &:hover {
           color: var(--primary-color);
         }
+      }
+
+      @include mobile() {
+        font-size: 14px;
+        line-height: 32px;
       }
     }
   }
