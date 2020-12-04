@@ -81,7 +81,7 @@ div.expanded-post {
       // Add 32 pixels to the width to account for the overflwoing comment menu
       width: #{$expanded_post_width}px;
       height: #{$expanded_post_header_height}px;
-      padding: 12px 16px;
+      padding: 8px 16px;
       z-index: 102;
       top: 0;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
@@ -146,7 +146,7 @@ div.expanded-post {
       }
 
       div.expanded-post-header-center {
-        height: 24px;
+        height: 32px;
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;

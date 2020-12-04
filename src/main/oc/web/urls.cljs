@@ -236,4 +236,4 @@
 
 ;; Help articles
 
-(def slack-private-announcement-share "http://help.carrot.io/en/articles/4602513-auto-share-to-private-and-announcement-only-slack-channels")
+(def slack-private-announcement-share "https://carrot.io/carrot/post/49a6-44c0-9d16") ;; Intercom article http://help.carrot.io/en/articles/4602513-auto-share-to-private-and-announcement-only-slack-channels

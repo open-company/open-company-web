@@ -112,7 +112,7 @@ div.stream-item {
     border-bottom: 1px solid var(--foc-divider-line-color);
     border-left: none;
     background-color: var(--mobile-foc-background-color);
-    padding: 16px 16px 13px;
+    padding: 24px 16px 18px;
   }
 
   &.draft {
@@ -211,6 +211,7 @@ div.stream-item {
 
     @include mobile() {
       width: 100%;
+      height: 32px;
       display: block;
     }
 
@@ -230,7 +231,7 @@ div.stream-item {
       }
 
       @include mobile() {
-        min-height: 24px;
+        min-height: 32px;
         height: auto;
         margin-right: 0;
         max-width: 100%;
@@ -273,10 +274,13 @@ div.stream-item {
         @include mobile() {
           color: var(--light-color);
           margin-left: 6px;
+          height: 32px;
+          line-height: 32px;
 
           time {
             vertical-align: baseline;
-            line-height: 24px;
+            line-height: 32px;
+            font-size: 14px;
           }
         }
       }
@@ -356,6 +360,10 @@ div.stream-item {
     display: grid;
     grid-template-columns: [col1] auto [col2];
     grid-template-rows: [row1] auto [row2] 4px [row3] auto [row4];
+
+    @include mobile() {
+      margin-top: 12px;
+    }
 
     div.stream-item-headline {
       grid-column-start: col1;
@@ -445,7 +453,7 @@ div.stream-item {
     @include mobile() {
       height: auto;
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 12px;
       width: 100%;
     }
 
