@@ -150,7 +150,7 @@
         expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?
-                                 (team-actions/invite-email-link))
+                                 (team-actions/invite-user-link))
         native-app-data (detect-native-app)
         web-app-version client-version
         build-version (when (seq ls/sentry-release-deploy) (str "build: " ls/sentry-release-deploy))
