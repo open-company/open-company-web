@@ -201,22 +201,24 @@
     (invite-user-failed invite-data)))
 
 (defn- split-full-name [full-name slack-user invite-medium]
-  (let [splitted-name (string/split full-name #"\s" 2)
+  (let [email? (= invite-medium "email")
+        slack? (= invite-medium "slack")
+        splitted-name (when email? (string/split full-name #"\s" 2))
         name-size (count splitted-name)
         splittable-name? (> name-size 1)
         first-name (cond
-                     (and (= invite-medium "email") (= name-size 1)) full-name
-                     (and (= invite-medium "email") splittable-name?) (first splitted-name)
-                     (and (= invite-medium "slack") (seq (:first-name slack-user))) (:first-name slack-user)
+                     (and email? (= name-size 1)) full-name
+                     (and email? splittable-name?) (first splitted-name)
+                     (and slack? (seq (:first-name slack-user))) (:first-name slack-user)
                      :else "")
         last-name (cond
-                    (and (= invite-medium "email") splittable-name?) (second splitted-name)
-                    (and (= invite-medium "slack") (seq (:last-name slack-user))) (:last-name slack-user)
+                    (and email? splittable-name?) (second splitted-name)
+                    (and slack? (seq (:last-name slack-user))) (:last-name slack-user)
                     :else "")]
     {:first-name first-name
      :last-name last-name}))
 
-(defn invite-email-link []
+(defn invite-user-link []
   (let [team-data (dis/team-data)]
     (utils/link-for (:links team-data) "add" "POST"
                     {:content-type "application/vnd.open-company.team.invite.v1"})))
@@ -226,13 +228,13 @@
         email (:user invite-data)
         slack-user (:user invite-data)
         user-type (:role invite-data)
-        parsed-email (when (= "email" invite-from) (utils/parse-input-email email))
-        email-name (:name parsed-email)
-        email-address (:address parsed-email)
+        email? (= "email" invite-from)
+        parsed-email (when email? (utils/parse-input-email email))
+        email-name (when email? (:name parsed-email))
+        email-address (if email? (:address parsed-email) (:email slack-user))
         ;; check if the user being invited by email is already present in the users list.
         ;; from slack is not possible to select a user already invited since they are filtered by status before
-        user (when (= invite-from "email")
-               (first (filter #(= (:email %) email-address) (:users team-data))))
+        user (some #(when (= (:email %) email-address) %) (:users team-data))
         old-user-type (when user (uu/get-user-type user org-data))]
     ;; Send the invitation only if the user is not part of the team already (ie user found in roster)
     ;; or if it's still pending, ie resend the invitation email
@@ -243,9 +245,9 @@
           user
           (invite-user-failed invite-data)
           :else
-          (let [invitation-link (invite-email-link)
+          (let [invitation-link (invite-user-link)
                 {:keys [first-name last-name]} (split-full-name email-name slack-user invite-from)
-                user-value (if (= invite-from "email") email-address slack-user)]
+                user-value (if email? email-address slack-user)]
             (api/send-invitation invitation-link user-value invite-from user-type first-name last-name
                                  note org-data (partial send-invitation-cb invite-data user-type))))))
 
