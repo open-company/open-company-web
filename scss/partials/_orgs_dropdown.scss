@@ -70,6 +70,13 @@ div.orgs-dropdown {
       list-style-type: none;
       margin: 0px;
       padding: 0px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: calc(100vh - #{$navbar_height * 2}px);
+
+      @include mobile() {
+        max-height: calc(100vh - #{$mobile_navbar_height * 2}px);
+      }
 
       li {
         height: 24px;
