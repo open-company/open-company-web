@@ -1,4 +1,5 @@
 (ns oc.web.actions.payments
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
@@ -19,8 +20,9 @@
 (def default-trial-expired-status "past_due")
 (def default-positive-statuses #{default-trial-status default-active-status})
 
-(def upgrade-message "🎉 Your team is now subscribed to Premium!")
-(def downgrade-message "✄ Your team is now subscribed to the Free plan.")
+(def upgraded-message "🎉 Your team is now subscribed to Premium!")
+(def prompt-upgrade-message "🤓 Upgrade to unlock all premium features")
+(def downgrade-message "✄ Your team downgraded to the Free plan.")
 (def cancel-message "🙄 Your team's Premium subscription was cancelled, ending on %s.")
 (def renew-message "🎉 Your team's Premium subscription was re-newed.")
 (def plan-change-message "🎉 Your plan was changed.")
@@ -35,6 +37,40 @@
                     :solid-button-title "OK, got it"
                     :solid-button-cb alert-modal/hide-alert}]
     (alert-modal/show-alert alert-data)))
+
+;; Banner handlers
+
+(defn should-show-prompt-banner-for-team? [{team-id :team-id premium-team? :premium}]
+  (let [cookie-name (router/payments-prompt-upgrade-cookie team-id)]
+    (and (not (cook/get-cookie cookie-name))
+         (not premium-team?)
+         (jwt/is-admin? team-id))))
+
+(defn dismiss-prompt-banner [team-id]
+  (cook/set-cookie! (router/payments-prompt-upgrade-cookie team-id) "dismissed" (* 60 60 24 365 10))) ;; Remember like forever)
+
+(defn show-prompt-upgrade-banner []
+  (dis/dispatch! [:input [dis/payments-ui-prompt-banner-key] true]))
+
+(defn hide-prompt-upgrade-banner
+  ([] (hide-prompt-upgrade-banner false))
+  ([skip-persistence?]
+   (when-not skip-persistence?
+     (dismiss-prompt-banner (:team-id (dis/org-data))))
+   (dis/dispatch! [:input [dis/payments-ui-prompt-banner-key] false])))
+
+(defn show-upgraded-banner []
+  (dis/dispatch! [:input [dis/payments-ui-upgraded-banner-key] true]))
+
+(defn hide-upgraded-banner []
+  (dis/dispatch! [:input [dis/payments-ui-upgraded-banner-key] false]))
+
+(defn maybe-show-prompt-banner []
+  (when-let* [org-data (dis/org-data)
+              team-data (dis/team-data)]
+    (if (should-show-prompt-banner-for-team? team-data)
+      (show-prompt-upgrade-banner)
+      (hide-prompt-upgrade-banner true))))
 
 ;; Subscriptions data retrieve
 
@@ -179,6 +215,11 @@
 (def checkout-session-result-param :result)
 
 (defn- notify-user [id msg]
+  ;; Hide the banner that prompts the user to upgrade
+  ;; and show the upgraded one
+  (when (= id :sub-upgrade-success)
+    (hide-prompt-upgrade-banner)
+    (show-upgraded-banner))
   (notif-actions/show-notification {:title msg
                                     :dismiss true
                                     :expire 3
@@ -197,7 +238,7 @@
             (cond (and new-premium
                       (not (:price-id old-data))
                       (not= (:premium? old-data) new-premium))
-                  (notify-user :sub-upgrade-success upgrade-message)
+                  (notify-user :sub-upgrade-success upgraded-message)
                   ;; Notify user of a downgrade
                   (and (:price-id old-data)
                       (not= (:premium? old-data) new-premium)
@@ -252,7 +293,7 @@
           (if new-subscription
            ;; If we have a new subscription it means the user had already a payment method on file
            ;; and we can notify the subscription!
-            (notify-user :sub-upgrade-success upgrade-message)
+            (notify-user :sub-upgrade-success upgraded-message)
             (do
               (cook/set-cookie! checkout-session-cookie (format-sub-cookie-data response-data))
               (stripe-client/redirect-to-checkout checkout-session

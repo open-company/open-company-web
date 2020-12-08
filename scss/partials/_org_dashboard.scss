@@ -23,6 +23,24 @@ div.org-dashboard {
     }
   }
 
+  &.top-banner {
+    div.page {
+      padding-top: #{$top_banner_height}px;
+
+      @include mobile() {
+        padding-top: #{$top_banner_height}px;
+      }
+    }
+
+    nav.oc-navbar {
+      top: #{$top_banner_height}px;
+
+      @include mobile() {
+        top: #{$top_banner_height}px;
+      }
+    }
+  }
+
   &.expanded-activity {
 
     div.page {
@@ -36,6 +54,16 @@ div.org-dashboard {
 
       nav.oc-navbar {
         display: none;
+      }
+    }
+
+    &.top-banner {
+      div.page {
+        padding-top: #{$top_banner_height}px;
+
+        @include mobile() {
+          padding-top: #{$top_banner_height}px;
+        }
       }
     }
   }

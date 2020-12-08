@@ -23,4 +23,6 @@
    (assoc :orgs-dropdown-visible false)
    (assoc :mobile-navigation-sidebar false)
    (dissoc (first dispatcher/cmail-state-key))
-   (dissoc (first dispatcher/cmail-data-key))))
+   (dissoc (first dispatcher/cmail-data-key))
+   (dissoc dispatcher/payments-ui-upgraded-banner-key)
+   (dissoc dispatcher/payments-ui-prompt-banner-key)))

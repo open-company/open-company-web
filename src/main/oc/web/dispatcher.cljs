@@ -283,6 +283,11 @@
 
 (def payments-checkout-session-result :checkout-session-result)
 
+;; Payments UI banner keys
+
+(def payments-ui-prompt-banner-key :payments-ui-prompt-banner)
+(def payments-ui-upgraded-banner-key :payments-ui-upgraded-banner)
+
 ;; Boards helpers
 
 (defn get-posts-for-board [posts-data board-slug]
@@ -657,7 +662,9 @@
                                :active-users active-users
                                :follow-publishers-list follow-publishers-list
                                :follow-boards-list follow-boards-list
-                               :show-premium-picker? (:show-premium-picker? base)})]
+                               :show-premium-picker? (:show-premium-picker? base)
+                               payments-ui-prompt-banner-key (get base payments-ui-prompt-banner-key)
+                               payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
