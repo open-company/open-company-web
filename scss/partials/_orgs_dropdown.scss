@@ -52,7 +52,7 @@ div.orgs-dropdown {
     border-radius: 5px;
     padding: 10px 16px;
     background-color: var(--overlay-background-color);
-    width: 152px;
+    width: 232px;
 
     div.triangle {
       position: absolute;
@@ -93,7 +93,6 @@ div.orgs-dropdown {
         }
 
         div.org-avatar {
-          width: 120px;
           height: 24px;
           overflow: hidden;
           @include org-avatar(24);
@@ -103,13 +102,11 @@ div.orgs-dropdown {
           }
 
           div.org-avatar-container {
-            width: 120px;
-
             span.org-name {
               @include OC_Body_Bold();
               font-size: 14px;
               color: var(--color);
-              max-width: 88px;
+              max-width: 168px;
 
               @include mobile() {
                 font-size: 18px;
