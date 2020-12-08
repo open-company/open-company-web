@@ -41,9 +41,12 @@
 (defn team-get [team-link]
   (api/get-team team-link
     (fn [{:keys [success body status]}]
-      (let [team-data (when success (json->cljs body))]
+      (let [team-data (when success (json->cljs body))
+            current-team? (= (:team-id team-data) (:team-id (dis/org-data)))]
         (when success
           (dis/dispatch! [:team-loaded (dis/current-org-slug) team-data])
+          (when current-team?
+            (utils/after 100 #(payments-actions/maybe-show-prompt-banner)))
           (utils/after 100 org-actions/maybe-show-integration-added-notification?)
           (enumerate-channels team-data))))))
 

@@ -171,6 +171,11 @@
   []
   (str "collapse-users-list-" (jwt/user-id)))
 
+(defn payments-prompt-upgrade-cookie
+  "Cookie used to remember if the current user has dismissed the premium banner."
+  [team-id]
+  (str "prompt-upgrade-" team-id "-" (jwt/user-id)))
+
 (def login-redirect-cookie "login-redirect")
 
 (def expo-push-token-cookie "expo-push-token")

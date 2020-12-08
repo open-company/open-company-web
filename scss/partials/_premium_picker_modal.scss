@@ -294,3 +294,55 @@ div.premium-picker {
     }
   }
 }
+
+div.payments-top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: #{$top_banner_height}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  @include OC_Body_Book();
+  font-size: 14px;
+  line-height: 18px;
+  background-color: var(--tooltip-background-color);
+  color: var(--tooltip-color);
+  z-index: $navbar_zindex;
+  position: relative;
+
+  span, button.payments-banner-link {
+    color: var(--tooltip-color);
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    height: 18px;
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  span {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  span.has-link {
+    margin-right: 0;
+  }
+
+  button.payments-banner-link {
+    margin-right: auto;
+    text-decoration: underline;
+  }
+
+  button.close-bt {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 12px 12px, var(--tooltip-color));
+  }
+}

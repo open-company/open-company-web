@@ -4,7 +4,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.actions.payments :as payments-actions]
-            [oc.web.actions.nav-sidebar :as nav-sidebar]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.mixins.ui :as ui-mixins]))
 
 (def yearly-plan-discount-copy "20% discount for annual plan.")
@@ -127,13 +127,14 @@
 
 (rum/defc premium-picker-modal <
   ui-mixins/no-scroll-mixin
+  rum/static
   []
   [:div.premium-picker-modal
 
     [:div.premium-picker-modal-inner
 
     [:button.close-modal-bt
-      {:on-click #(nav-sidebar/toggle-premium-picker!)}]
+      {:on-click #(nav-actions/toggle-premium-picker!)}]
 
     [:div.premium-picker-modal-content
       [:h3.premium-picker-modal-title
@@ -149,3 +150,26 @@
       "Camilo Alvarez, Operations Lead"]
       [:div.quote-link
       "Hopper.com"]]]])
+
+(rum/defc prompt-upgrade-banner < rum/static
+  []
+  [:div.payments-top-banner.prompt-upgrade-banner
+   {:on-click #(do
+                 (payments-actions/hide-prompt-upgrade-banner)
+                 (nav-actions/toggle-premium-picker!))}
+   [:span.has-link
+    (str payments-actions/prompt-upgrade-message
+        " - ")]
+   [:span.learn-more
+    "Learn more"]
+   [:button.mlb-reset.close-bt
+    {:on-click #(do
+                  (utils/event-stop %)
+                  (payments-actions/hide-prompt-upgrade-banner))}]])
+
+(rum/defc upgraded-banner < rum/static
+  []
+  [:div.payments-top-banner.upgraded-banner
+   [:span (str payments-actions/upgraded-message)]
+   [:button.mlb-reset.close-bt
+    {:on-click #(payments-actions/hide-upgraded-banner)}]])
