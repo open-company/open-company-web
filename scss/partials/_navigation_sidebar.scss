@@ -622,12 +622,18 @@ div.org-dashboard.top-banner {
   div.page div.org-dashboard-container div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container {
     div.left-navigation-sidebar {
       top: #{$navbar_height + $top_banner_height}px;
+      min-height: calc(100vh - #{$navbar_height}px - 24px - #{$top_banner_height}px);
 
       @media (max-height: 654px), (max-width: 975px) {
         top: #{$top_banner_height}px;
       }
 
       @include mobile() {
+        top: #{$top_banner_height}px;
+        min-height: calc(100vh - #{$mobile_navbar_height}px - 24px - #{$top_banner_height}px);
+      }
+
+      div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
         top: #{$top_banner_height}px;
       }
     }

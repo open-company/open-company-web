@@ -43,7 +43,7 @@ div.org-dashboard {
 
       div.org-dashboard-inner {
         @include big_web(){
-          padding-top: calc(#{$navbar_height}px + #{$top_banner_height}px);
+          padding-top: #{$navbar_height}px;
         }
 
         @include mobile() {
