@@ -296,6 +296,7 @@ div.premium-picker {
 }
 
 div.payments-top-banner {
+  position: absolute;
   position: fixed;
   top: 0;
   left: 0;
@@ -311,7 +312,6 @@ div.payments-top-banner {
   background-color: var(--tooltip-background-color);
   color: var(--tooltip-color);
   z-index: $navbar_zindex;
-  position: relative;
 
   span, button.payments-banner-link {
     color: var(--tooltip-color);
@@ -323,18 +323,36 @@ div.payments-top-banner {
     flex: 0 0 auto;
   }
 
-  span {
+  span.message {
     margin-left: auto;
     margin-right: auto;
   }
 
   span.has-link {
     margin-right: 0;
+
+    @include mobile() {
+      margin-right: auto;
+    }
   }
 
-  button.payments-banner-link {
+  span.dash {
+    margin-left: 0;
+    margin-right: 0;
+
+    @include mobile() {
+      display: none;
+    }
+  }
+
+  span.learn-more {
+    margin-left: 0;
     margin-right: auto;
     text-decoration: underline;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   button.close-bt {
