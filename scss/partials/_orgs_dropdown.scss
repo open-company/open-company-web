@@ -30,6 +30,10 @@ div.orgs-dropdown {
           position: absolute;
           top: 0;
           right: 0;
+
+          @include mobile() {
+            @include svgBgColor("/img/ML/select_arrows.svg", center, 8px 10px, var(--light-color));
+          }
         }
       }
 
