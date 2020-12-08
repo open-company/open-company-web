@@ -7,7 +7,7 @@ div.paginated-stream {
     margin-left: 0px;
     margin-top: 0px;
     padding-bottom: 0;
-    min-height: calc(100vh - 54px - 72px);
+    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$mobile_navbar_height}px);
   }
 
   div.paginated-stream-cards {

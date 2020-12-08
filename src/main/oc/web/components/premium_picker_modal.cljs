@@ -157,9 +157,10 @@
    {:on-click #(do
                  (payments-actions/hide-prompt-upgrade-banner)
                  (nav-actions/toggle-premium-picker!))}
-   [:span.has-link
-    (str payments-actions/prompt-upgrade-message
-        " - ")]
+   [:span.message.has-link
+    payments-actions/prompt-upgrade-message]
+   [:span.dash
+    " - "]
    [:span.learn-more
     "Learn more"]
    [:button.mlb-reset.close-bt
@@ -170,6 +171,6 @@
 (rum/defc upgraded-banner < rum/static
   []
   [:div.payments-top-banner.upgraded-banner
-   [:span (str payments-actions/upgraded-message)]
+   [:span.message (str payments-actions/upgraded-message)]
    [:button.mlb-reset.close-bt
     {:on-click #(payments-actions/hide-upgraded-banner)}]])

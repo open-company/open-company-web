@@ -23,12 +23,32 @@ div.org-dashboard {
     }
   }
 
-  &.top-banner {
-    div.page {
-      padding-top: #{$top_banner_height}px;
+  &.top-banner div.page {
+    padding-top: #{$top_banner_height}px;
+    min-height: calc(100vh - #{$footer_height}px - #{$top_banner_height}px);
 
-      @include mobile() {
-        padding-top: #{$top_banner_height}px;
+    @include mobile() {
+      padding-top: calc(#{$mobile_navbar_height}px + #{$top_banner_height}px);
+      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$top_banner_height}px);
+    }
+
+    div.org-dashboard-container {
+      div.empty-dashboard {
+        min-height: calc(100vh - #{$top_banner_height}px - #{$navbar_height}px - #{$footer_small_height}px + 30px);
+
+        @include mobile() {
+          min-height: calc(100vh - #{$top_banner_height}px - #{$mobile_navbar_height}px - #{$footer_small_height}px + 30px);
+        }
+      }
+
+      div.org-dashboard-inner {
+        @include big_web(){
+          padding-top: calc(#{$navbar_height}px + #{$top_banner_height}px);
+        }
+
+        @include mobile() {
+          min-height: calc(100vh - #{$mobile_navbar_height}px - #{$top_banner_height}px);
+        }
       }
     }
 
@@ -62,7 +82,7 @@ div.org-dashboard {
         padding-top: #{$top_banner_height}px;
 
         @include mobile() {
-          padding-top: #{$top_banner_height}px;
+          padding-top: calc(#{$mobile_navbar_height}px + #{$top_banner_height}px);
         }
       }
     }
@@ -95,7 +115,7 @@ div.org-dashboard {
       background-color: var(--background-color);
 
       @include big_web() {
-        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
+        min-width: calc(#{$left_navigation_sidebar_width}px + #{$left_navigation_sidebar_minimum_right_margin}px + #{$board_container_width}px);
       }
 
       @include mobile() {

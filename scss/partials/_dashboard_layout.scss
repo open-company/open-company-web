@@ -178,7 +178,7 @@ div.dashboard-layout {
       @include mobile() {
         width: 100%;
         padding: 0;
-        min-height: calc(100vh - #{$mobile_search_header_height}px);
+        min-height: calc(100% - #{$mobile_navbar_height}px);
         margin: 0;
         float: unset;
         background-color: var(--mobile-background-color);
