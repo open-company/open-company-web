@@ -73,7 +73,7 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
-(defn premium-picker-click [_ e]
+(defn premium-picker-click [s e]
   (.preventDefault e)
   (menu-close s)
   (nav-actions/toggle-premium-picker!))
