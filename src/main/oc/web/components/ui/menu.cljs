@@ -73,15 +73,20 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
-(defn premium-picker-click [_ e]
+(defn premium-picker-click [s e]
   (.preventDefault e)
+  (menu-close s)
   (nav-actions/toggle-premium-picker!))
 
 (defn manage-subscription-click [s payments-data e]
   (.preventDefault e)
   (when-not @(::loading-manage-sub s)
     (reset! (::loading-manage-sub s) true)
-    (payments-actions/manage-subscription! payments-data #(reset! (::loading-manage-sub s) false))))
+    (payments-actions/manage-subscription! payments-data
+                                           (fn [success?]
+                                             (when success?
+                                               (menu-close s))
+                                             (reset! (::loading-manage-sub s) false)))))
 
 (defn- detect-native-app
   []

@@ -349,4 +349,4 @@
 
 (defn ^:export toggle-premium-picker! []
   (when ls/payments-enabled
-    (dis/dispatch! [:update [dis/premium-picker-modal] not])))
+    (dis/dispatch! [:toggle-premium-picker])))

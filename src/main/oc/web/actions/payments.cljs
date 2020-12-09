@@ -24,7 +24,7 @@
 (def prompt-upgrade-message "🤓 Upgrade to unlock all premium features")
 (def downgrade-message "✄ Your team downgraded to the Free plan.")
 (def cancel-message "🙄 Your team's Premium subscription was cancelled, ending on %s.")
-(def renew-message "🎉 Your team's Premium subscription was re-newed.")
+(def renew-message "🎉 You’ve re-started your Premium subscription.")
 (def plan-change-message "🎉 Your plan was changed.")
 ;; (def abandon-message "You canceled a change to your subscription plan. You're still subscribed to the %s plan.")
 (def generic-error-message "An error occurred during checkout. Please try again")
@@ -216,45 +216,53 @@
 
 (defn- notify-user [id msg]
   ;; Hide the banner that prompts the user to upgrade
-  ;; and show the upgraded one
-  (when (= id :sub-upgrade-success)
+  ;; and show the upgraded one in case they activate
+  ;; or re-activate the premium plan
+  (when (#{:sub-upgrade-success :sub-renew-success} id)
     (hide-prompt-upgrade-banner)
     (show-upgraded-banner))
   (notif-actions/show-notification {:title msg
                                     :dismiss true
                                     :expire 3
                                     :id id}))
+(defn- check-notify-user* [new-payments-data {team-id :team-id success? :success? old-data :cookie-data}]
+  (if success?
+    (let [new-premium (jwt/premium? team-id)
+          new-sub (get-current-subscription new-payments-data)]
+      (when (or new-sub
+                (:price-id old-data))
+                ;; Notify user of a re-new/re-activation
+        (cond (and new-premium
+                    (not (:price-id old-data))
+                    (not (:premium? old-data))
+                    (> (:subscriptions new-payments-data) 1))
+              (notify-user :sub-renew-success renew-message)
+                ;; Notify user of an upgrade
+              (and new-premium
+                    (not (:price-id old-data))
+                    (not= (:premium? old-data) new-premium))
+              (notify-user :sub-upgrade-success upgraded-message)
+                ;; Notify user of a downgrade
+              (and (:price-id old-data)
+                    (not= (:premium? old-data) new-premium)
+                    (not new-premium))
+              (notify-user :sub-downgrade-success downgrade-message)
+                ;; Notify user of a plan change if the price-id of the current sub changed
+                ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
+              (or (not= (:price-id old-data) (-> new-sub :price :id))
+                  (not= (:subs-count old-data) (count (:subscriptions new-payments-data))))
+              (notify-user :price-change-success plan-change-message)
+                ;; Notify user of a cancel/renew
+              (not= (boolean (:cancel-at-period-end? new-sub)) (:cancel-at-period-end? old-data))
+              (if (:cancel-at-period-end? new-sub)
+                (notify-user :sub-cancel-success (string/format cancel-message (.toDateString (js/Date. (:current-period-end new-sub)))))
+                (notify-user :sub-renew-success renew-message)))))
+    (notify-user :sub-change-error generic-error-message)))
 
 (defn- check-notify-user [new-payments-data]
   (when-let [stored-session-data (dis/payments-notify-cache-data)]
-    (let [{team-id :team-id success? :success? old-data :cookie-data} stored-session-data]
-      (dis/dispatch! [:notify-cache/reset (dis/current-org-slug)])
-      (if success?
-        (let [new-premium (jwt/premium? team-id)
-              new-sub (get-current-subscription new-payments-data)]
-          (when (or new-sub
-                    (:price-id old-data))
-                  ;; Notify user of an upgrade
-            (cond (and new-premium
-                      (not (:price-id old-data))
-                      (not= (:premium? old-data) new-premium))
-                  (notify-user :sub-upgrade-success upgraded-message)
-                  ;; Notify user of a downgrade
-                  (and (:price-id old-data)
-                      (not= (:premium? old-data) new-premium)
-                      (not new-premium))
-                  (notify-user :sub-downgrade-success downgrade-message)
-                  ;; Notify user of a plan change if the price-id of the current sub changed
-                  ;; or there is a new subscription appeneded to the list (means they scheduled a sub change)
-                  (or (not= (:price-id old-data) (-> new-sub :price :id))
-                      (not= (:subs-count old-data) (count (:subscriptions new-payments-data))))
-                  (notify-user :price-change-success plan-change-message)
-                  ;; Notify user of a cancel/renew
-                  (not= (boolean (:cancel-at-period-end? new-sub)) (:cancel-at-period-end? old-data))
-                  (if (:cancel-at-period-end? new-sub)
-                    (notify-user :sub-cancel-success (string/format cancel-message (.toDateString (js/Date. (:current-period-end new-sub)))))
-                    (notify-user :sub-renew-success renew-message)))))
-        (notify-user :sub-change-error generic-error-message)))))
+    (dis/dispatch! [:notify-cache/reset (dis/current-org-slug)])
+    (check-notify-user* new-payments-data stored-session-data)))
 
 (defn- maybe-notify-user
   "Cookie data keep the subscription data before redirecting to Stripe:
@@ -293,7 +301,14 @@
           (if new-subscription
            ;; If we have a new subscription it means the user had already a payment method on file
            ;; and we can notify the subscription!
-            (notify-user :sub-upgrade-success upgraded-message)
+           (let [old-subscription (get-current-subscription fixed-payments-data)]
+             (dis/dispatch! [:hide-premium-picker])
+             (check-notify-user* response-data {:team-id (:team-id fixed-payments-data)
+                                                :success? true
+                                                :cookie-data {:cancel-at-period-end? (boolean (:cancel-at-period-end? old-subscription))
+                                                              :premium? (boolean (jwt/premium? (:team-id fixed-payments-data)))
+                                                              :subs-count (count (:subscriptions fixed-payments-data))
+                                                              :price-id (-> old-subscription :price :id)}}))
             (do
               (cook/set-cookie! checkout-session-cookie (format-sub-cookie-data response-data))
               (stripe-client/redirect-to-checkout checkout-session
@@ -331,6 +346,7 @@
                                            (router/redirect! redirect-url))
                                          (do
                                            (when success
+                                             (dis/dispatch! [:hide-premium-picker])
                                              (get-payments-cb (dis/current-org-slug) resp))
                                            (error-modal "An error occurred, please try again."))))
                                      (when (fn? cb)
