@@ -33,11 +33,11 @@ div.post-authorship {
         }
       }
     }
-    
+
     @include mobile() {
       @include activity-author(32) {
         a.publisher-name {
-          line-height: 32px;        
+          line-height: 32px;
         }
 
         .publisher-name {
