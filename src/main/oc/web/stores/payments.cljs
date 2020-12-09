@@ -30,3 +30,15 @@
   [db [_ org-slug]]
   (let [cache-key (dispatcher/payments-notify-cache-key org-slug)]
     (update-in db (butlast cache-key) dissoc (last cache-key))))
+
+(defmethod dispatcher/action :toggle-premium-picker
+  [db [_]]
+  (update db dispatcher/premium-picker-modal not))
+
+(defmethod dispatcher/action :hide-premium-picker
+  [db [_]]
+  (assoc db dispatcher/premium-picker-modal false))
+
+(defmethod dispatcher/action :show-premium-picker
+  [db [_]]
+  (assoc db dispatcher/premium-picker-modal true))
