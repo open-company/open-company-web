@@ -337,8 +337,8 @@ div.payments-top-banner {
   }
 
   span.dash {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 6px;
+    margin-right: 6px;
 
     @include mobile() {
       display: none;
