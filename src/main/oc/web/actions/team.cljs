@@ -316,14 +316,18 @@
 (defn user-action-cb [_]
   (teams-get))
 
-(defn user-action [team-id invitation action method other-link-params payload & [finished-cb]]
+(defn user-action [team-id item action method other-link-params payload & [finished-cb]]
   (let [team-data (dis/team-data team-id)
-        idx (.indexOf (:users team-data) invitation)]
+        org-data (dis/org-data)
+        idx (.indexOf (:users team-data) item)
+        payload* (merge payload {:org-slug (:slug org-data)
+                                 :org-uuid (:uuid org-data)
+                                 :org-name (:name org-data)})]
     (when (> idx -1)
-      (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload
+      (api/user-action (utils/link-for (:links item) action method other-link-params) payload*
        #(do
           (when (fn? finished-cb)
-            (finished-cb team-id invitation action method other-link-params payload %))
+            (finished-cb team-id item action method other-link-params payload* %))
           (user-action-cb %)))
       (dis/dispatch! [:user-action team-id idx]))))
 

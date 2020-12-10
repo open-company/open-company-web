@@ -652,7 +652,13 @@
   ([notification :guard map?]
    (when (jwt/before? (:refresh-token-at notification))
      (timbre/info "Force refresh token for notification" (:refresh-token-at notification))
-     (utils/after 10 jwt-actions/jwt-refresh))))
+     (let [redirect? (and (= (:team-action notification) :team-remove)
+                          (:live notification)
+                          (= (-> notification :org :team-id) (:team-id (dis/org-data))))
+           cb (when redirect? #(utils/after 100 (fn []
+                                                  (cook/remove-cookie! (router/last-org-cookie))
+                                                  (router/redirect! oc-urls/login))))]
+     (utils/after 10 #(jwt-actions/jwt-refresh cb))))))
 
 ;; subscribe to websocket events
 
@@ -664,7 +670,7 @@
         (dis/dispatch! [:user-notifications (dis/current-org-slug) fixed-notifications]))))
   (ws-nc/subscribe :user/notification
     (fn [{:keys [data]}]
-      (maybe-refresh-token data)
+      (maybe-refresh-token (assoc data :live true))
       (when-let [fixed-notification (notif-utils/fix-notification data true)]
         (dis/dispatch! [:user-notification (dis/current-org-slug) fixed-notification])
         (notification-actions/show-notification
