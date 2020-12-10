@@ -67,4 +67,8 @@
   ([]
     (api/jwt-refresh update-jwt logout))
   ([success-cb]
-    (api/jwt-refresh #(do (update-jwt %) (success-cb)) logout)))
+    (api/jwt-refresh #(do
+                        (update-jwt %)
+                        (when (fn? success-cb)
+                          (success-cb)))
+                     logout)))

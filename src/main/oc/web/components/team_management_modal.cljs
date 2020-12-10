@@ -25,7 +25,7 @@
   (swap! (::removing s) #(set (conj % (:user-id user))))
   (when author
     (team-actions/remove-author author))
-  (user-action team-id user "remove" "DELETE"  {:ref "application/vnd.open-company.user.v1+json"} remove-cb))
+  (user-action team-id user "remove" "DELETE" {:ref "application/vnd.open-company.user.v1+json"} remove-cb))
 
 (defn alert-resend-done []
   (notification-actions/show-notification {:title "Invitation resent"

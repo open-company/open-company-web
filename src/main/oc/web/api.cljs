@@ -646,7 +646,7 @@
   (if action-link
     (let [headers {:headers (headers-for-link action-link)}
           with-payload (if payload
-                          (assoc headers :json-params payload)
+                          (assoc headers :json-params (cljs->json payload))
                           headers)]
       (auth-http (method-for-link action-link) (relative-href action-link)
         with-payload
