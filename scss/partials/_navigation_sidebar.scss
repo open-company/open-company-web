@@ -186,7 +186,7 @@ div.left-navigation-sidebar {
   overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
-  padding: 24px 0 0;
+  padding: 40px 0 0;
 
   @media (max-height: 654px), (max-width: 975px) {
     position: absolute !important;
