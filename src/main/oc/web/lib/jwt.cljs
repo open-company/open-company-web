@@ -3,6 +3,7 @@
             [taoensso.timbre :as timbre]
             [oc.lib.schema :as lib-schema]
             [oc.lib.time :as lib-time]
+            [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
             [cljs-time.coerce :as tc]
             [cljs-time.core :as t]
@@ -70,11 +71,16 @@
     @-jwt-content
     (reset! -jwt-content (some-> (jwt) decode (js->clj :keywordize-keys true)))))
 
+(def token-refreshed-key [:token-refreshed?])
+
 (defn- ^:export refresh-jwt []
   (reset! -jwt nil)
   (reset! -jwt-content nil)
   (jwt)
   (get-contents))
+
+(defn jwt-refreshed []
+  (dis/dispatch! [:input token-refreshed-key true]))
 
 ;; Validation
 
@@ -86,7 +92,9 @@
 
 (defn ^:export refresh?
   ([]
-   (not (valid?))))
+   (or (not (valid?))
+       (and (dis/query-param :force-refresh-jwt)
+            (not (get-in @dis/app-state token-refreshed-key))))))
 
 ;; Write/delete ID Token
 
