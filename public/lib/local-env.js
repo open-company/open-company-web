@@ -1,1 +1,1 @@
-var OCEnv = {"web-hostname": "localhost"};
+var OCEnv = {"web-hostname": "192.168.1.48"};

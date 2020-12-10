@@ -65,10 +65,11 @@
 
 (defn jwt-refresh
   ([]
-    (api/jwt-refresh update-jwt logout))
+    (jwt-refresh nil))
   ([success-cb]
     (api/jwt-refresh #(do
                         (update-jwt %)
+                        (jwt/jwt-refreshed)
                         (when (fn? success-cb)
                           (success-cb)))
                      logout)))
