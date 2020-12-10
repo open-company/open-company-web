@@ -369,7 +369,7 @@
               [:a.private-announcement-channels
                {:href oc-urls/slack-private-announcement-share
                 :target "_blank"
-                :title "Tips for auto-share into private or announcement channels"
+                :title "Tips for auto-share to private or announcement channels"
                 :data-toggle "tooltip"
                 :data-placement "top"
                 :data-container "body"}
