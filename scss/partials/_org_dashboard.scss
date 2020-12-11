@@ -25,7 +25,7 @@ div.org-dashboard {
 
     @include mobile() {
       padding-top: calc(#{$mobile_navbar_height}px + #{$top_banner_height}px);
-      min-height: calc(100vh - #{$mobile_navbar_height}px - #{$top_banner_height}px);
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
 
     div.org-dashboard-container {
@@ -33,7 +33,7 @@ div.org-dashboard {
         min-height: calc(100vh - #{$top_banner_height}px - #{$navbar_height}px + 30px);
 
         @include mobile() {
-          min-height: calc(100vh - #{$top_banner_height}px - #{$mobile_navbar_height}px + 30px);
+          min-height: calc(100vh - #{$mobile_navbar_height}px + 30px);
         }
       }
 
@@ -44,7 +44,7 @@ div.org-dashboard {
         }
 
         @include mobile() {
-          min-height: calc(100vh - #{$mobile_navbar_height}px - #{$top_banner_height}px);
+          min-height: calc(100vh - #{$mobile_navbar_height}px);
         }
       }
     }
@@ -53,7 +53,7 @@ div.org-dashboard {
       top: #{$top_banner_height}px;
 
       @include mobile() {
-        top: #{$top_banner_height}px;
+        top: 0px;
       }
     }
   }
@@ -79,7 +79,7 @@ div.org-dashboard {
         padding-top: #{$top_banner_height}px;
 
         @include mobile() {
-          padding-top: calc(#{$mobile_navbar_height}px + #{$top_banner_height}px);
+          padding-top: calc(#{$mobile_navbar_height}px);
         }
       }
     }
