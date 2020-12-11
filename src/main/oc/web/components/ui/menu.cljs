@@ -288,8 +288,7 @@
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
           ;; Billing
-          (when (and (not is-mobile?)
-                    show-billing?)
+          (when show-billing?
             [:a.payments
               {:href "#"
               :on-click billing-click}
@@ -298,7 +297,8 @@
                (when @(::loading-manage-sub s)
                  (small-loading))]])
           ;; What's new & Support separator
-          [:div.oc-menu-separator]
+          (when-not is-mobile?
+            [:div.oc-menu-separator])
           ;; What's new
           [:a.whats-new-link
             (if ua/mobile?
@@ -313,14 +313,6 @@
             :href oc-urls/contact-mail-to}
             [:div.oc-menu-item.support
               "Get support"]]
-          ;; Mobile billing
-          (when (and is-mobile?
-                    show-billing?)
-            [:a.payments
-              {:href "#"
-              :on-click billing-click}
-              [:div.oc-menu-item
-                billing-label]])
           ;; Desktop app
           (when native-app-data
             [:a
