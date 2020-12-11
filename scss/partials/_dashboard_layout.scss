@@ -345,10 +345,10 @@ div.dashboard-layout {
               }
 
               &.replies-icon:before {
-                background-image: cdnUrl("/img/ML/nav_actvity.svg");
+                background-image: cdnUrl("/img/ML/nav_activity.svg");
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/nav_actvity@dark.svg");
+                  background-image: cdnUrl("/img/ML/nav_activity@dark.svg");
                 }
               }
 
