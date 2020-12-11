@@ -8,6 +8,22 @@
     padding: 7px 16px;
   }
 
+  .internal {
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    text-decoration: none;
+
+    &.new {
+      @include OC_Body_Bold();
+    }
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+
   span.count {
     @include OC_Body_Book();
     font-size: 12px;
@@ -311,6 +327,127 @@ div.left-navigation-sidebar {
     }
   }
 
+  div.left-navigation-sidebar-items {
+    @include mobile() {
+      position: relative;
+      z-index: 1;
+    }
+
+    a.left-navigation-sidebar-item {
+      display: block;
+      cursor: pointer;
+      padding-left: 16px;
+      margin: 0;
+      text-decoration: none;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      @include mobile() {
+        padding-left: 0px;
+      }
+
+      &.drafts-board {
+        margin-top: 24px;
+      }
+
+      &.hover-item {
+        @include default-item();
+        * {
+          cursor: pointer;
+        }
+
+        @include big_web() {
+          &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
+            @include item-hover();
+          }
+        }
+
+        &.item-selected {
+          @include item-selected();
+
+          div.public {
+            background-image: cdnUrl("/img/ML/board_public_white.svg");
+            opacity: 1;
+          }
+
+          div.private {
+            background-image: cdnUrl("/img/ML/board_private_white.svg");
+            opacity: 1;
+          }
+        }
+      }
+
+      div.public {
+        margin-left: 1px;
+        width: 16px;
+        height: 21px;
+        background-image: cdnUrl("/img/ML/board_public.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
+      }
+
+      div.private {
+        margin-left: 1px;
+        width: 16px;
+        height: 21px;
+        background-image: cdnUrl("/img/ML/board_private.svg");
+        background-size: 10px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
+      }
+
+      div.board-name {
+        width: calc(100% - 8px);
+        float: left;
+
+        div.internal {
+          padding: 1px 0px 0px 28px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          cursor: pointer;
+          max-width: 100%;
+
+          @include mobile() {
+            width: auto;
+            margin-left: 0px;
+          }
+
+          .emojione {
+            @include emoji-size(12);
+          }
+        }
+      }
+
+      &.contributions {
+        @include user_profile(22);
+
+        div.user-avatar-img-container {
+          float: left;
+        }
+      }
+    }
+  }
 
   div.left-navigation-sidebar-top {
     flex: 0 0 auto;
@@ -333,6 +470,69 @@ div.left-navigation-sidebar {
           top: 0px;
           left: -16px;
           background-color: var(--opac-background-color-08);
+        }
+      }
+    }
+
+    .left-navigation-sidebar-top-title {
+      padding: 0 16px;
+      margin: 0;
+      height: 32px;
+      width: 100%;
+      border-radius: 4px;
+
+      @include mobile() {
+        padding: 4px 16px;
+        height: 40px;
+        position: relative;
+        z-index: 1;
+        border-radius: 0;
+      }
+
+      @include big_web() {
+        &:hover {
+          background-color: var(--navigation-sidebar-hover-bg);
+        }
+      }
+
+      button.left-navigation-sidebar-sections-arrow {
+        position: relative;
+        height: 32px;
+        padding: 0 0 0 28px;
+
+        &.collapsed:before {
+          transform: rotate(-90deg);
+        }
+
+        &:before {
+          content: "";
+          position: absolute;
+          top: 12px;
+          left: 3px;
+          background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
+          background-size: 12px 6px;
+          background-repeat: no-repeat;
+          background-position: center;
+          width: 12px;
+          height: 6px;
+          transition: 180ms transform;
+        }
+
+        span.sections {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 32px;
+          color: var(--color);
+          float: left;
+        }
+
+        @include mobile() {
+          cursor: default;
+
+          span.sections {
+            color: var(--light-color);
+            font-size: 16px;
+          }
         }
       }
     }

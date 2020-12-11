@@ -850,6 +850,12 @@
   ([] (orgs-data @app-state))
   ([data] (get data orgs-key)))
 
+(defn ^:export early-org-data
+  ([] (early-org-data @app-state (current-org-slug)))
+  ([data] (early-org-data data (current-org-slug)))
+  ([data org-slug]
+   (some #(when (= (:slug %) org-slug) %) (orgs-data data))))
+
 (defn ^:export org-data
   "Get org data."
   ([]
