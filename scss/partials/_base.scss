@@ -203,7 +203,7 @@ div#wrap {
 }
 
 .tablet-only {
-  @media screen and (min-width: #{$max_tablet_width}px) {
+  @media screen and (min-width: #{$max_tablet_width + 1}px) {
     display: none !important;
   }
   @include mobile(){
@@ -218,7 +218,7 @@ div#wrap {
 }
 
 .tablet-mobile-only {
-  @media screen and (min-width: #{$max_tablet_width}px) {
+  @media screen and (min-width: #{$max_tablet_width + 1}px) {
     display: none !important;
   }
 }
