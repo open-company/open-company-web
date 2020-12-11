@@ -133,7 +133,7 @@
                                  (not is-drafts-board)
                                  (map? org-board-data)
                                  (false? (:following org-board-data)))
-        followers-boards-count (drv/react s :followers-boards-count)
+        _followers-boards-count (drv/react s :followers-boards-count)
         can-compose? (:can-compose? org-data)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?

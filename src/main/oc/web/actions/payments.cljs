@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.utils.stripe :as stripe-client]
@@ -42,7 +43,8 @@
 
 (defn should-show-prompt-banner-for-team? [{team-id :team-id premium-team? :premium}]
   (let [cookie-name (router/payments-prompt-upgrade-cookie team-id)]
-    (and (not (cook/get-cookie cookie-name))
+    (and (not (responsive/is-mobile-size?))
+         (not (cook/get-cookie cookie-name))
          (not premium-team?)
          (jwt/is-admin? team-id))))
 

@@ -349,4 +349,6 @@
 
 (defn ^:export toggle-premium-picker! []
   (when ls/payments-enabled
-    (dis/dispatch! [:toggle-premium-picker])))
+    (if (responsive/is-mobile-size?)
+      (.open js/window oc-urls/pricing "_blank")
+      (dis/dispatch! [:toggle-premium-picker]))))

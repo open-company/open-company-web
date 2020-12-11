@@ -313,6 +313,10 @@ div.payments-top-banner {
   color: var(--tooltip-color);
   z-index: $navbar_zindex;
 
+  @include mobile() {
+    display: none;
+  }
+
   span, button.payments-banner-link {
     color: var(--tooltip-color);
     @include OC_Body_Book();
