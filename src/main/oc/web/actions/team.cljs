@@ -59,30 +59,31 @@
 
 (defn read-teams [teams]
   (let [current-panel (last (:panel-stack @dis/app-state))
-        load-delay (if (#{:org :integrations :team :invite-picker :invite-email :invite-slack} current-panel)
-                     0
-                     2500)
-        org-data (dis/org-data)
-        load-users-info? (seq (dis/current-org-slug))]
-    (doseq [team teams
-            :let [current-team? (= (:team-id team) (:team-id org-data))
-                  team-link (utils/link-for (:links team) "item")
-                  channels-link (utils/link-for (:links team) "channels")
-                  roster-link (utils/link-for (:links team) "roster")
-                  payments-link (utils/link-for (:links team) "payments")]]
-      (when (and current-team?
-                 payments-link)
-        (payments-actions/maybe-load-payments-data payments-link false))
-      (when load-users-info?
+        payments-load-delay 1500
+        team-load-delay (if (#{:integrations :team :invite-picker :invite-email :invite-slack} current-panel)
+                          500
+                          2000)
+        roster-load-delay (if (#{:integrations :team :invite-picker :invite-email :invite-slack} current-panel)
+                            0
+                            (+ team-load-delay 500))
+        org-data (dis/early-org-data)]
+    (when (seq (dis/current-org-slug))
+      (doseq [team teams
+              :let [current-team? (= (:team-id team) (:team-id org-data))
+                    team-link (utils/link-for (:links team) "item")
+                    channels-link (utils/link-for (:links team) "channels")
+                    roster-link (utils/link-for (:links team) "roster")
+                    payments-link (utils/link-for (:links team) "payments")]
+              :when current-team?]
+        (when payments-link
+          (utils/maybe-after payments-load-delay #(payments-actions/maybe-load-payments-data payments-link false)))
         ; team link may not be present for non-admins, if so they can still get team users from the roster
         (if team-link
-          (utils/maybe-after load-delay #(team-get team-link))
+          (utils/maybe-after team-load-delay #(team-get team-link))
           (when channels-link
-            (utils/maybe-after load-delay #(enumerate-channels team))))
-        ;; Do not delay the roster load since it's needed for the mentions extention
-        ;; that needs to be initialized with the rich-body-editor or the add-comment components
+            (utils/maybe-after team-load-delay #(enumerate-channels team))))
         (when roster-link
-          (roster-get roster-link))))))
+          (utils/maybe-after roster-load-delay #(roster-get roster-link)))))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]
@@ -222,7 +223,7 @@
      :last-name last-name}))
 
 (defn invite-user-link []
-  (let [team-data (dis/team-data)]
+  (let [team-data (or (dis/team-data) (dis/team-roster))]
     (utils/link-for (:links team-data) "add" "POST"
                     {:content-type "application/vnd.open-company.team.invite.v1"})))
 
