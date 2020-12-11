@@ -306,14 +306,7 @@
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (and (not is-following)
-                                              (not is-replies)
-                                              (not is-bookmarks)
-                                              (not is-drafts-board)
-                                              (not is-contributions)
-                                              (not is-self-profile?)
-                                              (not is-topics)
-                                              (= current-board-slug (:slug board)))
+                        is-current-board (= current-board-slug (:slug board))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected is-current-board})
