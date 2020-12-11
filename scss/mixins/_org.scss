@@ -1,10 +1,10 @@
-@mixin carrot-fallback($max_logo_height, $show_border) {
+@mixin carrot-fallback($max_logo_height, $show_border, $pc: var(--primary-color), $sc: var(--secondary-color)) {
 
   &:before {
-    background-color: var(--primary-color);
+    background-color: $pc;
     content: attr(data-first-letter);
     text-align: center;
-    color: var(--secondary-color);
+    color: $sc;
     line-height: #{$max_logo_height}px;
     font-size: #{$max_logo_height * .7}px;
     position: absolute;
@@ -33,7 +33,7 @@
   }
 }
 
-@mixin org-avatar($max_logo_height: 42, $show_border: true){
+@mixin org-avatar($max_logo_height: 42, $show_border: true, $pc: var(--primary-color), $sc: var(--secondary-color)){
   div.org-avatar-container {
     line-height: 0;
     position: relative;
@@ -41,7 +41,7 @@
     min-width: #{$max_logo_height}px;
 
     &.no-avatar {
-      @include carrot-fallback($max_logo_height, $show_border);
+      @include carrot-fallback($max_logo_height, $show_border, $pc, $sc);
 
       span.org-name {
         margin-left: #{$max_logo_height + 8}px;
