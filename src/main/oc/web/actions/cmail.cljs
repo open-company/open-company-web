@@ -135,6 +135,12 @@
 (defn- cmail-fullscreen-save [fullscreen?]
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
+(defn- cmail-distraction-free-cookie []
+  (str "cmail-distraction-free-" (jwt/user-id)))
+
+(defn- cmail-distraction-free-save [on?]
+  (cook/set-cookie! (cmail-distraction-free-cookie) on? (* 60 60 24 30)))
+
 (defn- save-edit-open-cookie [entry-data]
   (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug entry-data) "/" (:uuid entry-data)) true) (* 60 60 24 365)))
 
@@ -164,11 +170,11 @@
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-fullscreen []
-  (let [current-state (dis/cmail-state)]
+  (let [saved-distractoin-free-state (cook/get-cookie (cmail-distraction-free-cookie))]
     (cmail-fullscreen-save true)
     (utils/scroll-to-y 0 0)
     (dom-utils/lock-page-scroll)
-    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen true :collapsed false})])))
+    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen true :collapsed false :distraction-free? (= saved-distractoin-free-state "true")})])))
 
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (dis/cmail-state)))]
@@ -179,6 +185,11 @@
       (dom-utils/lock-page-scroll)
       (dom-utils/unlock-page-scroll))
     (dis/dispatch! [:update dis/cmail-state-key #(merge % {:fullscreen next-fullscreen-value})])))
+
+(defn cmail-toggle-distraction-free []
+  (let [next-value (not (:distraction-free? (dis/cmail-state)))]
+    (cmail-distraction-free-save next-value)
+    (dis/dispatch! [:update dis/cmail-state-key #(merge % {:distraction-free? next-value})])))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update dis/cmail-data-key #(merge % {:must-see (not (:must-see %))
