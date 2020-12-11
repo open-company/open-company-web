@@ -539,6 +539,22 @@ div.left-navigation-sidebar {
           }
         }
       }
+
+      button.left-navigation-sidebar-top-title-button {
+        width: 20px;
+        height: 20px;
+        margin-right: -2px;
+        float: right;
+        padding: 0;
+        cursor: pointer;
+        transition: 230ms;
+        margin-top: 7px;
+        @include svgBgColor("/img/ML/plus_button_icon.svg", center, 16px 16px, var(--color));
+
+        @include mobile() {
+          display: none;
+        }
+      }
     }
 
     a.nav-link {

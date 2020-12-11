@@ -636,8 +636,8 @@ div.cmail-outer {
 
       div.delete-bt-container {
         flex: 0 0 auto;
-        order: 6;
-        margin-left: auto;
+        order: 7;
+        margin-left: 16px;
 
         @include mobile() {
           display: none;
@@ -831,6 +831,98 @@ div.cmail-outer {
           div.fullscreen-bt-container {
             display: none;
           }
+        }
+
+        div.distraction-free-container {
+          flex: 0 0 auto;
+          margin-left: auto;
+          order: 6;
+          height: 32px;
+
+          div.carrot-switch {
+            margin-top: 8px;
+          }
+        }
+      }
+    }
+
+    &.distraction-free {
+      background-color: var(--cmail-fullscreen-background-color);
+      max-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      div.cmail-container {
+        border: none;
+        margin: 40px auto;
+        width: calc(100% - 80px);
+        max-width: 1024px;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-flow: column nowrap;
+
+        div.dismiss-inline-cmail-container {
+          position: fixed;
+          top: 32px;
+          right: 32px;
+
+          button.dismiss-inline-cmail {
+            background-color: transparent;
+            @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 16px 16px, var(--light-color));
+          }
+        }
+
+        div.cmail-content-outer {
+          padding: 0 24px;
+          flex: 1 0 auto;
+          display: flex;
+          flex-flow: column nowrap;
+          max-height: unset;
+          overflow-x: hidden;
+          overflow-y: visible;
+
+          div.cmail-content {
+            min-height: unset;
+            max-height: unset;
+            flex: 1 0 auto;
+            display: flex;
+            flex-flow: column nowrap;
+
+            div.cmail-content-headline-container {
+              background-color: transparent;
+              margin-top: 0;
+              padding-bottom: 0;
+              width: 100%;
+              position: relative;
+              top: unset;
+              left: unset;
+
+              div.cmail-content-headline {
+                @include activity-title(32, 40);
+
+                &:empty:before {
+                  @include activity-title(32, 40);
+                  height: 40px;
+                }
+              }
+            }
+
+            div.rich-body-editor-outer-container {
+              margin-top: 24px;
+              flex: 1 0 auto;
+
+              div.rich-body-editor-container {
+                div.rich-body-editor {
+                  @include activity-body(24, 32, var(--color), 24);
+                  height: 100%;
+                }
+              }
+            }
+          }
+        }
+
+        div.cmail-footer {
+          margin-top: auto;
         }
       }
     }

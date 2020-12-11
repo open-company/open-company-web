@@ -23,6 +23,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
@@ -435,6 +436,7 @@
 
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
                                                                      (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
+                                                                     (not (-> %1 (drv/get-ref :cmail-state) deref :distraction-free?))
                                                                      (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper")))
                                                             (close-cmail %1 %2)))
 
@@ -574,11 +576,14 @@
                                       (pos? (count editable-boards)))
                                  (> (count editable-boards) 1))
         expanded-state? (and (contains? cmail-state :collapsed)
-                             (not (:collapsed cmail-state)))]
+                             (not (:collapsed cmail-state)))
+        fullscreen? (and expanded-state?
+                         (:fullscreen cmail-state))]
     [:div.cmail-outer
       {:class (utils/class-set {:quick-post-collapsed (not expanded-state?)
-                                :fullscreen (and expanded-state?
-                                                 (:fullscreen cmail-state))})
+                                :fullscreen fullscreen?
+                                :distraction-free (and fullscreen?
+                                                       (:distraction-free? cmail-state))})
        :on-click (when (and (not is-mobile?)
                             (not expanded-state?)
                             (not (:fullscreen cmail-state)))
@@ -612,7 +617,8 @@
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
-                             (:fullscreen cmail-state))
+                             (:fullscreen cmail-state)
+                             (not (:distraction-free? cmail-state)))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
             {:class (utils/class-set {:has-section-button show-section-picker?
@@ -743,4 +749,13 @@
         ;        :data-toggle (when-not is-mobile? "tooltip")
         ;        :data-placement "top"
         ;        :title "Fullscreen"}]])
-        ]]]))
+        (when (and (:fullscreen cmail-state)
+                  (not is-mobile?))
+          [:div.distraction-free-container
+            {:class (when (:uuid cmail-data) "has-delete-bt")
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :title "Distraction free"}
+            (carrot-switch {:selected (:distraction-free? cmail-state)
+                            :did-change-cb #(cmail-actions/cmail-toggle-distraction-free)})])]]]))
