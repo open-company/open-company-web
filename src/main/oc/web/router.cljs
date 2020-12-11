@@ -171,6 +171,11 @@
   []
   (str "collapse-users-list-" (jwt/user-id)))
 
+(defn collapse-sections-list-cookie
+  "Cookie used to remember if the sections list was collapsed or not."
+  []
+  (str "collapse-sections-list-" (jwt/user-id)))
+
 (defn payments-prompt-upgrade-cookie
   "Cookie used to remember if the current user has dismissed the premium banner."
   [team-id]

@@ -3,9 +3,11 @@
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.lib.cookies :as cook]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
+            [oc.web.router :as router]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -18,10 +20,33 @@
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
+(defn sort-boards [boards]
+  (vec (sort-by :name boards)))
+
+(def sidebar-top-margin 56)
+
+(defn save-content-height [s]
+  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
+    (let [height (.-offsetHeight navigation-sidebar)]
+      (when (not= height @(::content-height s))
+        (reset! (::content-height s) height)))))
+
+(defn- toggle-collapse-sections [s]
+  (let [next-value (not @(::sections-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::sections-list-collapsed s) next-value)
+    (reset! (::content-height s) nil)
+    (utils/after 100 #(save-content-height s))))
+
+(defn save-window-height
+  "Save the window height in the local state."
+  [s]
+  (reset! (::window-height s) (.-innerHeight js/window)))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
-                                (drv/drv :board-data)
+                                ; (drv/drv :board-data)
                                 (drv/drv :org-slug)
                                 (drv/drv :board-slug)
                                 (drv/drv :contributions-id)
@@ -32,16 +57,25 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :cmail-state)
-                                (drv/drv :show-add-post-tooltip)
+                                ; (drv/drv :show-add-post-tooltip)
                                 (drv/drv :show-invite-box)
                                 ;; Locals
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local true ::show-invite-people?)
+                                (rum/local false ::window-height)
+                                (rum/local false ::content-height)
+                                (rum/local false ::sections-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
+                                (ui-mixins/render-on-resize save-window-height)
 
                                 {:before-render (fn [s]
                                   (nux-actions/check-nux)
+                                  s)
+                                 :will-mount (fn [s]
+                                  (save-window-height s)
+                                  (save-content-height s)
+                                  (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
                                   s)
                                  :will-update (fn [s]
                                   (when (responsive/is-mobile-size?)
@@ -60,27 +94,24 @@
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
+        ; board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
         change-data (drv/react s :change-data)
         org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
         show-invite-box (drv/react s :show-invite-box)
-        filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
-                                                 (and (not (s/starts-with? container-uuid drafts-board-prefix))
-                                                      (not (= container-uuid (:uuid org-data)))))
-                                              change-data))
-        left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
+        ; filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
+        ;                                          (and (not (s/starts-with? container-uuid drafts-board-prefix))
+        ;                                               (not (= container-uuid (:uuid org-data)))))
+        ;                                       change-data))
         all-boards (:boards org-data)
+        sorted-boards (sort-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) all-boards))
         user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
         is-following (= (keyword current-board-slug) :following)
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
-        is-topics (or (= (keyword current-board-slug) :topics)
-                      (and current-board-slug
-                           (not (dis/is-container? current-board-slug))
-                           (not is-drafts-board)))
+        is-topics (= (keyword current-board-slug) :topics)
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
         is-contributions (seq current-contributions-id)
         is-self-profile? (and is-contributions
@@ -101,7 +132,7 @@
                          is-contributions)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
-        all-unread-items (mapcat :unread (vals filtered-change-data))
+        ; all-unread-items (mapcat :unread (vals filtered-change-data))
         following-badge (drv/react s :following-badge)
         replies-badge (drv/react s :replies-badge)
         ; show-you (and user-is-part-of-the-team?
@@ -111,11 +142,16 @@
                                  is-admin-or-author?
                                  show-invite-box)
         show-topics user-is-part-of-the-team?
-        show-add-post-tooltip (drv/react s :show-add-post-tooltip)
+        ; show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
-        show-plus-button? (:can-compose? org-data)]
+        show-plus-button? (:can-compose? org-data)
+        show-boards (and user-is-part-of-the-team?
+                         (or create-link
+                             (seq all-boards)))
+        is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
+                                :absolute-position is-tall-enough?})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -249,6 +285,56 @@
                   "Drafts"]
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
+        ;; Boards list
+        (when show-boards
+          [:div.left-navigation-sidebar-top.top-border.group
+            ;; Boards header
+           [:h3.left-navigation-sidebar-top-title.group
+            [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+             {:class (when @(::sections-list-collapsed s) "collapsed")
+              :on-click #(toggle-collapse-sections s)}
+             [:span.sections "Topics"]]
+            (when create-link
+              [:button.left-navigation-sidebar-top-title-button.btn-reset
+               {:on-click #(nav-actions/show-section-add)
+                :title "Create a new section"
+                :data-placement "top"
+                :data-toggle (when-not is-mobile? "tooltip")
+                :data-container "body"}])]])
+        (when (and show-boards
+                   (not @(::sections-list-collapsed s)))
+          [:div.left-navigation-sidebar-items.group
+            (for [board sorted-boards
+                  :let [board-url (oc-urls/board org-slug (:slug board))
+                        is-current-board (and (not is-following)
+                                              (not is-replies)
+                                              (not is-bookmarks)
+                                              (not is-drafts-board)
+                                              (not is-contributions)
+                                              (not is-self-profile?)
+                                              (not is-topics)
+                                              (= current-board-slug (:slug board)))
+                        board-change-data (get change-data (:uuid board))]]
+              [:a.left-navigation-sidebar-item.hover-item
+                {:class (utils/class-set {:item-selected is-current-board})
+                 :data-board (name (:slug board))
+                 :key (str "board-list-" (name (:slug board)) "-" (rand 100))
+                 :href board-url
+                 :on-click #(do
+                              (nav-actions/nav-to-url! % (:slug board) board-url))}
+                [:div.board-name.group
+                  {:class (utils/class-set {:public-board (= (:access board) "public")
+                                            :private-board (= (:access board) "private")
+                                            :team-board (= (:access board) "team")})}
+                  [:div.internal
+                    {:class (utils/class-set {:new (seq (:unread board-change-data))
+                                              :has-icon (#{"public" "private"} (:access board))})
+                     :key (str "board-list-" (name (:slug board)) "-internal")
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]
+                (when (= (:access board) "public")
+                  [:div.public])
+                (when (= (:access board) "private")
+                  [:div.private])])])
         (when show-plus-button?
           [:button.mlb-reset.create-bt
             {:on-click #(cmail-actions/cmail-fullscreen)
