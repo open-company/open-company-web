@@ -2,7 +2,9 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
+            [oc.web.expo :as expo]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
@@ -352,15 +354,18 @@
                     :message (or msg "This feature is available only to Premium accounts.")
                     :solid-button-style :green
                     :solid-button-title "Tell me more"
-                    :solid-button-cb #(do
+                    :solid-button-cb #(let [pricing-url (str ls/web-server-domain oc-urls/pricing)]
                                         (alert-modal/hide-alert)
-                                        (.open js/window (str ls/web-server-domain oc-urls/pricing) "_blank"))
+                                        (if ua/mobile-app?
+                                          (expo/open-in-browser pricing-url)
+                                          (.open js/window pricing-url "_blank")))
                     :link-button-title "OK, got it"
                     :link-button-cb #(alert-modal/hide-alert)}]
     (alert-modal/show-alert alert-data)))
 
 (defn ^:export toggle-premium-picker! [& [msg]]
   (when ls/payments-enabled
-    (if (responsive/is-mobile-size?)
+    (if (or (responsive/is-mobile-size?)
+            ua/mobile-app?)
       (prompt-open-pricing msg)
       (dis/dispatch! [:toggle-premium-picker]))))
