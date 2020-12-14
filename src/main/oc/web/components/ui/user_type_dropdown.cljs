@@ -7,6 +7,8 @@
             [oc.web.utils.user :as user-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
+(def premium-viewer-tooltip "Premium accounts can assign view-only access to teammates.")
+
 (rum/defc user-type-dropdown < rum/static
                                ui-mixins/refresh-tooltips-mixin
   [{:keys [user-id user-type on-change hide-admin on-remove disabled? premium?]}]
@@ -36,11 +38,11 @@
          {:on-click #(if premium?
                        (when (fn? on-change)
                          (on-change :viewer))
-                       (nav-actions/toggle-premium-picker!))
+                       (nav-actions/toggle-premium-picker! premium-viewer-tooltip))
           :data-toggle (when-not premium? "tooltip")
           :data-placement "top"
           :data-container "body"
-          :title "Premium accounts can assign view-only access to teammates. Click for details."
+          :title (str premium-viewer-tooltip " Click for details.")
           :class (utils/class-set {:selected (= user-type :viewer)
                                    :premium-lock (not premium?)})}
          "Viewer"]

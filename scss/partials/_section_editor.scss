@@ -407,6 +407,10 @@ div.section-editor-container {
         background-color: var(--background-color);
         z-index: 1001;
 
+        @include mobile() {
+          width: calc(100% - 32px);
+        }
+
         div.access-list-row {
           height: 32px;
           padding: 7px 8px;

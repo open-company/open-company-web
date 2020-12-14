@@ -347,8 +347,21 @@
 
 ;; Show premium picker
 
-(defn ^:export toggle-premium-picker! []
+(defn prompt-open-pricing [msg]
+  (let [alert-data {:action "mobile-prompt-open-pricing"
+                    :title "Try Premium"
+                    :message (or msg "This feature is available only to Premium accounts.")
+                    :solid-button-style :green
+                    :solid-button-title "Tell me more"
+                    :solid-button-cb #(do
+                                        (alert-modal/hide-alert)
+                                        (.open js/window oc-urls/pricing "_blank"))
+                    :link-button-title "OK, got it"
+                    :link-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)))
+
+(defn ^:export toggle-premium-picker! [& [msg]]
   (when ls/payments-enabled
     (if (responsive/is-mobile-size?)
-      (.open js/window oc-urls/pricing "_blank")
+      (prompt-open-pricing msg)
       (dis/dispatch! [:toggle-premium-picker]))))

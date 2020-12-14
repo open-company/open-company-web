@@ -104,6 +104,9 @@
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
+(def premium-remind-all-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
+(def premium-remind-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
+
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
                  (drv/drv :wrt-read-data)
@@ -119,12 +122,14 @@
                  (rum/local :all ::list-view) ;; :seen :unseen
                  (rum/local {} ::sending-notice)
                  (rum/local true ::show-remind-all-bt)
+                 (rum/local nil ::jelly-head)
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
                  mixins/refresh-tooltips-mixin
 
                  {:will-mount (fn [s]
+                   (reset! (::jelly-head s) (uu/random-avatar))
                    (when-let [activity-data @(drv/get-ref s :wrt-activity-data)]
                      (activity-actions/request-reads-data (:uuid activity-data)))
                    s)
@@ -175,13 +180,16 @@
                                             :users-list remind-all-users
                                             :slack-bot-data slack-bot-data
                                             :unopened-count (count unseen-users)}))
-                        #(nav-actions/toggle-premium-picker!))
+                        #(nav-actions/toggle-premium-picker! premium-remind-all-tooltip))
         remind-all-tooltip (if (:premium? org-data)
                              "Send a reminder to everyone that hasn’t opened it"
-                             "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details.")
+                             (str premium-remind-all-tooltip " Click for details."))
         remind-tooltip (when-not (:premium? org-data)
-                         "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed. Click for details.")
-        jelly-head (uu/random-avatar)]
+                         (str premium-remind-tooltip " Click for details."))
+        show-remind-all-bt? (and (> (count remind-all-users) 1)
+                                 @(::show-remind-all-bt s)
+                                 (or (not is-mobile?)
+                                     (:premium? org-data)))]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -249,20 +257,19 @@
                   " people viewed this "
                   (when (:private-access? read-data)
                     "private ")
-                  "post."))
-                (when (and (:private-access? read-data)
-                          (dis/board-data current-org-slug (:board-slug activity-data)))
-                  [:button.mlb-reset.manage-section-bt
-                    {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
-                    "Manage team members?"])
-                (when (and (> (count remind-all-users) 1)
-                          @(::show-remind-all-bt s))
-                  [:button.mlb-reset.send-to-all-bt
-                    {:on-click remind-all-cb
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :title remind-all-tooltip}
-                    "Send reminders"])]]
+                  "post."))]
+              (when (and (:private-access? read-data)
+                        (dis/board-data current-org-slug (:board-slug activity-data)))
+                [:button.mlb-reset.manage-section-bt
+                  {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
+                  "Manage team members?"])
+              (when show-remind-all-bt?
+                [:button.mlb-reset.send-to-all-bt
+                  {:on-click remind-all-cb
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :data-placement "top"
+                    :title remind-all-tooltip}
+                  "Send reminders"])]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select.oc-input
@@ -298,7 +305,7 @@
                           u                   (if (:premium? org-data)
                                                 u*
                                                 (-> u*
-                                                    (assoc :avatar-url jelly-head)
+                                                    (assoc :avatar-url @(::jelly-head s))
                                                     (assoc :name "Team member")))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
@@ -323,14 +330,15 @@
                         "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
-                             (:premium? org-data)
                              (not is-self-user?)
                              (not user-sending-notice))
                     [:button.mlb-reset.send-reminder-bt
-                      {:on-click #(remind-to s {:activity-data activity-data
-                                                :current-user-data current-user-data
-                                                :users-list [u]
-                                                :slack-bot-data slack-bot-data})
+                      {:on-click #(if (:premium? org-data)
+                                    (remind-to s {:activity-data activity-data
+                                                  :current-user-data current-user-data
+                                                  :users-list [u]
+                                                  :slack-bot-data slack-bot-data})
+                                    (nav-actions/toggle-premium-picker! premium-remind-tooltip))
                        :data-toggle (when (and (not (:premium? org-data))
                                                (not is-mobile?))
                                       "tooltip")
