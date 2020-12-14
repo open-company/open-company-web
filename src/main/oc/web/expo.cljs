@@ -119,6 +119,13 @@
     (reset! -color-scheme color-scheme)
     (theme-actions/expo-color-scheme-changed! (keyword color-scheme))))
 
+;; Open url in browser
+
+(defn ^:expo open-in-browser
+  ""
+  [url]
+  (bridge-call! "open-in-browser" url))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize bridge
 
