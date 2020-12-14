@@ -12,6 +12,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -97,6 +98,9 @@
 (defn- creating-new-section? [section-data]
   (or (not (seq (:uuid section-data)))
       (not (seq (:links section-data)))))
+
+(def private-board-tooltip "Premium accounts can create private topics for invited users only.")
+(def public-board-tooltip "Premium accounts can create public topics for sharing beyond your team.")
 
 (rum/defcs section-editor <
   ;; Mixins
@@ -195,9 +199,9 @@
                                                     (alert-modal/hide-alert)
                                                     (on-change nil nil exit-cb))})
                               (on-change nil nil exit-cb)))
-        private-allowed? (or (= (:access initial-section-data) "private")
-                              (:can-create-private-board? org-data))
-        public-allowed? (or (= (:access initial-section-data) "public")
+        private-enabled? (or (= (:access initial-section-data) "private")
+                             (:can-create-private-board? org-data))
+        public-enabled? (or (= (:access initial-section-data) "public")
                             (:can-create-public-board? org-data))]
     [:div.section-editor-container
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
@@ -298,44 +302,44 @@
                                                                                    :has-changes true})]))}
                 team-access]
               [:div.access-list-row
-                {:class (when-not private-allowed? "disabled")
-                 :data-toggle (when (and (not (:premium? org-data))
-                                         (not private-allowed?))
+                {:class (when-not private-enabled? "disabled")
+                :data-toggle (when (and (not (:premium? org-data))
+                                        (not private-enabled?))
                                 "tooltip")
-                 :title "Premium accounts can create private topics for invited users only. Click for details."
-                 :data-placement "top"
-                 :on-click (fn [e]
-                             (if private-allowed?
-                               (do
-                                 (utils/event-stop e)
-                                 (reset! (::show-access-list s) false)
-                                 (when show-slack-channels?
-                                   (reset! (::slack-enabled s) false))
-                                 (dis/dispatch! [:update [:section-editing]
-                                                 #(merge % {:access "private"
+                :title (str private-board-tooltip " Click for details.")
+                :data-placement "top"
+                :on-click (fn [e]
+                            (if private-enabled?
+                              (do
+                                (utils/event-stop e)
+                                (reset! (::show-access-list s) false)
+                                (when show-slack-channels?
+                                  (reset! (::slack-enabled s) false))
+                                (dis/dispatch! [:update [:section-editing]
+                                                #(merge % {:access "private"
                                                             :has-changes true
                                                             :authors (conj (set (:authors section-editing)) current-user-id)
                                                             :slack-mirror (if show-slack-channels?
                                                                             nil
                                                                             (:slack-mirror section-editor))})]))
-                               (nav-actions/toggle-premium-picker!)))}
+                              (nav-actions/toggle-premium-picker!)))}
                 private-access]
               (when-not disallow-public-board?
                 [:div.access-list-row
-                  {:class (when-not public-allowed? "disabled")
+                  {:class (when-not public-enabled? "disabled")
                    :data-toggle (when (and (not (:premium? org-data))
-                                           (not public-allowed?))
+                                           (not public-enabled?))
                                   "tooltip")
-                   :title "Premium accounts can create public topics for sharing beyond your team. Click for details."
+                   :title (str public-board-tooltip " Click for details.")
                    :data-placement "top"
                    :on-click (fn [e]
-                               (if public-allowed?
+                               (if public-enabled?
                                  (do
                                    (utils/event-stop e)
                                    (reset! (::show-access-list s) false)
                                    (dis/dispatch! [:update [:section-editing] #(merge % {:access "public"
                                                                                          :has-changes true})]))
-                                 (nav-actions/toggle-premium-picker!)))}
+                                 (nav-actions/toggle-premium-picker! public-board-tooltip)))}
                   public-access])])
           (when show-slack-channels?
             [:div.section-editor-add-label.top-separator

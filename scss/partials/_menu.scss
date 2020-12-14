@@ -17,6 +17,7 @@ div.menu {
     width: 100vw;
     padding: 0;
     overflow: initial;
+    height: calc(100vh - 2px);
   }
 
   &.dropdown-menu {
@@ -172,10 +173,14 @@ div.menu {
         padding: 0px;
         @include OC_Body_Book();
         font-size: 16px;
-        line-height: 18px;
+        line-height: 20px;
         color: var(--color);
         text-align: left;
         margin: 16px 0;
+
+        @include mobile() {
+          margin: 24px 0;
+        }
 
         @include big_web() {
           &:hover {
@@ -295,7 +300,7 @@ div.menu {
       padding: 0px;
       @include OC_Body_Book();
       font-size: 14px;
-      line-height: 18px;
+      line-height: 20px;
       color: var(--light-color);
       text-align: left;
       margin-top: auto;

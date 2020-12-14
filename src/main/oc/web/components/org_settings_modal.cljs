@@ -252,11 +252,12 @@
         current-theme (theme-utils/computed-value theme-data)
         current-brand-color (get (:brand-color org-editing) current-theme)
         premium-lock? (not (:premium? org-data))
+        premium-tooltip* "Premium accounts can customize logo and team colors. Click for details."
+        premium-tooltip (str premium-tooltip* " Click for details.")
         premium-lock-click (when premium-lock?
                              (fn [e]
                                (utils/event-stop e)
-                               (nav-actions/toggle-premium-picker!)))
-        premium-tooltip "Premium accounts can customize logo and team colors. Click for details."]
+                               (nav-actions/toggle-premium-picker! premium-tooltip*)))]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]

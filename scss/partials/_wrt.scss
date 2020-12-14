@@ -176,7 +176,7 @@ div.wrt-popup-container {
           text-align: center;
           float: unset;
           line-height: 24px;
-          font-size: 18px;
+          font-size: 16px;
           width: 120px;
           margin: 0 auto;
         }
@@ -221,11 +221,13 @@ div.wrt-popup-container {
 
       div.wrt-chart-container {
         margin-bottom: 24px;
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
 
         div.wrt-chart {
           width: 116px;
           height: 116px;
-          margin: 0 auto;
 
           .wrt-donut-segment {
             stroke-dasharray: 0 $circ;
@@ -262,41 +264,41 @@ div.wrt-popup-container {
           font-size: 14px;
           color: var(--color);
           line-height: 18px;
+        }
 
-          button.manage-section-bt {
-            display: block;
-            width: 100%;
-            padding: 0;
-            margin: 0;
-            height: 18px;
-            color: var(--primary-color);
-            @include OC_Body_Book();
-            font-size: 14px;
-            text-align: center;
-          }
+        button.manage-section-bt {
+          display: block;
+          width: 100%;
+          padding: 0;
+          margin: 0 0 8px;
+          height: 18px;
+          color: var(--primary-color);
+          @include OC_Body_Book();
+          font-size: 14px;
+          text-align: center;
+        }
 
-          button.send-to-all-bt {
-            @include OC_Body_Bold();
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--secondary-color);
-            background-color: var(--primary-color);
-            border-radius: 4px;
-            height: 32px;
-            padding: 0;
-            margin: 8px auto 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding: 7px 16px;
+        button.send-to-all-bt {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--secondary-color);
+          background-color: var(--primary-color);
+          border-radius: 4px;
+          height: 32px;
+          padding: 0;
+          margin: 8px auto 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding: 7px 16px;
 
-            @include mobile(){
-              // height: 24px;
-              // position: absolute;
-              // right: 16px;
-              // top: 12px;
-              margin: 16px auto 0;
-            }
+          @include mobile(){
+            // height: 24px;
+            // position: absolute;
+            // right: 16px;
+            // top: 12px;
+            margin: 16px auto 0;
           }
         }
       }

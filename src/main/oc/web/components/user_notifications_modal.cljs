@@ -46,6 +46,8 @@
         hours (if (> hours* 12) (- hours* 12) hours*)]
     (str  hours ":" minutes (if (> hours* 11) " PM" " AM"))))
 
+(def premium-times-tooltip "Premium accounts can change when digests are sent each day.")
+
 (rum/defcs user-notifications-modal <
   rum/reactive
   (drv/drv :org-data)
@@ -150,12 +152,12 @@
                   {:key (name t)
                    :class (when premium-locked? "premium-lock")
                    :title (when premium-locked?
-                            "Premium accounts can change when digests are sent each day. Click for details.")
+                            (str premium-times-tooltip " Click for details."))
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"
                    :on-click (if premium-locked?
-                               #(nav-actions/toggle-premium-picker!)
+                               #(nav-actions/toggle-premium-picker! premium-times-tooltip)
                                change-cb)}
                   (carrot-checkbox {:selected selected?
                                     :disabled premium-locked?})
