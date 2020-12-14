@@ -54,8 +54,7 @@
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug author-uuid)
-         org-data (dis/org-data)]
+         sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -93,8 +92,7 @@
          sort-type (activity-actions/saved-sort-type org-slug board-slug)
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          is-container? (dis/is-container? board-slug)
-         org-data (dis/org-data)
-         current-activity-id (dis/current-activity-id)]
+         org-data (dis/org-data)]
      (if (= current-path url)
        (do ;; In case user clicked on the current location let's refresh it
          (routing-actions/post-routing)
@@ -124,8 +122,7 @@
              (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))))))))
 
 (defn dismiss-post-modal [e]
-  (let [org-data (dis/org-data)
-        route (dis/route)
+  (let [route (dis/route)
         board (dis/current-board-slug)
         contributions-id (dis/current-contributions-id)
         is-contributions? (seq contributions-id)
@@ -292,7 +289,9 @@
 ;; WRT
 
 (defn show-wrt [activity-uuid]
-  (push-panel (keyword (str "wrt-" activity-uuid))))
+  (push-panel (keyword (str "wrt-" activity-uuid)))
+  (when (responsive/is-mobile-size?)
+    (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))))
 
 (defn hide-wrt []
   (pop-panel))
@@ -355,7 +354,7 @@
                     :solid-button-title "Tell me more"
                     :solid-button-cb #(do
                                         (alert-modal/hide-alert)
-                                        (.open js/window oc-urls/pricing "_blank"))
+                                        (.open js/window (str ls/web-server-domain oc-urls/pricing) "_blank"))
                     :link-button-title "OK, got it"
                     :link-button-cb #(alert-modal/hide-alert)}]
     (alert-modal/show-alert alert-data)))
