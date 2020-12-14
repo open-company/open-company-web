@@ -7,7 +7,7 @@
    [:div.main.home-page
       ; Hope page header
     [:section.cta.group
-        [:h1.headline.mobile-tablet-only
+        [:h1.headline.tablet-mobile-only
           "Team updates without the noise"]
         [:h1.headline.big-web-only
          "Team updates and communication without the noisy chatter"]
