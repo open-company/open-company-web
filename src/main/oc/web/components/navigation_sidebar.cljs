@@ -25,23 +25,18 @@
 
 (def sidebar-top-margin 56)
 
-(defn save-content-height [s]
+(defn fix-navbar-position [s]
   (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
-    (let [height (.-offsetHeight navigation-sidebar)]
-      (when (not= height @(::content-height s))
-        (reset! (::content-height s) height)))))
+    (let [component-height (.-offsetHeight navigation-sidebar)
+          taller? (> (+ sidebar-top-margin component-height)
+                     (dom-utils/viewport-height))]
+      (compare-and-set! (::absolute-position s) (not taller?) taller?))))
 
 (defn- toggle-collapse-sections [s]
   (let [next-value (not @(::sections-list-collapsed s))]
     (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
     (reset! (::sections-list-collapsed s) next-value)
-    (reset! (::content-height s) nil)
-    (utils/after 100 #(save-content-height s))))
-
-(defn save-window-height
-  "Save the window height in the local state."
-  [s]
-  (reset! (::window-height s) (.-innerHeight js/window)))
+    (utils/after 100 #(fix-navbar-position s))))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
@@ -62,19 +57,19 @@
                                 ;; Locals
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local true ::show-invite-people?)
-                                (rum/local false ::window-height)
-                                (rum/local false ::content-height)
+                                (rum/local false ::absolute-position)
                                 (rum/local false ::sections-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
-                                (ui-mixins/render-on-resize save-window-height)
+                                (ui-mixins/render-on-resize fix-navbar-position)
 
                                 {:before-render (fn [s]
                                   (nux-actions/check-nux)
                                   s)
+                                 :did-mount (fn [s]
+                                  (fix-navbar-position s)
+                                  s)
                                  :will-mount (fn [s]
-                                  (save-window-height s)
-                                  (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
                                   s)
                                  :will-update (fn [s]
@@ -117,7 +112,7 @@
         is-self-profile? (and is-contributions
                               (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
-        ; show-boards (or create-link (pos? (count boards)))
+        show-boards (or create-link (seq all-boards))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
@@ -144,14 +139,10 @@
         show-topics user-is-part-of-the-team?
         ; show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
-        show-plus-button? (:can-compose? org-data)
-        show-boards (and user-is-part-of-the-team?
-                         (or create-link
-                             (seq all-boards)))
-        is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))]
+        show-plus-button? (:can-compose? org-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
-                                :absolute-position is-tall-enough?})
+                                :absolute-position @(::absolute-position s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
