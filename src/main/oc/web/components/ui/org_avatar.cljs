@@ -14,7 +14,6 @@
 (rum/defcs internal-org-avatar < rum/static
   (rum/local false ::img-load-failed)
   {:did-mount (fn [s]
-                (js/console.log "DBG internal-org-avatar")
                  (let [brand-color (-> s :rum/args first :brand-color)
                        theme-key (theme-utils/computed-value (get-in @dis/app-state dis/theme-key))
                        primary-color-map (or (get-in brand-color [theme-key :primary])
