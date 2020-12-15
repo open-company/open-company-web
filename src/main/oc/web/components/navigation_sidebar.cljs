@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
+            [defun.core :refer (defun-)]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.cookies :as cook]
             [oc.web.dispatcher :as dis]
@@ -20,8 +21,14 @@
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
-(defn sort-boards [boards]
-  (vec (sort-by :name boards)))
+(defun- filter-sort-boards
+  ([boards :guard map?]
+   (filter-sort-boards (vals boards)))
+  ([boards :guard sequential?]
+   (->> boards
+        (filter #(not= (:slug %) utils/default-drafts-board-slug))
+        (sort-by :name)
+        vec)))
 
 (def sidebar-top-margin 56)
 
@@ -52,6 +59,7 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :cmail-state)
+                                (drv/drv :follow-boards-list)
                                 ; (drv/drv :show-add-post-tooltip)
                                 (drv/drv :show-invite-box)
                                 ;; Locals
@@ -101,7 +109,9 @@
         ;                                               (not (= container-uuid (:uuid org-data)))))
         ;                                       change-data))
         all-boards (:boards org-data)
-        sorted-boards (sort-boards (filter #(not= (:slug %) utils/default-drafts-board-slug) all-boards))
+        follow-boards-list (drv/react s :follow-boards-list)
+        _ (js/console.log "DBG follow-boards-list" follow-boards-list)
+        sorted-follow-boards (filter-sort-boards follow-boards-list)
         user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
         is-following (= (keyword current-board-slug) :following)
@@ -112,7 +122,7 @@
         is-self-profile? (and is-contributions
                               (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
-        show-boards (or create-link (seq all-boards))
+        show-boards (or create-link (seq follow-boards-list))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-following (and user-is-part-of-the-team?
@@ -295,7 +305,7 @@
         (when (and show-boards
                    (not @(::sections-list-collapsed s)))
           [:div.left-navigation-sidebar-items.group
-            (for [board sorted-boards
+            (for [board sorted-follow-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (= current-board-slug (:slug board))
                         board-change-data (get change-data (:uuid board))]]
