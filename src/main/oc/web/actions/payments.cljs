@@ -3,10 +3,12 @@
   (:require [oc.web.api :as api]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
+            [oc.lib.time :as lib-time]
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.jwt :as jwt-actions]
@@ -41,15 +43,46 @@
 
 ;; Banner handlers
 
-(defn should-show-prompt-banner-for-team? [{team-id :team-id premium-team? :premium}]
-  (let [cookie-name (router/payments-prompt-upgrade-cookie team-id)]
-    (and (not (responsive/is-mobile-size?))
-         (not (cook/get-cookie cookie-name))
-         (not premium-team?)
-         (jwt/is-admin? team-id))))
+(def prompt-after-days 14)
 
-(defn dismiss-prompt-banner [team-id]
-  (cook/set-cookie! (router/payments-prompt-upgrade-cookie team-id) "dismissed" (* 60 60 24 365 10))) ;; Remember like forever)
+(defn- old-user? [user-created-at]
+  (let [created-at (lib-time/millis (lib-time/from-iso user-created-at))
+        now-millis (lib-time/now-ts)
+        limit-ts (* 1000 60 60 24 prompt-after-days)]
+    (>= (- now-millis created-at)
+        limit-ts)))
+
+(defn- did-post? []
+  (seq (activity-utils/last-used-section)))
+
+(def ^:private dismiss-cookie-value "dismissed")
+(def ^:private dismiss-cookie-expire (* 60 60 24 365 10))
+
+(defn- banner-dismissed? [team-id]
+  (let [cookie-name (router/payments-prompt-upgrade-cookie team-id)]
+    (= (cook/get-cookie cookie-name) dismiss-cookie-value)))
+
+(defn- dismiss-prompt-banner [team-id]
+  (cook/set-cookie! (router/payments-prompt-upgrade-cookie team-id)
+                    dismiss-cookie-value dismiss-cookie-expire))
+
+(defn should-show-prompt-banner?
+  "Decide if the prompt banner needs to be shown.
+   Show if:
+   - is NOT mobile: not enough space on mobile
+   - is an admin: non-admins can't start premium subs
+   - is NOT on premium already
+   - has NOT been shown and dismissed before
+   - user is older than 14 days or user published at least one post"
+  [{team-id :team-id premium-team? :premium} {user-created-at :created-at :as _current-user-data}]
+  (let [old-enough-user? (old-user? user-created-at)
+        user-did-post? (did-post?)]
+    (and (not (responsive/is-mobile-size?))
+          (jwt/is-admin? team-id)
+          (not premium-team?)
+          (not (banner-dismissed? team-id))
+          (or old-enough-user?
+              user-did-post?))))
 
 (defn show-prompt-upgrade-banner []
   (dis/dispatch! [:input [dis/payments-ui-prompt-banner-key] true]))
@@ -69,8 +102,9 @@
 
 (defn maybe-show-prompt-banner []
   (when-let* [org-data (dis/org-data)
-              team-data (dis/team-data)]
-    (if (should-show-prompt-banner-for-team? team-data)
+              team-data (dis/team-data)
+              current-user-data (dis/current-user-data)]
+    (if (should-show-prompt-banner? team-data current-user-data)
       (show-prompt-upgrade-banner)
       (hide-prompt-upgrade-banner true))))
 
