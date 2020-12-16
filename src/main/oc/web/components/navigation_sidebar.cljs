@@ -110,7 +110,6 @@
         ;                                       change-data))
         all-boards (:boards org-data)
         follow-boards-list (drv/react s :follow-boards-list)
-        _ (js/console.log "DBG follow-boards-list" follow-boards-list)
         sorted-follow-boards (filter-sort-boards follow-boards-list)
         user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
