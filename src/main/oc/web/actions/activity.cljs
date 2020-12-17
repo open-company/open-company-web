@@ -2,28 +2,21 @@
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.utils.poll :as pu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
-            [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
-            [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.ws.change-client :as ws-cc]
-            [oc.web.actions.nux :as nux-actions]
-            [oc.web.lib.json :refer (json->cljs cljs->json)]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
-            [oc.web.utils.comment :as comment-utils]
-            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -740,8 +733,6 @@
   (dis/dispatch! [:entry-publish/finish org-slug edit-key entry-data])
   ;; Send item read
   (send-item-read (:uuid entry-data))
-  ;; Show the first post added tooltip if needed
-  (nux-actions/show-post-added-tooltip (:uuid entry-data))
   ;; Refresh the drafts board on publish
   (let [drafts-board (dis/org-board-data utils/default-drafts-board-slug)
         drafts-link (utils/link-for (:links drafts-board) "self")]
@@ -767,8 +758,7 @@
       (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
-    (send-item-read (:uuid saved-entry-data))
-    (nux-actions/show-post-added-tooltip (:uuid saved-entry-data))))
+    (send-item-read (:uuid saved-entry-data))))
 
 (defn- entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
@@ -820,7 +810,6 @@
 
 (defn activity-delete [activity-data]
   ;; Make sure the WRT sample is dismissed
-  (nux-actions/dismiss-post-added-tooltip)
   (cmail-actions/remove-cached-item (:uuid activity-data))
   (if (:links activity-data)
     (real-activity-delete activity-data)
@@ -1214,7 +1203,6 @@
 
 (defn delete-samples []
   ;; Make sure the WRT sample is dismissed
-  (nux-actions/dismiss-post-added-tooltip)
   (let [org-data (dis/org-data)
         org-link (utils/link-for (:links org-data) ["item" "self"] "GET")
         delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")]

@@ -10,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -189,7 +188,6 @@
                                     (not (utils/input-clicked? e))
                                     ;; No body link was clicked
                                     (not (utils/anchor-clicked? e)))
-                           (nux-actions/dismiss-post-added-tooltip)
                            (nav-actions/open-post-modal activity-data false))))))
        :id dom-element-id}
       [:button.mlb-reset.mobile-more-bt
@@ -284,17 +282,6 @@
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    ; (when show-post-added-tooltip?
-                    ;   [:div.post-added-tooltip-container
-                    ;     {:ref :post-added-tooltip}
-                    ;     [:div.post-added-tooltip-title
-                    ;       "Post analytics"]
-                    ;     [:div.post-added-tooltip
-                    ;       (str "Invite your team to " ls/product-name " so you can know who read your "
-                    ;        "post and when. Click here to access your post analytics anytime.")]
-                    ;     [:button.mlb-reset.post-added-tooltip-bt
-                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                    ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :premium? premium?
                                 :read-data read-data})])

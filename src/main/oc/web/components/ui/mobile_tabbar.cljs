@@ -8,8 +8,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (rum/defc mobile-tabbar
-  [{:keys [can-compose? show-add-post-tooltip
-           user-notifications-data active-tab]}]
+  [{:keys [can-compose? user-notifications-data active-tab]}]
   [:div.mobile-tabbar
     {:class (utils/class-set {:can-compose can-compose?})}
     [:button.mlb-reset.tab-button.following-tab
@@ -46,7 +45,7 @@
       [:button.mlb-reset.tab-button.new-post-tab
         {:on-click #(do
                       (.stopPropagation %)
-                      (ui-compose show-add-post-tooltip))
+                      (ui-compose))
         :class (when (= :new active-tab) "active")}
         [:span.tab-icon]
         [:span.tab-label "New"]])])

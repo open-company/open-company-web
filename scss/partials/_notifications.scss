@@ -208,10 +208,7 @@ div.notifications {
       color: $carrot_green;
 
       &.dismiss-x {
-        background-image: cdnUrl("/img/ML/close_notification_white.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
+        @include svgBgColor("/img/ML/close_notification_white.svg", center, 12px 12px, var(--tooltip-color));
         top: 8px;
         right: 10px;
         opacity: 0.5;

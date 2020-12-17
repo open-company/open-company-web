@@ -20,6 +20,7 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
+            [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -186,6 +187,7 @@
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
+        (nux-tooltips-manager)
         (cond
           ;; Activity removed
           show-activity-removed

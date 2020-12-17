@@ -45,18 +45,22 @@
        :top (oget rect "top")
        :right (oget rect "right")
        :bottom (oget rect "bottom")
-       :left (oget rect "left")})))
+       :left (oget rect "left")
+       :width (oget rect "width")
+       :height (oget rect "height")})))
 
 (defn window-rect []
   (bounding-rect (oget js/document "documentElement")))
 
 (defn window-height []
   (let [wr (window-rect)]
-    (- (:bottom wr) (:top wr))))
+    ;; (- (:bottom wr) (:top wr))
+    (:height wr)))
 
 (defn window-width []
   (let [wr (window-rect)]
-    (- (:right wr) (:left wr))))
+    ;; (- (:right wr) (:left wr))
+    (:width wr)))
 
 (defn is-element-bottom-in-viewport?
    "Given a DOM element return true if the bottom of it is actually visible in the viewport/"

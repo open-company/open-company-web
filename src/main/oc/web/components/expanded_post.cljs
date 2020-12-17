@@ -10,7 +10,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]

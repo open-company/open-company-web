@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -88,7 +87,6 @@
   (rum/local 0 ::initial-sending)
   {:will-mount (fn [s]
                  (setup-initial-rows s)
-                 (nux-actions/dismiss-post-added-tooltip)
                  (let [org-data @(drv/get-ref s :org-data)]
                    (org-actions/get-org org-data true)
                    (team-actions/teams-get))

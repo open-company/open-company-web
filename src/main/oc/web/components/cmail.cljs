@@ -15,7 +15,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
@@ -345,8 +344,6 @@
         body-text (.text (.html (js/$ "<div/>") initial-body))
         scroll-lock? (or (responsive/is-mobile-size?)
                          (:fullscreen cmail-state))]
-    (when-not (seq (:uuid cmail-data))
-      (nux-actions/dismiss-add-post-tooltip))
     (reset! (::last-body s) initial-body)
     (reset! (::initial-body s) initial-body)
     (reset! (::initial-headline s) initial-headline)
@@ -510,7 +507,6 @@
                     (fix-tooltips s)
                     s)
                    :will-unmount (fn [s]
-                    (nux-actions/dismiss-edit-tooltip)
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
@@ -588,7 +584,6 @@
                             (not expanded-state?)
                             (not (:fullscreen cmail-state)))
                    (fn [e]
-                      (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
                       (utils/after 280
                        #(when-let [el (headline-element s)]

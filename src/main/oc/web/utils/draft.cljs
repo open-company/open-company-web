@@ -1,6 +1,5 @@
 (ns oc.web.utils.draft
   (:require [oc.web.lib.utils :as utils]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
