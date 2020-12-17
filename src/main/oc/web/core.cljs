@@ -156,8 +156,7 @@
   (payments-actions/initial-loading))
 
 (defn check-nux [query-params]
-  (let [has-at-param (contains? query-params :at)
-        user-settings (when (and (contains? query-params :user-settings)
+  (let [user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)

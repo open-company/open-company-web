@@ -6,7 +6,6 @@
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
@@ -53,11 +52,7 @@
                               (drv/drv :show-invite-box)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
-                              {:before-render (fn [s]
-                                ;; Check if it needs any NUX stuff
-                                (nux-actions/check-nux)
-                                s)
-                               :did-mount (fn [s]
+                              {:did-mount (fn [s]
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (:can-compose? org-data)
@@ -190,34 +185,6 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
-            ; (let [non-admin-tooltip (str ls/product-name " is where you'll find key announcements, updates, and "
-            ;                              "decisions to keep you and your team pulling in the same direction.")
-            ;       is-second-user (= add-post-tooltip :is-second-user)]
-            ;   (when (and (not is-drafts-board)
-            ;              (not current-activity-id)
-            ;              add-post-tooltip)
-            ;     [:div.add-post-tooltip-container.group
-            ;       [:button.mlb-reset.add-post-tooltip-dismiss
-            ;         {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-            ;       [:div.add-post-tooltips
-            ;         {:class (when is-second-user "second-user")}
-            ;         [:div.add-post-tooltip-box-mobile]
-            ;         [:div.add-post-tooltip-title
-            ;           (str "Welcome to " ls/product-name "!")]
-            ;           [:div.add-post-tooltip
-            ;             (if is-admin-or-author
-            ;               (if is-second-user
-            ;                 non-admin-tooltip
-            ;                 (str "Create your first post now to see how " ls/product-name " works. Don't worry, you can delete it anytime."))
-            ;               non-admin-tooltip)]
-            ;           (when (and is-admin-or-author
-            ;                      (not is-second-user))
-            ;             [:button.mlb-reset.add-post-bt
-            ;               {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-            ;               [:span.add-post-bt-pen]
-            ;               "New post"])
-            ;         [:div.add-post-tooltip-box.big-web-only
-            ;           {:class (when is-second-user "second-user")}]]]))
             (when show-desktop-cmail?
               (cmail))
             (when is-contributions

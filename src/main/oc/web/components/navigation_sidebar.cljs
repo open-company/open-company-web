@@ -1,6 +1,6 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            [clojure.string :as s]
+            ;; [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [defun.core :refer (defun-)]
             [oc.web.urls :as oc-urls]
@@ -11,7 +11,6 @@
             [oc.web.router :as router]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
             [oc.web.lib.responsive :as responsive]
@@ -71,10 +70,7 @@
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize fix-navbar-position)
 
-                                {:before-render (fn [s]
-                                  (nux-actions/check-nux)
-                                  s)
-                                 :did-mount (fn [s]
+                                {:did-mount (fn [s]
                                   (fix-navbar-position s)
                                   s)
                                  :will-mount (fn [s]
