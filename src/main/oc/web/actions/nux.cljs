@@ -24,20 +24,20 @@
                  :next-title "Next"
                  :sel [:div.stream-item]}
       :feed     {:title "Personalize your feed"
-                 :description ["Add topics, such as Design, Marketing, HR to organize your updates into groups."
+                 :description [[:span "Add topics, such as Design, Marketing, HR to organize your updates into groups."]
                                [:br]
-                               "Your teammates will be able to subsctibe to topics they want to follow."]
+                               [:span "Your teammates will be able to subsctibe to topics they want to follow."]]
                  :steps (str "3 of " steps)
                  :arrow-position :left-top
                  :next-title "Next"
                  :position :right-top
                  :sel [:div.left-navigation-sidebar :a.nav-link.topics]}
       :settings {:title "Settings"
-                 :description ["Click your avatar to access your profile, team settings, and more."
+                 :description [[:span "Click your avatar to access your profile, team settings, and more."]
                                (when-not viewer?
                                  [:br])
                                (when-not viewer?
-                                 "Using Slack? Set up auto-sharing to specific #Slack channel, too.")]
+                                 [:span "Using Slack? Set up auto-sharing to specific #Slack channel, too."])]
                  :steps (str "4 of " steps)
                  :arrow-position :top-right
                  :next-title "Next"

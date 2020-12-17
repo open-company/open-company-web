@@ -128,11 +128,23 @@ div.nux-tooltip-container {
       }
 
       div.nux-tooltip-description {
+        width: 100%;
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 18px;
         color: var(--tooltip-color);
-        width: 100%;
+
+        span {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--tooltip-color);
+          display: inline-block;
+
+          &:not(:first-child) {
+            margin-top: 18px;
+          }
+        }
       }
 
       div.nux-tooltip-footer {
