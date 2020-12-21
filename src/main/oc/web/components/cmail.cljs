@@ -434,7 +434,8 @@
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
                                                                      (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
                                                                      (not (-> %1 (drv/get-ref :cmail-state) deref :distraction-free?))
-                                                                     (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper")))
+                                                                     (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper"))
+                                                                     (not (dom-utils/event-cotainer-has-class %2 "nux-tooltip-container")))
                                                             (close-cmail %1 %2)))
 
                    {:will-mount (fn [s]

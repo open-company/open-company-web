@@ -232,7 +232,7 @@
     (api/get-user fixed-user-link (fn [success data]
      (let [user-map (when success (json->cljs data))]
        (dis/dispatch! [:user-data user-map])
-       (utils/after 100 nux-actions/check-nux)
+       (utils/after 100 #(nux-actions/check-nux nil))
        (patch-timezone-if-needed user-map))))))
 
 ;; Auth

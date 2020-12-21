@@ -21,6 +21,8 @@
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
 (defun- filter-sort-boards
+  ([_ :guard (comp not seq)]
+   [])
   ([boards :guard map?]
    (filter-sort-boards (vals boards)))
   ([boards :guard sequential?]

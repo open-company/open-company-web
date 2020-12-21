@@ -4,9 +4,8 @@
             [oc.web.utils.dom :as du]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.theme :as theme-actions]
-            [oc.lib.cljs.useragent :as ua]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.notify-client :as ws-nc]))
@@ -16,7 +15,8 @@
 
 (defn post-routing []
   ;; Re-dispatch the current change data
-  (dis/dispatch! [:container/status (dis/change-data) true]))
+  (dis/dispatch! [:container/status (dis/change-data) true])
+  (nux-actions/check-nux))
 
 (defn maybe-404
   ([] (maybe-404 false))

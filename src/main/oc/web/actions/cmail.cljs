@@ -13,8 +13,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.routing :as routing-actions]))
+            [oc.web.lib.responsive :as responsive]))
 
 ;; Cached items
 
@@ -92,17 +91,19 @@
                (jwt/jwt)
                (:member? (dis/org-data)))
       (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data)))))
-  ; (when (and (< 399 status 500)
-  ;            (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
-  ;                (and (seq entry-uuid)
-  ;                     (= entry-uuid (dis/current-activity-id)))
-  ;                ;; We are trying to open a post via secure url but it doesn't exists or we don't have access
-  ;                (and (seq secure-uuid)
-  ;                     (= secure-uuid (dis/current-secure-activity-id)))))
-  ;     ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
-  ;     (routing-actions/maybe-404 (and (not (jwt/jwt))
-  ;                                     (not (jwt/id-token))
-  ;                                     (seq (dis/current-secure-activity-id)))))
+  (when (and (< 399 status 500)
+             (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
+                 (and (seq entry-uuid)
+                      (= entry-uuid (dis/current-activity-id)))
+                 ;; We are trying to open a post via secure url but it doesn't exists or we don't have access
+                 (and (seq secure-uuid)
+                      (= secure-uuid (dis/current-secure-activity-id)))))
+      ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
+      (if (and (not (jwt/jwt))
+               (not (jwt/id-token))
+               (seq (dis/current-secure-activity-id)))
+        (router/redirect-404!)
+        (dis/dispatch! [:show-login-wall])))
   (cond
     (< 399 status 500)
     (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
