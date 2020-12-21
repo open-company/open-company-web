@@ -45,8 +45,8 @@
                        data (-> state :rum/args first :data)]
                    (when (not= @(::last-step state) step)
                      (reset! (::last-step state) step)
-                     (reset! (::last-sel state) (:sel data))
                      (when @(::last-sel state)
+                       (reset! (::last-sel state) (:sel data))
                        (let [old-el (dommy/sel1 @(::last-sel state))]
                          (when (and old-el
                                     (dommy/has-class? old-el :nux-tooltip-handle))
