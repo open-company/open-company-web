@@ -1,3 +1,47 @@
+.nux-tooltip-handle {
+  border: 2px solid $carrot_green !important;
+  border-radius: 6px !important;
+
+  &.user-menu {
+    padding: 2px !important;
+  }
+
+  &.invite-people-box {
+    padding: 21px 21px 135px 21px !important;
+    background-position: bottom -1px left 50% !important;
+
+    button.invite-people-close {
+      top: 3px !important;
+      left: 3px !important;
+    }
+  }
+
+  &.nav-link {
+    padding: 0 14px !important;
+  }
+
+  &.cmail-outer {
+
+    div.cmail-container {
+      div.cmail-content-outer {
+        padding: 15px 15px 15px 23px !important;
+      }
+
+      div.cmail-footer {
+        padding: 16px 15px 15px 23px !important;
+      }
+
+    }
+
+    &.quick-post-collapsed div.cmail-container div.cmail-content-outer {
+      padding: 17px 23px !important;
+    }
+  }
+
+  &.cmail-outer.quick-post-collapsed div.cmail-container div.cmail-content-outer {
+    padding: 17px 23px !important;
+  }
+}
 
 div.nux-tooltip-container {
   position: fixed;
@@ -104,7 +148,7 @@ div.nux-tooltip-container {
       padding: #{$half-diagonal}px;
       border-radius: 6px;
       box-shadow: var(--box-shadow);
-      
+
       div.nux-tooltip-header {
         display: flex;
         flex-flow: row nowrap;
@@ -116,7 +160,7 @@ div.nux-tooltip-container {
           line-height: 18px;
           color: var(--tooltip-color);
         }
-    
+
         button.nux-tooltip-dismiss-bt {
           width: 24px;
           height: 24px;

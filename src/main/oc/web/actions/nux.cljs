@@ -3,13 +3,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.cookies :as cook]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn get-tooltip-data [step user-type]
   (let [viewer? (= user-type :viewer)
         steps (if viewer? 5 6)]
     (case step
-      :intro    {:title "A few quick tips"
+      :intro    {:title "Welcome!"
                  :description "When you’re ready to add an update or some news for your team, click here anytime."
                  :steps (str "1 of " steps)
                  :arrow-position :top
@@ -19,10 +20,10 @@
       :news     {:title "Your news feed"
                  :description "Updates from your team will show up here in your feed."
                  :steps (str "2 of " steps)
-                 :arrow-position :top
-                 :position :bottom
+                 :arrow-position :left-top
                  :next-title "Next"
-                 :sel [:div.stream-item]}
+                 :position :right-top
+                 :sel [:div.left-navigation-sidebar :a.nav-link.home]}
       :feed     {:title "Personalize your feed"
                  :description [[:span "Add topics, such as Design, Marketing, HR to organize your updates into groups."]
                                [:br]
@@ -58,6 +59,8 @@
                  :arrow-position :top
                  :next-title "Done"
                  :position :bottom
+                 :initial-cb #(cmail-actions/cmail-expand (dis/cmail-data) (dis/cmail-state))
+                 :post-dismiss-cb #(cmail-actions/cmail-hide)
                  :sel [:div.cmail-outer]}
       nil)))
 
