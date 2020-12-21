@@ -25,7 +25,7 @@
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
-            [oc.web.components.ui.sections-picker :refer (sections-picker)]
+            [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [goog.object :as gobj]
@@ -303,7 +303,7 @@
 (defn- collapse-if-needed [s & [e]]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
-        showing-section-picker? @(::show-section-picker s)
+        showing-board-picker? @(::show-board-picker s)
         event-in? (if e
                     (utils/event-inside? e (rum/dom-node s))
                     false)]
@@ -313,7 +313,7 @@
                   (:has-changes cmail-data)
                   (:auto-saving cmail-data)
                   (:uuid cmail-data)
-                  showing-section-picker?)
+                  showing-board-picker?)
       (real-close)
       (.blur (headline-element s)))))
 
@@ -360,33 +360,33 @@
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
 
-(defn- hide-section-picker! [s]
-  (reset! (::show-section-picker s) false))
+(defn- hide-board-picker! [s]
+  (reset! (::show-board-picker s) false))
 
-(defn- clear-delayed-show-section-picker [s]
-  (let [delayed-show-section-picker (::delayed-show-section-picker s)]
-    (when @delayed-show-section-picker
-      (.clearTimeout js/window @delayed-show-section-picker)
-      (reset! delayed-show-section-picker nil))))
+(defn- clear-delayed-show-board-picker [s]
+  (let [delayed-show-board-picker (::delayed-show-board-picker s)]
+    (when @delayed-show-board-picker
+      (.clearTimeout js/window @delayed-show-board-picker)
+      (reset! delayed-show-board-picker nil))))
 
-(defn- maybe-hide-section-picker [s]
-  (clear-delayed-show-section-picker s)
-  (when (= @(::show-section-picker s) :hover)
-    (hide-section-picker! s)))
+(defn- maybe-hide-board-picker [s]
+  (clear-delayed-show-board-picker s)
+  (when (= @(::show-board-picker s) :hover)
+    (hide-board-picker! s)))
 
-(defn- show-section-picker! [s v]
-  (reset! (::show-section-picker s) v)
-  (reset! (::delayed-show-section-picker s) nil))
+(defn- show-board-picker! [s v]
+  (reset! (::show-board-picker s) v)
+  (reset! (::delayed-show-board-picker s) nil))
 
-(defn- maybe-show-section-picker [s]
-  (when-not @(::show-section-picker s)
-    (clear-delayed-show-section-picker s)
-    (reset! (::delayed-show-section-picker s) (utils/after 720 #(show-section-picker! s :hover)))))
+(defn- maybe-show-board-picker [s]
+  (when-not @(::show-board-picker s)
+    (clear-delayed-show-board-picker s)
+    (reset! (::delayed-show-board-picker s) (utils/after 720 #(show-board-picker! s :hover)))))
 
-(defn- toggle-section-picker [s]
-  (if (= @(::show-section-picker s) :click)
-    (hide-section-picker! s)
-    (show-section-picker! s :click)))
+(defn- toggle-board-picker [s]
+  (if (= @(::show-board-picker s) :click)
+    (hide-board-picker! s)
+    (show-board-picker! s :click)))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -413,8 +413,8 @@
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
                    (rum/local false ::show-post-tooltip)
-                   (rum/local false ::show-section-picker)
-                   (rum/local nil ::delayed-show-section-picker)
+                   (rum/local false ::show-board-picker)
+                   (rum/local nil ::delayed-show-board-picker)
                    (rum/local nil ::last-body)
                    (rum/local nil ::post-tt-kw)
                    (rum/local 68 ::top-padding)
@@ -429,7 +429,7 @@
                      (mixins/on-window-click-mixin collapse-if-needed))
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
-                   (mixins/on-click-out :section-picker-container (fn [s e] (hide-section-picker! s)))
+                   (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
 
                    (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
                                                                      (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
@@ -547,8 +547,8 @@
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
                             "Share update")
-        did-pick-section (fn [board-data note dismiss-action]
-                           (hide-section-picker! s)
+        did-pick-board (fn [board-data note dismiss-action]
+                           (hide-board-picker! s)
                            (when (and board-data
                                       (seq (:name board-data)))
                             (let [has-changes (or (:has-changes cmail-data)
@@ -567,11 +567,11 @@
                               (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         editable-boards (drv/react s :editable-boards)
-        show-section-picker? (or ;; Publisher board can still be created
+        show-board-picker? (or ;; Publisher board can still be created
                                  (and (not (some :publisher-board editable-boards))
                                       ls/publisher-board-enabled?
                                       (pos? (count editable-boards)))
-                                 (> (count editable-boards) 1))
+                                 (seq editable-boards))
         expanded-state? (and (contains? cmail-state :collapsed)
                              (not (:collapsed cmail-state)))
         fullscreen? (and expanded-state?
@@ -617,21 +617,21 @@
                              (not (:distraction-free? cmail-state)))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
-            {:class (utils/class-set {:has-section-button show-section-picker?
-                                      :sections-dropdown-shown @(::show-section-picker s)})}
+            {:class (utils/class-set {:has-board-button show-board-picker?
+                                      :boards-dropdown-shown @(::show-board-picker s)})}
             (when is-mobile?
-              [:div.section-picker-bt-container
-                {:ref :section-picker-container}
+              [:div.board-picker-bt-container
+                {:ref :board-picker-container}
                 [:span.post-to "Post to"]
-                [:button.mlb-reset.section-picker-bt
-                  {:on-click #(toggle-section-picker s)}
-                  [:span.section-picker-bt-copy
+                [:button.mlb-reset.board-picker-bt
+                  {:on-click #(toggle-board-picker s)}
+                  [:span.board-picker-bt-copy
                     (:board-name cmail-data)]
                   [:div.dropdown-cog]]
-                (when @(::show-section-picker s)
-                  [:div.section-picker-container
-                    (sections-picker {:active-slug (:board-slug cmail-data)
-                                      :on-change did-pick-section
+                (when @(::show-board-picker s)
+                  [:div.board-picker-container
+                    (boards-picker {:active-slug (:board-slug cmail-data)
+                                      :on-change did-pick-board
                                       :current-user-data current-user-data})])
                  [:div.post-button-container.group
                    (post-to-button {:on-submit #(post-clicked s)
@@ -699,23 +699,23 @@
                            :post-tt-kw post-tt-kw
                            :force-show-tooltip @(::show-post-tooltip s)
                            :show-on-hover true})]
-        [:div.section-picker-bt-container
-          {:class (when-not show-section-picker? "hidden")
-           :on-mouse-leave #(maybe-hide-section-picker s)
-           :on-mouse-enter #(maybe-show-section-picker s)
-           :ref :section-picker-container}
-          [:button.mlb-reset.section-picker-bt
-            {:on-click #(toggle-section-picker s)
+        [:div.board-picker-bt-container
+          {:class (when-not show-board-picker? "hidden")
+           :on-mouse-leave #(maybe-hide-board-picker s)
+           :on-mouse-enter #(maybe-show-board-picker s)
+           :ref :board-picker-container}
+          [:button.mlb-reset.board-picker-bt
+            {:on-click #(toggle-board-picker s)
              :data-placement "top"
              :data-toggle "tooltip"
              :title board-tooltip}
-            [:span.section-picker-bt-copy
+            [:span.board-picker-bt-copy
              (:board-name cmail-data)]
             [:div.dropdown-cog]]
-          (when @(::show-section-picker s)
-            [:div.section-picker-container
-              (sections-picker {:active-slug (:board-slug cmail-data)
-                                :on-change did-pick-section
+          (when @(::show-board-picker s)
+            [:div.board-picker-container
+              (boards-picker {:active-slug (:board-slug cmail-data)
+                                :on-change did-pick-board
                                 :current-user-data current-user-data
                                 :direction (if (:fullscreen cmail-state) :up :down)})])]
         (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)

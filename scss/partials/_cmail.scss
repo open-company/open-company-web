@@ -237,36 +237,36 @@ div.cmail-outer {
       }
 
       @include mobile() {
-        &.has-section-button {
-          &.sections-dropdown-shown {
-            div.section-picker-bt-container {
+        &.has-board-button {
+          &.boards-dropdown-shown {
+            div.board-picker-bt-container {
               overflow-x: visible;
               overflow-y: visible;
             }
           }
 
           @media screen and (max-width: 321px) {
-            div.section-picker-bt-container {
-              div.section-picker-container {
+            div.board-picker-bt-container {
+              div.board-picker-container {
                 left: 0;
               }
             }
           }
 
-          div.section-picker-bt-container {
+          div.board-picker-bt-container {
             @media screen and (min-width: 322px) {
               span.post-to {
                 display: block;
               }
             }
-            button.section-picker-bt {
+            button.board-picker-bt {
               display: flex;
             }
           }
         }
       }
 
-      div.section-picker-bt-container {
+      div.board-picker-bt-container {
         display: none;
 
         @include mobile() {
@@ -297,7 +297,7 @@ div.cmail-outer {
             display: none;
           }
 
-          div.section-picker-container {
+          div.board-picker-container {
             position: absolute;
             top: 40px;
             left: 58px;
@@ -305,13 +305,13 @@ div.cmail-outer {
             display: block;
           }
 
-          button.section-picker-bt {
+          button.board-picker-bt {
             height: 32px;
             padding: 7px 8px;
-            // background-color: var(--cmail-section-bt-background);
+            // background-color: var(--cmail-board-bt-background);
             background-color: var(--secondary-color);
             border-radius: 4px;
-            // color: var(--cmail-section-bt-color);
+            // color: var(--cmail-board-bt-color);
             color: var(--primary-color);
             position: relative;
             text-align: left;
@@ -328,7 +328,7 @@ div.cmail-outer {
               min-width: 158px;
             }
 
-            span.section-picker-bt-copy {
+            span.board-picker-bt-copy {
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 18px;
@@ -548,7 +548,7 @@ div.cmail-outer {
         }
       }
 
-      div.section-picker-bt-container {
+      div.board-picker-bt-container {
         margin: 0 28px 0 4px;
         position: relative;
         display: block;
@@ -574,7 +574,7 @@ div.cmail-outer {
           width: 95px;
         }
 
-        div.section-picker-container {
+        div.board-picker-container {
           position: absolute;
           top: 32px;
           left: 0;
@@ -585,13 +585,13 @@ div.cmail-outer {
           }
         }
 
-        button.section-picker-bt {
+        button.board-picker-bt {
           height: 32px;
           padding: 7px 8px;
-          // background-color: var(--cmail-section-bt-background);
+          // background-color: var(--cmail-board-bt-background);
           background-color: var(--secondary-color);
           border-radius: 4px;
-          // color: var(--cmail-section-bt-color);
+          // color: var(--cmail-board-bt-color);
           color: var(--primary-color);
           position: relative;
           text-align: left;
@@ -602,7 +602,7 @@ div.cmail-outer {
           align-items: center;
           justify-content: center;
 
-          span.section-picker-bt-copy {
+          span.board-picker-bt-copy {
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
@@ -817,8 +817,8 @@ div.cmail-outer {
       }
 
       div.cmail-footer {
-        div.section-picker-bt-container {
-          div.section-picker-container {
+        div.board-picker-bt-container {
+          div.board-picker-container {
             position: absolute;
             top: unset;
             bottom: 32px;

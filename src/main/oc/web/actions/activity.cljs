@@ -670,7 +670,7 @@
          org-data (dis/org-data)]
      (dis/dispatch! [:entry-save fixed-edit-key])
      (if (:links fixed-edited-data)
-       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+       (if (and (= (:board-slug fixed-edited-data) utils/default-board-slug)
                 (:publisher-board fixed-edited-data))
              ;; Save existing post to new board
          (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note :publisher-board)
@@ -694,7 +694,7 @@
              ;; Update existing post
          (let [patch-entry-link (utils/link-for (:links edited-data) "partial-update")]
            (api/patch-entry patch-entry-link fixed-edited-data fixed-edit-key entry-save-cb)))
-       (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
+       (if (and (= (:board-slug fixed-edited-data) utils/default-board-slug)
                 (:publisher-board fixed-edited-data))
              ;; Save new post to new board
          (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note :publisher-board)
@@ -773,7 +773,7 @@
       (let [org-data (dis/org-data)
             fixed-entry-editing (assoc entry-editing :status "published")]
         (dis/dispatch! [:entry-publish fixed-edit-key])
-        (when (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
+        (when (and (= (:board-slug fixed-entry-editing) utils/default-board-slug)
                     board-editing)
           (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note :publisher-board)
                 final-board-data (assoc board-editing :entries [fixed-entry-data])

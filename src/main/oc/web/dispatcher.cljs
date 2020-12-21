@@ -69,6 +69,17 @@
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
 
+;; Editable boards keys
+
+(defn editable-boards-key [org-slug]
+  (vec (conj (org-key org-slug) :editable-boards)))
+
+(defn private-boards-key [org-slug]
+  (vec (conj (org-key org-slug) :private-boards)))
+
+(defn public-boards-key [org-slug]
+  (vec (conj (org-key org-slug) :public-boards)))
+
 (defn payments-key [org-slug]
   (vec (conj (org-key org-slug) :payments)))
 
@@ -347,6 +358,8 @@
 (declare board-data)
 (declare contributions-data)
 (declare editable-boards-data)
+(declare private-boards-data)
+(declare public-boards-data)
 (declare activity-data)
 (declare secure-activity-data)
 (declare activity-read-data)
@@ -479,6 +492,12 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
+   :private-boards      [[:base :org-slug]
+                         (fn [base org-slug]
+                           (private-boards-data base org-slug))]
+   :public-boards       [[:base :org-slug]
+                         (fn [base org-slug]
+                           (public-boards-data base org-slug))]
    :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
                          (fn [base org-slug board-slug contributions-id sort-type]
                            (when (and org-slug
@@ -928,18 +947,23 @@
     (when (and org-slug contributions-id)
       (get-in data (contributions-data-key org-slug contributions-id)))))
 
-(defn editable-boards-data
+(defn ^:export editable-boards-data
   ([] (editable-boards-data @app-state (current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
   ([data org-slug]
-  (let [org-data (org-data data org-slug)
-        filtered-boards (filterv
-                         (fn [board]
-                            (some #(when (= (:rel %) "create") %) (:links board)))
-                         (:boards org-data))]
-    (zipmap
-     (map :slug filtered-boards)
-     filtered-boards))))
+   (get-in data (editable-boards-key org-slug))))
+
+(defn ^:export private-boards-data
+  ([] (private-boards-data @app-state (current-org-slug)))
+  ([org-slug] (private-boards-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (private-boards-key org-slug))))
+
+(defn ^:export public-boards-data
+  ([] (public-boards-data @app-state (current-org-slug)))
+  ([org-slug] (public-boards-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (public-boards-key org-slug))))
 
 (defn ^:export container-data
   "Get container data."

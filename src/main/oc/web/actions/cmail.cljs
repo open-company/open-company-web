@@ -47,9 +47,9 @@
        (when (fn? completed-cb)
          (completed-cb))))))
 
-;; Last used and default section for editing
+;; Last used and default board for editing
 
-(defn get-default-section [& [editable-boards]]
+(defn get-default-board [& [editable-boards]]
   (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (dis/current-org-slug))))
         cookie-value (au/last-used-section)
         board-from-cookie (when cookie-value
@@ -77,7 +77,7 @@
             (= (:slug board-data) utils/default-drafts-board-slug)
             (:draft board-data)
             (not (utils/link-for (:links board-data) "create")))
-      (get-default-section sorted-editable-boards)
+      (get-default-board sorted-editable-boards)
       {:board-name (:name board-data)
        :board-slug (:slug board-data)
        :publisher-board (:publisher-board board-data)})))
@@ -95,7 +95,7 @@
              (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
                  (and (seq entry-uuid)
                       (= entry-uuid (dis/current-activity-id)))
-                 ;; We are trying to open a post via secure url but it doesn't exists or we don't have access
+                 ;; We are trying to open a post via secure url but it doesn't exists
                  (and (seq secure-uuid)
                       (= secure-uuid (dis/current-secure-activity-id)))))
       ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
@@ -162,7 +162,7 @@
    #(dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed false})])))
 
 (defn cmail-reset []
-  (dis/dispatch! [:input dis/cmail-data-key (get-default-section)])
+  (dis/dispatch! [:input dis/cmail-data-key (get-default-board)])
   (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}]))
 
 (defn cmail-hide []

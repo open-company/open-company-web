@@ -134,7 +134,7 @@
    (let [initial-section-data (first (:rum/args s))
          new-section? (creating-new-section? initial-section-data)
          fixed-section-data (if new-section?
-                              utils/default-section
+                              utils/default-board
                               (section-for-editing initial-section-data))]
      (reset! (::editing-existing-section? s) (not new-section?))
      (when (string? (:name fixed-section-data))
@@ -179,7 +179,7 @@
         ;; user can edit the private section users if
         ;; he's creating a new section
         ;; or if he's in the authors list of the existing section
-        can-change (or (= (:slug section-editing) utils/default-section-slug)
+        can-change (or (= (:slug section-editing) utils/default-board-slug)
                        (some #{current-user-id} (:authors section-editing))
                        user-is-admin?)
         last-section-standing (= (count no-drafts-boards) 1)
