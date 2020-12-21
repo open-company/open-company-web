@@ -105,8 +105,8 @@ $dark_mode: "dark";
 
   // Cmail
   --cmail-fullscreen-bt-bg: #{rgba(white, 0.2)};
-  --cmail-section-bt-background: #{$deep_navy};
-  --cmail-section-bt-color: white;
+  --cmail-board-bt-background: #{$deep_navy};
+  --cmail-board-bt-color: white;
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
   --cmail-fullscreen-background-color: white;
   --cmail-background-color: white;
@@ -257,8 +257,8 @@ $dark_mode: "dark";
 
   // Cmail
   --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};
-  --cmail-section-bt-background: white;
-  --cmail-section-bt-color: #{$deep_navy};
+  --cmail-board-bt-background: white;
+  --cmail-board-bt-color: #{$deep_navy};
   --cmail-me-separator: #{rgba($deep_navy, 0.3)};
   --cmail-background-color: #{rgba(white, 0.09)};
   --cmail-fullscreen-background-color: rgb(27, 32, 42);

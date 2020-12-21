@@ -4,7 +4,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.mixins.ui :refer (on-click-out)]
-            [oc.web.components.ui.sections-picker :refer (sections-picker)]))
+            [oc.web.components.ui.boards-picker :refer (boards-picker)]))
 
 (defn move-post [s]
   ;; move the post
@@ -44,7 +44,7 @@
         (or (:name @(::selected-board s)) "Move to...")]
       (when @(::show-boards-list s)
         [:div.boards-list
-          (sections-picker {:active-slug (:board-slug activity-data)
+          (boards-picker {:active-slug (:board-slug activity-data)
                             :on-change (fn [board-data note dismiss-action]
                                          (when (not= (:board-slug activity-data) (:slug board-data))
                                            (reset! (::selected-board s) board-data)

@@ -104,6 +104,7 @@
   [& [force?]]
   (when (and (or force?
                  (not (contains? @dis/app-state :nux)))
+             (dis/current-org-slug)
              (= (oget js/window "location.pathname") (oc-urls/following)))
     (dis/dispatch! [:input [:nux] (get-nux-cookie)])))
 

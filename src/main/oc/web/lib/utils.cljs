@@ -552,13 +552,13 @@
 
 (def default-drafts-board du/default-drafts-board)
 
-(def default-section-slug "--default-section-slug")
-(def default-section-access "team")
+(def default-board-slug "--default-section-slug")
+(def default-board-access "team")
 
-(def default-section
+(def default-board
   {:name ""
-   :access default-section-access
-   :slug default-section-slug})
+   :access default-board-access
+   :slug default-board-slug})
 
 (defn retina-src [url]
   {:src (cdn (str url ".png"))

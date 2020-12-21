@@ -10,6 +10,9 @@
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.stores.user :as user-store]))
 
+(def private-board-tooltip "Posting to private topics is part of the Premium plan.")
+(def public-board-tooltip "Posting to public topics is part of the Premium plan.")
+
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved? email-domain]]
   ;; We need to remove the boards that are no longer in the org
@@ -20,7 +23,7 @@
         ;; No need to add a spacial case for drafts board here since
         ;; we are only excluding keys that already exists in the app-state
         board-slugs (set (mapv #(keyword (str (:slug %))) (:boards org-data)))
-        filter-board (fn [[k v]]
+        filter-board (fn [[k _]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))
         with-saved? (if (nil? saved?)
@@ -31,11 +34,29 @@
         next-org-editing (-> with-saved?
                           (assoc :email-domain email-domain)
                           (dissoc :has-changes))
-        editable-boards (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
-                         (:boards org-data))
+        editable-boards* (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
+                          (:boards org-data))
+        editable-boards (zipmap (map :slug editable-boards*) editable-boards*)
+        premium? (jwt/premium? (:team-id org-data))
+        user-id (jwt/user-id)
+        private-boards* (when-not premium?
+                          ;; All private boards even if they have no create link but the user is an author, exclude drafts board
+                          (filterv #(and (= (:access %) "private")
+                                         (not (utils/link-for (:links %) "create" "POST"))
+                                         (not= (:slug %) utils/default-drafts-board-slug)
+                                         ((set (:authors %)) user-id))
+                                   (:boards org-data)))
+        private-boards (zipmap (map :slug private-boards*) (map #(assoc % :premium-lock private-board-tooltip) private-boards*))
+        public-boards* (when-not premium?
+                         ;; All public boards even if they have no create link but we know the user could post to
+                         (filterv #(and (= (:access %) "public")
+                                        (not (utils/link-for (:links %) "create" "POST"))
+                                        ((set (:authors org-data)) user-id))
+                                  (:boards org-data)))
+        public-boards (zipmap (map :slug public-boards*) (map #(assoc % :premium-lock public-board-tooltip) public-boards*))
         current-board-slug (dispatcher/current-board-slug)
-        editing-board (when (seq editable-boards)
-                        (cmail-actions/get-board-for-edit (when-not (dispatcher/is-container? current-board-slug) current-board-slug) editable-boards))
+        editing-board (when editable-boards*
+                        (cmail-actions/get-board-for-edit (when-not (dispatcher/is-container? current-board-slug) current-board-slug) editable-boards*))
         ;; Active users
         active-users (dispatcher/active-users (:slug fixed-org-data) db)
         ;; Follow/Unfollow boards/users
@@ -53,6 +74,9 @@
                           editing-board)]
     (as-> db ndb
      (assoc-in ndb org-data-key fixed-org-data)
+     (assoc-in ndb (dispatcher/editable-boards-key (:slug org-data)) editable-boards)
+     (assoc-in ndb (dispatcher/private-boards-key (:slug org-data)) private-boards)
+     (assoc-in ndb (dispatcher/public-boards-key (:slug org-data)) public-boards)
      (assoc ndb :org-editing next-org-editing)
      (assoc ndb :org-avatar-editing (select-keys fixed-org-data [:logo-url]))
      (update ndb :current-user-data #(user-store/parse-user-data % fixed-org-data active-users))
