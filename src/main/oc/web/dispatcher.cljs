@@ -626,10 +626,10 @@
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data
+   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :nux
                             :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
-                            (fn [base orgs org-data contributions-data container-data posts-data
+                            (fn [base orgs org-data contributions-data container-data posts-data nux
                                  entry-editing jwt loading payments search-active user-info-data current-user-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
@@ -664,7 +664,8 @@
                                :follow-boards-list follow-boards-list
                                :show-premium-picker? (:show-premium-picker? base)
                                payments-ui-prompt-banner-key (get base payments-ui-prompt-banner-key)
-                               payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)})]
+                               payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
+                               :nux nux})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]

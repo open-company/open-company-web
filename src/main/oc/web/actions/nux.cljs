@@ -1,10 +1,15 @@
 (ns oc.web.actions.nux
-  (:require [oc.web.lib.jwt :as jwt]
+  (:require [oops.core :refer (oget)]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
+
+(def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data) (dis/cmail-state)))
 
 (defn get-tooltip-data [step user-type]
   (let [viewer? (= user-type :viewer)
@@ -59,8 +64,8 @@
                  :arrow-position :top
                  :next-title "Done"
                  :position :bottom
-                 :initial-cb #(cmail-actions/cmail-expand (dis/cmail-data) (dis/cmail-state))
-                 :post-dismiss-cb #(cmail-actions/cmail-hide)
+                 :post-next-cb cmail-actions/cmail-hide
+                 :post-dismiss-cb cmail-actions/cmail-hide
                  :sel [:div.cmail-outer]}
       nil)))
 
@@ -97,8 +102,9 @@
 
 (defn check-nux
   [& [force?]]
-  (when (or force?
-            (not (contains? @dis/app-state :nux)))
+  (when (and (or force?
+                 (not (contains? @dis/app-state :nux)))
+             (= (oget js/window "location.pathname") (oc-urls/following)))
     (dis/dispatch! [:input [:nux] (get-nux-cookie)])))
 
 (defn ^:export end-nux
@@ -127,13 +133,22 @@
 
 (defn next-step []
   (let [current-value (get @dis/app-state :nux)
-        next-step (calc-step current-value)]
+        next-step (calc-step current-value)
+        same-step? (= (:step current-value) next-step)
+        prepare-cb (when (and (= next-step :ready)
+                              (not same-step?))
+                     expand-cmail)
+        delay (if (fn? prepare-cb)
+                280
+                0)]
     ;; In case we are stalled on a value it means NUX is finished/dismissed
     (when (:step current-value)
-      (if (= (:step current-value) next-step)
+      (if same-step?
         (end-nux)
         (set-nux-cookie (:user-type current-value) {:step next-step})))
-    (dis/dispatch! [:input [:nux :step] next-step])))
+    (when (fn? prepare-cb)
+      (prepare-cb))
+    (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] next-step]))))
 
 (defn dismiss-nux []
   (dis/dispatch! [:input [:nux :step] :dismiss])

@@ -7,44 +7,51 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.utils :as utils]))
 
-(rum/defcs nux-tooltip < ;;rum/static
+(rum/defcs nux-tooltip < rum/static
   (rum/local nil ::pos)
+  (rum/local nil ::last-step)
+  (rum/local nil ::last-sel)
   {:will-update (fn [state]
-                 (if-let* [data (-> state :rum/args first :data)
-                           el (dommy/sel1 (:sel data))]
-                   (let [rect (dom-utils/bounding-rect el)
-                         pos (case (:position data)
-                               :top
-                               {:x (:x rect)
+                  (if-let* [data (-> state :rum/args first :data)
+                            el (dommy/sel1 (:sel data))]
+                    (let [rect (dom-utils/bounding-rect el)
+                          pos (case (:position data)
+                                :top
+                                {:x (:x rect)
                                 :y (+ (:y rect) (:height rect))}
-                               :right
-                               {:x (+ (:x rect) (:width rect))
+                                :right
+                                {:x (+ (:x rect) (:width rect))
                                 :y (+ (:y rect) (/ (:height rect) 2))}
-                               :bottom
-                               {:x (+ (:x rect) (/ (:width rect) 2))
+                                :bottom
+                                {:x (+ (:x rect) (/ (:width rect) 2))
                                 :y (+ (:y rect) (:height rect))}
-                               :left
-                               {:x (:x rect)
+                                :left
+                                {:x (:x rect)
                                 :y (+ (:y rect) (/ (:height rect) 2))}
-                               :bottom-left
-                               {:x (- (dom-utils/window-width) 24)
+                                :bottom-left
+                                {:x (- (dom-utils/window-width) 24)
                                 :y (+ (:y rect) (:height rect))}
-                               :right-top
-                               {:x (+ (:x rect) (:width rect))
-                                :y (+ (:y rect) (/ (:height rect) 2))})]
-                     (dommy/add-class! el :nux-tooltip-handle)
-                     (when-not (= @(::pos state) pos)
-                       (reset! (::pos state) pos)))
-                   (when @(::pos state)
-                     (reset! (::pos state) nil)))
+                                :right-top
+                                {:x (+ (:x rect) (:width rect))
+                                 :y (+ (:y rect) (/ (:height rect) 2))})]
+                      (dommy/add-class! el :nux-tooltip-handle)
+                      (when-not (= @(::pos state) pos)
+                        (reset! (::pos state) pos)))
+                    (when @(::pos state)
+                      (reset! (::pos state) nil)))
                  state)
-   :did-mount (fn [state]
-                (utils/after 900
-                 #(let [initial-cb (-> state :rum/args first :data :initial-cb)]    
-                    (when (and (rum/dom-node state)
-                              (fn? initial-cb))
-                      (initial-cb))))
-                state)}
+   :did-update (fn [state]
+                 (let [step (-> state :rum/args first :step)
+                       data (-> state :rum/args first :data)]
+                   (when (not= @(::last-step state) step)
+                     (reset! (::last-step state) step)
+                     (reset! (::last-sel state) (:sel data))
+                     (when @(::last-sel state)
+                       (let [old-el (dommy/sel1 @(::last-sel state))]
+                         (when (and old-el
+                                    (dommy/has-class? old-el :nux-tooltip-handle))
+                                  (utils/after 10 #(dommy/remove-class! old-el :nux-tooltip-handle)))))))
+                 state)}
   [state
    {user-type                               :user-type
     dismiss-cb                              :dismiss-cb
@@ -52,11 +59,11 @@
     step                                    :step
     {:keys [title description next-title
             steps arrow-position position
-            post-dismiss-cb sel]
+            post-dismiss-cb post-next-cb sel]
      :as data}                              :data}]
   (let [{left :x top :y} @(::pos state)]
     (when (and left top
-              step)
+               step)
       [:div.nux-tooltip-container
        {:on-mouse-down utils/event-stop}
         [:div.nux-tooltip
@@ -75,7 +82,7 @@
               {:on-click (fn [e]
                            (utils/event-stop e)
                            (when-let [el (dommy/sel1 sel)]
-                             (dommy/remove-class! el :nux-tooltip-handle))
+                             (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
                            (dismiss-cb e)
                            (when (fn? post-dismiss-cb)
                              (post-dismiss-cb)))}]]
@@ -87,11 +94,11 @@
             [:button.mlb-reset.nux-tooltip-next-bt
               {:on-click (fn [e]
                           (utils/event-stop e)
-                          (next-cb e)
                           (when-let [el (dommy/sel1 sel)]
-                            (dommy/remove-class! el :nux-tooltip-handle))
-                          (when (fn? post-dismiss-cb)
-                            (post-dismiss-cb)))}
+                            (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
+                          (next-cb e)
+                          (when (fn? post-next-cb)
+                            (post-next-cb)))}
               next-title]]]]])))
 
 (rum/defcs nux-tooltips-manager <

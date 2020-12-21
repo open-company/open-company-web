@@ -87,7 +87,8 @@
                 search-active
                 show-premium-picker?
                 payments-ui-prompt-banner
-                payments-ui-upgraded-banner]} (drv/react s :org-dashboard-data)
+                payments-ui-upgraded-banner
+                nux]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
@@ -187,7 +188,8 @@
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
-        (nux-tooltips-manager)
+        (when nux
+          (nux-tooltips-manager))
         (cond
           ;; Activity removed
           show-activity-removed
