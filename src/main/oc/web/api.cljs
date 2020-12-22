@@ -249,7 +249,7 @@
 
 ;; Allowed keys
 
-(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot :utm-data :brand-color])
+(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot :utm-data :brand-color :new-entry-cta :new-entry-placeholder])
 
 (def entry-allowed-keys [:headline :body :attachments :video-id :video-error :board-slug :status :must-see :polls :publisher-board])
 

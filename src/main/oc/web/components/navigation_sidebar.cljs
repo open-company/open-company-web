@@ -49,6 +49,7 @@
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
+                                (drv/drv :org-editing)
                                 ; (drv/drv :board-data)
                                 (drv/drv :org-slug)
                                 (drv/drv :board-slug)
@@ -95,6 +96,7 @@
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
+        org-editing (drv/react s :org-editing)
         ; board-data (drv/react s :board-data)
         current-user-data (drv/react s :current-user-data)
         change-data (drv/react s :change-data)
@@ -330,9 +332,8 @@
           [:button.mlb-reset.create-bt
             {:on-click #(cmail-actions/cmail-fullscreen)
              :disabled (not (:collapsed cmail-state))}
-            ; [:span.plus-icon]
-            [:span.copy-text
-              "New update"]])
+            [:div.copy-text
+              (:new-entry-cta org-editing)]])
         (when show-invite-people?
           [:div.invite-people-box
             [:button.mlb-reset.invite-people-close

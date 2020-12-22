@@ -10,7 +10,18 @@
   {:accept "image/*"
    :fromSources ["local_file_system"]})
 
+(def org-name-min-length 3)
 (def org-name-max-length 50)
+
+(def new-entry-cta-min-length 2)
+(def new-entry-cta-max-length 32)
+
+(def new-entry-placeholder-min-length 3)
+(def new-entry-placeholder-max-length 54)
+
+(def default-entry-cta "New update")
+
+(def default-entry-placeholder "What's happening...")
 
 (defn clean-email-domain [email-domain]
   (when email-domain
@@ -114,3 +125,8 @@
    (when-let [theme-kw (theme-utils/computed-value (get-in @dis/app-state dis/theme-key))]
      (-> org-data :brand-color theme-kw)))
   ([] (current-brand-color (dis/org-data))))
+
+(defn reset-org-editing! [org-data]
+  (set-brand-color! org-data)
+  (dis/dispatch! [:update [:org-editing] #(merge % {:new-entry-cta (:new-entry-cta org-data)
+                                                    :new-entry-placeholder (:new-entry-placeholder org-data)})]))
