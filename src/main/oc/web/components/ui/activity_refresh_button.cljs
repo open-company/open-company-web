@@ -13,9 +13,9 @@
   (drv/drv :replies-badge)
   (rum/local 0 ::initial-unseen-comments)
   {:will-mount (fn [s]
-    (let [props (-> s :rum/args first)]
-        (reset! (::initial-unseen-comments s) (count-unseen-comments (:items-to-render props))))
-    s)}
+                 (let [props (-> s :rum/args first)]
+                   (reset! (::initial-unseen-comments s) (count-unseen-comments (:items-to-render props))))
+                 s)}
   [s {:keys [items-to-render]}]
   (let [replies-badge (drv/react s :replies-badge)
         delta-new-comments (- (count-unseen-comments items-to-render) @(::initial-unseen-comments s))
