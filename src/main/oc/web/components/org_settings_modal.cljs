@@ -90,7 +90,7 @@
   (let [org-data @(drv/get-ref s :org-data)
         org-editing @(drv/get-ref s :org-editing)
         dismiss #(do
-                   (org-utils/set-brand-color! org-data)
+                   (org-utils/reset-org-editing! org-data)
                    (dismiss-action))]
     (if (:has-changes org-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
@@ -119,10 +119,12 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
-(defn- on-change [k v]
+(defn- on-change [k v & [error?]]
   (dis/dispatch! [:update [:org-editing] #(merge % {k v
                                                     :has-changes true
-                                                    :error false})]))
+                                                    :error (if error?
+                                                             (conj (set (:error %)) k)
+                                                             (disj (set (:error %)) k))})]))
 
 (defn- change-content-visibility [content-visibility-data k v]
   (let [new-content-visibility (merge content-visibility-data {k v})]
@@ -257,7 +259,12 @@
         premium-lock-click (when premium-lock?
                              (fn [e]
                                (utils/event-stop e)
-                               (nav-actions/toggle-premium-picker! premium-tooltip*)))]
+                               (nav-actions/toggle-premium-picker! premium-tooltip*)))
+        save-disabled? (or @(::saving s)
+                           (:saved org-editing)
+                           (<= org-utils/org-name-min-length (:name org-editing) org-utils/org-name-max-length)
+                           (<= org-utils/new-entry-cta-min-length (:new-entry-cta org-editing) org-utils/new-entry-cta-max-length)
+                           (<= org-utils/new-entry-placeholder-min-length (:new-entry-placeholder org-editing) org-utils/new-entry-placeholder-max-length))]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]
@@ -268,11 +275,8 @@
           [:button.mlb-reset.save-bt
             {:on-click #(when (compare-and-set! (::saving s) false true)
                          (org-actions/org-edit-save org-editing))
-             :disabled (or @(::saving s)
-                           (:saved org-editing)
-                           (not (seq (:name org-editing)))
-                           (< (count (string/trim (:name org-editing))) 3))
-           :class (when (:saved org-editing) "no-disable")}
+             :disabled save-disabled?
+             :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
             {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
@@ -301,14 +305,15 @@
               "Company name"]
             [:input.field-value.oc-input
               {:type "text"
-               :class (when (= (:error org-editing) :name-field) "error")
+               :class (when (:name (:error org-editing)) "error")
                :value (or (:name org-editing) "")
+               :min-length org-utils/org-name-min-length
                :max-length org-utils/org-name-max-length
                :on-change #(let [org-name (.. % -target -value)
-                                 clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
-                             (on-change :name clean-org-name))}]
-            (when (= (:error org-editing) :name-field)
-              [:div.error "Must be between 3 and 50 characters"])
+                                 error? (not (<= org-utils/org-name-min-length (count org-name) org-utils/org-name-max-length))]
+                             (on-change :name org-name error?))}]
+            (when (:name (:error org-editing))
+              [:div.error (str "Must be between " org-utils/org-name-min-length " and " org-utils/org-name-max-length " characters")])
             (email-domains)]
           [:div.org-settings-fields.field-group
            {:class (utils/class-set {:premium-lock premium-lock?})
@@ -326,7 +331,6 @@
             "Button/link color"]
            [:input.field-value.oc-input
             {:type "text"
-             :class (when (= (:error org-editing) :primary-color-field) "error")
              :value @(::primary-color-value s)
              :pattern colors-reg-exp
              :placeholder "Ie: red, green or #0000ff"
@@ -383,6 +387,35 @@
             {:class (if (= current-theme :light) "on-light-theme" "on-dark-theme")}
             (theme-preview (:brand-color org-editing) :light)
             (theme-preview (:brand-color org-editing) :dark)]]
+          ;; Prompts copy
+          [:div.org-settings-fields.field-group
+           [:div.field-label
+            "New post button CTA"]
+           [:input.field-value.oc-input
+            {:type "text"
+             :class (when (:new-entry-cta (:error org-editing)) "error")
+             :value (or (:new-entry-cta org-editing) "")
+             :min-length org-utils/new-entry-cta-min-length
+             :max-length org-utils/new-entry-cta-max-length
+             :on-change #(let [entry-cta (.. % -target -value)
+                               error? (not (<= org-utils/new-entry-cta-min-length (count entry-cta) org-utils/new-entry-cta-max-length))]
+                           (on-change :new-entry-cta entry-cta error?))}]
+           (when (:new-entry-cta (:error org-editing))
+             [:div.error (str "Must be between " org-utils/new-entry-cta-min-length " and " org-utils/new-entry-cta-max-length " characters")])
+           [:div.field-label
+            "New post body placeholder"]
+           [:input.field-value.oc-input
+            {:type "text"
+              :class (when (:new-entry-placeholder (:error org-editing)) "error")
+              :value (or (:new-entry-placeholder org-editing) "")
+              :min-length org-utils/new-entry-placeholder-min-length
+              :max-length org-utils/new-entry-placeholder-max-length
+              :on-change #(let [entry-placeholder (.. % -target -value)
+                                error? (not (<= org-utils/new-entry-placeholder-min-length (count entry-placeholder) org-utils/new-entry-placeholder-max-length))]
+                            (on-change :new-entry-placeholder entry-placeholder error?))}]
+            (when (:new-entry-placeholder (:error org-editing))
+              [:div.error (str "Must be between " org-utils/new-entry-placeholder-min-length " and " org-utils/new-entry-placeholder-max-length " characters")])]
+          ;; Advanced section
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt

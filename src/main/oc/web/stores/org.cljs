@@ -33,6 +33,8 @@
                       (assoc fixed-org-data :saved saved?))
         next-org-editing (-> with-saved?
                           (assoc :email-domain email-domain)
+                          (update :new-entry-cta #(or % org-utils/default-entry-cta))
+                          (update :new-entry-placeholder #(or % org-utils/default-entry-placeholder))
                           (dissoc :has-changes))
         editable-boards* (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
                           (:boards org-data))

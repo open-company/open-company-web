@@ -695,15 +695,11 @@ div.left-navigation-sidebar {
     border-radius: 4px;
     width: 100%;
     height: 34px;
-    padding: 0;
+    padding: 8px;
     position: relative;
     background-color: var(--navigation-sidebar-create-bt-background);
     color: var(--navigation-sidebar-create-bt-color);
     transition: background-color 180ms ease-in;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
     flex: 0 0 auto;
     margin-top: 16px;
     border: none;
@@ -712,26 +708,18 @@ div.left-navigation-sidebar {
       display: none;
     }
 
-    span.plus-icon {
-      width: 11px;
-      height: 11px;
-      background-size: 11px 11px;
-      background-repeat: no-repeat;
-      background-position: center;
-      @include svgBgColor("/img/ML/add_to_board_plus_white.svg");
-      margin-left: auto;
-      margin-right: 10px;
-      flex: 0 0 auto;
-    }
-
-    span.copy-text {
+    div.copy-text {
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
+      height: 18px;
       color: var(--navigation-sidebar-create-bt-color);
-      flex: 0 0 auto;
-      margin-right: auto;
-      margin-left: auto;
+      text-align: center;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      white-space: pre;
     }
   }
 

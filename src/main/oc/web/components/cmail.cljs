@@ -397,6 +397,7 @@
                    (drv/drv :follow-boards-list)
                    (drv/drv :editable-boards)
                    (drv/drv :board-slug)
+                   (drv/drv :org-editing)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -519,6 +520,7 @@
   [s]
   (let [is-mobile? (responsive/is-mobile-size?)
         _current-board-slug (drv/react s :board-slug)
+        org-editing (drv/react s :org-editing)
         cmail-state (drv/react s :cmail-state)
         cmail-data* (drv/react s :cmail-data)
         cmail-data (update cmail-data* :board-name
@@ -662,7 +664,7 @@
                  :dangerouslySetInnerHTML @(::initial-headline s)}]]
             (when-not is-mobile?
               [:div.cmail-content-collapsed-placeholder
-                (str utils/default-body-placeholder "...")])
+                (:new-entry-placeholder org-editing)])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :static-positioned-media-picker true
@@ -671,7 +673,7 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
-                               :placeholder (str utils/default-body-placeholder "...")
+                               :placeholder (:new-entry-placeholder org-editing)
                                :dispatch-input-key (first dis/cmail-data-key)
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]

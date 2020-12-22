@@ -542,8 +542,6 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-body-placeholder "What's happening")
-
 (def default-drafts-board-name du/default-drafts-board-name)
 
 (def default-drafts-board-slug du/default-drafts-board-slug)
