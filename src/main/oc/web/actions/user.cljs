@@ -77,7 +77,7 @@
   ([success body callback]
   (let [collection (:collection body)]
     (if success
-      (let [orgs (:items collection)]
+      (let [orgs (sort-by :name (:items collection))]
         (dis/dispatch! [:entry-point orgs collection])
         (check-user-walls)
         (when (fn? callback)
