@@ -1144,7 +1144,7 @@ $header_top_margin: 24;
     line-height: #{$line_height}px;
     color: $color;
 
-    span.oc-replying-to {
+    .oc-replying-to {
       @include OC_Body_Book();
       font-size: 12px;
       line-height: 14px;

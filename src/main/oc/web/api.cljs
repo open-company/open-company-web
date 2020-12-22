@@ -255,6 +255,11 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :publisher-board :description])
 
+(def comment-allowed-keys [:body :parent-uuid])
+
+(def new-comment-allowed-keys (concat comment-allowed-keys [:uuid :author-wants-follow?]))
+
+
 (def user-allowed-keys [:first-name :last-name :current-password :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles :digest-delivery])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
@@ -751,17 +756,15 @@
       callback)
     (handle-missing-link "get-comments" comments-link callback)))
 
-(defn add-comment [add-comment-link comment-body comment-uuid parent-comment-uuid callback]
-  (if (and add-comment-link comment-body)
-    (let [json-data (cljs->json {:body comment-body
-                                 :uuid comment-uuid
-                                 :parent-uuid parent-comment-uuid})]
+(defn add-comment [add-comment-link comment-payload callback]
+  (if add-comment-link
+    (let [clean-comment-payload (select-keys comment-payload new-comment-allowed-keys)
+          json-data (cljs->json clean-comment-payload)]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}
         callback))
-    (handle-missing-link "add-comment" add-comment-link callback
-     {:comment-body comment-body})))
+    (handle-missing-link "add-comment" add-comment-link callback {:comment-payload comment-payload})))
 
 (defn delete-comment
   [delete-comment-link callback]

@@ -2,10 +2,7 @@
   (:require [rum.core :as rum]
             [clojure.data :refer (diff)]
             [goog.object :as gobj]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -16,10 +13,8 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -251,7 +246,7 @@
                           :optional-activity-data activity-data})])]]]])
 
 (defn- quoted-reply-header [comment-data]
-  (str "<span class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</span><br>"))
+  (str "<div class=\"oc-replying-to\" contenteditable=\"false\">↩︎ Replying to " (-> comment-data :author :name) "</div>"))
 
 (defn- reply-to [comment-data add-comment-focus-key]
   (comment-actions/reply-to add-comment-focus-key (str (quoted-reply-header comment-data) (:body comment-data)) true))

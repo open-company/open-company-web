@@ -67,16 +67,6 @@
                                :close-item (:close-item item)
                                :foc-menu-open foc-menu-open})}
      (cond
-      ;;  (= (:container-slug container-data) :replies)
-      ;;  (stream-reply-item {:reply-data            item
-      ;;                      :member?               member?
-      ;;                      :row-index             row-index
-      ;;                      :read-data             read-data
-      ;;                      :show-wrt?             show-wrt?
-      ;;                      :current-user-data     current-user-data
-      ;;                      :clear-cell-measure-cb clear-cell-measure-cb
-      ;;                      :add-comment-force-update add-comment-force-update
-      ;;                      :premium?              (:premium? org-data)})
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
                                :member?           member?

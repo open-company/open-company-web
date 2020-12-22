@@ -1,9 +1,11 @@
 (ns oc.web.components.ui.add-comment
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
+            [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.ui :as uu]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
@@ -18,6 +20,7 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)])
   (:import [goog.async Throttle]))
 
@@ -116,7 +119,7 @@
       (set! (.-innerHTML add-comment-div) @(::initial-add-comment s)))
     (let [updated-comment (if edit-comment-data
                             (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
-                            (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))]
+                            (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb @(::follow s)))]
       (when (and (not (responsive/is-mobile-size?))
                  (not edit-comment-data)
                  (not dismiss-reply-cb)
@@ -134,7 +137,7 @@
   (str "add-comment-box-container-" @(::add-comment-id s)))
 
 (defn- me-options [s parent-uuid placeholder]
-  {:media-config ["gif"]
+  {:media-config ["code" "gif" "photo" "video"]
    :comment-parent-uuid parent-uuid
    :placeholder (or placeholder (if parent-uuid "Reply…" "Add a comment…"))
    :use-inline-media-picker true
@@ -144,7 +147,8 @@
 
 (defn- did-change [s]
   (let [post-enabled (enable-post-button? s)
-        {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)]
+        {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)
+        comment-text (.-innerText (add-comment-field s))]
     (multiple-lines? s)
     (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
     (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)
@@ -228,6 +232,8 @@
                          (rum/local false ::last-add-comment-focus)
                          (rum/local 10000 ::inline-reply-max-width)
                          (rum/local nil ::did-change-throttled)
+                         ;; Follow/unfollow post
+                         (rum/local true ::follow)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -265,7 +271,7 @@
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))
                                  me-opts (me-options s (:parent-comment-uuid props) (:add-comment-placeholder props))
-                                 max-width (- (:internal-max-width props) 140)]
+                                 max-width (- (:internal-max-width props) 250)]
                              (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
@@ -354,7 +360,8 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))
         multiple-lines @(::multiple-lines s)
         collapsed? (and @(::collapsed s)
-                        (not multiple-lines))]
+                        (not multiple-lines))
+        show-follow-checkbox? (not edit-comment-data)]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
                                 (str "add-comment-box-" add-comment-focus-prefix) true
@@ -393,12 +400,20 @@
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
-            [:button.mlb-reset.close-reply-bt
-              {:on-click #(close-reply-clicked s)
-               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title (if edit-comment-data "Cancel edit" "Cancel")}]
+            (when-not show-follow-checkbox?
+              [:button.mlb-reset.close-reply-bt
+               {:class "has-follow-checkbox"
+                :on-click #(close-reply-clicked s)
+                :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+                :data-placement "top"
+                :data-container "body"
+                :title (if edit-comment-data "Cancel edit" "Cancel")}])
+            (when show-follow-checkbox?
+              [:div.add-comment-follow
+               {:on-click #(swap! (::follow s) not)}
+               (carrot-checkbox {:selected @(::follow s)})
+               [:span.add-comment-follow-label
+                 uu/watch-activity-copy]])
             (when uploading?
               [:div.upload-progress
                 (small-loading)
