@@ -15,7 +15,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
-            [oc.web.components.stream-reply-item :refer (replies-refresh-button stream-reply-item)]
+            [oc.web.components.ui.replies-refresh-button :refer (replies-refresh-button)]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
@@ -68,16 +68,6 @@
                                :close-item (:close-item item)
                                :foc-menu-open foc-menu-open})}
      (cond
-      ;;  (= (:container-slug container-data) :replies)
-      ;;  (stream-reply-item {:reply-data            item
-      ;;                      :member?               member?
-      ;;                      :row-index             row-index
-      ;;                      :read-data             read-data
-      ;;                      :show-wrt?             show-wrt?
-      ;;                      :current-user-data     current-user-data
-      ;;                      :clear-cell-measure-cb clear-cell-measure-cb
-      ;;                      :add-comment-force-update add-comment-force-update
-      ;;                      :premium?              (:premium? org-data)})
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
                                :member?           member?

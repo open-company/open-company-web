@@ -72,6 +72,10 @@ div.add-comment-box-container {
           button.close-reply-bt {
             display: none;
           }
+
+          div.add-comment-follow {
+            display: none;
+          }
         }
       }
     }
@@ -150,12 +154,32 @@ div.add-comment-box-container {
         @include mobile() {
           padding: 0;
         }
+        
+        div.add-comment-follow {
+          order: 2;
+          margin-right: auto;
+          display: flex;
+          flex-flow: row nowrap;
+          cursor: pointer;
+
+          div.carrot-checkbox {
+            flex: 0 0 auto;
+            margin-right: 6px;
+          }
+
+          span.add-comment-follow-label {
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 16px;
+            color: var(--light-color);
+          }
+        }
 
         div.upload-progress {
           margin-right: 16px;
           margin-top: 6px;
           flex: 0 0 auto;
-          order: 2;
+          order: 3;
 
           div.small-loading {
             float: left;
@@ -171,7 +195,7 @@ div.add-comment-box-container {
 
         div.emoji-picker {
           flex: 0 0 auto;
-          order: 3;
+          order: 4;
           width: 24px;
           height: 24px;
           position: unset;
@@ -214,7 +238,7 @@ div.add-comment-box-container {
           position: relative;
           margin-left: 8px;
           flex: 0 0 auto;
-          order: 4;
+          order: 5;
 
           div.medium-editor-media-picker {
             position: relative;
@@ -238,6 +262,10 @@ div.add-comment-box-container {
           margin-right: auto;
           order: 1;
           margin-left: -6px;
+
+          &.has-follow-checkbox {
+            margin-right: 16px;
+          }
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
@@ -264,7 +292,7 @@ div.add-comment-box-container {
           width: auto;
           overflow: hidden;
           display: block;
-          order: 5;
+          order: 6;
 
           &.separator-line:before {
             content: "";

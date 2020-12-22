@@ -1,6 +1,5 @@
 (ns oc.web.actions.comment
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.api :as api]
+  (:require [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -8,7 +7,6 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
             [oc.web.utils.activity :as activity-utils]
-            [oc.web.stores.comment :as comment-store]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -39,7 +37,7 @@
   (add-comment-blur (comment-utils/add-comment-focus-value prefix activity-uuid parent-comment-uuid comment-uuid))
   (dis/dispatch! [:add-comment-reset (dis/current-org-slug) activity-uuid parent-comment-uuid comment-uuid]))
 
-(defn add-comment [activity-data comment-body parent-comment-uuid save-done-cb]
+(defn add-comment [activity-data comment-body parent-comment-uuid save-done-cb author-wants-follow?]
   (let [org-slug (dis/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
         comments-data (get-in @dis/app-state comments-key)
@@ -53,6 +51,7 @@
                          :created-at (utils/as-of-now)
                          :parent-uuid parent-comment-uuid
                          :resource-uuid (:uuid activity-data)
+                         :author-wants-follow? author-wants-follow?
                          :uuid new-comment-uuid
                          :author {:name (:name user-data)
                                   :avatar-url (:avatar-url user-data)
@@ -60,36 +59,43 @@
         first-comment-from-user? (when-not (:publisher? activity-data)
                                    (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))
         should-show-follow-notification? (and first-comment-from-user?
-                                              (utils/link-for (:links activity-data) "follow"))
-        current-board-slug (dis/current-board-slug)]
+                                              author-wants-follow?
+                                              (utils/link-for (:links activity-data) "follow"))]
     ;; Reset the add comment field
     (dis/dispatch! [:add-comment-reset org-slug (:uuid activity-data) parent-comment-uuid nil])
     ;; Add the comment to the app-state to show it immediately
     (dis/dispatch! [:comment-add org-slug activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
     ;; Send WRT read on comment add
     (activity-actions/send-item-read (:uuid activity-data))
-    (api/add-comment add-comment-link comment-body new-comment-uuid parent-comment-uuid
+    (api/add-comment add-comment-link new-comment-map
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
-      (fn [{:keys [status success body]}]
+      (fn [{:keys [_status success body]}]
         (save-done-cb success)
-        ;; If the user is not the publisher of the post and is leaving his first comment on it
-        ;; let's inform them that they are now following the post
         (when success
-          (do
-            (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
-            (dis/dispatch! [:ropute/rewrite :refresh true]))
+          (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
+          (dis/dispatch! [:route/rewrite :refresh true])
           (when should-show-follow-notification?
+            ;; If the user is not the publisher of the post and is leaving his first comment on it
+            ;; let's inform them that they are now following the post
             (notification-actions/show-notification {:title "You are now following this post."
                                                      :dismiss true
                                                      :expire 3
                                                      :id :first-comment-follow-post})))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link
-           #(let [current-board-slug (dis/current-board-slug)]
+           #(let [current-board-slug (dis/current-board-slug)
+                  entry-links (-> activity-data
+                                  :uuid
+                                  (dis/entry-data)
+                                  :links)
+                  unfollow-link (utils/link-for entry-links ["unfollow"] ["POST"])]
               (activity-utils/get-comments-finished org-slug comments-key activity-data %)
               (when (not= (keyword current-board-slug) :replies)
-                (activity-actions/replies-get (dis/org-data))))))
+                (activity-actions/replies-get (dis/org-data)))
+              (when (and (not author-wants-follow?)
+                         unfollow-link)
+                (activity-actions/entry-unfollow (:uuid activity-data))))))
         ;; In case save didn't go well let's re-set the comment body in the add comment field
         (when-not success
           ;; Remove the newly added comment if still in the list
