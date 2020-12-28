@@ -99,7 +99,7 @@
   (or (not (seq (:uuid section-data)))
       (not (seq (:links section-data)))))
 
-(def private-board-tooltip "Premium accounts can create private topics for invited users only.")
+(def private-board-tooltip " Premium accounts can create private topics that are invite-only.")
 (def public-board-tooltip "Premium accounts can create public topics for sharing beyond your team.")
 
 (rum/defcs section-editor <
