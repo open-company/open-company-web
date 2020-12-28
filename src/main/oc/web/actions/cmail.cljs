@@ -161,6 +161,9 @@
   (load-cached-item initial-entry-data (first dis/cmail-data-key)
    #(dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed false})])))
 
+(defn cmail-collapse [cmail-state]
+  (dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed true :fullscreen false})]))
+
 (defn cmail-reset []
   (dis/dispatch! [:input dis/cmail-data-key (get-default-board)])
   (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}]))

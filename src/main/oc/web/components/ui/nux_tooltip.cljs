@@ -56,10 +56,11 @@
    {user-type                               :user-type
     dismiss-cb                              :dismiss-cb
     next-cb                                 :next-cb
+    prev-cb                                 :prev-cb
     step                                    :step
-    {:keys [title description next-title
-            steps arrow-position position
-            post-dismiss-cb post-next-cb sel]
+    {:keys [title description next-title back-title
+            steps arrow-position position sel
+            post-dismiss-cb post-next-cb post-prev-cb]
      :as data}                              :data}]
   (let [{left :x top :y} @(::pos state)]
     (when (and left top
@@ -89,17 +90,30 @@
             [:div.nux-tooltip-description
             description]
             [:div.nux-tooltip-footer
-            [:div.nux-tooltip-steps
+             [:div.nux-tooltip-back-bt-container
+              (when back-title
+                [:button.mlb-reset.nux-tooltip-back-bt
+                  {:on-click (fn [e]
+                              (utils/event-stop e)
+                              (when-let [el (dommy/sel1 sel)]
+                                (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
+                              (prev-cb e)
+                              (when (fn? post-prev-cb)
+                                (post-prev-cb)))}
+                  back-title])]
+             [:div.nux-tooltip-steps
               steps]
-            [:button.mlb-reset.nux-tooltip-next-bt
-              {:on-click (fn [e]
-                          (utils/event-stop e)
-                          (when-let [el (dommy/sel1 sel)]
-                            (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
-                          (next-cb e)
-                          (when (fn? post-next-cb)
-                            (post-next-cb)))}
-              next-title]]]]])))
+             [:div.nux-tooltip-next-bt-container
+              (when next-title
+                [:button.mlb-reset.nux-tooltip-next-bt
+                 {:on-click (fn [e]
+                             (utils/event-stop e)
+                             (when-let [el (dommy/sel1 sel)]
+                               (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
+                             (next-cb e)
+                             (when (fn? post-next-cb)
+                               (post-next-cb)))}
+                 next-title])]]]]])))
 
 (rum/defcs nux-tooltips-manager <
   rum/reactive
@@ -111,4 +125,5 @@
                     :user-type user-type
                     :data (nux-actions/get-tooltip-data step user-type)
                     :dismiss-cb #(nux-actions/dismiss-nux)
-                    :next-cb #(nux-actions/next-step)}))))
+                    :next-cb #(nux-actions/next-step)
+                    :prev-cb #(nux-actions/prev-step)}))))
