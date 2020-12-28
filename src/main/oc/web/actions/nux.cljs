@@ -18,6 +18,7 @@
    :description "When you’re ready to add an update or some news for your team, click here anytime."
    :steps (str "1 of " steps)
    :back-title nil
+   :scroll :top
    :arrow-position :top
    :position :bottom
    :next-title "Next"
@@ -30,6 +31,7 @@
             (str "1 of " steps)
             (str "2 of " steps))
    :back-title (when-not viewer? "Back")
+   :scroll :top
    :arrow-position :left-top
    :next-title "Next"
    :position :right-top
@@ -44,6 +46,7 @@
             (str "2 of " steps)
             (str "3 of " steps))
    :back-title "Back"
+   :scroll :top
    :arrow-position :left-top
    :next-title "Next"
    :position :right-top
@@ -60,6 +63,7 @@
             (str "3 of " steps)
             (str "4 of " steps))
    :back-title "Back"
+   :scroll :top
    :arrow-position :top-right
    :next-title "Next"
    :position :bottom-left
@@ -70,6 +74,7 @@
    :description "Carrot is built for teams. Send an invite link with an email or Slack to get started."
    :steps (str "5 of " steps)
    :back-title "Back"
+   :scroll :element
    :arrow-position :left
    :next-title "Next"
    :position :right
@@ -82,6 +87,7 @@
                   "Give it a try. Add an update or start an async discussion to get started.")
    :steps (if viewer? (str "4 of " steps) (str "6 of " steps))
    :back-title "Back"
+   :scroll :top
    :arrow-position :top
    :next-title "Done"
    :position :bottom

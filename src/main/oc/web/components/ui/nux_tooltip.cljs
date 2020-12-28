@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.nux-tooltip
   (:require-macros [if-let.core :refer (if-let*)])
   (:require [rum.core :as rum]
+            [oops.core :refer (oset!)]
             [dommy.core :as dommy]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.dom :as dom-utils]
@@ -34,6 +35,13 @@
                                 :right-top
                                 {:x (+ (:x rect) (:width rect))
                                  :y (+ (:y rect) (/ (:height rect) 2))})]
+                      (when (not= @(::last-step state) (:step data))
+                        (case (:scroll data)
+                          :top
+                          (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
+                          :element
+                          (.scrollIntoView el #js {:behavior "smooth" :block "center"})
+                          nil))
                       (dommy/add-class! el :nux-tooltip-handle)
                       (when-not (= @(::pos state) pos)
                         (reset! (::pos state) pos)))
