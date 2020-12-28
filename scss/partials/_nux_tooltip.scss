@@ -137,10 +137,6 @@ div.nux-tooltip-container {
     div.nux-tooltip-inner {
       background-color: var(--tooltip-background-color);
       color: var(--tooltip-color);
-      // display: grid;
-      // grid-template-areas: "title       title       dismiss-bt "
-      //                      "description description description"
-      //                      "empty       steps       next-bt    ";
       flex: grid;
       flex-flow: column nowrap;
       justify-content: center;
@@ -196,6 +192,24 @@ div.nux-tooltip-container {
         flex-flow: row nowrap;
         margin-top: 16px;
 
+        div.nux-tooltip-back-bt-container {
+          margin-right: auto;
+          flex: 1;
+          display: flex;
+
+          button.nux-tooltip-back-bt {
+            height: 40px;
+            background-color: transparent;
+            border-radius: 6px;
+            padding: 11px 0;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: var(--tooltip-light-color);
+            margin-left: 8px;
+          }
+        }
+
         div.nux-tooltip-steps {
           height: 40px;
           width: 54px;
@@ -204,20 +218,26 @@ div.nux-tooltip-container {
           line-height: 40px;
           color: var(--tooltip-light-color);
           text-align: center;
-          margin-left: calc((#{$width - $diagonal}px - 54px) / 2);
+          margin-left: auto;
           margin-right: auto;
         }
 
-        button.nux-tooltip-next-bt {
-          height: 40px;
-          background-color: $carrot_green;
-          border-radius: 6px;
-          padding: 11px 16px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          line-height: 18px;
-          color: white;
-          margin-left: 8px;
+        div.nux-tooltip-next-bt-container {
+          margin-left: auto;
+          flex: 1;
+          display: flex;
+
+          button.nux-tooltip-next-bt {
+            height: 40px;
+            background-color: $carrot_green;
+            border-radius: 6px;
+            padding: 11px 16px;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: white;
+            margin-left: auto;
+          }
         }
       }
     }
