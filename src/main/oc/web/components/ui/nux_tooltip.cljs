@@ -40,7 +40,7 @@
                           :top
                           (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
                           :element
-                          (.scrollIntoView el #js {:behavior "smooth" :block "center"})
+                          (.scrollIntoView el #js {:block "center"})
                           nil))
                       (dommy/add-class! el :nux-tooltip-handle)
                       (when-not (= @(::pos state) pos)

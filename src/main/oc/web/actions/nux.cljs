@@ -119,15 +119,14 @@
           router/nux-cookie
           cook/get-cookie
           json->cljs
-          (update :step keyword)
-          (update :user-type keyword)))
+          (update :step keyword)))
 
 (defn set-nux-cookie
   "Create a map for the new user cookie and save it. Also update the value of
   the nux-cookie-value atom."
-  [user-type value-map]
+  [value-map]
   (let [old-nux-cookie (get-nux-cookie)
-        value-map (merge {:user-type user-type} old-nux-cookie value-map)
+        value-map (merge old-nux-cookie value-map)
         json-map (cljs->json value-map)
         json-string (.stringify js/JSON json-map)]
     (cook/set-cookie!
@@ -135,12 +134,13 @@
       json-string
       (* 60 60 24 7))))
 
-(defn new-user-registered [user-type]
-  (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
-                    true (* 60 60 24 7))
-  (when (not= user-type :viewer)
-    (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
-  (set-nux-cookie user-type {:step :intro}))
+(defn new-user-registered [medium-type]
+  (let [cur-user-data (dis/current-user-data)]
+    (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
+                      true (* 60 60 24 7))
+    (when (-> cur-user-data :role (not= :viewer))
+      (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
+    (set-nux-cookie {:step :intro :medium medium-type})))
 
 (defn check-nux
   [& [force?]]
@@ -157,10 +157,10 @@
   (cook/remove-cookie! (router/nux-cookie (jwt/user-id))))
 
 (defn ^:export restart-nux []
-  (set-nux-cookie (:role (dis/current-user-data)) {:step :intro})
-  (check-nux true))
+  (set-nux-cookie {:step :intro})
+  (utils/after 280 #(check-nux true)))
 
-(defn- calc-step [{:keys [step user-type]}]
+(defn- calc-step [user-type {:keys [step]}]
   (case step
     :intro    (if (= user-type :viewer)
                 :feed
@@ -176,9 +176,14 @@
     nil       (if (= user-type :viewer) :news :intro)
     step))
 
+(defn- get-user-role []
+  (or (-> (dis/current-user-data) :role keyword)
+      :viewer))
+
 (defn next-step []
-  (let [current-value (get @dis/app-state :nux)
-        next-step (calc-step current-value)
+  (let [user-type (get-user-role)
+        current-value (get @dis/app-state :nux)
+        next-step (calc-step user-type current-value)
         same-step? (= (:step current-value) next-step)
         prepare-cb (when (and (= next-step :ready)
                               (not same-step?))
@@ -190,12 +195,12 @@
     (when (:step current-value)
       (if same-step?
         (end-nux)
-        (set-nux-cookie (:user-type current-value) {:step next-step})))
+        (set-nux-cookie {:step next-step})))
     (when (fn? prepare-cb)
       (prepare-cb))
     (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] next-step]))))
 
-(defn- calc-prev-step [{:keys [step user-type]}]
+(defn- calc-prev-step [user-type {:keys [step]}]
   (case step
     :news     :intro
     :feed     :news
@@ -208,8 +213,9 @@
     nil))
 
 (defn prev-step []
-  (let [current-value (get @dis/app-state :nux)
-        prev-step (calc-prev-step current-value)
+  (let [user-type (get-user-role)
+        current-value (get @dis/app-state :nux)
+        prev-step (calc-prev-step user-type current-value)
         same-step? (= (:step current-value) prev-step)
         prepare-cb (when (and (= current-value :ready)
                               (not same-step?))
@@ -220,7 +226,7 @@
     ;; In case we are stalled on a value it means NUX is finished/dismissed
     (when (:step current-value)
       (when-not same-step?
-        (set-nux-cookie (:user-type current-value) {:step prev-step})))
+        (set-nux-cookie {:step prev-step})))
     (when (fn? prepare-cb)
       (prepare-cb))
     (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] prev-step]))))
