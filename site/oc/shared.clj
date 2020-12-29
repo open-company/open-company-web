@@ -818,7 +818,7 @@
           [:div.column-title
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
-          [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href (env :whats-new-url) :target "_blank"} "What’s new"]]
           [:div.column-item [:a {:href (:oc-github options) :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
 

@@ -49,7 +49,7 @@
 ;; Web location
 (def web-server (str web-hostname ":" web-port))
 
-(def whats-new-url "https://carrot.news/")
+(def whats-new-url "https://headwayapp.co/carrot-changes")
 
 (def product-name "Carrot")
 
