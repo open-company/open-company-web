@@ -170,12 +170,13 @@
                            (or (:can-manage-subscription? payments-data)
                                (:can-create-subscription? payments-data))
                            current-org-slug)
+        manage-sub? (:can-manage-subscription? payments-data)
         billing-label (when show-billing?
-                        (if (:can-manage-subscription? payments-data)
+                        (if manage-sub?
                           "Manage subscription"
-                          "Try premium"))
+                          [[:div.arrow] [:div.copy "Try premium"]]))
         billing-click (when show-billing?
-                        (if (:can-manage-subscription? payments-data)
+                        (if manage-sub?
                           (partial manage-subscription-click s payments-data)
                           (partial premium-picker-click s)))]
     [:div.menu
@@ -291,7 +292,8 @@
           (when show-billing?
             [:a.payments
               {:href "#"
-              :on-click billing-click}
+               :class (when-not manage-sub? "try-premium")
+               :on-click billing-click}
               [:div.oc-menu-item
                 billing-label
                (when @(::loading-manage-sub s)
@@ -299,6 +301,12 @@
           ;; What's new & Support separator
           (when-not is-mobile?
             [:div.oc-menu-separator])
+          ;; Share feedback
+          [:a.whats-new-link
+           {:href oc-urls/feedback
+            :target "_blank"}
+           [:div.oc-menu-item.whats-new
+            "Share feedback"]]
           ;; What's new
           [:a.whats-new-link
             (if ua/mobile?
