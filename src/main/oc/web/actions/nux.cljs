@@ -111,6 +111,10 @@
       :ready    (step-ready steps viewer?)
       nil)))
 
+(defn- get-user-role []
+  (or (-> (dis/current-user-data) :role keyword)
+      :viewer))
+
 (defn get-nux-cookie
   "Read the cookie from the document only if the nux-cookie-value atom is nil.
   In all the other cases return the read value in the atom."
@@ -119,7 +123,8 @@
           router/nux-cookie
           cook/get-cookie
           json->cljs
-          (update :step keyword)))
+          (update :step keyword)
+          (assoc :user-type (get-user-role))))
 
 (defn set-nux-cookie
   "Create a map for the new user cookie and save it. Also update the value of
@@ -135,12 +140,11 @@
       (* 60 60 24 7))))
 
 (defn new-user-registered [medium-type]
-  (let [cur-user-data (dis/current-user-data)]
-    (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
-                      true (* 60 60 24 7))
-    (when (-> cur-user-data :role (not= :viewer))
-      (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
-    (set-nux-cookie {:step :intro :medium medium-type})))
+  (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
+                    true (* 60 60 24 7))
+  (when (not= (get-user-role) :viewer)
+    (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
+  (set-nux-cookie {:step :intro :medium medium-type}))
 
 (defn check-nux
   [& [force?]]
@@ -173,12 +177,8 @@
                 :invite)
     :invite   :ready
     :ready    :done
-    nil       (if (= user-type :viewer) :news :intro)
+    nil       :intro
     step))
-
-(defn- get-user-role []
-  (or (-> (dis/current-user-data) :role keyword)
-      :viewer))
 
 (defn next-step []
   (let [user-type (get-user-role)
@@ -203,7 +203,7 @@
 (defn- calc-prev-step [user-type {:keys [step]}]
   (case step
     :news     :intro
-    :feed     :news
+    :feed     (if (= user-type :viewer) :intro :news)
     :settings :feed
     :invite   :settings
     :ready    (if (or (= user-type :viewer)
