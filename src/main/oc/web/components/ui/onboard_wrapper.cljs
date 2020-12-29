@@ -799,6 +799,7 @@
           :on-click continue-fn}
          "Continue"]]]
       [:div.onboard-form
+        [:div.form-header-logo]
         [:div.form-title
           "Set a password to get started"]
         [:form
