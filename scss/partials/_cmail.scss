@@ -699,6 +699,7 @@ div.cmail-outer {
         margin-left: 6px;
         flex: 0 0 auto;
         order: 5;
+        margin-right: auto;
       }
     }
   }
@@ -923,6 +924,10 @@ div.cmail-outer {
 
         div.cmail-footer {
           margin-top: auto;
+
+          div.cmail-footer-media-picker-container {
+            margin-right: 0;
+          }
         }
       }
     }
