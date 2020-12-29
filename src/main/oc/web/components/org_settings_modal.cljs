@@ -390,31 +390,35 @@
           ;; Prompts copy
           [:div.org-settings-fields.field-group
            [:div.field-label
-            "New post button CTA"]
+            "Customize \"new posts\" copy"]
+           [:div.field-description
+            "Prompt"]
+           [:input.field-value.oc-input
+            {:type "text"
+             :class (when (:new-entry-placeholder (:error org-editing)) "error")
+             :value (or (:new-entry-placeholder org-editing) "")
+             :min-length org-utils/new-entry-placeholder-min-length
+             :max-length org-utils/new-entry-placeholder-max-length
+             :placeholder "\"Start a new discussion...\", \"What's new...\", etc"
+             :on-change #(let [entry-placeholder (.. % -target -value)
+                               error? (not (<= org-utils/new-entry-placeholder-min-length (count entry-placeholder) org-utils/new-entry-placeholder-max-length))]
+                           (on-change :new-entry-placeholder entry-placeholder error?))}]
+            (when (:new-entry-placeholder (:error org-editing))
+              [:div.error (str "Must be between " org-utils/new-entry-placeholder-min-length " and " org-utils/new-entry-placeholder-max-length " characters")])
+           [:div.field-description
+            "Button"]
            [:input.field-value.oc-input
             {:type "text"
              :class (when (:new-entry-cta (:error org-editing)) "error")
              :value (or (:new-entry-cta org-editing) "")
              :min-length org-utils/new-entry-cta-min-length
              :max-length org-utils/new-entry-cta-max-length
+             :placeholder "\"NEW\", \"New update\", \"Post\", etc"
              :on-change #(let [entry-cta (.. % -target -value)
                                error? (not (<= org-utils/new-entry-cta-min-length (count entry-cta) org-utils/new-entry-cta-max-length))]
                            (on-change :new-entry-cta entry-cta error?))}]
            (when (:new-entry-cta (:error org-editing))
-             [:div.error (str "Must be between " org-utils/new-entry-cta-min-length " and " org-utils/new-entry-cta-max-length " characters")])
-           [:div.field-label
-            "New post body placeholder"]
-           [:input.field-value.oc-input
-            {:type "text"
-              :class (when (:new-entry-placeholder (:error org-editing)) "error")
-              :value (or (:new-entry-placeholder org-editing) "")
-              :min-length org-utils/new-entry-placeholder-min-length
-              :max-length org-utils/new-entry-placeholder-max-length
-              :on-change #(let [entry-placeholder (.. % -target -value)
-                                error? (not (<= org-utils/new-entry-placeholder-min-length (count entry-placeholder) org-utils/new-entry-placeholder-max-length))]
-                            (on-change :new-entry-placeholder entry-placeholder error?))}]
-            (when (:new-entry-placeholder (:error org-editing))
-              [:div.error (str "Must be between " org-utils/new-entry-placeholder-min-length " and " org-utils/new-entry-placeholder-max-length " characters")])]
+             [:div.error (str "Must be between " org-utils/new-entry-cta-min-length " and " org-utils/new-entry-cta-max-length " characters")])]
           ;; Advanced section
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
