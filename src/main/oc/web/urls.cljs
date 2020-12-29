@@ -26,6 +26,8 @@
 
 (def help (str "http://help." domain "/"))
 
+(def feedback "https://docs.google.com/forms/d/1AmZknOfX_LA7SaeyApZPpL7nvhRa56w1F89W3T7HjlA/edit?usp=sharing")
+
 (def what-s-new ls/whats-new-url)
 
 (def home-try-it-focus (str home "?tif"))
