@@ -322,7 +322,7 @@
                                                             :slack-mirror (if show-slack-channels?
                                                                             nil
                                                                             (:slack-mirror section-editor))})]))
-                              (nav-actions/toggle-premium-picker!)))}
+                              (nav-actions/toggle-premium-picker! private-board-tooltip)))}
                 private-access]
               (when-not disallow-public-board?
                 [:div.access-list-row
