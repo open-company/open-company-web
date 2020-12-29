@@ -9,10 +9,6 @@ $mobile_thumbnail_height: $mobile_thumbnail_width / $mobile_thumbnail_ratio;
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
 
-  &:has(div.stream-item.nux-tooltip-handler) {
-    z-index: 3;
-  }
-
   @include big_web() {
     &.open-item div.stream-item {
       border-top: 1px solid var(--foc-divider-line-color);

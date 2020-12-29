@@ -94,7 +94,7 @@
    :post-next-cb (when-not viewer? cmail-actions/cmail-hide)
    :post-dismiss-cb (when-not viewer? cmail-actions/cmail-hide)
    :sel (if viewer?
-          [:div.paginated-stream-cards :div.virtualized-list-row:first-child :div.stream-item]
+          [:div.paginated-stream-cards :div.virtualized-list-item:first-child]
           [:div.cmail-outer])})
 
 (defn get-tooltip-data [step user-type]
