@@ -112,8 +112,7 @@
       nil)))
 
 (defn- get-user-role []
-  (or (-> (dis/current-user-data) :role keyword)
-      :viewer))
+  (some-> (dis/current-user-data) :role keyword))
 
 (defn get-nux-cookie
   "Read the cookie from the document only if the nux-cookie-value atom is nil.
@@ -123,7 +122,7 @@
           router/nux-cookie
           cook/get-cookie
           json->cljs
-          (update :step keyword)
+          (update :step #(when % (keyword %)))
           (assoc :user-type (get-user-role))))
 
 (defn set-nux-cookie
@@ -134,25 +133,9 @@
         value-map (merge old-nux-cookie value-map)
         json-map (cljs->json value-map)
         json-string (.stringify js/JSON json-map)]
-    (cook/set-cookie!
-     (router/nux-cookie (jwt/user-id))
-      json-string
-      (* 60 60 24 7))))
-
-(defn new-user-registered [medium-type]
-  (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
-                    true (* 60 60 24 7))
-  (when (not= (get-user-role) :viewer)
-    (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
-  (set-nux-cookie {:step :intro :medium medium-type}))
-
-(defn check-nux
-  [& [force?]]
-  (when (and (or force?
-                 (not (contains? @dis/app-state :nux)))
-             (dis/current-org-slug)
-             (= (oget js/window "location.pathname") (oc-urls/following)))
-    (dis/dispatch! [:input [:nux] (get-nux-cookie)])))
+    (cook/set-cookie! (router/nux-cookie (jwt/user-id))
+                      json-string
+                      (* 60 60 24 7))))
 
 (defn ^:export end-nux
   "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
@@ -160,30 +143,44 @@
   (dis/dispatch! [:input [:nux] nil])
   (cook/remove-cookie! (router/nux-cookie (jwt/user-id))))
 
-(defn ^:export restart-nux []
-  (set-nux-cookie {:step :intro})
-  (utils/after 280 #(check-nux true)))
+(defn check-nux
+  [& [force?]]
+  (when (and (or force?
+                 (not (contains? @dis/app-state :nux)))
+             (dis/current-org-slug)
+             (= (oget js/window "location.pathname") (oc-urls/following)))
+    (let [nux-state (get-nux-cookie)]
+      (if (= (:step nux-state) :done)
+        (end-nux)
+        (dis/dispatch! [:input [:nux] (get-nux-cookie)])))))
 
-(defn- calc-step [user-type {:keys [step]}]
-  (case step
-    :intro    (if (= user-type :viewer)
-                :feed
-                :news)
-    :news     :feed
-    :feed     :settings
-    :settings (if (or (= user-type :viewer)
-                      (not (get @dis/app-state dis/show-invite-box-key)))
-                :ready
-                :invite)
-    :invite   :ready
-    :ready    :done
-    nil       :intro
-    step))
+(defn- calc-next-step
+  ([] (calc-next-step (get-user-role) {}))
+  ([user-type] (calc-next-step user-type {}))
+  ([user-type {:keys [step]}]
+   (if (= user-type :viewer)
+     :done
+     (case step
+       :intro    (if (= user-type :viewer)
+                   :feed
+                   :news)
+       :news     :feed
+       :feed     :settings
+       :settings (if (or (= user-type :viewer)
+                         (not (get @dis/app-state dis/show-invite-box-key)))
+                   :ready
+                   :invite)
+       :invite   :ready
+       :ready    :done
+       nil       (if (= user-type :viewer)
+                   :done ;; Let's turn off NUX for viewers
+                   :intro)
+       step))))
 
 (defn next-step []
   (let [user-type (get-user-role)
         current-value (get @dis/app-state :nux)
-        next-step (calc-step user-type current-value)
+        next-step (calc-next-step user-type current-value)
         same-step? (= (:step current-value) next-step)
         prepare-cb (when (and (= next-step :ready)
                               (not same-step?))
@@ -232,5 +229,18 @@
     (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] prev-step]))))
 
 (defn dismiss-nux []
-  (dis/dispatch! [:input [:nux :step] :dismiss])
+  (dis/dispatch! [:input [:nux :step] :done])
   (end-nux))
+
+(defn new-user-registered [medium-type & [cb]]
+  (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
+                    true (* 60 60 24 7))
+  (when (not= (get-user-role) :viewer)
+    (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
+  (set-nux-cookie {:step (calc-next-step) :medium medium-type})
+  (when (fn? cb)
+    (utils/after 100 cb)))
+
+(defn ^:export restart-nux [& [step]]
+  (set-nux-cookie {:step (if step (keyword step) (calc-next-step))})
+  (utils/after 280 #(check-nux true)))

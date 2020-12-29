@@ -292,10 +292,11 @@
   (if success
     (do
       (jwt-actions/update-jwt body)
-      (when (and (not= token-type :password-reset)
-                 (empty? (jwt/get-key :name)))
-        (nux-actions/new-user-registered "email"))
-      (auth-with-token-success token-type body))
+      (if (and (not= token-type :password-reset)
+                 (and (empty? (jwt/get-key :first-name))
+                      (empty? (jwt/get-key :last-name))))
+        (nux-actions/new-user-registered "email" #(auth-with-token-success token-type body))
+        (auth-with-token-success token-type body)))
     (cond
       (= status 401)
       (auth-with-token-failed 401)
@@ -371,8 +372,7 @@
       (fn [status body success]
         (when success
           (dis/dispatch! [:user-data (json->cljs body)]))
-        (when (and (>= status 200)
-                   (<= status 299))
+        (when (<= 200 status 299)
           (if password-reset?
             (do
               (cook/remove-cookie! :show-login-overlay)

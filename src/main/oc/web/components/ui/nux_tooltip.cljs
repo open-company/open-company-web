@@ -8,58 +8,67 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.utils :as utils]))
 
+(defn- scroll-to-tooltip [data el]
+  (case (:scroll data)
+    :top
+    (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
+    :element
+    (.scrollIntoView el #js {:block "center"})
+    nil))
+
+(defn- remove-old-tooltip-handle [state step]
+  (when (not= step @(::last-step state))
+    (when-let [old-el (dommy/sel1 @(::last-sel state))]
+      (when (dommy/has-class? old-el :nux-tooltip-handle)
+        (dommy/remove-class! old-el :nux-tooltip-handle)))))
+
+(defn- next-tooltip [state el data]
+  (let [step (-> state :rum/args first :step)
+        new-step? (not= @(::last-step state) step)
+        _ (when new-step?
+            (scroll-to-tooltip data el))
+        rect (dom-utils/bounding-rect el)
+        pos (case (:position data)
+              :top
+              {:x (:x rect)
+              :y (+ (:y rect) (:height rect))}
+              :right
+              {:x (+ (:x rect) (:width rect))
+              :y (+ (:y rect) (/ (:height rect) 2))}
+              :bottom
+              {:x (+ (:x rect) (/ (:width rect) 2))
+              :y (+ (:y rect) (:height rect))}
+              :left
+              {:x (:x rect)
+              :y (+ (:y rect) (/ (:height rect) 2))}
+              :bottom-left
+              {:x (- (dom-utils/window-width) 24)
+              :y (+ (:y rect) (:height rect))}
+              :right-top
+              {:x (+ (:x rect) (:width rect))
+              :y (+ (:y rect) (/ (:height rect) 2))})]
+    (dommy/add-class! el :nux-tooltip-handle)
+    (when-not (= @(::pos state) pos)
+      (reset! (::pos state) pos))
+    (when new-step?
+      (remove-old-tooltip-handle state step)
+      (reset! (::last-step state) step)
+      (reset! (::last-sel state) (:sel data)))))
+
+(defn- check-step [state]
+  (if-let* [data (-> state :rum/args first :data)
+            el (dommy/sel1 (:sel data))]
+    (next-tooltip state el data)
+    (when @(::pos state)
+      (reset! (::pos state) nil))))
+
 (rum/defcs nux-tooltip < rum/static
   (rum/local nil ::pos)
   (rum/local nil ::last-step)
   (rum/local nil ::last-sel)
   {:will-update (fn [state]
-                  (if-let* [data (-> state :rum/args first :data)
-                            el (dommy/sel1 (:sel data))]
-                    (let [rect (dom-utils/bounding-rect el)
-                          pos (case (:position data)
-                                :top
-                                {:x (:x rect)
-                                :y (+ (:y rect) (:height rect))}
-                                :right
-                                {:x (+ (:x rect) (:width rect))
-                                :y (+ (:y rect) (/ (:height rect) 2))}
-                                :bottom
-                                {:x (+ (:x rect) (/ (:width rect) 2))
-                                :y (+ (:y rect) (:height rect))}
-                                :left
-                                {:x (:x rect)
-                                :y (+ (:y rect) (/ (:height rect) 2))}
-                                :bottom-left
-                                {:x (- (dom-utils/window-width) 24)
-                                :y (+ (:y rect) (:height rect))}
-                                :right-top
-                                {:x (+ (:x rect) (:width rect))
-                                 :y (+ (:y rect) (/ (:height rect) 2))})]
-                      (when (not= @(::last-step state) (:step data))
-                        (case (:scroll data)
-                          :top
-                          (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
-                          :element
-                          (.scrollIntoView el #js {:block "center"})
-                          nil))
-                      (dommy/add-class! el :nux-tooltip-handle)
-                      (when-not (= @(::pos state) pos)
-                        (reset! (::pos state) pos)))
-                    (when @(::pos state)
-                      (reset! (::pos state) nil)))
-                 state)
-   :did-update (fn [state]
-                 (let [step (-> state :rum/args first :step)
-                       data (-> state :rum/args first :data)]
-                   (when (not= @(::last-step state) step)
-                     (reset! (::last-step state) step)
-                     (when @(::last-sel state)
-                       (reset! (::last-sel state) (:sel data))
-                       (let [old-el (dommy/sel1 @(::last-sel state))]
-                         (when (and old-el
-                                    (dommy/has-class? old-el :nux-tooltip-handle))
-                                  (utils/after 10 #(dommy/remove-class! old-el :nux-tooltip-handle)))))))
-                 state)}
+                  (check-step state)
+                  state)}
   [state
    {user-type                               :user-type
     dismiss-cb                              :dismiss-cb
