@@ -26,7 +26,7 @@
 
 (defn step-news [steps viewer?]
   {:title (if viewer? "Welcome!" "Your news feed")
-   :description "Updates and async discussions from your team will show up here in your feed."
+   :description "Updates and discussions from your team will show up here in your feed."
    :steps (if viewer?
             (str "1 of " steps)
             (str "2 of " steps))
@@ -84,7 +84,7 @@
   {:title "You’re ready to go! 🎉"
    :description (if viewer?
                   "Check the latest update from your team."
-                  "Give it a try. Add an update or start an async discussion to get started.")
+                  "Give it a try. Add an update or start a discussion to get started.")
    :steps (if viewer? (str "4 of " steps) (str "6 of " steps))
    :back-title "Back"
    :scroll :top

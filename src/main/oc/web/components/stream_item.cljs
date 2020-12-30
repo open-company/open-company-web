@@ -74,6 +74,7 @@
                          (rum/local false ::show-mobile-more-bt)
                          (rum/local false ::on-scroll)
                          (rum/local nil ::last-mobile-swipe-menu)
+                         (rum/local false ::show-view-more)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (when (responsive/is-mobile-size?)
@@ -86,6 +87,12 @@
                            (when (responsive/is-mobile-size?)
                              (reset! (::on-scroll s)
                               (events/listen js/window EventType/SCROLL (partial on-scroll s))))
+                           (let [activity-data (-> s :rum/args first :activity-data)]
+                             (reset! (::show-view-more s) (or (seq (:polls activity-data))
+                                                              (seq (:fixed-video-id activity-data))
+                                                              (seq (:thumbnail (:body-thumbnail activity-data)))
+                                                              (and (seq (:body activity-data))
+                                                                   (> (.-length (.text (.html (js/$ "<div/>") (:body activity-data)))) 110))))) ;; ~ 2 lines
                            s)
                           :did-update (fn [s]
                            (when (responsive/is-mobile-size?)
@@ -290,6 +297,6 @@
                     [:span.mobile-attachments-icon]
                     [:span.mobile-attachments-count
                       (count activity-attachments)]]))]
-            (when is-mobile?
+            (when @(::show-view-more s)
               [:div.stream-item-mobile-view-more
-                "View more"])])]))
+               "View more"])])]))
