@@ -61,13 +61,6 @@
     (when (add-comment-field s)
       (compare-and-set! (::collapsed s) true false))))
 
-(defn- multiple-lines? [s]
-  (when (and (not @(::collapsed s))
-             (not @(::multiple-lines s)))
-    (when-let [f (add-comment-field s)]
-      (reset! (::multiple-lines s) (or (> (.-scrollWidth f) @(::inline-reply-max-width s))
-                                       (> (.-scrollHeight f) 20))))))
-
 ;; (defn- fix-selection [s]
 ;;   (let [el (add-comment-field s)
 ;;         sel (js/OCStaticTextareaSaveSelection)]
@@ -85,7 +78,6 @@
   ;   ; (utils/after 10 #)
   ;   (fix-selection s))
   (maybe-expand s)
-  (multiple-lines? s)
   (toggle-post-button s))
 
 (defn- blur [s]
@@ -94,12 +86,10 @@
     ;; In case post button is being disabled let's collapse
     (when (and (not toggle)
                (-> s :rum/args first :collapse?))
-      (reset! (::collapsed s) true)
-      (reset! (::multiple-lines s) false))))
+      (reset! (::collapsed s) true))))
 
 (defn- send-clicked [_ s]
   (reset! (::collapsed s) true)
-  (reset! (::multiple-lines s) false)
   (let [add-comment-div (add-comment-field s)
         comment-body (cu/add-comment-content add-comment-div)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
@@ -149,7 +139,6 @@
   (let [post-enabled (enable-post-button? s)
         {:keys [activity-data parent-comment-uuid edit-comment-data]} (-> s :rum/args first)
         comment-text (.-innerText (add-comment-field s))]
-    (multiple-lines? s)
     (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) (add-comment-body s))
     (compare-and-set! (::post-enabled s) (not post-enabled) post-enabled)
     (when-let [throttled-did-change @(::did-change-throttled s)]
@@ -178,7 +167,6 @@
                       (set! (.-innerHTML el)
                        (or (-> s :rum/args first :edit-comment-data :body) au/empty-body-html)))
                     (reset! (::collapsed s) true)
-                    (reset! (::multiple-lines s) false)
                     (when (fn? dismiss-reply-cb)
                       (dismiss-reply-cb true)))]
     (if @(::post-enabled s)
@@ -225,7 +213,6 @@
                          ;; Locals
                          (rum/local nil ::add-comment-key)
                          (rum/local true ::collapsed)
-                         (rum/local false ::multiple-lines)
                          (rum/local false ::post-enabled)
                          (rum/local au/empty-body-html ::initial-add-comment)
                          ; (rum/local false ::did-change)
@@ -275,7 +262,6 @@
                              (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
-                           (multiple-lines? s)
                            (utils/after 2500 #(emoji-autocomplete/autocomplete (rum/ref-node s "editor-node")))
                            s)
                           :will-update (fn [s]
@@ -306,7 +292,6 @@
                                  (when focus
                                    (reset! (::last-add-comment-focus s) nil))
                                  (set! (.-innerHTML body-field) next-body)
-                                 (multiple-lines? s)
                                  (comment-actions/add-comment-change (:activity-data props) (:parent-comment-uuid props) (:uuid (:edit-comment-data props)) (add-comment-body s))
                                  (reset! (::collapsed s) false)
                                  (reset! (::post-enabled s) true)
@@ -358,17 +343,13 @@
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
         add-comment-class (str "add-comment-" @(::add-comment-id s))
-        multiple-lines @(::multiple-lines s)
-        collapsed? (and @(::collapsed s)
-                        (not multiple-lines))
+        collapsed? @(::collapsed s)
         show-follow-checkbox? (not edit-comment-data)]
     [:div.add-comment-box-container
       {:class (utils/class-set {container-class true
                                 (str "add-comment-box-" add-comment-focus-prefix) true
-                                :collapsed-box collapsed?
-                                :inline-reply (not multiple-lines)})
-       :on-click (when (or collapsed?
-                           (not multiple-lines))
+                                :collapsed-box collapsed?})
+       :on-click (when collapsed?
                    #(when-not (= (rum/ref-node s "editor-node") (.-activeElement js/document))
                       (focus! s)))}
       [:div.add-comment-box
@@ -396,9 +377,8 @@
                                 (.blur add-comment-node)))
                             (when (and (= (.-activeElement js/document) add-comment-node)
                                        (= (.-key e) "Enter"))
-                              (if (.-metaKey e)
-                                (send-clicked e s)
-                                (compare-and-set! (::multiple-lines s) false true)))))
+                              (when (.-metaKey e)
+                                (send-clicked e s)))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
