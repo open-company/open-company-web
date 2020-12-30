@@ -95,7 +95,7 @@ div.add-comment-box-container {
       position: relative;
       border-radius: 4px;
       border: 1px solid var(--add-comment-border-color);
-      padding: 12px 0 12px 0;
+      padding: 14px 0 10px 0;
       background-color: var(--add-comment-background);
       flex-flow: column nowrap;
       width: 100%;
@@ -111,12 +111,14 @@ div.add-comment-box-container {
       }
 
       div.add-comment {
+        $line_height: 20;
+        $mobile_line_height: 24;
         resize: none;
         outline: none;
         cursor: auto;
         margin: 0;
         height: auto;
-        min-height: 24px;
+        min-height: #{$line_height * 2}px;
         outline: none;
         flex: 0 1 auto;
         max-height: 80vh;
@@ -125,6 +127,7 @@ div.add-comment-box-container {
 
         @include mobile(){
           padding: 0;
+          min-height: #{$mobile_line_height}px;
         }
 
         &.medium-editor-placeholder-hidden:after {
@@ -135,10 +138,10 @@ div.add-comment-box-container {
           @include emoji-size(13);
         }
 
-        @include activity-comment(16, 20, 12);
+        @include activity-comment(16, $line_height, 12);
 
         @include mobile() {
-          @include activity-comment(18, 24, 16);
+          @include activity-comment(18, $mobile_line_height, 16);
         }
       }
 
@@ -147,7 +150,7 @@ div.add-comment-box-container {
         flex-flow: row nowrap;
         justify-content: flex-end;
         align-items: center;
-        margin-top: 8px;
+        margin-top: 6px;
         position: relative;
         padding: 0 12px 0 16px;
 
