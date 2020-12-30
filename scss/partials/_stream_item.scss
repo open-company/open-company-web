@@ -726,30 +726,26 @@ div.stream-item {
       }
 
       div.stream-item-mobile-view-more {
-        display: none;
+        display: block;
+        float: right;
+        height: 26px;
+        line-height: 26px;
+        font-size: 14px;
+        @include OC_Body_Book();
+        color: var(--light-color);
+        padding-left: 12px;
+        position: relative;
 
-        @include mobile() {
+        &:before {
+          content: "";
+          width: 8px;
+          height: 4px;
+          @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
+          position: absolute;
+          top: 12px;
+          left: 0;
+          transform: rotate(-90deg);
           display: block;
-          float: right;
-          height: 26px;
-          line-height: 26px;
-          font-size: 14px;
-          @include OC_Body_Book();
-          color: var(--light-color);
-          padding-left: 12px;
-          position: relative;
-
-          &:before {
-            content: "";
-            width: 8px;
-            height: 4px;
-            @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
-            position: absolute;
-            top: 12px;
-            left: 0;
-            transform: rotate(-90deg);
-            display: block;
-          }
         }
       }
     }
