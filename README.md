@@ -143,12 +143,36 @@ To have a ClojureScript REPL connected to the browser, first start the dev task:
 
 ```console
 shadow-cljs browser-repl
+
+# or, if shadow-cljs is installed locally
+
+npx shadow-cljs browser-repl
 ```
 
-NB: if shadow-cljs is not installed as a global package then use
+Try running:
 
 ```console
-npx shadow-cljs browser-repl
+(js/alert "This is the REPL evaluate window")
+```
+
+This will open a new browser window loading http://localhost:9630/repl-js/browser-repl and that will evaluate all the code entered there.
+
+To inject code in your webapp directly now you need to run:
+
+```console
+shadow-cljs cljs-repl webapp
+
+# or, if shadow-cljs is installed locally
+
+npx shadow-cljs cljs-repl webapp
+```
+
+This will open a REPL and will move to oc.web.core namespace.
+
+Now refresh the webapp window to make sure the REPL is connected to it and then run:
+
+```console
+(.log js/console "This is the webapp window, current url is:" (.. js/window -location -pathname))
 ```
 
 Next open a browser window: [http://localhost:3559/](http://localhost:3559/)
