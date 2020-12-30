@@ -262,9 +262,9 @@
                                (nav-actions/toggle-premium-picker! premium-tooltip*)))
         save-disabled? (or @(::saving s)
                            (:saved org-editing)
-                           (<= org-utils/org-name-min-length (:name org-editing) org-utils/org-name-max-length)
-                           (<= org-utils/new-entry-cta-min-length (:new-entry-cta org-editing) org-utils/new-entry-cta-max-length)
-                           (<= org-utils/new-entry-placeholder-min-length (:new-entry-placeholder org-editing) org-utils/new-entry-placeholder-max-length))]
+                           (not (<= org-utils/org-name-min-length (count (:name org-editing)) org-utils/org-name-max-length))
+                           (not (<= org-utils/new-entry-cta-min-length (count (:new-entry-cta org-editing)) org-utils/new-entry-cta-max-length))
+                           (not (<= org-utils/new-entry-placeholder-min-length (count (:new-entry-placeholder org-editing)) org-utils/new-entry-placeholder-max-length)))]
     [:div.org-settings-modal.fields-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]
@@ -390,7 +390,7 @@
           ;; Prompts copy
           [:div.org-settings-fields.field-group
            [:div.field-label
-            "Customize \"new posts\" copy"]
+            "Change prompt and button copy"]
            [:div.field-description
             "Prompt"]
            [:input.field-value.oc-input

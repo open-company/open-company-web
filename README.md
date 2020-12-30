@@ -35,10 +35,12 @@ Latest Chrome, Firefox, and Safari.
 
 Prospective users of [Carrot](https://carrot.io/) should get started by going to [Carrot.io](https://carrot.io/). The following local setup is **for developers** wanting to work on the Web application.
 
-Most of the dependencies are internal, meaning [Boot](https://github.com/boot-clj/boot) will handle getting them for you. There are a few exceptions:
+Most of the dependencies are internal, meaning [Shadow-cljs](https://github.com/thheller/shadow-cljs) will handle getting them for you. There are a few exceptions:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8 JRE is needed to run Clojure
-* [Boot](https://github.com/boot-clj/boot) - A Clojure build and dependency management tool
+* [Leiningen](https://github.com/technomancy/leiningen) 2.9.1+ - Clojure's build and dependency management tool
+* [Node LTE](https://nodejs.org/en/)
+* [NPM](https://npmjs.com) - A command line tool and package manager for Javascript
 
 #### Java
 
@@ -58,13 +60,13 @@ brew update
 brew cask install adoptopenjdk8
 ```
 
-#### Boot
+#### Leiningen
 
-Installing Boot is easy, for the most up to date instructions, check out the [Boot README](https://github.com/boot-clj/boot#install).
+Installing Leiningen is easy, for the most up to date instructions, check out the [Leiningen installation](https://github.com/technomancy/leiningen#installation) section of the README.
 You can verify your install with:
 
 ```console
-boot -V
+lein -v
 ```
 
 
@@ -78,13 +80,15 @@ Local usage of the web application requires you to run 3 services, the [Storage 
 lein start
 ```
 
+Plus the following optional services are usually required to get a clean working app: [Change service](https://github.com/open-company/open-company-change) and [Notify service](https://github.com/open-company/open-company-notify)
+
 To get an interactive web **development** environment, start the iterative compilation process in this repository:
 
 ```console
-boot dev
+lein start
 ```
 
-If you've done it right, you'll now have 4 terminal sessions running: Storage, Auth, Interaction and Web.
+If you've done it right, you'll now have 4 terminal sessions running: Storage, Auth, Interaction and Web, optionally another 2 running Change and Notify services.
 
 Open your browser to [http://localhost:3559/](http://localhost:3559/).
 
@@ -97,22 +101,28 @@ var OCEnv = {
 }
 ```
 
-Then you can connect to [http://192.168.1:3559](http://192.168.1:3559). This file, and any of its keys, is optional.
+also set that same IP address in your environment:
 
-NB: If you want to change the port you have to change it also in the build.boot file under the dev task.
+```console
+export LOCAL_DEV_HOST=192.168.1.2
+export LOCAL_DEV_PORT=3559
+```
+
+Then you can connect to [http://192.168.1.2:3559](http://192.168.1.2:3559). This file, and any of its keys, is optional.
+
+NB: If you want to change the port you have to change it also in the [shadow.cljs](/shadow.cljs) and [oc.web.local-settings](/src/main/oc/web/local_settings.cljs) files.
 
 To create a **production** build run:
 
 ```console
-boot prod-build target
+lein prod-build
 ```
 
-Open `target/public/app-shell.html` in your browser. Using production rather than dev, you will not get the live reloading nor a REPL.
+To compile assets for production use you need the Google Closure compiler. Download the google closure compiler from this link
 
-To get a jetty server along with the production build:
-
-Download the google closure compiler.
 https://developers.google.com/closure/compiler/
+
+then unzip and place it in a known location:
 
 ```console
 mkdir ~/closure_compiler
@@ -120,13 +130,10 @@ mv <download location>/compiler_latest.zip ~/closure_compiler/
 cd ~/closure_compiler
 unzip compiler_latest.zip
 ```
+now you can build it:
 
 ```console
-boot dev-advanced target
-```
-
-```console
-script/compile_assets.sh <compiler version> ~/path/to/open-company-web localhost:3559
+script/compile_assets.sh <compiler version> ~/path/to/open-company-web $LOCAL_DEV_HOST:$LOCAL_DEV_PORT
 cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company-way/resources/public/
 ```
 
@@ -135,31 +142,16 @@ cp ~/path/to/open-company-web/target/public/oc_assets.js* ~/path/to/open-company
 To have a ClojureScript REPL connected to the browser, first start the dev task:
 
 ```console
-boot dev
+shadow-cljs browser-repl
 ```
 
-If you get an error like this:
+NB: if shadow-cljs is not installed as a global package then use
 
 ```console
-clojure.lang.Compiler$CompilerException: java.lang.RuntimeException: No such var: string/index-of, compiling:(cljs/source_map.clj:260:52)
-             java.lang.RuntimeException: No such var: string/index-of
+npx shadow-cljs browser-repl
 ```
-
-Make sure you have [clojure 1.10+](https://github.com/adzerk-oss/boot-cljs-repl#boot-cljs-repl) in build.boot, in the project boot settings [boot.properties](boot.properties) and in your local setup: `~/.boot/boot.properties`.
 
 Next open a browser window: [http://localhost:3559/](http://localhost:3559/)
-
-Then in another terminal window start a REPL with boot:
-
-```console
-boot repl -c
-```
-
-At this point, you can start a weasel server to connect to the browser window:
-
-```console
-boot.user=> (start-repl)
-```
 
 If the REPL doesn't connect to the browser window, refresh the page in the browser.
 
@@ -173,6 +165,8 @@ cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
 ```
 
 #### Cider
+
+@FIXME: i don't use cider so i am not sure how to fix this atm
 
 For cider users, the steps are just slightly different. Within emacs:
 
@@ -220,23 +214,7 @@ Documentation of the technical design is [here](./docs/TECHNICAL_DESIGN.md).
 
 ## Testing
 
-Install [PhantomJS](https://http://phantomjs.org/) downloading the latest 2.x binary from [here](https://github.com/eugene1g/phantomjs/releases), the one from their site is currently broken.
-
-Then move the `phantomjs` binary somewhere reachable by your `PATH` so you can run:
-
-```console
-phantomjs -v
-```
-
-Then run:
-
-```console
-boot test!
-```
-
-For more info on testing:
-
-- React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
+TBD
 
 ## Desktop Application
 
