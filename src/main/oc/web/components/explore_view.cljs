@@ -35,11 +35,6 @@
     [:div.explore-view
       [:div.explore-view-blocks
         {:class (when can-create-topic? "has-create-topic-bt")}
-        (when can-create-topic?
-          [:button.mlb-reset.explore-view-block.create-topic-bt
-            {:on-click #(nav-actions/show-section-add)}
-            [:span.plus]
-            [:span.new-topic "New topic"]])
         (for [item sorted-items
               :let [followers-count (get-in followers-boards-count [(:uuid item) :count])
                     premium-locked? (and premium-lock?
@@ -115,4 +110,9 @@
                {:on-click (fn [e]
                             (utils/event-stop e)
                             (nav-actions/show-section-editor (:slug item)))}
-               "Edit topic"])]])]]))
+               "Edit topic"])]])
+        (when can-create-topic?
+          [:button.mlb-reset.explore-view-block.create-topic-bt
+            {:on-click #(nav-actions/show-section-add)}
+            [:span.plus]
+            [:span.new-topic "New topic"]])]]))
