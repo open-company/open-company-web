@@ -173,8 +173,8 @@
         manage-sub? (:can-manage-subscription? payments-data)
         billing-label (when show-billing?
                         (if manage-sub?
-                          "Manage subscription"
-                          [:div [:div.arrow] [:div.copy "Try premium"]]))
+                          [:div.oc-menu-item-inner "Manage subscription"]
+                          [:div.oc-menu-item-inner [:div.arrow] [:div.copy "Try premium"]]))
         billing-click (when show-billing?
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
