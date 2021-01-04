@@ -161,10 +161,6 @@
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
-        show-pinned-tag (or (and is-home?
-                                 (:home-pinned activity-data))
-                            (and is-entry-board?
-                                 (:board-pinned activity-data)))
         show-body-thumbnail? (:body-thumbnail activity-data)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
@@ -173,7 +169,7 @@
                                 :unseen-item (:unseen activity-data)
                                 :expandable is-published?
                                 :muted-item (utils/link-for (:links activity-data) "follow")
-                                :pinned-item show-pinned-tag
+                                :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-last-activity-at (::last-activity-at activity-data)

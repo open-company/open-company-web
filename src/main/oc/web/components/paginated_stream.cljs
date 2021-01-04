@@ -104,9 +104,10 @@
     (:message item)])
 
 (rum/defc separator-item < rum/static
-  [{:keys [foc-layout item] :as props}]
+  [{:keys [foc-layout item after-pins] :as props}]
   [:div.virtualized-list-separator
-    {:class (when (not= foc-layout dis/other-foc-layout) "expanded-list")}
+    {:class (utils/class-set {:expanded-list (not= foc-layout dis/other-foc-layout)
+                              :after-pins after-pins})}
     (:label item)])
 
 (rum/defc caught-up-wrapper < rum/static
@@ -153,7 +154,7 @@
         (activity-utils/resource-type? item :loading-more)
         (load-more {:item item})
         (activity-utils/resource-type? item :separator)
-        (separator-item {:item item :foc-layout foc-layout})
+        (separator-item {:item item :foc-layout foc-layout :after-pins (:after-pins item)})
         ; isScrolling
         ; [:div.virtualized-list-placeholder]
         :else
@@ -178,11 +179,13 @@
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
         static-part (str (name (:resource-type item)) "-" (:uuid item))
-        variable-part (cond
-                        entry?
-                        (or (:updated-at item) (:created-at item))
-                        :else
-                        (:last-activity-at item))]
+        variable-part (str (:updated-at item) "-"
+                           (:created-at item) "-"
+                           (when entry?
+                             (str (:published-at item) "-"))
+                           (when entry?
+                             (str (:pinned-at item) "-"))
+                           (:last-activity-at item))]
     (str static-part "-" variable-part)))
 
 (defn- clear-cell-measure
@@ -196,10 +199,8 @@
 
 (defn- clear-changed-cells-cache [s next-row-keys]
   (let [props (-> s :rum/args first)
-        container-data (:container-data props)
         items (:items props)
-        resource-types (::row-keys s)
-        cache @(::cache s)]
+        resource-types (::row-keys s)]
     (doseq [idx (range (count items))
             :let [old-resource-type (get @resource-types idx)
                   new-resource-type (get next-row-keys idx)]
