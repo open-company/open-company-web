@@ -305,13 +305,13 @@
           [:a.whats-new-link
            {:href oc-urls/feedback
             :target "_blank"}
-           [:div.oc-menu-item.whats-new
+           [:div.oc-menu-item.share-feedback
             "Share feedback"]]
           ;; What's new
           [:a.whats-new-link
             (if ua/mobile?
               {:href oc-urls/what-s-new
-              :target "_blank"}
+               :target "_blank"}
               {:on-click (partial whats-new-click s)})
             [:div.oc-menu-item.whats-new
               "What’s new"]]
