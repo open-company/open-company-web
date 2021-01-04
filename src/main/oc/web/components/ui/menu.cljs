@@ -26,12 +26,12 @@
   (menu-close s)
   (jwt-actions/logout))
 
-(defn profile-edit-click [s e]
+(defn profile-edit-click [_s e]
   (.preventDefault e)
   ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
   (nav-actions/show-user-settings :profile))
 
-(defn my-profile [s cur-user-id e]
+(defn my-profile [_s cur-user-id e]
   (.preventDefault e)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
@@ -40,23 +40,23 @@
   (menu-close s)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
-(defn notifications-settings-click [s e]
+(defn notifications-settings-click [_s e]
   (.preventDefault e)
   (nav-actions/show-user-settings :notifications))
 
-(defn team-settings-click [s e]
+(defn team-settings-click [_s e]
   (.preventDefault e)
   (nav-actions/show-org-settings :org))
 
-(defn manage-team-click [s e]
+(defn manage-team-click [_s e]
   (.preventDefault e)
   (nav-actions/show-org-settings :team))
 
-(defn invite-team-click [s e]
+(defn invite-team-click [_s e]
   (.preventDefault e)
   (nav-actions/show-org-settings :invite-picker))
 
-(defn integrations-click [s e]
+(defn integrations-click [_s e]
   (.preventDefault e)
   (nav-actions/show-org-settings :integrations))
 
@@ -65,11 +65,11 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
-(defn whats-new-click [s e]
+(defn whats-new-click [_s e]
   (.preventDefault e)
   (whats-new/show))
 
-(defn reminders-click [s e]
+(defn reminders-click [_s e]
   (.preventDefault e)
   (nav-actions/show-reminders))
 
@@ -174,7 +174,7 @@
         billing-label (when show-billing?
                         (if manage-sub?
                           "Manage subscription"
-                          [[:div.arrow] [:div.copy "Try premium"]]))
+                          [:div [:div.arrow] [:div.copy "Try premium"]]))
         billing-click (when show-billing?
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
@@ -302,17 +302,17 @@
           (when-not is-mobile?
             [:div.oc-menu-separator])
           ;; Share feedback
-          [:a.whats-new-link
+          [:a.share-feedback-link
            {:href oc-urls/feedback
             :target "_blank"}
            [:div.oc-menu-item.share-feedback
             "Share feedback"]]
           ;; What's new
           [:a.whats-new-link
-            (if ua/mobile?
-              {:href oc-urls/what-s-new
-               :target "_blank"}
-              {:on-click (partial whats-new-click s)})
+            {:href oc-urls/what-s-new
+             :target "_blank"
+             :on-click (when is-mobile?
+                         (partial whats-new-click s))}
             [:div.oc-menu-item.whats-new
               "What’s new"]]
           ;; Support
