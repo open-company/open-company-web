@@ -154,18 +154,23 @@
         list-home-pin? (and home-pin? (or is-mobile? (not external-home-pin)))
         home-pinned? (when home-pin?
                        (get-in entity-data [:pins (keyword ls/seen-home-container-id)]))
-        home-pin-title (if home-pinned?
-                         "Unpin from Home"
-                         "Pin to Home")
         board-pin-link (utils/link-for (:links entity-data) "board-pin")
         board-pin? (and board-pin-link
                         show-board-pin)
         list-board-pin? (and board-pin? (or is-mobile? (not external-board-pin)))
         board-pinned? (when board-pin?
                         (get-in entity-data [:pins (keyword (:board-uuid entity-data))]))
+        show-both-pins (and show-home-pin show-board-pin)
+        home-pin-title (if home-pinned?
+                         (if show-both-pins
+                           "Unpin from Home"
+                           "Unpin")
+                         "Pin to Home")
         board-pin-title (if board-pinned?
-                          (str "Unpin from " (:board-name entity-data))
-                          (str "Pin to " (:board-name entity-data)))
+                          (if show-both-pins
+                            (str "Unpin from #" (:board-name entity-data))
+                            "Unpin")
+                          (str "Pin to #" (:board-name entity-data)))
         pins? (or home-pin? board-pin?)
         list-pins? (or list-home-pin? list-board-pin?)]
     (when (or edit-link
@@ -479,7 +484,7 @@
             :class (when board-pinned? "pinned")
             :on-click #(do
                          (hide-menu s will-close)
-                         (pin-actions/toggle-board-pin! entity-data home-pin-link))
+                         (pin-actions/toggle-board-pin! entity-data board-pin-link))
             :data-toggle (if is-mobile? "" "tooltip")
             :data-placement (or tooltip-position "top")
             :data-container "body"

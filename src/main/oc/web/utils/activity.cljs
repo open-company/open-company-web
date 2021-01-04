@@ -746,10 +746,12 @@
                                  (vec (conj next-links link-to-move))
                                  next-links)
                                (:links board-data))
+            pinned-at #(assoc % :pinned-at (get-in % [:pins (keyword (:uuid board-data)) :pinned-at]))
             items-list (when (contains? board-data :entries)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
                                 (assoc :resource-type :entry)
+                                (pinned-at)
                                 (select-keys preserved-keys))
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)

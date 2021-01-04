@@ -342,16 +342,6 @@ div.more-menu {
     padding: 8px 0;
     list-style-type: none;
 
-    &.has-pins {
-      width: 124px;
-
-      @include mobile() {
-        left: unset;
-        right: 0;
-        width: 124px;
-      }
-    }
-
     &.has-mark-unread {
       width: 134px;
 
@@ -379,6 +369,17 @@ div.more-menu {
         left: unset;
         right: 0;
         width: 162px;
+      }
+    }
+
+    &.has-pins {
+      width: 164px;
+      left: -20px !important;
+
+      @include mobile() {
+        left: unset !important;
+        right: 0;
+        width: 164px;
       }
     }
 
