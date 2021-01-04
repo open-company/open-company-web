@@ -81,12 +81,13 @@
   (toggle-post-button s))
 
 (defn- blur [s]
-  (comment-actions/add-comment-blur (focus-value s))
-  (let [toggle (toggle-post-button s)]
-    ;; In case post button is being disabled let's collapse
-    (when (and (not toggle)
-               (-> s :rum/args first :collapse?))
-      (reset! (::collapsed s) true))))
+  (if @(::prevent-blur s)
+    (reset! (::prevent-blur s) false)
+    (let [toggle (toggle-post-button s)]
+      ;; In case post button is being disabled let's collapse
+      (when (and (not toggle)
+                (-> s :rum/args first :collapse?))
+        (reset! (::collapsed s) true)))))
 
 (defn- send-clicked [_ s]
   (reset! (::collapsed s) true)
@@ -219,6 +220,7 @@
                          (rum/local false ::last-add-comment-focus)
                          (rum/local 10000 ::inline-reply-max-width)
                          (rum/local nil ::did-change-throttled)
+                         (rum/local false ::prevent-blur)
                          ;; Follow/unfollow post
                          (rum/local true ::follow)
                          ;; Mixins
@@ -226,17 +228,18 @@
                          (mention-mixins/oc-mentions-hover)
                          (emoji-autocomplete/autocomplete-mixin ["editor-node"])
 
-                         (ui-mixins/on-window-click-mixin (fn [s e]
-                          (when (and @(::me-media-utils/showing-media-video-modal s)
-                                     (not (.contains (.-classList (.-target e)) "media-video"))
-                                     (not (utils/event-inside? e (rum/ref-node s :video-container))))
-                            (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
-                            (reset! (::me-media-utils/showing-media-video-modal s) false))
-                          (when (and @(::me-media-utils/showing-gif-selector s)
-                                     (not (.contains (.-classList (.-target e)) "media-gif"))
-                                     (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
-                            (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) nil)
-                            (reset! (::me-media-utils/showing-gif-selector s) false))))
+                         (ui-mixins/on-click-out (fn [s e]
+                                                   (when (and @(::me-media-utils/showing-media-video-modal s)
+                                                              (not (.contains (.-classList (.-target e)) "media-video"))
+                                                              (not (utils/event-inside? e (rum/ref-node s :video-container))))
+                                                      (me-media-utils/media-video-add s @(::me-media-utils/media-picker-ext s) nil)
+                                                      (reset! (::me-media-utils/showing-media-video-modal s) false))
+                                                    (when (and @(::me-media-utils/showing-gif-selector s)
+                                                              (not (.contains (.-classList (.-target e)) "media-gif"))
+                                                              (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
+                                                      (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) nil)
+                                                      (reset! (::me-media-utils/showing-gif-selector s) false))))
+
                          {:will-mount (fn [s]
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [{:keys [activity-data parent-comment-uuid edit-comment-data collapse? add-comment-did-change]} (first (:rum/args s))
@@ -392,7 +395,9 @@
                 :title (if edit-comment-data "Cancel edit" "Cancel")}])
             (when show-follow-checkbox?
               [:div.add-comment-follow
-               {:on-click #(swap! (::follow s) not)}
+               {:on-mouse-down #(do
+                                  (reset! (::prevent-blur s) true)
+                                  (swap! (::follow s) not))}
                (carrot-checkbox {:selected @(::follow s)})
                [:span.add-comment-follow-label
                  uu/watch-activity-copy]])
