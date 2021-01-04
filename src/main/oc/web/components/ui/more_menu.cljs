@@ -151,7 +151,7 @@
         home-pin-link (utils/link-for (:links entity-data) "home-pin")
         home-pin? (and home-pin-link
                        show-home-pin)
-        list-home-pin? (and home-pin? (not is-mobile?) external-home-pin)
+        list-home-pin? (and home-pin? (or is-mobile? (not external-home-pin)))
         home-pinned? (when home-pin?
                        (get-in entity-data [:pins (keyword ls/seen-home-container-id)]))
         home-pin-title (if home-pinned?
@@ -160,7 +160,7 @@
         board-pin-link (utils/link-for (:links entity-data) "board-pin")
         board-pin? (and board-pin-link
                         show-board-pin)
-        list-board-pin? (and board-pin? (not is-mobile?) external-board-pin)
+        list-board-pin? (and board-pin? (or is-mobile? (not external-board-pin)))
         board-pinned? (when board-pin?
                         (get-in entity-data [:pins (keyword (:board-uuid entity-data))]))
         board-pin-title (if board-pinned?
