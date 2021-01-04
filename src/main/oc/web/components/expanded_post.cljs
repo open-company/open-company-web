@@ -173,6 +173,8 @@
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
                                     :external-follow (not is-mobile?)
+                                    :show-home-pin true
+                                    :show-board-pin true
                                     :show-edit? true
                                     :show-delete? true
                                     :show-move? (not is-mobile?)

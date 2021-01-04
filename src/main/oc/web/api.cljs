@@ -1044,6 +1044,15 @@
      callback)
     (handle-missing-link "poll-delete-reply" delete-reply-link callback)))
 
+;; Pins
+
+(defn toggle-pin [pin-link callback]
+  (if pin-link
+    (storage-http (method-for-link pin-link) (relative-href pin-link)
+     {:headers (headers-for-link pin-link)}
+     callback)
+    (handle-missing-link "toggle-pin" pin-link callback)))
+
 ;; WRT
 
 (defn request-reads-data [item-id]

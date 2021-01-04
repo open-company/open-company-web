@@ -40,7 +40,7 @@
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
    :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
-   :for-you-context :last-activity-at])
+   :for-you-context :last-activity-at :pins])
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -97,11 +97,33 @@
         (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
          :posts-list [item-data]))))))
 
+(defn- pins-separator [pin-items]
+  (when-let [pinned-at (-> pin-items
+                           first
+                           :sort-value
+                           (+ 1000)
+                           utils/js-date)]
+  {:label "Pins"
+   :resource-type :separator
+   :last-activity-at pinned-at
+   :date pinned-at}))
+
 (defn- grouped-posts
   ([items-list]
-   (grouped-posts items-list :published-at))
-  ([items-list date-time-key]
-   (let [last-monday (utils/js-date)
+   (grouped-posts items-list nil :published-at))
+  ([items-list pins-container-id]
+   (grouped-posts items-list pins-container-id :published-at))
+  ([items-list pins-container-id date-time-key]
+   (let [pinned-items (filterv #(and (contains? % :pins)
+                                    (contains? (:pins %) (keyword pins-container-id))
+                                    (map? (get-in % [:pins (keyword pins-container-id)])))
+                              items-list)
+         pins-grouped-items (if (seq pinned-items)
+                              (vec (cons (pins-separator pinned-items) pinned-items))
+                              [])
+         rest-items-list (subvec items-list (count pinned-items) (count items-list))
+
+         last-monday (utils/js-date)
          _last-monday (doto last-monday
                         (.setDate (- (.getDate last-monday)
                                      ; First saturday before now
@@ -132,17 +154,19 @@
                         (.setSeconds 59)
                         (.setMilliseconds 999))
 
-         last-date (-> items-list
-                       last
-                       date-time-key)
          separators-data (loop [separators []
-                                posts items-list]
+                                posts rest-items-list]
                            (if (empty? posts)
                              separators
                              (recur (add-posts-to-separator (first posts) date-time-key separators last-monday two-weeks-ago first-month)
-                                    (rest posts))))]
-         (vec (rest ;; Always remove the first label
-          (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
+                                    (rest posts))))
+         non-pins-grouped-items (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)
+         ;; If there are pinned items at the top we need to keep the Pins group header
+         final-items (if (seq pins-grouped-items)
+                       (concat pins-grouped-items non-pins-grouped-items)
+                       ;; Remove the first group header if no pins are present
+                       (rest non-pins-grouped-items))]
+     (vec final-items))))
 
 (defun resource-type?
   ([resource-data resource-types :guard coll?]
@@ -646,7 +670,9 @@
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data) false)))
-        (assoc :container-seen-at container-seen-at))))))
+        (assoc :container-seen-at container-seen-at)
+        (assoc :home-pinned (contains? (:pins entry-data) (keyword ls/seen-home-container-id)))
+        (assoc :board-pinned (contains? (:pins entry-data) (keyword (:board-uuid entry-data)))))))))
 
 (defn parse-org
   "Fix org data coming from the API."
@@ -738,7 +764,7 @@
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
             grouped-items (if (show-separators? (:slug board-data) sort-type)
-                            (grouped-posts full-items-list)
+                            (grouped-posts full-items-list (:uuid board-data))
                             full-items-list)
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
@@ -893,7 +919,7 @@
                                              dis/recent-activity-sort) :last-activity-at
                                           :else                        :published-at)
             grouped-items (if (show-separators? (:container-slug container-data) sort-type)
-                            (grouped-posts full-items-list separator-date-time-key)
+                            (grouped-posts full-items-list (:container-id container-data) separator-date-time-key)
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))

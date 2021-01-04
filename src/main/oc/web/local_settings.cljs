@@ -118,3 +118,6 @@
 (def default-brand-color
   {:light default-color
    :dark default-color})
+
+;; Pins sort pivot
+(def pins-sort-pivot-days (* 365 50))

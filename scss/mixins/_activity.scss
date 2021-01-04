@@ -148,6 +148,41 @@ $header_top_margin: 24;
   }
 }
 
+@mixin pinned-tag() {
+  div.pinned-tag {
+    width: auto;
+    height: 18px;
+    position: relative;
+    background-color: var(--ultralight-color);
+    border-radius: 4px;
+    margin-left: 8px;
+    padding: 0 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+
+    &:before {
+      @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 10px 10px, var(--color));
+      width: 10px;
+      height: 10px;
+      margin-right: 4px;
+      display: inline-block;
+      content: "";
+    }
+
+    &:after {
+      display: inline-block;
+      height: 12px;
+      @include OC_Body_Bold();
+      font-size: 11px;
+      line-height: 12px;
+      color: var(--color);
+      content: "PINNED";
+    }
+  }
+}
+
 @mixin muted-activity($width: 12, $height: 14) {
   div.muted-activity {
     margin-right: 8px;

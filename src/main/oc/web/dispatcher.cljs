@@ -58,6 +58,8 @@
 (def notifications-key [:notifications-data])
 (def show-login-overlay-key :show-login-overlay)
 
+(def current-user-key [:current-user-data])
+
 (def orgs-key :orgs)
 
 (defn org-key [org-slug]
@@ -148,6 +150,13 @@
 (defn activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
+
+(defn pins-key [org-slug entry-uuid]
+  (let [entry-key (activity-key org-slug entry-uuid)]
+    (vec (concat entry-key [:pins]))))
+
+(defn pin-key [org-slug entry-uuid pin-container-uuid]
+  (vec (concat (pins-key org-slug entry-uuid) pin-container-uuid)))
 
 (defn activity-last-read-at-key [org-slug activity-uuid]
   (vec (conj (activity-key org-slug activity-uuid) :last-read-at)))
@@ -864,7 +873,7 @@
 (defn current-user-data
   "Get the current logged in user info."
   ([] (current-user-data @app-state))
-  ([data] (get-in data [:current-user-data])))
+  ([data] (get-in data current-user-key)))
 
 (defn ^:export orgs-data
   ([] (orgs-data @app-state))
@@ -1107,6 +1116,30 @@
       (get-in data activity-key))))
 (def activity-data-get activity-data)
 (def entry-data activity-data)
+
+(defn ^:export pins-data
+  "Get entry pins data."
+  ([]
+   (pins-data (current-org-slug) (current-activity-id) @app-state))
+  ([entry-uuid]
+   (pins-data (current-org-slug) entry-uuid @app-state))
+  ([org-slug entry-uuid]
+   (pins-data org-slug entry-uuid @app-state))
+  ([org-slug entry-uuid data]
+   (let [entry-pins-key (pins-key org-slug entry-uuid)]
+     (get-in data entry-pins-key))))
+
+(defn ^:export pin-data
+  "Get entry pin data."
+  ([pin-container-uuid]
+   (pin-data (current-org-slug) (current-activity-id) pin-container-uuid @app-state))
+  ([entry-uuid pin-container-uuid]
+   (pin-data (current-org-slug) entry-uuid pin-container-uuid @app-state))
+  ([org-slug entry-uuid pin-container-uuid]
+   (pin-data org-slug entry-uuid pin-container-uuid @app-state))
+  ([org-slug entry-uuid pin-container-uuid data]
+   (let [entry-pin-key (pin-key org-slug entry-uuid pin-container-uuid)]
+     (get-in data entry-pin-key))))
 
 (defn ^:export secure-activity-data
   "Get secure activity data."
