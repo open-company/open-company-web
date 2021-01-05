@@ -64,6 +64,10 @@ div.nux-tooltip-container {
   background-color: transparent;
   z-index: #{$navbar_zindex + 203};
 
+  @include mobile() {
+    display: none !important;
+  }
+
   div.nux-tooltip {
     $width: 320;
     $side: 24;
