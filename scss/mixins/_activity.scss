@@ -163,7 +163,7 @@ $header_top_margin: 24;
     justify-content: center;
 
     &:before {
-      @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 10px 10px, var(--color));
+      @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 10px 10px, var(--bright-color));
       width: 10px;
       height: 10px;
       margin-right: 4px;
@@ -181,7 +181,7 @@ $header_top_margin: 24;
       @include OC_Body_Bold();
       font-size: 11px;
       line-height: 12px;
-      color: var(--color);
+      color: var(--bright-color);
       content: "PINNED";
 
       @include mobile() {
