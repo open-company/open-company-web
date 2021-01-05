@@ -145,9 +145,7 @@
                            :external-share (not is-mobile?)
                            :external-bookmark (not is-mobile?)
                            :external-follow (not is-mobile?)
-                           :external-home-pin (not is-mobile?)
                            :show-home-pin is-home?
-                           :external-board-pin (not is-mobile?)
                            :show-board-pin is-entry-board?
                            :show-edit? true
                            :show-delete? true

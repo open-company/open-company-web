@@ -169,6 +169,10 @@ $header_top_margin: 24;
       margin-right: 4px;
       display: inline-block;
       content: "";
+
+      @include mobile() {
+        margin-right: 0;
+      }
     }
 
     &:after {
@@ -179,7 +183,13 @@ $header_top_margin: 24;
       line-height: 12px;
       color: var(--color);
       content: "PINNED";
+
+      @include mobile() {
+        display: none;
+      }
     }
+
+    @content
   }
 }
 

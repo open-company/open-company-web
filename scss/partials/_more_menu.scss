@@ -708,6 +708,11 @@ div.more-menu {
           &.toggle-pin {
             padding-left: 56px;
 
+            &.disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+
             &:before {
               transition: transform 180ms ease-in, margin-top 180ms ease-in;
               content: "";
