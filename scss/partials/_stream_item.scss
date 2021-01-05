@@ -397,7 +397,7 @@ div.stream-item {
         display: flex;
         flex-flow: column nowrap;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
 
         img.stream-item-preview {
           border-radius: 6px;
