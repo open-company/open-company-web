@@ -198,8 +198,8 @@
 
 (defn- get-payments-cb [org-slug {:keys [success status body]}]
   (if-not success
-    (dis/dispatch! [:payments-data org-slug {:error true
-                                             :status status}])
+    (dis/dispatch! [:payments org-slug {:error true
+                                        :status status}])
     (let [payments-data (parse-payments-data (json->cljs body))]
       (dis/dispatch! [:payments org-slug payments-data])
       (check-notify-user payments-data))))

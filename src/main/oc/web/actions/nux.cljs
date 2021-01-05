@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
@@ -147,6 +148,7 @@
   [& [force?]]
   (when (and (or force?
                  (not (contains? @dis/app-state :nux)))
+             (not (responsive/is-mobile-size?))
              (dis/current-org-slug)
              (= (oget js/window "location.pathname") (oc-urls/following)))
     (let [nux-state (get-nux-cookie)]
