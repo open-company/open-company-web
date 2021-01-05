@@ -181,7 +181,7 @@
             [:div.stream-collapsed-item-avatar
               (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
             [:div.stream-item-context
-             (str (-> activity-data :for-you-context :label) " to:")]
+             (str (-> activity-data :for-you-context :label) " in:")]
             ;; Needed to wrap mobile on a new line
             [:div.stream-item-break]
             ;; [:div.stream-item-arrow]
