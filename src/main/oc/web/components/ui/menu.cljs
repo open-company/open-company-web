@@ -311,7 +311,7 @@
           [:a.whats-new-link
             {:href oc-urls/what-s-new
              :target "_blank"
-             :on-click (when is-mobile?
+             :on-click (when-not is-mobile?
                          (partial whats-new-click s))}
             [:div.oc-menu-item.whats-new
               "What’s new"]]
