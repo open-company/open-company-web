@@ -93,7 +93,7 @@
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s e]
                                                              (hide-menu s (-> s :rum/args first :will-close))))
-                       (ui-mixins/strict-refresh-tooltips-mixin)
+                       ui-mixins/strict-refresh-tooltips-mixin
                        {:will-update (fn [s]
                                        (let [next-force-show-menu (-> s :rum/args first :force-show-menu)]
                                          (when (not= @(::last-force-show-menu s) next-force-show-menu)
