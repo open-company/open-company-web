@@ -247,7 +247,8 @@
                                 activity-add-comment-data (add-comment-data s add-comment-key)
                                 initial-body (or activity-add-comment-data
                                                  (:body edit-comment-data)
-                                                 au/empty-body-html)]
+                                                 au/empty-body-html)
+                                follow-link (utils/link-for (:links activity-data) "follow")]
                             (reset! (::add-comment-key s) add-comment-key)
                             (reset! (::initial-add-comment s) initial-body)
                             (reset! (::collapsed s) (and collapse?
@@ -256,7 +257,8 @@
                                                                      (not= activity-add-comment-data (:body edit-comment-data))
                                                                      (not (au/empty-body? activity-add-comment-data)))))
                             (when (fn? add-comment-did-change)
-                              (reset! (::did-change-throttled s) (Throttle. add-comment-did-change 2000))))
+                              (reset! (::did-change-throttled s) (Throttle. add-comment-did-change 2000)))
+                            (reset! (::follow s) (not follow-link)))
                           s)
                           :did-mount (fn [s]
                            (let [props (first (:rum/args s))
