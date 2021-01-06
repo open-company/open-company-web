@@ -145,12 +145,21 @@
                                     (rest posts))))
          non-pins-grouped-items (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)
          ;; If there are pinned items at the top we need to keep the Pins group header
-         final-items (if (seq pinned-items)
+         final-items (cond
+                       ;; If both pins and non pins items are persent remove add a special class to the first non pins header
+                       (and (seq pinned-items)
+                            (seq non-pins-grouped-items))
                        (concat pinned-items
                                [(assoc (first non-pins-grouped-items) :after-pins true)]
                                (rest non-pins-grouped-items))
                        ;; Remove the first group header if no pins are present
-                       (rest non-pins-grouped-items))]
+                       (seq non-pins-grouped-items)
+                       (rest non-pins-grouped-items)
+                       ;; Keep only pins if no other items are present
+                       (seq pinned-items)
+                       pinned-items
+                       :else
+                       [])]
      (vec final-items))))
 
 (defun resource-type?
