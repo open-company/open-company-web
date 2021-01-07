@@ -173,8 +173,13 @@
         manage-sub? (:can-manage-subscription? payments-data)
         billing-label (when show-billing?
                         (if manage-sub?
-                          [:div.oc-menu-item-inner "Manage subscription"]
-                          [:div.oc-menu-item-inner [:div.arrow] [:div.copy "Try premium"]]))
+                          [:div.oc-menu-item-inner
+                           [:div.copy "Manage subscription"]
+                           (when @(::loading-manage-sub s)
+                             (small-loading))]
+                          [:div.oc-menu-item-inner
+                           [:div.arrow]
+                           [:div.copy "Try premium"]]))
         billing-click (when show-billing?
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
@@ -295,9 +300,7 @@
                :class (when-not manage-sub? "try-premium")
                :on-click billing-click}
               [:div.oc-menu-item
-                billing-label
-               (when @(::loading-manage-sub s)
-                 (small-loading))]])
+                billing-label]])
           ;; What's new & Support separator
           (when-not is-mobile?
             [:div.oc-menu-separator])

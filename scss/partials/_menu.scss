@@ -201,25 +201,47 @@ div.menu {
           height: 32px;
           background-color: $carrot_orange;
           border-radius: 4px;
-          width: 128px;
+
+          div.oc-menu-item {
+            div.oc-menu-item-inner {
+              div.copy {
+                color: white;
+                font-size: 14px;
+                line-height: 18px;
+                @include OC_Body_Bold();
+              }
+            }
+          }
+        }
+
+        &.payments {
+          width: auto;
+          background-color: transparent;
+          display: inline-block;
+          margin: 0;
+          border: none;
 
           div.oc-menu-item {
             width: auto;
             background-color: transparent;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-items: center;
 
             div.oc-menu-item-inner {
-              display: flex;
+              display: inline-flex;
               flex-flow: row nowrap;
               justify-content: center;
               align-items: center;
 
               div.copy {
                 display: block;
-                font-size: 14px;
-                line-height: 18px;
-                color: white;
+                font-size: 16px;
+                line-height: 20px;
                 background-color: transparent;
-                @include OC_Body_Bold();
+                color: var(--light-color);
+                @include OC_Body_Book();
               }
 
               div.arrow {
@@ -248,8 +270,11 @@ div.menu {
         font-size: 16px;
 
         div.small-loading {
-          padding: 0 2px;
+          padding: 0;
           margin: 0 0 0 6px;
+          height: 18px;
+          width: 18px;
+
         }
 
         @include mobile() {
