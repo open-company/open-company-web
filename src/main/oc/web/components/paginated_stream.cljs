@@ -179,13 +179,10 @@
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
         static-part (str (name (:resource-type item)) "-" (:uuid item))
-        variable-part (str (:updated-at item) "-"
-                           (:created-at item) "-"
-                           (when entry?
-                             (str (:published-at item) "-"))
-                           (when entry?
-                             (str (:pinned-at item) "-"))
-                           (:last-activity-at item))]
+        variable-part (cond entry?
+                            (or (:updated-at item) (:created-at item))
+                            :else
+                            (:last-activity-at item))]
     (str static-part "-" variable-part)))
 
 (defn- clear-cell-measure
@@ -279,7 +276,7 @@
                          :rowHeight (oget @(::cache s) "rowHeight")
                          :cellRenderer (partial cell-measurer-renderer {:cache @(::cache s)})
                          :scrollTop scrollTop
-                         ; :overscanRowCount 20
+                         ;; :overscanRowCount 20
                          :columnCount 1
                          :style {:outline "none"}})]))
 

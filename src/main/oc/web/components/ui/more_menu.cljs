@@ -139,16 +139,18 @@
         can-move-item? (and show-move?
                             edit-link
                             (> (count editable-boards) 1))
+        private-board? (= (:board-access entity-data) "private")
         ;; Pins
         home-pin-link (utils/link-for (:links entity-data) "home-pin")
-        home-pin? (and home-pin-link
-                       show-home-pin)
-        home-pinned? (when home-pin?
+        can-home-pin? (and home-pin-link
+                          (not private-board?)
+                          show-home-pin)
+        home-pinned? (when can-home-pin?
                        (get-in entity-data [:pins (keyword ls/seen-home-container-id)]))
         board-pin-link (utils/link-for (:links entity-data) "board-pin")
-        board-pin? (and board-pin-link
-                        show-board-pin)
-        board-pinned? (when board-pin?
+        can-board-pin? (and board-pin-link
+                            show-board-pin)
+        board-pinned? (when can-board-pin?
                         (get-in entity-data [:pins (keyword (:board-uuid entity-data))]))
         show-both-pins (and show-home-pin show-board-pin)
         home-pin-title (if home-pinned?
@@ -317,17 +319,17 @@
                     "Bookmark"])))
             (when show-home-pin
               [:li.toggle-pin.home-pin
-               {:class (utils/class-set {:bottom-rounded (not board-pin?)
-                                         :bottom-margin (not board-pin?)
+               {:class (utils/class-set {:bottom-rounded (not can-board-pin?)
+                                         :bottom-margin (not can-board-pin?)
                                          :pinned home-pinned?
-                                         :disabled (not home-pin-link)})
+                                         :disabled (not can-home-pin?)})
                 :ref "more-menu-home-pin-bt"
                 :on-click #(do
                              (hide-menu s will-close)
-                             (when home-pin-link
+                             (when can-home-pin?
                                (pin-actions/toggle-home-pin! entity-data home-pin-link)))
-                :title (when-not home-pin-link
-                         (if (= (:board-access entity-data) "private")
+                :title (when-not can-home-pin?
+                         (if private-board?
                            "Private posts can’t be pinned to the Home feed"
                            "Can't pin this post to Home"))
                 :data-toggle (when-not is-mobile? "tooltip"
@@ -339,11 +341,11 @@
                {:class (utils/class-set {:bottom-rounded true
                                          :bottom-margin true
                                          :pinned board-pinned?
-                                         :disabled (not board-pin-link)})
+                                         :disabled (not can-board-pin?)})
                 :ref "more-menu-board-pin-bt"
                 :on-click #(do
                              (hide-menu s will-close)
-                             (when board-pin-link
+                             (when can-board-pin?
                                (pin-actions/toggle-board-pin! entity-data board-pin-link)))}
                board-pin-title])
             (when can-react?
