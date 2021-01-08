@@ -123,7 +123,7 @@
           router/nux-cookie
           cook/get-cookie
           json->cljs
-          (update :step #(when % (keyword %)))
+          (update :key #(when % (keyword %)))
           (assoc :user-type (get-user-role))))
 
 (defn set-nux-cookie
@@ -152,17 +152,17 @@
              (dis/current-org-slug)
              (= (oget js/window "location.pathname") (oc-urls/following)))
     (let [nux-state (get-nux-cookie)]
-      (if (= (:step nux-state) :done)
+      (if (= (:key nux-state) :done)
         (end-nux)
         (dis/dispatch! [:input [:nux] (get-nux-cookie)])))))
 
 (defn- calc-next-step
   ([] (calc-next-step (get-user-role) {}))
   ([user-type] (calc-next-step user-type {}))
-  ([user-type {:keys [step]}]
+  ([user-type {:keys [key]}]
    (if (= user-type :viewer)
      :done
-     (case step
+     (case key
        :intro    (if (= user-type :viewer)
                    :feed
                    :news)
@@ -177,13 +177,13 @@
        nil       (if (= user-type :viewer)
                    :done ;; Let's turn off NUX for viewers
                    :intro)
-       step))))
+       key))))
 
 (defn next-step []
   (let [user-type (get-user-role)
         current-value (get @dis/app-state :nux)
         next-step (calc-next-step user-type current-value)
-        same-step? (= (:step current-value) next-step)
+        same-step? (= (:key current-value) next-step)
         prepare-cb (when (and (= next-step :ready)
                               (not same-step?))
                      expand-cmail)
@@ -191,16 +191,16 @@
                 280
                 0)]
     ;; In case we are stalled on a value it means NUX is finished/dismissed
-    (when (:step current-value)
+    (when (:key current-value)
       (if same-step?
         (end-nux)
-        (set-nux-cookie {:step next-step})))
+        (set-nux-cookie {:key next-step})))
     (when (fn? prepare-cb)
       (prepare-cb))
-    (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] next-step]))))
+    (utils/maybe-after delay #(dis/dispatch! [:input [:nux :key] next-step]))))
 
-(defn- calc-prev-step [user-type {:keys [step]}]
-  (case step
+(defn- calc-prev-step [user-type {:keys [key]}]
+  (case key
     :news     :intro
     :feed     (if (= user-type :viewer) :intro :news)
     :settings :feed
@@ -215,7 +215,7 @@
   (let [user-type (get-user-role)
         current-value (get @dis/app-state :nux)
         prev-step (calc-prev-step user-type current-value)
-        same-step? (= (:step current-value) prev-step)
+        same-step? (= (:key current-value) prev-step)
         prepare-cb (when (and (= current-value :ready)
                               (not same-step?))
                      collapse-cmail)
@@ -223,15 +223,15 @@
                 280
                 0)]
     ;; In case we are stalled on a value it means NUX is finished/dismissed
-    (when (:step current-value)
+    (when (:key current-value)
       (when-not same-step?
-        (set-nux-cookie {:step prev-step})))
+        (set-nux-cookie {:key prev-step})))
     (when (fn? prepare-cb)
       (prepare-cb))
-    (utils/maybe-after delay #(dis/dispatch! [:input [:nux :step] prev-step]))))
+    (utils/maybe-after delay #(dis/dispatch! [:input [:nux :key] prev-step]))))
 
 (defn dismiss-nux []
-  (dis/dispatch! [:input [:nux :step] :done])
+  (dis/dispatch! [:input [:nux :key] :done])
   (end-nux))
 
 (defn new-user-registered [medium-type & [cb]]
@@ -239,10 +239,10 @@
                     true (* 60 60 24 7))
   (when (not= (get-user-role) :viewer)
     (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
-  (set-nux-cookie {:step (calc-next-step) :medium medium-type})
+  (set-nux-cookie {:key (calc-next-step) :medium medium-type})
   (when (fn? cb)
     (utils/after 100 cb)))
 
-(defn ^:export restart-nux [& [step]]
-  (set-nux-cookie {:step (if step (keyword step) (calc-next-step))})
+(defn ^:export restart-nux [& [key]]
+  (set-nux-cookie {:key (if key (keyword key) (calc-next-step))})
   (utils/after 280 #(check-nux true)))

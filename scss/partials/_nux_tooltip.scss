@@ -99,7 +99,7 @@ div.nux-tooltip-container {
     &.left {
       // left: #{$half-diagonal}px;
       // top: 50%;
-      transform: translate(-#{$half-diagonal}px, -50%);
+      transform: translate(calc(-100% - #{$half-diagonal}px), calc(-50% + #{$diagonal}px));
     }
 
     &.bottom-left {
@@ -147,6 +147,11 @@ div.nux-tooltip-container {
       &.left-top {
         top: #{$side + ($side - $half-diagonal)}px;
         left: -#{$side / 2}px;
+      }
+
+      &.right-top {
+        top: #{$side + ($side - $half-diagonal)}px;
+        right: -#{$side / 2}px;
       }
     }
 

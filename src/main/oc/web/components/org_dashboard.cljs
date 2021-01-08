@@ -20,7 +20,7 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
-            [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager)]
+            [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
@@ -88,7 +88,8 @@
                 show-premium-picker?
                 payments-ui-prompt-banner
                 payments-ui-upgraded-banner
-                nux]} (drv/react s :org-dashboard-data)
+                nux
+                ui-tooltip]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
@@ -188,8 +189,13 @@
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
-        (when nux
-          (nux-tooltips-manager))
+        (if nux
+          (nux-tooltips-manager)
+          (when ui-tooltip
+            (nux-tooltip {:data ui-tooltip
+                          :next-cb (:next-cb ui-tooltip)
+                          :dismiss-cb (:next-cb ui-tooltip)})))
+        
         (cond
           ;; Activity removed
           show-activity-removed

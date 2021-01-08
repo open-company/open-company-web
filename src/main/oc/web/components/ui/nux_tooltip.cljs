@@ -1,5 +1,4 @@
 (ns oc.web.components.ui.nux-tooltip
-  (:require-macros [if-let.core :refer (if-let*)])
   (:require [rum.core :as rum]
             [oops.core :refer (oset!)]
             [dommy.core :as dommy]
@@ -16,16 +15,16 @@
     (.scrollIntoView el #js {:block "center"})
     nil))
 
-(defn- remove-old-tooltip-handle [state step]
-  (when (not= step @(::last-step state))
+(defn- remove-old-tooltip-handle [state key]
+  (when (not= key @(::last-key state))
     (when-let [old-el (dommy/sel1 @(::last-sel state))]
       (when (dommy/has-class? old-el :nux-tooltip-handle)
         (dommy/remove-class! old-el :nux-tooltip-handle)))))
 
 (defn- next-tooltip [state el data]
-  (let [step (-> state :rum/args first :step)
-        new-step? (not= @(::last-step state) step)
-        _ (when new-step?
+  (let [key (-> state :rum/args first :key)
+        new-key? (not= @(::last-key state) key)
+        _ (when new-key?
             (scroll-to-tooltip data el))
         rect (dom-utils/bounding-rect el)
         pos (case (:position data)
@@ -46,49 +45,60 @@
               :y (+ (:y rect) (:height rect))}
               :right-top
               {:x (+ (:x rect) (:width rect))
-              :y (+ (:y rect) (/ (:height rect) 2))})]
+               :y (+ (:y rect) (/ (:height rect) 2))}
+              :left-top
+              {:x (:x rect)
+               :y (+ (:y rect) (/ (:height rect) 2))})]
     (dommy/add-class! el :nux-tooltip-handle)
     (when-not (= @(::pos state) pos)
       (reset! (::pos state) pos))
-    (when new-step?
-      (remove-old-tooltip-handle state step)
-      (reset! (::last-step state) step)
+    (when new-key?
+      (remove-old-tooltip-handle state key)
+      (reset! (::last-key state) key)
       (reset! (::last-sel state) (:sel data)))))
 
-(defn- check-step [state]
-  (if-let* [data (-> state :rum/args first :data)
-            el (dommy/sel1 (:sel data))]
-    (next-tooltip state el data)
-    (when @(::pos state)
-      (reset! (::pos state) nil))))
+(defn- check-data [state]
+  (let [data (-> state :rum/args first :data)
+        el (dommy/sel1 (:sel data))]
+    (if el
+      (next-tooltip state el data)
+      (do
+        (when @(::pos state)
+          (reset! (::pos state) nil))
+        (when (fn? (:show-el-cb data))
+          ((:show-el-cb data))
+          (utils/after 1500 #(reset! (::rand state) (rand 10000))))))))
 
 (rum/defcs nux-tooltip < rum/static
   (rum/local nil ::pos)
-  (rum/local nil ::last-step)
+  (rum/local nil ::last-key)
   (rum/local nil ::last-sel)
-  {:will-update (fn [state]
-                  (check-step state)
-                  state)}
+  (rum/local nil ::rand)
+  {:will-mount (fn [state]
+                 (check-data state)
+                 state)
+   :did-update (fn [state]
+                 (check-data state)
+                 state)}
   [state
    {user-type                               :user-type
     dismiss-cb                              :dismiss-cb
     next-cb                                 :next-cb
     prev-cb                                 :prev-cb
-    step                                    :step
+    key                                     :key
     {:keys [title description next-title back-title
-            steps arrow-position position sel
+            steps arrow-position position sel key
             post-dismiss-cb post-next-cb post-prev-cb]
      :as data}                              :data}]
   (let [{left :x top :y} @(::pos state)]
-    (when (and left top
-               step)
+    (when (and data left top)
       [:div.nux-tooltip-container
        {:on-mouse-down utils/event-stop}
         [:div.nux-tooltip
           {:class (utils/class-set {position true})
             :style (clj->js {:left (str left "px")
                              :top (str top "px")})
-            :key (str "nux-tooltip-" (name step))}
+            :key (str "nux-tooltip-" key)}
           (when arrow-position
             [:div.triangle
               {:class (utils/class-set {arrow-position true})}])
@@ -136,11 +146,11 @@
   rum/reactive
   (drv/drv :nux)
   [s]
-  (let [{step :step user-type :user-type} (drv/react s :nux)]
-    (when step
-      (nux-tooltip {:step step
+  (let [{key :key user-type :user-type} (drv/react s :nux)]
+    (when key
+      (nux-tooltip {:key key
                     :user-type user-type
-                    :data (nux-actions/get-tooltip-data step user-type)
+                    :data (nux-actions/get-tooltip-data key user-type)
                     :dismiss-cb #(nux-actions/dismiss-nux)
                     :next-cb #(nux-actions/next-step)
                     :prev-cb #(nux-actions/prev-step)}))))

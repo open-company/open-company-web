@@ -693,7 +693,8 @@
                                :show-premium-picker? (:show-premium-picker? base)
                                payments-ui-prompt-banner-key (get base payments-ui-prompt-banner-key)
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
-                               :nux nux})]
+                               :nux nux
+                               :ui-tooltip (:ui-tooltip base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -721,8 +722,8 @@
    :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
-   :show-invite-box      [[:base] (fn [base] (get base show-invite-box-key))]
-   :can-compose         [[:org-data] (fn [org-data] (get org-data can-compose-key))]
+   :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
+   :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
    :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
    })
 

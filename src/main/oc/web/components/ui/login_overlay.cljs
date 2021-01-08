@@ -1,9 +1,6 @@
 (ns oc.web.components.ui.login-overlay
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [clojure.string :as s]
-            [taoensso.timbre :as timbre]
-            [goog.object :as gobj]
             [goog.style :as gstyle]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
@@ -14,7 +11,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn close-overlay [e]
@@ -23,7 +19,7 @@
 
 (def dont-scroll
   {:will-mount (fn [s]
-                 (when-not (user-store/auth-settings?)
+                 (when-not (user-actions/auth-settings?)
                    (utils/after 100 #(user-actions/auth-settings-get)))
                 s)
    :before-render (fn [s]

@@ -697,6 +697,16 @@
        (callback status body success)))
     (handle-missing-link "refresh-slack-user" refresh-link callback)))
 
+(defn user-tag
+  "Used to add or remove a certain tag from the user's tags list"
+  [tag-link callback]
+  (if tag-link
+    (auth-http (method-for-link tag-link) (relative-href tag-link)
+     {:headers (headers-for-link tag-link)}
+     callback
+     {:report-errors? false})
+    (handle-missing-link "user-tag" tag-link {})))
+
 (defn add-author
   "Given a user-id add him as an author to the current org.
   Refresh the user list and the org-data when finished."
