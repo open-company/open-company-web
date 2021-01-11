@@ -3,8 +3,6 @@
             [oc.web.lib.responsive :as responsive]
             [oops.core :refer (oget)]))
 
-(defonce onload-recalc-measure-class "onload-reaclc-measure")
-
 (defonce _lock-counter (atom 0))
 
 (defn lock-page-scroll

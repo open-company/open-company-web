@@ -6,8 +6,8 @@
 (defn- count-unseen-comments [items]
   (reduce (fn [c item]
             (+ c (count (filter :unseen (:replies-data item)))))
-          0
-          items))
+   0
+   items))
 
 (rum/defcs activity-refresh-button < rum/reactive
   (drv/drv :replies-badge)

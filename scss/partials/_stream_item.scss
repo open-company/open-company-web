@@ -1,14 +1,10 @@
-// --foc-background-color: rgba($deep_navy, 0.05);
-// --mobile-foc-background-color: rgba($deep_navy, 0.05);
-// --foc-hover-color: rgba($deep_navy, 0.10);
-// --foc-new-color: white;
-// --foc-divider-line-color: rgba($deep_navy, 0.15);
-
-$thumbnail_width: 128;
+$thumbnail_ratio: 1.23;
 $thumbnail_height: 98;
+$thumbnail_width: $thumbnail_height * $thumbnail_ratio;
 
-$mobile_thumbnail_height: 72;
-$mobile_thumbnail_width: 72 * ($thumbnail_width/$thumbnail_height);
+$mobile_thumbnail_ratio: 1;
+$mobile_thumbnail_width: 70;
+$mobile_thumbnail_height: $mobile_thumbnail_width / $mobile_thumbnail_ratio;
 
 div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
@@ -97,7 +93,6 @@ div.virtualized-list-row:not(.collapsed-item) {
 
 div.stream-item {
   width: #{$board_container_width}px;
-  max-height: #{$foc_height}px;
   margin: 0;
   border-top: 1px solid transparent;
   border-right: 1px solid var(--foc-divider-line-color);
@@ -117,9 +112,7 @@ div.stream-item {
     border-bottom: 1px solid var(--foc-divider-line-color);
     border-left: none;
     background-color: var(--mobile-foc-background-color);
-
     padding: 24px 16px 18px;
-    max-height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -370,393 +363,344 @@ div.stream-item {
     margin-top: 16px;
   }
 
-  div.stream-item-body-ext {
-    padding: 0;
-    border-radius: 6px;
+  div.stream-item-content {
+    position: relative;
+    cursor: pointer;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: [col1] auto [col2];
+    grid-template-rows: [row1] auto [row2] 4px [row3] auto [row4];
 
     @include mobile() {
-      border-radius: 0;
+      margin-top: 12px;
     }
 
-    &.expanded {
-      div.thumbnail-container {
-        cursor: default;
-
-        div.body-thumbnail-wrapper {
-          display: none;
-        }
-      }
-    }
-
-    div.thumbnail-container {
-      position: relative;
-      cursor: pointer;
-      margin-top: 8px;
+    div.stream-item-headline {
+      grid-column-start: col1;
+      grid-column-end: col2;
+      grid-row-start: row1;
+      grid-row-end: row2;
+      @include activity-title-foc(20, 28, var(--color), 1);
 
       @include mobile() {
-        margin-top: 12px;
+      @include activity-title-foc(18, 23, var(--color), 1);
+      }
+    }
+
+    div.stream-item-body {
+      grid-column-start: col1;
+      grid-column-end: col2;
+      grid-row-start: row3;
+      grid-row-end: row4;
+      @include activity-body-foc(16, 22, var(--color), 3);
+
+      @include mobile() {
+        @include activity-body-foc(16, 20, var(--color), 2);
+      }
+    }
+
+    &.has-preview {
+      grid-template-columns: [col1] auto [col2] 8px [col3] auto [col4];
+      grid-template-rows: [row1] auto [row2] 4px [row3] auto [row4];
+
+      @include mobile() {
+        grid-template-columns: [col1] auto [col2] 8px [col3] auto [col4];
       }
 
-      &.has-preview {
-        min-height: #{$thumbnail_height}px;
+      div.stream-item-preview-container {
+        grid-column-start: col3;
+        grid-column-end: col4;
+        grid-row-start: row1;
+        grid-row-end: row4;
         display: flex;
-        flex-flow: row nowrap;
+        flex-flow: column nowrap;
         justify-content: center;
-        align-items: flex-start;
+        align-items: flex-end;
 
-        @include mobile() {
-          min-height: #{$mobile_thumbnail_height}px;
-          align-items: center;
-        }
-
-        div.body-thumbnail-wrapper {
-          width: #{$thumbnail_width}px;
-          min-height: #{$thumbnail_height}px;
-          height: auto;
-          background-repeat: no-repeat;
-          background-size: contain;
-          background-position: center;
-          order: 2;
-          display: flex;
-          flex-flow: column nowrap;
-          justify-content: center;
-          align-items: center;
-
-          img.body-thumbnail {
-            border-radius: 6px;
-            object-fit: contain;
-            max-width: #{$thumbnail_width}px;
-            max-height: #{$thumbnail_height}px;
-          }
+        img.stream-item-preview {
+          border-radius: 6px;
+          object-fit: contain;
+          max-width: #{$thumbnail_width}px;
+          max-height: #{$thumbnail_height}px;
 
           @include mobile() {
-            width: #{$mobile_thumbnail_width}px;
-            min-height: #{$mobile_thumbnail_height}px;
-
-            img.body-thumbnail {
-              max-height: #{$mobile_thumbnail_height}px;
-              max-width: #{$mobile_thumbnail_width}px;
-            }
-          }
-
-          &.video {
-            position: relative;
-
-            &:hover:after {
-              opacity: 1;
-            }
-
-            &:after {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              content: "";
-              width: 45px;
-              height: 45px;
-              background-image: cdnUrl("/img/ML/play.svg");
-              background-repeat: no-repeat;
-              background-position: center;
-              background-size: 45px;
-              opacity: 0.6;
-            }
+            max-height: #{$mobile_thumbnail_height}px;
+            max-width: #{$mobile_thumbnail_width}px;
           }
         }
 
-        div.stream-body-left {
+        &.video {
           position: relative;
-          width: calc(100% - #{$thumbnail_width}px - 8px);
-          order: 1;
-          margin-right: 8px;
 
-          @include mobile() {
-            width: calc(100% - #{$mobile_thumbnail_width}px - 8px);
+          &:hover:after {
+            opacity: 1;
+          }
+
+          &:after {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            content: "";
+            width: 45px;
+            height: 45px;
+            background-image: cdnUrl("/img/ML/play.svg");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 45px;
+            opacity: 0.6;
+          }
+        }
+      }
+    }
+  }
+
+  div.stream-item-footer {
+    margin-top: 10px;
+    min-height: 26px;
+    position: relative;
+
+    @include mobile() {
+      height: auto;
+      overflow: hidden;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    div.reactions {
+      @include mobile() {
+        display: inline-block;
+      }
+    }
+
+    div.stream-item-footer-mobile-group {
+      @include mobile() {
+        float: left;
+        height: 26px;
+      }
+    }
+
+    div.stream-body-draft-edit {
+      float: left;
+
+      button.edit-draft-bt {
+        text-align: left;
+        padding: 0px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: var(--primary-color);
+      }
+    }
+
+    div.stream-body-draft-delete {
+      float: right;
+      button.delete-draft-bt {
+        text-align: right;
+        padding: 0px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: var(--light-color);
+      }
+    }
+
+    div.stream-item-comments-summary {
+      float: left;
+      margin-right: 16px;
+
+      @include mobile() {
+        position: relative;
+        top: initial;
+        left: initial;
+      }
+    }
+
+    div.reactions {
+      float: left;
+      margin-right: 16px;
+
+      div.reactions-picker-container {
+
+        div.emoji-mart {
+          bottom: unset;
+          top: 0;
+          left: calc(100% + 8px);
+
+          @include mobile(){
+            bottom: unset;
+            right: unset;
+            top: unset;
+            left: unset;
           }
         }
       }
     }
 
-    div.stream-body-left {
-      position: relative;
+    div.stream-item-mobile-attachments {
+      display: none;
 
-      @include tablet() {
-        width: 100%;
-        margin: 0;
-      }
+      @include mobile() {
+        display: block;
+        float: left;
+        height: 22px;
 
-      div.stream-item-headline {
-        height: 28px;
-        @include activity-title(20px, 28px);
-        color: var(--color);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-        overflow-wrap: break-word;
+        span.mobile-attachments-icon {
+          display: inline-block;
+          width: 18px;
+          height: 22px;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 18px 20px;
+          background-repeat: no-repeat;
+          background-position: center;
+          margin-right: 6px;
+          opacity: 0.5;
 
-        @include mobile() {
-          height: 23px;
-          @include activity-title(18px, 23px);
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
         }
-      }
 
-      div.stream-item-body {
-        margin-top: 4px;
-        @include activity-body-preview(16, 22, var(--color), 3);
-
-        @include mobile() {
-          @include activity-body-preview(16, 20, var(--color), 2);
+        span.mobile-attachments-count {
+          @include OC_Body_Book();
+          font-size: 17px;
+          line-height: 22px;
+          color: var(--light-color);
+          display: inline-block;
+          height: 22px;
+          vertical-align: top;
         }
       }
     }
 
-    div.stream-item-footer {
-      margin-top: 10px;
-      min-height: 26px;
+    div.stream-item-attachments {
+      float: left;
+      margin-right: 16px;
+      height: 26px;
       position: relative;
 
       @include mobile() {
-        height: auto;
-        overflow: hidden;
-        margin-top: 10px;
-        width: 100%;
-      }
-
-      div.reactions {
-        @include mobile() {
-          display: inline-block;
-        }
-      }
-
-      div.stream-item-footer-mobile-group {
-        @include mobile() {
-          float: left;
-          height: 26px;
-        }
-      }
-
-      div.stream-body-draft-edit {
-        float: left;
-
-        button.edit-draft-bt {
-          text-align: left;
-          padding: 0px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          color: var(--primary-color);
-        }
-      }
-
-      div.stream-body-draft-delete {
-        float: right;
-        button.delete-draft-bt {
-          text-align: right;
-          padding: 0px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          color: var(--light-color);
-        }
-      }
-
-      div.stream-item-comments-summary {
-        float: left;
-        margin-right: 16px;
-
-        @include mobile() {
-          position: relative;
-          top: initial;
-          left: initial;
-        }
-      }
-
-      div.reactions {
-        float: left;
-        margin-right: 16px;
-
-        div.reactions-picker-container {
-
-          div.emoji-mart {
-            bottom: unset;
-            top: 0;
-            left: calc(100% + 8px);
-
-            @include mobile(){
-              bottom: unset;
-              right: unset;
-              top: unset;
-              left: unset;
-            }
-          }
-        }
-      }
-
-      div.stream-item-mobile-attachments {
         display: none;
-
-        @include mobile() {
-          display: block;
-          float: left;
-          height: 22px;
-
-          span.mobile-attachments-icon {
-            display: inline-block;
-            width: 18px;
-            height: 22px;
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 18px 20px;
-            background-repeat: no-repeat;
-            background-position: center;
-            margin-right: 6px;
-            opacity: 0.5;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-            }
-          }
-
-          span.mobile-attachments-count {
-            @include OC_Body_Book();
-            font-size: 17px;
-            line-height: 22px;
-            color: var(--light-color);
-            display: inline-block;
-            height: 22px;
-            vertical-align: top;
-          }
-        }
       }
 
-      div.stream-item-attachments {
-        float: left;
-        margin-right: 16px;
-        height: 26px;
-        position: relative;
-
-        @include mobile() {
-          display: none;
-        }
-
-        &:hover {
-          div.stream-item-attachments-count {
-            opacity: 1;
-          }
-
-          div.stream-item-attachments-list {
-            display: block;
-          }
-        }
-
+      &:hover {
         div.stream-item-attachments-count {
-          position: relative;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          opacity: 0.5;
-          line-height: 26px;
-          padding-left: 22px;
-
-          &:before {
-            content: "";
-            width: 12px;
-            height: 23px;
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 12px 16px;
-            background-repeat: no-repeat;
-            background-position: center;
-            position: absolute;
-            left: 0;
-            top: 0;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-            }
-          }
-
-          &:hover {
-            opacity: 1;
-          }
+          opacity: 1;
         }
 
         div.stream-item-attachments-list {
+          display: block;
+        }
+      }
+
+      div.stream-item-attachments-count {
+        position: relative;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        opacity: 0.5;
+        line-height: 26px;
+        padding-left: 22px;
+
+        &:before {
+          content: "";
+          width: 12px;
+          height: 23px;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 12px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
           position: absolute;
-          top: 26px;
-          left: calc(50% - 120px);
-          width: 240px;
-          max-height: 200px;
-          background-color: var(--overlay-background-color);
-          border-radius: 4px;
-          border: 1px solid var(--divider-line);
-          padding: 8px 0;
-          display: none;
-          z-index: 2;
+          left: 0;
+          top: 0;
 
-          a.stream-item-attachments-item {
-            padding: 8px 16px;
-            height: 34px;
-            display: block;
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+        }
 
-            &:active, &:hover {
-              background-color: var(--selected-row-background-color);
-              div.stream-item-attachments-item-desc {
-                color: var(--selected-row-color);
-              }
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      div.stream-item-attachments-list {
+        position: absolute;
+        top: 26px;
+        left: calc(50% - 120px);
+        width: 240px;
+        max-height: 200px;
+        background-color: var(--overlay-background-color);
+        border-radius: 4px;
+        border: 1px solid var(--divider-line);
+        padding: 8px 0;
+        display: none;
+        z-index: 2;
+
+        a.stream-item-attachments-item {
+          padding: 8px 16px;
+          height: 34px;
+          display: block;
+
+          &:active, &:hover {
+            background-color: var(--selected-row-background-color);
+            div.stream-item-attachments-item-desc {
+              color: var(--selected-row-color);
+            }
+          }
+
+          div.stream-item-attachments-item-desc {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: var(--light-color);
+            white-space: nowrap;
+            max-width: 100%;
+
+            span.file-name {
+              display: inline-block;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-transform: capitalize;
+              max-width: calc(100% - 80px);
             }
 
-            div.stream-item-attachments-item-desc {
-              @include OC_Body_Book();
-              font-size: 14px;
-              color: var(--light-color);
+            span.file-size {
               white-space: nowrap;
-              max-width: 100%;
-
-              span.file-name {
-                display: inline-block;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-transform: capitalize;
-                max-width: calc(100% - 80px);
-              }
-
-              span.file-size {
-                white-space: nowrap;
-                overflow: hidden;
-                display: inline-block;
-                margin-left: 8px;
-              }
+              overflow: hidden;
+              display: inline-block;
+              margin-left: 8px;
             }
           }
         }
       }
+    }
 
-      div.stream-item-wrt {
-        float: left;
-        position: relative;
-        margin-right: 16px;
-      }
+    div.stream-item-wrt {
+      float: left;
+      position: relative;
+      margin-right: 16px;
+    }
 
-      div.stream-item-mobile-view-more {
+    div.stream-item-mobile-view-more {
+      display: block;
+      float: right;
+      height: 26px;
+      line-height: 26px;
+      font-size: 14px;
+      @include OC_Body_Book();
+      color: var(--light-color);
+      padding-left: 12px;
+      position: relative;
+
+      &:before {
+        content: "";
+        width: 8px;
+        height: 4px;
+        @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
+        position: absolute;
+        top: 12px;
+        left: 0;
+        transform: rotate(-90deg);
         display: block;
-        float: right;
-        height: 26px;
-        line-height: 26px;
-        font-size: 14px;
-        @include OC_Body_Book();
-        color: var(--light-color);
-        padding-left: 12px;
-        position: relative;
-
-        &:before {
-          content: "";
-          width: 8px;
-          height: 4px;
-          @include svgBgColor("/img/ML/chevron.svg", center, 8px 4px, var(--light-color));
-          position: absolute;
-          top: 12px;
-          left: 0;
-          transform: rotate(-90deg);
-          display: block;
-        }
       }
     }
   }

@@ -350,7 +350,7 @@
                                :edit-cb (partial start-editing s)
                                :delete-cb (partial delete-clicked s activity-data)
                                :react-cb (when can-react? #(reset! (::show-picker s) (:uuid root-comment-data)))
-                               :reply-cb #(comment-actions/reply-to reply-focus-value (:body root-comment-data) true)
+                               :reply-cb #(reply-to root-comment-data reply-focus-value)
                                :did-react-cb (when can-react?
                                                #(comment-mark-read s (:uuid root-comment-data)))
                                :emoji-picker (when showing-picker?

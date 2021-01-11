@@ -1,7 +1,6 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
-            [oops.core :refer (oget oset!)]
+            [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
@@ -75,8 +74,9 @@
                                :show-wrt?         show-wrt?
                                :editable-boards   editable-boards
                                :current-user-data current-user-data
-                               :replies?          replies?
-                               :foc-menu-open     foc-menu-open
+                               :clear-cell-measure-cb clear-cell-measure-cb
+                               :replies?           replies?
+                               :foc-menu-open      foc-menu-open
                                :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
@@ -86,6 +86,7 @@
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
+                     :clear-cell-measure-cb clear-cell-measure-cb
                      :editable-boards    editable-boards
                      :container-slug     (:container-slug container-data)
                      :foc-board          (not (activity-utils/board? container-data))

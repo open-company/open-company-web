@@ -312,12 +312,12 @@ div.expanded-post {
       }
 
       div.expanded-post-headline {
-        @include activity-title(26px, 33px);
+        @include activity-title(26, 33);
         min-height: 0;
         margin-bottom: 16px;
 
         @include mobile() {
-          @include activity-title(22px, 28px);
+          @include activity-title(22, 28);
         }
       }
 

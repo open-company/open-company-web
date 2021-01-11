@@ -13,6 +13,11 @@ div.login-wall-container {
     padding: 0;
   }
 
+  @include mobile() {
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
+    margin-top: #{$mobile_navbar_height}px;
+  }
+
   -webkit-app-region: drag;
   -webkit-user-select: none;
 
@@ -96,7 +101,6 @@ div.login-wall-container {
       z-index: 1031;
       left: 0;
       margin-left: 0;
-      position: absolute;
 
       button.top-back-button {
         top: 16px;
@@ -352,19 +356,26 @@ div.login-wall-container {
             color: white;
             opacity: 1 !important;
           }
+
+          @include mobile() {
+            margin-top: 32px;
+          }
         }
       }
     }
   }
 
   div.footer-link {
-    // margin-top: 40px;
     margin-bottom: auto;
     @include OC_Body_Book();
     font-size: 14px;
     color: $ui_grey;
     line-height: 18px;
     text-align: center;
+
+    @include mobile() {
+      padding-bottom: 32px;
+    }
 
     a {
       @include OC_Body_Book();

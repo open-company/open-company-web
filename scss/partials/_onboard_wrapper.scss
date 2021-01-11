@@ -6,6 +6,7 @@ div.onboard-wrapper-container {
   min-height: 100vh;
 
   @include mobile() {
+    min-height: unset;
     background-color: $grey_num_2;
     width: 100%;
   }
@@ -19,7 +20,6 @@ div.onboard-wrapper-container {
   div.onboard-wrapper {
     text-align: center;
     position: relative;
-    height: 100%;
 
     @include mobile() {
       width: 100%;
@@ -118,6 +118,11 @@ div.onboard-container-inner {
 
   @include mobile() {
     padding: 0;
+  }
+
+  @include mobile() {
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
+    margin-top: #{$mobile_navbar_height}px;
   }
 
   header.main-cta {
@@ -221,7 +226,6 @@ div.onboard-container-inner {
       z-index: 1031;
       left: 0;
       margin-left: 0;
-      position: absolute;
 
       button.top-back-button {
         top: 16px;
@@ -606,8 +610,15 @@ div.onboard-container-inner {
       }
 
       span.error {
-        margin-left: 16px;
+        margin-left: 8px;
         color: $carrot_orange;
+
+        a.underline {
+          &, &:hover {
+            color: $carrot_orange;
+            text-decoration: underline;
+          }
+        }
       }
     }
 
@@ -771,6 +782,10 @@ div.onboard-container-inner {
     color: $ui_grey;
     line-height: 18px;
     text-align: center;
+
+    @include mobile() {
+      padding-bottom: 32px;
+    }
 
     a {
       @include OC_Body_Book();

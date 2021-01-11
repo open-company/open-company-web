@@ -109,7 +109,7 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? foc-menu-open premium?]}]
+             current-user-data container-slug show-new-comments? foc-menu-open clear-cell-measure-cb premium?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -117,19 +117,7 @@
         current-activity-id (drv/react s :activity-uuid)
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
-        publisher (if is-published?
-                    (:publisher activity-data)
-                    (first (:author activity-data)))
         dom-node-class (str "stream-item-" (:uuid activity-data))
-        has-video (seq (:fixed-video-id activity-data))
-        uploading-video (dis/uploading-video-data (:video-id activity-data))
-        video-player-show (and (:publisher? activity-data) uploading-video)
-        video-size (when has-video
-                     (if is-mobile?
-                       {:width (win-width)
-                        :height @(::mobile-video-height s)}
-                       {:width 136
-                        :height (utils/calc-video-height 136)}))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
@@ -245,82 +233,75 @@
               (rum/portal (more-menu-comp) mobile-more-menu-el))
             (more-menu-comp)))
         [:div.activity-share-container]]
-      [:div.stream-item-body-ext.group
-        [:div.thumbnail-container.group
-          {:class (when show-body-thumbnail? "has-preview")}
-          (when show-body-thumbnail?
-            [:div.body-thumbnail-wrapper
-              {:class (:type (:body-thumbnail activity-data))}
-              [:img.body-thumbnail
-                {:data-image (:thumbnail (:body-thumbnail activity-data))
-                 :src (-> activity-data
-                          :body-thumbnail
-                          :thumbnail
-                          (img/optimize-image-url (* 102 3)))}]])
-          [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (and show-body-thumbnail?
-                                                          (not (:fixed-video-id activity-data)))
-                                      :has-video (and show-body-thumbnail?
-                                                      (:fixed-video-id activity-data))
-                                      utils/hide-class true})}
-            [:div.stream-item-headline.ap-seen-item-headline
-              {:ref "activity-headline"
-               :data-itemuuid (:uuid activity-data)
-               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            (stream-item-summary activity-data)]]
-          (if-not is-published?
-            [:div.stream-item-footer.group
-              [:div.stream-body-draft-edit
-                [:button.mlb-reset.edit-draft-bt
-                  {:on-click #(activity-actions/activity-edit activity-data)}
-                  "Continue editing"]]
-              [:div.stream-body-draft-delete
-                [:button.mlb-reset.delete-draft-bt
-                  {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
-                  "Delete draft"]]]
-            [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
+      [:div.stream-item-content
+        {:class (when show-body-thumbnail? "has-preview")}
+        [:div.stream-item-headline.ap-seen-item-headline
+          {:ref "activity-headline"
+            :data-itemuuid (:uuid activity-data)
+            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+        (stream-item-summary activity-data)
+        (when show-body-thumbnail?
+          [:div.stream-item-preview-container
+            [:img.stream-item-preview
+             {:data-image (:thumbnail (:body-thumbnail activity-data))
+              :on-load clear-cell-measure-cb
+              :src (-> activity-data
+                       :body-thumbnail
+                       :thumbnail
+                       (img/optimize-image-url (* 102 3)))}]])]
+        (if-not is-published?
+          [:div.stream-item-footer.group
+            [:div.stream-body-draft-edit
+              [:button.mlb-reset.edit-draft-bt
+                {:on-click #(activity-actions/activity-edit activity-data)}
+                "Continue editing"]]
+            [:div.stream-body-draft-delete
+              [:button.mlb-reset.delete-draft-bt
+                {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+                "Delete draft"]]]
+          [:div.stream-item-footer.group
+            {:ref "stream-item-reactions"}
+            (when member?
+              (reactions {:entity-data activity-data
+                          :only-thumb? true
+                          :hide-picker true}))
+            [:div.stream-item-footer-mobile-group
               (when member?
-                (reactions {:entity-data activity-data
-                            :only-thumb? true
-                            :hide-picker true}))
-              [:div.stream-item-footer-mobile-group
-                (when member?
-                  [:div.stream-item-comments-summary
-                    (foc-comments-summary {:entry-data activity-data
-                                           :add-comment-focus-prefix "main-comment"
-                                           :current-activity-id current-activity-id
-                                           :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
-                (when show-wrt?
-                  [:div.stream-item-wrt
-                    {:ref :stream-item-wrt}
-                    (wrt-count {:activity-data activity-data
-                                :premium? premium?
-                                :read-data read-data})])
-                (when (seq activity-attachments)
-                  (if-not is-mobile?
-                    [:div.stream-item-attachments
-                      {:ref :stream-item-attachments}
-                      [:div.stream-item-attachments-count
-                        {:data-toggle (when-not is-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
-                        (count activity-attachments)]
-                      [:div.stream-item-attachments-list
-                        (for [atc activity-attachments]
-                          [:a.stream-item-attachments-item
-                            {:href (:file-url atc)
-                             :target "_blank"}
-                            [:div.stream-item-attachments-item-desc
-                              [:span.file-name
-                                (:file-name atc)]
-                              [:span.file-size
-                                (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
-                    [:div.stream-item-mobile-attachments
-                      [:span.mobile-attachments-icon]
-                      [:span.mobile-attachments-count
-                        (count activity-attachments)]]))]
-              (when @(::show-view-more s)
-                [:div.stream-item-mobile-view-more
-                  "View more"])])]]))
+                [:div.stream-item-comments-summary
+                  (foc-comments-summary {:entry-data activity-data
+                                          :add-comment-focus-prefix "main-comment"
+                                          :current-activity-id current-activity-id
+                                          :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
+              (when show-wrt?
+                [:div.stream-item-wrt
+                  {:ref :stream-item-wrt}
+                  (wrt-count {:activity-data activity-data
+                              :premium? premium?
+                              :read-data read-data})])
+              (when (seq activity-attachments)
+                (if-not is-mobile?
+                  [:div.stream-item-attachments
+                    {:ref :stream-item-attachments}
+                    [:div.stream-item-attachments-count
+                      {:data-toggle (when-not is-mobile? "tooltip")
+                        :data-placement "top"
+                        :data-container "body"
+                        :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
+                      (count activity-attachments)]
+                    [:div.stream-item-attachments-list
+                      (for [atc activity-attachments]
+                        [:a.stream-item-attachments-item
+                          {:href (:file-url atc)
+                            :target "_blank"}
+                          [:div.stream-item-attachments-item-desc
+                            [:span.file-name
+                              (:file-name atc)]
+                            [:span.file-size
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
+                  [:div.stream-item-mobile-attachments
+                    [:span.mobile-attachments-icon]
+                    [:span.mobile-attachments-count
+                      (count activity-attachments)]]))]
+            (when @(::show-view-more s)
+              [:div.stream-item-mobile-view-more
+               "View more"])])]))

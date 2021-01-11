@@ -1,10 +1,8 @@
 (ns oc.web.components.ui.notifications
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.theme :as theme-utils]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
@@ -63,14 +61,12 @@
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
-             click dismiss-x] :as notification-data}
-      light-theme]
+             click dismiss-x] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update web-app-update
                               :slack-bot slack-bot
                               :opac opac
-                              :light-theme light-theme
                               :mention-notification (and mention mention-author)
                               :bottom-notch (^js js/isiPhoneWithoutPhysicalHomeBt)
                               :dismiss dismiss
@@ -123,16 +119,11 @@
                            (drv/drv :notifications-data)
                            (drv/drv :org-slug)
                            (drv/drv :panel-stack)
-                           (drv/drv :theme)
   [s]
   (let [notifications-data (drv/react s :notifications-data)
         org-slug (drv/react s :org-slug)
-        panel-stack (drv/react s :panel-stack)
-        theme-data (drv/react s :theme)
-        current-theme (theme-utils/computed-value theme-data)
-        light-theme? (or (pos? (count panel-stack))
-                         (= current-theme :dark))]
+        panel-stack (drv/react s :panel-stack)]
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]
-        (rum/with-key (notification n light-theme?) (str "notif-" (:id n))))]))
+        (rum/with-key (notification n) (str "notif-" (:id n))))]))

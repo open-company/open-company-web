@@ -137,11 +137,11 @@ div.secure-activity-container {
       }
 
       div.activity-title {
-        @include activity-title(26px, 33px);
+        @include activity-title(26, 33);
         color: var(--color);
 
         @include mobile() {
-          @include activity-title(36px, 40px);
+          @include activity-title(36, 40);
         }
 
         .emojione {

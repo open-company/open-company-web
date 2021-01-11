@@ -83,10 +83,15 @@ $dark_mode: "dark";
   --navigation-sidebar-invite-border: 1px solid #DCDDE1;
   --navigation-sidebar-invite-background: white;
 
-  // Notifications tray
-  --notifications-item-background: #{$grey_num_2};
-  --notifications-item-unread-background: white;
-  --notifications-border: #{$deep_tan};
+  // User notifications tray
+  --user-notifications-background: #{$grey_num_2};
+  --user-notifications-unread-background: white;
+  --user-notifications-border: #{$deep_tan};
+
+  // Notification area
+  --notification-background-color: #{$light_navy};
+  --notification-color: white;
+  --notification-border: #{$deep_tan};
 
   // Search
   --search-background-color: #{rgba($light_ui_grey, 0.2)};
@@ -233,9 +238,14 @@ $dark_mode: "dark";
   --navigation-sidebar-invite-background: #{rgba(white, 0.09)};
 
   // Notifications tray
-  --notifications-item-background: #{#1B202A};
-  --notifications-item-unread-background: #{rgba(white, 0.1)};
-  --notifications-border: #{rgba(white, 0.16)};
+  --user-notifications-background: #1B202A;
+  --user-notifications-unread-background: #{rgba(white, 0.1)};
+  --user-notifications-border: #{rgba(white, 0.16)};
+
+  // Notification area
+  --notification-background-color: white;
+  --notification-color: #1B202A;
+  --notification-border: #{rgba(white, 0.16)};
 
   // Search
   --search-background-color: #{rgba(white, 0.09)};
