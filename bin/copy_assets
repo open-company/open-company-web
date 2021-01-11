@@ -14,7 +14,7 @@ echo "Copy medium-editor theme style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
 echo "Done!"
 echo "Copy @open-company/medium-editor-extentions style..."
-cp $INIT_CWD/node_modules/\@open-company/medium-editor-extentions/css/TCMention/main.css $INIT_CWD/public/css/medium-editor/extensions/mention-panel.min.css
+cp $INIT_CWD/node_modules/\@open-company/medium-editor-extentions/css/TCMention/style.css $INIT_CWD/public/css/medium-editor/extensions/mention-panel.min.css
 echo "Done!"
 echo "Copy @bago2k4/medium-editor-media-picker style..."
 cp $INIT_CWD/node_modules/\@bago2k4/medium-editor-media-picker/style.css $INIT_CWD/public/css/medium-editor/extensions/media-picker.css
