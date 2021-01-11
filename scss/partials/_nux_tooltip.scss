@@ -1,0 +1,261 @@
+.nux-tooltip-handle {
+  border: 2px solid $carrot_green !important;
+
+  &.virtualized-list-item {
+    border: none !important;
+    border-radius: 0 !important;
+    z-index: 3;
+
+    div.virtualized-list-row div.stream-item {
+      border: 2px solid $carrot_green !important;
+      // border-radius: 6px !important;
+    }
+  }
+
+  &.user-menu {
+    padding: 2px !important;
+    border-radius: 6px !important;
+  }
+
+  &.invite-people-box {
+    padding: 21px 21px 135px 21px !important;
+    background-position: bottom -1px left 50% !important;
+
+    button.invite-people-close {
+      top: 3px !important;
+      left: 3px !important;
+    }
+  }
+
+  &.nav-link {
+    padding: 0 14px !important;
+    border-radius: 6px !important;
+  }
+
+  &.cmail-outer {
+
+    div.cmail-container {
+      div.cmail-content-outer {
+        padding: 15px 15px 15px 23px !important;
+      }
+
+      div.cmail-footer {
+        padding: 16px 15px 15px 23px !important;
+      }
+
+    }
+
+    &.quick-post-collapsed div.cmail-container div.cmail-content-outer {
+      padding: 17px 23px !important;
+    }
+  }
+
+  &.cmail-outer.quick-post-collapsed div.cmail-container div.cmail-content-outer {
+    padding: 17px 23px !important;
+  }
+}
+
+div.nux-tooltip-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: #{$navbar_zindex + 203};
+
+  @include mobile() {
+    display: none !important;
+  }
+
+  div.nux-tooltip {
+    $width: 320;
+    $side: 24;
+    $diagonal: ($side * 1.41421356237);
+    $half-diagonal: ($diagonal / 2);
+
+    position: fixed;
+    width: #{$width}px;
+    z-index: #{$navbar_zindex + 204};
+
+    &.top {
+      // top: #{$half-diagonal}px;
+      // left: 50%;
+      transform: translate(-50%, #{$half-diagonal}px);
+    }
+
+    &.right {
+      // right: #{$half-diagonal}px;
+      // top: 50%;
+      transform: translate(#{$half-diagonal}px, -50%);
+    }
+
+    &.bottom {
+      // bottom: #{$half-diagonal}px;
+      // left: 50%;
+      transform: translate(-50%, #{$half-diagonal}px);
+    }
+
+    &.left {
+      // left: #{$half-diagonal}px;
+      // top: 50%;
+      transform: translate(-#{$half-diagonal}px, -50%);
+    }
+
+    &.bottom-left {
+      // bottom: #{$half-diagonal}px;
+      // left: -50%;
+      transform: translate(-100%, #{$half-diagonal + 16}px);
+    }
+
+    &.right-top {
+      transform: translate(#{$half-diagonal}px, -#{$half-diagonal + $side}px);
+    }
+
+    div.triangle {
+      position: absolute;
+      width: #{$side}px;
+      height: #{$side}px;
+      background-color: var(--tooltip-background-color);
+      transform: rotate(-45deg);
+
+      &.top {
+        top: -#{$side / 2}px;
+        left: 50%;
+      }
+
+      &.right {
+        right: -#{$side / 2}px;
+        top: 50%;
+      }
+
+      &.bottom {
+        bottom: -#{$side / 2}px;
+        left: 50%;
+      }
+
+      &.left {
+        left: -#{$side / 2}px;
+        top: calc(50% - #{$side / 2}px);
+      }
+
+      &.top-right {
+        top: -#{$side / 2}px;
+        right: #{$half-diagonal + $side}px;
+      }
+
+      &.left-top {
+        top: #{$side + ($side - $half-diagonal)}px;
+        left: -#{$side / 2}px;
+      }
+    }
+
+    div.nux-tooltip-inner {
+      background-color: var(--tooltip-background-color);
+      color: var(--tooltip-color);
+      flex: grid;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      padding: #{$half-diagonal}px;
+      border-radius: 6px;
+      box-shadow: var(--box-shadow);
+
+      div.nux-tooltip-header {
+        display: flex;
+        flex-flow: row nowrap;
+        margin-bottom: 8px;
+
+        div.nux-tooltip-title {
+          @include OC_Body_Bold();
+          font-size: 16px;
+          line-height: 18px;
+          color: var(--tooltip-color);
+        }
+
+        button.nux-tooltip-dismiss-bt {
+          width: 24px;
+          height: 24px;
+          @include svgBgColor("/img/ML/close_notification.svg", center, 12px 12px, var(--tooltip-light-color));
+          margin-left: auto;
+          margin-right: -8px;
+          margin-top: -8px;
+        }
+      }
+
+      div.nux-tooltip-description {
+        width: 100%;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--tooltip-color);
+
+        span {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--tooltip-color);
+          display: inline-block;
+
+          &:not(:first-child) {
+            margin-top: 18px;
+          }
+        }
+      }
+
+      div.nux-tooltip-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        margin-top: 16px;
+
+        div.nux-tooltip-back-bt-container {
+          margin-right: auto;
+          flex: 1;
+          display: flex;
+
+          button.nux-tooltip-back-bt {
+            height: 40px;
+            background-color: transparent;
+            border-radius: 6px;
+            padding: 11px 0;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: var(--tooltip-light-color);
+            margin-left: 8px;
+          }
+        }
+
+        div.nux-tooltip-steps {
+          height: 40px;
+          width: 54px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 40px;
+          color: var(--tooltip-light-color);
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        div.nux-tooltip-next-bt-container {
+          margin-left: auto;
+          flex: 1;
+          display: flex;
+
+          button.nux-tooltip-next-bt {
+            height: 40px;
+            background-color: $carrot_green;
+            border-radius: 6px;
+            padding: 11px 16px;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: white;
+            margin-left: auto;
+          }
+        }
+      }
+    }
+  }
+}

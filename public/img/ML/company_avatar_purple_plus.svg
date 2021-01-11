@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>+</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="NUX" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Company" transform="translate(-810.000000, -176.000000)" fill="#6833F1">
+            <g id="Group-2" transform="translate(782.000000, 149.000000)">
+                <g id="Group-5">
+                    <g id="Components-/-Buttons-/-Add" transform="translate(28.000000, 27.000000)">
+                        <g id="Icon">
+                            <g id="+">
+                                <path d="M10,6 L14.0059397,6 C15.1072288,6 16,6.88772964 16,8 C16,9.1045695 15.1054862,10 14.0059397,10 L10,10 L10,14.0059397 C10,15.1072288 9.11227036,16 8,16 C6.8954305,16 6,15.1054862 6,14.0059397 L6,10 L1.99406028,10 C0.892771196,10 0,9.11227036 0,8 C0,6.8954305 0.894513756,6 1.99406028,6 L6,6 L6,1.99406028 C6,0.892771196 6.88772964,0 8,0 C9.1045695,0 10,0.894513756 10,1.99406028 L10,6 Z" id="Combined-Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

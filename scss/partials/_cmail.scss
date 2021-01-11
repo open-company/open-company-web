@@ -5,7 +5,7 @@ div.cmail-outer {
   background-color: var(--cmail-background-color);
   box-shadow: var(--cmail-active-box-shadow);
   border: var(--cmail-active-border);
-  border-radius: 4px;
+  border-radius: 6px;
 
   @include mobile() {
     position: fixed;
@@ -23,378 +23,56 @@ div.cmail-outer {
     z-index: #{$navbar_zindex + 20};
   }
 
-  div.trial-expired-alert-container {
-    display: none;
-  }
+  @include big_web() {
+    &.quick-post-collapsed {
+      div.cmail-container {
 
-  &.quick-post-collapsed {
-    box-shadow: var(--cmail-box-shadow);
-    border: var(--cmail-border);
-
-    @include big_web() {
-      &:hover {
-        box-shadow: var(--cmail-active-box-shadow);
-        border: var(--cmail-active-border);
-      }
-    }
-
-    @include mobile() {
-      display: none;
-    }
-
-    &.show-trial-expired-alert {
-      div.cmail-container, div.cmail-container div.cmail-content-outer,
-      div.cmail-container div.cmail-content-outer div.cmail-content
-      div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
-        cursor: not-allowed;
-      }
-
-      div.trial-expired-alert-container {
-        margin-left: -#{$paywall_alert_width / 2}px;
-      }
-
-      @include big_web() {
-        &:hover {
-          div.trial-expired-alert-container {
-            display: block;
-          }
+        div.dismiss-inline-cmail-container {
+          display: none;
         }
-      }
-    }
 
-    div.cmail-container {
-
-      div.cmail-content-outer {
-        padding: 16px 24px;
-
-        div.cmail-content {
-          height: 24px;
-          min-height: 24px;
-
-          div.cmail-content-headline-container {
-            display: none;
-          }
-
-          div.cmail-content-abstract-container-outer {
-            display: none;
-          }
-
-          div.rich-body-editor-outer-container {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-
-            div.rich-body-editor-container {
-              margin-top: 0;
-              height: 24px;
-
-              div.rich-body-editor {
-                margin-top: 0;
-                min-height: 24px;
-
-                p:first-child {
-                  display: none;
-                }
-              }
-            }
-          }
-
-          div.stream-attachments {
-            display: none;
-          }
-        }
-      }
-
-      div.cmail-footer {
-        display: none;
-      }
-    }
-  }
-
-  &.fullscreen {
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--overlay-background-color);
-    border-radius: 0;
-    z-index: #{$navbar_zindex + 116};
-    box-shadow: none;
-
-    @include mobile() {
-      position: relative;
-      height: initial;
-      min-height: 100vh;
-      display: block;
-      top: unset;
-      left: unset;
-      background-color: var(--mobile-background-color);
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      box-shadow: none;
-      border-radius: 0;
-    }
-
-    div.cmail-container {
-      width: 100vw;
-      height: 100vh;
-      top: 0;
-      left: 0;
-      position: absolute;
-
-      @include mobile() {
-        margin-left: 0;
-        margin-right: 0;
-        width: 100%;
-        height: initial;
-        top: unset;
-      }
-
-      div.cmail-header {
-        background-color: var(--overlay-background-color);
-        border-bottom: 1px solid var(--divider-line);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        z-index: 3;
-        display: block;
-
-        div.close-bt-container {
-
-          .tooltip {
-            margin-top: 0;
-          }
+        div.delete-bt-container {
+          display: none;
         }
 
         div.fullscreen-bt-container {
-          position: absolute;
-          left: 48px;
-          top: 12px;
-          float: unset;
-
-          button.fullscreen-bt {
-            background-color: var(--opac-background-color-1);
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse.svg");
-          }
-
-          .tooltip {
-            margin-top: 0;
-          }
+          display: none;
         }
 
-        div.cmail-header-right-buttons {
-          position: absolute;
-          height: 32px;
-          right: 16px;
-          top: 12px;
+        div.cmail-content-outer {
+          padding: 18px 24px;
 
-          button.attachment-button {
-            @include OC_Body_Book();
-            font-size: 14px;
-            color: var(--color);
-            position: relative;
-            float: left;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            opacity: 1;
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-color: var(--opac-background-color-1);
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-            border-left: 1px solid var(--divider-line);
+          div.cmail-content {
+            height: 20px;
+            min-height: 20px;
 
-            &:not(.disabled):hover {
-              background-color: var(--opac-background-color-2);
-            }
-          }
-
-          div.emoji-picker {
-            float: left;
-            width: 32px;
-            height: 32px;
-
-            button.emoji-button {
-              width: 32px;
-              height: 32px;
-              background-position: center;
-              background-size: 16px 16px;
-              background-color: var(--opac-background-color-1);
-              border-top-left-radius: 4px;
-              border-bottom-left-radius: 4px;
-              padding: 0;
-              position: absolute;
-              top: 0px;
-              left: 0px;
-              cursor: pointer;
-              opacity: 1;
-
-              &:not(.disabled):hover {
-                background-color: var(--opac-background-color-2);
-              }
-            }
-
-            @include mobile() {
+            div.cmail-content-headline-container {
               display: none;
             }
 
-            div.picker-container {
-              right: -16px;
-              left: unset;
-              top: 28px;
-            }
-          }
-
-          div.section-picker-bt-container {
-            position: relative;
-            margin-top: 4px;
-            margin-left: 8px;
-            padding-left: 8px;
-            float: left;
-            height: 24px;
-
-            .tooltip {
-              width: 118px;
+            div.rich-body-editor-outer-container {
+              display: none;
             }
 
-            div.sections-picker {
-              position: absolute;
-              top: 26px;
-              left: 0;
-              z-index: #{$navbar_zindex - 1};
-
-              @include mobile (){
-                top: 30px;
-              }
+            div.stream-attachments {
+              display: none;
             }
 
-            button.section-picker-bt {
-              height: 24px;
-              padding: 3px 24px 3px 8px;
-              color: white;
-              background-color: var(--cmail-section-bt-background);
-              border-radius: 4px;
+            div.cmail-content-collapsed-placeholder {
               @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 18px;
-              color: var(--cmail-section-bt-color);
-              position: relative;
+              font-size: 16px;
+              line-height: 20px;
+              height: 20px;
+              color: var(--light-color);
+              display: block;
+              cursor: text;
 
-              @include mobile() {
-                height: 28px;
-                font-size: 16px;
-
-                &:after {
-                  top: 9px;
-                }
-              }
-
-              &:after {
-                content: "";
-                width: 8px;
-                height: 10px;
-                position: absolute;
-                top: 7px;
-                right: 8px;
-                background-image: cdnUrl("/img/ML/select_arrows_white.svg");
-                background-size: 8px 10px;
-                background-repeat: no-repeat;
-                background-position: center;
-
-                @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
-                }
-              }
+              @include no-user-select();
             }
           }
         }
-      }
 
-      div.cmail-content-outer {
-        padding: 56px 0 0;
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-        background-color: transparent;
-      }
-
-      div.cmail-content {
-        width: 640px;
-        margin: 0 auto;
-        padding: 32px 0 18px;
-        min-height: 100%;
-        max-height: unset;
-        overflow-x: auto;
-        overflow-y: auto;
-        overflow-x: visible;
-
-        @include mobile() {
-          padding: 16px 16px 24px;
-          width: 100%;
-        }
-
-        div.cmail-content-headline-container {
-          div.cmail-content-headline:empty:before {
-            @include activity-title(20px, 28px);
-            height: 28px;
-          }
-        }
-
-        div.cmail-content-abstract-container-outer {
-          margin-top: 40px;
-          margin-bottom: 24px;
-        }
-
-        div.rich-body-editor-outer-container {
-          border-top: none;
-          margin-top: 24px;
-          padding-top: 0;
-
-          div.rich-body-editor-container {
-
-            div.rich-body-editor {
-              padding-bottom: 30vh;
-              min-height: calc(100vh - 334px);
-              @include activity-body(17, 22, var(--color), 16);
-
-              @media screen and (min-height: 556px) {
-                max-height: initial;
-                min-height: calc(100vh - 354px);
-              }
-            }
-          }
-        }
-      }
-
-      div.cmail-footer {
-        width: 240px;
-        margin: 0 auto 32px;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        left: unset;
-        background-color: transparent;
-
-        div.saving-saved {
-          float: right;
-          margin: 0px 16px 0px 0px;
-        }
-
-        div.dismiss-inline-cmail-container {
+        div.cmail-footer {
           display: none;
         }
       }
@@ -405,6 +83,7 @@ div.cmail-outer {
     width: 100%;
     height: 100%;
     position: relative;
+    overflow: visible;
 
     @include mobile() {
       width: 100vw;
@@ -426,287 +105,105 @@ div.cmail-outer {
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
         z-index: 2;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-items: center;
+        align-items: center;
 
-        button.mobile-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 32px;
+        div.cmail-mobile-header-left {
+          margin-right: auto;
+          flex: 0 0 auto;
           height: 32px;
-          padding: 0;
-          position: absolute;
-          top: 11px;
-          left: 16px;
-          background-color: var(--opac-background-color-1);
-          border-radius: 4px;
-        }
-
-        div.cmail-mobile-header-right {
-          position: absolute;
-          top: 11px;
-          right: 16px;
 
           button.mobile-attachment-button {
             background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
+            background-size: 16px 18px;
             background-position: center;
             background-repeat: no-repeat;
             width: 32px;
             height: 32px;
             padding: 0;
-            float: left;
             opacity: 1;
-            background-color: var(--opac-background-color-1);
             border-radius: 4px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+            }
+          }
+        }
+
+        div.cmail-mobile-header-title {
+          @include OC_Body_Book();
+          font-size: 16px;
+          flex: 0 1 auto;
+          max-width: 50vw;
+        }
+
+        button.mobile-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          border-radius: 4px;
+          flex: 0 0 auto;
+          margin-left: auto;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
           }
         }
       }
     }
 
-    div.cmail-header {
-      background-color: var(--color);
-      height: 56px;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      padding: 12px 16px;
-      display: none;
-
-      @include no-user-select();
+    div.dismiss-inline-cmail-container {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      display: block;
 
       @include mobile() {
         display: none;
       }
 
-      div.cmail-header-center {
-        position: absolute;
-        height: 24px;
-        top: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-
-        @include user-profile(24);
-
-        div.user-avatar-img-container {
-          float: left;
-        }
-
-        @include mobile() {
-          div.user-avatar-img-container {
-            display: none;
-          }
-        }
-
-        div.cmail-header-center-title {
-          margin-left: 8px;
-          height: 18px;
-          margin-top: 3px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          color: var(--color);
-          line-height: 18px;
-          float: left;
-          max-width: 25vw;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: pre;
-        }
-      }
-
-      div.cmail-header-left-buttons {
-        position: absolute;
+      button.dismiss-inline-cmail {
+        width: 32px;
         height: 32px;
-        left: 16px;
-        top: 12px;
         padding: 0;
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        background-size: 12px 12px;
+        background-color: var(--color);
+        border-radius: 50%;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 1;
+        display: block;
+        border: none;
 
-        div.close-bt-container {
-          float: left;
-
-          @include mobile() {
-            display: none;
-          }
-
-          button.close-bt {
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-            background-size: 12px 12px;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: var(--opac-background-color-1);
-            border-radius: 4px;
-            padding: 0;
-            opacity: 1;
-
-            &:not(.disabled):hover {
-              background-color: var(--opac-background-color-2);
-            }
-
-            @include mobile() {
-              margin-left: 0;
-              background-size: 14px 14px;
-            }
-          }
-
-          &.unpublished-post {
-            button.close-bt {
-              background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
-              background-size: 14px 10px;
-            }
-
-            .tooltip {
-              width: 103px;
-              // margin-left: -24px;
-            }
-          }
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
         }
 
-        div.delete-button-container {
-          float: left;
-          margin-left: 16px;
-          border-left: 1px solid var(--opac-background-color-1);
-          padding-left: 16px;
-
-          button.delete-button {
-            width: 32px;
-            height: 32px;
-            background-color: var(--opac-background-color-1);
-            border-radius: 4px;
-            background-image: cdnUrl("/img/ML/cmail_delete.svg");
-            background-size: 14px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 0;
-            display: block;
-            opacity: 1;
-
-            &:not(.disabled):hover {
-              background-color: var(--opac-background-color-1);
-            }
-          }
-        }
-
-        div.saving-saved {
-          height: 32px;
-          @include OC_Body_Book();
-          color: var(--light-color);
-          font-size: 16px;
-          line-height: 32px;
-          margin: 0 0 0 16px;
-          float: left;
+        &:not(.disabled):hover {
+          opacity: 0.9;
         }
       }
 
-      div.cmail-header-right-buttons {
-        position: absolute;
-        height: 32px;
-        right: 16px;
-        top: 12px;
-        padding: 0;
-
-        @include mobile() {
-          display: none;
-        }
-
-        button.attachment-button {
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          position: relative;
-          float: left;
-          padding: 0;
-          width: 32px;
-          height: 32px;
-          background-color: var(--opac-background-color-1);
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 14px 16px;
-          background-repeat: no-repeat;
-          background-position: center;
-          border-top-right-radius: 4px;
-          border-bottom-right-radius: 4px;
-          opacity: 1;
-
-          &:not(.disabled):hover {
-            background-color: var(--opac-background-color-2);
-          }
-        }
-
-        div.emoji-picker {
-          float: left;
-          margin-left: 8px;
-          width: 32px;
-          height: 32px;
-
-          button.emoji-button {
-            width: 32px;
-            height: 32px;
-            background-color: var(--opac-background-color-1);
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-            background-position: center;
-            background-size: 16px 16px;
-            padding: 0px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            cursor: pointer;
-            opacity: 1;
-
-            &:not(.disabled):hover {
-              background-color: var(--opac-background-color-2);
-            }
-          }
-
-          @include mobile() {
-            display: none;
-          }
-
-          div.picker-container {
-            right: -16px;
-            left: unset;
-            top: 28px;
-          }
-        }
-      }
-
-      button.right-button {
-        margin-top: -2px;
-      }
-
-      div.fullscreen-bt-container {
-        float: left;
-
-        @include mobile() {
-          display: none;
-        }
-
-        button.fullscreen-bt {
-          width: 32px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-color: var(--cmail-fullscreen-bt-bg);
-          border-radius: 4px;
-          margin-left: 8px;
-          display: block;
-
-          @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_collapse.svg"));
+      &.long-tooltip {
+        .tooltip {
+          width: 88px;
         }
       }
     }
 
     div.post-button-container {
       position: relative;
-      margin-left: 16px;
       float: right;
 
       @include mobile() {
-        margin-left: 16px;
         padding-left: 16px;
-        border-left: 1px solid var(--divider-line);
       }
     }
 
@@ -717,7 +214,7 @@ div.cmail-outer {
 
       @include mobile() {
         background-color: transparent;
-        padding: 24px 0;
+        padding: 0;
         border: none;
         box-shadow: none;
         border-radius: 0;
@@ -732,14 +229,44 @@ div.cmail-outer {
       height: auto;
 
       @include mobile() {
-        padding: 4px 16px 24px;
-        min-height: calc(100vh - 112px);
+        padding: 16px;
+        min-height: calc(100vh - #{$mobile_navbar_height}px);
         max-height: initial;
         overflow-x: visible;
         overflow-y: visible;
       }
 
-      div.section-picker-bt-container {
+      @include mobile() {
+        &.has-board-button {
+          &.boards-dropdown-shown {
+            div.board-picker-bt-container {
+              overflow-x: visible;
+              overflow-y: visible;
+            }
+          }
+
+          @media screen and (max-width: 321px) {
+            div.board-picker-bt-container {
+              div.board-picker-container {
+                left: 0;
+              }
+            }
+          }
+
+          div.board-picker-bt-container {
+            @media screen and (min-width: 322px) {
+              span.post-to {
+                display: block;
+              }
+            }
+            button.board-picker-bt {
+              display: flex;
+            }
+          }
+        }
+      }
+
+      div.board-picker-bt-container {
         display: none;
 
         @include mobile() {
@@ -747,128 +274,101 @@ div.cmail-outer {
           position: relative;
           margin: 0;
           width: 100%;
-          height: 40px;
+          height: 48px;
           border-bottom: 1px solid var(--divider-line);
           padding-bottom: 16px;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-items: center;
+          align-items: center;
+          overflow-x: auto;
+          overflow-y: hidden;
 
           span.post-to {
-            float: left;
-            display: block;
-            height: 28px;
+            height: 32px;
             font-size: 16px;
-            line-height: 28px;
+            line-height: 32px;
             @include OC_Body_Book();
             color: var(--color);
             margin-right: 8px;
-            width: 52px;
-          }
-
-          div.sections-picker {
-            position: absolute;
-            top: 30px;
-            left: 0;
-            z-index: #{$navbar_zindex - 1};
-          }
-
-          button.section-picker-bt {
-            float: left;
-            height: 28px;
-            padding: 5px 24px 5px 8px;
-            background-color: var(--cmail-section-bt-background);
-            border-radius: 4px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--cmail-section-bt-color);
-            position: relative;
-            text-align: left;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-
-            &:after {
-              content: "";
-              width: 8px;
-              height: 10px;
-              position: absolute;
-              top: calc(50% - 5px);
-              right: 8px;
-              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              background-position: center;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
-              }
-            }
-          }
-        }
-      }
-
-      div.ziggeo-player, div.ziggeo-recorder {
-        margin: 0px auto 24px;
-
-        @include mobile() {
-          margin-top: -24px;
-          margin-left: -24px;
-        }
-
-        video {
-          max-width: 548px;
-
-          @include mobile() {
-            max-width: 100vw;
-          }
-        }
-
-        div.ziggeo-player-not-processed, div.ziggeo-recorder-not-processed {
-          margin: 0px auto;
-
-          @include mobile() {
-            margin-top: -24px;
-            margin-left: -24px;
-          }
-        }
-      }
-
-      div.cmail-content-abstract-bt-container {
-        border-bottom: 1px solid var(--divider-line);
-        padding: 6px 0 12px;
-        margin-bottom: 16px;
-        display: block;
-
-        button.show-abstract-bt {
-          float: left;
-          color: $carrot_green;
-          padding: 0;
-          margin: 0;
-          height: 24px;
-          text-align: left;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 24px;
-
-          @include mobile() {
+            width: 50px;
+            flex: 0 0 50px;
             display: none;
           }
-        }
 
-        .tooltip {
-          width: 172px;
+          div.board-picker-container {
+            position: absolute;
+            top: 40px;
+            left: 58px;
+            z-index: #{$navbar_zindex - 1};
+            display: block;
+          }
+
+          button.board-picker-bt {
+            height: 32px;
+            padding: 7px 8px;
+            // background-color: var(--cmail-board-bt-background);
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            // color: var(--cmail-board-bt-color);
+            color: var(--primary-color);
+            position: relative;
+            text-align: left;
+            max-width: calc(100% - 50px - 8px - 16px - 120px);
+            flex: 0 1 auto;
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            min-width: 100px;
+
+            @media screen and (max-width: 321px) {
+              min-width: 158px;
+            }
+
+            span.board-picker-bt-copy {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              flex: 0 1 auto;
+              margin-right: 4px;
+            }
+
+            div.dropdown-cog {
+              width: 6px;
+              height: 4px;
+              margin-left: 4px;
+              @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
+              flex: 0 0 6px;
+            }
+          }
+
+          div.post-button-container {
+            margin-left: auto;
+            margin-right: 0;
+            flex: 0 0 auto;
+          }
         }
       }
 
       div.cmail-content-headline-container {
         display: block;
+        padding: 0 0 16px;
+
+        @include mobile() {
+          padding: 0;
+        }
 
         div.cmail-content-headline {
           border: none;
           outline: none;
           cursor: text;
-          @include activity-title(20px, 28px);
+          @include activity-title(20, 28);
           color: var(--color);
           white-space: normal;
           overflow-wrap: break-word;
@@ -880,65 +380,35 @@ div.cmail-outer {
           display: block;
 
           @include mobile() {
-            @include activity-title(16px, 22px);
-            min-height: 22px;
-            line-height: 22px;
-            width: calc(100% - 55px - 8px);
-
-            &:empty:before {
-              @include activity-title(16px, 22px);
-              height: 22px;
-            }
+            @include activity-title(18, 23);
+            min-height: 23px;
+            line-height: 23px;
           }
 
           &:empty:before {
             content: attr(placeholder);
-            @include activity-title(20px, 28px);
+            @include activity-title(20, 28);
             display: inline-block;
             color: var(--light-color) !important;
             font-style: none;
             height: 28px;
             margin: 0;
             padding: 0;
+
+            @include mobile() {
+              @include activity-title(18, 23);
+              height: 23px;
+            }
           }
         }
       }
 
-      div.cmail-content-abstract-container-outer {
-        background-color: var(--opac-background-color-1);
-        padding: 16px 24px;
-        position: relative;
-        margin-top: 24px;
-        margin-bottom: 16px;
-        border-radius: 4px;
-        display: block;
-
-        @include mobile() {
-          padding: 8px 16px;
-          margin-top: 40px;
-          margin-bottom: 32px;
-        }
-
-        button.remove-abstract-bt {
-          width: 24px;
-          height: 24px;
-          position: absolute;
-          top: 4px;
-          right: 4px;
-          background-image: cdnUrl("/img/ML/black_close.svg");
-          background-size: 8px 8px;
-          background-repeat: no-repeat;
-          background-position: center;
-        }
-
-        div.cmail-content-abstract-container {
-          @include activity-abstract(17px, 22px);
-        }
+      div.cmail-content-collapsed-placeholder {
+        display: none;
       }
 
       div.rich-body-editor-outer-container {
         position: relative;
-        margin-top: 8px;
 
         &.block-edit {
           &, * {
@@ -947,8 +417,8 @@ div.cmail-outer {
         }
 
         @include mobile() {
+          margin-top: 16px;
           min-height: calc(100vh - 334px);
-          padding-top: 16px;
         }
       }
 
@@ -956,13 +426,6 @@ div.cmail-outer {
         position: relative;
         height: auto;
         margin-top: 0;
-
-        div.medium-editor-media-picker {
-          margin-top: 1px;
-          top: 0;
-          left: unset;
-          right: 0;
-        }
 
         div.rich-body-editor {
           border: none;
@@ -974,28 +437,26 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(17, 22, var(--color), 16);
-            font-size: 17px;
-            line-height: 22px;
-            min-height: 26px;
+            @include activity-body(16, 20, var(--color), 16);
+            font-size: 16px;
+            line-height: 20px;
+            min-height: 76px;
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 26px;
+            min-height: 76px;
           }
 
           @include mobile() {
             min-height: 20vh;
             max-height: initial;
-            @include activity-body(18, 24, var(--color), 16);
-            font-size: 18px;
-            line-height: 24px;
+            @include activity-body(16, 22, var(--color), 16);
             overflow-y: auto;
             overflow-x: visible;
             padding-bottom: 30vh;
 
             &:after {
-              line-height: 24px;
+              line-height: 22px;
             }
           }
 
@@ -1015,85 +476,168 @@ div.cmail-outer {
     div.cmail-footer {
       height: 64px;
       width: 100%;
-      padding: 16px;
+      padding: 16px 16px 16px 24px;
       border-bottom-left-radius: 4px;
       border-bottom-right-radius: 4px;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: flex-start;
 
       @include mobile() {
         display: none;
       }
 
-      div.saving-saved {
-        height: 35px;
+      button.attachment-button {
         @include OC_Body_Book();
-        color: var(--light-color);
         font-size: 14px;
-        line-height: 35px;
-        margin: 0px 0px 0px 16px;
-        float: left;
+        color: var(--color);
+        position: relative;
+        padding: 0;
+        width: 24px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+        background-size: 14px 16px;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.3;
+        flex: 0 0 auto;
+        order: 4;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+        }
+
+        &:not(.disabled):hover {
+          opacity: 1;
+        }
       }
 
-      div.dismiss-inline-cmail-container {
-        float: left;
+      div.emoji-picker {
+        width: 24px;
+        height: 32px;
+        margin-right: 7px;
+        flex: 0 0 auto;
+        order: 3;
+
+        button.emoji-button {
+          width: 24px;
+          height: 32px;
+          background-position: center;
+          background-size: 16px 16px;
+          padding: 0px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          cursor: pointer;
+          opacity: 0.3;
+          border-radius: 0;
+
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+        }
 
         @include mobile() {
           display: none;
         }
 
-        button.dismiss-inline-cmail {
-          width: 32px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          opacity: 1;
-          border-radius: 0;
+        div.picker-container {
+          right: -16px;
+          left: unset;
+        }
+      }
 
-          &:not(.disabled):hover {
-            opacity: 0.9;
+      div.board-picker-bt-container {
+        margin: 0 28px 0 4px;
+        position: relative;
+        display: block;
+        height: 32px;
+        order: 2;
+        flex: 0 1 auto;
+
+        &:after {
+          width: 1px;
+          height: 16px;
+          background-color: var(--divider-line);
+          position: absolute;
+          top: 8px;
+          right: -16px;
+          content: "";
+        }
+
+        &.hidden {
+          display: none;
+        }
+
+        .tooltip {
+          width: 95px;
+        }
+
+        div.board-picker-container {
+          position: absolute;
+          top: 32px;
+          left: 0;
+          z-index: #{$navbar_zindex - 1};
+
+          @include mobile (){
+            top: 30px;
           }
         }
 
-        &.long-tooltip {
-          .tooltip {
-            width: 88px;
+        button.board-picker-bt {
+          height: 32px;
+          padding: 7px 8px;
+          // background-color: var(--cmail-board-bt-background);
+          background-color: var(--secondary-color);
+          border-radius: 4px;
+          // color: var(--cmail-board-bt-color);
+          color: var(--primary-color);
+          position: relative;
+          text-align: left;
+          max-width: 100%;
+          flex: 0 1 auto;
+          display: flex;
+          flex-flow: row nowrap;
+          align-items: center;
+          justify-content: center;
+
+          span.board-picker-bt-copy {
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 0 1 auto;
+            margin-right: 4px;
+          }
+
+          div.dropdown-cog {
+            width: 6px;
+            height: 4px;
+            margin-left: 4px;
+            @include svgBgColor("/img/ML/dropdown_cog.svg", center, 6px 4px, var(--primary-color));
+            flex: 0 0 6px;
           }
         }
       }
 
-      div.fullscreen-bt-container {
-        float: left;
+      div.post-button-container {
+        margin-left: 0;
+        margin-right: 12px;
+        flex: 0 0 auto;
+        order: 1;
 
         @include mobile() {
           display: none;
-        }
-
-        button.fullscreen-bt {
-          height: 32px;
-          width: 32px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
-          background-size: 12px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-          border-radius: 0;
-          padding: 0;
-          opacity: 1;
-          display: block;
-
-          &:not(.disabled):hover {
-            opacity: 0.9;
-          }
         }
       }
 
       div.delete-bt-container {
-        float: left;
-        height: 16px;
-        margin-top: 8px;
-        margin-left: 6px;
-        padding-left: 8px;
-        border-left: 1px solid var(--divider-line);
+        flex: 0 0 auto;
+        order: 7;
+        margin-left: 16px;
 
         @include mobile() {
           display: none;
@@ -1101,287 +645,289 @@ div.cmail-outer {
 
         button.delete-bt {
           position: relative;
-          top: -8px;
           height: 32px;
-          width: 32px;
+          width: 24px;
           background-image: cdnUrl("/img/ML/cmail_delete.svg");
-          background-size: 16px 14px;
+          background-size: 14px 16px;
           background-position: center;
           background-repeat: no-repeat;
-          border-radius: 0;
           padding: 0;
-          opacity: 1;
+          opacity: 0.3;
+          display: block;
 
           &:not(.disabled):hover {
-            opacity: 0.9;
+            opacity: 1;
+          }
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
           }
         }
       }
 
-      div.cmail-footer-right {
-        float: right;
-        position: relative;
+      div.fullscreen-bt-container {
+        float: left;
+        margin-right: 7px;
 
-        button.attachment-button {
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
+        @include mobile() {
+          display: none;
+        }
+
+        button.fullscreen-bt {
           position: relative;
-          float: left;
-          padding: 0;
-          width: 32px;
           height: 32px;
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 14px 16px;
-          background-repeat: no-repeat;
+          width: 24px;
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
+          background-size: 12px 12px;
           background-position: center;
-          opacity: 1;
-          border-radius: 0;
+          background-repeat: no-repeat;
+          padding: 0;
+          opacity: 0.3;
+          display: block;
 
           &:not(.disabled):hover {
-            opacity: 0.9;
-          }
-        }
-
-        div.emoji-picker {
-          float: left;
-          width: 32px;
-          height: 32px;
-
-          button.emoji-button {
-            width: 32px;
-            height: 32px;
-            background-position: center;
-            background-size: 16px 16px;
-            padding: 0px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            cursor: pointer;
             opacity: 1;
-            border-radius: 0;
-
-            &:not(.disabled):hover {
-              opacity: 0.9;
-            }
           }
 
-          @include mobile() {
-            display: none;
-          }
-
-          div.picker-container {
-            right: -16px;
-            left: unset;
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
           }
         }
+      }
 
-        div.section-picker-bt-container {
-          position: relative;
-          margin-top: 8px;
-          margin-left: 7px;
-          padding-left: 8px;
-          border-left: 1px solid var(--divider-line);
-          float: right;
-          height: 16px;
-
-          .tooltip {
-            width: 118px;
-          }
-
-          div.sections-picker {
-            position: absolute;
-            top: 26px;
-            left: 0;
-            z-index: #{$navbar_zindex - 1};
-
-            @include mobile (){
-              top: 30px;
-            }
-          }
-
-          button.section-picker-bt {
-            height: 32px;
-            top: -8px;
-            padding: 7px 16px 7px 8px;
-            background-color: transparent;
-            border-radius: 4px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--color);
-            position: relative;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-
-            @include mobile() {
-              height: 28px;
-              font-size: 16px;
-              color: var(--light-color);
-
-              &:after {
-                top: 9px;
-              }
-            }
-
-            &:after {
-              content: "";
-              width: 8px;
-              height: 10px;
-              position: absolute;
-              top: 50%;
-              margin-top: -5px;
-              right: 2px;
-              background-image: cdnUrl("/img/ML/select_arrows.svg");
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              background-position: center;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-              }
-            }
-
-            @include big_web() {
-              &:hover {
-                opacity: 0.9;
-              }
-            }
-          }
-        }
-
-        div.post-button-container {
-          float: right;
-          margin-left: 14px;
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
-        div.board-name {
-          width: 160px;
-          height: 32px;
-          cursor: pointer;
-          position: relative;
-          float: right;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: var(--color);
-          line-height: 16px;
-          padding: 7px 8px;
-          background-image: cdnUrl("/img/ML/select_arrows.svg");
-          background-size: 8px 10px;
-          background-position: top 11px right 8px;
-          background-repeat: no-repeat;
-          background-color: var(--opac-background-color-1);
-          border-radius: 4px;
-          margin-left: 16px;
-
-          @include big_web() {
-            &:hover, &.active {
-              background-color: var(--opac-background-color-2);
-            }
-          }
-
-          div.board-name-inner {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: calc(100% - 16px);
-            white-space: nowrap;
-          }
-
-          @include mobile() {
-            width: calc(100% - 16px - 32px);
-            background-color: var(--opac-background-color-1);
-            color: var(--color);
-
-            &:hover, &.open {
-              background-color: var(--opac-background-color-2);
-            }
-          }
-        }
+      div.cmail-footer-media-picker-container {
+        margin-left: 6px;
+        flex: 0 0 auto;
+        order: 5;
+        margin-right: auto;
       }
     }
   }
-}
 
-@include dark_mode() {
-  div.cmail-outer {
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: #{$navbar_zindex + 100};
+    background-color: $carrot_modal_bg;
+    border: none;
+    box-shadow: none;
+
+    @include mobile() {
+      background-color: var(--mobile-background-color);
+      border: initial;
+      box-shadow: initial;
+    }
+
     div.cmail-container {
-      div.cmail-footer {
-        div.cmail-footer-right {
-          div.board-name {
-            background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-          }
+      width: #{$modal_width}px;
+      // min-height: 318px;
+      height: auto;
+      position: relative;
+      background-color: var(--cmail-fullscreen-background-color);
+      box-shadow: var(--cmail-active-box-shadow);
+      border: var(--cmail-active-border);
+      border-radius: 6px;
+      margin: 96px auto;
 
-          button.attachment-button {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
-        }
-
-        div.fullscreen-bt-container button.fullscreen-bt {
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
-        }
-
-        div.delete-bt-container button.delete-bt {
-          background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
-        }
-
-        div.dismiss-inline-cmail-container button.dismiss-inline-cmail {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-
-        div.cmail-content-abstract-container-outer button.remove-abstract-bt {
-          background-image: cdnUrl("/img/ML/black_close@dark.svg");
-        }
+      @include mobile() {
+        width: 100vw;
+        box-shadow: none;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-color: var(--mobile-background-color);
+        margin-bottom: 0;
+        z-index: #{$navbar_zindex + 20};
+        min-height: initial;
+        margin: 0 auto;
+        border: none;
       }
 
-      div.cmail-header {
-        div.fullscreen-bt-container button.fullscreen-bt {
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
-        }
+      div.cmail-content-outer {
+        padding: 68px 24px 0;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-height: calc(100vh - (96px * 2) - 64px); // Window height less top and bottom margin and the footer
 
-        div.cmail-header-right-buttons {
-          button.attachment-button {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
-        }
-
-        div.cmail-header-left-buttons {
-          div.delete-button-container button.delete-button {
-            background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
-          }
-
-          div.close-bt-container button.close-bt {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-        }
-      }
-
-      div.cmail-mobile-header {
         @include mobile() {
-          div.cmail-mobile-header-right button.mobile-attachment-button {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
+          padding: 0;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          max-height: initial;
+          overflow-x: initial;
+          overflow-y: initial;
+        }
+      }
 
-          button.mobile-close-bt {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      div.cmail-content {
+        min-height: initial;
+        overflow-y: initial;
+        overflow-x: initial;
+        overflow: initial;
+        height: initial;
+
+        @include mobile() {
+          padding: 16px 16px 24px;
+          min-height: calc(100vh - #{$mobile_navbar_height}px - 1px);
+          max-height: initial;
+          overflow-x: visible;
+          overflow-y: visible;
+        }
+
+        div.cmail-content-headline-container {
+          position: absolute;
+          top: 0;
+          width: #{$modal_width - 24 - 24}px;
+          min-height: 28px;
+          padding: 24px 0 16px;
+          background-color: var(--cmail-fullscreen-background-color);
+          z-index: 2;
+
+          @include mobile() {
+            position: initial;
+            top: unset;
+            width: 100%;
+            min-height: 23px;
+          }
+        }
+
+        div.rich-body-editor-outer-container {
+          @include mobile() {
+            margin-top: 16px;
+            padding-top: 0;
+          }
+        }
+
+        div.rich-body-editor-container {
+          div.rich-body-editor {
+            @include big_web() {
+              min-height: 184px;
+            }
+
+            @media screen and (min-height: 556px) {
+              min-height: 184px;
+            }
+          }
+        }
+      }
+
+      div.cmail-footer {
+        div.board-picker-bt-container {
+          div.board-picker-container {
+            position: absolute;
+            top: unset;
+            bottom: 32px;
+            left: 0;
+            z-index: #{$navbar_zindex - 1};
+          }
+        }
+
+        div.cmail-footer-right {
+          div.fullscreen-bt-container {
+            display: none;
+          }
+        }
+
+        div.distraction-free-container {
+          flex: 0 0 auto;
+          margin-left: auto;
+          order: 6;
+          height: 32px;
+
+          div.carrot-switch {
+            margin-top: 8px;
           }
         }
       }
     }
 
-    &.fullscreen {
+    &.distraction-free {
+      background-color: var(--cmail-fullscreen-background-color);
+      max-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+
       div.cmail-container {
-        div.cmail-header div.cmail-header-right-buttons button.attachment-button {
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+        border: none;
+        margin: 40px auto;
+        width: calc(100% - 80px);
+        max-width: 1024px;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-flow: column nowrap;
+
+        div.dismiss-inline-cmail-container {
+          position: fixed;
+          top: 32px;
+          right: 32px;
+
+          button.dismiss-inline-cmail {
+            background-color: transparent;
+            @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 16px 16px, var(--light-color));
+          }
         }
 
-        div.cmail-header div.fullscreen-bt-container button.fullscreen-bt {
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse@dark.svg");
+        div.cmail-content-outer {
+          padding: 0 24px;
+          flex: 1 0 auto;
+          display: flex;
+          flex-flow: column nowrap;
+          max-height: unset;
+          overflow-x: hidden;
+          overflow-y: visible;
+
+          div.cmail-content {
+            min-height: unset;
+            max-height: unset;
+            flex: 1 0 auto;
+            display: flex;
+            flex-flow: column nowrap;
+
+            div.cmail-content-headline-container {
+              background-color: transparent;
+              margin-top: 0;
+              padding-bottom: 0;
+              width: 100%;
+              position: relative;
+              top: unset;
+              left: unset;
+
+              div.cmail-content-headline {
+                @include activity-title(32, 40);
+
+                &:empty:before {
+                  @include activity-title(32, 40);
+                  height: 40px;
+                }
+              }
+            }
+
+            div.rich-body-editor-outer-container {
+              margin-top: 24px;
+              flex: 1 0 auto;
+
+              div.rich-body-editor-container {
+                div.rich-body-editor {
+                  @include activity-body(24, 32, var(--color), 24);
+                  height: 100%;
+                }
+              }
+            }
+          }
+        }
+
+        div.cmail-footer {
+          margin-top: auto;
+
+          div.cmail-footer-media-picker-container {
+            margin-right: 0;
+          }
         }
       }
     }

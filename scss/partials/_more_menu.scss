@@ -35,8 +35,6 @@ div.more-menu {
     }
 
     @include mobile() {
-      background-color: var(--divider-line);
-      border-radius: 4px;
       opacity: 1;
     }
 
@@ -49,12 +47,6 @@ div.more-menu {
     }
   }
 
-  &.has-more-menu-bt {
-    button.more-menu-share-bt {
-      margin-left: 9px;
-    }
-  }
-
   button.more-menu-share-bt {
     height: 32px;
     width: 32px;
@@ -62,22 +54,13 @@ div.more-menu {
     background-image: cdnUrl("/img/ML/more_menu_new_share.svg");
     background-size: 14px 14px;
     background-position: center;
-    background-color: var(--opac-background-color-1);
-    border-radius: 4px;
     padding: 0;
     background-repeat: no-repeat;
-    margin-left: 16px;
     display: inline-block;
-    opacity: 1;
+    opacity: 0.5;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
-    }
-
-    @include big_web() {
-      &:hover {
-        background-color: var(--opac-background-color-2);
-      }
     }
 
     @include mobile() {
@@ -87,6 +70,10 @@ div.more-menu {
 
     &:hover, &:active, &:focus {
       opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
     }
   }
 
@@ -98,7 +85,7 @@ div.more-menu {
   button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: var(--opac-background-color-15);
+    border-right: 0px solid var(--opac-background-color-15);
   }
 
   button.more-menu-remove-bookmark-bt {
@@ -107,10 +94,9 @@ div.more-menu {
     background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
     background-size: 10px 14px;
     background-position: center;
-    background-color: var(--opac-background-color-1);
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -119,7 +105,6 @@ div.more-menu {
 
     @include big_web() {
       &:hover {
-        background-color: var(--opac-background-color-2);
         background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
 
         @include dark_mode() {
@@ -130,6 +115,7 @@ div.more-menu {
 
     @include mobile() {
       border-radius: 4px;
+      opacity: 1;
     }
 
     &:hover, &:active, &:focus {
@@ -152,12 +138,11 @@ div.more-menu {
       background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
       background-size: 10px 14px;
       background-position: center;
-      background-color: var(--opac-background-color-1);
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
       padding: 0;
       background-repeat: no-repeat;
-      opacity: 1;
+      opacity: 0.5;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
@@ -165,7 +150,6 @@ div.more-menu {
 
       @include big_web() {
         &:hover {
-          background-color: var(--opac-background-color-2);
           background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
 
           @include dark_mode() {
@@ -175,9 +159,8 @@ div.more-menu {
       }
 
       @include mobile() {
-        width: 32px;
-        height: 32px;
         border-radius: 4px;
+        opacity: 1;
       }
 
       &:hover, &:active, &:focus {
@@ -204,24 +187,18 @@ div.more-menu {
     background-image: cdnUrl("/img/ML/more_inbox_done.svg");
     background-size: 14px 10px;
     background-position: center;
-    background-color: var(--opac-background-color-1);
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_inbox_done@dark.svg");
     }
 
-    @include big_web() {
-      &:hover {
-        background-color: var(--opac-background-color-2);
-      }
-    }
-
     @include mobile() {
       border-radius: 4px;
+      opacity: 1;
     }
 
     &:hover, &:active, &:focus {
@@ -233,16 +210,15 @@ div.more-menu {
     }
   }
 
-  button.more-menu-inbox-follow-bt {
+  button.more-menu-entry-follow-bt {
     height: 32px;
     width: 32px;
     background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
     background-size: 12px 14px;
     background-position: center;
-    background-color: var(--opac-background-color-1);
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -251,7 +227,6 @@ div.more-menu {
 
     @include big_web() {
       &:hover {
-        background-color: var(--opac-background-color-2);
         background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
 
         @include dark_mode() {
@@ -261,6 +236,7 @@ div.more-menu {
     }
 
     @include mobile() {
+      opacity: 1;
       border-radius: 4px;
     }
 
@@ -273,16 +249,15 @@ div.more-menu {
     }
   }
 
-  button.more-menu-inbox-unfollow-bt {
+  button.more-menu-entry-unfollow-bt {
     height: 32px;
     width: 32px;
     background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
     background-size: 12px 14px;
     background-position: center;
-    background-color: var(--opac-background-color-1);
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
     display: inline-block;
 
     @include dark_mode() {
@@ -291,7 +266,6 @@ div.more-menu {
 
     @include big_web() {
       &:hover {
-        background-color: var(--opac-background-color-2);
         background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
 
         @include dark_mode() {
@@ -302,6 +276,7 @@ div.more-menu {
 
     @include mobile() {
       border-radius: 4px;
+      opacity: 1;
     }
 
     &:hover, &:active, &:focus {
@@ -383,8 +358,8 @@ div.more-menu {
 
       @include big_web() {
         &:hover {
-          background-color: $feint_emerald;
-          color: $carrot_green;
+          background-color: var(--primary-light-color);
+          color: var(--primary-color);
         }
       }
 
@@ -409,7 +384,7 @@ div.more-menu {
       top: 100vh;
       background-color: var(--opac-background-color-2);
       opacity: 0;
-      z-index: #{$navbar_zindex + 10};
+      z-index: #{$navbar_zindex + 101};
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 

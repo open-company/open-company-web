@@ -1,534 +1,510 @@
+$expanded_post_header_height: 56;
+
 div.expanded-post {
-  width: #{$board_container_width}px;
-  margin: 0 auto;
-  padding: 0 0 24px;
-  position: relative;
+  width: 100%;
+  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: $carrot_modal_bg;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: #{$navbar_zindex + 100};
 
   @include mobile() {
     width: 100%;
     background-color: var(--mobile-background-color);
-    padding: 24px 16px 16px;
-
-    // Add some extra padding on android at the bottom
-    // to make sure the add comment field is not hidden
-    // behind the keyboard, Safari resize the viewport when
-    // the keyboard pops out so it's not a problem
-    &.android {
-      padding-bottom: 25vh;
-    }
+    padding: #{$mobile_navbar_height}px 16px 16px;
   }
 
-  div.activity-share-container {
-    // position: unset;
-
-    div.activity-share-modal-container {
-      top: 36px;
-      right: 64px;
-      margin-top: 0;
-    }
-  }
-
-  div.expanded-post-header {
-    position: fixed;
-    // Add 32 pixels to the width to account for the overflwoing comment menu
-    width: #{$board_container_width + 40}px;
-    margin-left: -8px;
-    height: 72px;
-    padding: 24px 32px 16px 8px;
-    background-color: var(--background-color);
-    z-index: 102;
-
-    &:before {
-      content: "";
-      width: #{$board_container_width}px;
-      height: 1px;
-      position: absolute;
-      bottom: 0;
-      left: 8px;
-      background-color: var(--opac-background-color-15);
-    }
-
-    @include mobile() {
-      width: 100vw;
-      height: #{$mobile_navbar_height}px;
-      padding: 11px 16px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      border-bottom: 1px solid var(--divider-line);
-      background-color: var(--mobile-background-color);
-      margin-left: 0;
-
-      &:before {
-        display: none;
-      }
-    }
-
-    button.back-to-board {
-      float: left;
-      height: 32px;
-      width: 32px;
-      border-radius: 4px;
-      opacity: 1;
-      background-color: var(--opac-background-color-1);
-      background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
-      background-size: 14px 10px;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      @include mobile() {
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-size: 12px 12px;
-      }
-
-      @include big_web(){
-        &:hover {
-          background-color: var(--opac-background-color-2);
-        }
-      }
-    }
-
-    div.expanded-post-wrt-container {
-      float: right;
-      position: relative;
-      margin-top: 0;
-      padding: 4px 16px 4px 0;
-
-      &:after {
-        content: "";
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 1px;
-        height: 32px;
-        background-color: var(--opac-background-color-2);
-      }
-
-      @include mobile() {
-        margin-top: 0;
-      }
-
-      div.wrt-count-container {
-        height: 24px;
-
-        div.wrt-count {
-          line-height: 24px;
-          color: var(--color);
-          opacity: 1;
-        }
-      }
-    }
-
-    button.mobile-more-bt {
+  div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
+    div.muted-activity, div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
       display: none;
-
-      @include mobile() {
-        float: right;
-        height: 32px;
-        width: 32px;
-        display: inline;
-        background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
-        background-size: 18px 4px;
-        background-position: center;
-        padding: 0;
-        background-repeat: no-repeat;
-        opacity: 1;
-        background-color: transparent;
-        border-radius: 4px;
-        margin: 0 0 0 9px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
-        }
-
-        &:active, &:focus {
-          opacity: 0.9;
-        }
-      }
     }
+  }
 
-    div.more-menu {
-      float: right;
-      height: 32px;
-
-      div.activity-move {
-        left: -64px;
-        top: 34px;
-      }
-
-      button.more-menu-bt {
-        width: 32px;
-        height: 32px;
-        background-color: transparent;
-        border-radius: 4px;
-        padding: 0;
-        margin: 0 0 0 9px;
-        opacity: 1;
-
-        &:first-child {
-          border-radius: 4px;
-          border-left: none;
-        }
-
-        &:not(.disabled):hover, &:not(.disabled):active {
-          background-color: var(--opac-background-color-2);
+  &.bookmark-item {
+    div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
+      @include big_web() {
+        div.bookmark-tag {
+          display: block;
         }
       }
-
-      ul.more-menu-list {
-        top: 34px;
-        left: 0px;
+      @include mobile() {
+        div.bookmark-tag-small {
+          display: block;
+        }
       }
     }
   }
 
-  div.ziggeo-player {
-    margin-top: 16px;
-    width: 638px;
-    height: 478px;
+  &.must-see-tag:not(.bookmark-item) {
+    div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
+      div.must-see-tag {
+        display: block;
+      }
+    }
+  }
+
+  &.muted-item {
+    div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
+      div.muted-activity {
+        display: block;
+      }
+    }
+  }
+
+  div.expanded-post-container {
+    width: #{$expanded_post_width}px;
+    margin: 78px auto 40px;
+    background-color: var(--background-color);
+    border-radius: 4px;
     position: relative;
 
-    video {
-      max-height: 478px;
-    }
-
-    @include mobile(){
-      width: 100vw;
-      height: calc(100vw *  0.75);
-    }
-  }
-
-  div.expanded-post-headline {
-    @include activity-title(26px, 33px);
-    padding-top: #{72 + 40}px;
-
     @include mobile() {
-      @include activity-title(22px, 28px);
-      padding-top: 0;
+      width: 100%;
+      margin: 16px auto 40px;
+      background-color: var(--mobile-background-color);
     }
-  }
 
-  div.expanded-post-author {
-    margin-top: 8px;
-    min-height: 18px;
+    div.activity-share-container {
+      div.activity-share-modal-container {
+        top: 36px;
+        right: 64px;
+        margin-top: 0;
+      }
+    }
 
-    div.expanded-post-author-inner {
-      @include OC_Body_Book();
-      font-size: 12px;
-      color: var(--light-color);
-      line-height: 18px;
+    div.expanded-post-header {
+      position: absolute;
+      // Add 32 pixels to the width to account for the overflwoing comment menu
+      width: #{$expanded_post_width}px;
+      height: #{$expanded_post_header_height}px;
+      padding: 8px 16px;
+      z-index: 102;
+      top: 0;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--opac-background-color-15);
 
-      div.expanded-post-author-dot {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background-color: var(--opac-background-color-2);
-        margin: 0 6px 3px;
-        display: inline-block;
+      @include mobile() {
+        width: 100vw;
+        height: #{$mobile_navbar_height}px;
+        padding: 11px 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        margin-left: 0;
+      }
 
-        &.muted-dot {
+      div.back-to-board-container {
+        order: 1;
+        flex: 1;
+        margin-right: auto;
+        height: 32px;
+
+        @include mobile() {
+          order: 3;
+          margin-left: 10px;
+          // Push the button to the right to align the centered icon with the content
+          margin-right: -6px;
+          flex: 0 0 auto;
+        }
+
+        button.back-to-board {
+          height: 32px;
+          width: 32px;
+          border-radius: 4px;
+          opacity: 1;
+          background-color: var(--opac-background-color-2);
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-repeat: no-repeat;
+          background-position: center;
+          opacity: 0.5;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+
           @include mobile() {
-            display: none;
+            background-color: transparent;
+          }
+
+          @include big_web(){
+            &:hover {
+              opacity: 1;
+            }
           }
         }
       }
 
-      div.expanded-post-author-inner-label {
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: var(--light-color);
-        line-height: 18px;
-        opacity: 1;
-        display: inline-block;
-        position: relative;
+      div.expanded-post-header-center {
+        height: 32px;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        order: 2;
+        flex: 0 1 auto;
 
-        span.hover-info-popup-container {
-          position: relative;
+        @include mobile() {
+          order: 1;
+          margin-left: 0;
+          max-width: calc(100% - 32px - 8px - 32px - 8px);
+          overflow: hidden;
+        }
 
-          span.name {
-            margin-right: 4px;
-            min-height: 18px;
-            line-height: 18px;  
+        div.post-authorship {
+          max-width: 100%;
+
+          @include mobile() {
+            max-width: 92%;
+            flex: 0 1 auto;
+            flex-flow: row nowrap;
           }
         }
 
         time {
-          min-height: 18px;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: var(--light-color);
           line-height: 18px;
-          display: inline-block;
+          flex: 0 0 auto;
+          margin-left: 6px;
         }
 
-        @include mobile() {
+        @include bookmark-tag();
+        @include must-see-tag();
+
+        div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+          flex: 0 0 auto;
           margin-right: 0;
-          margin-bottom: 8px;
-          display: inline-block;
+          margin-left: 6px;
+        }
+
+        @include muted-activity();
+
+        div.muted-activity {
+          flex: 0 0 auto;
+          opacity: 0.5;
+          margin-left: 6px;
         }
       }
 
-      @include muted-activity();
+      div.more-menu-container {
+        flex: 1;
+        order: 3;
 
-      div.muted-activity {
-        display: inline-block;
-        margin-top: 2px;
-        opacity: 0.5;
-        margin-right: 0;
+        div.more-menu {
+          margin-left: auto;
+        }
+
+        @include mobile() {
+          margin-left: auto;
+          flex: 0 0 auto;
+          order: 2;
+
+          button.mobile-more-bt {
+            margin-left: 0;
+          }
+        }
+      }
+
+      button.mobile-more-bt {
+        display: none;
+
+        @include mobile() {
+          float: right;
+          height: 32px;
+          width: 32px;
+          display: inline;
+          background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
+          background-size: 18px 4px;
+          background-position: center;
+          padding: 0;
+          background-repeat: no-repeat;
+          opacity: 1;
+          background-color: transparent;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+          }
+
+          &:active, &:focus {
+            opacity: 0.9;
+          }
+        }
+      }
+
+      div.more-menu {
+        height: 32px;
 
         @include mobile() {
           display: none;
         }
+
+        div.activity-move {
+          left: -64px;
+          top: 34px;
+        }
+
+        & > button:not(.more-menu-bt), & > * > button:not(.more-menu-bt) {
+          width: 32px;
+          height: 32px;
+          background-color: var(--opac-background-color-2);
+          padding: 0;
+          opacity: 0.5;
+          border-radius: 4px;
+
+          &:not(.disabled):hover, &:not(.disabled):active {
+            opacity: 1;
+          }
+
+          &.has-next-bt {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+
+            & + button:not(.more-menu-bt),
+            & + div > button:not(.more-menu-bt) {
+              border-top-left-radius: 0;
+              border-bottom-left-radius: 0;
+            }
+          }
+        }
+
+        button.more-menu-bt {
+          width: 32px;
+          height: 32px;
+          background-color: transparent;
+          padding: 0;
+          margin: 0 9px 0 0;
+          opacity: 0.5;
+
+          &:not(.disabled):hover, &:not(.disabled):active {
+            opacity: 1;
+            background-color: transparent;
+          }
+
+          &:first-child {
+            border-left: none;
+          }
+        }
+
+        ul.more-menu-list {
+          top: 34px;
+          left: 0px;
+        }
+      }
+    }
+
+    div.expanded-post-container-inner {
+      padding: #{$expanded_post_header_height + 51}px 120px 32px;
+
+      @include mobile() {
+        padding: 0;
       }
 
-      div.must-see-tag {
-        display: inline-block;
+      div.expanded-post-headline {
+        @include activity-title(26, 33);
+        min-height: 0;
+        margin-bottom: 16px;
 
         @include mobile() {
-          display: inline-block;
-          margin-left: 0;
-          margin-top: 3px;
-          margin-bottom: 8px;
+          @include activity-title(22, 28);
+        }
+      }
+
+      div.expanded-post-body {
+        @include activity-body(17, 22, var(--color), 16);
+
+        @include mobile() {
+          margin-top: 8px;
+          @include activity-body(18, 24, var(--color), 16);
+        }
+
+        .interactive-image {
+          cursor: zoom-in;
+
+          &:hover {
+            opacity: 0.7;
+          }
+        }
+
+    $big-web-collapse-height: 134;
+    $mobile-collapse-height: 160;
+        &.collapsed {
+          height: #{$big-web-collapse-height}px;
+          position: relative;
           overflow: hidden;
-          max-width: 100%;
-          text-overflow: ellipsis;
-          white-space: normal;
-          overflow-wrap: break-word;
-        }
-      }
+          cursor: pointer;
 
-      @include bookmark-tag();
+          @include mobile() {
+            height: #{$mobile-collapse-height}px;
+          }
 
-      div.bookmark-tag {
-        display: inline-block;
+          &:before {
+            content: "";
+            display: block;
+            width: 100%;
+            position: absolute;
+            top: 47px;
+            left: 0;
+            z-index: 2;
+            height: #{$big-web-collapse-height - 47}px;
+            background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(100%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* IE10+ */
+            background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--collapse-post-start-bg), endColorstr=var(--collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
 
-        @include mobile() {
-          display: inline-block;
-          margin-left: 0;
-          margin-top: 0;
-          margin-bottom: 8px;
-          overflow: hidden;
-          max-width: 100%;
-          text-overflow: ellipsis;
-          white-space: normal;
-          overflow-wrap: break-word;
-        }
-      }
-    }
-  }
-
-  div.expanded-post-abstract {
-    @include activity-abstract(17px, 22px);
-    margin: 16px 0 24px;
-    @include OC_Body_Bold();
-    white-space: normal;
-    overflow-wrap: break-word;
-
-    // Abstract is bold only in expanded post view
-    // we need to make sure italic doesn't override
-    // the font weight only here
-    i, i strong, i b, b i, strong i {
-      @include OC_Body_Bold_Italic();
-    }
-
-    @include mobile() {
-      margin: 8px 0 16px;
-    }
-  }
-
-  div.expanded-post-body {
-    @include activity-body(17, 22, var(--color), 16);
-    margin-top: 16px;
-
-    @include mobile() {
-      margin-top: 8px;
-      @include activity-body(18, 24, var(--color), 16);
-    }
-
-    .interactive-image {
-      cursor: zoom-in;
-
-      &:hover {
-        opacity: 0.7;
-      }
-    }
-
-$big-web-collapse-height: 134;
-$mobile-collapse-height: 160;
-    &.collapsed {
-      height: #{$big-web-collapse-height}px;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-
-      @include mobile() {
-        height: #{$mobile-collapse-height}px;
-      }
-
-      &:before {
-        content: "";
-        display: block;
-        width: #{$board_container_width}px;
-        position: absolute;
-        top: 47px;
-        left: 0;
-        z-index: 2;
-        height: #{$big-web-collapse-height - 47}px;
-        background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* FF3.6+ */
-        background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(100%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Opera 11.10+ */
-        background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* IE10+ */
-        background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* W3C */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--collapse-post-start-bg), endColorstr=var(--collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
-
-        @include mobile() {
-          top: 65px;
-          height: #{$mobile-collapse-height - 65}px;
-          background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* FF3.6+ */
-          background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(100%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
-          background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
-          background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Opera 11.10+ */
-          background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* IE10+ */
-          background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* W3C */
-          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--mobile-collapse-post-start-bg), endColorstr=var(--mobile-collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
-        }
-      }
-    }
-  }
-
-  button.expand-button {
-    display: block;
-    width: 100%;
-    height: 72px;
-    opacity: 1;
-
-    @include big_web() {
-      &:hover {
-        div.expand-button-inner {
-          color: var(--color);
-          background-color: var(--ultralight-color);
-        }
-      }
-    }
-
-    div.expand-button-inner {
-      margin: 16px auto 24px;
-      width: 132px;
-      height: 32px;  
-      padding: 7px 18px 7px 43px;
-      @include OC_Body_Book();
-      font-size: 14px;
-      line-height: 18px;
-      color: var(--color);
-      position: relative;
-      border-radius: 4px;
-      background-color: var(--reaction-bt-background);
-
-      &:before {
-        content: "";
-        width: 16px;
-        height: 16px;
-        background-color: #000000;
-        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-        background-size: 16px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 50%;
-        position: absolute;
-        top: 8px;
-        left: 19px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-          background-color: #FFFFFF;
-        }
-      }
-    }
-  }
-
-  // div.expanded-post-mobile-reactions {
-  //   display: none;
-
-  //   @include mobile() {
-  //     display: block;
-  //     height: 48px;
-  //     margin: 24px 0 0;
-  //     padding-bottom: 16px;
-  //     border-bottom: 1px solid $ultra_light_grey;
-  //   }
-  // }
-
-  div.expanded-post-footer {
-    margin-top: 24px;
-    min-height: 26px;
-    position: relative;
-
-    @include mobile() {
-      margin-top: 3px;
-      min-height: 32px;
-    }
-
-    div.expanded-post-footer-mobile-group {
-      @include mobile() {
-        float: left;
-        height: 20px;
-        margin-top: 20px;
-      }
-
-      div.is-comments {
-        div.is-comments-summary {
-          color: var(--color);
-        }
-      }
-    }
-
-    div.is-comments {
-      margin-right: 16px;
-      float: left;
-    }
-
-    div.reactions {
-      float: left;
-      margin-right: 14px;
-
-      @include mobile() {
-        margin-top: 13px;
-      }
-
-      div.reactions-picker-container {
-        div.emoji-mart {
-          bottom: unset;
-          top: 0;
-          left: calc(100% + 8px);
-
-          @include mobile(){
-            bottom: unset;
-            right: unset;
-            top: unset;
-            left: unset;
+            @include mobile() {
+              top: 65px;
+              height: #{$mobile-collapse-height - 65}px;
+              background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* FF3.6+ */
+              background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(100%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
+              background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+              background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+              background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* IE10+ */
+              background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* W3C */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--mobile-collapse-post-start-bg), endColorstr=var(--mobile-collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
+            }
           }
         }
       }
-    }
-  }
 
-  div.expanded-post-comments {
-    padding-bottom: 0;
-    margin-top: 40px;
+      button.expand-button {
+        display: block;
+        width: 100%;
+        height: 72px;
+        opacity: 1;
 
-    @include mobile() {
-      margin-top: 16px;
-      width: 100%;
-      padding: 16px 0;
-    }
-  }
-}
+        @include big_web() {
+          &:hover {
+            div.expand-button-inner {
+              color: var(--color);
+              background-color: var(--ultralight-color);
+            }
+          }
+        }
 
+        div.expand-button-inner {
+          margin: 16px auto 24px;
+          display: inline-block;
+          width: auto; //136px;
+          height: 32px;
+          padding: 5px 8px 5px 32px;
+          @include OC_Body_Book();
+          color: var(--color);
+          position: relative;
+          border-radius: 4px;
+          background-color: var(--reaction-bt-background);
+          font-size: 17px;
+          line-height: 22px;
 
-@include dark_mode() {
-  div.expanded-post div.expanded-post-header button.back-to-board {
-    background-image: cdnUrl("/img/ML/expanded_post_back_arrow@dark.svg");
+          @include mobile() {
+            font-size: 18px;
+          }
 
-    @include mobile() {
-      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          &:before {
+            content: "";
+            width: 16px;
+            height: 16px;
+            background-color: #000000;
+            background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+            background-size: 16px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            left: 8px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+              background-color: #FFFFFF;
+            }
+          }
+        }
+      }
+
+      div.expanded-post-footer {
+        margin-top: 24px;
+        min-height: 26px;
+        position: relative;
+
+        @include mobile() {
+          margin-top: 16px;
+          min-height: 26px;
+        }
+
+        div.expanded-post-footer-mobile-group {
+          min-height: 26px;
+          float: left;
+          height: auto;
+          width: auto;
+        }
+
+        div.is-comments {
+          margin-left: 32px;
+          float: left;
+          cursor: pointer;
+        }
+
+        div.reactions {
+          float: left;
+
+          div.reactions-picker-container {
+            div.emoji-mart {
+              bottom: unset;
+              top: 0;
+              left: calc(100% + 8px);
+
+              @include mobile(){
+                bottom: unset;
+                right: unset;
+                top: unset;
+                left: unset;
+              }
+            }
+          }
+        }
+
+        div.wrt-count-container {
+          float: left;
+          margin-left: 32px;
+        }
+      }
+
+      div.expanded-post-comments {
+        padding-bottom: 56px;
+
+        @include mobile() {
+          margin-top: 8px;
+          width: 100%;
+          padding: 0 0 25vh;
+        }
+
+        div.add-comment-box-container {
+          z-index: 2;
+
+          div.add-comment-box div.add-comment-internal {
+            border: 1px solid var(--divider-line);
+          }
+        }
+
+        div.stream-comments {
+          z-index: 3;
+        }
+      }
     }
   }
 }

@@ -125,7 +125,7 @@
   }
 
   h1, h2, h3, h4, h5 {
-    text-size: 19px;
+    font-size: 19px;
     @include OC_Body_Bold();
   }
 
@@ -219,13 +219,39 @@
 
 @mixin image-2x($image, $suffix: ".png") {
   background-image: cdnUrl($image + $suffix);
-  @media (min--moz-device-pixel-ratio: 1.3),
-         (-o-min-device-pixel-ratio: 2.6/2),
-         (-webkit-min-device-pixel-ratio: 1.3),
-         (min-device-pixel-ratio: 1.3),
-         (min-resolution: 1.3dppx) {
+  @media only screen and (min--moz-device-pixel-ratio: 5/4),
+ 	       only screen and (-o-min-device-pixel-ratio: 5/4),
+         only screen and (-webkit-min-device-pixel-ratio: 1.25),
+         only screen and (min-device-pixel-ratio: 1.25),
+         only screen and (min-resolution: 1.25dppx) {
     /* on retina, use image that's scaled by 2 */
     background-image: cdnUrl($image + "@2x" + $suffix);
+  }
+}
+
+@mixin image-3x($image, $suffix: ".png") {
+  @include image-2x($image, $suffix);
+
+  @media only screen and (min--moz-device-pixel-ratio: 9/4),
+         only screen and (-o-min-device-pixel-ratio: 9/4),
+         only screen and (-webkit-min-device-pixel-ratio: 2.25),
+         only screen and (min-device-pixel-ratio: 2.25),
+         only screen and (min-resolution: 2.25dppx) {
+    /* on retina, use image that's scaled by 2 */
+    background-image: cdnUrl($image + "@3x" + $suffix);
+  }
+}
+
+@mixin image-4x($image, $suffix: ".png") {
+  @include image-3x($image, $suffix);
+
+  @media // only screen and (min--moz-device-pixel-ratio 13/4), // Commenting this out because of an issue with SCSS compiler
+ 	       only screen and (-o-min-device-pixel-ratio: 13/4),
+         only screen and (-webkit-min-device-pixel-ratio: 3.25),
+         only screen and (min-device-pixel-ratio: 3.25),
+         only screen and (min-resolution: 3.25dppx) {
+    /* on retina, use image that's scaled by 2 */
+    background-image: cdnUrl($image + "@4x" + $suffix);
   }
 }
 
@@ -249,4 +275,117 @@
       content: $image_urls;
     }
   }
+}
+
+@mixin truncate($lines, $line-height: null) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @if ($line-height) {
+    max-height: #{$line-height * $lines};
+  }
+
+  @if ($lines > 1) {
+    // Truncate last line of text preview
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+    white-space: normal;
+  }
+}
+
+@mixin svgBgColor($svgUrl, $position: center, $size: contain, $bgColor: var(--primary-color)) {
+  background-color: $bgColor;
+  background-image: none;
+  mask-image: cdnUrl($svgUrl);
+  mask-repeat: no-repeat;
+  mask-position: $position;
+  mask-size: $size;
+  -webkit-mask-image: cdnUrl($svgUrl);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: $position;
+  -webkit-mask-size: $size;
+}
+
+@mixin face-pile($width: 18) {
+  $margin: $width / 9;
+  $total-width: $width + ($margin * 2);
+  $mobile-width: $width - 2;
+  $mobile-margin: $margin / 2;
+  div.face-pile {
+    position: relative;
+    margin-left: -#{$margin}px;
+
+    @include mobile() {
+      margin-left: -#{$mobile-margin}px;
+    }
+
+    &.show-border {
+      div.face-pile-face {
+        background-color: transparent;
+        border: #{$margin}px solid transparent;
+      }
+    }
+
+    div.face-pile-face {
+      float: left;
+      width: #{$total-width}px;
+      height: #{$total-width}px;
+      background-color: transparent;
+      border: #{$margin}px solid transparent;
+      border-radius: 50%;
+      margin-left: -#{$width / 1.8}px;
+
+      @include user-profile($width);
+
+      @include mobile(){
+        width: #{$mobile-width + ($margin + 2)}px;
+        height: #{$total-width}px;
+        border: #{$mobile-margin}px solid transparent;
+        margin-left: -#{$mobile-width / 2}px;
+
+        @include user-profile($mobile-width);
+      }
+
+      &:first-child {
+        margin-left: 0px;
+      }
+    }
+  }
+}
+
+@mixin mac_electron() {
+  $cur_sel: #{&};
+  @at-root body.electron.mac-electron {
+    #{$cur_sel} {
+      @content
+    }
+  }
+}
+
+@mixin win_electron() {
+  $cur_sel: #{&};
+  @at-root body.electron.mac-electron {
+    #{$cur_sel} {
+      @content
+    }
+  }
+}
+
+@mixin premium_cursor($important: true) {
+  @if $important == true {
+    cursor: help !important;
+  } @else {
+    cursor: help;
+  }
+}
+
+@mixin premium_lock() {
+  @include premium_cursor();
+  opacity: 0.7 !important;
+
+  @content
 }

@@ -12,36 +12,59 @@ div.lazy-stream {
     width: 100%;
     height: 100%;
     background-repeat: repeat-y;
-    background-position: 0 0;
+    background-position: top -32px left 0;
 
     @include big_web() {
+      margin-top: 16px;
       min-height: calc(100vh - 140px);
-      background-image: cdnUrl("/img/ML/interstitial.svg");
-      background-size: #{$board_container_width}px #{$foc_height + 1}px;
+      background-image: cdnUrl("/img/ML/oc_loading_dashboard.svg");
+      background-size: #{$board_container_width}px 664px;
 
       @include dark_mode() {
-        background-image: cdnUrl("/img/ML/interstitial@dark.svg");
-      }
-
-      &.collapsed {
-        margin-top: 10px;
-        background-image: cdnUrl("/img/ML/interstitial_collapsed.svg");
-        background-size: #{$board_container_width}px #{($collapsed_foc_height * 2) + 3}px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/interstitial_collapsed@dark.svg");
-        }
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard@dark.svg");
       }
     }
 
     @include mobile() {
-      margin-top: 0;
-      background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+      margin-top: 16px;
+      padding: 0 8px 0 0;
+      background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
       min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
-      background-size: 100% #{$mobile_foc_height + 1}px;
+      background-size: calc(100% - 48px) auto;
+      background-position: left 24px top 0;
+      background-repeat: repeat-y;
 
       @include dark_mode() {
-        background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+      }
+    }
+
+    &.collapsed {
+      background-position: top 0 left 0;
+
+      @include big_web() {
+        margin-top: 16px;
+        min-height: calc(100vh - 140px);
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed.svg");
+        background-size: #{$board_container_width}px auto;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed@dark.svg");
+        }
+      }
+
+      @include mobile() {
+        margin-top: 16px;
+        padding: 0 8px 0 0;
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collapsed.svg");
+        min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
+        background-size: calc(100% - 48px) auto;
+        background-position: left 24px top 0;
+        background-repeat: repeat-y;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collaped@dark.svg");
+        }
       }
     }
   }
@@ -50,25 +73,23 @@ div.lazy-stream {
 html:not(.theme-mode-dark) {
   div.preload-interstitial {
     @include big_web() {
-      @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
-      @include preload_image(cdnUrl("/img/ML/interstitial_collapsed.svg"), "before");
+      @include preload_image(cdnUrl("/img/ML/oc_loading_dashboard.svg"));
     }
 
-    @include mobile() {
-      @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
-    }
+    // @include mobile() {
+    //   @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
+    // }
   }  
 }
 
 html.theme-mode-dark {
   div.preload-interstitial {
     @include big_web() {
-      @include preload_image(cdnUrl("/img/ML/interstitial@dark.svg"));
-      @include preload_image(cdnUrl("/img/ML/interstitial_collapsed@dark.svg"), "before");
+      @include preload_image(cdnUrl("/img/ML/oc_loading_dashboard@dark.svg"));
     }
 
-    @include mobile() {
-      @include preload_image(cdnUrl("/img/ML/interstitial_mobile@dark.svg"));
-    }
+    // @include mobile() {
+    //   @include preload_image(cdnUrl("/img/ML/interstitial_mobile@dark.svg"));
+    // }
   }  
 }

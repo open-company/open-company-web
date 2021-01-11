@@ -1,10 +1,9 @@
 div.empty-board {
-  margin: 0 auto;
-  padding-top: 124px;
-  float: left;
   text-align: center;
   width: 100%;
+  margin: 16px auto 0;
   border-top: 1px solid var(--divider-line);
+  padding-top: 108px;
 
   @include mobile() {
     float: unset;
@@ -49,37 +48,54 @@ div.empty-board {
         &.contributions {
           background-image: none;
           @include user-profile(56);
-
         }
 
-        &.inbox {
-          background-image: cdnUrl("/img/ML/empty_state_inbox_section.svg");
-          background-size: 24px 21px;
+        &.all-posts {
+          background-image: cdnUrl("/img/ML/nav_all.svg");
+          background-size: 24px 24px;
         }
 
         &.drafts {
-          background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-          background-size: 18px 22px;
+          background-image: cdnUrl("/img/ML/nav_drafts.svg");
+          background-size: 24px 24px;
         }
 
         &.bookmarks {
-          background-image: cdnUrl("/img/ML/empty_state_bookmarks_section.svg");
-          background-size: 18px 24px;
+          background-image: cdnUrl("/img/ML/nav_bookmarks.svg");
+          background-size: 24px 24px;
+        }
+
+        &.following {
+          background-image: cdnUrl("/img/ML/nav_home.svg");
+          background-size: 24px 24px;
+        }
+
+        &.replies {
+          background-image: cdnUrl("/img/ML/nav_activity.svg");
+          background-size: 24px 24px;
         }
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
 
-          &.inbox {
-            background-image: cdnUrl("/img/ML/empty_state_inbox_section@dark.svg");
+          &.all {
+            background-image: cdnUrl("/img/ML/nav_all@dark.svg");
           }
 
           &.drafts {
-            background-image: cdnUrl("/img/ML/empty_state_drafts@dark.svg");
+            background-image: cdnUrl("/img/ML/nav_drafts@dark.svg");
           }
 
           &.bookmarks {
-            background-image: cdnUrl("/img/ML/empty_state_bookmarks_section@dark.svg");
+            background-image: cdnUrl("/img/ML/nav_bookmarks@dark.svg");
+          }
+
+          &.following {
+            background-image: cdnUrl("/img/ML/nav_home@dark.svg");
+          }
+
+          &.replies {
+            background-image: cdnUrl("/img/ML/nav_activity@dark.svg");
           }
         }
       }
@@ -91,6 +107,60 @@ div.empty-board {
       color: var(--color);
       line-height: 20px;
       margin: 16px auto 0;
+
+      div.empty-following, div.empty-drafts {
+        text-align: center;
+        max-width: 300px;
+        margin: 0 auto;
+
+        button.create-bt {
+          border-radius: 4px;
+          width: #{$left_navigation_sidebar_width}px;
+          height: 34px;
+          padding: 0;
+          position: relative;
+          background-color: var(--navigation-sidebar-create-bt-background);
+          color: var(--navigation-sidebar-create-bt-color);
+          transition: background-color 180ms ease-in;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
+          margin: 16px auto 0;
+
+          @include mobile() {
+            display: none;
+          }
+
+          span.plus-icon {
+            width: 11px;
+            height: 11px;
+            background-size: 11px 11px;
+            background-repeat: no-repeat;
+            background-position: center;
+            @include svgBgColor("/img/ML/add_to_board_plus_white.svg");
+            margin-left: auto;
+            margin-right: 10px;
+            flex: 0 0 auto;
+          }
+
+          span.copy-text {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: var(--navigation-sidebar-create-bt-color);
+            flex: 0 0 auto;
+            margin-right: auto;
+            margin-left: auto;
+          }
+        }
+      }
+
+      div.empty-replies {
+        text-align: center;
+        max-width: 300px;
+        margin: 0 auto;
+      }
     }
   }
 }

@@ -64,10 +64,10 @@ div.user-notifications-modal-container {
       button.save-bt {
         height: 32px;
         padding: 7px 14px;
-        background-color: $carrot_green;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
         border-radius: 4px;
@@ -96,6 +96,49 @@ div.user-notifications-modal-container {
           color: var(--color);
           @include OC_Body_Book();
           font-size: 14px;
+        }
+
+        div.field-value-group {
+          margin-top: 16px;
+
+          div.field-value {
+            width: 100%;
+            margin-top: 4px;
+
+            &.premium-lock {
+              @include premium_lock() {
+                div.carrot-checkbox.disabled {
+                  @include premium_cursor();
+                  pointer-events: none;
+                }
+
+                span.digest-time {
+                  @include premium_cursor();
+                  pointer-events: none;
+                }
+              }
+            }
+
+            div.carrot-checkbox {
+              float: left;
+            }
+          }
+
+          span.digest-time {
+            float: left;
+            height: 16px;
+            margin-left: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 16px;
+            color: var(--color);
+            cursor: pointer;
+
+            &.not-allowed, &.disabled {
+              cursor: not-allowed;
+              opacity: 0.4;
+            }
+          }
         }
 
         input.field-value {
@@ -146,7 +189,7 @@ div.user-notifications-modal-container {
           background-size: 8px 10px;
           background-position: top 11px right 8px;
           background-repeat: no-repeat;
-        
+
           &::-ms-expand {
             display: none;
           }
@@ -174,6 +217,15 @@ div.user-notifications-modal-container {
           @include OC_Body_Book();
           font-size: 14px;
           color: var(--color);
+
+          a {
+            color: var(--primary-color);
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

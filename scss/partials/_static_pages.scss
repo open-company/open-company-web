@@ -178,7 +178,7 @@ div.homepage-testimonials-container {
   }
 }
 
-button.get-started-button {
+a.get-started-button {
   width: 220px;
   height: 56px;
   border-radius: 6px;
@@ -187,14 +187,14 @@ button.get-started-button {
   @include OC_Body_Bold();
   font-size: 20px;
   line-height: 25px;
-  padding: 15px 40px;
+  padding: 15px 20px;
   margin: 32px auto 0;
   position: relative;
   text-align: center;
-  padding: 0;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 
   @include mobile(){
     max-width: 100%;
@@ -256,10 +256,17 @@ div.testimonials-block {
     padding: 0 16px;
   }
 
-  &.ifttt {
-    max-width: 640px;
+  // &.ifttt {
+  //   max-width: 640px;
+  //   div.testimonial-author-pic {
+  //     @include image-2x("/img/ML/testimonial_author_ifttt");
+  //   }
+  // }
+
+  &.hopper {
+    max-width: 700px;
     div.testimonial-author-pic {
-      @include image-2x("/img/ML/testimonial_author_ifttt");
+      @include image-2x("/img/ML/testimonial_author_hopper");
     }
   }
 
@@ -565,7 +572,7 @@ section.pricing-footer {
   text-align: center;
   position: relative;
   width: 100%;
-  background-color: $another_ui_grey;
+  background-color: rgba($deep_navy, 0.08);
 
   @include tablet() {
     overflow: visible;
@@ -579,16 +586,16 @@ section.pricing-footer {
   }
 
   h1.pricing-headline {
-    font-size: 60px;
-    line-height: 78px;
-    @include OC_Title()
+    font-size: 50px;
+    line-height: auto;
+    @include OC_Title();
     color: $deep_navy;
     max-width: 730px;
     margin: 0 auto;
 
     @include mobile() {
-      margin: 0 auto;
-      font-size: 36px;
+      // margin: 0 auto;
+      font-size: 26px;
       line-height: initial;
       max-width: initial;
       padding: 0 24px;
@@ -601,7 +608,7 @@ div.pricing-subheadline {
   font-size: 22px;
   line-height: 28px;
   @include OC_Body_Book();
-  margin: 24px auto 0px;
+  margin: 40px auto 0px;
   position: relative;
   max-width: 630px;
 
@@ -620,120 +627,169 @@ div.pricing-subheadline {
 }
 
 div.pricing-table {
-  background-color: $deep_navy;
-  border-radius: 16px;
-  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 960px;
-  margin: 40px auto 0;
-  padding: 40px;
-  position: relative;
-  min-height: 240px;
-  display: flex;
-  flex-direction: row;
-  align-items: normal;
-  align-content: flex-start;
+  margin: 32px auto 0;
 
-  @include mobile() {
-    margin-top: 24px;
-    padding: 40px 24px;
-    display: block
-  }
-
-  div.pricing-table-left {
-    width: 195px;
-    flex: 0 0 195px;
-
-    @include mobile() {
-      position: initial;
-      width: 100%;
-      left: unset;
-      top: unset;
-      transform: unset;
-      padding-right: 0;
-    }
-
-    div.pricing-table-left-price {
-      @include OC_Body_Book();
-      font-size: 80px;
-      line-height: 90px;
-      color: white;
-      text-align: center;
-    }
-
-    div.pricing-table-left-subprice {
-      margin-top: 8px;
-      @include OC_Body_Book();
-      font-size: 22px;
-      line-height: 28px;
-      color: rgba(white, 0.5);
-      text-align: center;
-    }
-  }
-
-  div.pricing-table-divider-line {
-    width: 1px;
-    min-height: 100%;
-    flex: 0 0 1px;
-    background-color: rgba(white, 0.2);
-    margin: 0 60px;
-
-    @include mobile() {
-      width: 100%;
-      height: 1px;
-      min-height: unset;
-      margin: 40px 0;
-    }
-  }
-
-  div.pricing-table-right {
-    float: right;
-    width: auto;
-    flex: 1 1 auto;
+  div.pricing-table-inner {
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-flow: row nowrap;
     justify-content: center;
     align-content: flex-start;
 
     @include mobile() {
-      float: unset;
-      width: 100%;
-      border-left: none;
-      padding-left: 0;
+      flex-flow: row wrap;
     }
 
-    div.pricing-table-right-copy {
-      @include OC_Body_Book();
-      font-size: 22px;
-      line-height: 28px;
-      color: white;
-      text-align: left;
+    div.pricing-table-column {
+      display: flex;
+      flex-flow: column nowrap;
+      width: 368px;
+      margin: 0 12px;
 
-      @include mobile() {
-        text-align: center;
-        font-size: 20px;
-        line-height: 25px;
+      &:first-child {
+        margin: 0 12px 0 0;
       }
-    }
 
-    a.pricing-table-right-link {
-      margin-top: 24px;
-      display: block;
-      height: 56px;
-      color: white;
-      background-color: #fb5e48;
-      border-radius: 6px;
-      text-align: center;
-      @include OC_Body_Bold();
-      font-size: 18px;
-      line-height: 23px;
-      padding: 16px 26px;
-      width: 205px;
+      &:last-child {
+        margin: 0 0 0 12px;
+      }
 
       @include mobile() {
-        float: unset;
         width: 100%;
+        margin: 0 0 16px;
+
+        &:first-child {
+          margin: 0 0 16px;
+        }
+
+        &:last-child {
+          margin: 0 0 16px;
+        }
       }
+
+      div.pricing-table-column-inner {
+        background-color: white;
+        border-radius: 8px;
+        padding: 0 0 8px 0;
+
+        div.pricing-column-header {
+          padding: 21px 0;
+          border-top-left-radius: 8px;
+          border-top-right-radius: 8px;
+          background-color: rgba($deep_navy, 0.04);
+          @include OC_Body_Bold();
+          font-size: 20px;
+          line-height: 24px;
+        }
+
+        div.pricing-column-value {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
+          margin-top: 16px;
+          min-height: 51px;
+          @include OC_Body_Book();
+          font-size: 16px;
+          line-height: 20px;
+          color: $deep_navy;
+
+          span.pricing-column-value-copy {
+            max-width: 197px;
+            margin: 0 auto;
+          }
+
+          div.price-value {
+            font-size: 40px;
+            color: $deep_navy;
+            line-height: 51px;
+            margin-right: 16px;
+          }
+
+          div.price-desc {
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            color: $ui_grey;
+            text-align: left;
+          }
+        }
+
+        a.pricing-column-right-link {
+          display: inline-block;
+          margin: 16px auto 24px;
+          padding: 9px 36px;
+          background-color: $carrot_orange;
+          border-radius: 4px;
+          color: white;
+          @include OC_Body_Book();
+          font-size: 16px;
+
+          &.chat-with-us-link {
+            background-color: $carrot_green;
+          }
+        }
+
+        div.tooltip {
+          max-width: 400px;
+        }
+
+        div.pricing-column-row {
+          padding: 16px 0;
+          margin: 0 24px;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: $deep_navy;
+          border-top: 1px solid rgba($deep_navy, 0.08);
+          text-align: left;
+
+          &.has-tooltip {
+            span.pricing-column-copy {
+              cursor: pointer;
+              @include OC_Body_Book();
+              font-size: 16px;
+              color: $deep_navy;
+              line-height: 22px;
+
+              &:after {
+                font-family: "Material Design Icons";
+                content: "\F2FD";
+                margin-left: 4px;
+                color: $deep_navy;
+                font-size: 14px;
+              }
+            }
+
+            div.tooltip {
+              max-width: 300px;
+
+              div.tooltip-inner {
+                @include OC_Body_Book();
+                padding: 5px 8px;
+                font-size: 12px;
+                color: var(--tooltip-color);
+                line-height: 18px;
+              }
+            }
+          }
+
+          &.coming-feature {
+            color: rgba($deep_navy, 0.5);
+          }
+        }
+      }
+    }
+  }
+
+  div.pricing-column-footer-note {
+    margin-top: 16px;
+    text-align: center;
+    margin-bottom: auto;
+    @include OC_Body_Book();
+    font-size: 14px;
+
+    @include mobile() {
+      margin-top: 24px;
     }
   }
 }
@@ -788,6 +844,67 @@ div.pricing-header-footer {
       &:hover {
         color: $carrot_green;
         text-decoration: underline;
+      }
+    }
+  }
+}
+
+div.testimonials-commgaps-block {
+  width: 100%;
+  max-width: 1212px;
+  margin: 0 auto;
+
+  div.testimonals-commgaps-header {
+    @include OC_Body_Bold();
+    font-size: 60px;
+    line-height: 60px;
+    color: $deep_navy;
+  }
+
+  div.testimonals-commgaps-subheader {
+    margin-top: 24px;
+    @include OC_Body_Book();
+    font-size: 24px;
+    line-height: 32px;
+    color: $deep_navy;
+  }
+
+  div.testimonials.commgaps-block-inner {
+    width: 100%;
+    margin-top: 40px;
+
+    div.testimonials-commgaps-column {
+      width: calc(50% - 3px);
+      text-align: center;
+
+      &.left-column {
+        float: left;
+      }
+
+      &.right-column {
+        float: right;
+      }
+
+      img.testimonials-commgaps-column-screenshot {
+        width: 100%;
+      }
+
+      div.testimonials-commgaps-column-header {
+        @include OC_Body_Bold();
+        font-size: 26px;
+        line-height: 33px;
+        color: $deep_navy;
+        max-width: 404px;
+        margin: 16px auto 0;
+      }
+
+      div.testimonials-commgaps-column-subheader {
+        @include OC_Body_Book();
+        font-size: 20px;
+        line-height: 26px;
+        color: $deep_navy;
+        max-width: 404px;
+        margin: 8px auto 0;
       }
     }
   }
@@ -894,7 +1011,7 @@ section.testimonials-section-old {
         div.testimonial-footer {
           div.testimonial-image {
             @include image-2x("/img/ML/testimonial_novo");
-          } 
+          }
         }
       }
 
@@ -928,7 +1045,7 @@ section.testimonials-section-old {
         }
 
         div.testimonial-name {
-          @include OC_Title()
+          @include OC_Title();
           font-size: 14px;
           color: $deep_navy;
           line-height: 18px;
@@ -969,4 +1086,93 @@ span.beta-app-label {
   font-size: 11px;
   color: rgba($light_navy, 0.5);
   vertical-align: middle;
+}
+
+div.close-communication-gaps-container {
+  padding: 0;
+  margin: 0 auto;
+  max-width: 1080px;
+
+  h3.close-communication-gaps {
+    @include OC_Body_Bold();
+    font-size: 50px;
+    line-height: 63px;
+    color: $deep_navy;
+    margin: 0 auto;
+
+    @include mobile() {
+      font-size: 26px;
+      line-height: auto;
+    }
+  }
+
+  p {
+    @include OC_Body_Book();
+    font-size: 24px;
+    line-height: 32px;
+    color: $deep_navy;
+    margin: 16px auto 0;
+
+    @include mobile() {
+      font-size: 18px;
+      line-height: auto;
+    }
+  }
+
+  div.close-communigation-gaps-video {
+    width: 100%;
+    padding: 26% 0;
+    box-sizing: border-box;
+    position: relative;
+    background-color: rgba($deep_navy, 0.72);
+    border: 1px solid rgba($deep_navy, 0.72);
+    margin: 40px auto 0;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+
+    &.video-playing {
+      div.animation-lightbox-container {
+        display: block;
+      }
+    }
+
+    p.not-needed {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: transparent;
+
+      @include no-user-select();
+    }
+
+    &:before {
+      position: absolute;
+      top: calc(50% - 20px);
+      left: calc(50% - 20px);
+      color: white;
+      font-family: FontAwesome;
+      content: "\f144";
+      text-align: center;
+      vertical-align: middle;
+      font-size: 47px;
+    }
+
+    div.animation-lightbox-container {
+      text-align: center;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      div.animation-lightbox {
+        width: 100vw;
+        height: 100vh;
+        max-width: 1080px;
+        max-height: 608px;
+        margin: 0 auto;
+        position: relative;
+      }
+    }
+  }
 }

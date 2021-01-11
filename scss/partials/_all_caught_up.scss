@@ -25,3 +25,101 @@ div.all-caught-up {
     }
   }
 }
+
+div.caught-up-line {
+  height: 48px;
+  width: 100%;
+  position: relative;
+  padding: 16px 0 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  z-index: 1;
+
+  // Line besides caught up
+  &:before {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    z-index: 1;
+    background-color: var(--primary-color);
+    content: "";
+  }
+
+  @include mobile() {
+    height: 32px;
+    padding: 0;
+
+    // Line besides caught up
+    &:before {
+      top: 16px;
+    }
+  }
+
+  div.all-caught-up {
+    width: auto;
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    height: 32px;
+    position: relative;
+    flex: 0 0 auto;
+
+    // Layer to avoid seeing the horzontal line if the bg color is transparent
+    &:before {
+      content: "";
+      width: 100%;
+      height: 32px;
+      border-radius: 4px;
+      z-index: 2;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: var(--background-color);
+
+      @include mobile() {
+        background-color: var(--mobile-background-color);
+      }
+    }
+
+    div.all-caught-up-inner {
+      height: 32px;
+      width: 100%;
+      background-color: var(--primary-color);
+      border-radius: 4px;
+      padding: 4px 16px;
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      background-image: none;
+
+      div.message {
+        color: var(--secondary-color);
+        line-height: 24px;
+        font-size: 14px;
+        text-align: center;
+        @include OC_Body_Bold();
+        padding-top: 0;
+      }
+    }
+  }
+
+  &.gray-style {
+    &:before {
+      background-color: var(--light-color);
+    }
+
+    div.all-caught-up div.all-caught-up-inner {
+      background-color: transparent;
+
+
+      div.message {
+        color: var(--light-color);
+      }
+    }
+  }
+}

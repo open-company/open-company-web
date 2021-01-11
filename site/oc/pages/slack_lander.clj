@@ -1,5 +1,5 @@
 (ns oc.pages.slack-lander
-  (:require [oc.pages.shared :as shared]
+  (:require [oc.shared :as shared]
             [environ.core :refer (env)]))
 
 (defn slack-lander

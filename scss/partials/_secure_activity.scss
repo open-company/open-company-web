@@ -60,7 +60,7 @@ div.secure-activity-container {
         float: right;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: var(--primary-color);
         padding: 0;
 
         @include user-profile(32) {
@@ -102,7 +102,7 @@ div.secure-activity-container {
         height: 32px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: var(--primary-color);
       }
 
       button.learn-more-bt {
@@ -111,7 +111,7 @@ div.secure-activity-container {
         text-align: left;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: var(--primary-color);
         padding: 0;
         margin: 0;
       }
@@ -136,22 +136,12 @@ div.secure-activity-container {
         min-height: calc(100vh - 210px);
       }
 
-      div.ziggeo-player {
-        margin-top: 16px;
-        video {
-          max-height: 480px;
-        }
-        @include tablet(){
-          margin-left: -24px;
-        }
-      }
-
       div.activity-title {
-        @include activity-title(26px, 33px);
+        @include activity-title(26, 33);
         color: var(--color);
 
         @include mobile() {
-          @include activity-title(36px, 40px);
+          @include activity-title(36, 40);
         }
 
         .emojione {
@@ -171,17 +161,6 @@ div.secure-activity-container {
           font-size: 12px;
           color: var(--light-color);
           line-height: 24px;
-        }
-      }
-
-      div.activity-abstract {
-        margin: 16px 0 32px;
-        cursor: text;
-        @include activity-abstract(16px, 20px);
-        @include OC_Body_Bold();
-
-        @include mobile() {
-          @include activity-abstract(18px, 24px);
         }
       }
 
@@ -272,28 +251,23 @@ div.secure-activity-container {
 
       div.sent-via-carrot-copy {
         height: 18px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: var(--color);
-        padding-left: 18px;
-        position: relative;
-        opacity: 0.5;
-        width: 110px;
         margin: 0 auto;
+        display: flex;
 
-        &:before {
-          content: "";
-          height: 18px;
+        span.sent-copy {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--light-color);
+          margin-right: auto;
+        }
+
+        span.sent-icon {
           width: 10px;
-          background-image: cdnUrl("/img/ML/carrot_grey.svg");
-          background-size: 10px 18px;
-          background-repeat: no-repeat;
-          background-position: center;
-          background-color: transparent;
-          position: absolute;
-          top: 0;
-          left: 0;
+          height: 18px;
+          @include svgBgColor("/img/ML/carrot_grey.svg", center, 10px 18px, var(--light-color));
+          margin-left: auto;
+          margin-right: 8px;
         }
       }
     }
@@ -302,14 +276,8 @@ div.secure-activity-container {
       height: 72px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $carrot_green;
+      color: var(--primary-color);
       padding: 0;
     }
-  }
-}
-
-@include dark_mode() {
-  div.secure-activity-container div.secure-activity-footer a.sent-via-carrot div.sent-via-carrot-copy:before {
-    background-image: cdnUrl("/img/ML/carrot_logo_white.svg");
   }
 }

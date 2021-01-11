@@ -114,10 +114,10 @@ div.user-profile-modal-container {
       button.save-bt {
         height: 32px;
         padding: 7px 14px;
-        background-color: $carrot_green;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         line-height: 18px;
         float: right;
         border-radius: 4px;
@@ -133,7 +133,7 @@ div.user-profile-modal-container {
           top: 15px;
           right: 16px;
           background-color: transparent;
-          color: $carrot_green;
+          color: var(--primary-color);
           padding: 0;
         }
       }
@@ -165,16 +165,16 @@ div.user-profile-modal-container {
           height: 32px;
           border-radius: 50%;
           background-color: #F8FCFA;
-          // border: 1px dashed $carrot_green;
-          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          // border: 1px dashed var(--primary-color);
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
+          @include svgBgColor("/img/ML/company_avatar_purple_plus.svg");
           float: left;
         }
 
         div.user-profile-avatar-label {
-          color: $carrot_green;
+          color: var(--primary-color);
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 32px;
@@ -275,7 +275,7 @@ div.user-profile-modal-container {
               margin-left: 0;
 
               &:first-of-type {
-                marign-left: 0;
+                margin-left: 0;
                 margin-right: 0;
               }
             }

@@ -5,10 +5,6 @@ div.org-dashboard {
     background-color: var(--mobile-background-color);
   }
 
-  div.login-required {
-    min-height: calc(100vh - #{$footer_small_height}px - 44px);
-  }
-
   & > div.activity-share-modal-container {
     z-index: 1132;
   }
@@ -23,31 +19,41 @@ div.org-dashboard {
     }
   }
 
-  &.trial-expired {
-    div.page {
-      padding-top: #{$navbar_height}px;
+  &.top-banner div.page {
+    padding-top: #{$top_banner_height}px;
+    min-height: calc(100% - #{$top_banner_height}px);
 
-      @include mobile() {
-        padding-top: #{$mobile_trial_expired_banner_height + $mobile_navbar_height}px;
+    @include mobile() {
+      padding-top: calc(#{$mobile_navbar_height}px + #{$top_banner_height}px);
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
+    }
+
+    div.org-dashboard-container {
+      div.empty-dashboard {
+        min-height: calc(100vh - #{$top_banner_height}px - #{$navbar_height}px + 30px);
+
+        @include mobile() {
+          min-height: calc(100vh - #{$mobile_navbar_height}px + 30px);
+        }
+      }
+
+      div.org-dashboard-inner {
+        @include big_web(){
+          min-height: calc(100vh - #{$top_banner_height}px);
+          padding-top: #{$navbar_height}px;
+        }
+
+        @include mobile() {
+          min-height: calc(100vh - #{$mobile_navbar_height}px);
+        }
       }
     }
 
     nav.oc-navbar {
-      top: 56px;
+      top: #{$top_banner_height}px;
 
       @include mobile() {
-        top: #{$mobile_trial_expired_banner_height}px;
-      }
-    }
-
-    div.left-navigation-sidebar {
-      top: #{$navbar_height * 2}px;
-      height: calc(100vh - #{($navbar_height) + 2}px);
-
-      @include mobile() {
-        top: 0;
-        z-index: #{$navbar_zindex + 103};
-        height: 100vh;
+        top: 0px;
       }
     }
   }
@@ -68,19 +74,12 @@ div.org-dashboard {
       }
     }
 
-    &.trial-expired {
+    &.top-banner {
       div.page {
-        padding-top: #{$navbar_height}px;
+        padding-top: #{$top_banner_height}px;
 
         @include mobile() {
-          padding-top: #{$mobile_trial_expired_banner_height}px;
-
-          div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container div.board-container div.expanded-post {
-            padding-top: #{$mobile_navbar_height + 24}px;
-            div.expanded-post-header {
-              top: #{$mobile_trial_expired_banner_height}px;
-            }
-          }
+          padding-top: calc(#{$mobile_navbar_height}px);
         }
       }
     }
@@ -101,7 +100,7 @@ div.org-dashboard {
     z-index: 20; /* Make sure this is higher than #menu */
     top: 0px !important;
     background: #fff;
-    min-height: calc(100vh - #{$footer_height}px);
+    min-height: 100%;
 
     @include mobile(){
       background-color: var(--mobile-background-color);
@@ -113,7 +112,7 @@ div.org-dashboard {
       background-color: var(--background-color);
 
       @include big_web() {
-        min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
+        min-width: calc(#{$left_navigation_sidebar_width}px + #{$left_navigation_sidebar_minimum_right_margin}px + #{$board_container_width}px);
       }
 
       @include mobile() {
@@ -123,13 +122,13 @@ div.org-dashboard {
       }
 
       div.empty-dashboard {
-        min-height: calc(100vh - #{$navbar_height}px - #{$footer_small_height}px + 30px);
+        min-height: calc(100vh - #{$navbar_height}px + 30px);
         padding: 80px 20px;
         margin-top: -20px;
 
         @include mobile() {
           margin: -20px 24px 0px;
-          min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px + 30px);
+          min-height: calc(100vh - #{$mobile_navbar_height}px + 30px);
         }
 
         h3.empty-dashboard-title {
@@ -148,7 +147,8 @@ div.org-dashboard {
           padding-top: #{$navbar_height}px;
         }
 
-        @include mobile(){
+        @include mobile() {
+          padding-bottom: 0;
           background-color: var(--mobile-background-color);
           min-height: calc(100vh - #{$mobile_navbar_height}px);
         }

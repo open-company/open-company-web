@@ -1,0 +1,96 @@
+div.post-authorship {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  max-width: 100%;
+
+  div.user-hover-container {
+    display: contents;
+    position: relative;
+
+    @include activity-author(24) {
+      div.user-avatar-img-container {
+        margin-right: 6px;
+        flex: 0 0 auto;
+      }
+
+      a.publisher-name {
+        flex: 0 1 auto;
+        display: block;
+        color: var(--color);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 24px;
+        margin-right: 4px;
+        text-decoration: underline;
+
+        @include big_web() {
+          &:hover {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+
+    @include mobile() {
+      @include activity-author(32) {
+        a.publisher-name {
+          line-height: 32px;
+        }
+
+        .publisher-name {
+          font-size: 14px;
+          line-height: 32px;
+        }
+      }
+    }
+  }
+
+  span.in {
+    @include OC_Body_Book();
+    color: var(--color);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 24px;
+    margin-right: 4px;
+    flex: 0 0 auto;
+
+    @include mobile() {
+      font-size: 14px;
+      line-height: 32px;
+    }
+  }
+
+  div.board-hover-container {
+    display: contents;
+    position: relative;
+
+    a.board-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      @include OC_Body_Book();
+      color: var(--color);
+      font-size: 12px;
+      line-height: 24px;
+      white-space: nowrap;
+      flex: 0 1 auto;
+      text-decoration: underline;
+
+      @include big_web() {
+        &:hover {
+          color: var(--primary-color);
+        }
+      }
+
+      @include mobile() {
+        font-size: 14px;
+        line-height: 32px;
+      }
+    }
+  }
+}

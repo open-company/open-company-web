@@ -2,10 +2,10 @@ div.reactions {
   height: 26px;
   float: left;
 
-  @include mobile() {
-    float: unset;
-    height: 32px;
-  }
+  // @include mobile() {
+  //   float: unset;
+  //   height: 32px;
+  // }
 
   div.reactions-list {
 
@@ -15,15 +15,14 @@ div.reactions {
       position: relative;
       height: 26px;
       cursor: default;
-      padding: 4px 3px;
-      @include OC_Body_Bold();
+      padding: 2px 0;
+      @include OC_Body_Book();
       box-shadow: none;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--color);
-      min-width: 40px;
       border-radius: 4px;
-      margin-left: 4px;
-      background-color: var(--reaction-bt-background);
+      margin-left: 16px;
+      opacity: 0.9;
 
       @include mobile() {
         height: 32px;
@@ -34,11 +33,79 @@ div.reactions {
         margin-left: 0px;
       }
 
+      &.only-thumb {
+        $height: 26px;
+        height: $height;
+        opacity: 0.5;
+        padding: 0;
+
+        span.reaction {
+          line-height: $height;
+          height: $height;
+          width: 22px;
+          float: left;
+          display: block;
+          margin-right: 0;
+
+          @include retina_screen() {
+            margin-right: 0;
+          }
+
+          span.thumb-up-icon {
+            float: left;
+            width: 14px;
+            height: $height;
+            @include svgBgColor("/img/ML/reaction_thumb.svg", center, 14px 14px, var(--color));
+            opacity: 1;
+          }
+        }
+
+        div.count {
+          margin-top: 0;
+          color: var(--color);
+          line-height: $height;
+          font-size: 14px;
+          height: $height;
+          float: left;
+          display: block;
+        }
+
+        &.reacted, &:hover {
+          opacity: 1;
+        }
+
+        &.reacted, &.can-react:hover {
+          span.reaction {
+            opacity: 1;
+
+            span.thumb-up-icon {
+              @include svgBgColor("/img/ML/reaction_thumb_reacted.svg", center, 14px 14px, var(--primary-color));
+            }
+          }
+
+          div.count {
+            color: var(--primary-color);
+
+            @include dark_mode() {
+              color: var(--primary-color);
+            }
+          }
+        }
+      }
+
       span.reaction {
         position: relative;
         float: left;
-        font-size: 15px;
-        margin-left: 2px;
+        font-size: 16px;
+        text-align: center;
+        vertical-align: bottom;
+        margin-right: 4px;
+
+        &.safari {
+          @include retina_screen() {
+            font-size: 12px;
+          }
+        }
 
         @include mobile() {
           font-size: 17px;
@@ -48,12 +115,14 @@ div.reactions {
 
       div.count {
         float: right;
-        margin-top: 2px;
-        min-width: 14px;
-        height: 15px;
-        text-align: center;
-        margin-left: -1px;
+        margin-top: 1px;
+        height: 18px;
+        line-height: 18px;
+        text-align: right;
         color: var(--light-color);
+        font-size: 14px;
+        vertical-align: bottom;
+        min-width: 5px;
 
         @include mobile() {
           margin-top: 3px;
@@ -66,7 +135,11 @@ div.reactions {
 
         @include big_web() {
           &:hover {
-            background-color: var(--ultralight-color);
+            opacity: 1;
+
+            span.reaction.grayscale {
+              opacity: 1;
+            }
 
             div.count {
               color: var(--color);
@@ -74,19 +147,17 @@ div.reactions {
           }
 
           &.reacted:hover {
-            background-color: rgba($carrot_green, 0.35);
+
             div.count {
-              color: $carrot_green;
+              color: var(--color);
             }
           }
         }
       }
 
       &.reacted {
-        background-color: rgba($carrot_green, 0.2);
-
         div.count {
-          color: $carrot_green;
+          color: var(--color);
         }
       }
 
@@ -102,19 +173,17 @@ div.reactions {
         }
 
         span.reaction {
-          margin: 0 0 0 4px;
           opacity: 0.5;
           display: inline-block;
           width: 24px;
           height: 16px;
           background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
           background-size: 24px 16px;
+          margin-top: -2px;
           background-position: center;
           background-repeat: no-repeat;
 
           @include mobile() {
-            // width: 25px;
-            // height: 17px;
             margin: 0 0 0 5px;
           }
         }
@@ -141,7 +210,6 @@ div.reactions {
         right: 8px;
         color: var(--color);
         @include OC_Body_Bold();
-        font-size: 16px;
       }
     }
 
@@ -173,6 +241,6 @@ div.reactions {
 @include dark_mode() {
   div.reactions div.reactions-list button.reaction-btn.reaction-picker span.reaction {
     opacity: 1;
-    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");  
+    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
   }
 }

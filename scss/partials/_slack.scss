@@ -1,11 +1,11 @@
 div.slack-wrap {
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
 
   div.main.slack {
     width: 100%;
 
     section {
-      background-color: $ultra_light_gold;
+      background-color: $marketing_site_bg;
     }
 
     section.pricing-footer {
@@ -20,7 +20,7 @@ div.slack-wrap {
       overflow: hidden;
 
       @include mobile() {
-        padding: 88px 16px 40px;
+        padding: 138px 16px 40px;
       }
 
       & > * {
@@ -40,6 +40,10 @@ div.slack-wrap {
         display: block;
         content: "";
         max-width: 1232px;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       h1.slack-headline {

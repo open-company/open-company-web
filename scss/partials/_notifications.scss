@@ -12,7 +12,7 @@ div.notifications {
 
   div.notification {
     width: 320px;
-    background-color: $light_navy;
+    background-color: var(--notification-background-color);
     border-radius: 6px;
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
     margin-top: 8px;
@@ -43,43 +43,11 @@ div.notifications {
 
       div.notification-description {
         color: white;
+        @include activity-body-foc(14, 18, white, 3);
       }
 
       button.notification-dismiss-bt {
         color: white;
-      }
-    }
-
-    @include big_web() {
-      &:not(.server-error).light-theme {
-        background-color: white;
-
-        span.slack-icon {
-          background-image: cdnUrl("/img/ML/slack_normal.svg");
-        }
-
-        div.notification-title {
-          color: $light_navy;
-        }
-
-        div.notification-description {
-          color: $light_navy;
-
-          &.oc-mentions span.oc-mention[data-found="true"] {
-            color: $light_navy !important;
-          }
-        }
-
-        button.notification-button {
-          &.solid-green {
-            color: $carrot_green;
-            background-color: $feint_emerald;
-          }
-
-          &.default-link {
-            color: $light_navy;
-          }
-        }
       }
     }
 
@@ -184,7 +152,8 @@ div.notifications {
     div.notification-title {
       @include OC_Body_Bold();
       font-size: 14px;
-      color: white;
+      line-height: 18px;
+      color: var(--notification-color);
 
       &.no-description {
         @include OC_Body_Book();
@@ -207,10 +176,7 @@ div.notifications {
       color: $carrot_green;
 
       &.dismiss-x {
-        background-image: cdnUrl("/img/ML/close_notification_white.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
+        @include svgBgColor("/img/ML/close_notification_white.svg", center, 12px 12px, var(--tooltip-color));
         top: 8px;
         right: 10px;
         opacity: 0.5;
@@ -221,66 +187,10 @@ div.notifications {
       @include OC_Body_Book();
       font-size: 14px;
       font-weight: normal;
-      color: white;
-      margin-top: 8px;
+      color: var(--notification-color);
+      margin-top: 4px;
       overflow-wrap: break-word;
-
-      blockquote {
-        padding: 1px 0 1px 8px;
-        border-left: 2px solid rgba(255, 255, 255, 0.5);
-        @include OC_Body_Book();
-        font-weight: normal;
-        font-size: 14px;
-        color: white;
-        text-decoration: none;
-        font-style: normal;
-      }
-
-      code, pre {
-        background-color: transparent;
-        padding: 0;
-        margin: 0;
-        color: white;
-        font-size: 14px;
-        line-height: normal;
-        min-height: unset;
-        border: none;
-        border-radius: 0;
-        @include OC_Body_Book();
-        overflow-x: hidden;
-        white-space: pre-wrap;
-      }
-
-      ul {
-        @include OC_Body_Book();
-        font-size: 14px;
-        font-weight: normal;
-        color: white;
-        text-decoration: none;
-        font-style: normal;
-        padding-left: 20px;
-      }
-
-      &.oc-mentions span.oc-mention[data-found="true"] {
-        background-color: transparent !important;
-        color: white !important;
-        @include OC_Body_Book();
-      }
-
-      a {
-        color: $carrot_green;
-        text-decoration: none;
-
-        @include big_web() {
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      img, iframe {
-        display: none;
-      }
+      @include activity-body-foc(14, 18, var(--notification-color), 3);
     }
 
     button.notification-button {
@@ -328,7 +238,7 @@ div.notifications {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
-        color: white;
+        color: var(--notification-color);
         background-color: transparent;
         opacity: 0.6;
       }

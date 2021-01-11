@@ -46,44 +46,15 @@ div.activity-move {
       position: absolute;
       left: 16px;
       top: 80px;
-      width: 160px;
-      border: 1px solid var(--divider-line);
-      border-radius: 4px;
-      background-color: var(--overlay-background-color);
-      padding: 8px 0;
       z-index: 112;
-      overflow-x: hidden;
-      overflow-y: auto;
-      max-height: 300px;
-
-      div.board-item {
-        height: 32px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: var(--color);
-        cursor: pointer;
-        padding: 7px 8px;
-        background-color: var(--overlay-background-color);
-        overflow: hidden;
-        max-width: 100%;
-        text-overflow: ellipsis;
-
-        &.disabled {
-          opacity: 0.4;
-        }
-
-        &:not(.disabled):hover {
-          text-decoration: underline;
-        }
-      }
     }
 
     button {
       margin-top: 8px;
       border-radius: 4px;
       height: 32px;
-      background-color: $carrot_green;
-      color: white;
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
       @include OC_Body_Bold;
       font-size: 14px;
       width: 100%;

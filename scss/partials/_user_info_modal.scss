@@ -36,8 +36,6 @@ div.user-info-modal {
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: var(--divider-line);
-      border-radius: 4px;
       z-index: 3;
 
       @include dark_mode() {
@@ -61,9 +59,8 @@ div.user-info-modal {
 
     @include mobile() {
       top: 0;
-      left: unset;
-      right: 0;
-      width: 85vw;
+      left: 0;
+      width: 100%;
       height: auto;
       max-height: initial;
       min-height: 100vh;
@@ -89,7 +86,9 @@ div.user-info-modal {
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
-        width: 85vw;
+        width: 100%;
+        right: unset;
+        left: 0;
         border-bottom: 1px solid var(--divider-line);
         background-color: var(--mobile-background-color);
         padding: 16px;
@@ -131,7 +130,7 @@ div.user-info-modal {
         padding: 0;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
+        color: var(--primary-color);
         line-height: 18px;
         float: right;
 
@@ -174,12 +173,25 @@ div.user-info-modal {
         white-space: pre;
       }
 
+      div.user-info-followers-count {
+        margin-top: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--light-color);
+        line-height: 18px;
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+      }
+
       button.view-posts-bt {
         margin: 16px auto 0;
         padding: 7px 12px;
-        background-color: $carrot_green;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
-        color: white;
+        color: var(--secondary-color);
         font-size: 14px;
         line-height: 18px;
         width: auto;
@@ -224,7 +236,7 @@ div.user-info-modal {
           position: relative;
 
           a {
-            color: $carrot_green;
+            color: var(--primary-color);
             text-decoration: none;
 
             @include big_web() {
@@ -238,10 +250,10 @@ div.user-info-modal {
             content: "";
             width: 16px;
             height: 16px;
-            background-image: cdnUrl("/img/ML/email_icon_green.svg");
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
+            @include svgBgColor("/img/ML/email_icon_purple.svg");
             position: absolute;
             left: 0;
             top: 3px;
@@ -254,7 +266,7 @@ div.user-info-modal {
           font-size: 14px;
           height: 20px;
           line-height: 20px;
-          color: $carrot_green;
+          color: var(--primary-color);
           text-align: left;
           padding-left: 24px;
           position: relative;
@@ -263,10 +275,10 @@ div.user-info-modal {
             content: "";
             width: 16px;
             height: 16px;
-            background-image: cdnUrl("/img/ML/slack_icon_green.svg");
             background-size: 16px 16px;
             background-position: center;
             background-repeat: no-repeat;
+            @include svgBgColor("/img/ML/slack_icon_purple.svg");
             position: absolute;
             left: 0;
             top: 3px;

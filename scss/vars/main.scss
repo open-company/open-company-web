@@ -1,5 +1,5 @@
 $navbar_height: 56;
-$mobile_navbar_height: 54;
+$mobile_navbar_height: 56;
 $su_preview_navbar_height: 115;
 $back_to_dashboard_row_height: 70;
 $footer_height: 225;
@@ -7,6 +7,7 @@ $footer_small_height: 94;
 $mobile_menu_height: 130;
 $mobile_menu_signout_height: 55;
 $oc_switch_height: 39;
+$top_banner_height: 40;
 
 $mobile_menu_item_height: 39;
 
@@ -16,12 +17,17 @@ $carrot_trend_collapsed_height: 10;
 $carrot_trend_expanded_height: 40;
 $carrot_trend_trending_height: 232;
 
+$modal_width: 880;
+
 $left_navigation_sidebar_width: 176;
 $left_navigation_sidebar_minimum_right_margin: 40;
-$board_container_width: 600;
-$foc_height: 188 - 8; // To keep the space between each item
-$collapsed_foc_height: 56; // Same
-$mobile_foc_height: 162; // No gaps on mobile
+$board_container_width: 620;
+$foc_height: 204;
+$collapsed_foc_height: 56;
+$mobile_foc_height: 190;
+$mobile_collapsed_foc_height: 131;
+$carrot_close_height: 60;
+$expanded_post_width: 880;
 
 // setting panel sizes
 $settings_header_height: 48px;
@@ -30,9 +36,5 @@ $settings_content_width: 590;
 // User profile
 $user_profile_footer_height: 90px;
 
-// Payments
-$paywall_alert_width: 270;
-
 // Mobile specific
-$mobile_trial_expired_banner_height: 82;
 $mobile_search_header_height: 64;

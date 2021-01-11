@@ -7,8 +7,8 @@ div.carrot-checkbox {
   background-color: transparent;
 
   &.selected {
-    border: 1.5px solid $carrot_green;
-    background-color: $carrot_green;
+    border: 1.5px solid var(--primary-color);
+    background-color: var(--primary-color);
     background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
     background-size: 10px 8px;
     background-repeat: no-repeat;
@@ -27,8 +27,8 @@ div.carrot-checkbox {
 }
 
 
-@include dark_mode() {
-  div.carrot-checkbox.selected {
-    background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
-  }
-}
+// @include dark_mode() {
+//   div.carrot-checkbox.selected {
+//     background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
+//   }
+// }

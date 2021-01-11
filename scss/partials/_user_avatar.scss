@@ -1,15 +1,25 @@
-$avatar_size: 32;
-$mobile_avatar_size: 32;
+$avatar_size: 24;
 
 button.user-avatar-button{
   margin: 0;
   border: 0px solid transparent;
   background-color: transparent;
-  width: #{$avatar_size}px;
-  height: #{$avatar_size}px;
-  border-radius: 50%;
   padding: 0;
   position: relative;
+  height: #{$avatar_size}px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding-right: 14px;
+  background-image: cdnUrl("/img/ML/menu_chevron.svg");
+  background-size: 6px 4px;
+  background-position: right 0px top 10px;
+  background-repeat: no-repeat;
+
+  @include dark_mode() {
+    background-image: cdnUrl("/img/ML/menu_chevron@dark.svg");
+  }
 
   &.disabled-user-menu {
     cursor: default;
@@ -20,11 +30,24 @@ button.user-avatar-button{
     border: 0px solid tranparent;
   }
 
-  @include user-profile($avatar_size);
+  @include user-profile($avatar_size) {
+    flex: 0 0 auto;
+  }
 
-  @include mobile() {
-    width: #{$mobile_avatar_size}px;
-    height: #{$mobile_avatar_size}px;
-    @include user-profile($mobile_avatar_size);
+  span.user-name {
+    flex: 0 1 auto;
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    color: var(--color);
+    margin-left: 8px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @include mobile() {
+      display: none;
+    }
   }
 }

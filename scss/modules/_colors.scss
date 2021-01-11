@@ -73,6 +73,7 @@ $carrot_site_purple: #9B67E9;
 $carrot_settings_background: #FCFBF7;
 
 // Grey
+$alt_deep_navy: #1B202A;
 $deep_navy: #34414F;
 $light_navy: #242D42;
 $ui_grey: #898D93;
@@ -98,7 +99,7 @@ $carrot_orange: #FA6452;
 $coral: #FBE3DD;
 
 // Green
-$carrot_green: #3FBD7C;
+$carrot_green: #21B268; //3FBD7C;
 $feint_emerald: #D4F6E4;
 
 // Gold
@@ -115,4 +116,12 @@ $chalk_blue: #E2EEFF;
 $lilac: #A66EF9;
 $light_lilac: #F5EDFF;
 
-$carrot_modal_bg: rgba($deep_navy,0.8);
+// Wut
+
+$wut_purple: 104,51,241; // #6833F1
+$wut_feint_purple: rgba(104,51,241, 0.16);
+
+$wut_green: rgb(33,179,104); // #21B368;
+
+$carrot_modal_bg: rgba($deep_navy, 0.64);
+$marketing_site_bg: #FCFAF9;

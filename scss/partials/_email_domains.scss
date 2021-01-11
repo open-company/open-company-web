@@ -63,7 +63,7 @@ div.email-domain-container {
       width: auto;
       padding: 0;
       @include OC_Body_Bold();
-      color: $carrot_green;
+      color: var(--primary-color);
       font-size: 13px;
       height: 18px;
       margin-top: 7px;

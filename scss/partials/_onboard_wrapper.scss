@@ -1,12 +1,13 @@
 div.onboard-wrapper-container {
-  background-color: white;
+  background-color: $grey_num_2;
   box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
-  min-height: 100vh;
-  width: 720px;
+  width: 100%;
   margin: 0 auto;
+  min-height: 100vh;
 
   @include mobile() {
-    background-color: white;
+    min-height: unset;
+    background-color: $grey_num_2;
     width: 100%;
   }
 
@@ -16,46 +17,14 @@ div.onboard-wrapper-container {
     position: fixed;
   }
 
-  div.bottom-gradient {
-    width: 944px;
-    height: 27vh;
-    max-height: 220px;
-    margin-left: -112px;
-    margin-top: -50px;
-    background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
-    display: block;
-    position: fixed;
-    bottom: 0;
-    pointer-events: none;
-
-    @include mobile() {
-      display: none;
-    }
-
-    div.onboard-box {
-      background-image: cdnUrl("/img/ML/onboard_box.svg");
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: 229px 234px;
-      width: 229px;
-      height: 234px;
-      position: absolute;
-      right: 6px;
-      bottom: 0;
-    }
-  }
-
   div.onboard-wrapper {
     text-align: center;
-    padding-bottom: 16vh;
     position: relative;
 
     @include mobile() {
       width: 100%;
       box-shadow: unset;
       margin: 0;
-      min-height: unset;
-      padding-bottom: 32px;
     }
   }
 }
@@ -85,12 +54,12 @@ div.onboard-email-container {
   &.email-wall {
     width: 385px;
     color: $deep_navy;
-    @incldude OC_Body_Bold();
+    @include OC_Body_Bold();
 
     div.email-wall-icon {
-      background-image: cdnUrl("/img/ML/email_wall.svg");
       background-size: 48px 36px;
       background-position: center;
+      @include svgBgColor("/img/ML/wut_email_wall.svg", center, 48px 36px);
       width: 48px;
       height: 36px;
       margin: 0 auto 32px;
@@ -119,8 +88,8 @@ div.onboard-email-container {
   button.continue {
     width: 100%;
     height: 40px;
-    background-color: $sea_blue;
-    color: white;
+    background-color: $primary_color;
+    color: $secondary_color;
     @include OC_Body_Bold();
     font-size: 16px;
     line-height: 20px;
@@ -137,118 +106,102 @@ div.onboard-email-container {
   }
 }
 
-div.onboard-lander {
+div.onboard-container-inner {
   text-align: center;
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+  min-height: 100vh;
+  padding: 90px 0;
 
   @include mobile() {
-    padding: 0 16px;
+    padding: 0;
   }
 
-  div.main-cta {
+  @include mobile() {
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
+    margin-top: #{$mobile_navbar_height}px;
+  }
 
-    div.onboard-lander-header {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      margin-left: -360px;
+  header.main-cta {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: #{$navbar_height}px;
+    width: 100%;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+    border-bottom: 0.5px solid var(--opac-background-color-24);
+    padding: 18px 24px;
+    background-color: $grey_num_2;
+    display: flex;
+    flex-flow: row nowrap;
+    z-index: 2;
+    align-items: center;
+    justify-content: center;
+
+    div.top-back-button-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       button.top-back-button {
-        display: block;
-        width: 32px;
-        height: 32px;
-        background-position: center;
+        background-position: top 6px left 0;
         background-repeat: no-repeat;
-        background-color: rgba($deep_navy, 0.1);
-        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-image: cdnUrl("/img/ML/black_back_arrow.svg");
         background-size: 14px 10px;
-        border-radius: 4px;
-        position: absolute;
-        top: 24px;
-        left: 24px;
-      }
+        padding-left: 22px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: $deep_navy;
+        margin-right: auto;
 
-      button.top-continue {
-        display: none;
-      }
-
-      @include mobile() {
-        z-index: 1031;
-        left: 0;
-        margin-left: 0;
-        position: absolute;
-
-        button.top-back-button {
-          top: 16px;
-          left: 16px;
-        }
-
-        button.top-continue {
-          display: block;
-          float: right;
-          @include OC_Body_Bold();
-          font-size: 15px;
-          height: 32px;
-          width: 66px;
-          padding: 0px;
-          position: absolute;
-          top: 12px;
-          right: 24px;
-          color: $carrot_green;
-          text-align: right;
-
-          &.disabled, &:disabled {
-            color: $light_ui_grey;
-            opacity: 0;
-          }
+        @include mac_electron() {
+          margin-left: 60px;
         }
       }
     }
 
     div.title {
       @include OC_Body_Bold();
-      font-size: 32px;
-      line-height: 41px;
-      padding-top: 64px;
+      font-size: 16px;
+      line-height: 20px;
       color: $deep_navy;
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 61px;
-        font-size: 30px;
         margin: 0 auto;
       }
     }
 
-    div.steps {
-      width: 100px;
-      height: 15px;
-      margin: 12px auto 0;
-      text-align: center;
-      @include OC_Body_Bold();
-      font-size: 11px;
-      line-height: 15px;
-      letter-spacing: 0.42px;
-      color: $light_ui_grey;
-      text-transform: uppercase;
-    }
+    div.top-continue-container {
+      flex: 1;
+      display:flex;
 
-    div.steps-separator {
-      width: 77%;
-      height: 1px;
-      margin: 32px auto 0;
-      background-color: $ultra_light_grey;
+      button.top-continue {
+        padding: 0;
+        @include OC_Body_Book();
+        font-size: 16px;
+        line-height: 20px;
+        color: $primary_color;
+        margin-left: auto;
 
-      @include mobile() {
-        display: none;
+        &.disabled, &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
       }
     }
 
     button.continue {
-      margin-top: 24px;
+      margin-top: 32px;
       width: 100%;
       height: 40px;
-      background-color: $sea_blue;
-      color: white;
+      background-color: $primary_color;
+      color: $secondary_color;
       @include OC_Body_Bold();
       font-size: 16px;
       line-height: 20px;
@@ -266,6 +219,37 @@ div.onboard-lander {
         background-color: $light_ui_grey;
         opacity: 1 !important;
         cursor: not-allowed;
+      }
+    }
+
+    @include mobile() {
+      z-index: 1031;
+      left: 0;
+      margin-left: 0;
+
+      button.top-back-button {
+        top: 16px;
+        left: 16px;
+      }
+
+      button.top-continue {
+        display: block;
+        float: right;
+        @include OC_Body_Bold();
+        font-size: 15px;
+        height: 32px;
+        width: 66px;
+        padding: 0px;
+        position: absolute;
+        top: 12px;
+        right: 24px;
+        color: $primary_color;
+        text-align: right;
+
+        &.disabled, &:disabled {
+          color: $light_ui_grey;
+          opacity: 0;
+        }
       }
     }
   }
@@ -288,9 +272,89 @@ div.onboard-lander {
   }
 
   div.onboard-form {
-    width: 320px;
-    margin: 0 auto 32px;
-    text-align: left;
+    width: 400px;
+    margin-top: auto;
+    margin-bottom: 24px;
+    text-align: center;
+    border: 1px solid #DCDDE1;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    background-color: white;
+    padding: 40px;
+
+    &:last-child {
+      margin-bottom: auto;
+    }
+
+    @include mobile() {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 32px 16px;
+      // margin: #{$mobile_navbar_height}px auto 0;
+      width: 100%;
+    }
+
+    div.form-header-logo {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 24px;
+      @include image-2x("/img/carrot_logo");
+      background-size: 48px 48px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    div.form-title {
+      @include OC_Body_Bold();
+      font-size: 22px;
+      color: $deep_navy;
+      line-height: 28px;
+      text-align: center;
+    }
+
+    button.user-profile-avatar {
+      margin: 24px auto 0;
+      cursor: pointer;
+      width: 80px;
+      height: 80px;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+      display: block;
+
+      @include user-profile(80) {
+        img.user-avatar-img {
+          cursor: pointer;
+        }
+      }
+
+      &:hover {
+        div.plus-icon {
+          opacity: 1;
+          transform: rotate(0deg);
+        }
+      }
+
+      div.plus-icon {
+        opacity: 0;
+        display: block;
+        width: 80px;
+        height: 80px;
+        top: 0;
+        left: 0;
+        position: absolute;
+        background-size: 40px 40px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: rgba(white, 0.56);
+        @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 40px 40px);
+        transform: rotate(45deg);
+        transition: 180ms transform ease-in, 180ms opacity ease-in;
+      }
+    }
 
     div.subtitle {
       @include OC_Body_Book();
@@ -307,32 +371,28 @@ div.onboard-lander {
       }
     }
 
-    @include mobile() {
-      width: 100%;
-      padding: 0;
-    }
-
     button.signup-with-slack {
-      margin-top: 40px;
+      float: left;
     }
 
     button.signup-with-google {
-      margin-top: 8px;
+      float: right;
     }
 
     button.signup-with-slack, button.signup-with-google {
-      width: 320px;
+      margin-top: 16px;
+      width: calc(50% - 8px);
       height: 40px;
       background-color: rgba($deep_navy, 0.1);
       color: $deep_navy;
       border-radius: 6px;
       text-align: center;
-      @include OC_Body_Bold();
-      font-size: 14px;
-      color: $deep_navy;
-      line-height: 18px;
       position: relative;
       opacity: 1;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       @include big_web() {
         &:hover {
@@ -340,30 +400,29 @@ div.onboard-lander {
         }
       }
 
+      div.slack-text, div.google-text {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 20px;
+      }
+
       div.slack-icon {
-        position: absolute;
-        top: 10px;
-        left: 16px;
         width: 20px;
         height: 20px;
         background-image: cdnUrl("/img/ML/slack_normal.svg");
         background-repeat: no-repeat;
         background-size: 20px 20px;
-        float: left;
-        margin-right: 16px;
+        margin-right: 8px;
       }
 
       div.google-icon {
-        position: absolute;
-        top: 10px;
-        left: 16px;
         width: 20px;
         height: 20px;
         background-image: cdnUrl("/img/ML/google_signin.svg");
         background-repeat: no-repeat;
         background-size: 20px 20px;
-        float: left;
-        margin-right: 16px;
+        margin-right: 8px;
       }
 
       @include mobile() {
@@ -373,15 +432,15 @@ div.onboard-lander {
 
     div.or-with-email{
       width: 100%;
-      height: 18px;
+      height: 20px;
       margin-top: 24px;
       position: relative;
 
       div.or-with-email-copy {
         text-align: center;
         @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
+        font-size: 16px;
+        line-height: 20px;
         color: rgba($deep_navy, 0.5);
         margin: 0 auto;
       }
@@ -417,12 +476,12 @@ div.onboard-lander {
           width: 72px;
           height: 72px;
           background-color: #F8FCFA;
-          border: 1px dashed $carrot_green;
+          border: 1px dashed $primary_color;
           border-radius: 8px;
-          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
+          @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 16px 16px);
         }
 
         div.org-avatar {
@@ -483,17 +542,17 @@ div.onboard-lander {
         height: 72px;
         border-radius: 50%;
         background-color: #F8FCFA;
-        border: 1px dashed $carrot_green;
-        background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+        border: 1px dashed $primary_color;
         background-size: 16px 16px;
         background-position: center;
         background-repeat: no-repeat;
+        @include svgBgColor("/img/ML/company_avatar_purple_plus.svg", center, 16px 16px);
       }
 
       div.add-picture-link {
         @include OC_Body_Bold();
         font-size: 16px;
-        color: $carrot_green;
+        color: $primary_color;
         float: left;
         margin-left: 24px;
         margin-top: 12px;
@@ -523,7 +582,7 @@ div.onboard-lander {
 
     div.error {
       margin-top: 4px;
-      color: $carrot_orange;
+      color: $primary_color;
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 18px;
@@ -531,10 +590,11 @@ div.onboard-lander {
 
     div.field-label {
       @include OC_Body_Book();
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 12px;
+      line-height: 15px;
       color: $deep_navy;
       margin-top: 16px;
+      text-align: left;
 
       &.info {
         @include OC_Body_Book();
@@ -550,33 +610,13 @@ div.onboard-lander {
       }
 
       span.error {
-        margin-left: 16px;
+        margin-left: 8px;
         color: $carrot_orange;
-      }
 
-      &.left-half-field-label, &.right-half-field-label {
-        width: calc(50% - 4px);
-
-        @include mobile() {
-          width: 100%;
-        }
-      }
-
-      &.left-half-field-label {
-        float: left;
-
-        @include mobile() {
-          float: unset;
-        }
-      }
-
-      &.right-half-field-label {
-        float: right;
-
-        @include mobile() {
-          &.field-label.name-fields {
-            float: unset;
-            margin-top: 16px;
+        a.underline {
+          &, &:hover {
+            color: $carrot_orange;
+            text-decoration: underline;
           }
         }
       }
@@ -588,7 +628,7 @@ div.onboard-lander {
       line-height: 15px;
       color: rgba($deep_navy, 0.5);
       margin: 16px auto 0;
-      width: 249px;
+      width: 230px;
       text-align: center;
 
       a {
@@ -597,37 +637,14 @@ div.onboard-lander {
       }
     }
 
-    div.footer-link {
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid $divider_line_grey;
-      @include OC_Body_Book();
-      font-size: 16px;
-      color: $deep_navy;
-      line-height: 20px;
-      text-align: center;
-
-      a {
-        @include OC_Body_Book();
-        font-size: 16px;
-        color: $carrot_green;
-        line-height: 20px;
-        margin-left: 4px;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
     input.field {
       width: 100%;
       height: 40px;
       border-radius: 4px;
-      background-color: rgba($deep_navy, 0.1);
+      background-color: rgba($deep_navy, 0.08);
       border: 1px solid transparent;
       outline: none;
-      padding: 11px 16px;
+      padding: 11px 12px;
       position: relative;
       @include OC_Body_Book();
       font-size: 14px;
@@ -647,31 +664,7 @@ div.onboard-lander {
       }
 
       &.valid {
-        border: 1px solid rgba($carrot_green, 0.5);
-      }
-
-      &.right-half-field, &.left-half-field {
-        width: calc(50% - 4px);
-
-        @include mobile() {
-          width: 100%;
-        }
-      }
-
-      &.left-half-field {
-        float: left;
-
-        @include mobile() {
-          float: unset;
-        }
-      }
-
-      &.right-half-field {
-        float: right;
-
-        @include mobile() {
-          float: unset;
-        }
+        border: 1px solid rgba($carrot_green, 0.5); // 0.5
       }
     }
 
@@ -727,8 +720,8 @@ div.onboard-lander {
       width: 100%;
       height: 40px;
       max-width: 320px;
-      background-color: $carrot_orange;
-      color: white;
+      background-color: $primary_color;
+      color: $secondary_color;
       @include OC_Body_Bold();
       font-size: 16px;
       line-height: 20px;
@@ -737,171 +730,214 @@ div.onboard-lander {
       overflow: hidden;
       text-overflow: ellipsis;
       padding: 10px 24px;
-      margin-top: 24px;
+      margin-top: 32px;
 
       @include mobile() {
         max-width: initial;
       }
 
       &.start-using-carrot {
-        background-color: $carrot_orange_2;
-        color: white;
+        background-color: $primary_color;
+        color: $secondary_color;
 
-        &.disabled {
-          background-color: rgba($carrot_orange_2, 0.2);
+        &.disabled, &:disabled {
+          background-color: rgba($deep_navy, 0.16);
+          color: $ui_grey;
         }
       }
 
       &.disabled, &:disabled {
-        background-color: $light_ui_grey;
+        background-color: rgba($deep_navy, 0.16);
+        color: $ui_grey;
         opacity: 1 !important;
         cursor: not-allowed;
       }
     }
+  }
 
-    div.logout-cancel {
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid $divider_line_grey;
-      text-align: center;
+  div.logout-cancel {
+    margin-bottom: auto;
+    text-align: center;
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    color: $deep_navy;
+
+    button.logout-cancel {
       @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: $deep_navy;
-
-      button.logout-cancel {
-        @include OC_Body_Book();
-        font-size: 16px;
-        line-height: 20px;
-        color: $carrot_green;
-        padding: 0;
-        display: block;
-        margin: 0 auto;
-      }
+      font-size: 14px;
+      line-height: 18px;
+      color: blue;
+      text-decoration: underline;
+      padding: 0;
+      display: block;
+      margin: 0 auto;
     }
   }
 
-  @include mobile() {
-    div.main-cta {
-      div.mobile-header {
-        height: 104px;
-        border-bottom: none;
-        position: absolute;
+  div.footer-link {
+    margin-bottom: auto;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: $ui_grey;
+    line-height: 18px;
+    text-align: center;
 
-        div.onboard-lander-header {
-          width: 36px;
-          height: 64px;
-          background-size: 36px 64px;
-          position: relative;
-          top: unset;
-          left: unset;
-          margin: 40px auto 0;
-        }
-      }
-
-      div.title {
-        @include OC_Body_Bold();
-        font-size: 30px;
-        line-height: 41px;
-        color: $deep_navy;
-      }
-    }
-  }
-
-  &.lander {
     @include mobile() {
-      padding: 0 0 24px;
+      padding-bottom: 32px;
+    }
+
+    a {
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: blue;
+      text-decoration: underline;
+      line-height: 18px;
+      display: inline-block;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
+
+  // @include mobile() {
+  //   header.main-cta {
+  //     div.mobile-header {
+  //       height: 104px;
+  //       border-bottom: none;
+  //       position: absolute;
+
+  //       div.onboard-lander-header {
+  //         width: 36px;
+  //         height: 64px;
+  //         background-size: 36px 64px;
+  //         position: relative;
+  //         top: unset;
+  //         left: unset;
+  //         margin: 40px auto 0;
+  //       }
+  //     }
+
+  //     div.title {
+  //       @include OC_Body_Bold();
+  //       font-size: 16px;
+  //       line-height: 20px;
+  //       color: $deep_navy;
+
+  //       @include mobile() {
+  //         margin-top: 0px;
+  //         margin: 0 auto;
+  //       }
+  //     }
+  //   }
+  // }
+
+  // &.lander {
+  //   @include mobile() {
+  //     padding: 0 0 24px;
+  //   }
+  // }
 
   &.lander-profile {
-    div.mobile-header {
-      button.top-continue {
-        color: $sea_blue;
-      }
-    }
     div.onboard-form {
-      margin-top: 32px;
-
-      div.field-label.name-fields {
+      div.field-label:first-child {
         margin-top: 0;
       }
     }
   }
 
   &.invitee-team-lander {
-    div.main-cta {
+    div.title-container {
+      div.team-logo-container {
+        width: 100%;
+        display: block;
 
-      div.title-container {
+        @include org-avatar(72);
 
-        div.team-logo-container {
-          width: 100%;
-          display: block;
-          margin: 0 0 24px;
-          padding-top: 64px;
-
-          @include org-avatar(72);
-
-          div.org-avatar {
-            float: none;
-
-            div.org-avatar-container:before {
-              left: 50%;
-              transform: translateX(-50%);
-            }
-          }
-        }
-
-        div.title {
-          padding-top: 0;
+        div.org-avatar {
+          width: 72px;
+          float: unset;
+          margin: 0 auto;
         }
       }
 
-      div.invite-token-container {
-        position: absolute;
-        left: 50%;
-        top: calc(50% - 32px);
-        transform: translate(-50%, -50%);
+      div.title.main-lander {
+        margin-top: 24px;
 
-        div.title {
-          font-size: 32px;
-        }
-
-        div.subtitle {
-          width: 379px;
-          margin: 16px auto 0;
-          font-size: 18px;
-
-          &.checking-invitation {
-            width: 264px;
-            text-align: left;
-          }
+        @include mobile() {
+          margin-top: 0;
         }
       }
     }
   }
 
-  &.invitee-lander {
-    div.invite-container {
-      position: absolute;
-      left: 50%;
-      top: calc(50% - 32px);
-      transform: translate(-50%, -50%);
+  &.invitee-lander, &.invitee-team-lander {
 
-      div.title {
-        width: 400px;
-        font-size: 32px;
+    div.subtitle {
+      width: 379px;
+      margin: 56px auto 0;
+      padding: 72px 0 0;
+      font-size: 16px;
+      color: $deep_navy;
+      position: relative;
+      text-align: center;
+
+      &.token-error {
+        &:before {
+          top: 0;
+          left: 0;
+          position: absolute;
+          width: 100%;
+          height: 72px;
+          content: "";
+          background-image: cdnUrl("/img/ML/error_icon.png");
+          background-size: 32px 32px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
       }
 
-      div.subtitle {
-        width: 379px;
-        margin: 16px auto 0;
-        font-size: 18px;
+      &.checking-invitation {
+        width: 186px;
+        text-align: left;
 
-        &.checking-invitation {
-          width: 264px;
-          text-align: left;
+        div.small-loading {
+          float: unset;
+          margin: 0 auto;
+          display: block;
+          width: 20px;
+          position: absolute;
+          top: 24px;
+          left: 50%;
+          transform: translateX(-50%);
         }
+      }
+    }
+  }
+
+  &.invitee-lander-password {
+    div.onboard-form {
+      input.field.email-field {
+        cursor: not-allowed;
+      }
+
+      div.email-field-tooltip-container {
+        div.tooltip {
+          width: 240px;
+        }
+      }
+
+      span.field-label-description {
+        font-size: 12px;
+        line-height: 18px;
+        color: $ui_grey;
+      }
+
+      input.email-field + div.field-description {
+        text-align: left;
+        margin: 8px 0 0;
+        width: 100%;
       }
     }
   }
@@ -918,7 +954,7 @@ div.onboard-lander {
     div.onboard-form {
       div.field-label {
         button.add-another-invite-row {
-          color: $carrot_green;
+          color: $primary_color;
           float: right;
           @include OC_Body_Book();
           font-size: 13px;
@@ -949,7 +985,7 @@ div.onboard-lander {
         div.invite-row {
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
           border-radius: 4px;
-          background-color: white;
+          background-color: $grey_num_2;
           margin-top: 8px;
           width: 100%;
           height: 40px;
@@ -965,7 +1001,7 @@ div.onboard-lander {
             color: $deep_navy;
             outline: none;
             border: none;
-            background-color: white;
+            background-color: $grey_num_2;
             margin: 0px;
             padding: 0px;
             width: 100%;

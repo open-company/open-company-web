@@ -1,20 +1,13 @@
 div.home-wrap {
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
 
   div.main.home-page {
     width: 100%;
 
-    section {
-      background-color: $ultra_light_gold;
-    }
-
-    section.pricing-footer {
-      background-color: $another_ui_grey;
-    }
-
     section.cta {
       padding-top: 143px;
-      padding-bottom: 73px;
+      // padding-bottom: 73px;
+      padding-bottom: 0;
       padding-left: 24px !important;
       padding-right: 24px !important;
       text-align: center;
@@ -38,19 +31,19 @@ div.home-wrap {
         z-index: 3;
       }
 
-      &:before {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        width: calc(100% - 32px);
-        height: 32%;
-        transform: translateX(-50%);
-        background-color: rgba($deep_navy, 0.1);
-        border-radius: 20px 200px 20px 20px;
-        display: block;
-        content: "";
-        max-width: 1232px;
-      }
+      // &:before {
+      //   position: absolute;
+      //   bottom: 0;
+      //   left: 50%;
+      //   width: calc(100% - 32px);
+      //   height: 32%;
+      //   transform: translateX(-50%);
+      //   background-color: rgba($deep_navy, 0.1);
+      //   border-radius: 20px 200px 20px 20px;
+      //   display: block;
+      //   content: "";
+      //   max-width: 1232px;
+      // }
 
       // &:after {
       //   background-color: $another_ui_grey;
@@ -81,14 +74,14 @@ div.home-wrap {
       // }
 
       h1.headline {
-        font-size: 60px;
-        @include OC_Body_Bold()
+        font-size: 50px;
+        @include OC_Body_Bold();
         color: $deep_navy;
-        line-height: 66px;
+        line-height: 50px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 722px;
+        max-width: 860px;
 
         @include mobile(){
           font-size: 36px;
@@ -103,16 +96,13 @@ div.home-wrap {
 
       div.subheadline {
         color: $deep_navy;
-        font-size: 28px;
-        line-height: 36px;
+        font-size: 20px;
+        line-height: 25px;
         @include OC_Body_Book();
-        margin: 0 auto;
+        margin: 16px auto 0;
         z-index: 2;
         position: relative;
-
-        &:first-of-type {
-          margin-top: 16px;
-        }
+        max-width: 640px;
 
         @include tablet(){
           font-size: 24px;
@@ -134,7 +124,7 @@ div.home-wrap {
       }
 
       div.get-started-button-container {
-        margin: 0 auto 80px;
+        margin: 0 auto;
         width: 220px;
         text-align: center;
 
@@ -144,6 +134,33 @@ div.home-wrap {
           justify-content: initial;
           align-items: initial;
         }
+      }
+    }
+
+    section.video {
+      padding-top: 143px;
+      padding-bottom: 73px;
+      padding-left: 24px !important;
+      padding-right: 24px !important;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      position: relative;
+
+      @include tablet() {
+        padding-bottom: 0px;
+        padding: 131px 24px 0;
+      }
+
+      @include mobile() {
+        width: 100%;
+        overflow: visible;
+        padding: 88px 16px 24px;
+      }
+
+      & > * {
+        position: relative;
+        z-index: 3;
       }
     }
   }

@@ -54,10 +54,10 @@ div.recurring-updates-modal-container {
       button.new-recurring-update-bt {
         height: 32px;
         padding: 7px 14px;
-        background-color: $carrot_green;
+        background-color: var(--primary-color);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: white;
+        color: var(--secondary-color);
         float: right;
         line-height: 18px;
         border-radius: 4px; 

@@ -1,0 +1,124 @@
+button.follow-button {
+  background-color: var(--primary-color);
+  height: 32px;
+  border-radius: 4px;
+  width: auto;
+  padding: 8px;
+
+  &.default-copy {
+    width: 94px;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  @include big_web(){
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  span.main-title, span.hover-title {
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    color: var(--secondary-color);
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    @include no-user-select();
+  }
+
+  span.main-title {
+    display: block;
+  }
+
+  span.hover-title {
+    display: none;
+  }
+
+  @include big_web() {
+    &:not(.disabled):hover {
+      span.main-title {
+        display: none;
+      }
+
+      span.hover-title {
+        display: block;
+      }
+    }
+  }
+
+  &.on {
+    background-color: var(--opac-background-color-1);
+
+    span.main-title, span.hover-title {
+      color: var(--light-color);
+    }
+
+    @include big_web(){
+      &:not(.disabled):hover {
+        background-color: var(--opac-background-color-2);
+        
+        span.main-title, span.hover-title {
+          color: var(--color);
+        }
+      }
+    }
+  }
+}
+
+div.follow-banner {
+  width: 100%;
+  height: #{$navbar_height}px;
+  background-color: var(--primary-color);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  span.follow-banner-copy {
+    margin-left: auto;
+    margin-right: 8px;
+    flex: 0 0 auto;
+    @include OC_Body_Bold();
+    color: var(--secondary-color);
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  button.follow-button {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    margin-right: auto;
+
+    background-color: white;
+    
+    span.main-title, span.hover-title {
+      color: var(--primary-color);
+    }
+
+    &.on {
+      background-color: white;
+
+      span.main-title, span.hover-title {
+        color: var(--primary-color);
+      }
+
+      @include big_web(){
+        &:not(.disabled):hover {
+          background-color: white;
+          opacity: 0.7;
+          
+          span.main-title, span.hover-title {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+}

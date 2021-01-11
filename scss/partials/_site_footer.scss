@@ -1,5 +1,5 @@
 .navbar-bottom {
-  background-color: $ultra_light_gold !important;
+  background-color: $marketing_site_bg !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
@@ -12,6 +12,29 @@
 
   @include mobile() {
     padding: 0;
+  }
+
+  section.try-carrot-footer {
+    max-width: 1024px;
+    padding: 80px 24px;
+    text-align: center;
+    margin: 0 auto;
+
+    @include mobile() {
+      padding: 40px 16px;
+    }
+
+    h2 {
+      @include OC_Body_Bold();
+      color: $deep_navy;
+      font-size: 36px;
+      line-height: 46px;
+      margin: 0 auto;
+    }
+
+    a.get-started-button {
+      margin-top: 24px;
+    }
   }
 
   div.mobile-footer {
@@ -31,6 +54,7 @@
     padding-left: 0px !important;
     padding-right: 0px !important;
     padding-top: 40px !important;
+    border-top: 1px solid rgba($deep_navy, 0.16);
 
     @include mobile(){
       padding-left: 32px;
@@ -46,7 +70,7 @@
       @include tablet() {
         width: 100%;
         float: none;
-        padding-top: 40px;
+        padding-bottom: 40px;
       }
 
       @include mobile() {
@@ -144,7 +168,7 @@
         width: 100%;
         float: none;
         margin-right: 0;
-        padding-bottom: 40px;
+        padding-top: 40px;
       }
 
       @include mobile() {

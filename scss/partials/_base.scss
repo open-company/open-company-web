@@ -109,10 +109,22 @@ div.fullscreen-page {
 }
 
 html.no-scroll {
-  overflow-y: hidden;
+  @include big_web() {
+    // overflow-y: hidden;
+    overflow: hidden;
 
-  body {
+    body {
+      // overflow-y: hidden;
+      overflow: hidden;
+    }
+  }
+
+  @include mobile() {
     overflow-y: hidden;
+
+    body {
+      overflow-y: hidden;
+    }
   }
 }
 
@@ -181,7 +193,7 @@ span.num.red {
 
 div#wrap {
   min-height: 100vh;
-  background-color: $ultra_light_gold;
+  background-color: $marketing_site_bg;
 }
 
 .mobile-only {
@@ -191,7 +203,7 @@ div#wrap {
 }
 
 .tablet-only {
-  @media screen and (min-width: #{$max_tablet_width}px) {
+  @media screen and (min-width: #{$max_tablet_width + 1}px) {
     display: none !important;
   }
   @include mobile(){
@@ -206,7 +218,7 @@ div#wrap {
 }
 
 .tablet-mobile-only {
-  @media screen and (min-width: #{$max_tablet_width}px) {
+  @media screen and (min-width: #{$max_tablet_width + 1}px) {
     display: none !important;
   }
 }
@@ -217,16 +229,12 @@ div#wrap {
   }
 }
 
-// Textcomplete dropdown for emojis
-
-.dropdown-menu.textcomplete-dropdown {
-  max-height: 300px;
-  top: 0px;
-  overflow: scroll;
-}
-
 .oc-input {
   &.active, &:active, &:focus {
     opacity: 0.9;
   }
+}
+
+.emoji-mart-search input {
+  box-sizing: border-box !important;
 }

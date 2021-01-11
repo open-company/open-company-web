@@ -24,10 +24,6 @@ div.pricing-wrap {
       }
     }
 
-    section {
-      background-color: $ultra_light_gold;
-    }
-
     section.pricing-covid-letter {
       padding: 120px 0 0;
       text-align: center;
@@ -83,10 +79,11 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding: 40px 0 0;
+      padding: 152px 0 80px;
       text-align: center;
       position: relative;
       width: 100%;
+      background-color: rgba($deep_navy, 0.08) !important;
 
       @include tablet() {
         overflow: visible;
@@ -96,10 +93,54 @@ div.pricing-wrap {
       }
 
       @include mobile() {
-        padding: 40px 16px 40px;
+        padding: 88px 16px 40px;
       }
 
       h1.pricing-headline {
+        font-size: 60px;
+        line-height: 78px;
+        @include OC_Title();
+        color: $deep_navy;
+        margin: 0 auto;
+        max-width: 730px;
+
+        @include mobile() {
+          margin-bottom: 40px;
+          font-size: 36px;
+          line-height: initial;
+          max-width: initial;
+          padding: 0 24px;
+        }
+      }
+    }
+
+    section.video {
+      padding-top: 80px;
+      padding-bottom: 73px;
+      padding-left: 24px !important;
+      padding-right: 24px !important;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      position: relative;
+
+      @include tablet() {
+        padding-bottom: 0px;
+        padding: 40px 24px 0;
+      }
+
+      @include mobile() {
+        width: 100%;
+        overflow: visible;
+        padding: 88px 16px 24px;
+      }
+
+      & > * {
+        position: relative;
+        z-index: 3;
+      }
+
+      h4 {
         font-size: 60px;
         line-height: 78px;
         @include OC_Title()
@@ -119,7 +160,6 @@ div.pricing-wrap {
 
     section.pricing-apps {
       padding: 80px 16px;
-      background-color: $another_ui_grey;
 
       @include mobile() {
         padding: 40px 0 0;

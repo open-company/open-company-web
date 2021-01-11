@@ -23,8 +23,8 @@
 }
 
 .mlb-default {
-  background-color: $carrot_orange;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   border-radius: 4px;
   height: 40px;
   font-size: 16px;
@@ -71,7 +71,7 @@
 }
 
 .mlb-link-green {
-  @include mlb-link($carrot_green);
+  @include mlb-link(var(--primary-color));
 }
 
 .btn-reset {
@@ -214,9 +214,9 @@
 
 .gray5 {color: $oc_gray_5}
 
-.b--red {border-color: $oc_red_regular}
-.red {color: $oc_red_regular;}
-.green {color: $oc_green_regular;}
+.b--red {border-color: $carrot_orange}
+.red {color: $carrot_orange; }
+.green {color: $carrot_green;}
 
 .bg-gray { background-color: $oc_gray_1 }
 .bg-white-05 { background-color: rgba(255,255,255,.5) }

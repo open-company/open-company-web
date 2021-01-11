@@ -6,16 +6,11 @@ div.paginated-stream {
     width: 100%;
     margin-left: 0px;
     margin-top: 0px;
-    min-height: calc(100vh - 54px - 72px);
+    padding-bottom: 0;
+    min-height: calc(100vh - #{$mobile_navbar_height}px - #{$mobile_navbar_height}px);
   }
 
   div.paginated-stream-cards {
-    float: left;
-
-    @include mobile() {
-      width: 100%;
-      float: unset;
-    }
 
     div.loading-updates {
       text-align: center;
@@ -31,18 +26,14 @@ div.paginated-stream {
       }
     }
 
-    div.carrot-close {
+    div.closing-item {
       text-align: center;
-      height: 60px;
-      background-image: cdnUrl("/img/ML/closing_carrot.svg");
-      background-size: 14px 24px;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.2;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
-      }
+      height: #{$carrot_close_height}px;
+      padding: #{($carrot_close_height - 24) / 2}px 0;
+      @include OC_Body_Book();
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--light-color);
     }
 
     div.paginated-stream-cards-inner {
@@ -51,24 +42,20 @@ div.paginated-stream {
       padding-bottom: 24px;
 
       @include mobile() {
-        margin-top: 8px;
+        padding-bottom: 0;
       }
 
-      .ReactVirtualized__Grid.ReactVirtualized__List,
-      .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
+      .ReactVirtualized__Grid,
+      .ReactVirtualized__Grid .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;
 
         div.virtualized-list-separator {
           background-color: var(--background-color);
           @include OC_Body_Bold();
-          padding: 16px 0;
+          padding: 16px 0 0;
           font-size: 14px;
           line-height: 18px;
           color: var(--light-color);
-
-          &.expanded-list {
-            padding: 8px 0 16px;
-          }
         }
       }
 
@@ -108,6 +95,74 @@ div.paginated-stream {
 
           @include mobile() {
             width: 100%;
+          }
+        }
+      }
+
+      div.virtualized-list-container {
+        position: relative;
+        background-size: contain;
+        // background-repeat-x: no-repeat;
+        background-repeat: repeat-y;
+        background-position: left 0px top 16px;
+        background-origin: top 16px left 0;
+        width: 100%;
+        // background-image: cdnUrl("/img/ML/interstitial.svg");
+        background-image: cdnUrl("/img/ML/oc_loading_dashboard.svg");
+
+        @include dark_mode() {
+          // background-image: cdnUrl("/img/ML/interstitial@dark.svg");
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard@dark.svg");
+        }
+
+        @include mobile() {
+          background-position: left 0px top 0px;
+          background-origin: top 0 left 0;
+          // background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile.svg");
+
+          @include dark_mode() {
+            // background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile@dark.svg");
+          }
+        }
+
+        &.collapsed {
+          background-position: left 0px top 0px;
+          background-origin: top 0 left 0;
+          background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_collapsed@dark.svg");
+          }
+
+          @include mobile() {
+            background-position: left 0px top 0px;
+            background-origin: top 0 left 0;
+            background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collpased.svg");
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/oc_loading_dashboard_mobile_collapsed@dark.svg");
+            }
+          }
+        }
+
+        div.virtualized-list-item {
+          background-color: var(--background-color);
+
+          @include mobile() {
+            background-color: var(--mobile-background-color);
+          }
+        }
+
+        div.refresh-button-container {
+          position: fixed;
+          bottom: 24px;
+          width: #{$board_container_width}px;
+          height: 40px;
+
+          @include mobile() {
+            width: 100vw;
           }
         }
       }

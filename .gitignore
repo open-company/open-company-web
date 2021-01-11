@@ -5,7 +5,6 @@ pom.xml
 /classes/
 /out/
 /target/
-resources/public/js/compiled/
 .lein-*
 .repl
 .nrepl-*
@@ -14,18 +13,29 @@ resources/public/js/compiled/
 .idea*
 open-company-web.iml
 .sass-cache/
+.shadow-cljs/
+node_modules/
 
 .ruby-gemset
 .ruby-version
-
-resources/public/js/oc_assets.*
 
 forms-emitted.txt
 forms-read.txt
 forms-analyzed.txt
 
-# See resources/electron-builder.example.env
-resources/electron-builder.env
+.vscode/
+.calva/
+.clj-kondo/
+.lsp/
+.vscode/
+public/js/
+
+# Ignore compiled css and html files
+public/css/app.main.css
+public/*.html
+
+# See electron-builder.example.env
+electron-builder.env
 
 # Local env file used only in local development
-resources/public/js/local-env.js
+resources/public/lib/local-env.js

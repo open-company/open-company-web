@@ -38,62 +38,64 @@ nav.oc-navbar {
 
   z-index: $navbar_zindex;
   margin: 0px;
+  $mobile_vertical_padding: 12;
+  $mobile_navbar_content_height: $mobile_navbar_height - ($mobile_vertical_padding * 2);
 
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 12px 16px;
+    padding: 12px 12px 12px 16px;
     height: #{$navbar_height}px;
     width: 100%;
 
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
-      padding: 16px;
+      padding: #{$mobile_vertical_padding}px 16px;
     }
 
     div.oc-navbar-header-container{
+      width: 100%;
       height: 32px;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
 
-      @include mobile(){
-        height: 24px;
+      @include mac_electron() {
+        padding-left: 60px;
       }
 
       div.navbar-center {
         text-align: center;
         width: 320px;
         height: 32px;
-        position: absolute;
-        left: 50%;
-        top: 12px;
-        margin-left: -160px;
         @include OC_Body_Bold();
         font-size: 26px;
         transition: margin-left 320ms ease-in, width 320ms ease-in;
+        flex: 0 0 auto;
 
         @include mobile() {
-          position: absolute;
-          top: 15px;
-          left: 50%;
-          width: 60vw;
-          height: 24px;
-          margin: 0 0 0 -30vw;
+          max-width: calc(100vw - 16px - 24px - 16px - 32px - 16px); // viewport width less external padding, left and right buttons and their margins btw the center
           text-align: center;
+          flex-shrink: 1;
 
           div.navbar-mobile-title {
-            @include OC_Body_Bold();
-            font-size: 18px;
+            @include OC_Body_Book();
+            font-size: 16px;
             color: var(--color);
-            line-height: 24px;
+            line-height: #{$mobile_navbar_content_height}px;
+            height: #{$mobile_navbar_content_height}px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-left: 16px;
+            margin-right: 16px;
           }
         }
 
         &.search-active {
           width: 430px;
-          margin-left: -215px;
         }
 
         button.orgs-dropdown div.org-avatar {
@@ -103,30 +105,26 @@ nav.oc-navbar {
       }
 
       div.navbar-left {
-        float: left;
         height: 32px;
-
-        @include mobile() {
-          height: 24px;
-        }
+        margin-left: 0;
+        flex: 1;
+        margin-right: auto;
+        text-align: left;
 
         button.mobile-ham-menu {
           display: none;
 
           @include mobile() {
             display: block;
-            width: 32px;
+            width: 24px;
             height: 32px;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: var(--ultralight-color);
             border-radius: 4px;
-            position: absolute;
             padding: 0;
-            top: 11px;
-            left: 16px;
+            margin-right: auto;
 
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
@@ -198,91 +196,23 @@ nav.oc-navbar {
       }
 
       div.navbar-right {
-        margin-right: 0px;
-        position: absolute;
-        left: calc(100vw - 72px - 16px);
-        min-width: 72px;
-        width: auto;
+        margin-right: 0;
+        flex: 1;
+        margin-left: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: row nowrap;
 
         &.anonymous-user {
-          position: relative;
-          left: unset;
-          float: right;
-        }
-
-        &.create-post {
-          min-width: 112px; // 72 + 32 + 8
-          left: calc(100vw - 112px - 16px);
-        }
-
-        @include mobile() {
-          min-width: unset;
-          position: absolute;
-          top: 11px;
-          left: unset;
-          right: 16px;
-          width: 32px;
-          height: 32px;
-        }
-
-        button.navbar-create-bt {
-          float: left;
-          margin-right: 8px;
-          border-radius: 50%;
-          width: 32px;
-          height: 32px;
-          position: relative;
-          background-color: var(--opac-background-color-1);
-          transition: background-color 180ms ease-in;
-
-          span.plus-icon {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/add_to_board_plus.svg");
-            background-size: 14px 14px;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.5;
-            transition: opacity 180ms ease-in;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-            }
-          }
-
-          span.plus-icon-active {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-            background-size: 14px 14px;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 180ms ease-in;
-          }
-
-          &.scrolled, &:hover {
-            background-color: $carrot_green;
-
-            span.plus-icon {
-              opacity: 0;
-            }
-
-            span.plus-icon-active {
-              opacity: 1;
-            }
+          div.login-button-container {
+            margin-left: auto;
           }
         }
 
         div.user-notifications {
-          float: left;
           margin-right: 8px;
+          margin-left: auto;
 
           @include mobile() {
             display: none;
@@ -290,10 +220,10 @@ nav.oc-navbar {
         }
 
         div.user-menu {
-          width: 32px;
+          min-width: 32px;
           height: 32px;
-          float: right;
           position: relative;
+          padding: 4px;
 
           div.user-menu-button {
             position: relative;
@@ -303,7 +233,7 @@ nav.oc-navbar {
               width: 12px;
               height: 12px;
               border-radius: 50%;
-              background-color: $carrot_green;
+              background-color: var(--primary-color);
               position: absolute;
               top: 0;
               right: 0;
@@ -311,48 +241,6 @@ nav.oc-navbar {
             }
           }
         }
-      }
-    }
-  }
-
-  div.mobile-header {
-    display: none;
-
-    @include mobile() {
-      height: #{$mobile_navbar_height}px;
-      width: 100vw;
-      background-color: var(--mobile-background-color);
-      border-bottom: 1px solid var(--divider-line);
-      padding: 15px 16px;
-      display: block;
-      text-align: center;
-      z-index: 2;
-
-      button.search-close-bt {
-        display: block;
-        width: 32px;
-        height: 32px;
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 12px 12px;
-        background-color: var(--divider-line);
-        border-radius: 4px;
-        position: absolute;
-        left: 16px;
-        top: 11px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-
-      div.mobile-header-title {
-        @include OC_Body_Bold();
-        font-size: 18px;
-        color: var(--color);
-        line-height: 24px;
-        height: 24px;
       }
     }
   }

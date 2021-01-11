@@ -9,7 +9,7 @@ div.post-to-button {
     div.post-to-bt-container button.post-to-bt {
       cursor: not-allowed;
       color: var(--light-color);
-      background-color: var(--opac-background-color-1);
+      background-color: var(--opac-background-color-08);
     }
   }
 
@@ -20,18 +20,19 @@ div.post-to-button {
       &:hover {
         div.post-bt-tooltip {
           display: block;
+          opacity: 1;
         }
       }
     }
 
     button.post-to-bt {
       padding: 7px 16px;
-      background-color: $carrot_green;
+      background-color: var(--primary-color);
       height: 32px;
       @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
-      color: white;
+      color: var(--secondary-color);
       overflow: hidden;
       cursor: pointer;
       border-radius: 4px;
@@ -42,50 +43,73 @@ div.post-to-button {
       display: block;
     }
 
-    // @include big_web() {
-    //   &:hover {
-    //     div.post-bt-tooltip {
-    //       display: block;
-    //     }
-    //   }
-    // }
-
     &.tt-title div.post-bt-tooltip {
-      width: 142px;
-    }
-
-    &.tt-abstract div.post-bt-tooltip {
-      width: 144px;
+      width: 192px;
     }
 
     div.post-bt-tooltip {
-      background-color: var(--tooltip-background-color);
       white-space:pre-wrap;
-      max-width: none;
-      text-align: left;
-      opacity: 1;
-      @include OC_Body_Book();
-      font-size: 14px;
-      color: var(--tooltip-color);
-      line-height: 18px;
-      padding: 11px 16px;
-      border-radius: 4px;
-      box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-      border: 1px solid var(--divider-line);
+      max-width: unset;
       position: absolute;
-      top: 34px;
-      right: 0;
+      top: -12px;
+      left: 50%;
       z-index: #{$navbar_zindex + 157};
-      display: none;
+      transform: translate(calc(-50%) , -100%);
+      overflow: visible;
+      transition: opacity .15s linear;
+      display: block;
+      pointer-events: none;
+      line-break: auto;
+      text-align: left;
+      text-align: start;
+      text-decoration: none;
+      text-shadow: none;
+      text-transform: none;
+      white-space: normal;
+      word-break: normal;
+      word-spacing: normal;
+      word-wrap: normal;
+      font-size: 12px;
+      opacity: 0;
+      filter: alpha(opacity=0);
+
+      div.tooltip-arrow {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-color: transparent;
+        border-style: solid;
+        bottom: -5px;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px 5px 0;
+        border-top-color: var(--tooltip-background-color);
+      }
+
+      div.tooltip-inner {
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--tooltip-color);
+        line-height: 18px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+        border: 1px solid var(--divider-line);
+        background-color: var(--tooltip-background-color);
+        border-radius: 4px;
+        text-align: left;
+        max-width: unset;
+      }
 
       @include mobile() {
+        left: unset;
         right: -8px;
         top: 36px;
       }
     }
   }
 
-  div.sections-picker-container {
+  div.boards-picker-container {
     position: absolute;
     top: 32px;
     left: 0;
@@ -93,7 +117,7 @@ div.post-to-button {
     max-height: 370px;
     width: 100%;
 
-    div.sections-picker {
+    div.boards-picker {
       overflow: auto;
       position: relative;
       top: unset;

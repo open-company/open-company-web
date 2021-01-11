@@ -1,0 +1,34 @@
+#!/bin/bash
+# Removed since not used anymore
+# -W QUIET \
+# --js lib/scrollTo/scrollTo.min.js \
+# --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
+# --js lib/rangy/rangy-core.js \
+# --js lib/rangy/rangy-selectionsaverestore.js \
+# --js lib/rangy/rangy-classapplier.js \
+# --js lib/MediumEditor/index.min.js \
+# --js lib/MediumEditorExtensions/MediumEditorToolbar/toolbar.js \
+# --js lib/MediumEditorExtensions/MediumEditorPaste/paste.js \
+# --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
+# --js lib/MediumEditorExtensions/MediumEditorAutoquote/autoquote.js \
+# --js lib/MediumEditorExtensions/MediumEditorAutocode/autocode.js \
+# --js lib/MediumEditorExtensions/MediumEditorAutoInlinecode/autoinlinecode.js \
+# --js lib/MediumEditorExtensions/MediumEditorInlineCodeButton/inlinecodebutton.js \
+# --js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
+# --js lib/MediumEditorExtensions/MediumEditorHighlighterButton/highlighterbutton.js \
+
+cd $2/public/ && \
+java -jar ~/closure_compiler/closure-compiler-v$1.jar \
+--js_output_file js/oc_assets.js \
+--create_source_map js/oc_assets.js.map \
+--js lib/print_ascii.js \
+--js lib/js-utils/pasteHtmlAtCaret.js \
+--js lib/cleanHTML/cleanHTML.js \
+--output_wrapper "%output%
+//# sourceMappingURL=$3/js/oc_assets.js.map"
+
+cd $2/public/js/ && \
+cat <<EOT >> oc.js
+
+//# sourceMappingURL=$3/js/oc.js.map
+EOT

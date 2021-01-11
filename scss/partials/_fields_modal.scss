@@ -1,0 +1,191 @@
+.fields-modal {
+  .field-group {
+    margin-top: 16px;
+    border-top: 1px solid var(--divider-line);
+    padding-top: 16px;
+  }
+
+  .field-label {
+    margin: 16px 0 0;
+    color: var(--color);
+    @include OC_Body_Book();
+    font-size: 14px;
+
+    &:first-child {
+      margin: 0;
+    }
+
+    .half-field-label {
+      width: calc(50% - 4px);
+      display: inline-block;
+      margin-left: 4px;
+      color: var(--color);
+      @include OC_Body_Book();
+      font-size: 14px;
+
+      &:first-of-type {
+        margin-left: 0;
+        margin-right: 4px;
+      }
+    }
+
+    span.error {
+      display: block;
+      width: 100%;
+      color: $carrot_orange;
+    }
+  }
+
+  input.field-value {
+    width: 100%;
+    height: 32px;
+    background-color: var(--opac-background-color-1);
+    border-radius: 4px;
+    padding: 6px 7px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    margin-top: 8px;
+    outline: none;
+    border: 1px solid var(--opac-background-color-1); // transparent border since it's the same color of the bg
+
+    @include placeholder(){
+      color: var(--ultralight-color);
+    }
+
+    &:focus, &:active {
+      border: 1px solid var(--opac-background-color-1);
+      outline: none;
+    }
+
+    &.not-allowed {
+      cursor: not-allowed;
+    }
+
+    &:not(:valid) {
+      border: 1px solid $carrot_orange;
+    }
+
+    &.half-field {
+      width: calc(50% - 4px);
+      display: inline-block;
+      margin-left: 4px;
+
+      &:first-of-type {
+        margin-left: 0;
+        margin-right: 4px;
+      }
+
+      @include mobile() {
+        width: 100%;
+        display: block;
+        margin-left: 0;
+
+        &:first-of-type {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  textarea.field-value {
+    width: 100%;
+    resize: none;
+    background-color: var(--opac-background-color-1);
+    border-radius: 4px;
+    padding: 7px 8px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    margin-top: 8px;
+    border: none;
+    outline: none;
+    display: block;
+
+    @include placeholder(){
+      color: var(--light-color);
+    }
+
+    &:focus, &:active {
+      border: none;
+      outline: none;
+    }
+
+    &.not-allowed {
+      cursor: not-allowed;
+    }
+
+    &.half-field {
+      width: calc(50% - 4px);
+      display: inline-block;
+      margin-left: 4px;
+
+      &:first-of-type {
+        margin-left: 0;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  select.field-value {
+    width: 100%;
+    height: 32px;
+    border-radius: 4px;
+    padding: 7px 8px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    margin-top: 8px;
+    display: block;
+    border: none;
+    outline: none;
+    display: block;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--opac-background-color-1);
+    position: relative;
+    background-image: cdnUrl("/img/ML/select_arrows.svg");
+    background-size: 8px 10px;
+    background-position: top 11px right 8px;
+    background-repeat: no-repeat;
+
+    &::-ms-expand {
+      display: none;
+    }
+
+    &:hover {
+      border-color: #888;
+    }
+
+    &:focus {
+      border-color: none;
+      box-shadow: none;
+      outline: none;
+    }
+
+    option {
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $deep_navy;
+      background-color: rgba($deep_navy, 0.1);
+    }
+  }
+
+  .field-description {
+    margin-top: 8px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height-step: 18px;
+    color: var(--light-color);
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

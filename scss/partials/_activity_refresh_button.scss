@@ -1,0 +1,11 @@
+div.refresh-button-container.activity-refresh-button-container {
+  position: fixed;
+  bottom: 24px;
+  width: #{$board_container_width}px;
+  height: 40px;
+
+  @include mobile() {
+    width: 100vw;
+    bottom: calc(#{$mobile_navbar_height}px + 24px);
+  }
+}

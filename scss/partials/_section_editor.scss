@@ -14,10 +14,18 @@ div.section-editor-container {
   opacity: 1;
   transition: opacity 180ms ease-in;
 
+  @include mobile(){
+    padding: 0;
+  }
+
   button.modal-close-bt {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.section-editor {
@@ -32,6 +40,15 @@ div.section-editor-container {
     overflow-x: hidden;
     overflow-y: auto;
 
+    @include mobile() {
+      width: 100%;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      margin-top: 0;
+      z-index: 1;
+    }
+
     div.section-editor-header {
       width: 320px;
       height: 56px;
@@ -42,47 +59,100 @@ div.section-editor-container {
       z-index: 1000;
       top: 0;
       right: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: center;
 
-      div.section-editor-header-title {
-        @include OC_Body_Bold();
-        font-size: 14px;
-        color: var(--color);
-        line-height: 32px;
-        float: left;
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        right: unset;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px;
+        margin: 0;
+        z-index: 2;
       }
 
-      button.cancel-bt {
-        height: 32px;
-        padding: 0 8px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: var(--light-color);
+      div.section-editor-header-left {
+        order: 2;
+        margin-left: auto;
         margin-right: 8px;
-        float: right;
+        display: flex;
+
+        @include mobile() {
+          order: 1;
+          margin-left: 0;
+          margin-right: 0;
+          flex: 1;
+        }
+
+        button.cancel-bt {
+          height: 32px;
+          padding: 0 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--light-color);
+
+          @include mobile() {
+            margin-right: auto;
+          }
+        }
+      }
+
+      div.section-editor-header-center {
+        order: 1;
+        margin-right: auto;
+
+        @include mobile() {
+          order: 2;
+          margin-right: initial;
+          width: 40vw;
+          text-align: center;;
+        }
+
+        div.section-editor-header-title {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: var(--color);
+          line-height: 32px;
+        }
       }
       
-      button.save-bt {
-        height: 32px;
-        padding: 7px 12px;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        background-color: $carrot_green;
-        border-radius: 4px;
-        color: white;
-        line-height: 18px;
-        float: right;
+      div.section-editor-header-right {
+        order: 3;
+        display: flex;
 
-        &.disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
+        @include mobile() {
+          margin-right: 0;
+          flex: 1;
+        }
+
+        button.save-bt {
+          height: 32px;
+          padding: 7px 12px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          background-color: var(--primary-color);
+          border-radius: 4px;
+          color: var(--secondary-color);
+          line-height: 18px;
+
+          @include mobile() {
+            margin-left: auto;
+          }
+  
+          &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+          }
         }
       }
     }
 
     div.section-editor-add {
-      @include mobile() {
-        margin-top: 64px;
-      }
 
       div.section-editor-error-label {
         margin-top: 8px;
@@ -148,8 +218,30 @@ div.section-editor-container {
         }
 
         &.preflight-ok {
-          border: 1px solid $carrot_green;
+          border: 1px solid var(--primary-color);
         }
+
+        @include placeholder() {
+          color: var(--light-color);
+        }
+      }
+
+      textarea.section-editor-description {
+        border-radius: 4px;
+        background-color: var(--opac-background-color-1);
+        height: 32px;
+        width: 100%;
+        resize: none;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        padding: 5px 8px;
+        position: relative;
+        cursor: text;
+        margin-top: 8px;
+        outline: none;
+        border: none;
+        border: 1px solid var(--opac-background-color-1);
 
         @include placeholder() {
           color: var(--light-color);
@@ -215,7 +307,7 @@ div.section-editor-container {
                 color: var(--light-color);
 
                 a {
-                  color: $carrot_green;
+                  color: var(--primary-color);
                 }
               }
             }
@@ -233,13 +325,30 @@ div.section-editor-container {
         }
       }
 
-      div.section-editor-add-slack-channel {
+      div.section-editor-add-slack-channel-container {
         margin-top: 8px;
 
-        &.disabled {
-          opacity: 0.5;
-          div.slack-channels-dropdown {
-            pointer-events: none;
+        div.section-editor-add-slack-channel {
+          &.disabled {
+            opacity: 0.5;
+            div.slack-channels-dropdown {
+              pointer-events: none;
+            }
+          }
+        }
+
+        div.section-editor-info {
+          margin-top: 8px;
+          padding: 0;
+
+          a.private-announcement-channels {
+            @include OC_Body_Book();
+            font-size: 13px;
+
+            &, &:hover {
+              text-decoration: underline;
+              color: var(--light-color);
+            }
           }
         }
       }
@@ -253,7 +362,7 @@ div.section-editor-container {
         line-height: 24px;
 
         button.enable-slack-bot-bt {
-          color: $carrot_green;
+          color: var(--primary-color);
           display: inline;
           padding: 0;
 
@@ -298,6 +407,10 @@ div.section-editor-container {
         background-color: var(--background-color);
         z-index: 1001;
 
+        @include mobile() {
+          width: calc(100% - 32px);
+        }
+
         div.access-list-row {
           height: 32px;
           padding: 7px 8px;
@@ -307,6 +420,10 @@ div.section-editor-container {
 
           &:hover {
             opacity: 1;
+          }
+
+          &.disabled {
+            @include premium_lock();
           }
 
           &:last-child {
@@ -522,8 +639,8 @@ div.section-editor-container {
           height: 32px;
           text-align: center;
           float: right;
-          color: white;
-          background-color: $carrot_green;
+          color: var(--secondary-color);
+          background-color: var(--primary-color);
           border-radius: 6px;
           @include OC_Body_Bold();
           font-size: 14px;

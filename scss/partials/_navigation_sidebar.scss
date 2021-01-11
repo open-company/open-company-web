@@ -1,16 +1,11 @@
 @mixin default-item(){
   background-color: transparent;
   height: 32px;
-  padding-top: 5px;
 
   @include mobile() {
     height: 40px;
     margin: 2px 0;
     padding: 7px 16px;
-
-    &.all-posts {
-      margin-top: 16px;
-    }
   }
 
   .internal {
@@ -30,7 +25,6 @@
   }
 
   span.count {
-    float: right;
     @include OC_Body_Book();
     font-size: 12px;
     line-height: 16px;
@@ -41,18 +35,20 @@
     display: inline-block;
     background-color: var(--navigation-sidebar-count-bg);
     border-radius: 4px;
-    margin-top: 4px;
-    margin-right: 16px;
+    margin-left: auto;
     padding: 0 4px;
-
-    @include mobile() {
-      float: left;
-      margin-top: 5px;
-      margin-left: 8px;
-    }
   }
 
-  div.drafts-label {
+  span.unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--navigation-sidebar-badge-color);
+    border-radius: 50%;
+    margin-right: 4px;
+    margin-left: auto;
+  }
+
+  &.drafts div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -67,12 +63,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+    div.nav-link-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -98,16 +94,12 @@
 }
 
 @mixin item-selected() {
-  background-color: $carrot_green;
+  -webkit-tap-highlight-color: var(--navigation-sidebar-hover-bg);
+  background-color: var(--navigation-sidebar-hover-bg);
   outline: none;
   border-radius: 4px;
 
-  @include mobile() {
-    border-radius: 0;
-  }
-
-  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
-    // color: $carrot_green;
+  div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
     text-decoration: none;
@@ -121,6 +113,10 @@
     span.count {
       background-color: white;
       color: $deep_navy;
+    }
+
+    span.unread-dot {
+      background-color: var(--navigation-sidebar-badge-color);
     }
 
     @include mobile() {
@@ -137,7 +133,11 @@
     color: $deep_navy;
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+  span.unread-dot {
+    background-color: var(--navigation-sidebar-badge-color);
+  }
+
+  div.nav-link-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -150,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
+    div.nav-link-label {
       text-decoration: none;
     }
   }
 
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.nav-link-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -177,27 +177,10 @@
   border-radius: 4px;
 
   @include mobile() {
-    background-color: transparent;
     border-radius: 0;
   }
 
-  .internal {
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: var(--color);
-    text-decoration: none;
-
-    @include mobile() {
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
-    }
-  }
-
-  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.contributions-label {
+  div.nav-link-label {
     color: var(--color);
     text-decoration: none;
 
@@ -219,36 +202,21 @@ div.left-navigation-sidebar {
   overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
-  // height: calc(100vh - #{$navbar_height + 1}px);
-  @include no-user-select();
-  padding: 24px 0 0;
+  padding: 40px 0;
 
-  @include big_web() {
-    &.collapsed-sections {
-      overflow-y: hidden;
-
-      div.left-navigation-sidebar-content {
-        overflow-y: hidden;
-      }
-    }
-  }
-
-  @include big_web() {
-    &.absolute-position {
-      position: absolute;
-      top: 0;
-      overflow-y: visible;
-      overflow: visible;
-    }
-  }
-
-  @media screen and (max-width: 975px) {
-    position: absolute;
+  @media (max-height: 654px), (max-width: 975px) {
+    position: absolute !important;
     top: 0;
+    overflow-y: visible;
+    display: block;
+
+    div.left-navigation-sidebar-content {
+      display: block;
+    }
   }
 
   @include mobile() {
-    position: fixed;
+    position: fixed!important;
     margin-top: 0;
     top: 0;
     left: 0;
@@ -267,297 +235,99 @@ div.left-navigation-sidebar {
     }
   }
 
+  &.absolute-position {
+    position: absolute;
+    top: 0;
+  }
+
+  @include no-user-select();
+
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-bottom: 10px;
+    min-height: calc(100vh - #{$navbar_height}px - 24px - 40px);
+    display: flex;
+    flex-flow: column nowrap;
 
     @include mobile() {
       position: relative;
-      padding-bottom: 40px;
-      width: 85%;
+      padding: 0 16px 40px;
+      width: 100%;
       height: auto;
       background-color: var(--background-color);
       min-height: 100%;
       padding-top: #{$mobile_navbar_height + 16}px;
       -webkit-overflow-scrolling: touch;
+      display: block;
     }
 
     div.left-navigation-sidebar-mobile-header {
       display: none;
 
       @include mobile() {
-        display: block;
         height: #{$mobile_navbar_height}px;
         position: fixed;
         top: 0;
         left: 0;
-        width: calc(85% - 1px);
+        width: 100%;
         background-color: var(--background-color);
         padding: 11px 16px;
         border-bottom: 1px solid var(--divider-line);
         z-index: #{$navbar_zindex};
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+
+        button.mobile-search-bt {
+          display: block;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/dark_search_lens.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          flex: 0 0 auto;
+          margin-left: auto;
+          order: 2;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/wrt_search_lens@dark.svg");
+          }
+        }
 
         button.mobile-close-bt {
           display: block;
-          position: absolute;
-          right: 16px;
-          top: 11px;
           width: 32px;
           height: 32px;
           padding: 0;
           background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
+          background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: var(--ultralight-color);
-          border-radius: 4px;
+          flex: 0 0 auto;
+          margin-left: 8px;
+          order: 3;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
         }
 
         div.orgs-dropdown  {
-          width: calc(100% - 40px);
+          // width: calc(100% - 40px);
+          flex: 0 0 auto;
+          order: 1;
+          position: relative;
+          top: unset;
+          left: unset;
 
           div.orgs-dropdown-container {
             z-index: 2;
           }
         }
-      }
-    }
-  }
-
-  a.inbox, a.all-posts, a.bookmarks, a.drafts, a.contributions {
-    display: block;
-    background-color: transparent;
-    border: none;
-    outline: none;
-    padding-left: 16px;
-
-    @include mobile() {
-      padding-left: 0px;
-    }
-
-    &.hover-item{
-      @include default-item();
-
-      * {
-        cursor: pointer;
-      }
-
-      @include big_web() {
-        &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
-          @include item-hover();
-        }
-      }
-
-      &.item-selected {
-        @include item-selected();
-      }
-    }
-
-    &.item-selected {
-
-      div.inbox-icon {
-        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
-      }
-
-      div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
-      }
-
-      div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/bookmarks_icon_white.svg");
-      }
-
-      div.drafts-icon {
-        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
-      }
-    }
-
-    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.contributions-label {
-      padding: 2px 0px 0px 0;
-      float: left;
-      text-align: left;
-      margin-left: 12px;
-      text-decoration: none;
-
-      @include mobile() {
-        padding: 0px;
-        line-height: 18px;
-      }
-    }
-
-    div.contributions-label {
-      margin-left: 7px;
-      max-width: 92px;
-
-      @include mobile() {
-        max-width: initial;
-      }
-    }
-
-    div.inbox-icon {
-      background-image: cdnUrl("/img/ML/inbox_icon_grey.svg");
-      background-size: 14px 13px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 16px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        opacity: 1;
-        height: 24px;
-      }
-    }
-
-    div.all-posts-icon {
-      background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
-      background-size: 14px 13px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 16px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        opacity: 1;
-        height: 24px;
-      }
-    }
-
-    div.bookmarks-icon {
-      background-image: cdnUrl("/img/ML/bookmarks_icon_grey.svg");
-      background-size: 12px 16px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 16px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 5px;
-        opacity: 1;
-      }
-    }
-
-    div.drafts-icon {
-      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-      background-size: 12px 16px;
-      background-repeat: no-repeat;
-      background-position: center 3px;
-      width: 16px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        background-position: center;
-        opacity: 1;
-        height: 24px;
-      }
-    }
-  }
-
-  a.drafts {
-
-    @include mobile() {
-      margin-bottom: 0px;
-    }
-
-    &.hover-item {
-      @include mobile() {
-        &:after {
-          display: none;
-        }
-      }
-    }
-  }
-
-  div.left-navigation-sidebar-top{
-    margin-top: 16px;
-
-    .left-navigation-sidebar-top-title {
-      padding: 0 16px;
-      margin: 0;
-      height: 32px;
-      width: 100%;
-      border-radius: 4px;
-
-      @include mobile() {
-        padding: 4px 16px;
-        height: 40px;
-        position: relative;
-        z-index: 1;
-        border-radius: 0;
-      }
-
-      @include big_web() {
-        &:hover {
-          background-color: var(--navigation-sidebar-hover-bg);
-        }
-      }
-
-      button.left-navigation-sidebar-sections-arrow {
-        position: relative;
-        height: 32px;
-        padding: 0 0 0 28px;
-
-        &.collapsed:before {
-          transform: rotate(-90deg);
-        }
-
-        &:before {
-          content: "";
-          position: absolute;
-          top: 12px;
-          left: 3px;
-          background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
-          background-size: 12px 6px;
-          background-repeat: no-repeat;
-          background-position: center;
-          width: 12px;
-          height: 6px;
-          transition: 180ms transform;
-        }
-
-        span.sections {
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 32px;
-          color: var(--color);
-          float: left;
-        }
-
-        @include mobile() {
-          cursor: default;
-
-          span.sections {
-            color: var(--light-color);
-            font-size: 16px;
-          }
-        }
-      }
-    }
-
-    button.left-navigation-sidebar-top-title-button {
-      width: 20px;
-      height: 20px;
-      margin-right: -2px;
-      float: right;
-      padding: 0;
-      cursor: pointer;
-      transition: 230ms;
-      background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 16px 16px;
-      @include OC_Body_Bold();
-      margin-top: 7px;
-
-      @include mobile() {
-        display: none;
       }
     }
   }
@@ -606,12 +376,10 @@ div.left-navigation-sidebar {
           @include item-selected();
 
           div.public {
-            background-image: cdnUrl("/img/ML/board_public_white.svg");
             opacity: 1;
           }
 
           div.private {
-            background-image: cdnUrl("/img/ML/board_private_white.svg");
             opacity: 1;
           }
         }
@@ -620,40 +388,41 @@ div.left-navigation-sidebar {
       div.public {
         margin-left: 1px;
         width: 16px;
-        height: 21px;
-        background-image: cdnUrl("/img/ML/board_public.svg");
-        background-size: 12px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
+        height: 32px;
+        @include svgBgColor("/img/ML/board_public.svg", center, 12px 12px, var(--color));
         opacity: 0.5;
 
         @include mobile() {
           margin-left: 0;
-          margin-top: 2px;
           opacity: 1;
+          height: 24px;
         }
       }
 
       div.private {
         margin-left: 1px;
         width: 16px;
-        height: 21px;
-        background-image: cdnUrl("/img/ML/board_private.svg");
-        background-size: 10px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
+        height: 32px;
+        @include svgBgColor("/img/ML/board_private.svg", center, 12px 12px, var(--color));
         opacity: 0.5;
 
         @include mobile() {
           margin-left: 0;
-          margin-top: 2px;
           opacity: 1;
+          height: 24px;
         }
       }
 
       div.board-name {
         width: calc(100% - 8px);
         float: left;
+        height: 32px;
+        line-height: 32px;
+
+        @include mobile() {
+          height: 24px;
+          line-height: 24px;
+        }
 
         div.internal {
           padding: 1px 0px 0px 28px;
@@ -666,6 +435,7 @@ div.left-navigation-sidebar {
           @include mobile() {
             width: auto;
             margin-left: 0px;
+            padding: 0px 0px 0px 28px;
           }
 
           .emojione {
@@ -684,91 +454,360 @@ div.left-navigation-sidebar {
     }
   }
 
-  div.left-navigation-sidebar-footer {
-    position: relative;
+  div.left-navigation-sidebar-top {
+    flex: 0 0 auto;
+
+    &.top-border {
+      margin-top: 16px;
+      border-top: 1px solid var(--opac-background-color-08);
+      padding-top: 16px;
+
+      @include mobile() {
+        border-top: 0px;
+        position: relative;
+
+        &:before {
+          content: "";
+          position: absolute;
+          width: calc(100% + 32px);
+          height: 1px;
+          position: absolute;
+          top: 0px;
+          left: -16px;
+          background-color: var(--opac-background-color-08);
+        }
+      }
+    }
+
+    .left-navigation-sidebar-top-title {
+      padding: 0 16px;
+      margin: 0;
+      height: 32px;
+      width: 100%;
+      border-radius: 4px;
+
+      @include mobile() {
+        padding: 4px 16px;
+        height: 40px;
+        position: relative;
+        z-index: 1;
+        border-radius: 0;
+      }
+
+      @include big_web() {
+        &:hover {
+          background-color: var(--navigation-sidebar-hover-bg);
+        }
+      }
+
+      button.left-navigation-sidebar-sections-arrow {
+        position: relative;
+        height: 32px;
+        padding: 0 0 0 28px;
+
+        &.collapsed:before {
+          transform: rotate(-90deg);
+        }
+
+        &:before {
+          content: "";
+          position: absolute;
+          top: 12px;
+          left: 3px;
+          width: 12px;
+          height: 6px;
+          transition: 180ms transform;
+          @include svgBgColor("/img/ML/navigation_sidebar_sections_arrow.svg", center, 12px 6px, var(--light-color));
+        }
+
+        span.sections {
+          @include OC_Body_Bold();
+          font-size: 12px;
+          line-height: 32px;
+          color: var(--light-color);
+          float: left;
+          text-transform: uppercase;
+        }
+
+        @include mobile() {
+          cursor: default;
+
+          &:before {
+            @include svgBgColor("/img/ML/navigation_sidebar_sections_arrow.svg", center, 12px 6px, var(--color));
+          }
+
+          span.sections {
+            @include OC_Body_Book();
+            color: var(--color);
+            text-transform: unset;
+            font-size: 16px;
+          }
+        }
+      }
+
+      button.left-navigation-sidebar-top-title-button {
+        width: 20px;
+        height: 20px;
+        margin-right: -2px;
+        float: right;
+        padding: 0;
+        cursor: pointer;
+        transition: 230ms;
+        margin-top: 7px;
+        @include svgBgColor("/img/ML/plus_button_icon.svg", center, 16px 16px, var(--color));
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    a.nav-link {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      flex: 0 0 auto;
+      padding: 0 16px;
+
+      @include mobile() {
+        padding-left: 0px;
+      }
+
+      &.hover-item{
+        @include default-item();
+
+        * {
+          cursor: pointer;
+        }
+
+        @include big_web() {
+          &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
+            @include item-hover();
+          }
+        }
+
+        &.item-selected {
+          @include item-hover();
+        }
+      }
+
+      div.nav-link-label {
+        padding: 0;
+        text-align: left;
+        margin-left: 12px;
+        flex: 0 1 auto;
+        text-decoration: none;
+        margin-right: 8px;
+
+        @include mobile() {
+          padding: 0px;
+          line-height: 18px;
+        }
+      }
+
+      div.contributions-label {
+        margin-left: 7px;
+        max-width: 92px;
+
+        @include mobile() {
+          max-width: initial;
+        }
+      }
+
+      div.nav-link-icon {
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 16px;
+        height: 16px;
+        text-align: center;
+
+        @include mobile() {
+          opacity: 1;
+        }
+      }
+
+      &.home {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_home.svg", center, 14px 14px, var(--color));
+        }
+      }
+
+      &.topics {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_all.svg", center, 12px 14px, var(--color));
+
+          @include mobile() {
+            margin-left: 0px;
+            background-position: center;
+          }
+        }
+      }
+
+      &.replies-view {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_activity.svg", center, 14px 14px, var(--color));
+        }
+      }
+
+      &.profile {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_profile.svg", center, 12px 14px, var(--color));
+        }
+      }
+
+      &.my-posts {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_my_posts.svg", center, 14px 14px, var(--color));
+        }
+      }
+
+      &.bookmarks {
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_bookmarks.svg", center, 12px 14px, var(--color));
+        }
+      }
+
+      &.drafts {
+        @include mobile() {
+          margin-bottom: 0px;
+        }
+
+        div.nav-link-icon {
+          @include svgBgColor("/img/ML/nav_drafts.svg", center, 14px 14px, var(--color));
+        }
+
+        &.hover-item {
+          @include mobile() {
+            &:after {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  button.create-bt {
+    border-radius: 4px;
     width: 100%;
-    overflow: visible;
-    padding: 16px 0;
+    height: 34px;
+    padding: 8px;
+    position: relative;
+    background-color: var(--navigation-sidebar-create-bt-background);
+    color: var(--navigation-sidebar-create-bt-color);
+    transition: background-color 180ms ease-in;
+    flex: 0 0 auto;
+    margin-top: 16px;
+    border: none;
 
     @include mobile() {
       display: none;
     }
 
+    div.copy-text {
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
+      height: 18px;
+      color: var(--navigation-sidebar-create-bt-color);
+      text-align: center;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      white-space: pre;
+    }
+  }
+
+  div.invite-people-box {
+    position: relative;
+    width: 100%;
+    padding: 22px 22px 136px 22px;
+    @include image-2x("/img/ML/invite_box");
+    background-position: bottom 0px left 50%;
+    background-repeat: no-repeat;
+    background-size: 117px 120px;
+    background-color: var(--navigation-sidebar-invite-background);
+    border: var(--navigation-sidebar-invite-border);
+    box-shadow: var(--navigation-sidebar-invite-shadow);
+    border-radius: 8px;
+    flex: 0 0 auto;
+    margin-top: 24px;
+
+    @include mobile() {
+      display: none;
+    }
+
+    @include dark_mode() {
+      @include image-2x("/img/ML/invite_box@dark");
+    }
+
+    button.invite-people-close {
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background-image: cdnUrl("/img/ML/close_x.svg");
+      background-size: 8px 8px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.5;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/close_x@dark.svg");
+      }
+    }
+
+    label.explore-label {
+      text-align: center;
+      @include OC_Body_Bold();
+      font-size: 18px;
+      line-height: 20px;
+      color: var(--color);
+      margin-bottom: 16px;
+    }
+
     button.invite-people-bt {
       width: 100%;
-      height: 32px;
-      text-align: left;
-      padding-left: 40px;
+      height: 34px;
+      padding: 8px;
+      text-align: center;
       border-radius: 4px;
-      background-image: cdnUrl("/img/ML/invite_people_bt.svg");
-      background-size: 14px 14px;
-      background-position: left 17px top 9px;
-      background-repeat: no-repeat;
-      @include OC_Body_Book();
+      background-color: $carrot_green;
+      color: white;
+      @include OC_Body_Bold();
       font-size: 14px;
-      color: var(--color);
       line-height: 18px;
-
-      @include big_web(){
-        &:hover {
-          background-color: var(--navigation-sidebar-hover-bg);
-        }
-      }
     }
   }
 }
 
-@include dark_mode() {
-  div.left-navigation-sidebar {
-    div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
+div.org-dashboard.top-banner {
+  div.page div.org-dashboard-container div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container {
+    div.left-navigation-sidebar {
+      top: #{$navbar_height + $top_banner_height}px;
+      min-height: calc(100vh - #{$navbar_height}px - 24px - #{$top_banner_height}px);
+
+      &.absolute-position {
+        top: 0;
+      }
+
+      @media (max-height: 654px), (max-width: 975px) {
+        top: #{$top_banner_height}px;
+      }
+
       @include mobile() {
-        button.mobile-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-    }
-
-    a.inbox, a.all-posts, a.bookmarks, a.drafts {
-      div.inbox-icon {
-        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
+        top: #{$top_banner_height}px;
+        min-height: calc(100vh - #{$mobile_navbar_height}px - 24px - #{$top_banner_height}px);
       }
 
-      div.all-posts-icon {
-        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
-      }
-
-      div.bookmarks-icon {
-        background-image: cdnUrl("/img/ML/bookmarks_icon_white.svg");
-      }
-
-      div.drafts-icon {
-        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-top {
-      .left-navigation-sidebar-top-title button.left-navigation-sidebar-sections-arrow:before {
-        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
-      }
-
-      button.left-navigation-sidebar-top-title-button {
-        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-items a.left-navigation-sidebar-item {
-      div.public {
-        background-image: cdnUrl("/img/ML/board_public_white.svg");
-      }
-
-      div.private {
-        background-image: cdnUrl("/img/ML/board_private_white.svg");
-      }
-    }
-
-    div.left-navigation-sidebar-footer {
-      button.invite-people-bt {
-        background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
+      div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
+        top: #{$top_banner_height}px;
       }
     }
   }

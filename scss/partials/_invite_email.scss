@@ -1,0 +1,160 @@
+div.invite-email-container {
+  div.invite-email {
+
+    div.invite-email-item-outer {
+      margin-top: 16px;
+
+      &:not(:first-child) {
+        border-top: 1px solid var(--divider-line);
+        padding-top: 16px;
+      }
+
+      div.invite-email-item-error {
+        color: $carrot_orange;
+        width: 100%;
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 14px;
+        margin-bottom: 8px;
+      }
+
+      div.invite-email-item {
+        position: relative;
+        display: flex;
+        flex-flow: row no-wrap;
+        justify-content: flex-start;
+        align-items: center;
+
+        div.invite-email-item-left {
+          flex: 0 0 calc(100% - 24px);
+
+          input.org-settings-field {
+            width: 100%;
+            border-radius: 4px;
+            background-color: var(--opac-background-color-1);
+            border: none;
+            outline: none;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: var(--color);
+            border: none;
+            outline: none;
+            padding: 7px 8px;
+
+            &:focus, &:active {
+              border: none;
+              outline: none;
+              background-color: var(--opac-background-color-15);
+            }
+          }
+
+          div.user-type-dropdown {
+            width: 100%;
+
+            div.dropdown {
+              margin-top: 8px;
+              height: 32px;
+              text-align: left;
+              border-radius: 4px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: var(--color);
+              background-color: var(--opac-background-color-1);
+
+              button.user-type-btn {
+                width: 100%;
+                text-align: left;
+                height: 32px;
+                padding: 7px 8px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: var(--color);
+                line-height: 18px;
+              }
+
+              ul.user-type-dropdown-menu {
+                left: 0px;
+                top: 40px;
+                width: 100%;
+
+                li {
+                  color: var(--color);
+                  text-align: left;
+                  padding: 7px 12px;
+                  @include OC_Body_Book();
+                  font-size: 14px;
+                  line-height: 18px;
+                }
+              }
+            }
+          }
+        }
+
+        button.remove-user {
+          flex: 0 0 auto;
+          width: 24px;
+          height: 24px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/remove_user.svg");
+          background-size: 12px 14px;
+          background-position: top 5px right 0px;
+          background-repeat: no-repeat;
+          display: block;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/remove_user@dark.svg");
+          }
+        }
+      }
+    }
+  }
+
+  button.add-button {
+    padding: 0 0 0 24px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: var(--color);
+    line-height: 18px;
+    margin-top: 16px;
+    position: relative;
+    display: block;
+
+    div.add-button-plus {
+      width: 16px;
+      height: 16px;
+      background-image: cdnUrl("/img/ML/invite_add_another_plus.svg");
+      background-size: 16px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      left: 0;
+      top: 1px;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/invite_add_another_plus@dark.svg");
+      }
+    }
+  }
+
+  button.save-bt {
+    height: 32px;
+    padding: 7px 16px;
+    background-color: var(--primary-color);
+    @include OC_Body_Bold();
+    font-size: 14px;
+    color: var(--secondary-color);
+    line-height: 18px;
+    float: right;
+    border-radius: 4px;
+    display: block;
+    margin-top: 16px;
+    float: none;
+
+    &:disabled {
+      opacity: 1 !important;
+      background-color: var(--opac-background-color-1);
+      color: var(--light-color);
+    }
+  }
+}
