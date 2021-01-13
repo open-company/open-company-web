@@ -286,7 +286,7 @@
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
         (when show-plus-button?
-          [:div.left-navigation-sidebar-top.top-border
+          [:div.left-navigation-sidebar-top.create-bt-container.top-border
             [:button.mlb-reset.create-bt
              {:on-click #(cmail-actions/cmail-fullscreen)
               :disabled (not (:collapsed cmail-state))}
