@@ -42,7 +42,7 @@
   {:title "Personalize your feed"
    :description [[:span "Add topics, such as Design, Marketing, HR to organize your updates into groups."]
                  [:br]
-                 [:span "Your teammates will be able to subsctibe to topics they want to follow."]]
+                 [:span "Your teammates will be able to subscribe to topics they want to follow."]]
    :steps (if viewer?
             (str "2 of " steps)
             (str "3 of " steps))
