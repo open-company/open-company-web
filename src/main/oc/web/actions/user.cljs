@@ -2,7 +2,7 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
-            [defun.core :refer (defun-)]
+            [defun.core :refer (defun defun-)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -10,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.user :as user-utils]
-            [oc.web.stores.user :as user-store]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.org :as org-actions]
@@ -24,6 +23,16 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]
             ["moment-timezone" :as moment-timezone]))
+
+(defn- orgs? []
+  (contains? @dis/app-state dis/orgs-key))
+
+(defn- auth-settings? []
+  (contains? @dis/app-state (first dis/auth-settings-key)))
+
+(defn- auth-settings-status? []
+  (and (auth-settings?)
+       (contains? (dis/auth-settings) :status)))
 
 ;; Invite box
 
@@ -50,9 +59,9 @@
     ; Delay to let the last api request set the app-state data
     (when (jwt/jwt)
       (utils/after 100
-        #(when (and (user-store/orgs?)
-                    (user-store/auth-settings?)
-                    (user-store/auth-settings-status?))
+        #(when (and (orgs?)
+                    (auth-settings?)
+                    (auth-settings-status?))
             (check-user-walls (dis/auth-settings) (dis/orgs-data))))))
   ([auth-settings orgs]
     (let [status-response (set (map keyword (:status auth-settings)))
@@ -227,13 +236,15 @@
 
 ;; Get user
 
-(defn get-user [user-link]
-  (when-let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
-    (api/get-user fixed-user-link (fn [success data]
-     (let [user-map (when success (json->cljs data))]
-       (dis/dispatch! [:user-data user-map])
-       (utils/after 100 #(nux-actions/check-nux nil))
-       (patch-timezone-if-needed user-map))))))
+(defun get-user
+  ([nil] nil)
+  ([] (get-user (utils/link-for (:links (dis/auth-settings)) "user" "GET")))
+  ([user-link :guard :href]
+   (api/get-user user-link (fn [success data]
+                             (let [user-map (when success (json->cljs data))]
+                               (dis/dispatch! [:user-data user-map])
+                               (utils/after 100 #(nux-actions/check-nux))
+                               (patch-timezone-if-needed user-map))))))
 
 ;; Auth
 
@@ -688,6 +699,30 @@
   (ws-cc/subscribe :followers/count
     (fn [{:keys [data]}]
       (dis/dispatch! [:followers-count/finish (dis/current-org-slug) data]))))
+
+;; Tags
+
+(defun tag!
+  ([tag :guard string?] (when tag (tag! (keyword tag))))
+  ([tag :guard keyword?]
+   (when-let [cur-user (dis/current-user-data)]
+     (let [cleaned-tag (if (keyword? tag) (name tag) (str tag))
+           tag-link (utils/link-for (:links cur-user) "partial-tag" "POST" {} {:tag cleaned-tag})]
+       (dis/dispatch! [:user/tag! tag])
+       (api/user-tag tag-link (fn [{success :success}]
+                                (when-not success
+                                  (get-user))))))))
+
+(defun untag!
+  ([tag :guard string?] (when tag (untag! (keyword tag))))
+  ([tag :guard keyword?]
+   (when-let [cur-user (dis/current-user-data)]
+     (let [cleaned-tag (if (keyword? tag) (name tag) (str tag))
+           tag-link (utils/link-for (:links cur-user) "partial-untag" "DELETE" {} {:tag cleaned-tag})]
+       (dis/dispatch! [:user/untag! tag])
+       (api/user-tag tag-link (fn [{success :success}]
+                                (when-not success
+                                  (get-user))))))))
 
 ;; Debug
 

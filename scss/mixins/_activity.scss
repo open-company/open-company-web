@@ -148,6 +148,51 @@ $header_top_margin: 24;
   }
 }
 
+@mixin pinned-tag() {
+  div.pinned-tag {
+    width: auto;
+    height: 18px;
+    position: relative;
+    background-color: var(--very-light-color);
+    border-radius: 4px;
+    margin-left: 8px;
+    padding: 0 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+
+    &:before {
+      @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 10px 10px, var(--bright-color));
+      width: 10px;
+      height: 10px;
+      margin-right: 4px;
+      display: inline-block;
+      content: "";
+
+      @include mobile() {
+        margin-right: 0;
+      }
+    }
+
+    &:after {
+      display: inline-block;
+      height: 12px;
+      @include OC_Body_Bold();
+      font-size: 11px;
+      line-height: 12px;
+      color: var(--bright-color);
+      content: "PINNED";
+
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    @content
+  }
+}
+
 @mixin muted-activity($width: 12, $height: 14) {
   div.muted-activity {
     margin-right: 8px;
@@ -1277,19 +1322,17 @@ $header_top_margin: 24;
 
   max-height: #{$line_height * $preview_lines}px;
 
-  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2, & > img, & > iframe {
-    margin-top: 0!important;
-    margin-bottom: 0!important;
-    padding-top: 0!important;
-    padding-bottom: 0!important;
-    display: block!important;
-    @include OC_Body_Book();
-    line-height: #{$line_height}px;
-    color: $color;
-    font-size: #{$font_size}px;
-
-    &:empty {
-      display: none!important;
+  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2 {
+    &:not(:empty) {
+      margin-top: 0!important;
+      margin-bottom: 0!important;
+      padding-top: 0!important;
+      padding-bottom: 0!important;
+      display: block!important;
+      @include OC_Body_Book();
+      line-height: #{$line_height}px;
+      color: $color;
+      font-size: #{$font_size}px;
     }
   }
 
@@ -1315,6 +1358,10 @@ $header_top_margin: 24;
   }
 
   .carrot-no-preview {
+    display: none;
+  }
+
+  *:empty, * > *:only-child:empty {
     display: none;
   }
 

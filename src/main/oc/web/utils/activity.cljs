@@ -40,7 +40,7 @@
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
    :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
-   :for-you-context :last-activity-at])
+   :for-you-context :last-activity-at :pinned-at])
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -73,19 +73,21 @@
        :last-activity-at first-month}
       (and (= (.getMonth now) (.getMonth d))
            (= (.getFullYear now) (.getFullYear d)))
-      {:label "This month"
-       :resource-type :separator
-       :date (post-month-date-from-date d)
-       :last-activity-at (post-month-date-from-date d)}
+      (let [dd (post-month-date-from-date d)]
+        {:label "This month"
+        :resource-type :separator
+        :date dd
+        :last-activity-at dd})
       (= (.getFullYear now) (.getFullYear d))
       {:label month-string
        :resource-type :separator
        :last-activity-at (post-month-date-from-date d)}
       :else
-      {:label (str month-string ", " (.getFullYear d))
-       :resource-type :separator
-       :date (post-month-date-from-date d)
-       :last-activity-at (post-month-date-from-date d)})))
+      (let [dd (post-month-date-from-date d)]
+       {:label (str month-string ", " (.getFullYear d))
+        :resource-type :separator
+        :date dd
+        :last-activity-at dd}))))
 
 (defn- add-posts-to-separator [item-data date-time-key separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (get item-data date-time-key))]
@@ -101,7 +103,10 @@
   ([items-list]
    (grouped-posts items-list :published-at))
   ([items-list date-time-key]
-   (let [last-monday (utils/js-date)
+   (let [pinned-items (filterv :pinned-at items-list)
+         rest-items-list (subvec items-list (count pinned-items) (count items-list))
+
+         last-monday (utils/js-date)
          _last-monday (doto last-monday
                         (.setDate (- (.getDate last-monday)
                                      ; First saturday before now
@@ -132,17 +137,30 @@
                         (.setSeconds 59)
                         (.setMilliseconds 999))
 
-         last-date (-> items-list
-                       last
-                       date-time-key)
          separators-data (loop [separators []
-                                posts items-list]
+                                posts rest-items-list]
                            (if (empty? posts)
                              separators
                              (recur (add-posts-to-separator (first posts) date-time-key separators last-monday two-weeks-ago first-month)
-                                    (rest posts))))]
-         (vec (rest ;; Always remove the first label
-          (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))))
+                                    (rest posts))))
+         non-pins-grouped-items (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)
+         ;; If there are pinned items at the top we need to keep the Pins group header
+         final-items (cond
+                       ;; If both pins and non pins items are persent remove add a special class to the first non pins header
+                       (and (seq pinned-items)
+                            (seq non-pins-grouped-items))
+                       (concat pinned-items
+                               [(assoc (first non-pins-grouped-items) :after-pins true)]
+                               (rest non-pins-grouped-items))
+                       ;; Remove the first group header if no pins are present
+                       (seq non-pins-grouped-items)
+                       (rest non-pins-grouped-items)
+                       ;; Keep only pins if no other items are present
+                       (seq pinned-items)
+                       pinned-items
+                       :else
+                       [])]
+     (vec final-items))))
 
 (defun resource-type?
   ([resource-data resource-types :guard coll?]
@@ -231,10 +249,15 @@
    (and (seq user-id)
         (= user-id author-id))))
 
-(defn board-by-uuid [board-uuid]
-  (let [org-data (dis/org-data)
+(defn board-by-uuid
+  ([board-uuid]
+   (board-by-uuid @dis/app-state (dis/current-org-slug) board-uuid))
+  ([data board-uuid]
+   (board-by-uuid data (dis/current-org-slug) board-uuid))
+  ([data org-slug board-uuid]
+  (let [org-data (dis/org-data data)
         boards (:boards org-data)]
-    (some #(when (= (:uuid %) board-uuid) %) boards)))
+    (some #(when (= (:uuid %) board-uuid) %) boards))))
 
 (defn icon-for-mimetype
   "Thanks to https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922"
@@ -646,7 +669,9 @@
         (assoc :has-headline (has-headline? entry-data))
         (assoc :body-thumbnail (when (seq (:body entry-data))
                                  (html-lib/first-body-thumbnail (:body entry-data) false)))
-        (assoc :container-seen-at container-seen-at))))))
+        (assoc :container-seen-at container-seen-at)
+        (assoc :home-pinned (map? (get-in  entry-data [:pins (keyword ls/seen-home-container-id)])))
+        (assoc :board-pinned (map? (get-in  entry-data [:pins (keyword (:board-uuid entry-data))]))))))))
 
 (defn parse-org
   "Fix org data coming from the API."
@@ -730,15 +755,17 @@
                                  (vec (conj next-links link-to-move))
                                  next-links)
                                (:links board-data))
+            pinned-at #(assoc % :pinned-at (get-in % [:pins (keyword (:uuid board-data)) :pinned-at]))
             items-list (when (contains? board-data :entries)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
                                 (assoc :resource-type :entry)
+                                (pinned-at)
                                 (select-keys preserved-keys))
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
             grouped-items (if (show-separators? (:slug board-data) sort-type)
-                            (grouped-posts full-items-list)
+                            (grouped-posts full-items-list (:uuid board-data))
                             full-items-list)
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
             with-ending-item (insert-ending-item with-open-close-items (utils/link-for fixed-next-links "next"))
@@ -842,7 +869,7 @@
   ([container-data change-data org-data active-users sort-type]
    (parse-container container-data change-data org-data active-users sort-type nil))
 
-  ([container-data change-data org-data active-users sort-type {:keys [direction load-comments?] :as options}]
+  ([container-data change-data org-data active-users sort-type {:keys [direction _load-comments?] :as _options}]
     (when container-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -877,11 +904,13 @@
                                  next-links)
                                (:links container-data))
             replies? (= (-> container-data :container-slug keyword) :replies)
+            pinned-at #(assoc % :pinned-at (get-in % [:pins (keyword (:container-id container-data)) :pinned-at]))
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
                                 (assoc :resource-type :entry)
                                 (merge (get-in with-fixed-activities [:fixed-items (:uuid %)]))
+                                (pinned-at)
                                 (select-keys preserved-keys))
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction)
@@ -970,28 +999,31 @@
      db
      (keys (get-in db contributions-list-key)))))
 
-(defn update-boards [db org-data change-data active-users]
+(defn update-board [db board-slug org-data change-data active-users]
   (let [org-slug (:slug org-data)
-        boards-key (dis/boards-key org-slug)
-        following-boards (dis/follow-boards-list org-slug db)]
-    (reduce (fn [tdb board-key]
-             (let [rp-board-data-key (dis/board-data-key org-slug board-key dis/recently-posted-sort)
-                   ra-board-data-key (dis/board-data-key org-slug board-key dis/recent-activity-sort)]
-               (as-> tdb tdb*
-                (if (contains? (get-in tdb* (butlast rp-board-data-key)) (last rp-board-data-key))
-                  (update-in tdb* rp-board-data-key
-                   #(-> %
-                     (parse-board change-data active-users following-boards dis/recently-posted-sort)
-                     (dissoc :fixed-items)))
-                  tdb*)
-                (if (contains? (get-in tdb* (butlast ra-board-data-key)) (last ra-board-data-key))
-                  (update-in tdb* ra-board-data-key
-                   #(-> %
-                     (parse-board change-data active-users following-boards dis/recent-activity-sort)
-                     (dissoc :fixed-items)))
-                  tdb*))))
-    db
-    (keys (get-in db boards-key)))))
+        following-boards (dis/follow-boards-list org-slug db)
+        rp-board-data-key (dis/board-data-key org-slug board-slug dis/recently-posted-sort)
+        ra-board-data-key (dis/board-data-key org-slug board-slug dis/recent-activity-sort)]
+    (as-> db tdb
+      (if (contains? (get-in tdb (butlast rp-board-data-key)) (last rp-board-data-key))
+        (update-in tdb rp-board-data-key
+                    #(-> %
+                        (parse-board change-data active-users following-boards dis/recently-posted-sort)
+                        (dissoc :fixed-items)))
+        tdb)
+      (if (contains? (get-in tdb (butlast ra-board-data-key)) (last ra-board-data-key))
+        (update-in tdb ra-board-data-key
+                    #(-> %
+                        (parse-board change-data active-users following-boards dis/recent-activity-sort)
+                        (dissoc :fixed-items)))
+        tdb))))
+
+(defn update-boards [db org-data change-data active-users]
+  (let [boards-key (dis/boards-key (:slug org-data))]
+    (reduce
+     #(update-board %1 %2 org-data change-data active-users)
+     db
+     (keys (get-in db boards-key)))))
 
 (defn update-container
   [db container-slug org-data change-data active-users]

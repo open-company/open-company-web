@@ -3,13 +3,14 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
+            [oc.web.local-settings :as ls]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :as uu]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.pin :as pin-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
@@ -91,31 +92,24 @@
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s e]
-                        (hide-menu s (-> s :rum/args first :will-close))))
-                       {:did-mount (fn [s]
-                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
-                       s)
-                       :will-update (fn [s]
-                        (let [next-force-show-menu (-> s :rum/args first :force-show-menu)]
-                          (when (not= @(::last-force-show-menu s) next-force-show-menu)
-                            (reset! (::last-force-show-menu s) next-force-show-menu)
-                            (when next-force-show-menu
-                             ;; avoid automatic dismiss of the menu on iOS
-                             (reset! (::can-unmount s) false)
-                             (utils/after 1000 #(reset! (::can-unmount s) true)))))
-                        s)
-                       :did-update (fn [s]
-                        (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
-                          #(doto (js/$ %2)
-                             (.tooltip "fixTitle")
-                             (.tooltip "hide")))
-                       s)}
+                                                             (hide-menu s (-> s :rum/args first :will-close))))
+                       ui-mixins/strict-refresh-tooltips-mixin
+                       {:will-update (fn [s]
+                                       (let [next-force-show-menu (-> s :rum/args first :force-show-menu)]
+                                         (when (not= @(::last-force-show-menu s) next-force-show-menu)
+                                           (reset! (::last-force-show-menu s) next-force-show-menu)
+                                           (when next-force-show-menu
+                                           ;; avoid automatic dismiss of the menu on iOS
+                                           (reset! (::can-unmount s) false)
+                                           (utils/after 1000 #(reset! (::can-unmount s) true)))))
+                        s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
              can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
-             mark-unread-cb current-user-data hide-bookmark? hide-share?]}]
+             mark-unread-cb current-user-data hide-bookmark? hide-share?
+             show-home-pin show-board-pin ]}]
   (let [{current-org-slug :org
          current-board-slug :board
          current-contributions-id :contributions
@@ -144,7 +138,34 @@
         showing-menu? (currently-shown? s)
         can-move-item? (and show-move?
                             edit-link
-                            (> (count editable-boards) 1))]
+                            (> (count editable-boards) 1))
+        private-board? (= (:board-access entity-data) "private")
+        ;; Pins
+        home-pin-link (utils/link-for (:links entity-data) "home-pin")
+        can-home-pin? (and home-pin-link
+                          (not private-board?)
+                          show-home-pin)
+        home-pinned? (when can-home-pin?
+                       (get-in entity-data [:pins (keyword ls/seen-home-container-id)]))
+        board-pin-link (utils/link-for (:links entity-data) "board-pin")
+        can-board-pin? (and board-pin-link
+                            show-board-pin)
+        board-pinned? (when can-board-pin?
+                        (get-in entity-data [:pins (keyword (:board-uuid entity-data))]))
+        show-both-pins (and show-home-pin show-board-pin)
+        home-pin-title (if home-pinned?
+                         (if show-both-pins
+                           "Unpin from Home"
+                           "Unpin")
+                         (if show-both-pins
+                           "Pin to Home"
+                           "Pin"))
+        board-pin-title (if board-pinned?
+                          (if show-both-pins
+                            (str "Unpin from #" (:board-name entity-data))
+                            "Unpin")
+                          (str "Pin to #" (:board-name entity-data)))
+        pins? (or show-home-pin show-board-pin)]
     (when (or edit-link
               share-link
               inbox-unread-link
@@ -155,7 +176,8 @@
               add-bookmark-link
               remove-bookmark-link
               follow-link
-              unfollow-link)
+              unfollow-link
+              pins?)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded showing-menu?
@@ -194,7 +216,8 @@
                                       :has-add-bookmark (and remove-bookmark-link
                                                              (or is-mobile?
                                                                  (not external-bookmark)))
-                                      :has-mark-unread inbox-unread-link})}
+                                      :has-mark-unread inbox-unread-link
+                                      :has-pins pins?})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
@@ -222,8 +245,9 @@
                                             share-link))
                                   (not (or is-mobile?
                                             (not external-follow)))
-                                   (not (or is-mobile?
-                                            (not external-bookmark))))
+                                  (not (or is-mobile?
+                                          (not external-bookmark)))
+                                  (not pins?))
                           "bottom-rounded bottom-margin")
                 :on-click #(do
                              (reset! (::showing-menu s) false)
@@ -236,7 +260,8 @@
                                    (not (or is-mobile?
                                             (not external-follow)))
                                    (not (or is-mobile?
-                                            (not external-bookmark))))
+                                            (not external-bookmark)))
+                                   (not pins?))
                           "bottom-rounded bottom-margin")
                  :on-click #(do
                               (hide-menu s will-close)
@@ -248,7 +273,8 @@
                 {:class (when (and (not (or is-mobile?
                                             (not external-follow)))
                                    (not (or is-mobile?
-                                            (not external-bookmark))))
+                                            (not external-bookmark)))
+                                   (not pins?))
                           "bottom-rounded bottom-margin")
                  :on-click #(do
                               (hide-menu s will-close)
@@ -260,7 +286,7 @@
                       (not external-follow))
               (if follow-link
                 [:li.follow
-                  {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
+                  {:class (when-not pins? "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (hide-menu s will-close)
                                 (activity-actions/entry-follow (:uuid entity-data)))}
@@ -276,19 +302,52 @@
                       (not external-bookmark))
               (if remove-bookmark-link
                 [:li.remove-bookmark.bottom-rounded.bottom-margin
-                  {:ref "more-menu-remove-bookmark-bt"
+                  {:class (when-not pins? "bottom-rounded bottom-margin")
+                   :ref "more-menu-remove-bookmark-bt"
                    :on-click #(do
                                 (hide-menu s will-close)
                                 (activity-actions/remove-bookmark entity-data remove-bookmark-link))}
                   "Remove bookmark"]
                 (when add-bookmark-link
-                  [:li.add-bookmark.bottom-rounded.bottom-margin
-                    {:ref "more-menu-add-bookmark-bt"
+                  [:li.add-bookmark
+                    {:class (when-not pins? "bottom-rounded bottom-margin")
+                     :ref "more-menu-add-bookmark-bt"
                      :data-container "body"
                      :on-click #(do
                                   (hide-menu s will-close)
                                   (activity-actions/add-bookmark entity-data add-bookmark-link))}
                     "Bookmark"])))
+            (when show-home-pin
+              [:li.toggle-pin.home-pin
+               {:class (utils/class-set {:bottom-rounded (not can-board-pin?)
+                                         :bottom-margin (not can-board-pin?)
+                                         :pinned home-pinned?
+                                         :disabled (not can-home-pin?)})
+                :ref "more-menu-home-pin-bt"
+                :on-click #(do
+                             (hide-menu s will-close)
+                             (when can-home-pin?
+                               (pin-actions/toggle-home-pin! entity-data home-pin-link)))
+                :title (when-not can-home-pin?
+                         (if private-board?
+                           "Private posts can’t be pinned to the Home feed"
+                           "Can't pin this post to Home"))
+                :data-toggle (when-not is-mobile? "tooltip"
+                :data-placement "top"
+                :data-container "body")}
+               home-pin-title])
+            (when show-board-pin
+              [:li.toggle-pin.board-pin
+               {:class (utils/class-set {:bottom-rounded true
+                                         :bottom-margin true
+                                         :pinned board-pinned?
+                                         :disabled (not can-board-pin?)})
+                :ref "more-menu-board-pin-bt"
+                :on-click #(do
+                             (hide-menu s will-close)
+                             (when can-board-pin?
+                               (pin-actions/toggle-board-pin! entity-data board-pin-link)))}
+               board-pin-title])
             (when can-react?
               [:li.react.top-rounded
                 {:on-click #(do

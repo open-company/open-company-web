@@ -118,3 +118,6 @@
 (def default-brand-color
   {:light default-color
    :dark default-color})
+
+;; Pins sort pivot
+(def pins-sort-pivot-days (.parseInt js/window (or (env :pins-sort-pivot-days) (* 365 100)) 10))

@@ -6,6 +6,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             ["moment-timezone" :as moment-timezone]))
 
 (defonce default-avatar-url (uu/random-avatar))
@@ -26,12 +28,6 @@
   (get-in @dispatcher/app-state [dispatcher/show-login-overlay-key]))
 
 ;; Auth Settings
-(defn auth-settings? []
-  (contains? @dispatcher/app-state (first dispatcher/auth-settings-key)))
-
-(defn auth-settings-status? []
-  (and (auth-settings?)
-       (contains? (dispatcher/auth-settings) :status)))
 
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
@@ -67,6 +63,35 @@
                       (assoc :self? (= (:user-id u) (j/user-id)))))
           users-list)))
 
+(defn- pin-tooltip [db]
+  {:title "New! Pin key communications"
+   :description "Keep important posts at the top of the feed for everyone to see."
+   :back-title nil
+   :scroll :top
+   :arrow-position :right-top
+   :position :left
+   :key :pin-tooltip
+   :next-title "OK"
+   :show-el-cb #(let [following-data (dispatcher/following-data)
+                      menu-uuid (-> following-data :posts-list first :uuid)]
+                  (when menu-uuid
+                    (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
+   :next-cb #(do
+               (user-actions/untag! :pin-tooltip)
+               (user-actions/tag! :pin-tooltip-done)
+               (dispatcher/dispatch! [:input [:ui-tooltip] nil]))
+   :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :li.toggle-pin]})
+
+(defn check-user-tags [db]
+  (let [cur-user-data (dispatcher/current-user-data db)
+        show-pin-tooltip? (and (not (responsive/is-mobile-size?))
+                               ((:tags cur-user-data) :pin-tooltip)
+                               (not (:ui-tooltip db))
+                               (not (:nux db)))]
+    (if show-pin-tooltip?
+      (assoc db :ui-tooltip (pin-tooltip db))
+      db)))
+
 (defn parse-user-data [user-data org-data active-users]
   (let [active-user-data (get active-users (:user-id user-data))
         fixed-digest-delivery (map #(update % :digest-times (partial mapv keyword))
@@ -80,7 +105,8 @@
       (assoc u :name (user-lib/name-for user-data))
       (assoc u :short-name (user-lib/short-name-for user-data))
       (update u :pointed-name #(or % (pointed-name u)))
-      (assoc u :digest-delivery fixed-digest-delivery))))
+      (assoc u :digest-delivery fixed-digest-delivery)
+      (update u :tags #(set (map keyword %))))))
 
 (def ^:private empty-user*
  {:first-name ""
@@ -125,7 +151,8 @@
      (assoc :current-user-data fixed-user-data)
      (update :edit-user-profile #(editable-user-data (if force-edit-reset? nil %) fixed-user-data))
      (assoc :edit-user-profile-avatar (:avatar-url fixed-user-data))
-     (dissoc :edit-user-profile-failed)))))
+     (dissoc :edit-user-profile-failed)
+     (check-user-tags)))))
 
 (defmethod dispatcher/action :user-profile-avatar-update/failed
   [db [_]]
@@ -260,9 +287,6 @@
 (defmethod dispatcher/action :logout
   [db _]
   (dissoc db :jwt :latest-entry-point :latest-auth-settings))
-
-(defn orgs? []
-  (contains? @dispatcher/app-state dispatcher/orgs-key))
 
 ;; API entry point
 (defmethod dispatcher/action :entry-point
@@ -495,3 +519,12 @@
   [db [_ org-slug {:keys [last-added-uuid resource-type]}]]
   (let [follow-list-last-added-key (conj (dispatcher/follow-list-last-added-key org-slug) resource-type)]
     (assoc-in db follow-list-last-added-key last-added-uuid)))
+
+(defmethod dispatcher/action :user/tag!
+  [db [_ tag]]
+  (update-in db (conj dispatcher/current-user-key :tags)
+             #(conj (or % #{}) tag)))
+
+(defmethod dispatcher/action :user/untag!
+  [db [_ tag]]
+  (update-in db (conj dispatcher/current-user-key :tags) #(disj (or % #{}) tag)))

@@ -124,6 +124,8 @@
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         mobile-more-menu? (and is-mobile?
                                mobile-more-menu-el)
+        is-home? (-> container-slug keyword (= :following))
+        is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
         more-menu-comp #(more-menu
                           {:entity-data activity-data
                            :share-container-id dom-element-id
@@ -131,6 +133,8 @@
                            :external-share (not is-mobile?)
                            :external-bookmark (not is-mobile?)
                            :external-follow (not is-mobile?)
+                           :show-home-pin is-home?
+                           :show-board-pin is-entry-board?
                            :show-edit? true
                            :show-delete? true
                            :show-move? (not is-mobile?)
@@ -140,7 +144,6 @@
                            :mobile-tray-menu mobile-more-menu?
                            :current-user-data current-user-data})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
-        is-home? (-> container-slug keyword (= :following))
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
@@ -152,6 +155,7 @@
                                 :unseen-item (:unseen activity-data)
                                 :expandable is-published?
                                 :muted-item (utils/link-for (:links activity-data) "follow")
+                                :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-last-activity-at (::last-activity-at activity-data)
@@ -222,7 +226,8 @@
           (when show-new-item-tag
             [:div.new-item-tag])
           [:div.bookmark-tag-small.mobile-only]
-          [:div.bookmark-tag.big-web-tablet-only]]
+          [:div.bookmark-tag.big-web-tablet-only]
+          [:div.pinned-tag]]
         (when is-published?
           (if is-mobile?
             (when mobile-more-menu?

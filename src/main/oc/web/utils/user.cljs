@@ -2,6 +2,7 @@
   (:require [defun.core :refer (defun)]
             [cuerdas.core :as string]
             [oc.lib.oauth :as oauth]
+            [oc.lib.user :as user-lib]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.utils :as utils]))
 
@@ -177,3 +178,8 @@
 (defn load-follow-data []
   (load-follow-list)
   (load-followers-count))
+
+(defn author-for-user [user-data]
+  {:name (user-lib/name-for user-data)
+   :avatar-url (:avatar-url user-data)
+   :user-id (:user-id user-data)})

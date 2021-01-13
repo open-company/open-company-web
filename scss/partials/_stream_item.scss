@@ -144,6 +144,10 @@ div.stream-item {
     display: inline-block;
   }
 
+  &.pinned-item div.pinned-tag {
+    display: flex;
+  }
+
   div.activity-share-container {
     display: none;
 
@@ -289,6 +293,10 @@ div.stream-item {
         flex: 0 0 auto;
       }
 
+      div.pin-tag {
+        flex: 0 0 auto;
+      }
+
       div.bookmark-tag-small {
         margin-right: 0;
         flex: 0 0 auto;
@@ -343,7 +351,9 @@ div.stream-item {
 
   @include new-item-tag();
 
-  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
+  @include pinned-tag();
+
+  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag {
     display: none;
     margin-right: 0;
     margin-left: 8px;

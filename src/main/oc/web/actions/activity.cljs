@@ -9,6 +9,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
             [oc.web.actions.section :as sa]
@@ -1035,7 +1036,6 @@
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
-            container-id (:container-id change-data)
             entry-uuid (:item-id change-data)
             container-id (:container-id change-data)
             change-type (:change-type change-data)
@@ -1048,7 +1048,7 @@
                               (fn [{:keys [success]}]
                                 (when success
                                   (dis/dispatch! [:mark-unread (dis/current-org-slug) {:uuid entry-uuid
-                                                                                          :board-uuid container-id}]))))
+                                                                                       :board-uuid container-id}]))))
             current-board-slug (dis/current-board-slug)]
         (if-not (au/is-published? item-status)
           ;; Refresh the count of drafts and bookmarks
@@ -1065,24 +1065,28 @@
               ;; Refresh following items
               (following-did-change)
               ;; Refresh specific containers/sections
-              (cond
-                (= current-board-slug "inbox")
-                (inbox-get org-data dispatch-unread)
-                (= current-board-slug "all-posts")
-                (all-posts-get org-data dispatch-unread)
-                (= current-board-slug "bookmarks")
-                (bookmarks-get org-data dispatch-unread)
-                ;; (= current-board-slug "following")
-                ;; (following-get org-data dispatch-unread)
-                (= current-board-slug "unfollowing")
-                (unfollowing-get org-data dispatch-unread)
-                ;; If it's not one of the previous containers then load
-                ;; a real board if needed
-                (and (not (dis/is-container? current-board-slug))
-                     (not (dis/current-contributions-id)))
-                (sa/section-change container-id dispatch-unread)))
+              (cond (= current-board-slug "inbox")
+                    (inbox-get org-data dispatch-unread)
+                    (= current-board-slug "all-posts")
+                    (all-posts-get org-data dispatch-unread)
+                    (= current-board-slug "bookmarks")
+                    (bookmarks-get org-data dispatch-unread)
+                    ;; (= current-board-slug "following")
+                    ;; (following-get org-data dispatch-unread)
+                    (= current-board-slug "unfollowing")
+                    (unfollowing-get org-data dispatch-unread)
+                    ;; If it's not one of the previous containers then load
+                    ;; a real board if needed
+                    (and (not (dis/is-container? current-board-slug))
+                        (not (dis/current-contributions-id)))
+                    (sa/section-change container-id dispatch-unread)))
             (when (= change-type :delete)
               (dis/dispatch! [:activity-delete (dis/current-org-slug) {:uuid entry-uuid}]))
+            (when (and (= change-type :pin-toggle)
+                       (:pin-container-uuid change-data))
+              (if (= (:pin-container-uuid change-data) ls/seen-home-container-id)
+                (following-get org-data)
+                (sa/board-get-by-uuid (:pin-container-uuid change-data))))
             ;; Refresh the entry in case of an item update
             (when (= change-type :update)
               (entry-change (:slug org-data) entry-uuid)))))))

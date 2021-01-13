@@ -27,11 +27,13 @@
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
             [oc.web.stores.contributions]
+            [oc.web.stores.pin]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.actions.team]
+            [oc.web.actions.pin]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]

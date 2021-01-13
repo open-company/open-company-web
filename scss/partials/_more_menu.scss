@@ -288,6 +288,45 @@ div.more-menu {
     }
   }
 
+  button.more-menu-toggle-pin-bt {
+    height: 32px;
+    width: 32px;
+    @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 14px 14px, var(--color));
+    padding: 0;
+    opacity: 0.5;
+    display: inline-block;
+    transition: transform 180ms ease-in, margin-top 180ms ease-in;
+
+    @include big_web() {
+      &:hover {
+        transform: rotate(-45deg);
+      }
+    }
+
+    &.pinned {
+      transform: rotate(-45deg);
+
+      @include big_web() {
+        &:hover {
+          transform: rotate(0deg);
+        }
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+      opacity: 1;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
   ul.more-menu-list {
     position: absolute;
     top: 26px;
@@ -302,6 +341,16 @@ div.more-menu {
     margin: 0;
     padding: 8px 0;
     list-style-type: none;
+
+    &.has-mark-unread {
+      width: 134px;
+
+      @include mobile() {
+        left: unset;
+        right: 0;
+        width: 134px;
+      }
+    }
 
     &.has-add-bookmark {
       width: 144px;
@@ -323,14 +372,15 @@ div.more-menu {
       }
     }
 
-    &.has-mark-unread {
-      width: 134px;
+    &.has-pins {
+      width: 164px;
+      left: -20px !important;
 
       @include mobile() {
-        left: unset;
+        left: unset !important;
         right: 0;
-        width: 134px;
-      } 
+        width: 164px;
+      }
     }
 
     @include mobile() {
@@ -347,6 +397,10 @@ div.more-menu {
       padding: 8px 16px;
       background-color: var(--overlay-background-color);
       position: relative;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       &:first-child {
         margin-top: 0px;
@@ -648,6 +702,32 @@ div.more-menu {
               @include dark_mode() {
                 background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
               }
+            }
+          }
+
+          &.toggle-pin {
+            padding-left: 56px;
+
+            &.disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+
+            &:before {
+              transition: transform 180ms ease-in, margin-top 180ms ease-in;
+              content: "";
+              width: 18px;
+              height: 18px;
+              margin-top: 0px;
+              @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 18px 18px, var(--color));
+              position: absolute;
+              top: 15px;
+              left: 15px;
+            }
+
+            &.pinned:before {
+              transform: rotate(-45deg);
+              margin-top: 2px;
             }
           }
 

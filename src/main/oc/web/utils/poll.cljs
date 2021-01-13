@@ -2,9 +2,8 @@
   (:require [defun.core :refer (defun)]
             [oops.core :refer (oget oset!)]
             [dommy.core :as dommy :refer-macros (sel1)]
-            [oc.lib.user :as user-lib]
+            [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dis]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.sentry :as sentry]))
 
@@ -23,15 +22,10 @@
 (defn new-reply-id []
   (utils/activity-uuid))
 
-(defn- author-for-user [user-data]
-  {:name (user-lib/name-for user-data)
-   :avatar-url (:avatar-url user-data)
-   :user-id (:user-id user-data)})
-
 (defn poll-reply [user-data body & [ts]]
   {:created-at (or ts (created-at))
    :body (or body "")
-   :author (author-for-user user-data)
+   :author (user-utils/author-for-user user-data)
    :reply-id (new-reply-id)
    :votes []})
 
@@ -48,7 +42,7 @@
    :can-add-reply false ;; To enable just use: (boolean ls/poll-can-add-reply)
    :created-at (created-at)
    :updated-at (created-at)
-   :author (author-for-user user-data)
+   :author (user-utils/author-for-user user-data)
    :replies (poll-default-replies user-data)})
 
 (defn clean-poll-reply [poll-reply-data]
