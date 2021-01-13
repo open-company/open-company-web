@@ -285,6 +285,13 @@
                   "Drafts"]
                 (when (pos? draft-count)
                   [:span.count draft-count])]]))
+        (when show-plus-button?
+          [:div.left-navigation-sidebar-top.top-border
+            [:button.mlb-reset.create-bt
+             {:on-click #(cmail-actions/cmail-fullscreen)
+              :disabled (not (:collapsed cmail-state))}
+             [:div.copy-text
+              (:new-entry-cta org-editing)]]])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.top-border.group
@@ -328,12 +335,6 @@
                   [:div.public])
                 (when (= (:access board) "private")
                   [:div.private])])])
-        (when show-plus-button?
-          [:button.mlb-reset.create-bt
-            {:on-click #(cmail-actions/cmail-fullscreen)
-             :disabled (not (:collapsed cmail-state))}
-            [:div.copy-text
-              (:new-entry-cta org-editing)]])
         (when show-invite-people?
           [:div.invite-people-box
             [:button.mlb-reset.invite-people-close
