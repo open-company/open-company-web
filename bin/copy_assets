@@ -1,27 +1,33 @@
 #!/bin/bash
-echo $(PWD)
-echo "$INIT_CWD"
-echo "Copy node_modules assets..."
+
+echo "Copy of node_modules assets..."
+
 mkdir $INIT_CWD/public/css/medium-editor
 mkdir $INIT_CWD/public/css/medium-editor/themes
 mkdir $INIT_CWD/public/css/medium-editor/extensions
 mkdir $INIT_CWD/public/css/emojione
 mkdir $INIT_CWD/public/css/emoji-mart
-echo "Copy medium-editor style..."
+
+echo "Copying medium-editor style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/medium-editor.css $INIT_CWD/public/css/medium-editor/medium-editor.css
 echo "Done!"
-echo "Copy medium-editor theme style..."
+
+echo "Copying medium-editor theme style..."
 cp $INIT_CWD/node_modules/medium-editor/dist/css/themes/default.css $INIT_CWD/public/css/medium-editor/themes/default.css
 echo "Done!"
-echo "Copy @open-company/medium-editor-extentions style..."
+
+echo "Copying @open-company/medium-editor-extentions style..."
 cp $INIT_CWD/node_modules/\@open-company/medium-editor-extentions/css/TCMention/style.css $INIT_CWD/public/css/medium-editor/extensions/mention-panel.min.css
 echo "Done!"
-echo "Copy @bago2k4/medium-editor-media-picker style..."
+
+echo "Copying @bago2k4/medium-editor-media-picker style..."
 cp $INIT_CWD/node_modules/\@bago2k4/medium-editor-media-picker/style.css $INIT_CWD/public/css/medium-editor/extensions/media-picker.css
 echo "Done!"
-echo "Copy emojone style..."
+
+echo "Copying emojone style..."
 cp $INIT_CWD/node_modules/emojione/extras/css/emojione.css $INIT_CWD/public/css/emojione/emojione.css
 echo "Done!"
-echo "Copy emoj-mart style..."
+
+echo "Copying emoj-mart style..."
 cp $INIT_CWD/node_modules/emoji-mart/css/emoji-mart.css $INIT_CWD/public/css/emoji-mart/emoji-mart.css
 echo "Done!"
