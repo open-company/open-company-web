@@ -144,7 +144,8 @@
         show-feed? (or (not is-contributions)
                        (not= (:role contributions-user-data) :viewer)
                        (pos? (count (:posts-list contributions-data))))
-        no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)]
+        no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
+        can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.mobile-more-menu]
@@ -270,7 +271,12 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])]
+                       :title "Visible to the world, including search engines"}])
+                  (when can-create-topic?
+                    [:button.mlb-reset.explore-view-block.create-topic-bt
+                     {:on-click #(nav-actions/show-section-add)}
+                     [:span.plus]
+                     [:span.new-topic "Create topic"]])]
                 [:div.board-name-right
                   (when should-show-settings-bt
                     [:div.board-settings-container

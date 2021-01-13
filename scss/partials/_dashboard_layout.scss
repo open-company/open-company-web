@@ -480,6 +480,35 @@ div.dashboard-layout {
               margin-left: -12px;
             }
           }
+
+          button.create-topic-bt {
+            display: inline-flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+            margin-left: 16px;
+            padding: 0;
+
+            span.plus {
+              width: 11px;
+              height: 11px;
+              background-size: 11px 11px;
+              background-repeat: no-repeat;
+              background-position: center;
+              @include svgBgColor("/img/ML/purple_plus.svg");
+              margin-left: auto;
+              margin-right: 4px;
+            }
+
+            span.new-topic {
+              @include OC_Body_Bold();
+              font-size: 14px;
+              line-height: 16px;
+              color: var(--primary-color);
+              margin-left: 4px;
+              margin-right: auto;
+            }
+          }
         }
 
         div.board-name-right {

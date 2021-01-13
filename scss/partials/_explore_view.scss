@@ -2,6 +2,7 @@ div.explore-view {
   width: #{$board_container_width}px;
   overflow-x: hidden;
   overflow-y: auto;
+  margin-top: 12px;
 
   @include mobile() {
     width: 100%;
@@ -33,44 +34,6 @@ div.explore-view {
         height: auto;
         margin: 4px 0;
         width: 100%;
-      }
-    }
-
-    button.create-topic-bt {
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      justify-content: center;
-
-      span.plus {
-        width: 11px;
-        height: 11px;
-        background-size: 11px 11px;
-        background-repeat: no-repeat;
-        background-position: center;
-        @include svgBgColor("/img/ML/purple_plus.svg");
-        margin-left: auto;
-        margin-right: 4px;
-      }
-
-      span.new-topic {
-        @include OC_Body_Bold();
-        font-size: 18px;
-        line-height: 22px;
-        color: var(--primary-color);
-        margin-left: 4px;
-        margin-right: auto;
-
-        @include mobile() {
-          font-size: 14px;
-        }
-      }
-
-      @include mobile() {
-        width: 100%;
-        padding: 16px;
-        min-height: initial;
-        height: auto;
       }
     }
 
