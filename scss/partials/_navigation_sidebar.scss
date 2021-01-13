@@ -457,6 +457,12 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-top {
     flex: 0 0 auto;
 
+    @include mobile() {
+      &.create-bt-container {
+        display: none;
+      }
+    }
+
     &.top-border {
       margin-top: 16px;
       border-top: 1px solid var(--opac-background-color-08);

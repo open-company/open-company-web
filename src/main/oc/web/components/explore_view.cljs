@@ -30,9 +30,11 @@
         with-follow (map #(assoc % :follow (utils/in? follow-boards-list (:uuid %))) (:boards org-data))
         sorted-items (filter-sort-items s with-follow)
         is-mobile? (responsive/is-mobile-size?)
+        can-create-topic? (utils/link-for (:links org-data) "create" "POST")
         premium-lock? (not (:premium? org-data))]
     [:div.explore-view
       [:div.explore-view-blocks
+        {:class (when can-create-topic? "has-create-topic-bt")}
         (for [item sorted-items
               :let [followers-count (get-in followers-boards-count [(:uuid item) :count])
                     premium-locked? (and premium-lock?
@@ -108,4 +110,9 @@
                {:on-click (fn [e]
                             (utils/event-stop e)
                             (nav-actions/show-section-editor (:slug item)))}
-               "Edit topic"])]])]]))
+               "Edit topic"])]])
+        (when can-create-topic?
+          [:button.mlb-reset.explore-view-block.create-topic-bt
+            {:on-click #(nav-actions/show-section-add)}
+            [:span.plus]
+            [:span.new-topic "New topic"]])]]))
