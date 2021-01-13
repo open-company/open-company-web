@@ -1322,19 +1322,17 @@ $header_top_margin: 24;
 
   max-height: #{$line_height * $preview_lines}px;
 
-  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2, & > img, & > iframe {
-    margin-top: 0!important;
-    margin-bottom: 0!important;
-    padding-top: 0!important;
-    padding-bottom: 0!important;
-    display: block!important;
-    @include OC_Body_Book();
-    line-height: #{$line_height}px;
-    color: $color;
-    font-size: #{$font_size}px;
-
-    &:empty {
-      display: none!important;
+  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2 {
+    &:not(:empty) {
+      margin-top: 0!important;
+      margin-bottom: 0!important;
+      padding-top: 0!important;
+      padding-bottom: 0!important;
+      display: block!important;
+      @include OC_Body_Book();
+      line-height: #{$line_height}px;
+      color: $color;
+      font-size: #{$font_size}px;
     }
   }
 
@@ -1360,6 +1358,10 @@ $header_top_margin: 24;
   }
 
   .carrot-no-preview {
+    display: none;
+  }
+
+  *:empty, * > *:only-child:empty {
     display: none;
   }
 
