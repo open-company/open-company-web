@@ -79,6 +79,7 @@
       (assoc u :auth-source (or (j/get-key :auth-source) default-invite-type))
       (assoc u :name (user-lib/name-for user-data))
       (assoc u :short-name (user-lib/short-name-for user-data))
+      (update u :pointed-name #(or % (pointed-name u)))
       (assoc u :digest-delivery fixed-digest-delivery))))
 
 (def ^:private empty-user*

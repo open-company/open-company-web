@@ -9,7 +9,7 @@
 (rum/defc post-authorship < rum/static
   [{{:keys [publisher author status board-name board-slug board-access board-uuid] :as activity-data} :activity-data
     user-avatar? :user-avatar? user-hover? :user-hover? board-hover? :board-hover? leave-delay? :leave-delay?
-    activity-board? :activity-board? current-user-id :current-user-id hide-last-name? :hide-last-name?}]
+    activity-board? :activity-board? current-user-id :current-user-id hide-last-name? :hide-last-name? short-name? :short-name?}]
   (let [published? (= status "published")
         author-data (cond
                       published?
@@ -24,7 +24,10 @@
     [:div.post-authorship
       [:div.user-hover-container
         (when user-hover?
-          (user-info-hover {:user-data author-data :current-user-id current-user-id :hide-last-name? hide-last-name? :leave-delay? leave-delay?}))
+          (user-info-hover {:user-data author-data
+                            :current-user-id current-user-id
+                            :hide-last-name? hide-last-name?
+                            :leave-delay? leave-delay?}))
         (when user-avatar?
           (user-avatar-image author-data))
         [:a.publisher-name
@@ -34,7 +37,14 @@
            :on-click #(when (:user-id author-data)
                         (utils/event-stop %)
                         (nav-actions/nav-to-author! % (:user-id author-data) (oc-urls/contributions (:user-id author-data))))}
-          (:name author-data)]]
+          (cond (and short-name?
+                     (seq (:pointed-name author-data)))
+                (:pointed-name author-data)
+                (and hide-last-name?
+                     (seq (:first-name author-data)))
+                (:first-name author-data)
+                :else
+                (:name author-data))]]
       (when show-board?
         [:span.in "in "])
       (when show-board?

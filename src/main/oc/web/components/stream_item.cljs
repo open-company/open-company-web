@@ -198,6 +198,7 @@
                             :user-avatar? true
                             :user-hover? true
                             :board-hover? true
+                            :short-name? is-mobile?
                             ; :show-board? foc-board
                             :activity-board? (and (not (:publisher-board activity-data))
                                                   (not= (:board-slug activity-data) current-board-slug)

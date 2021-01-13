@@ -36,7 +36,7 @@
                       :resource-uuid (:board-uuid activity-data)})]])
 
 (rum/defc user-info-view < rum/static
-  [{:keys [user-data user-id my-profile? hide-buttons otf above? inline? following followers-count hide-last-name?]}]
+  [{:keys [user-data user-id my-profile? hide-buttons otf above? inline? following followers-count hide-last-name? short-name?]}]
   (let [timezone-location-string (user-utils/timezone-location-string user-data)]
     [:div.user-info-view
       {:class (utils/class-set {:otf otf
@@ -46,10 +46,14 @@
         (user-avatar-image user-data {:preferred-avatar-size 96})
         [:div.user-info-right
           [:div.user-info-name
-            (if (and hide-last-name?
-                     (seq (:first-name user-data)))
-              (:first-name user-data)
-              (:name user-data))]
+            (cond (and hide-last-name?
+                       (seq (:first-name user-data)))
+                  (:first-name user-data)
+                  (and short-name?
+                       (seq (:pointed-name user-data)))
+                  (:pointed-name user-data)
+                  :else
+                  (:name user-data))]
           (when (seq (:title user-data))
             [:div.user-info-line
               (:title user-data)])
@@ -183,7 +187,7 @@
       (events/unlistenByKey @(::click s))
       (reset! (::click s) nil))
     s)}
-  [s {:keys [disabled user-data current-user-id leave-delay?]}]
+  [s {:keys [disabled user-data current-user-id leave-delay? hide-last-name? short-name?]}]
   ;; Return an empty DOM for mobile since we don't show the hover popup
   (if (responsive/is-mobile-size?)
     [:div.info-hover-view]
@@ -205,6 +209,8 @@
         (user-info-view {:user-data complete-user-data
                          :inline? (not active-user-data)
                          :hide-buttons (not active-user-data)
+                         :hide-last-name? hide-last-name?
+                         :short-name? short-name?
                          :my-profile? my-profile?
                          :following following?
                          :followers-count (:count followers-count)})])))

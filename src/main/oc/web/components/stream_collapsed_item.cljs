@@ -90,9 +90,6 @@
         dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
         dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
-        publisher (if is-published?
-                    (:publisher activity-data)
-                    (first (:author activity-data)))
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))
         follow-link (utils/link-for (:links activity-data) "follow")
