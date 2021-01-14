@@ -1,6 +1,7 @@
 (ns oc.web.stores.user
   (:require [oc.lib.user :as user-lib]
             [clojure.set :as clj-set]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
@@ -88,7 +89,8 @@
         show-pin-tooltip? (and (not (responsive/is-mobile-size?))
                                ((:tags cur-user-data) :pin-tooltip)
                                (not (:ui-tooltip db))
-                               (not (:nux db)))]
+                               (not (:nux db))
+                               (router/is-home?))]
     (if show-pin-tooltip?
       (assoc db :ui-tooltip (pin-tooltip db))
       db)))

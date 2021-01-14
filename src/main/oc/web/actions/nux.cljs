@@ -1,7 +1,5 @@
 (ns oc.web.actions.nux
-  (:require [oops.core :refer (oget)]
-            [oc.web.lib.jwt :as jwt]
-            [oc.web.urls :as oc-urls]
+  (:require [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -150,7 +148,7 @@
                  (not (contains? @dis/app-state :nux)))
              (not (responsive/is-mobile-size?))
              (dis/current-org-slug)
-             (= (oget js/window "location.pathname") (oc-urls/following)))
+             (router/is-home?))
     (let [nux-state (get-nux-cookie)]
       (if (= (:key nux-state) :done)
         (end-nux)

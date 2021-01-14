@@ -1,12 +1,10 @@
 (ns oc.web.router
-  (:require [secretary.core :as secretary]
-            [taoensso.timbre :as timbre]
-            [goog.history.Html5History :as history5]
+  (:require [taoensso.timbre :as timbre]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
             [oc.web.lib.sentry :as sentry]
             [oc.web.dispatcher :as dis]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.jwt :as jwt]
             [clojure.string :as cstr]
             [oops.core :refer (oget ocall oset!)]))
@@ -184,3 +182,6 @@
 (def login-redirect-cookie "login-redirect")
 
 (def expo-push-token-cookie "expo-push-token")
+
+(defn is-home? []
+  (= (oget js/window "location.pathname") (oc-urls/following)))
