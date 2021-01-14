@@ -77,9 +77,10 @@
                   (when menu-uuid
                     (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
    :next-cb #(do
+               (dispatcher/dispatch! [:input [:ui-tooltip] nil])
+               (dispatcher/dispatch! [:input [:foc-menu-open] nil])
                (user-actions/untag! :pin-tooltip)
-               (user-actions/tag! :pin-tooltip-done)
-               (dispatcher/dispatch! [:input [:ui-tooltip] nil]))
+               (user-actions/tag! :pin-tooltip-done))
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :li.toggle-pin]})
 
 (defn check-user-tags [db]
