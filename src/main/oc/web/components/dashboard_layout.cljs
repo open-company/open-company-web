@@ -272,7 +272,8 @@
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}])
-                  (when can-create-topic?
+                  (when (and is-topics
+                             can-create-topic?)
                     [:button.mlb-reset.explore-view-block.create-topic-bt
                      {:on-click #(nav-actions/show-section-add)}
                      [:span.plus]
