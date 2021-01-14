@@ -1,5 +1,6 @@
 (ns oc.web.router
-  (:require [taoensso.timbre :as timbre]
+  (:require [secretary.core :as secretary]
+            [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.history.EventType :as HistoryEventType]
             [oc.web.lib.sentry :as sentry]
@@ -7,7 +8,9 @@
             [oc.web.urls :as oc-urls]
             [oc.web.lib.jwt :as jwt]
             [clojure.string :as cstr]
-            [oops.core :refer (oget ocall oset!)]))
+            [oops.core :refer (oget ocall oset!)])
+  (:import [goog.history Html5History]
+           [goog.history.Html5History TokenTransformer]))
 
 (defonce ^:export history (atom nil))
 
@@ -33,9 +36,9 @@
   than adding to them.
   See: https://gist.github.com/pleasetrythisathome/d1d9b1d74705b6771c20"
   []
-  (let [transformer (goog.history.Html5History.TokenTransformer.)]
+  (let [transformer (TokenTransformer.)]
     (set! (.. transformer -retrieveToken)
-          (fn [path-prefix location]
+          (fn [_path-prefix location]
             (str (.-pathname location) (.-search location))))
     (set! (.. transformer -createUrl)
           (fn [token path-prefix location]
@@ -43,7 +46,7 @@
     transformer))
 
 (defn make-history []
-  (doto (goog.history.Html5History. js/window (build-transformer))
+  (doto (Html5History. js/window (build-transformer))
     (.setPathPrefix (oget js/window "location.origin"))
     (.setUseFragment false)))
 
