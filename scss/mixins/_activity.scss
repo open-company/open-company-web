@@ -263,16 +263,16 @@ $header_top_margin: 24;
     /*! autoprefixer: off */
     -webkit-box-orient: vertical;
     /* autoprefixer: on */
+    max-height: #{$line_height * $preview_lines}px;
   } @else {
     white-space: nowrap;
+    height: #{$line_height}px;
   }
 
   color: $color;
   @include OC_Body_Bold();
   line-height: #{$line_height}px;
   font-size: #{$font_size}px;
-
-  max-height: #{$line_height * $preview_lines}px;
 }
 
 @mixin poll($paragraph_spacing) {

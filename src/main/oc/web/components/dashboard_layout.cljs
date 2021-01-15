@@ -277,8 +277,8 @@
                     [:button.mlb-reset.explore-view-block.create-topic-bt
                      {:on-click #(nav-actions/show-section-add)}
                      [:span.plus]
-                     [:span.new-topic "Create topic"]])]
-                [:div.board-name-right
+                     [:span.new-topic "Add new topic"]])]
+                [:div.board-name-rightAdd
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button

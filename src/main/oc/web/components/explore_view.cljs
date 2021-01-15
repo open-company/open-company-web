@@ -115,4 +115,4 @@
           [:button.mlb-reset.explore-view-block.create-topic-bt
             {:on-click #(nav-actions/show-section-add)}
             [:span.plus]
-            [:span.new-topic "New topic"]])]]))
+            [:span.new-topic "Add new topic"]])]]))

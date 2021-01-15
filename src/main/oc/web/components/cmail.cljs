@@ -748,12 +748,14 @@
         ;        :data-placement "top"
         ;        :title "Fullscreen"}]])
         (when (and (:fullscreen cmail-state)
-                  (not is-mobile?))
+                   (not is-mobile?))
           [:div.distraction-free-container
             {:class (when (:uuid cmail-data) "has-delete-bt")
              :data-toggle "tooltip"
              :data-placement "top"
              :data-container "body"
-             :title "Distraction free"}
+             :title (if (:distraction-free? cmail-state)
+                      "Normal editing"
+                      "Distraction-free editing")}
             (carrot-switch {:selected (:distraction-free? cmail-state)
                             :did-change-cb #(cmail-actions/cmail-toggle-distraction-free)})])]]]))
