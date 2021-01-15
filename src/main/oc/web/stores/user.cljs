@@ -65,7 +65,7 @@
           users-list)))
 
 (defn- pin-tooltip [db]
-  {:title "New! Pin key communications"
+  {:title "New! Increase visibility with Pins."
    :description "Keep important posts at the top of the feed for everyone to see."
    :back-title nil
    :scroll :top
