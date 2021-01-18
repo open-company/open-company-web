@@ -5,6 +5,7 @@
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
+            [oc.web.utils.pin :as pi]
             [oc.web.urls :as oc-urls]
             [oc.lib.html :as html-lib]
             [oc.web.router :as router]
@@ -671,7 +672,9 @@
                                  (html-lib/first-body-thumbnail (:body entry-data) false)))
         (assoc :container-seen-at container-seen-at)
         (assoc :home-pinned (map? (get-in  entry-data [:pins (keyword ls/seen-home-container-id)])))
-        (assoc :board-pinned (map? (get-in  entry-data [:pins (keyword (:board-uuid entry-data))]))))))))
+        (assoc :board-pinned (map? (get-in  entry-data [:pins (keyword (:board-uuid entry-data))])))
+        (pi/can-home-pin? (jwt/user-id) org-data)
+        (pi/can-board-pin? (jwt/user-id) org-data board-data))))))
 
 (defn parse-org
   "Fix org data coming from the API."

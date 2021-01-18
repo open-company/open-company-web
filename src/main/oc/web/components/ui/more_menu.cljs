@@ -122,17 +122,6 @@
         add-bookmark-link (when-not hide-bookmark? (utils/link-for (:links entity-data) "bookmark" "POST"))
         remove-bookmark-link (when (and (not hide-bookmark?) (:bookmarked-at entity-data))
                                (utils/link-for (:links entity-data) "bookmark" "DELETE"))
-        should-show-more-bt (or (and show-edit?
-                                     edit-link)
-                                (and show-delete?
-                                     delete-link)
-                                can-comment-share?
-                                can-react?
-                                can-reply?
-                                (and (not external-share)
-                                     share-link)
-                                (and inbox-unread-link
-                                     show-unread))
         follow-link (utils/link-for (:links entity-data) "follow")
         unfollow-link (utils/link-for (:links entity-data) "unfollow")
         showing-menu? (currently-shown? s)
@@ -143,15 +132,14 @@
         ;; Pins
         home-pin-link (utils/link-for (:links entity-data) "home-pin")
         can-home-pin? (and home-pin-link
-                          (not private-board?)
-                          show-home-pin)
-        home-pinned? (when can-home-pin?
-                       (get-in entity-data [:pins (keyword ls/seen-home-container-id)]))
+                           (:can-home-pin? entity-data)
+                           show-home-pin)
+        home-pinned? (get-in entity-data [:pins (keyword ls/seen-home-container-id)])
         board-pin-link (utils/link-for (:links entity-data) "board-pin")
         can-board-pin? (and board-pin-link
+                            (:can-board-pin? entity-data)
                             show-board-pin)
-        board-pinned? (when can-board-pin?
-                        (get-in entity-data [:pins (keyword (:board-uuid entity-data))]))
+        board-pinned? (get-in entity-data [:pins (keyword (:board-uuid entity-data))])
         show-both-pins (and show-home-pin show-board-pin)
         home-pin-title (if home-pinned?
                          (if show-both-pins
@@ -165,7 +153,19 @@
                             (str "Unpin from #" (:board-name entity-data))
                             "Unpin")
                           (str "Pin to #" (:board-name entity-data)))
-        pins? (or show-home-pin show-board-pin)]
+        pins? (or can-home-pin? can-board-pin?)
+        should-show-more-bt (or (and show-edit?
+                                     edit-link)
+                                (and show-delete?
+                                     delete-link)
+                                can-comment-share?
+                                can-react?
+                                can-reply?
+                                (and (not external-share)
+                                     share-link)
+                                (and inbox-unread-link
+                                     show-unread)
+                                pins?)]
     (when (or edit-link
               share-link
               inbox-unread-link
@@ -317,26 +317,24 @@
                                   (hide-menu s will-close)
                                   (activity-actions/add-bookmark entity-data add-bookmark-link))}
                     "Bookmark"])))
-            (when show-home-pin
+            (when can-home-pin?
               [:li.toggle-pin.home-pin
                {:class (utils/class-set {:bottom-rounded (not can-board-pin?)
                                          :bottom-margin (not can-board-pin?)
                                          :pinned home-pinned?
-                                         :disabled (not can-home-pin?)})
+                                         :disabled private-board?})
                 :ref "more-menu-home-pin-bt"
                 :on-click #(do
                              (hide-menu s will-close)
-                             (when can-home-pin?
+                             (when-not private-board?
                                (pin-actions/toggle-home-pin! entity-data home-pin-link)))
-                :title (when-not can-home-pin?
-                         (if private-board?
-                           "Private posts can’t be pinned to the Home feed"
-                           "Can't pin this post to Home"))
+                :title (when private-board?
+                         "Private posts can’t be pinned to the Home feed")
                 :data-toggle (when-not is-mobile? "tooltip"
                 :data-placement "top"
                 :data-container "body")}
                home-pin-title])
-            (when show-board-pin
+            (when can-board-pin?
               [:li.toggle-pin.board-pin
                {:class (utils/class-set {:bottom-rounded true
                                          :bottom-margin true

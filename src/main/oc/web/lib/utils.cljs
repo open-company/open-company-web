@@ -4,14 +4,9 @@
             [goog.fx.dom :refer (Scroll)]
             [oops.core :refer (oget)]
             [oc.lib.cljs.useragent :as ua]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.utils.drafts :as du]
-            [oc.web.dispatcher :as dis]
-            [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.responsive :as responsive]
             [cuerdas.core :as s]
-            [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
             [cljs.reader :as reader]))
 
