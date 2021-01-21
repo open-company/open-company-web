@@ -252,6 +252,27 @@ div.fsp-picker {
       div.fsp-content {
         background-color: var(--overlay-background-color);
 
+        
+        div.fsp-cloud__container div.fsp-cloud__files-container {
+          div.fsp-cloud__breadcrumbs {
+            border-bottom: 1px solid var(--light-color);
+
+            span.fsp-breadcrumb__label {
+              color: var(--color);
+            }
+          }
+          div.fsp-grid {
+            div.fsp-grid__cell {
+              background-color: var(--overlay-background-color);
+              box-shadow: 0 1px 1px 0 var(--light-color);
+
+              span.fsp-grid__text {
+                color: var(--color);
+              }
+            }
+          }
+        }
+
         div.fsp-cloud {
           div.fsp-source-auth__wrapper {
             div.fsp-text__title.fsp-source-auth__el {
