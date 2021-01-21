@@ -27,7 +27,7 @@
                        :maxSize ls/file-upload-size ; Limit the uploaded file to be at most 20MB
                        :storeTo store-to
                        :transformations {
-                         :crop {:circle true}
+                         :circle true
                          :rotate true
                        }
                        :fromSources from-sources
@@ -52,26 +52,29 @@
                        ;; Close cb
                        :onClose (fn []
                           (when (fn? close-cb)
-                            (close-cb)))}
-        config        (merge base-config config)
+                            (close-cb)))
+                       ;; Upload finished
+                       :onUploadDone (fn [res]
+                                       (let [files-uploaded (gobj/get res "filesUploaded")]
+                                         (when (= (count files-uploaded) 1)
+                                           (success-cb (get files-uploaded 0)))))}
+        config        (merge base-config (dissoc config :accept))
         fs (init-filestack)]
-    (.then
-      (.pick fs
-        (clj->js config))
-      (fn [res]
-        (let [files-uploaded (gobj/get res "filesUploaded")]
-          (when (= (count files-uploaded)1)
-            (success-cb (get files-uploaded 0))))))))
+    (.open (.picker fs (clj->js config)))))
 
 (defn upload-file! [file success-cb & [error-cb progress-cb]]
   (try
-    (let [fs-client (init-filestack)]
-      (.then
-        (.upload fs-client file #js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent ^js %)))})
-        (fn [res]
-          (let [url (gobj/get res "url")]
-            (when (fn? success-cb)
-              (success-cb url))))))
+    (let [fs-client (init-filestack)
+          upload-opts (clj->js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent ^js %)))})]
+      (.catch (.then (.upload fs-client file upload-opts)
+                     (fn [res]
+                       (let [url (gobj/get res "url")]
+                         (when (fn? success-cb)
+                           (success-cb url)))))
+              (fn [e]
+                (sentry/capture-error! e)
+                (when (fn? error-cb)
+                  (error-cb e)))))
     (catch :default e
       (sentry/capture-error! e)
       (when (fn? error-cb)
