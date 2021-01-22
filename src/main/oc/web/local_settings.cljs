@@ -10,7 +10,6 @@
 
 ;; Sentry
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
-(def local-whitelist-array (remove nil? ["localhost" "127.0.0.1" (env :web-hostname)]))
 (def sentry-env "local")
 (def sentry-release "")
 (def sentry-release-deploy "")
