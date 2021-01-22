@@ -27,7 +27,8 @@
    (filter-sort-boards (vals boards)))
   ([boards :guard sequential?]
    (->> boards
-        (filter #(not= (:slug %) utils/default-drafts-board-slug))
+        (filter #(and (not (:draft %))
+                      (not= (:slug %) utils/default-drafts-board-slug)))
         (sort-by :name)
         vec)))
 

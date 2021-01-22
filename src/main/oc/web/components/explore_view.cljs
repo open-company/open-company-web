@@ -10,7 +10,8 @@
             [oc.web.components.ui.follow-button :refer (follow-button)]))
 
 (defn- filter-item [s item]
-  (not= (:slug item) utils/default-drafts-board-slug))
+  (and (not= (:slug item) utils/default-drafts-board-slug)
+       (not (:draft item))))
 
 (defn- filter-sort-items [s items]
   (->> items
