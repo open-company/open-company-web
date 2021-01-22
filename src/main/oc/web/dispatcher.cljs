@@ -305,7 +305,6 @@
 
 ;; Payments UI banner keys
 
-(def payments-ui-prompt-banner-key :payments-ui-prompt-banner)
 (def payments-ui-upgraded-banner-key :payments-ui-upgraded-banner)
 
 ;; Boards helpers
@@ -691,7 +690,6 @@
                                :follow-publishers-list follow-publishers-list
                                :follow-boards-list follow-boards-list
                                :show-premium-picker? (:show-premium-picker? base)
-                               payments-ui-prompt-banner-key (get base payments-ui-prompt-banner-key)
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
                                :nux nux
                                :ui-tooltip (:ui-tooltip base)})]

@@ -32,7 +32,7 @@
             [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
             [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.premium-picker-modal :refer (premium-picker-modal prompt-upgrade-banner upgraded-banner)]
+            [oc.web.components.premium-picker-modal :refer (premium-picker-modal upgraded-banner)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
@@ -86,7 +86,6 @@
                 active-users
                 search-active
                 show-premium-picker?
-                payments-ui-prompt-banner
                 payments-ui-upgraded-banner
                 nux
                 ui-tooltip]} (drv/react s :org-dashboard-data)
@@ -183,9 +182,8 @@
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity current-activity-id
-                                  :top-banner (or payments-ui-upgraded-banner payments-ui-prompt-banner)
+                                  :top-banner payments-ui-upgraded-banner
                                   :showing-upgraded-banner payments-ui-upgraded-banner
-                                  :showing-prompt-banner (and (not payments-ui-upgraded-banner) payments-ui-prompt-banner)
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -262,10 +260,8 @@
           ;; Mobile fullscreen search
           mobile-search?
           (search-box))
-        (if payments-ui-upgraded-banner
-          (upgraded-banner)
-          (when payments-ui-prompt-banner
-            (prompt-upgrade-banner)))
+        (when payments-ui-upgraded-banner
+          (upgraded-banner))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

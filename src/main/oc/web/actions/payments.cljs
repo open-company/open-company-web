@@ -1,16 +1,12 @@
 (ns oc.web.actions.payments
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.utils.activity :as activity-utils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
-            [oc.lib.time :as lib-time]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.utils.stripe :as stripe-client]
@@ -43,70 +39,11 @@
 
 ;; Banner handlers
 
-(def prompt-after-days 14)
-
-(defn- old-user? [user-created-at]
-  (let [created-at (lib-time/millis (lib-time/from-iso user-created-at))
-        now-millis (lib-time/now-ts)
-        limit-ts (* 1000 60 60 24 prompt-after-days)]
-    (>= (- now-millis created-at)
-        limit-ts)))
-
-(defn- did-post? []
-  (seq (activity-utils/last-used-section)))
-
-(def ^:private dismiss-cookie-value "dismissed")
-(def ^:private dismiss-cookie-expire (* 60 60 24 365 10))
-
-(defn- banner-dismissed? [team-id]
-  (let [cookie-name (router/payments-prompt-upgrade-cookie team-id)]
-    (= (cook/get-cookie cookie-name) dismiss-cookie-value)))
-
-(defn- dismiss-prompt-banner [team-id]
-  (cook/set-cookie! (router/payments-prompt-upgrade-cookie team-id)
-                    dismiss-cookie-value dismiss-cookie-expire))
-
-(defn should-show-prompt-banner?
-  "Decide if the prompt banner needs to be shown.
-   Show if:
-   - is NOT mobile: not enough space on mobile
-   - is an admin: non-admins can't start premium subs
-   - is NOT on premium already
-   - has NOT been shown and dismissed before
-   - user is older than 14 days or user published at least one post"
-  [{team-id :team-id premium-team? :premium} {user-created-at :created-at :as _current-user-data}]
-  (let [old-enough-user? (old-user? user-created-at)
-        user-did-post? (did-post?)]
-    (and (not (responsive/is-mobile-size?))
-          (jwt/is-admin? team-id)
-          (not premium-team?)
-          (not (banner-dismissed? team-id))
-          (or old-enough-user?
-              user-did-post?))))
-
-(defn show-prompt-upgrade-banner []
-  (dis/dispatch! [:input [dis/payments-ui-prompt-banner-key] true]))
-
-(defn hide-prompt-upgrade-banner
-  ([] (hide-prompt-upgrade-banner false))
-  ([skip-persistence?]
-   (when-not skip-persistence?
-     (dismiss-prompt-banner (:team-id (dis/org-data))))
-   (dis/dispatch! [:input [dis/payments-ui-prompt-banner-key] false])))
-
 (defn show-upgraded-banner []
   (dis/dispatch! [:input [dis/payments-ui-upgraded-banner-key] true]))
 
 (defn hide-upgraded-banner []
   (dis/dispatch! [:input [dis/payments-ui-upgraded-banner-key] false]))
-
-(defn maybe-show-prompt-banner []
-  (when-let* [org-data (dis/org-data)
-              team-data (dis/team-data)
-              current-user-data (dis/current-user-data)]
-    (if (should-show-prompt-banner? team-data current-user-data)
-      (show-prompt-upgrade-banner)
-      (hide-prompt-upgrade-banner true))))
 
 ;; Subscriptions data retrieve
 
@@ -255,7 +192,6 @@
   ;; and show the upgraded one in case they activate
   ;; or re-activate the premium plan
   (when (#{:sub-upgrade-success :sub-renew-success} id)
-    (hide-prompt-upgrade-banner)
     (show-upgraded-banner))
   (notif-actions/show-notification {:title msg
                                     :dismiss true

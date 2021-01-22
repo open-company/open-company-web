@@ -151,23 +151,6 @@
       [:div.quote-link
       "Hopper.com"]]]])
 
-(rum/defc prompt-upgrade-banner < rum/static
-  []
-  [:div.payments-top-banner.prompt-upgrade-banner
-   {:on-click #(do
-                 (payments-actions/hide-prompt-upgrade-banner)
-                 (nav-actions/toggle-premium-picker!))}
-   [:span.message.has-link
-    payments-actions/prompt-upgrade-message]
-   [:span.dash
-    " - "]
-   [:span.learn-more
-    "Learn more"]
-   [:button.mlb-reset.close-bt
-    {:on-click #(do
-                  (utils/event-stop %)
-                  (payments-actions/hide-prompt-upgrade-banner))}]])
-
 (rum/defc upgraded-banner < rum/static
   []
   [:div.payments-top-banner.upgraded-banner
