@@ -7,8 +7,7 @@
             [taoensso.timbre :as timbre]))
 
 (defn init-parameters [dsn]
-  {:whitelistUrls ls/local-whitelist-array
-   :tags {:isMobile (responsive/is-mobile-size?)
+  {:tags {:isMobile (responsive/is-mobile-size?)
           :hasJWT (not (not (jwt/jwt)))
           :deployKey ls/deploy-key}
    :sourceRoot ls/web-server
