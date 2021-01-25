@@ -111,7 +111,7 @@
       nil)))
 
 (defn- get-user-role []
-  (some-> (dis/current-user-data) :role keyword))
+  (or (some-> (dis/current-user-data) :role keyword) :viewer))
 
 (defn get-nux-cookie
   "Read the cookie from the document only if the nux-cookie-value atom is nil.
@@ -158,24 +158,20 @@
   ([] (calc-next-step (get-user-role) {}))
   ([user-type] (calc-next-step user-type {}))
   ([user-type {:keys [key]}]
-   (if (= user-type :viewer)
-     :done
-     (case key
-       :intro    (if (= user-type :viewer)
-                   :feed
-                   :news)
-       :news     :feed
-       :feed     :settings
-       :settings (if (or (= user-type :viewer)
-                         (not (get @dis/app-state dis/show-invite-box-key)))
-                   :ready
-                   :invite)
-       :invite   :ready
-       :ready    :done
-       nil       (if (= user-type :viewer)
-                   :done ;; Let's turn off NUX for viewers
-                   :intro)
-       key))))
+   (case key
+     :intro    (if (= user-type :viewer)
+                 :feed
+                 :news)
+     :news     :feed
+     :feed     :settings
+     :settings (if (or (= user-type :viewer)
+                       (not (get @dis/app-state dis/show-invite-box-key)))
+                 :ready
+                 :invite)
+     :invite   :ready
+     :ready    :done
+     nil       :intro
+     key)))
 
 (defn next-step []
   (let [user-type (get-user-role)
