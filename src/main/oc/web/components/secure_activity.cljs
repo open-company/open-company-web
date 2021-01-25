@@ -131,7 +131,6 @@
             [:div.activity-content-footer.group
               (comments-summary {:activity-data activity-data :comments-data comments-drv :current-activity-id (:uuid activity-data)})
               (reactions {:entity-data activity-data
-                          :only-thumb? true
                           :hide-picker true})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
