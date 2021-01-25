@@ -15,7 +15,7 @@
    :deploy ls/sentry-release-deploy
    :debug (= ls/log-level "debug")
    :dsn dsn
-   :normalizeDepth 10
+   :normalizeDepth 6
    :environment ls/sentry-env})
 
 (defn sentry-setup []
