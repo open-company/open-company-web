@@ -271,12 +271,12 @@
 (defn invitation-confirmed [status body success]
  (when success
     (jwt-actions/update-jwt body)
-    (when (= status 201)
+    (when (<= 200 status 299)
       (nux-actions/new-user-registered "email")
       (api/get-entry-point (dis/current-org-slug) entry-point-get-finished)
       (auth-settings-get))
     ;; Go to password setup
-    (router/nav! oc-urls/confirm-invitation-password))
+    (utils/after 200 #(router/nav! oc-urls/confirm-invitation-password)))
   (dis/dispatch! [:invitation-confirmed success]))
 
 (defn confirm-invitation [token]
@@ -383,14 +383,14 @@
       (fn [status body success]
         (when success
           (dis/dispatch! [:user-data (json->cljs body)]))
-        (when (<= 200 status 299)
+        (when (= status 201)
           (if password-reset?
             (do
               (cook/remove-cookie! :show-login-overlay)
               (utils/after 200 #(router/nav! oc-urls/login)))
             (do
               (nux-actions/new-user-registered "email")
-              (router/nav! oc-urls/confirm-invitation-profile))))
+              (utils/after 200 #(router/nav! oc-urls/confirm-invitation-profile)))))
         (dis/dispatch! [:pswd-collect/finish status]))))
   (dis/dispatch! [:pswd-collect password-reset?]))
 
