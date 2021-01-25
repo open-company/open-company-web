@@ -13,7 +13,7 @@
                          (drv/drv :foc-layout)
                          {:did-mount (fn [s]
                            (utils/scroll-to-y (dis/route-param :scroll-y) 0)
-                           (utils/after 100 #(reset! (::delayed s) true))
+                           (utils/after 10 #(reset! (::delayed s) true))
                            s)}
   [s stream-comp]
   (let [container-data (drv/react s :container-data)
