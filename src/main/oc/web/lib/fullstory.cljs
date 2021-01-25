@@ -1,10 +1,16 @@
 (ns oc.web.lib.fullstory
   (:require [oc.web.lib.jwt :as jwt]))
 
+(defn- init-fs?
+  "Use filestack only if user is part of a premium team or if it's identified by an ID token."
+  []
+  (and (exists? js/FS)
+       (or (and (jwt/jwt)
+                (seq (jwt/get-key :premium-teams)))
+           (jwt/id-token))))
+
 (defn identify []
-  (when (and (exists? js/FS)
-             (or (jwt/jwt)
-                 (jwt/id-token)))
+  (when (init-fs?)
     (let [is-id-token? (jwt/id-token)
           user-data (if is-id-token?
                       (jwt/get-id-token-contents)
