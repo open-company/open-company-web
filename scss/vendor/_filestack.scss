@@ -162,97 +162,94 @@ div.fsp-picker {
 
     }
 
+    .fsp-picker__close-button, .fsp-picker__close-button:hover {
+      background-color: transparent;
+    }
+
+    .fsp-picker__close-button.fsp-icon--close-modal {
+      width: 32px;
+      height: 32px;
+      background-color: $carrot_light_blue;
+      border-radius: 4px;
+      background-image: cdnUrl("/img/ML/board_remove_filter.png");
+      background-position: 50%;
+      background-repeat: no-repeat;
+      transition: 230ms;
+      opacity: 1;
+
+      &:hover {
+        background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
+        background-color: $carrot_text_blue;
+        opacity: 1;
+      }
+    }
+
+    .fsp-button--cancel {
+      cursor: pointer;
+      outline: none;
+      border-width: 0;
+      opacity: 0.9;
+      background-color: transparent;
+      color: var(--color);
+      @include OC_Body_Bold();
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.2 !important;
+      }
+
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+    }
+
+    .fsp-button--primary {
+      @include carrot_button();
+    }
+
     div.fsp-modal__body {
       background-color: var(--overlay-background-color);
 
       div.fsp-header {
         background-color: var(--overlay-background-color);
         border: none;
+      }
 
-        .fsp-picker__close-button, .fsp-picker__close-button:hover {
-          background-color: transparent;
-        }
+      .fsp-header-text--visible {
+        position: relative;
+        color: var(--overlay-background-color);
+        margin-top: 12px;
 
-        .fsp-header-text--visible {
-          position: relative;
-          color: var(--overlay-background-color);
-          margin-top: 12px;
-
-          &:after {
-            content: "My Computer";
-            text-align: center;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 18px;
-            color: var(--color);
-          }
-        }
-
-        .fsp-picker__close-button.fsp-icon--close-modal {
-          width: 32px;
-          height: 32px;
-          background-color: $carrot_light_blue;
-          border-radius: 4px;
-          background-image: cdnUrl("/img/ML/board_remove_filter.png");
-          background-position: 50%;
-          background-repeat: no-repeat;
-          transition: 230ms;
-          opacity: 1;
-
-          &:hover {
-            background-image: cdnUrl("/img/ML/board_remove_filter_white.png");
-            background-color: $carrot_text_blue;
-            opacity: 1;
-          }
+        &:after {
+          content: "My Computer";
+          text-align: center;
+          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 18px;
+          color: var(--color);
         }
       }
 
       div.fsp-footer {
         background-color: var(--overlay-background-color);
         border-top: none;
+      }
 
-        div.fsp-nav {
+      
 
-          span.fsp-nav__left {
+      span.fsp-nav__right {
 
-            span.fsp-button.fsp-button--cancel {
-              cursor: pointer;
-              outline: none;
-              border-width: 0;
-              opacity: 0.9;
-              background-color: transparent;
-              color: var(--color);
-              @include OC_Body_Bold();
-
-              &:disabled {
-                cursor: not-allowed;
-                opacity: 0.2 !important;
-              }
-
-              &:hover {
-                opacity: 1;
-                text-decoration: underline;
-              }
-            }
-          }
-          span.fsp-nav__right {
-            span.fsp-button.fsp-button--primary {
-              @include carrot_button();
-            }
-
-            span.fsp-badge {
-              display: none;
-            }
-          }
+        span.fsp-badge {
+          display: none;
         }
       }
 
       div.fsp-content {
         background-color: var(--overlay-background-color);
 
-        
         div.fsp-cloud__container div.fsp-cloud__files-container {
           div.fsp-cloud__breadcrumbs {
             border-bottom: 1px solid var(--light-color);
