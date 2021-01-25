@@ -383,7 +383,7 @@
       (fn [status body success]
         (when success
           (dis/dispatch! [:user-data (json->cljs body)]))
-        (when (= status 201)
+        (when (<= 200 status 299)
           (if password-reset?
             (do
               (cook/remove-cookie! :show-login-overlay)
