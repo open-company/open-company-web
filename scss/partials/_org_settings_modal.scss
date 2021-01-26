@@ -28,7 +28,7 @@ div.org-settings-modal {
     height: calc(100vh - #{$navbar_height}px);
     right: 0;
     margin-top: #{$navbar_height}px;
-    padding: 0 24px 16px;
+    padding: 0 24px 32px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
     overflow-y: auto;
