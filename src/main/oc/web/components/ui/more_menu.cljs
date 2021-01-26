@@ -99,10 +99,10 @@
                                          (when (not= @(::last-force-show-menu s) next-force-show-menu)
                                            (reset! (::last-force-show-menu s) next-force-show-menu)
                                            (when next-force-show-menu
-                                           ;; avoid automatic dismiss of the menu on iOS
-                                           (reset! (::can-unmount s) false)
-                                           (utils/after 1000 #(reset! (::can-unmount s) true)))))
-                        s)}
+                                             ;; avoid automatic dismiss of the menu on iOS
+                                             (reset! (::can-unmount s) false)
+                                             (utils/after 1000 #(reset! (::can-unmount s) true)))))
+                                       s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
              can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
