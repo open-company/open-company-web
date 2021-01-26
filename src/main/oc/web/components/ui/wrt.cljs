@@ -309,21 +309,22 @@
                   :on-key-up #(when (= (.-key %) "Escape")
                                 (reset-search s))
                   :on-change #(reset! query (.. % -target -value))}]])
-            [:div.wrt-download-csv-container.group
-              [:a.download-csv-bt
-               {:href (if (:premium? org-data)
-                        (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
-                        "")
-                :on-click (when-not (:premium? org-data)
-                            #(nav-actions/toggle-premium-picker! download-csv-tooltip))
-                :download (str "post-" (:uuid activity-data) ".csv")
-                :data-toggle (when-not is-mobile? "tooltip")
-                :data-placement "top"
-                :data-container "body"
-                :title (if (:premium? org-data)
-                        (str "Download analytics data in excel compatible format.")
-                        premium-download-csv-tooltip)}
-               "Download data"]]
+            (when-not (get-in org-data [:content-visibility :disallow-wrt-download])
+              [:div.wrt-download-csv-container.group
+                [:a.download-csv-bt
+                 {:href (if (:premium? org-data)
+                          (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
+                          "")
+                  :on-click (when-not (:premium? org-data)
+                              #(nav-actions/toggle-premium-picker! download-csv-tooltip))
+                  :download (str "post-" (:uuid activity-data) ".csv")
+                  :data-toggle (when-not is-mobile? "tooltip")
+                  :data-placement "top"
+                  :data-container "body"
+                  :title (if (:premium? org-data)
+                          (str "Download analytics data in excel compatible format.")
+                          premium-download-csv-tooltip)}
+                "Download data"]])
             [:div.wrt-popup-list
               (for [u users-list
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
