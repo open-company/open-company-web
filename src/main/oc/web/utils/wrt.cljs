@@ -1,9 +1,6 @@
 (ns oc.web.utils.wrt
   (:require [cuerdas.core :as s]
-            [oc.web.local-settings :as ls]
-            [taoensso.timbre :as timbre]
-            [oc.web.lib.utils :as utils]
-            [oc.web.urls :as oc-urls]))
+            [oc.web.lib.utils :as utils]))
 
 (def column-separator ", ")
 (def row-separator "\n")

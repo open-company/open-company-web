@@ -3,9 +3,8 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.dom :as du]
             [oc.web.utils.org :as ou]
-            [oc.web.urls :as oc-urls]
-            [oc.lib.user :as user-lib]
             [oc.web.utils.wrt :as wu]
             [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
@@ -203,9 +202,9 @@
                                (str premium-download-csv-tooltip " Click for details"))]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
-                    (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
+                    (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
                       (reset! (::list-view-dropdown-open s) false))
-                    (when-not (utils/event-inside? % (rum/ref-node s :wrt-popup))
+                    (when-not (du/event-inside? % (rum/ref-node s :wrt-popup))
                       (nav-actions/hide-wrt)))}
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/hide-wrt}]
@@ -213,9 +212,9 @@
         {:class (utils/class-set {:loading (not (:reads read-data))})
         :ref :wrt-popup
         :on-click #(when @(::list-view-dropdown-open s)
-                      (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
+                      (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
                         (reset! (::list-view-dropdown-open s) false))
-                        (utils/event-stop %))}
+                        (du/prevent-default %))}
         [:div.wrt-popup-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
@@ -316,7 +315,9 @@
                           (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
-                              #(nav-actions/toggle-premium-picker! download-csv-tooltip))
+                              #(do
+                                 ( %)
+                                 (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"

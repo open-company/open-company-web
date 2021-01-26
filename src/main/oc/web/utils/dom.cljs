@@ -1,7 +1,7 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.responsive :as responsive]
-            [oops.core :refer (oget)]))
+            [oops.core :refer (oget ocall)]))
 
 (defonce _lock-counter (atom 0))
 
@@ -118,3 +118,15 @@
       (or (= (oget style "?display") "none")
           (= (oget style "?visibility") "hidden")
           (nil? (oget el "?offsetParent"))))))
+
+(defn stop-propagation [e]
+  (when (fn? (oget e "stopPropagation"))
+    (ocall e "stopPropagation")))
+
+(defn prevent-default [e]
+  (when (fn? (oget e "preventDefault"))
+    (ocall e "preventDefault")))
+
+(defn stop-event [e]
+  (prevent-default e)
+  (stop-propagation e))
