@@ -7,6 +7,7 @@
 
 (def column-separator ", ")
 (def row-separator "\n")
+(def empty-value "N/A")
 
 (defn- csv-row [row]
   (let [values (map #(if (keyword? %) (name %) %) row)]
@@ -19,17 +20,27 @@
 (defn- read-date [row]
   (if (:read-at row)
     (.toString (utils/js-date (:read-at row)))
-    "N/A"))
+    empty-value))
 
-(defn- field-value [row k]
-  (get row k ""))
+(defn- clean-value [row k]
+  (get row k empty-value))
 
-(defn- clean-users-list [data]
-  (map #(vec [(field-value % :name) (field-value % :email) (read-date %)]) data))
+(defn- name-from-user [{first-name :first-name last-name :last-name}]
+  (cond (and (seq first-name) (seq last-name))
+        (str first-name " " last-name)
+        (seq first-name)
+        first-name
+        (seq last-name)
+        last-name
+        :else
+        empty-value))
+
+(defn- clean-user [row]
+  (vec [(name-from-user row) (clean-value row :email) (read-date row)]))
 
 (defn encoded-csv-string [headers data]
   (let [header (when headers (s/join ", " headers))
-        cleaned-data (clean-users-list data)
+        cleaned-data (map clean-user data)
         body (csv-rows cleaned-data)
         csv-content (s/join "\n" [header body])]
     (str "data:text/csv;charset=utf-8," (js/encodeURIComponent csv-content))))
