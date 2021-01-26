@@ -470,7 +470,7 @@
                     :on-click did-change-cb}
                     "Allow public share links"]])
               (let [did-change-cb #(change-content-visibility content-visibility-data :disallow-wrt-download (not (:disallow-wrt-download content-visibility-data)))]
-                [:div.org-settings-advanced-row.digest-links.group
+                [:div.org-settings-advanced-row.wrt-download.group
                  (carrot-checkbox {:selected (not (:disallow-wrt-download content-visibility-data))
                                    :disabled false
                                    :did-change-cb did-change-cb})
