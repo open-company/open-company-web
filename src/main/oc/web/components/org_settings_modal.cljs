@@ -430,23 +430,24 @@
             [:div.org-settings-advanced
               [:div.org-settings-advanced-title
                 "Advanced settings"]
-              [:div.org-settings-advanced-row.digest-links.group
-                (carrot-checkbox {:selected (not (:disallow-secure-links content-visibility-data))
-                                  :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links (not %))})
-                [:div.checkbox-label
-                  {:class (when (:disallow-secure-links content-visibility-data) "unselected")
-                   :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
-                  "Allow secure links to open posts from email or Slack"
-                  [:i.mdi.mdi-information-outline
-                    {:title (str
-                             "When team members receive " ls/product-name " posts via an email or Slack morning digest, secure "
-                             "links allow them to read the post without first logging in. A login is still required "
-                             "to access additional posts. If you turn off secure links, your team will always need to "
-                             "be logged in to view posts.")
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"}]]]
+              (let [did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))]
+                [:div.org-settings-advanced-row.digest-links.group
+                  (carrot-checkbox {:selected (not (:disallow-secure-links content-visibility-data))
+                                    :disabled false
+                                    :did-change-cb did-change-cb})
+                  [:div.checkbox-label
+                    {:class (when (:disallow-secure-links content-visibility-data) "unselected")
+                    :on-click did-change-cb}
+                    "Allow secure links to open posts from email or Slack"
+                    [:i.mdi.mdi-information-outline
+                      {:title (str
+                              "When team members receive " ls/product-name " posts via an email or Slack morning digest, secure "
+                              "links allow them to read the post without first logging in. A login is still required "
+                              "to access additional posts. If you turn off secure links, your team will always need to "
+                              "be logged in to view posts.")
+                      :data-toggle (when-not is-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"}]]])
               (let [did-change-cb (when-not premium-lock?
                                     #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data))))]
                 [:div.org-settings-advanced-row.public-sections.group
@@ -459,11 +460,28 @@
                   {:class (when (:disallow-public-board content-visibility-data) "unselected")
                    :on-click did-change-cb}
                   "Allow public topics"]])
-              [:div.org-settings-advanced-row.public-share.group
-                (carrot-checkbox {:selected (not (:disallow-public-share content-visibility-data))
-                                  :disabled false
-                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share (not %))})
-                [:div.checkbox-label
-                  {:class (when (:disallow-public-share content-visibility-data) "unselected")
-                   :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
-                  "Allow public share links"]]])]]]))
+              (let [did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))]
+                [:div.org-settings-advanced-row.public-share.group
+                  (carrot-checkbox {:selected (not (:disallow-public-share content-visibility-data))
+                                    :disabled false
+                                    :did-change-cb did-change-cb})
+                  [:div.checkbox-label
+                    {:class (when (:disallow-public-share content-visibility-data) "unselected")
+                    :on-click did-change-cb}
+                    "Allow public share links"]])
+              (let [did-change-cb #(change-content-visibility content-visibility-data :disallow-wrt-download (not (:disallow-wrt-download content-visibility-data)))]
+                [:div.org-settings-advanced-row.digest-links.group
+                 (carrot-checkbox {:selected (not (:disallow-wrt-download content-visibility-data))
+                                   :disabled false
+                                   :did-change-cb did-change-cb})
+                 [:div.checkbox-label
+                  {:class (when (:disallow-wrt-download content-visibility-data) "unselected")
+                   :on-click did-change-cb}
+                  "Allow analytics download"
+                  [:i.mdi.mdi-information-outline
+                   {:title (str
+                            "When team members open the post analytics view relative to a post, this "
+                            "link will allow them to download the info in a excel compatible format.")
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :data-placement "top"
+                    :data-container "body"}]]])])]]]))
