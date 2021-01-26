@@ -111,7 +111,7 @@
       nil)))
 
 (defn- get-user-role []
-  (or (some-> (dis/current-user-data) :role keyword) :viewer))
+  (some-> (dis/current-user-data) :role keyword))
 
 (defn get-nux-cookie
   "Read the cookie from the document only if the nux-cookie-value atom is nil.
