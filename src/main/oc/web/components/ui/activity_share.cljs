@@ -91,8 +91,7 @@
         has-bot? (has-slack-bot? org-data)
         can-share-to-slack? (and (not is-mobile?)
                                  has-bot?)
-        disallow-public-share? (and (:content-visibility org-data)
-                                    (:disallow-public-share (:content-visibility org-data)))]
+        disallow-public-share? (get-in org-data [:content-visibility :disallow-public-share])]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
