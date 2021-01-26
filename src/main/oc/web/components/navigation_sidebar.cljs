@@ -53,6 +53,26 @@
     (reset! (::sections-list-collapsed s) next-value)
     (utils/after 100 #(fix-navbar-position s))))
 
+(def debounced)
+
+(defn- home-clicked [e]
+  (nav-actions/nav-to-url! e "following" (oc-urls/following)))
+
+(defn- explore-clicked [e]
+  (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
+
+(defn- activity-clicked [e]
+  (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
+
+(defn- profile-clicked [user-id e]
+  (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
+
+(defn- bookmarks-clicked [e]
+  (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
+
+(defn- board-clicked [board-slug e]
+  (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -181,7 +201,7 @@
               {:class (utils/class-set {:item-selected is-following
                                         :new following-badge})
                :href (oc-urls/following)
-               :on-click #(nav-actions/nav-to-url! % "following" (oc-urls/following))}
+               :on-click home-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -195,7 +215,7 @@
             [:a.nav-link.topics.hover-item.group
               {:class (utils/class-set {:item-selected is-topics})
                :href (oc-urls/unfollowing)
-               :on-click #(nav-actions/nav-to-url! % "topics" (oc-urls/topics))}
+               :on-click explore-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -211,9 +231,7 @@
               {:class (utils/class-set {:item-selected is-replies
                                         :new replies-badge})
                :href (oc-urls/replies)
-               :on-click (fn [e]
-                           (utils/event-stop e)
-                           (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))}
+               :on-click activity-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -229,9 +247,7 @@
               [:a.nav-link.profile.hover-item.group
                 {:class (utils/class-set {:item-selected is-contributions})
                  :href (oc-urls/contributions (:user-id current-user-data))
-                 :on-click (fn [e]
-                             (utils/event-stop e)
-                             (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
+                 :on-click (partial profile-clicked (:user-id current-user-data))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label
                   ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -262,7 +278,7 @@
             [:a.nav-link.bookmarks.hover-item.group
               {:class (utils/class-set {:item-selected is-bookmarks})
                :href (oc-urls/bookmarks)
-               :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
+               :on-click bookmarks-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 "Bookmarks"]
@@ -286,7 +302,7 @@
                  :data-board (name (:slug drafts-board))
                  :key (str "board-list-" (name (:slug drafts-board)))
                  :href board-url
-                 :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
+                 :on-click (partial board-clicked (:slug drafts-board))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label.group
                   "Drafts"]
@@ -327,8 +343,7 @@
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)) "-" (rand 100))
                  :href board-url
-                 :on-click #(do
-                              (nav-actions/nav-to-url! % (:slug board) board-url))}
+                 :on-click (partial board-clicked (:slug board))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")

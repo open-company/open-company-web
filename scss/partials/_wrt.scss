@@ -381,7 +381,7 @@ div.wrt-popup-container {
       div.wrt-download-csv-container {
         margin: 16px 0;
 
-        button.mlb-reset.download-csv-bt {
+        a.download-csv-bt {
           float: right;
           color: var(--primary-color);
           font-size: 14px;

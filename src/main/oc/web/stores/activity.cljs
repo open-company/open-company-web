@@ -770,8 +770,13 @@
         org-data        (dispatcher/org-data db org-slug)
         roster-data     (or team-roster (dispatcher/team-roster (:team-id org-data) db))
         board-data      (first (filter #(= (:slug %) (:board-slug activity-data)) (:boards org-data)))
-        fixed-read-data (vec (map #(assoc % :seen true) read-data))
         team-users      (uu/filter-active-users (:users roster-data))
+        get-user-info   (fn [u]
+                          (let [user-id (if (string? u)
+                                          u
+                                          (:user-id u))]
+                            (some #(when (= (:user-id %) user-id) %) team-users)))
+        fixed-read-data (vec (map #(merge (get-user-info %) % {:seen true}) read-data))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
         all-private-users (when private-access?
@@ -781,8 +786,7 @@
                           team-users)
         all-ids         (set (map :user-id filtered-users))
         unseen-ids      (clojure.set/difference all-ids seen-ids)
-        unseen-users    (vec (map (fn [user-id]
-                         (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))
+        unseen-users    (vec (map get-user-info unseen-ids))
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
