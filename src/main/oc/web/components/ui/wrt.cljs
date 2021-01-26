@@ -317,7 +317,7 @@
                           "")
                   :on-click (when-not (:premium? org-data)
                               #(nav-actions/toggle-premium-picker! download-csv-tooltip))
-                  :download (str "post-" (:uuid activity-data) ".csv")
+                  :download (when-not (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"
