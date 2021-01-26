@@ -314,10 +314,10 @@
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
                           (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
-                          "")
+                          "#")
                   :on-click (when-not (:premium? org-data)
                               #(nav-actions/toggle-premium-picker! download-csv-tooltip))
-                  :download (when-not (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
+                  :download (when (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"
