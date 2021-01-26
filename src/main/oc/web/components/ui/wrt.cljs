@@ -158,14 +158,9 @@
                                         (if is-author?
                                           (filter #(not= (:user-id %) (:user-id current-user-data)) reads)
                                           reads))))
-        _ (js/console.log "DBG read-data*" read-data*)
-        _ (js/console.log "DBG    read-data" read-data)
         seen-users (vec (sort-by :name (:reads read-data)))
-        _ (js/console.log "DBG    seen-users" seen-users)
         unseen-users (vec (sort-by :name (:unreads read-data)))
-        _ (js/console.log "DBG    unseen-users" unseen-users)
         all-users (sort-by :name (concat seen-users unseen-users))
-        _ (js/console.log "DBG    all-users" all-users)
         query (::query s)
         lower-query (string/lower (or @query ""))
         list-view (::list-view s)
@@ -173,19 +168,14 @@
                         :all (filterv #(filter-by-query % lower-query) all-users)
                         :seen seen-users
                         :unseen unseen-users)
-        _ (js/console.log "DBG    filtered-users" filtered-users)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
-        _ (js/console.log "DBG    sorted-filtered-users" sorted-filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
-        _ (js/console.log "DBG    seen-percent" seen-percent)
         team-id (:team-id org-data)
         slack-bot-data (first (jwt/team-has-bot? team-id))
-        _ (js/console.log "DBG    slack-bot-data" slack-bot-data)
         remind-all-users (filterv #(and (not (get @(::sending-notice s) (:user-id %)))
                                         (not= (:user-id %) (:user-id current-user-data)))
                                   unseen-users)
-        _ (js/console.log "DBG    remind-all-users" remind-all-users)
         remind-all-cb (if (:premium? org-data)
                         (fn []
                           (remind-to-all s {:activity-data activity-data
@@ -209,7 +199,6 @@
                                (assoc :avatar-url @(::jelly-head s))
                                (assoc :name "Team member")))
                         sorted-filtered-users)
-        _ (js/console.log "DBG    users-list" users-list)
         download-csv-tooltip (when-not (:premium? org-data)
                                (str premium-download-csv-tooltip " Click for details"))]
     [:div.wrt-popup-container
