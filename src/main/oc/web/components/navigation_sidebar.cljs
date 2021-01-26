@@ -32,12 +32,18 @@
         (sort-by :name)
         vec)))
 
-(def sidebar-top-margin 56)
+(def sidebar-top-margin 40)
+(def sidebar-bottomm-margin 40)
+(def navbar-height 56)
 
 (defn fix-navbar-position [s]
-  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
+  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar-content)]
     (let [component-height (.-offsetHeight navigation-sidebar)
-          taller? (> (+ sidebar-top-margin component-height)
+          component-total-height (+ navbar-height
+                                    sidebar-top-margin
+                                    sidebar-bottomm-margin
+                                    component-height)
+          taller? (> component-total-height
                      (dom-utils/viewport-height))]
       (compare-and-set! (::absolute-position s) (not taller?) taller?))))
 

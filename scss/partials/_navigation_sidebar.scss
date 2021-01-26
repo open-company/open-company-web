@@ -246,7 +246,7 @@ div.left-navigation-sidebar {
     width: #{$left_navigation_sidebar_width}px;
     overflow-x: hidden;
     overflow-y: auto;
-    min-height: calc(100vh - #{$navbar_height}px - 24px - 40px);
+    min-height: calc(100vh - #{$navbar_height}px - 40px - 40px);
     display: flex;
     flex-flow: column nowrap;
 
