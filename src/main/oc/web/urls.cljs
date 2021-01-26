@@ -236,6 +236,14 @@
     (following org-slug)
     login))
 
+;; CSV download
+
+(defn wrt-csv
+  ([] (wrt-csv (dis/current-org-slug) (or (dis/current-activity-id) (dis/current-secure-activity-id))))
+  ([entry-uuid] (wrt-csv (dis/current-org-slug) entry-uuid))
+  ([org-slug entry-uuid]
+   (str (org org-slug) "/post/" (name entry-uuid) "/wrt/" (name entry-uuid) ".csv")))
+
 ;; Help articles
 
 (def slack-private-announcement-share "https://carrot.io/carrot/post/49a6-44c0-9d16") ;; Intercom article http://help.carrot.io/en/articles/4602513-auto-share-to-private-and-announcement-only-slack-channels

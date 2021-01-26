@@ -4,7 +4,9 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
+            [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
+            [oc.web.utils.wrt :as wu]
             [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -106,6 +108,7 @@
 
 (def premium-remind-all-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
 (def premium-remind-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
+(def premium-download-csv-tooltip "Please upgrade to premium to download your team's Analytics data.")
 
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
@@ -189,7 +192,15 @@
         show-remind-all-bt? (and (> (count remind-all-users) 1)
                                  @(::show-remind-all-bt s)
                                  (or (not is-mobile?)
-                                     (:premium? org-data)))]
+                                     (:premium? org-data)))
+        users-list (map #(if (:premium? org-data)
+                           %
+                           (-> %
+                               (assoc :avatar-url @(::jelly-head s))
+                               (assoc :name "Team member")))
+                        sorted-filtered-users)
+        download-csv-tooltip (when-not (:premium? org-data)
+                               (str premium-download-csv-tooltip " Click for details"))]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -298,15 +309,22 @@
                   :on-key-up #(when (= (.-key %) "Escape")
                                 (reset-search s))
                   :on-change #(reset! query (.. % -target -value))}]])
+            [:div.wrt-download-csv-container.group
+              [:button.mlb-reset.download-csv-bt
+               {:on-click #(if (:premium? org-data)
+                            (wu/download-csv (:slug org-data) (:uuid activity-data) ["Name" "Email" "Read"] users-list)
+                            (nav-actions/toggle-premium-picker! download-csv-tooltip))
+                :data-toggle (when-not is-mobile? "tooltip")
+                :data-placement "top"
+                :data-container "body"
+                :title (if (:premium? org-data)
+                        (str "Download analytics data in excel compatible format.")
+                        premium-download-csv-tooltip)}
+               "Download data"]]
             [:div.wrt-popup-list
-              (for [u* sorted-filtered-users
-                    :let [user-sending-notice (get @(::sending-notice s) (:user-id u*))
-                          is-self-user?       (= (:user-id current-user-data) (:user-id u*))
-                          u                   (if (:premium? org-data)
-                                                u*
-                                                (-> u*
-                                                    (assoc :avatar-url @(::jelly-head s))
-                                                    (assoc :name "Team member")))]]
+              (for [u users-list
+                    :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
+                          is-self-user?       (= (:user-id current-user-data) (:user-id u))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                   :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
