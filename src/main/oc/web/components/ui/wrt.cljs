@@ -128,7 +128,7 @@
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
-                 mixins/refresh-tooltips-mixin
+                 mixins/strict-refresh-tooltips-mixin
 
                  {:will-mount (fn [s]
                    (reset! (::jelly-head s) (uu/random-avatar))
@@ -168,6 +168,13 @@
                         :seen seen-users
                         :unseen unseen-users)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
+        sort-all-users (sort-users (:user-id current-user-data) all-users)
+        all-users-list (map #(if (:premium? org-data)
+                               %
+                               (-> %
+                                   (assoc :avatar-url @(::jelly-head s))
+                                   (assoc :name "Team member")))
+                             sort-all-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         team-id (:team-id org-data)
@@ -312,20 +319,21 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
-                          (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
+                          (wu/encoded-csv activity-data ["Name" "Email" "Read"] all-users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do
                                  (du/prevent-default %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
-                  :download (when (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
+                  :download (when (:premium? org-data)
+                              (wu/csv-filename activity-data))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"
                   :title (if (:premium? org-data)
                           (str "Download analytics data in excel compatible format.")
                           premium-download-csv-tooltip)}
-                "Download data"]])
+                "Download CSV"]])
             [:div.wrt-popup-list
               (for [u users-list
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
