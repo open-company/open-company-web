@@ -128,7 +128,7 @@
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
-                 mixins/refresh-tooltips-mixin
+                 mixins/strict-refresh-tooltips-mixin
 
                  {:will-mount (fn [s]
                    (reset! (::jelly-head s) (uu/random-avatar))
@@ -326,7 +326,7 @@
                                  (du/prevent-default %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
-                              (str "post-" (:uuid activity-data) "-" (.toLocaleString (js/Date.)) ".csv"))
+                              (str "post-" (:uuid activity-data) ".csv"))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"
