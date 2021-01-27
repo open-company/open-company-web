@@ -2,8 +2,6 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
-            [cljs-time.core :as t]
-            [cljs-time.format :as f]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.dom :as du]
             [oc.web.utils.org :as ou]
@@ -228,25 +226,7 @@
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
-            "Post analytics"]
-         (when-not (get-in org-data [:content-visibility :disallow-wrt-download])
-           [:div.wrt-popup-header-right.group
-            [:a.download-csv-bt
-             {:href (if (:premium? org-data)
-                      (wu/encoded-csv-string ["Name" "Email" "Read"] all-users-list)
-                      "#")
-              :on-click (when-not (:premium? org-data)
-                          #(do
-                             (du/prevent-default %)
-                             (nav-actions/toggle-premium-picker! download-csv-tooltip)))
-              :download (when (:premium? org-data) (str "post-" (f/unparse (f/formatter "yyyy_MM_dd") (t/now)) (:uuid activity-data) ".csv"))
-              :data-toggle (when-not is-mobile? "tooltip")
-              :data-placement "left"
-              :data-container "body"
-              :title (if (:premium? org-data)
-                       (str "Download analytics data in excel compatible format.")
-                       premium-download-csv-tooltip)}
-             "Download CSV"]])]
+            "Post analytics"]]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
           (small-loading)
@@ -339,13 +319,14 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
-                          (wu/encoded-csv-string ["Name" "Email" "Read"] all-users-list)
+                          (wu/encoded-csv activity-data ["Name" "Email" "Read"] all-users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do
                                  (du/prevent-default %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
-                  :download (when (:premium? org-data) (str "post-" (:uuid activity-data) ".csv"))
+                  :download (when (:premium? org-data)
+                              (str "post-" (:uuid activity-data) "-" (.toLocaleString (js/Date.)) ".csv"))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"
