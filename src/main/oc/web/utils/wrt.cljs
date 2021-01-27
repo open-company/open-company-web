@@ -1,10 +1,11 @@
 (ns oc.web.utils.wrt
   (:require [cuerdas.core :as s]
-            [oc.web.lib.utils :as utils]))
+            [oc.lib.time :as lib-time]
+            [cljs-time.format :as format]))
 
 (def column-separator ", ")
 (def row-separator "\n")
-(def empty-value "N/A")
+(def empty-value "-")
 
 (defn- csv-row [row]
   (let [values (map #(if (keyword? %) (name %) %) row)]
@@ -16,7 +17,7 @@
 
 (defn- read-date [row]
   (if (:read-at row)
-    (.toString (utils/js-date (:read-at row)))
+    (format/unparse (format/formatter "MMM dd, yyyy") (lib-time/from-iso (:read-at row)))
     empty-value))
 
 (defn- clean-value [row k]

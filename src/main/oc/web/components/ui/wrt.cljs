@@ -2,6 +2,8 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
+            [cljs-time.core :as t]
+            [cljs-time.format :as f]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.dom :as du]
             [oc.web.utils.org :as ou]
@@ -168,6 +170,13 @@
                         :seen seen-users
                         :unseen unseen-users)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
+        sort-all-users (sort-users (:user-id current-user-data) all-users)
+        all-users-list (map #(if (:premium? org-data)
+                               %
+                               (-> %
+                                   (assoc :avatar-url @(::jelly-head s))
+                                   (assoc :name "Team member")))
+                             sort-all-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         team-id (:team-id org-data)
@@ -219,7 +228,25 @@
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
-            "Post analytics"]]
+            "Post analytics"]
+         (when-not (get-in org-data [:content-visibility :disallow-wrt-download])
+           [:div.wrt-popup-header-right.group
+            [:a.download-csv-bt
+             {:href (if (:premium? org-data)
+                      (wu/encoded-csv-string ["Name" "Email" "Read"] all-users-list)
+                      "#")
+              :on-click (when-not (:premium? org-data)
+                          #(do
+                             (du/prevent-default %)
+                             (nav-actions/toggle-premium-picker! download-csv-tooltip)))
+              :download (when (:premium? org-data) (str "post-" (f/unparse (f/formatter "yyyy_MM_dd") (t/now)) (:uuid activity-data) ".csv"))
+              :data-toggle (when-not is-mobile? "tooltip")
+              :data-placement "left"
+              :data-container "body"
+              :title (if (:premium? org-data)
+                       (str "Download analytics data in excel compatible format.")
+                       premium-download-csv-tooltip)}
+             "Download CSV"]])]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
           (small-loading)
@@ -312,7 +339,7 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
-                          (wu/encoded-csv-string ["Name" "Email" "Read"] users-list)
+                          (wu/encoded-csv-string ["Name" "Email" "Read"] all-users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do
@@ -325,7 +352,7 @@
                   :title (if (:premium? org-data)
                           (str "Download analytics data in excel compatible format.")
                           premium-download-csv-tooltip)}
-                "Download data"]])
+                "Download CSV"]])
             [:div.wrt-popup-list
               (for [u users-list
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
