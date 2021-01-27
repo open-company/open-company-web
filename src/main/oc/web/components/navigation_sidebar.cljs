@@ -53,8 +53,6 @@
     (reset! (::sections-list-collapsed s) next-value)
     (utils/after 100 #(fix-navbar-position s))))
 
-(def debounced)
-
 (defn- home-clicked [e]
   (nav-actions/nav-to-url! e "following" (oc-urls/following)))
 
