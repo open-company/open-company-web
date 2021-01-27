@@ -326,7 +326,7 @@
                                  (du/prevent-default %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
-                              (str "post-" (:uuid activity-data) ".csv"))
+                              (wu/csv-filename activity-data))
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"

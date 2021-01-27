@@ -63,3 +63,6 @@
         description (csv-description)
         csv-content (s/join "\n" [title post-link description "" header body])]
     (str "data:text/csv;charset=utf-8," (js/encodeURIComponent csv-content))))
+
+(defn csv-filename [entry-data]
+  (str "post-" (:uuid entry-data) "-" (lib-time/to-iso (lib-time/utc-now)) ".csv"))
