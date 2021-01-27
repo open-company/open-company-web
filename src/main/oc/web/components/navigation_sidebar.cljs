@@ -1,6 +1,6 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            ;; [clojure.string :as s]
+            [oops.core :refer (ocall)]
             [org.martinklepsch.derivatives :as drv]
             [defun.core :refer (defun-)]
             [oc.web.urls :as oc-urls]
@@ -16,7 +16,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)])
+  (:import [goog.async Throttle]))
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
@@ -53,23 +54,114 @@
     (reset! (::sections-list-collapsed s) next-value)
     (utils/after 100 #(fix-navbar-position s))))
 
-(defn- home-clicked [e]
-  (nav-actions/nav-to-url! e "following" (oc-urls/following)))
+(defn- get-drafts-board [org-data]
+  (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data)))
 
-(defn- explore-clicked [e]
-  (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
+(defn- drafts-link [org-data]
+  (utils/link-for (-> org-data (get-drafts-board) :links) "self"))
 
-(defn- activity-clicked [e]
-  (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
+(defn- show-drafts? [org-data]
+  (and (:member? org-data)
+       (drafts-link org-data)))
 
-(defn- profile-clicked [user-id e]
-  (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
+(defn- show-following? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "following")))
 
-(defn- bookmarks-clicked [e]
-  (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
+(defn- show-topics? [org-data]
+  (:member? org-data))
 
-(defn- board-clicked [board-slug e]
-  (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
+(defn- show-bookmarks? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "bookmarks")))
+
+(defn- show-boards? [s org-data]
+  (or (utils/link-for (:links org-data) "create")
+      (seq @(drv/get-ref s :follow-boards-list))))
+
+(defn- show-replies? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "replies")))
+
+(defn- show-profile? [s org-data]
+  (or (:member? org-data)
+      (seq @(drv/get-ref s :contributions-id))))
+
+(defn- dispose-fn [throttled-fn]
+  (when (fn? throttled-fn)
+    (ocall throttled-fn "disposeInterval")))
+
+(defn- dispose-fns-map [fns]
+  (doseq [[k v] fns]
+    (if (map? v)
+      (dispose-fns-map v)
+      (dispose-fn v))))
+
+(defn- dispose-all-throttled-fns [s]
+  (let [throttled-fns @(::throttled-fns s)]
+    (dispose-fns-map throttled-fns)
+    (reset! (::throttled-fns s) nil)))
+
+(def throttle-ms (* 30 1000))
+
+(defn- setup-throttle-fns [s]
+  (dispose-all-throttled-fns s)
+  (let [org-data @(drv/get-ref s :org-data)
+        follow-boards-list @(drv/get-ref s :follow-boards-list)
+        sorted-follow-boards (filter-sort-boards follow-boards-list)
+        throttled-fns-map (cond-> {}
+                            ;; Home
+                            (show-following? org-data)
+                            (assoc :home (Throttle. #(nav-actions/nav-to-url! % "following" (oc-urls/following)) throttle-ms))
+                            ;; Topics
+                            (show-topics? org-data)
+                            (assoc :topics (Throttle. #(nav-actions/nav-to-url! % "topics" (oc-urls/topics)) throttle-ms))
+                            ;; Replies
+                            (show-replies? org-data)
+                            (assoc :replies (Throttle. #(nav-actions/nav-to-url! % "replies" (oc-urls/replies)) throttle-ms))
+                            ;; Profile
+                            (show-profile? s org-data)
+                            (assoc :profile (Throttle. #(nav-actions/nav-to-author! %1 %2 (oc-urls/contributions %2)) throttle-ms))
+                            ;; Bookmarks
+                            (show-bookmarks? org-data)
+                            (assoc :bookmarks (Throttle. #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)) throttle-ms))
+                            ;; Drafts
+                            (show-drafts? org-data)
+                            (assoc :drafts (Throttle. #(nav-actions/nav-to-url! %1 %2 (oc-urls/board %2)) throttle-ms))
+                            ;; Boards
+                            (and (show-boards? s org-data)
+                                 (seq sorted-follow-boards))
+                            (assoc :boards (into {}
+                                                 (map (fn [b]
+                                                        (hash-map (:slug b)
+                                                                  (Throttle. #(nav-actions/nav-to-url! % (:slug b) (oc-urls/board (:slug b)))
+                                                                             throttle-ms)))
+                                                      sorted-follow-boards))))]
+    (reset! (::throttled-fns s)throttled-fns-map)))
+
+(defn- home-clicked [s e]
+  (let [f (-> s ::throttled-fns deref :home)]
+    (ocall f "fire" e)))
+
+(defn- explore-clicked [s e]
+  (let [f (-> s ::throttled-fns deref :topics)]
+    (ocall f "fire" e)))
+
+(defn- activity-clicked [s e]
+  (let [f (-> s ::throttled-fns deref :replies)]
+    (ocall f "fire" e)))
+
+(defn- profile-clicked [s user-id e]
+  (let [f (-> s ::throttled-fns deref :profile)]
+    (ocall f "fire" e user-id)))
+
+(defn- bookmarks-clicked [s e]
+  (let [f (-> s ::throttled-fns deref :bookmarks)]
+    (ocall f "fire" e)))
+
+(defn- board-clicked [s board-slug e]
+  (when-let [f (-> s ::throttled-fns deref :board board-slug)]
+    (ocall f "fire" e board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
@@ -94,12 +186,14 @@
                                 (rum/local true ::show-invite-people?)
                                 (rum/local false ::absolute-position)
                                 (rum/local false ::sections-list-collapsed)
+                                (rum/local nil ::throttled-fns)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize fix-navbar-position)
 
                                 {:did-mount (fn [s]
                                   (fix-navbar-position s)
+                                  (setup-throttle-fns s)
                                   s)
                                  :will-mount (fn [s]
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
@@ -146,19 +240,14 @@
         is-self-profile? (and is-contributions
                               (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
-        show-boards (or create-link (seq follow-boards-list))
-        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
+        show-boards (show-boards? s org-data)
+        drafts-board (get-drafts-board org-data)
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-following (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "following"))
-        show-bookmarks (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "bookmarks"))
-        show-drafts (and user-is-part-of-the-team?
-                         drafts-link)
-        show-replies (and user-is-part-of-the-team?
-                          (utils/link-for (:links org-data) "replies"))
-        show-profile (or user-is-part-of-the-team?
-                         is-contributions)
+        show-following (show-following? org-data)
+        show-bookmarks (show-bookmarks? org-data)
+        show-drafts (show-drafts? org-data)
+        show-replies (show-replies? org-data)
+        show-profile (show-profile? s org-data)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
