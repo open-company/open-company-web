@@ -44,84 +44,90 @@
 
 (defn nav-to-author!
   ([e author-uuid url]
-  (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+   (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+  
+  ([e author-uuid url refresh?]
+   (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
   ([e author-uuid url back-y refresh?]
-  (when (and e
-             (.-preventDefault e))
-    (.preventDefault e))
-  (when (responsive/is-mobile-size?)
-    (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-    (notif-actions/hide-mobile-user-notifications))
-  (utils/after 0 (fn []
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
-     (if (= current-path url)
-       (do ;; In case user is clicking on the currently highlighted section
-           ;; let's refresh the posts list only
-         (routing-actions/post-routing)
-         (user-actions/initial-loading refresh?))
-       (do ;; If user clicked on a different section/container
-           ;; let's switch to it using pushState and changing
-           ;; the internal router state
-         (routing-actions/routing! {:org org-slug
-                                    :contributions author-uuid
-                                    :sort-type sort-type
-                                    :scroll-y back-y
-                                    :query-params (dis/query-params)
-                                    :route [org-slug author-uuid sort-type "dashboard"]
-                                    dis/router-opts-key [dis/router-dark-allowed-key]})
-         (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (when refresh?
-           (refresh-contributions-data author-uuid)))))))))
+   (when (and e
+              (.-preventDefault e))
+     (.preventDefault e))
+   (when (responsive/is-mobile-size?)
+     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+     (notif-actions/hide-mobile-user-notifications))
+   (utils/after 0 (fn []
+    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+          org-slug (dis/current-org-slug)
+          sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
+      (if (= current-path url)
+        (do ;; In case user is clicking on the currently highlighted section
+            ;; let's refresh the posts list only
+          (routing-actions/post-routing)
+          (user-actions/initial-loading refresh?))
+        (do ;; If user clicked on a different section/container
+            ;; let's switch to it using pushState and changing
+            ;; the internal router state
+          (routing-actions/routing! {:org org-slug
+                                     :contributions author-uuid
+                                     :sort-type sort-type
+                                     :scroll-y back-y
+                                     :query-params (dis/query-params)
+                                     :route [org-slug author-uuid sort-type "dashboard"]
+                                     dis/router-opts-key [dis/router-dark-allowed-key]})
+          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (when refresh?
+            (refresh-contributions-data author-uuid)))))))))
 
 (defn nav-to-url!
   ([e board-slug url]
-  (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+   (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+  
+  ([e board-slug url refresh?]
+   (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
   ([e board-slug url back-y refresh?]
-  (when (and e
-             (.-preventDefault e))
-    (.preventDefault e))
-  (when (responsive/is-mobile-size?)
-    (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-    (notif-actions/hide-mobile-user-notifications))
-  (utils/after 0 (fn []
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug board-slug)
-         is-drafts-board? (= board-slug utils/default-drafts-board-slug)
-         is-container? (dis/is-container? board-slug)
-         org-data (dis/org-data)]
-     (if (= current-path url)
-       (do ;; In case user clicked on the current location let's refresh it
-         (routing-actions/post-routing)
-         (user-actions/initial-loading refresh?))
-       (do ;; If user clicked on a different section/container
-           ;; let's switch to it using pushState and changing
-           ;; the internal router state
-         (routing-actions/routing! {:org org-slug
-                                    :board board-slug
-                                    :sort-type sort-type
-                                    :scroll-y back-y
-                                    :query-params (dis/query-params)
-                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
-                                    dis/router-opts-key [dis/router-dark-allowed-key]})
-         (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (when refresh?
-           (activity-actions/reload-current-container))
-         ;; Let's change the QP section if it's not active and going to an editable section
-         (when (and (not is-container?)
-                    (not is-drafts-board?)
-                    (:collapsed (dis/cmail-state)))
-           (when-let* [nav-to-board-data (dis/org-board-data org-data board-slug)
-                       edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
-             (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
-                                                        :board-name (:name nav-to-board-data)
-                                                        :publisher-board (:publisher-board nav-to-board-data)}])
-             (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))))))))
+   (when (and e
+              (.-preventDefault e))
+     (.preventDefault e))
+   (when (responsive/is-mobile-size?)
+     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+     (notif-actions/hide-mobile-user-notifications))
+   (utils/after 0 (fn []
+    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+          org-slug (dis/current-org-slug)
+          sort-type (activity-actions/saved-sort-type org-slug board-slug)
+          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
+          is-container? (dis/is-container? board-slug)
+          org-data (dis/org-data)]
+      (if (= current-path url)
+        (do ;; In case user clicked on the current location let's refresh it
+          (routing-actions/post-routing)
+          (user-actions/initial-loading refresh?))
+        (do ;; If user clicked on a different section/container
+            ;; let's switch to it using pushState and changing
+            ;; the internal router state
+          (routing-actions/routing! {:org org-slug
+                                     :board board-slug
+                                     :sort-type sort-type
+                                     :scroll-y back-y
+                                     :query-params (dis/query-params)
+                                     :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
+                                     dis/router-opts-key [dis/router-dark-allowed-key]})
+          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+          (when refresh?
+            (activity-actions/reload-current-container))
+          ;; Let's change the QP section if it's not active and going to an editable section
+          (when (and (not is-container?)
+                     (not is-drafts-board?)
+                     (:collapsed (dis/cmail-state)))
+            (when-let* [nav-to-board-data (dis/org-board-data org-data board-slug)
+                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
+              (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
+                                                         :board-name (:name nav-to-board-data)
+                                                         :publisher-board (:publisher-board nav-to-board-data)}])
+              (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))))))))
 
 (defn dismiss-post-modal [e]
   (let [route (dis/route)

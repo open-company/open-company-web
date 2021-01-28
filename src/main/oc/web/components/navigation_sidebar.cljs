@@ -102,7 +102,7 @@
     (dispose-fns-map throttled-fns)
     (reset! (::throttled-fns s) nil)))
 
-(def throttle-ms (* 30 1000))
+(def throttle-ms (* 10 1000))
 
 (defn- setup-throttle-fns [s]
   (dispose-all-throttled-fns s)
@@ -140,26 +140,32 @@
     (reset! (::throttled-fns s)throttled-fns-map)))
 
 (defn- home-clicked [s e]
+  (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :home)]
     (ocall f "fire" e)))
 
 (defn- explore-clicked [s e]
+  (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :topics)]
     (ocall f "fire" e)))
 
 (defn- activity-clicked [s e]
+  (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :replies)]
     (ocall f "fire" e)))
 
 (defn- profile-clicked [s user-id e]
+  (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :profile)]
     (ocall f "fire" e user-id)))
 
 (defn- bookmarks-clicked [s e]
+  (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :bookmarks)]
     (ocall f "fire" e)))
 
 (defn- board-clicked [s board-slug e]
+  (dom-utils/prevent-default! e)
   (when-let [f (-> s ::throttled-fns deref :board board-slug)]
     (ocall f "fire" e board-slug)))
 
@@ -288,7 +294,7 @@
               {:class (utils/class-set {:item-selected is-following
                                         :new following-badge})
                :href (oc-urls/following)
-               :on-click home-clicked}
+               :on-click (partial home-clicked s)}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -302,7 +308,7 @@
             [:a.nav-link.topics.hover-item.group
               {:class (utils/class-set {:item-selected is-topics})
                :href (oc-urls/unfollowing)
-               :on-click explore-clicked}
+               :on-click (partial explore-clicked s)}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -318,7 +324,7 @@
               {:class (utils/class-set {:item-selected is-replies
                                         :new replies-badge})
                :href (oc-urls/replies)
-               :on-click activity-clicked}
+               :on-click (partial activity-clicked s)}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -334,27 +340,11 @@
               [:a.nav-link.profile.hover-item.group
                 {:class (utils/class-set {:item-selected is-contributions})
                  :href (oc-urls/contributions (:user-id current-user-data))
-                 :on-click (partial profile-clicked (:user-id current-user-data))}
+                 :on-click (partial profile-clicked s (:user-id current-user-data))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label
                   ; {:class (utils/class-set {:new (seq all-unread-items)})}
                   "Profile"]]]))
-        ;; You
-        ; (when show-you
-        ;   [:div.left-navigation-sidebar-top.top-border
-        ;     [:a.nav-link.my-posts.hover-item.group
-        ;       {:class (utils/class-set {:item-selected is-my-posts})
-        ;        :href (oc-urls/contributions (:user-id current-user-data))
-        ;        :on-click (fn [e]
-        ;                    (utils/event-stop e)
-        ;                    (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
-        ;       [:div.nav-link-icon]
-        ;       [:div.nav-link-label
-        ;         ; {:class (utils/class-set {:new (seq all-unread-items)})}
-        ;         "You"]
-        ;         ; (when (pos? (:contributions-count org-data))
-        ;         ;   [:span.count (:contributions-count org-data)])
-        ;         ]])
         ;; Bookmarks
         (when show-bookmarks
           [:div.left-navigation-sidebar-top
@@ -365,7 +355,7 @@
             [:a.nav-link.bookmarks.hover-item.group
               {:class (utils/class-set {:item-selected is-bookmarks})
                :href (oc-urls/bookmarks)
-               :on-click bookmarks-clicked}
+               :on-click (partial bookmarks-clicked s)}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 "Bookmarks"]
@@ -389,7 +379,7 @@
                  :data-board (name (:slug drafts-board))
                  :key (str "board-list-" (name (:slug drafts-board)))
                  :href board-url
-                 :on-click (partial board-clicked (:slug drafts-board))}
+                 :on-click (partial board-clicked s (:slug drafts-board))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label.group
                   "Drafts"]
@@ -430,7 +420,7 @@
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)) "-" (rand 100))
                  :href board-url
-                 :on-click (partial board-clicked (:slug board))}
+                 :on-click (partial board-clicked s (:slug board))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")

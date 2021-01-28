@@ -221,7 +221,7 @@
         :on-click #(when @(::list-view-dropdown-open s)
                       (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
                         (reset! (::list-view-dropdown-open s) false))
-                        (du/prevent-default %))}
+                        (du/prevent-default! %))}
         [:div.wrt-popup-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
@@ -323,7 +323,7 @@
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do
-                                 (du/prevent-default %)
+                                 (du/prevent-default! %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
                               (wu/csv-filename activity-data))

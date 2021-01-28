@@ -119,14 +119,14 @@
           (= (oget style "?visibility") "hidden")
           (nil? (oget el "?offsetParent"))))))
 
-(defn stop-propagation [e]
+(defn stop-propagation! [e]
   (when (fn? (oget e "stopPropagation"))
     (ocall e "stopPropagation")))
 
-(defn prevent-default [e]
+(defn prevent-default! [e]
   (when (fn? (oget e "preventDefault"))
     (ocall e "preventDefault")))
 
-(defn stop-event [e]
-  (prevent-default e)
-  (stop-propagation e))
+(defn event-stop! [e]
+  (prevent-default! e)
+  (stop-propagation! e))

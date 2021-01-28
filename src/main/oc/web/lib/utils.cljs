@@ -5,6 +5,7 @@
             [oops.core :refer (oget)]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.utils.drafts :as du]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.local-settings :as ls]
             [cuerdas.core :as s]
             [oc.lib.hateoas :as hateoas]
@@ -270,18 +271,9 @@
  []
  (str (my-uuid) "-" (my-uuid) "-" (my-uuid)))
 
-(defn event-stop [e]
-  (.preventDefault e)
-  (.stopPropagation e))
+(def event-stop dom-utils/event-stop!)
 
-(defn event-inside? [e el]
-  (when e
-    (loop [element (.-target e)]
-      (if element
-        (if (= element el)
-          true
-          (recur (.-parentElement element)))
-        false))))
+(def event-inside? dom-utils/event-inside?)
 
 (defn to-end-of-content-editable [content-editable-element]
   (if (.-createRange js/document)
