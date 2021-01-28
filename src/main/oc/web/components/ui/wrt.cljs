@@ -315,7 +315,8 @@
                   :on-key-up #(when (= (.-key %) "Escape")
                                 (reset-search s))
                   :on-change #(reset! query (.. % -target -value))}]])
-            (when-not (get-in org-data [:content-visibility :disallow-wrt-download])
+            (when (and (not is-mobile?)
+                       (not (get-in org-data [:content-visibility :disallow-wrt-download])))
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
