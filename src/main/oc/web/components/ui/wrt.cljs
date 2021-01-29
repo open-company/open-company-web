@@ -320,7 +320,7 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
-                          (wu/encoded-csv activity-data ["Name" "Email" "Read"] all-users-list)
+                          (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] all-users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do

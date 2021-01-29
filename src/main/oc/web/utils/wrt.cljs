@@ -3,8 +3,9 @@
             [oc.lib.time :as lib-time]
             [oc.web.urls :as oc-urls]
             [oc.web.local-settings :as ls]
-            [cljs-time.format :as format]
-            [cljs-time.core :as time]))
+            ;; [cljs-time.format :as format]
+            ;; [cljs-time.core :as time]
+            ))
 
 (def column-separator ", ")
 (def row-separator "\n")
@@ -18,18 +19,18 @@
   (let [rows-list (map csv-row rows)]
     (s/join row-separator rows-list)))
 
-(defn- formatted-date-time
-  ([] (formatted-date-time (time/now)))
-  ([date-time]
-   (let [date-format (format/formatter "MMM dd yyyy hh:mma")
-         fixed-date-time (if (time/date? date-time)
-                           date-time
-                           (lib-time/from-iso date-time))]
-     (format/unparse date-format fixed-date-time))))
+;; (defn- formatted-date-time
+;;   ([] (formatted-date-time (time/now)))
+;;   ([date-time]
+;;    (let [date-format (format/formatter "MMM dd yyyy hh:mma")
+;;          fixed-date-time (if (time/date? date-time)
+;;                            date-time
+;;                            (lib-time/from-iso date-time))]
+;;      (format/unparse date-format fixed-date-time))))
 
 (defn- read-date [row]
   (if (:read-at row)
-    (formatted-date-time (:read-at row))
+    (lib-time/csv-date (:read-at row))
     empty-value))
 
 (defn- clean-value [row k]
@@ -51,17 +52,18 @@
 (defn- post-href [entry-data]
   (str ls/web-server-domain (oc-urls/entry (:board-slug entry-data) (:uuid entry-data))))
 
-(defn- csv-description []
-  (str "Downloaded on " (formatted-date-time)))
+(defn- csv-intro [org-name]
+  (str "Analytics for " org-name " generated on " (lib-time/csv-date) "\n"))
 
-(defn encoded-csv [entry-data headers data]
+(defn encoded-csv [org-data entry-data headers data]
   (let [header (when headers (s/join ", " headers))
         cleaned-data (map clean-user data)
         body (csv-rows cleaned-data)
-        title (:headline entry-data)
-        post-link (post-href entry-data)
-        description (csv-description)
-        csv-content (s/join "\n" [title post-link description "" header body])]
+        title (str "Title: " (:headline entry-data))
+        published (str "Published on: " (lib-time/csv-date (:published-at entry-data)))
+        post-link (str "Link: " (post-href entry-data))
+        intro (csv-intro (:name org-data))
+        csv-content (s/join "\n" [intro title published post-link "-" header body])]
     (str "data:text/csv;charset=utf-8," (js/encodeURIComponent csv-content))))
 
 (defn csv-filename [entry-data]

@@ -183,7 +183,8 @@
         billing-click (when show-billing?
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
-                          (partial premium-picker-click s)))]
+                          (partial premium-picker-click s)))
+        download-csv-link (utils/link-for (:links org-data) "wrt-csv")]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -301,6 +302,12 @@
                :on-click billing-click}
               [:div.oc-menu-item
                 billing-label]])
+          (when download-csv-link
+            [:a.download-wrt
+             {:href (:href download-csv-link)
+              :target "_blank"}
+             [:div.oc-menu-item
+              "Download CSV"]])
           ;; What's new & Support separator
           (when-not is-mobile?
             [:div.oc-menu-separator])
