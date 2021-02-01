@@ -2,14 +2,13 @@
   (:require [cuerdas.core :as s]
             [oc.lib.time :as lib-time]
             [oc.web.urls :as oc-urls]
-            [oc.web.local-settings :as ls]
-            ;; [cljs-time.format :as format]
-            ;; [cljs-time.core :as time]
-            ))
+            [oc.web.local-settings :as ls]))
 
 (def column-separator ", ")
 (def row-separator "\n")
 (def empty-value "-")
+
+(def premium-download-csv-tooltip "Please upgrade to premium to download your team's Analytics data.")
 
 (defn- csv-row [row]
   (let [values (map #(if (keyword? %) (name %) %) row)]
@@ -18,15 +17,6 @@
 (defn- csv-rows [rows]
   (let [rows-list (map csv-row rows)]
     (s/join row-separator rows-list)))
-
-;; (defn- formatted-date-time
-;;   ([] (formatted-date-time (time/now)))
-;;   ([date-time]
-;;    (let [date-format (format/formatter "MMM dd yyyy hh:mma")
-;;          fixed-date-time (if (time/date? date-time)
-;;                            date-time
-;;                            (lib-time/from-iso date-time))]
-;;      (format/unparse date-format fixed-date-time))))
 
 (defn- read-date [row]
   (if (:read-at row)

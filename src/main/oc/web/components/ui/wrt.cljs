@@ -107,7 +107,6 @@
 
 (def premium-remind-all-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
 (def premium-remind-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
-(def premium-download-csv-tooltip "Please upgrade to premium to download your team's Analytics data.")
 
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
@@ -206,7 +205,7 @@
                                (assoc :name "Team member")))
                         sorted-filtered-users)
         download-csv-tooltip (when-not (:premium? org-data)
-                               (str premium-download-csv-tooltip " Click for details"))]
+                               (str wu/premium-download-csv-tooltip " Click for details"))]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -221,7 +220,7 @@
         :on-click #(when @(::list-view-dropdown-open s)
                       (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
                         (reset! (::list-view-dropdown-open s) false))
-                        (du/prevent-default %))}
+                        (du/prevent-default! %))}
         [:div.wrt-popup-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
@@ -324,7 +323,7 @@
                           "#")
                   :on-click (when-not (:premium? org-data)
                               #(do
-                                 (du/prevent-default %)
+                                 (du/prevent-default! %)
                                  (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
                               (wu/csv-filename activity-data))
@@ -333,7 +332,7 @@
                   :data-container "body"
                   :title (if (:premium? org-data)
                           (str "Download analytics data in excel compatible format.")
-                          premium-download-csv-tooltip)}
+                          wu/premium-download-csv-tooltip)}
                 "Download CSV"]])
             [:div.wrt-popup-list
               (for [u users-list

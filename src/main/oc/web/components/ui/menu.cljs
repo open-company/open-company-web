@@ -4,10 +4,12 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.utils.wrt :as wu]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.dom :as  dom-utils]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.whats-new :as whats-new]
@@ -22,64 +24,64 @@
   (nav-actions/menu-close))
 
 (defn logout-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (jwt-actions/logout))
 
 (defn profile-edit-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
   (nav-actions/show-user-settings :profile))
 
 (defn my-profile [_s cur-user-id e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn my-posts-click [s cur-user-id e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn notifications-settings-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-user-settings :notifications))
 
 (defn team-settings-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :org))
 
 (defn manage-team-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :team))
 
 (defn invite-team-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :invite-picker))
 
 (defn integrations-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :integrations))
 
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (user-actions/show-login :login-with-slack))
 
 (defn whats-new-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (whats-new/show))
 
 (defn reminders-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-reminders))
 
 (defn premium-picker-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (nav-actions/toggle-premium-picker!))
 
 (defn manage-subscription-click [s payments-data e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (when-not @(::loading-manage-sub s)
     (reset! (::loading-manage-sub s) true)
     (payments-actions/manage-subscription! payments-data
@@ -111,7 +113,7 @@
     client-version))
 
 (defn- theme-settings-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-theme-settings))
 
 (defn- setup-env-clicks [s]
@@ -132,7 +134,7 @@
                   (rum/local nil ::hr)
                   (rum/local false ::complete-info)
                   (rum/local false ::loading-manage-sub)
-  mixins/refresh-tooltips-mixin
+  mixins/strict-refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -184,10 +186,12 @@
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
                           (partial premium-picker-click s)))
-        download-csv-link (utils/link-for (:links org-data) "wrt-csv")]
+        download-csv-link (utils/link-for (:links org-data) "wrt-csv")
+        show-download-csv? (and download-csv-link
+                                (not (-> org-data :content-visibility :disallow-wrt-download)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
-       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
+       :on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :menu-container))
                     (menu-close s))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close s)}]
@@ -302,10 +306,20 @@
                :on-click billing-click}
               [:div.oc-menu-item
                 billing-label]])
-          (when download-csv-link
+          (when show-download-csv?
             [:a.download-wrt
              {:href (:href download-csv-link)
-              :target "_blank"}
+              :on-click (if-not (:premium? org-data)
+                          premium-picker-click
+                          #(menu-close s))
+              :target "_blank"
+              :data-toggle (when-not is-mobile?
+                             "tooltip")
+              :data-container "body"
+              :data-placement "top"
+              :title (if (:premium? org-data)
+                       (str "Download analytics data in excel compatible format.")
+                       (str wu/premium-download-csv-tooltip " Click for details"))}
              [:div.oc-menu-item
               "Download CSV"]])
           ;; What's new & Support separator
