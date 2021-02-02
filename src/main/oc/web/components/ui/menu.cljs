@@ -298,14 +298,6 @@
               :on-click #(integrations-click s %)}
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
-          ;; Billing
-          (when show-billing?
-            [:a.payments
-              {:href "#"
-               :class (when-not manage-sub? "try-premium")
-               :on-click billing-click}
-              [:div.oc-menu-item
-                billing-label]])
           (when show-download-csv?
             [:a.download-wrt
              {:href (:href download-csv-link)
@@ -321,7 +313,15 @@
                        (str "Download analytics data in excel compatible format.")
                        (str wu/premium-download-csv-tooltip " Click for details"))}
              [:div.oc-menu-item
-              "Download CSV"]])
+              "Analytics"]])
+          ;; Billing
+          (when show-billing?
+            [:a.payments
+              {:href "#"
+               :class (when-not manage-sub? "try-premium")
+               :on-click billing-click}
+              [:div.oc-menu-item
+                billing-label]])
           ;; What's new & Support separator
           (when-not is-mobile?
             [:div.oc-menu-separator])
