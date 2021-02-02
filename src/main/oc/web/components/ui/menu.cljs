@@ -304,7 +304,7 @@
                       (:href download-csv-link)
                       oc-urls/pricing)
               :on-click (if-not (:premium? org-data)
-                          premium-picker-click
+                          billing-click
                           #(menu-close s))
               :target "_blank"
               :data-toggle (when-not is-mobile?
