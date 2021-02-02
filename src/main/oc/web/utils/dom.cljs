@@ -127,6 +127,6 @@
   (when (fn? (oget e "preventDefault"))
     (ocall e "preventDefault")))
 
-(defn stop-event! [e]
+(defn event-stop! [e]
   (prevent-default! e)
   (stop-propagation! e))
