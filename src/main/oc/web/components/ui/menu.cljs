@@ -300,7 +300,9 @@
                 "Integrations"]])
           (when show-download-csv?
             [:a.download-wrt
-             {:href (:href download-csv-link)
+             {:href (when (:premium? org-data)
+                      (:href download-csv-link)
+                      oc-urls/pricing)
               :on-click (if-not (:premium? org-data)
                           premium-picker-click
                           #(menu-close s))
