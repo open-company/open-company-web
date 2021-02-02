@@ -322,9 +322,9 @@
                           (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] all-users-list)
                           "#")
                   :on-click (when-not (:premium? org-data)
-                              #(do
-                                 (du/prevent-default! %)
-                                 (nav-actions/toggle-premium-picker! download-csv-tooltip)))
+                              (fn [e]
+                                (du/prevent-default! e)
+                                (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
                               (wu/csv-filename activity-data))
                   :data-toggle (when-not is-mobile? "tooltip")
