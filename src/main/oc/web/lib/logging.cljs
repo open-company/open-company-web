@@ -9,7 +9,7 @@
     (when (#{:trace :debug :info :warn :error :fatal :report} level-kw)
       (timbre/info "Log level:" level-kw)
       (reset! carrot-log-level level-kw)
-      (timbre/merge-config! {:level level-kw}))))
+      (timbre/merge-config! {:min-level level-kw}))))
 
 (defn dbg [& args]
   (when (= @carrot-log-level :debug)
