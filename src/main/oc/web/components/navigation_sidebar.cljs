@@ -166,7 +166,7 @@
 
 (defn- board-clicked [s board-slug e]
   (dom-utils/prevent-default! e)
-  (when-let [f (-> s ::throttled-fns deref :board board-slug)]
+  (when-let [f (-> s ::throttled-fns deref :board (get board-slug))]
     (ocall f "fire" e board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
