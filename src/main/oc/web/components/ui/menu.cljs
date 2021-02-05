@@ -187,7 +187,8 @@
                           (partial manage-subscription-click s payments-data)
                           (partial premium-picker-click s)))
         download-csv-link (utils/link-for (:links org-data) "wrt-csv")
-        show-download-csv? (and download-csv-link
+        show-download-csv? (and (not is-mobile?)
+                                download-csv-link
                                 (not (-> org-data :content-visibility :disallow-wrt-download)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
@@ -299,23 +300,29 @@
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
           (when show-download-csv?
-            [:a.download-wrt
-             {:href (if (:premium? org-data)
-                      (:href download-csv-link)
-                      oc-urls/pricing)
-              :on-click (if (:premium? org-data)
-                          #(menu-close s)
-                          billing-click)
-              :target "_blank"
-              :data-toggle (when-not is-mobile?
-                             "tooltip")
-              :data-container "body"
-              :data-placement "top"
-              :title (if (:premium? org-data)
-                       (str "Download analytics data in excel compatible format.")
-                       (str wu/premium-download-csv-tooltip " Click for details"))}
-             [:div.oc-menu-item
-              "Analytics"]])
+            (if (:premium? org-data)
+              [:a.download-wrt
+               {:href (:href download-csv-link)
+                :on-click #(menu-close s)
+                :target "_blank"
+                :data-toggle (when-not is-mobile?
+                               "tooltip")
+                :data-container "body"
+                :data-placement "top"
+                :title (str "Download analytics data in excel compatible format.")}
+               [:div.oc-menu-item
+                "Analytics"]]
+              [:a.download-wrt
+               {:href oc-urls/pricing
+                :on-click billing-click
+                :target "_blank"
+                :data-toggle (when-not is-mobile?
+                               "tooltip")
+                :data-container "body"
+                :data-placement "top"
+                :title (str wu/premium-download-csv-tooltip " Click for details")}
+               [:div.oc-menu-item
+                "Analytics"]]))
           ;; Billing
           (when show-billing?
             [:a.payments
