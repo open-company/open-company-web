@@ -300,12 +300,12 @@
                 "Integrations"]])
           (when show-download-csv?
             [:a.download-wrt
-             {:href (when (:premium? org-data)
+             {:href (if (:premium? org-data)
                       (:href download-csv-link)
                       oc-urls/pricing)
-              :on-click (if-not (:premium? org-data)
-                          billing-click
-                          #(menu-close s))
+              :on-click (if (:premium? org-data)
+                          #(menu-close s)
+                          billing-click)
               :target "_blank"
               :data-toggle (when-not is-mobile?
                              "tooltip")
