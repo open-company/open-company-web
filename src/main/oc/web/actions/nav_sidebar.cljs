@@ -59,10 +59,9 @@
           org-slug (dis/current-org-slug)
           sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
       (if (= current-path url)
-        (do ;; In case user is clicking on the currently highlighted section
-            ;; let's refresh the posts list only
+        (do ;; In case use clicked on the current container, refresh all the posts until now
           (routing-actions/post-routing)
-          (user-actions/initial-loading refresh?))
+          (activity-actions/refresh-current-container))
         (do ;; If user clicked on a different section/container
             ;; let's switch to it using pushState and changing
             ;; the internal router state
@@ -98,9 +97,9 @@
           is-container? (dis/is-container? board-slug)
           org-data (dis/org-data)]
       (if (= current-path url)
-        (do ;; In case user clicked on the current location let's refresh it
+        (do ;; In case use clicked on the current container, refresh all the posts until now
           (routing-actions/post-routing)
-          (user-actions/initial-loading))
+          (activity-actions/refresh-current-container))
         (do ;; If user clicked on a different section/container
             ;; let's switch to it using pushState and changing
             ;; the internal router state
