@@ -125,9 +125,6 @@
                             ;; Bookmarks
                             (show-bookmarks? org-data)
                             (assoc :bookmarks (Throttle. #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)) throttle-ms))
-                            ;; Drafts
-                            (show-drafts? org-data)
-                            (assoc :drafts (Throttle. #(nav-actions/nav-to-url! %1 %2 (oc-urls/board %2)) throttle-ms))
                             ;; Boards
                             (and (show-boards? s org-data)
                                  (seq sorted-follow-boards))
@@ -136,7 +133,10 @@
                                                         (hash-map (:slug b)
                                                                   (Throttle. #(nav-actions/nav-to-url! % (:slug b) (oc-urls/board (:slug b)))
                                                                              throttle-ms)))
-                                                      sorted-follow-boards))))]
+                                                      sorted-follow-boards)))
+                            ;; Drafts
+                            (show-drafts? org-data)
+                            (assoc-in [:boards utils/default-drafts-board-slug] (Throttle. #(nav-actions/nav-to-url! %1 %2 (oc-urls/board %2)) throttle-ms)))]
     (reset! (::throttled-fns s)throttled-fns-map)))
 
 (defn- home-clicked [s e]
