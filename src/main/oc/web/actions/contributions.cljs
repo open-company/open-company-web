@@ -1,8 +1,5 @@
 (ns oc.web.actions.contributions
-  (:require-macros [if-let.core :refer (if-let* when-let*)])
-  (:require [clojure.string :as s]
-            [defun.core :refer (defun)]
-            [taoensso.timbre :as timbre]
+  (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -11,7 +8,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]
-            [oc.web.lib.json :refer (json->cljs cljs->json)]))
+            [oc.web.lib.json :refer (json->cljs)]))
 
 (defn- watch-boards [posts-data]
   (when (jwt/jwt) ; only for logged in users

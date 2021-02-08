@@ -265,11 +265,11 @@
   ([replies-link org-slug sort-type keep-seen-at? finish-cb]
    (replies-real-get replies-link org-slug sort-type keep-seen-at? false finish-cb))
   ([replies-link org-slug sort-type keep-seen-at? refresh? finish-cb]
-  (api/get-all-posts replies-link
-   (fn [resp]
-     (replies-get-finish org-slug sort-type keep-seen-at? refresh? resp)
-     (when (fn? finish-cb)
-       (finish-cb resp))))))
+   (api/get-all-posts replies-link
+    (fn [resp]
+      (replies-get-finish org-slug sort-type keep-seen-at? refresh? resp)
+      (when (fn? finish-cb)
+        (finish-cb resp))))))
 
 (defn replies-get
   ([] (replies-get (dis/org-data) false nil))
