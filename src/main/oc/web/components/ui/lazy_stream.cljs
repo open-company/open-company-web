@@ -6,22 +6,23 @@
 
 (rum/defcs lazy-stream < rum/static
                          rum/reactive
-                         (rum/local false ::delayed)
+                        ;;  (rum/local false ::delayed)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
                          (drv/drv :board-slug)
                          (drv/drv :foc-layout)
                          {:did-mount (fn [s]
                            (utils/scroll-to-y (dis/route-param :scroll-y) 0)
-                           (utils/after 10 #(reset! (::delayed s) true))
+                          ;;  (utils/after 10 #(reset! (::delayed s) true))
                            s)}
   [s stream-comp]
   (let [container-data (drv/react s :container-data)
         activity-data (drv/react s :activity-data)
         current-board-slug (drv/react s :board-slug)
         foc-layout (drv/react s :foc-layout)
-        ready? (and @(::delayed s)
-                    (map? container-data))
+        ;; ready? (and @(::delayed s)
+        ;;             (map? container-data))
+        ready? (map? container-data)
         collapsed-foc? (or (= foc-layout dis/other-foc-layout)
                            (= current-board-slug "replies"))]
     [:div.lazy-stream
