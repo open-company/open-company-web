@@ -1,6 +1,7 @@
 (ns oc.web.utils.wrt
   (:require [cuerdas.core :as s]
             [oc.lib.time :as lib-time]
+            [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
             [oc.web.local-settings :as ls]))
 
@@ -20,21 +21,15 @@
 
 (defn- read-date [row]
   (if (:read-at row)
-    (lib-time/csv-date (:read-at row))
+    (lib-time/csv-date-time (:read-at row))
     empty-value))
 
 (defn- clean-value [row k]
   (get row k empty-value))
 
-(defn- name-from-user [{first-name :first-name last-name :last-name}]
-  (cond (and (seq first-name) (seq last-name))
-        (str first-name " " last-name)
-        (seq first-name)
-        first-name
-        (seq last-name)
-        last-name
-        :else
-        empty-value))
+(defn- name-from-user [user-map]
+  (or (lib-user/name-for user-map)
+      empty-value))
 
 (defn- clean-user [row]
   (vec [(name-from-user row) (clean-value row :email) (read-date row)]))
@@ -43,14 +38,14 @@
   (str ls/web-server-domain (oc-urls/entry (:board-slug entry-data) (:uuid entry-data))))
 
 (defn- csv-intro [org-name]
-  (str "Analytics for " org-name " generated on " (lib-time/csv-date) "\n"))
+  (str org-name " analytics for post generated on " (lib-time/csv-date) "\n"))
 
 (defn encoded-csv [org-data entry-data headers data]
   (let [header (when headers (s/join ", " headers))
         cleaned-data (map clean-user data)
         body (csv-rows cleaned-data)
         title (str "Title: " (:headline entry-data))
-        published (str "Published on: " (lib-time/csv-date (:published-at entry-data)))
+        published (str "Published on: " (lib-time/csv-date-time (:published-at entry-data)))
         post-link (str "Link: " (post-href entry-data))
         intro (csv-intro (:name org-data))
         csv-content (s/join "\n" [intro title published post-link "-" header body])]
