@@ -1,4 +1,5 @@
 (ns oc.web.actions.contributions
+  (:require-macros [if-let.core :refer (if-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
