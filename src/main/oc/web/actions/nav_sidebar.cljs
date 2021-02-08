@@ -50,9 +50,7 @@
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
   ([e author-uuid url back-y refresh?]
-   (when (and e
-              (.-preventDefault e))
-     (.preventDefault e))
+   (dom-utils/prevent-default! e)
    (when (responsive/is-mobile-size?)
      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
      (notif-actions/hide-mobile-user-notifications))
@@ -88,9 +86,7 @@
    (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
   ([e board-slug url back-y refresh?]
-   (when (and e
-              (.-preventDefault e))
-     (.preventDefault e))
+   (dom-utils/prevent-default! e)
    (when (responsive/is-mobile-size?)
      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
      (notif-actions/hide-mobile-user-notifications))
@@ -104,7 +100,7 @@
       (if (= current-path url)
         (do ;; In case user clicked on the current location let's refresh it
           (routing-actions/post-routing)
-          (user-actions/initial-loading refresh?))
+          (user-actions/initial-loading))
         (do ;; If user clicked on a different section/container
             ;; let's switch to it using pushState and changing
             ;; the internal router state
@@ -307,9 +303,7 @@
 ;; Integrations
 
 (defn open-integrations-panel [e]
-  (when e
-    (.preventDefault e)
-    (.stopPropagation e))
+  (dom-utils/event-stop! e)
   (if (responsive/is-mobile-size?)
     (let [alert-data {:action "mobile-integrations-link"
                       :message (str ls/product-name " integrations need to be configured in a desktop browser.")

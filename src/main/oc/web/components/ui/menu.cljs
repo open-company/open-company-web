@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.actions.jwt :as jwt-actions]
@@ -22,64 +23,64 @@
   (nav-actions/menu-close))
 
 (defn logout-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (jwt-actions/logout))
 
 (defn profile-edit-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
   (nav-actions/show-user-settings :profile))
 
 (defn my-profile [_s cur-user-id e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn my-posts-click [s cur-user-id e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn notifications-settings-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-user-settings :notifications))
 
 (defn team-settings-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :org))
 
 (defn manage-team-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :team))
 
 (defn invite-team-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :invite-picker))
 
 (defn integrations-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :integrations))
 
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (user-actions/show-login :login-with-slack))
 
 (defn whats-new-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (whats-new/show))
 
 (defn reminders-click [_s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-reminders))
 
 (defn premium-picker-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (menu-close s)
   (nav-actions/toggle-premium-picker!))
 
 (defn manage-subscription-click [s payments-data e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (when-not @(::loading-manage-sub s)
     (reset! (::loading-manage-sub s) true)
     (payments-actions/manage-subscription! payments-data
@@ -111,7 +112,7 @@
     client-version))
 
 (defn- theme-settings-click [s e]
-  (.preventDefault e)
+  (dom-utils/prevent-default! e)
   (nav-actions/show-theme-settings))
 
 (defn- setup-env-clicks [s]

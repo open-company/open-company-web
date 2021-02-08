@@ -142,32 +142,32 @@
 (defn- home-clicked [s e]
   (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :home)]
-    (ocall f "fire" e)))
+    (ocall f "?fire" e)))
 
 (defn- explore-clicked [s e]
   (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :topics)]
-    (ocall f "fire" e)))
+    (ocall f "?fire" e)))
 
 (defn- activity-clicked [s e]
   (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :replies)]
-    (ocall f "fire" e)))
+    (ocall f "?fire" e)))
 
 (defn- profile-clicked [s user-id e]
   (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :profile)]
-    (ocall f "fire" e user-id)))
+    (ocall f "?fire" e user-id)))
 
 (defn- bookmarks-clicked [s e]
   (dom-utils/prevent-default! e)
   (let [f (-> s ::throttled-fns deref :bookmarks)]
-    (ocall f "fire" e)))
+    (ocall f "?fire" e)))
 
 (defn- board-clicked [s board-slug e]
   (dom-utils/prevent-default! e)
   (when-let [f (-> s ::throttled-fns deref :board (get board-slug))]
-    (ocall f "fire" e board-slug)))
+    (ocall f "?fire" e board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
