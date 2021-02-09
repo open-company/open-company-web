@@ -7,10 +7,13 @@
             [oc.web.utils.org :as ou]
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
-            [oc.web.utils.activity :as au]))
+            [oc.web.utils.activity :as au]
+            [oc.lib.time :as lib-time]))
 
 (defn- item-from-entity [entry]
   (select-keys entry au/preserved-keys))
+
+(def min-iso8601 (lib-time/to-iso (lib-time/from-millis 0)))
 
 (defn- update-sort-value
   "Calculate the sort value as used on the server while quering the data.
@@ -23,16 +26,14 @@
                                                 :last-activity-at
                                                 (= sort-type :bookmarked-at)
                                                 :bookmarked-at
-                                                (and container-id
-                                                     (contains? item :pinned-at))
+                                                container-id
                                                 :pinned-at
                                                 :else
                                                 :published-at)
-                                 activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))
-                                 sort-val (.getTime (utils/js-date (get activity-data sort-key)))]
+                                 activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))]
                              (if (= sort-key :pinned-at)
-                               (+ sort-val pins-store/pins-sort-pivot-ms)
-                               sort-val)))))
+                               (str (or (get-in activity-data [:pins (keyword container-id) :pinned-at]) min-iso8601) (:published-at activity-data))
+                               (get activity-data sort-key))))))
 
 (defn- add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity

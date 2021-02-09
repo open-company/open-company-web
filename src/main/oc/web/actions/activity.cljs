@@ -283,7 +283,7 @@
  ([] (replies-refresh (dis/org-data) true))
  ([org-data] (replies-refresh org-data true))
  ([org-data keep-seen-at?]
-  (if-let* [replies-data (dis/following-data)
+  (if-let* [replies-data (dis/replies-data)
             refresh-link (utils/link-for (:links replies-data) "refresh")]
     (replies-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? true nil)
     (replies-get org-data keep-seen-at? nil))))
