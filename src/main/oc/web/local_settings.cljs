@@ -120,3 +120,5 @@
 
 ;; Pins sort pivot
 (def pins-sort-pivot-days (.parseInt js/window (or (env :pins-sort-pivot-days) (* 365 100)) 10))
+
+(defonce default-csv-days 30)

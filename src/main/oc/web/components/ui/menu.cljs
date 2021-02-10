@@ -17,6 +17,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -125,6 +126,15 @@
                                    :taps 5
                                    :pointers 1}))
         (.on hr "fivetaps" (fn [_] (reset! (::complete-info s) true)))))))
+
+(defn- show-analytics-no-posts-alert []
+  (alert-modal/show-alert {:action "analytics-no-posts"
+                           :title "No posts :("
+                           :message (str "There is no data for the past " ls/default-csv-days " days.")
+                           :solid-button-style :red
+                           :solid-button-title "OK, got it"
+                           :solid-button-dismiss true
+                           :solid-button-click #(alert-modal/dismiss-modal)}))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :payments)
@@ -303,13 +313,17 @@
             (if (:premium? org-data)
               [:a.download-wrt
                {:href (:href download-csv-link)
-                :on-click #(menu-close s)
+                :on-click (if (pos? (:wrt-posts-count org-data))
+                            #(menu-close s)
+                            (fn [e]
+                              (dom-utils/prevent-default! e)
+                              (show-analytics-no-posts-alert)))
                 :target "_blank"
                 :data-toggle (when-not is-mobile?
                                "tooltip")
                 :data-container "body"
                 :data-placement "top"
-                :title (str "Download analytics data in excel compatible format.")}
+                :title (str "Download analytics for the past " ls/default-csv-days " days in excel-compatible format")}
                [:div.oc-menu-item
                 "Analytics"]]
               [:a.download-wrt

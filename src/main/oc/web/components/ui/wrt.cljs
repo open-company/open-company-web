@@ -158,7 +158,7 @@
                                           reads))))
         seen-users (vec (sort-by :name (:reads read-data)))
         unseen-users (vec (sort-by :name (:unreads read-data)))
-        all-users (sort-by :name (concat seen-users unseen-users))
+        all-users (concat (:reads read-data) (:unreads read-data))
         query (::query s)
         lower-query (string/lower (or @query ""))
         list-view (::list-view s)
@@ -167,13 +167,9 @@
                         :seen seen-users
                         :unseen unseen-users)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
-        sort-all-users (sort-users (:user-id current-user-data) all-users)
-        all-users-list (map #(if (:premium? org-data)
-                               %
-                               (-> %
-                                   (assoc :avatar-url @(::jelly-head s))
-                                   (assoc :name "Team member")))
-                             sort-all-users)
+        csv-users-list (when (:premium? org-data)
+                         (->> (concat (:reads read-data*) (:unreads read-data*))
+                              (sort-users (:user-id current-user-data))))
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         team-id (:team-id org-data)
@@ -319,7 +315,7 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:href (if (:premium? org-data)
-                          (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] all-users-list)
+                          (wu/encoded-csv org-data activity-data ["Name" "Email" (str "Read (" (count (:reads read-data*)) ")")] csv-users-list (:user-id current-user-data))
                           "#")
                   :on-click (when-not (:premium? org-data)
                               (fn [e]
