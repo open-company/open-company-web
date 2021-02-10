@@ -16,8 +16,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)])
-  (:import [goog.async Throttle]))
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
 
@@ -87,87 +86,29 @@
   (or (:member? org-data)
       (seq @(drv/get-ref s :contributions-id))))
 
-(defn- dispose-fn [throttled-fn]
-  (when (fn? throttled-fn)
-    (ocall throttled-fn "disposeInterval")))
-
-(defn- dispose-fns-map [fns]
-  (doseq [[k v] fns]
-    (if (map? v)
-      (dispose-fns-map v)
-      (dispose-fn v))))
-
-(defn- dispose-all-throttled-fns [s]
-  (let [throttled-fns @(::throttled-fns s)]
-    (dispose-fns-map throttled-fns)
-    (reset! (::throttled-fns s) nil)))
-
-(def throttle-ms (* 10 1000))
-
-(defn- setup-throttle-fns [s]
-  (dispose-all-throttled-fns s)
-  (let [org-data @(drv/get-ref s :org-data)
-        follow-boards-list @(drv/get-ref s :follow-boards-list)
-        sorted-follow-boards (filter-sort-boards follow-boards-list)
-        throttled-fns-map (cond-> {}
-                            ;; Home
-                            (show-following? org-data)
-                            (assoc :home (Throttle. #(nav-actions/nav-to-url! % "following" (oc-urls/following)) throttle-ms))
-                            ;; Topics
-                            (show-topics? org-data)
-                            (assoc :topics (Throttle. #(nav-actions/nav-to-url! % "topics" (oc-urls/topics)) throttle-ms))
-                            ;; Replies
-                            (show-replies? org-data)
-                            (assoc :replies (Throttle. #(nav-actions/nav-to-url! % "replies" (oc-urls/replies)) throttle-ms))
-                            ;; Profile
-                            (show-profile? s org-data)
-                            (assoc :profile (Throttle. #(nav-actions/nav-to-author! %1 %2 (oc-urls/contributions %2)) throttle-ms))
-                            ;; Bookmarks
-                            (show-bookmarks? org-data)
-                            (assoc :bookmarks (Throttle. #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)) throttle-ms))
-                            ;; Boards
-                            (and (show-boards? s org-data)
-                                 (seq sorted-follow-boards))
-                            (assoc :boards (into {}
-                                                 (map (fn [b]
-                                                        (hash-map (:slug b)
-                                                                  (Throttle. #(nav-actions/nav-to-url! % (:slug b) (oc-urls/board (:slug b)))
-                                                                             throttle-ms)))
-                                                      sorted-follow-boards)))
-                            ;; Drafts
-                            (show-drafts? org-data)
-                            (assoc-in [:boards utils/default-drafts-board-slug] (Throttle. #(nav-actions/nav-to-url! %1 %2 (oc-urls/board %2)) throttle-ms)))]
-    (reset! (::throttled-fns s)throttled-fns-map)))
-
 (defn- home-clicked [s e]
   (dom-utils/prevent-default! e)
-  (let [f (-> s ::throttled-fns deref :home)]
-    (ocall f "?fire" e)))
+  (nav-actions/nav-to-url! e "following" (oc-urls/following)))
 
 (defn- explore-clicked [s e]
   (dom-utils/prevent-default! e)
-  (let [f (-> s ::throttled-fns deref :topics)]
-    (ocall f "?fire" e)))
+  (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
 
 (defn- activity-clicked [s e]
   (dom-utils/prevent-default! e)
-  (let [f (-> s ::throttled-fns deref :replies)]
-    (ocall f "?fire" e)))
+  (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
 
 (defn- profile-clicked [s user-id e]
   (dom-utils/prevent-default! e)
-  (let [f (-> s ::throttled-fns deref :profile)]
-    (ocall f "?fire" e user-id)))
+  (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
 
 (defn- bookmarks-clicked [s e]
   (dom-utils/prevent-default! e)
-  (let [f (-> s ::throttled-fns deref :bookmarks)]
-    (ocall f "?fire" e)))
+  (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
 
 (defn- board-clicked [s board-slug e]
   (dom-utils/prevent-default! e)
-  (when-let [f (-> s ::throttled-fns deref :boards (get board-slug))]
-    (ocall f "?fire" e board-slug)))
+  (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
@@ -192,14 +133,12 @@
                                 (rum/local true ::show-invite-people?)
                                 (rum/local false ::absolute-position)
                                 (rum/local false ::sections-list-collapsed)
-                                (rum/local nil ::throttled-fns)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize fix-navbar-position)
 
                                 {:did-mount (fn [s]
                                   (fix-navbar-position s)
-                                  (setup-throttle-fns s)
                                   s)
                                  :will-mount (fn [s]
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
