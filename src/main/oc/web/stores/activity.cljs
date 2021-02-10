@@ -7,13 +7,10 @@
             [oc.web.utils.org :as ou]
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
-            [oc.web.utils.activity :as au]
-            [oc.lib.time :as lib-time]))
+            [oc.web.utils.activity :as au]))
 
 (defn- item-from-entity [entry]
   (select-keys entry au/preserved-keys))
-
-(def min-iso8601 (lib-time/to-iso (lib-time/from-millis 0)))
 
 (defn- update-sort-value
   "Calculate the sort value as used on the server while quering the data.
@@ -32,7 +29,8 @@
                                                 :published-at)
                                  activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))]
                              (if (= sort-key :pinned-at)
-                               (str (or (get-in activity-data [:pins (keyword container-id) :pinned-at]) min-iso8601) (:published-at activity-data))
+                               (str (get-in activity-data [:pins (keyword container-id) :pinned-at] pins-store/no-pin-sort-value) ;; default to min iso8601
+                                    (:published-at activity-data))
                                (get activity-data sort-key))))))
 
 (defn- add-remove-item-from-all-posts

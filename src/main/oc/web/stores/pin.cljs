@@ -1,11 +1,10 @@
 (ns oc.web.stores.pin
   (:require [oc.web.dispatcher :as dispatcher]
-            [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as user-utils]
-            [oc.web.local-settings :as ls]
+            [oc.lib.time :as lib-time]
             [oc.web.utils.activity :as activity-utils]))
 
-(def pins-sort-pivot-ms (* 1000 60 60 24 ls/pins-sort-pivot-days))
+(def no-pin-sort-value (lib-time/to-iso (lib-time/from-millis 0)))
 
 (defn toggle-pin
   [db org-slug entry-data pin-container-uuid container-key board?]
@@ -19,15 +18,14 @@
         active-users (dispatcher/active-users org-slug db)
         existing-pins (get-in db (conj entry-key :pins) {})
         pinned-at (when-not on?
-                    (utils/as-of-now))
+                    (lib-time/to-iso (lib-time/utc-now)))
         updated-pins (if on?
                       (dissoc existing-pins pin-container-kw)
                       (assoc existing-pins pin-container-kw {:author (user-utils/author-for-user current-user-data)
                                                              :pinned-at pinned-at}))
-        new-sort-value (let [t (.getTime (utils/js-date pinned-at))]
-                         (if on?
-                           (- t pins-sort-pivot-ms)
-                           (+ t pins-sort-pivot-ms)))
+        new-sort-value (if on?
+                         (str no-pin-sort-value (:published-at entry-data))
+                         (str pinned-at (:published-at entry-data)))
         update-sort-item-fn (fn [entry]
                               (if (= (:uuid entry) (:uuid entry-data))
                                 (-> entry

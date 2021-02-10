@@ -758,12 +758,12 @@
                                  (vec (conj next-links link-to-move))
                                  next-links)
                                (:links board-data))
-            pinned-at #(assoc % :pinned-at (get-in % [:pins (keyword (:uuid board-data)) :pinned-at]))
+            pinned-at-fn #(assoc % :pinned-at (get-in % [:pins (keyword (:uuid board-data)) :pinned-at]))
             items-list (when (contains? board-data :entries)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
                                 (assoc :resource-type :entry)
-                                (pinned-at)
+                                (pinned-at-fn)
                                 (select-keys preserved-keys))
                           (:entries board-data)))
             full-items-list (merge-items-lists items-list (:posts-list board-data) direction)
@@ -907,13 +907,13 @@
                                  next-links)
                                (:links container-data))
             replies? (= (-> container-data :container-slug keyword) :replies)
-            pinned-at #(assoc % :pinned-at (get-in % [:pins (keyword (:container-id container-data)) :pinned-at]))
+            pinned-at-fn #(assoc % :pinned-at (get-in % [:pins (keyword (:container-id container-data)) :pinned-at]))
             items-list (when (contains? container-data :items)
                          ;; In case we are parsing a fresh response from server
                          (map #(-> %
                                 (assoc :resource-type :entry)
                                 (merge (get-in with-fixed-activities [:fixed-items (:uuid %)]))
-                                (pinned-at)
+                                (pinned-at-fn)
                                 (select-keys preserved-keys))
                           (:items container-data)))
             items-list* (merge-items-lists items-list (:posts-list container-data) direction)
