@@ -42,6 +42,21 @@
   (when author-uuid
     (contributions-actions/contributions-get author-uuid)))
 
+(def ^:private click-throttle-ms (* 1000 15))
+
+(defonce refresh-delays (atom {}))
+
+(defn- maybe-refresh-container [container-slug]
+  (let [container-kw (keyword container-slug)]
+    (when (-> refresh-delays deref container-kw not)
+      ;; Set lock
+      (swap! refresh-delays assoc container-kw true)
+      ;; Pre-set unlock
+      (utils/after click-throttle-ms #(swap! refresh-delays dissoc container-kw))
+      ;; Do action
+      (routing-actions/post-routing)
+      (activity-actions/refresh-current-container))))
+
 (defn nav-to-author!
   ([e author-uuid url]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
@@ -59,9 +74,7 @@
           org-slug (dis/current-org-slug)
           sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
       (if (= current-path url)
-        (do ;; In case use clicked on the current container, refresh all the posts until now
-          (routing-actions/post-routing)
-          (activity-actions/refresh-current-container))
+        (maybe-refresh-container (str "-author-" author-uuid))
         (do ;; If user clicked on a different section/container
             ;; let's switch to it using pushState and changing
             ;; the internal router state
@@ -97,9 +110,7 @@
           is-container? (dis/is-container? board-slug)
           org-data (dis/org-data)]
       (if (= current-path url)
-        (do ;; In case use clicked on the current container, refresh all the posts until now
-          (routing-actions/post-routing)
-          (activity-actions/refresh-current-container))
+        (maybe-refresh-container (str "-container-" board-slug))
         (do ;; If user clicked on a different section/container
             ;; let's switch to it using pushState and changing
             ;; the internal router state
