@@ -50,8 +50,12 @@
         title (str "Title: " (:headline entry-data))
         published (str "Published on: " (lib-time/csv-date-time (:published-at entry-data)))
         post-link (str "Link: " (post-href entry-data))
+        reads-count (count (filter :read-at data))
+        reads-percent (when (pos? reads-count)
+                        (str (.toFixed (float (* (/ reads-count (count data)) 100)) 2) "%"))
+        stats (str "Reads: " (count (filter :read-at data)) " of " (count data) (when reads-percent (str " (" reads-percent ")")))
         intro (csv-intro (:name org-data))
-        csv-content (s/join "\n" [intro title published post-link "-" header body])]
+        csv-content (s/join "\n" [intro title published post-link stats "-" header body])]
     (str "data:text/csv;charset=utf-8," (js/encodeURIComponent csv-content))))
 
 (defn csv-filename [entry-data]
