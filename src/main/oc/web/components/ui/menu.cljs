@@ -133,8 +133,7 @@
                            :message (str "There is no data for the past " ls/default-csv-days " days.")
                            :solid-button-style :red
                            :solid-button-title "OK, got it"
-                           :solid-button-dismiss true
-                           :solid-button-click #(alert-modal/dismiss-modal)}))
+                           :solid-button-cb #(alert-modal/dismiss-modal)}))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :payments)
