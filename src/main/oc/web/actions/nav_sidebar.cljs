@@ -55,7 +55,8 @@
       (utils/after click-throttle-ms #(swap! refresh-delays dissoc container-kw))
       ;; Do action
       (routing-actions/post-routing)
-      (activity-actions/refresh-current-container))))
+      ;; Refresh container and update the seen at since it's an explicit action from the user
+      (activity-actions/refresh-current-container true))))
 
 (defn nav-to-author!
   ([e author-uuid url]

@@ -618,31 +618,32 @@
           (when board-link
             (sa/section-get (:slug fixed-board-data) board-link)))))))
 
-(defn refresh-current-container []
-  (when-not (dis/current-activity-id)
-    (let [current-board-slug (dis/current-board-slug)
-          current-contrib-id (dis/current-contributions-id)
-          org-data (dis/org-data)
-          container-data (dis/current-container-data)
-          board-kw (keyword current-board-slug)]
-      (cond (= board-kw :topics)
-            (load-explore-data)
-            (= board-kw :all-posts)
-            (all-posts-refresh org-data)
-            (= board-kw :bookmarks)
-            (bookmarks-refresh org-data)
-            (= board-kw :replies)
-            (replies-refresh org-data true)
-            (= board-kw :following)
-            (following-refresh org-data true)
-            (= board-kw :unfollowing)
-            (unfollowing-refresh org-data true)
-            (seq current-contrib-id)
-            (contrib-actions/contributions-refresh org-data current-contrib-id)
-            (not (dis/is-container? current-board-slug))
-            (sa/section-refresh current-board-slug)
-            :else
-            (reload-current-container)))))
+(defn refresh-current-container
+  ([] (refresh-current-container false))
+  ([refresh-seen-at?]
+   (when-not (dis/current-activity-id)
+     (let [current-board-slug (dis/current-board-slug)
+           current-contrib-id (dis/current-contributions-id)
+           org-data (dis/org-data)
+           board-kw (keyword current-board-slug)]
+       (cond (= board-kw :topics)
+             (load-explore-data)
+             (= board-kw :all-posts)
+             (all-posts-refresh org-data)
+             (= board-kw :bookmarks)
+             (bookmarks-refresh org-data)
+             (= board-kw :replies)
+             (replies-refresh org-data refresh-seen-at?)
+             (= board-kw :following)
+             (following-refresh org-data refresh-seen-at?)
+             (= board-kw :unfollowing)
+             (unfollowing-refresh org-data refresh-seen-at?)
+             (seq current-contrib-id)
+             (contrib-actions/contributions-refresh org-data current-contrib-id)
+             (not (dis/is-container? current-board-slug))
+             (sa/section-refresh current-board-slug)
+             :else
+             (reload-current-container))))))
 
 (declare entry-revert)
 
