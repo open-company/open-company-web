@@ -315,7 +315,7 @@
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
                  {:class (when (or (not= @list-view :all)
-                                   (not (string/blank? lower-query)))
+                                   (not (string/empty-or-nil? lower-query)))
                            "hide-download-bt")
                   :href (if (:premium? org-data)
                           (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] csv-users-list (:user-id current-user-data))

@@ -29,7 +29,7 @@
 
   ([container-slug sort-type]
    (and ;; only on board/containers/contributions pages
-        (not (s/blank? container-slug))
+        (not (s/empty-or-nil? container-slug))
         ;; never on mobile
         (not (responsive/is-mobile-size?))
         ;; only on recently posted sorting except for replies
@@ -168,7 +168,7 @@
    (some (partial resource-type? resource-data) resource-types))
 
   ([resource-data resource-type :guard string?]
-   (when-not (s/blank? resource-type)
+   (when-not (s/empty-or-nil? resource-type)
      (resource-type? resource-data resource-type)))
 
   ([resource-data resource-type :guard keyword?]
@@ -345,11 +345,11 @@
   (seq (:attachments data)))
 
 (defn has-headline? [data]
-  (-> data :headline s/trim s/blank? not))
+  (-> data :headline s/trim s/empty-or-nil? not))
 
 (defn empty-body? [body]
   (boolean
-   (or (s/blank? body)
+   (or (s/empty-or-nil? body)
        (re-matches #"(?i)^(\s*<p[^>]*>\s*(<br[^>]*/?>)*?\s*</p>\s*)*$" body))))
 
 (defn has-body? [data]
@@ -573,7 +573,7 @@
                                (reverse))
              commenters (->> authors-list
                              (map user-name)
-                             (remove s/blank?))
+                             (remove s/empty-or-nil?))
              mention-regexp (js/RegExp. (str "data-user-id=\"" current-user-id "\"") "ig")
              mention? (and (not (:self? (:author last-comment)))
                            (.match (:body last-comment) mention-regexp))
