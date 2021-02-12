@@ -17,7 +17,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
-            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -126,14 +125,6 @@
                                    :taps 5
                                    :pointers 1}))
         (.on hr "fivetaps" (fn [_] (reset! (::complete-info s) true)))))))
-
-(defn- show-analytics-no-posts-alert []
-  (alert-modal/show-alert {:action "analytics-no-posts"
-                           :title "No posts :("
-                           :message (str "There is no data for the past " ls/default-csv-days " days.")
-                           :solid-button-style :red
-                           :solid-button-title "OK, got it"
-                           :solid-button-cb #(alert-modal/dismiss-modal)}))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :payments)
@@ -316,7 +307,7 @@
                             #(menu-close s)
                             (fn [e]
                               (dom-utils/prevent-default! e)
-                              (show-analytics-no-posts-alert)))
+                              (wu/empty-analytics-alert)))
                 :target "_blank"
                 :data-toggle (when-not is-mobile?
                                "tooltip")

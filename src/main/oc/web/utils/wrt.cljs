@@ -3,7 +3,8 @@
             [oc.lib.time :as lib-time]
             [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
-            [oc.web.local-settings :as ls]))
+            [oc.web.local-settings :as ls]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def column-separator ", ")
 (def row-separator "\n")
@@ -60,3 +61,11 @@
 
 (defn csv-filename [entry-data]
   (str "post-" (:uuid entry-data) "-" (lib-time/to-iso (lib-time/utc-now)) ".csv"))
+
+(defn empty-analytics-alert []
+  (alert-modal/show-alert {:action "analytics-no-posts"
+                           :title "No posts :("
+                           :message (str "There have been no new posts in the past " ls/default-csv-days " days.")
+                           :solid-button-style :red
+                           :solid-button-title "OK, got it"
+                           :solid-button-cb #(alert-modal/dismiss-modal)}))

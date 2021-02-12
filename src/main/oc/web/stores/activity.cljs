@@ -7,7 +7,8 @@
             [oc.web.utils.org :as ou]
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
-            [oc.web.utils.activity :as au]))
+            [oc.web.utils.activity :as au]
+            [clojure.set :as set]))
 
 (defn- item-from-entity [entry]
   (select-keys entry au/preserved-keys))
@@ -785,8 +786,8 @@
                           (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)
         all-ids         (set (map :user-id filtered-users))
-        unseen-ids      (clojure.set/difference all-ids seen-ids)
-        unseen-users    (vec (map get-user-info unseen-ids))
+        unseen-ids      (set/difference all-ids seen-ids)
+        unseen-users    (set/difference unseen-ids)
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
