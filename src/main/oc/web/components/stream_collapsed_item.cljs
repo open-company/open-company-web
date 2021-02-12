@@ -173,19 +173,23 @@
               [:div.stream-item-headline.ap-seen-item-headline
                {:ref "activity-headline"
                 :data-itemuuid (:uuid activity-data)
+                :class utils/hide-class
                 :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]]
           [:div.stream-collapsed-item-fill
             [:div.stream-collapsed-item-avatar
+              {:class utils/hide-class}
               (face-pile {:width 24 :faces (:authors (:for-you-context activity-data))})]
             [:div.stream-item-context
+             {:class utils/hide-class}
              (str (-> activity-data :for-you-context :label) " in:")]
             ;; Needed to wrap mobile on a new line
             [:div.stream-item-break]
             ;; [:div.stream-item-arrow]
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
-              :data-itemuuid (:uuid activity-data)
-              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+               :data-itemuuid (:uuid activity-data)
+               :class utils/hide-class
+               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             [:div.stream-collapsed-item-dot.muted-dot]
             [:div.new-item-tag]
             [:div.bookmark-tag-small]
@@ -196,7 +200,7 @@
             [:div.collapsed-time
               (let [t (:timestamp (:for-you-context activity-data))]
                 [:time
-                {:date-time t
+                 {:date-time t
                   :data-toggle (when-not is-mobile? "tooltip")
                   :data-placement "top"
                   :data-container "body"

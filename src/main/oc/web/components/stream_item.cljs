@@ -25,6 +25,7 @@
   [:div.stream-item-body.oc-mentions
     {:data-itemuuid (:uuid activity-data)
      :ref :item-body
+     :class utils/hide-class
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
 (defn win-width []
@@ -238,14 +239,16 @@
         {:class (when show-body-thumbnail? "has-preview")}
         [:div.stream-item-headline.ap-seen-item-headline
           {:ref "activity-headline"
-            :data-itemuuid (:uuid activity-data)
-            :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+           :data-itemuuid (:uuid activity-data)
+           :class utils/hide-class
+           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
         (stream-item-summary activity-data)
         (when show-body-thumbnail?
           [:div.stream-item-preview-container
             [:img.stream-item-preview
              {:data-image (:thumbnail (:body-thumbnail activity-data))
               :on-load clear-cell-measure-cb
+              :class utils/hide-class
               :src (-> activity-data
                        :body-thumbnail
                        :thumbnail
