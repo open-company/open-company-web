@@ -314,8 +314,11 @@
                        (not (get-in org-data [:content-visibility :disallow-wrt-download])))
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
-                 {:href (if (:premium? org-data)
-                          (wu/encoded-csv org-data activity-data ["Name" "Email" (str "Read (" (count (:reads read-data*)) ")")] csv-users-list (:user-id current-user-data))
+                 {:class (when (or (not= @list-view :all)
+                                   (not (string/blank? lower-query)))
+                           "hide-download-bt")
+                  :href (if (:premium? org-data)
+                          (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] csv-users-list (:user-id current-user-data))
                           "#")
                   :on-click (when-not (:premium? org-data)
                               (fn [e]

@@ -387,6 +387,11 @@ div.wrt-popup-container {
           font-size: 14px;
           text-decoration: underline;
           @include OC_Body_Book();
+
+          &.hide-download-bt {
+            opacity: 0 !important;
+            pointer-events: none;
+          }
         }
       }
 
