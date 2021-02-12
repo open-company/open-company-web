@@ -146,9 +146,7 @@
 
 (defn foc-date-time [past-date & [flags]]
   (let [past-js-date (js-date past-date)
-        past (.getTime past-js-date)
-        now-date (js-date)
-        now (.getTime now-date)]
+        now-date (js-date)]
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
@@ -157,9 +155,7 @@
 
 (defn explore-date-time [past-date & [flags]]
   (let [past-js-date (js-date past-date)
-        past (.getTime past-js-date)
-        now-date (js-date)
-        now (.getTime now-date)]
+        now-date (js-date)]
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
@@ -484,14 +480,14 @@
     (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
-    (catch :default e
+    (catch :default _
       false)))
 
 (defn body-without-preview [body]
   (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)
         hidden-class (str "activity-body-" (int (rand 10000)))
         $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
-        appened-body (.append (js/$ (.-body js/document)) $body-content)
+        _ (.append (js/$ (.-body js/document)) $body-content)
         _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
                                                                         (let [$this (js/$ this)]
                                                                           (.remove $this))))

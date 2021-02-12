@@ -2,9 +2,7 @@
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
-            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
@@ -13,21 +11,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.face-pile :refer (face-pile)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.info-hover-views :refer (user-info-hover)]))
-
-(defn- prefixed-html
-  "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.
-   To prevent it we need to add an empty div as first element of the body."
-  [html-string]
-  (str "<div class=\"hide-tooltip\"></div>" html-string))
-
-(defn- stream-item-summary [activity-data]
-  [:div.stream-item-body.oc-mentions
-    {:data-itemuuid (:uuid activity-data)
-     :dangerouslySetInnerHTML {:__html (prefixed-html (:body activity-data))}}])
+            [oc.web.mixins.gestures :refer (swipe-gesture-manager)]))
 
 (defn- dismiss-swipe-button [s & [e ref-kw]]
   (when e
@@ -84,9 +68,7 @@
   [s {:keys [activity-data read-data comments-data]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
-        current-activity-id (drv/react s :activity-uuid)
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
-        is-inbox? (= current-board-slug "inbox")
         dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
         dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)

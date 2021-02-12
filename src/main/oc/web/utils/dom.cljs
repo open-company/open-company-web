@@ -65,8 +65,6 @@
   [el & [offset]]
   (let [fixed-offset (or offset 0)
         rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
         doc-element (oget js/document "documentElement")
         win-height (or (oget doc-element "clientHeight")
                        (oget js/window "innerHeight"))]
@@ -80,8 +78,6 @@
   [el & [offset]]
   (let [fixed-offset (or offset 0)
         rect (.getBoundingClientRect el)
-        zero-pos? #(or (zero? %)
-                       (pos? %))
         doc-element (oget js/document "documentElement")
         win-height (or (oget doc-element "clientHeight")
                        (oget js/window "innerHeight"))]

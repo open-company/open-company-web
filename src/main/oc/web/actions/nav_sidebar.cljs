@@ -133,8 +133,6 @@
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
                                  (:refresh route)
                                  (not cont-data))
-        ;; Get the previous scroll top position
-        default-back-y (or (:back-y route) (utils/page-scroll-top))
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
         back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
@@ -148,7 +146,7 @@
   ([entry-data dont-scroll]
    (open-post-modal entry-data dont-scroll nil))
 
-  ([entry-data dont-scroll comment-uuid]
+  ([entry-data _dont-scroll comment-uuid]
   (let [org (dis/current-org-slug)
         entry-board-slug (:board-slug entry-data)
         current-sort-type (dis/current-sort-type)

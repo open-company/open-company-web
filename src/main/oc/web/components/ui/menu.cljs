@@ -20,7 +20,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn menu-close [& [s]]
+(defn menu-close [& [_state]]
   (nav-actions/menu-close))
 
 (defn logout-click [s e]
@@ -102,7 +102,7 @@
                    :href ls/android-app-url}
       ua/ios?     {:title "Download iOS app"
                    :href ls/ios-app-url}
-      :default nil)))
+      :else       nil)))
 
 (def client-version "3.0")
 
@@ -112,7 +112,7 @@
     (.getElectronAppVersion js/OCCarrotDesktop)
     client-version))
 
-(defn- theme-settings-click [s e]
+(defn- theme-settings-click [_state e]
   (dom-utils/prevent-default! e)
   (nav-actions/show-theme-settings))
 
