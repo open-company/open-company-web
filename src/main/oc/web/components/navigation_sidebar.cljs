@@ -1,6 +1,5 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            [oops.core :refer (ocall)]
             [org.martinklepsch.derivatives :as drv]
             [defun.core :refer (defun-)]
             [oc.web.urls :as oc-urls]
@@ -86,27 +85,27 @@
   (or (:member? org-data)
       (seq @(drv/get-ref s :contributions-id))))
 
-(defn- home-clicked [s e]
+(defn- home-clicked [e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "following" (oc-urls/following)))
 
-(defn- explore-clicked [s e]
+(defn- explore-clicked [e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
 
-(defn- activity-clicked [s e]
+(defn- activity-clicked [e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
 
-(defn- profile-clicked [s user-id e]
+(defn- profile-clicked [user-id e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
 
-(defn- bookmarks-clicked [s e]
+(defn- bookmarks-clicked [e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
 
-(defn- board-clicked [s board-slug e]
+(defn- board-clicked [board-slug e]
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
 
@@ -172,18 +171,13 @@
         ;                                          (and (not (s/starts-with? container-uuid drafts-board-prefix))
         ;                                               (not (= container-uuid (:uuid org-data)))))
         ;                                       change-data))
-        all-boards (:boards org-data)
         follow-boards-list (drv/react s :follow-boards-list)
         sorted-follow-boards (filter-sort-boards follow-boards-list)
-        user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
         is-following (= (keyword current-board-slug) :following)
-        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         is-topics (= (keyword current-board-slug) :topics)
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
         is-contributions (seq current-contributions-id)
-        is-self-profile? (and is-contributions
-                              (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (show-boards? s org-data)
         drafts-board (get-drafts-board org-data)
@@ -193,6 +187,7 @@
         show-drafts (show-drafts? org-data)
         show-replies (show-replies? org-data)
         show-profile (show-profile? s org-data)
+        show-topics (show-topics? org-data)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -204,7 +199,6 @@
         show-invite-people? (and org-slug
                                  is-admin-or-author?
                                  show-invite-box)
-        show-topics user-is-part-of-the-team?
         ; show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
         show-plus-button? (:can-compose? org-data)]
@@ -233,7 +227,7 @@
               {:class (utils/class-set {:item-selected is-following
                                         :new following-badge})
                :href (oc-urls/following)
-               :on-click (partial home-clicked s)}
+               :on-click home-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -247,7 +241,7 @@
             [:a.nav-link.topics.hover-item.group
               {:class (utils/class-set {:item-selected is-topics})
                :href (oc-urls/unfollowing)
-               :on-click (partial explore-clicked s)}
+               :on-click explore-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -263,7 +257,7 @@
               {:class (utils/class-set {:item-selected is-replies
                                         :new replies-badge})
                :href (oc-urls/replies)
-               :on-click (partial activity-clicked s)}
+               :on-click activity-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 ; {:class (utils/class-set {:new (seq all-unread-items)})}
@@ -271,19 +265,18 @@
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile
-          (let [contrib-user-id (if is-contributions current-contributions-id (:user-id current-user-data))]
-            [:div.left-navigation-sidebar-top
-              {:class (when (and (or show-following show-topics)
-                                 (not show-replies))
-                        "top-border")}
-              [:a.nav-link.profile.hover-item.group
-                {:class (utils/class-set {:item-selected is-contributions})
-                 :href (oc-urls/contributions (:user-id current-user-data))
-                 :on-click (partial profile-clicked s (:user-id current-user-data))}
-                [:div.nav-link-icon]
-                [:div.nav-link-label
+          [:div.left-navigation-sidebar-top
+           {:class (when (and (or show-following show-topics)
+                              (not show-replies))
+                     "top-border")}
+           [:a.nav-link.profile.hover-item.group
+            {:class (utils/class-set {:item-selected is-contributions})
+             :href (oc-urls/contributions (:user-id current-user-data))
+             :on-click (partial profile-clicked (:user-id current-user-data))}
+            [:div.nav-link-icon]
+            [:div.nav-link-label
                   ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                  "Profile"]]]))
+             "Profile"]]])
         ;; Bookmarks
         (when show-bookmarks
           [:div.left-navigation-sidebar-top
@@ -294,7 +287,7 @@
             [:a.nav-link.bookmarks.hover-item.group
               {:class (utils/class-set {:item-selected is-bookmarks})
                :href (oc-urls/bookmarks)
-               :on-click (partial bookmarks-clicked s)}
+               :on-click bookmarks-clicked}
               [:div.nav-link-icon]
               [:div.nav-link-label
                 "Bookmarks"]
@@ -318,7 +311,7 @@
                  :data-board (name (:slug drafts-board))
                  :key (str "board-list-" (name (:slug drafts-board)))
                  :href board-url
-                 :on-click (partial board-clicked s (:slug drafts-board))}
+                 :on-click (partial board-clicked (:slug drafts-board))}
                 [:div.nav-link-icon]
                 [:div.nav-link-label.group
                   "Drafts"]
@@ -359,7 +352,7 @@
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)) "-" (rand 100))
                  :href board-url
-                 :on-click (partial board-clicked s (:slug board))}
+                 :on-click (partial board-clicked (:slug board))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")
