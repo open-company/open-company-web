@@ -784,7 +784,7 @@
                           team-users)
         all-ids         (set (map :user-id filtered-users))
         unseen-ids      (set/difference all-ids seen-ids)
-        unseen-users    (set/difference unseen-ids)
+        unseen-users    (mapv get-user-info unseen-ids)
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
