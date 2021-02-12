@@ -745,11 +745,13 @@
 (defmethod dispatcher/action :activities-count
   [db [_ org-slug items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
-        ks (vec (map :item-id items-count))
-        vs (map #(zipmap [:count :reads :item-id]
-                         [(:count %)
-                          (get-in old-reads-data [(:item-id %) :reads])
-                          (:item-id %)]) items-count)
+        ks (map :item-id items-count)
+        vs (map #(let [author? (:publisher? (dispatcher/activity-data org-slug (:item-id %) db))
+                       cnt (if author? (max (dec (:count %)) 0) (:count %))]
+                   {:count cnt
+                    :reads (get-in old-reads-data [(:item-id %) :reads])
+                    :item-id (:item-id %)})
+                items-count)
         new-items-count (zipmap ks vs)
         last-read-at-map (zipmap ks (map :last-read-at items-count))]
     (as-> db tdb
