@@ -7,7 +7,8 @@
             [oc.web.utils.org :as ou]
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
-            [oc.web.utils.activity :as au]))
+            [oc.web.utils.activity :as au]
+            [clojure.set :as set]))
 
 (defn- item-from-entity [entry]
   (select-keys entry au/preserved-keys))
@@ -284,8 +285,8 @@
             follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
             parsed-rp-data (when rp-old-data
                              (-> rp-new-posts-list
-                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort))
-                              (dissoc :fixed-items))
+                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort)
+                              (dissoc :fixed-items)))
             parsed-ra-data (when ra-old-data
                              (-> ra-new-posts-list
                               (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recent-activity-sort)
@@ -322,7 +323,7 @@
     (assoc-in db [dispatch-input-key :attachments] next-attachments)))
 
 (defmethod dispatcher/action :entry-clear-local-cache
-  [db [_ edit-key]]
+  [db [_ _edit-key]]
   (dissoc db :entry-save-on-exit))
 
 (defmethod dispatcher/action :entry-save
@@ -455,7 +456,6 @@
         with-fixed-contribs (reduce
                              (fn [ndb ckey]
                                (let [contrib-data-key (dispatcher/contributions-key org-slug ckey)
-                                     contrib-posts-list-key (conj contrib-data-key :posts-list)
                                      contrib-data (get-in ndb contrib-data-key)
                                      updated-contrib-data (update contrib-data :posts-list (fn [posts-list]
                                                                                             (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
@@ -469,7 +469,6 @@
         with-fixed-boards (reduce
                            (fn [ndb ckey]
                              (let [board-data-key (dispatcher/board-data-key org-slug ckey)
-                                   posts-list-key (conj board-data-key :posts-list)
                                    board-data (get-in ndb board-data-key)
                                    updated-board-data (update board-data :posts-list (fn [posts-list]
                                                                                       (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
@@ -486,7 +485,7 @@
       (assoc-in with-fixed-boards posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
-  [db [_ activity-data org-slug board-data]]
+  [db [_ activity-data _org-slug _board-data]]
   (update db :foc-menu-open #(if (= % (:uuid activity-data)) nil %)))
 
 (defmethod dispatcher/action :activity-share-show
@@ -519,7 +518,7 @@
       (au/parse-entry shared-data (:board-slug shared-data) (dispatcher/change-data db))
       {:error true})))
 
-(defmethod dispatcher/action :entry-revert [db [_ entry]]
+(defmethod dispatcher/action :entry-revert [db [_ _entry]]
   ;; do nothing for now
   db)
 
@@ -669,7 +668,7 @@
 
 ;; Bookmarks
 
-(defn- bookmarks-get-finish [db org-slug sort-type bookmarks-data]
+(defn- bookmarks-get-finish [db org-slug _sort-type bookmarks-data]
   (let [org-data-key (dispatcher/org-data-key org-slug)
         org-data (get-in db org-data-key)
         change-data (dispatcher/change-data db org-slug)
@@ -694,7 +693,7 @@
   (bookmarks-get-finish db org-slug sort-type bookmarks-data))
 
 (defmethod dispatcher/action :bookmarks-more
-  [db [_ org-slug sort-type]]
+  [db [_ org-slug _sort-type]]
   (let [container-key (dispatcher/container-key org-slug :bookmarks)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)
@@ -704,7 +703,7 @@
      (update-in bookmarks-count-key #(ou/disappearing-count-value % (:total-count next-posts-data))))))
 
 (defmethod dispatcher/action :bookmarks-more/finish
-  [db [_ org sort-type direction posts-data]]
+  [db [_ org _sort-type direction posts-data]]
   (if posts-data
     (let [org-data-key (dispatcher/org-data-key org)
           org-data (get-in db org-data-key)
@@ -730,7 +729,6 @@
 (defmethod dispatcher/action :remove-bookmark
   [db [_ org-slug entry-data]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
-        bookmarks-key (dispatcher/container-key org-slug :bookmarks)
         org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
       (update-in (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (dec %)))
@@ -738,7 +736,7 @@
       (add-remove-item-from-bookmarks org-slug entry-data))))
 
 (defmethod dispatcher/action :add-bookmark
-  [db [_ org-slug activity-data]]
+  [db [_ org-slug _activity-data]]
   (let [org-data-key (dispatcher/org-data-key org-slug)]
     (update-in db (conj org-data-key :bookmarks-count) #(ou/disappearing-count-value % (inc %)))))
 
@@ -786,8 +784,8 @@
                           (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)
         all-ids         (set (map :user-id filtered-users))
-        unseen-ids      (clojure.set/difference all-ids seen-ids)
-        unseen-users    (vec (map get-user-info unseen-ids))
+        unseen-ids      (set/difference all-ids seen-ids)
+        unseen-users    (mapv get-user-info unseen-ids)
         current-user-id (j/user-id)
         current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
         last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
@@ -953,7 +951,7 @@
     db))
 
 (defmethod dispatcher/action :inbox/unread
-  [db [_ org-slug current-board-slug item-id]]
+  [db [_ org-slug _current-board-slug item-id]]
   (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           posts-list-key (conj inbox-key :posts-list)
@@ -1202,14 +1200,14 @@
   (assoc-in db (dispatcher/replies-badge-key org-slug) false))
 
 (defmethod dispatcher/action :container-seen
-  [db [_ org-slug container-id seen-at]]
+  [db [_ _org-slug _container-id _seen-at]]
   ; (if org-slug
   ;   (assoc-in db (dispatcher/container-seen-key org-slug container-id) seen-at)
   ;   db)
   db)
 
 (defmethod dispatcher/action :container-nav-in
-  [db [_ org-slug container-slug sort-type]]
+  [db [_ org-slug container-slug _sort-type]]
   (cond
    (= container-slug :replies)
    (assoc-in db (dispatcher/replies-badge-key org-slug) false)
@@ -1230,7 +1228,7 @@
      (au/update-container container-slug org-data change-data active-users))))
 
 (defmethod dispatcher/action :update-replies-comments
-  [db [_ org-slug current-board-slug]]
+  [db [_ org-slug _current-board-slug]]
   (let [org-data (dispatcher/org-data db org-slug)
         change-data (dispatcher/change-data db org-slug)
         active-users (dispatcher/active-users org-slug db)]

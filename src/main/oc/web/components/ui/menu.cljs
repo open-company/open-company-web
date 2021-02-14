@@ -4,11 +4,13 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.web.utils.wrt :as wu]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.dom :as  dom-utils]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.whats-new :as whats-new]
@@ -19,7 +21,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn menu-close [& [s]]
+(defn menu-close [& [_state]]
   (nav-actions/menu-close))
 
 (defn logout-click [s e]
@@ -101,7 +103,7 @@
                    :href ls/android-app-url}
       ua/ios?     {:title "Download iOS app"
                    :href ls/ios-app-url}
-      :default nil)))
+      :else       nil)))
 
 (def client-version "3.0")
 
@@ -111,7 +113,7 @@
     (.getElectronAppVersion js/OCCarrotDesktop)
     client-version))
 
-(defn- theme-settings-click [s e]
+(defn- theme-settings-click [_state e]
   (dom-utils/prevent-default! e)
   (nav-actions/show-theme-settings))
 
@@ -133,7 +135,7 @@
                   (rum/local nil ::hr)
                   (rum/local false ::complete-info)
                   (rum/local false ::loading-manage-sub)
-  mixins/refresh-tooltips-mixin
+  mixins/strict-refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -184,10 +186,14 @@
         billing-click (when show-billing?
                         (if manage-sub?
                           (partial manage-subscription-click s payments-data)
-                          (partial premium-picker-click s)))]
+                          (partial premium-picker-click s)))
+        download-csv-link (utils/link-for (:links org-data) "wrt-csv")
+        show-download-csv? (and (not is-mobile?)
+                                download-csv-link
+                                (not (-> org-data :content-visibility :disallow-wrt-download)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
-       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
+       :on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :menu-container))
                     (menu-close s))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close s)}]
@@ -294,6 +300,34 @@
               :on-click #(integrations-click s %)}
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
+          (when show-download-csv?
+            (if (:premium? org-data)
+              [:a.download-wrt
+               {:href (:href download-csv-link)
+                :on-click (if (pos? (:wrt-posts-count org-data))
+                            #(menu-close s)
+                            (fn [e]
+                              (dom-utils/prevent-default! e)
+                              (wu/empty-analytics-alert)))
+                :target "_blank"
+                :data-toggle (when-not is-mobile?
+                               "tooltip")
+                :data-container "body"
+                :data-placement "top"
+                :title (str "Download analytics for the past " ls/default-csv-days " days in excel-compatible format")}
+               [:div.oc-menu-item
+                "Analytics"]]
+              [:a.download-wrt
+               {:href oc-urls/pricing
+                :on-click billing-click
+                :target "_blank"
+                :data-toggle (when-not is-mobile?
+                               "tooltip")
+                :data-container "body"
+                :data-placement "top"
+                :title (str wu/premium-download-csv-tooltip " Click for details")}
+               [:div.oc-menu-item
+                "Analytics"]]))
           ;; Billing
           (when show-billing?
             [:a.payments

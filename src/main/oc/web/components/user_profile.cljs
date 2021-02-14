@@ -17,7 +17,7 @@
           [:div.user-profile-header-info-name
             [:span.name
               (:name user-data)]
-            (when-not (string/blank? (:role-string user-data))
+            (when-not (string/empty-or-nil? (:role-string user-data))
               [:span.role
                 (str "(" (string/capital (:role-string user-data)) ")")])
             (when (:self? user-data)
@@ -65,7 +65,7 @@
                     (str "@" (:display-name slack-user)))]))
             (when has-profile-links?
               (for [[k v] (:profiles user-data)
-                    :when (not (string/blank? v))
+                    :when (not (string/empty-or-nil? v))
                     :let [un (last (string/split v #"/"))]]
                 [:a.profile-link
                   {:class (name k)

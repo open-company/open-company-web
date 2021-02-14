@@ -2,6 +2,7 @@
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
+            [clojure.set :as set]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -30,7 +31,7 @@
           org-data (dis/org-data)
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
-      (ws-ic/board-unwatch (fn [rep]
+      (ws-ic/board-unwatch (fn [_]
         (let [board-uuids (map org-board-map board-slugs)]
           (timbre/debug "Watching on socket " board-slugs board-uuids)
           (ws-ic/boards-watch board-uuids)))))))
@@ -54,8 +55,7 @@
 (defn- bookmarks-get-finish
   [org-slug sort-type refresh? {:keys [body success]}]
   (when body
-    (let [posts-data-key (dis/posts-data-key org-slug)
-          bookmarks-data (when success (json->cljs body))]
+    (let [bookmarks-data (when success (json->cljs body))]
       (when (= (dis/current-board-slug) "bookmarks")
         (cook/set-cookie! (router/last-board-cookie org-slug) "bookmarks" (* 60 60 24 365))
         (request-reads-count (->> bookmarks-data :collection :items (map :uuid)))
@@ -83,7 +83,7 @@
  ([] (bookmarks-refresh (dis/org-data)))
  ([org-data]
   (if-let* [bookmarks-data (dis/bookmarks-data)
-              refresh-link (utils/link-for (:links bookmarks-data) "refresh")]
+            refresh-link (utils/link-for (:links bookmarks-data) "refresh")]
     (bookmarks-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil)
     (bookmarks-get org-data))))
 
@@ -100,9 +100,7 @@
 
 (defn- all-posts-get-finish [org-slug sort-type refresh? {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          posts-data-key (dis/posts-data-key org-slug)
-          all-posts-data (when success (json->cljs body))]
+    (let [all-posts-data (when success (json->cljs body))]
       (when (= (dis/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org-slug) "all-posts" (* 60 60 24 365))
         (request-reads-count (->> all-posts-data :collection :items (map :uuid)))
@@ -135,7 +133,7 @@
  ([] (all-posts-refresh (dis/org-data)))
  ([org-data]
   (if-let* [all-posts-data (dis/all-posts-data)
-              refresh-link (utils/link-for (:links all-posts-data) "refresh")]
+            refresh-link (utils/link-for (:links all-posts-data) "refresh")]
     (activity-real-get refresh-link (:slug org-data) dis/recently-posted-sort true nil)
     (all-posts-get org-data))))
 
@@ -152,8 +150,7 @@
 
 (defn- inbox-get-finish [org-slug sort-type {:keys [body success]}]
   (when body
-    (let [posts-data-key (dis/posts-data-key org-slug)
-          inbox-data (when success (json->cljs body))]
+    (let [inbox-data (when success (json->cljs body))]
       (when (= (dis/current-board-slug) "inbox")
         (cook/set-cookie! (router/last-board-cookie org-slug) "inbox" (* 60 60 24 365))
         (request-reads-count (->> inbox-data :collection :items (map :uuid)))
@@ -181,9 +178,7 @@
 
 (defn- following-get-finish [org-slug sort-type keep-seen-at? refresh? {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          posts-data-key (dis/posts-data-key org-slug)
-          following-data (when success (json->cljs body))
+    (let [following-data (when success (json->cljs body))
           current-board-slug (dis/current-board-slug)]
       (when (= current-board-slug "following")
         (cook/set-cookie! (router/last-board-cookie org-slug) "following" (* 60 60 24 365))
@@ -218,7 +213,7 @@
  ([org-data] (following-refresh org-data true))
  ([org-data keep-seen-at?]
   (if-let* [following-data (dis/following-data)
-              refresh-link (utils/link-for (:links following-data) "refresh")]
+            refresh-link (utils/link-for (:links following-data) "refresh")]
     (following-real-get refresh-link (:slug org-data) dis/recently-posted-sort keep-seen-at? true nil)
     (following-get org-data keep-seen-at? nil))))
 
@@ -249,9 +244,7 @@
 
 (defn- replies-get-finish [org-slug sort-type keep-seen-at? refresh? {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          posts-data-key (dis/posts-data-key org-slug)
-          replies-data (when success (json->cljs body))
+    (let [replies-data (when success (json->cljs body))
           current-board-slug (dis/current-board-slug)]
       (when (= current-board-slug "replies")
         (cook/set-cookie! (router/last-board-cookie org-slug) "replies" (* 60 60 24 365))
@@ -301,9 +294,7 @@
 
 (defn- unfollowing-get-finish [org-slug sort-type refresh? {:keys [body success]}]
   (when body
-    (let [org-data (dis/org-data)
-          posts-data-key (dis/posts-data-key org-slug)
-          unfollowing-data (when success (json->cljs body))]
+    (let [unfollowing-data (when success (json->cljs body))]
       (when (= (dis/current-board-slug) "unfollowing")
         (cook/set-cookie! (router/last-board-cookie org-slug) "unfollowing" (* 60 60 24 365))
         (request-reads-count (->> unfollowing-data :collection :items (map :uuid)))
@@ -356,7 +347,7 @@
   ([resp]
    (refresh-org-data-cb (dis/current-board-slug) (dis/current-sort-type) resp))
 
-  ([board-slug sort-type {:keys [status body success]}]
+  ([board-slug sort-type {:keys [body success]}]
   (let [org-data (when success (json->cljs body))
         board-kw (keyword board-slug)
         is-all-posts (= board-kw :all-posts)
@@ -365,7 +356,6 @@
         is-following (= board-kw :following)
         is-unfollowing (= board-kw :unfollowing)
         is-replies (= board-kw :replies)
-        is-drafts (= board-slug utils/default-drafts-board-slug)
         active-users (dis/active-users)
         is-contributions? (get active-users board-slug)
         board-data (dis/org-board-data org-data board-slug)
@@ -463,7 +453,7 @@
            ;; dispatch that you are auto saving
            (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :body (:body entry-map)})])
            (entry-save edit-key entry-map
-             (fn [_ _ {:keys [success body status]}]
+             (fn [_ _ {:keys [success body]}]
                (if-not success
                  ;; If save fails let's make sure save will be retried on next call
                  (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
@@ -527,7 +517,7 @@
                                                :expire 3
                                                :id :entry-updated-notification}))))
 
-(defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
+(defn create-update-entry-cb [entry-data edit-key {:keys [success body]}]
   (if success
     (entry-save-finish (:board-slug entry-data) (when body (json->cljs body)) (:uuid entry-data) edit-key)
     (dis/dispatch! [:entry-save/failed edit-key])))
@@ -560,7 +550,7 @@
 (defn get-org [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (fn [{:keys [status body success]}]
+    (api/get-org org-link (fn [{:keys [ body success]}]
                             (let [org-data (when success (json->cljs body))]
                               (dis/dispatch! [:org-loaded org-data])
                               (cb success))))))
@@ -611,7 +601,7 @@
              (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-unfollowing-get org-data)
 
-        :default
+        :else
         (let [fixed-board-data (or board-data
                                    (dis/org-board-data org-data board-slug))
               board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
@@ -647,8 +637,9 @@
 
 (declare entry-revert)
 
-(defn entry-clear-local-cache [item-uuid edit-key item]
+(defn entry-clear-local-cache
   "Removes user local cache and also reverts any auto saved drafts."
+  [item-uuid edit-key item]
   (cmail-actions/remove-cached-item item-uuid)
   ;; revert draft to old version
   (timbre/debug "Reverting to " @initial-revision item-uuid)
@@ -718,8 +709,7 @@
                                                                                     :board-uuid (:uuid response-board-data)})]
                                    (entry-save-cb updated-entry-data fixed-edit-key response))))))
              ;; Save new post to existing board
-         (let [org-slug (dis/current-org-slug)
-               entry-board-data (dis/org-board-data org-data (:board-slug fixed-edited-data))
+         (let [entry-board-data (dis/org-board-data org-data (:board-slug fixed-edited-data))
                entry-create-link (utils/link-for (:links entry-board-data) "create")]
            (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
@@ -741,14 +731,13 @@
     (when drafts-link
       (sa/section-get utils/default-drafts-board-slug drafts-link))))
 
-(defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
+(defn- entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [success body]}]
   (if success
     (entry-publish-finish entry-uuid edit-key (dis/current-org-slug) posted-to-board-slug (when success (json->cljs body)))
     (dis/dispatch! [:entry-publish/failed edit-key])))
 
 (defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
-  (let [board-slug (:slug new-board-data)
-        saved-entry-data (first (:entries new-board-data))]
+  (let [saved-entry-data (first (:entries new-board-data))]
     (au/save-last-used-section (:slug new-board-data))
     (cmail-actions/remove-cached-item entry-uuid)
     ;; reset initial revision after successful publish.
@@ -836,7 +825,7 @@
 (defn activity-share-reset []
   (dis/dispatch! [:activity-share-reset]))
 
-(defn activity-share-cb [{:keys [status success body]}]
+(defn activity-share-cb [{:keys [success body]}]
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
@@ -849,8 +838,6 @@
   (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
-          org-slug (dis/current-org-slug)
-          board-data (dis/board-data @dis/app-state org-slug (:board-slug entry-editing))
           revert-entry-link (when entry-exists?
                               ;; If the entry already exists use the publish link in it
                               (utils/link-for (:links entry-editing) "revert"))]
@@ -866,13 +853,13 @@
   (let [old-org-data (dis/org-data)]
     (-> secure-activity-data
       (select-keys [:org-uuid :org-name :org-slug :org-logo-url :team-id])
-      (clojure.set/rename-keys {:org-uuid :uuid
-                                :org-name :name
-                                :org-slug :slug
-                                :org-logo-url :logo-url})
+      (set/rename-keys {:org-uuid :uuid
+                        :org-name :name
+                        :org-slug :slug
+                        :org-logo-url :logo-url})
       (merge old-org-data))))
 
-(defn- secure-activity-get-finish [secure-uuid {:keys [status success body] :as resp}]
+(defn- secure-activity-get-finish [secure-uuid {:keys [success body] :as resp}]
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
     (cmail-actions/get-entry-finished (:slug org-data) nil resp secure-uuid)
@@ -911,7 +898,7 @@
         board-data (au/board-by-uuid container-id)]
     (when-not (= (:slug board-data) utils/default-drafts-board-slug)
       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
-       (fn [success status]
+       (fn [success]
          (when success
            (let [entry-data (dis/activity-data entry-uuid)
                  follow-boards-list (dis/follow-boards-list org-slug)
@@ -952,34 +939,28 @@
 
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/change
-    (fn [data]
-      (let [change-data (:data data)
-            container-id (:item-id change-data)
-            change-type (:change-type change-data)]
-        ;; Refresh AP if user is looking at it
-        (when (= (dis/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data)))
-        (when (= (dis/current-board-slug) "bookmarks")
-          (bookmarks-get (dis/org-data)))
-        ; (when (= (dis/current-board-slug) "following")
-        ;   (following-get (dis/org-data)))
-        (when (= (dis/current-board-slug) "unfollowing")
-          (unfollowing-get (dis/org-data)))
-        (when (= (dis/current-board-slug) "inbox")
-          (inbox-get (dis/org-data)))
-        )))
+    (fn [_data]
+      ;; Refresh AP if user is looking at it
+      (when (= (dis/current-board-slug) "all-posts")
+        (all-posts-get (dis/org-data)))
+      (when (= (dis/current-board-slug) "bookmarks")
+        (bookmarks-get (dis/org-data)))
+      ; (when (= (dis/current-board-slug) "following")
+      ;   (following-get (dis/org-data)))
+      (when (= (dis/current-board-slug) "unfollowing")
+        (unfollowing-get (dis/org-data)))
+      (when (= (dis/current-board-slug) "inbox")
+        (inbox-get (dis/org-data)))
+      ))
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
       (when (and (#{:dismiss :unread :follow :unfollow :comment-add} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
-              org-slug (dis/current-org-slug)
               container-id (:container-id change-data)
-              board-data (au/board-by-uuid container-id)
               entry-uuid (:item-id change-data)
               change-type (:change-type change-data)
-              inbox-action (:inbox-action change-data)
               current-board-slug (dis/current-board-slug)
               org-data (dis/org-data)]
           (cond
@@ -1020,8 +1001,6 @@
         (let [change-data (:data data)
               entry-uuid (:item-id change-data)
               container-id (:container-id change-data)
-              change-type (:change-type change-data)
-              inbox-action (:inbox-action change-data)
               org-data (dis/org-data)
               current-board-slug (dis/current-board-slug)]
           (timbre/debug "Comment added for" entry-uuid)
@@ -1231,8 +1210,7 @@
                              (cmail-actions/get-board-for-edit))]
       (activity-edit next-cmail-data)))
   ([activity-data]
-    (let [is-published? (= (:status activity-data) "published")
-          cmail-state {:key (utils/activity-uuid)
+    (let [cmail-state {:key (utils/activity-uuid)
                        :fullscreen true
                        :collapsed false}]
       (cmail-actions/cmail-show activity-data cmail-state))))
@@ -1316,7 +1294,7 @@
              is-contributions?)
         (contrib-actions/contributions-get to-slug)
 
-        :default
+        :else
         (when-let* [fixed-board-data (or board-data
                                          (dis/org-board-data org-data to-slug))
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
@@ -1358,7 +1336,7 @@
     (when dismiss-link
       (dis/dispatch! [:inbox/dismiss org-slug entry-uuid dismiss-at])
       (api/inbox-dismiss dismiss-link dismiss-at
-       (fn [{:keys [status success body] :as resp}]
+       (fn [resp]
          (cmail-actions/get-entry-finished org-slug entry-uuid resp)
        ; (inbox-get (dis/org-data))
          )))))
@@ -1382,7 +1360,7 @@
     (let [org-slug (dis/current-org-slug)]
       (dis/dispatch! [:inbox/unread org-slug (dis/current-board-slug) (:uuid activity-data)])
       (api/inbox-unread unread-link
-                        (fn [{:keys [status success body] :as resp}]
+                        (fn [resp]
                           (cmail-actions/get-entry-finished org-slug (:uuid activity-data) resp)
                         ; (inbox-get (dis/org-data))
                           )))))
@@ -1393,7 +1371,7 @@
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
     (dis/dispatch! [:inbox/dismiss-all (dis/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link dismiss-at
-     (fn [{:keys [status success body]}]
+     (fn [_resp]
        ; (inbox-get (dis/org-data))
        ))))
 

@@ -182,7 +182,7 @@
       "Button text"]]))
 
 (defn- rgb-from-hex [color]
-  (let [rm-blank #(remove string/blank? %)
+  (let [rm-blank #(remove string/empty-or-nil? %)
         colors (-> color
                    (string/split #"")
                    rm-blank

@@ -107,7 +107,6 @@
 
 (def premium-remind-all-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
 (def premium-remind-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
-(def premium-download-csv-tooltip "Please upgrade to premium to download your team's Analytics data.")
 
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
@@ -159,7 +158,7 @@
                                           reads))))
         seen-users (vec (sort-by :name (:reads read-data)))
         unseen-users (vec (sort-by :name (:unreads read-data)))
-        all-users (sort-by :name (concat seen-users unseen-users))
+        all-users (concat (:reads read-data) (:unreads read-data))
         query (::query s)
         lower-query (string/lower (or @query ""))
         list-view (::list-view s)
@@ -168,13 +167,9 @@
                         :seen seen-users
                         :unseen unseen-users)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
-        sort-all-users (sort-users (:user-id current-user-data) all-users)
-        all-users-list (map #(if (:premium? org-data)
-                               %
-                               (-> %
-                                   (assoc :avatar-url @(::jelly-head s))
-                                   (assoc :name "Team member")))
-                             sort-all-users)
+        csv-users-list (when (:premium? org-data)
+                         (->> (concat (:reads read-data*) (:unreads read-data*))
+                              (sort-users (:user-id current-user-data))))
         is-mobile? (responsive/is-tablet-or-mobile?)
         seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         team-id (:team-id org-data)
@@ -206,7 +201,7 @@
                                (assoc :name "Team member")))
                         sorted-filtered-users)
         download-csv-tooltip (when-not (:premium? org-data)
-                               (str premium-download-csv-tooltip " Click for details"))]
+                               (str wu/premium-download-csv-tooltip " Click for details"))]
     [:div.wrt-popup-container
       {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (du/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
@@ -319,13 +314,16 @@
                        (not (get-in org-data [:content-visibility :disallow-wrt-download])))
               [:div.wrt-download-csv-container.group
                 [:a.download-csv-bt
-                 {:href (if (:premium? org-data)
-                          (wu/encoded-csv activity-data ["Name" "Email" "Read"] all-users-list)
+                 {:class (when (or (not= @list-view :all)
+                                   (not (string/empty-or-nil? lower-query)))
+                           "hide-download-bt")
+                  :href (if (:premium? org-data)
+                          (wu/encoded-csv org-data activity-data ["Name" "Email" "Read"] csv-users-list (:user-id current-user-data))
                           "#")
                   :on-click (when-not (:premium? org-data)
-                              #(do
-                                 (du/prevent-default! %)
-                                 (nav-actions/toggle-premium-picker! download-csv-tooltip)))
+                              (fn [e]
+                                (du/prevent-default! e)
+                                (nav-actions/toggle-premium-picker! download-csv-tooltip)))
                   :download (when (:premium? org-data)
                               (wu/csv-filename activity-data))
                   :data-toggle (when-not is-mobile? "tooltip")
@@ -333,7 +331,7 @@
                   :data-container "body"
                   :title (if (:premium? org-data)
                           (str "Download analytics data in excel compatible format.")
-                          premium-download-csv-tooltip)}
+                          wu/premium-download-csv-tooltip)}
                 "Download CSV"]])
             [:div.wrt-popup-list
               (for [u users-list

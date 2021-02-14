@@ -117,3 +117,5 @@
 (def default-brand-color
   {:light default-color
    :dark default-color})
+
+(defonce default-csv-days 30)

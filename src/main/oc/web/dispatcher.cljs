@@ -797,7 +797,7 @@
 
 (defun ^:export route-param
   ([k] (route-param @app-state k))
-  ([data k :guard s-or-k?] (route-param [k]))
+  ([data k :guard s-or-k?] (route-param data [k]))
   ([data ks :guard coll?] (get-in data (concat [router-key] ks))))
 
 (defn ^:export route-set
@@ -1471,11 +1471,11 @@
 (set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 (set! (.-OCWebPrintRouterPath js/window) print-router-path)
 ;; Utility externs
-(set! (.-OCWebUtils js/window) #js {:deref cljs.core.deref
-                                    :keyword cljs.core.keyword
-                                    :count cljs.core.count
-                                    :get cljs.core.get
-                                    :filter cljs.core.filter
-                                    :map cljs.core.map
-                                    :clj__GT_js cljs.core.clj__GT_js
-                                    :js__GT_clj cljs.core.js__GT_clj})
+(set! (.-OCWebUtils js/window) #js {:deref deref
+                                    :keyword keyword
+                                    :count count
+                                    :get get
+                                    :filter filter
+                                    :map map
+                                    :clj__GT_js clj->js
+                                    :js__GT_clj js->clj})
