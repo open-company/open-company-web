@@ -7,12 +7,10 @@
    [:div.main.home-page
       ; Hope page header
     [:section.cta.group
-        [:h1.headline.tablet-mobile-only
-          "Team updates without the noise"]
-        [:h1.headline.big-web-only
-         "Team updates and communication without the noisy chatter"]
+        [:h1.headline
+         "Team updates and newsletters that inspire alignment"]
         [:div.subheadline
-         "Carrot is a personalized news feed that keeps your team in sync with fewer interruptions. Ideal for remote teams and asynchronous updates."]
+         "Keep your team focused on what matters with more effective internal communication."]
 
         [:div.get-started-button-container.group
           [:a.get-started-button.get-started-action
