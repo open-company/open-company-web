@@ -81,7 +81,7 @@ div.home-wrap {
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 860px;
+        max-width: 730px;
 
         @include mobile(){
           font-size: 36px;
@@ -102,7 +102,7 @@ div.home-wrap {
         margin: 16px auto 0;
         z-index: 2;
         position: relative;
-        max-width: 640px;
+        max-width: 480px;
 
         @include tablet(){
           font-size: 24px;
