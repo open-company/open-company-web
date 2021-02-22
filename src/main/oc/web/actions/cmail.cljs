@@ -108,8 +108,10 @@
                 (seq (dis/current-secure-activity-id)))
           (router/redirect-404!)
           (dis/dispatch! [:show-login-wall])))
-    ;; User trying to access a non published post
-    (when (and success-status?
+    ;; User trying to open a non published post?
+    (when (and (or (= (dis/current-secure-activity-id) secure-uuid)
+                   (= (dis/current-activity-id) entry-uuid))
+               success-status?
                (not published?))
       (router/redirect-404!))
     (cond
