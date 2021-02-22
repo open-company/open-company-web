@@ -89,7 +89,11 @@
   (let [activity-data (when success (json->cljs body))
         published? (au/is-published? activity-data)
         not-found-status? (<= 400 status 499)
-        success-status? (<= 200 status 299)]
+        success-status? (<= 200 status 299)
+        secure-post? (and (seq (dis/current-secure-activity-id))
+                          (= (dis/current-secure-activity-id) secure-uuid))
+        viewing-post? (and (seq (dis/current-activity-id))
+                           (= (dis/current-activity-id) entry-uuid))]
     (when (and secure-uuid
                published?
                (jwt/jwt)
@@ -109,8 +113,8 @@
           (router/redirect-404!)
           (dis/dispatch! [:show-login-wall])))
     ;; User trying to open a non published post?
-    (when (and (or (= (dis/current-secure-activity-id) secure-uuid)
-                   (= (dis/current-activity-id) entry-uuid))
+    (when (and (or secure-post?
+                   viewing-post?)
                success-status?
                (not published?))
       (router/redirect-404!))
