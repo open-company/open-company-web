@@ -86,31 +86,39 @@
 
 (defn get-entry-finished [org-slug entry-uuid {:keys [status success body]} & [secure-uuid]]
   ;; Redirect to the real post page in case user has access to it
-  (let [activity-data (when success (json->cljs body))]
+  (let [activity-data (when success (json->cljs body))
+        published? (au/is-published? activity-data)
+        not-found-status? (<= 400 status 499)
+        success-status? (<= 200 status 299)]
     (when (and secure-uuid
+               published?
                (jwt/jwt)
                (:member? (dis/org-data)))
-      (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data)))))
-  (when (and (< 399 status 500)
-             (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
-                 (and (seq entry-uuid)
-                      (= entry-uuid (dis/current-activity-id)))
-                 ;; We are trying to open a post via secure url but it doesn't exists
-                 (and (seq secure-uuid)
-                      (= secure-uuid (dis/current-secure-activity-id)))))
-      ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
-      (if (and (not (jwt/jwt))
-               (not (jwt/id-token))
-               (seq (dis/current-secure-activity-id)))
-        (router/redirect-404!)
-        (dis/dispatch! [:show-login-wall])))
-  (cond
-    (< 399 status 500)
-    (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
-    (not success)
-    (dis/dispatch! [:activity-get/failed org-slug entry-uuid secure-uuid])
-    :else
-    (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) secure-uuid])))
+      (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data))))
+    (when (and not-found-status?
+              (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
+                  (and (seq entry-uuid)
+                        (= entry-uuid (dis/current-activity-id)))
+                  ;; We are trying to open a post via secure url but it doesn't exists
+                  (and (seq secure-uuid)
+                        (= secure-uuid (dis/current-secure-activity-id)))))
+        ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
+        (if (and (not (jwt/jwt))
+                (not (jwt/id-token))
+                (seq (dis/current-secure-activity-id)))
+          (router/redirect-404!)
+          (dis/dispatch! [:show-login-wall])))
+    ;; User trying to access a non published post
+    (when (and success-status?
+               (not published?))
+      (router/redirect-404!))
+    (cond
+      not-found-status?
+      (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
+      (not success)
+      (dis/dispatch! [:activity-get/failed org-slug entry-uuid secure-uuid])
+      :else
+      (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) secure-uuid]))))
 
 (defn get-entry-with-uuid [board-slug entry-uuid & [loaded-cb]]
   (let [org-slug (dis/current-org-slug)
