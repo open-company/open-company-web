@@ -1,10 +1,8 @@
 (ns oc.web.actions.cmail
-  (:require [defun.core :refer (defun)]
-            [oc.web.api :as api]
+  (:require [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -90,31 +88,30 @@
         published? (au/is-published? activity-data)
         not-found-status? (<= 400 status 499)
         success-status? (<= 200 status 299)
-        secure-post? (and (seq (dis/current-secure-activity-id))
-                          (= (dis/current-secure-activity-id) secure-uuid))
-        viewing-post? (and (seq (dis/current-activity-id))
-                           (= (dis/current-activity-id) entry-uuid))]
-    (when (and secure-uuid
+        current-secure-post? (and (seq (dis/current-secure-activity-id))
+                                  (= (dis/current-secure-activity-id) secure-uuid))
+        current-post? (and (seq (dis/current-activity-id))
+                           (= (dis/current-activity-id) entry-uuid))
+        no-auth? (and (not (jwt/jwt))
+                      (not (jwt/id-token)))]
+    (when (and current-secure-post?
                published?
                (jwt/jwt)
                (:member? (dis/org-data)))
       (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data))))
+    ;; Show the login wall if trying to access a non-public post
     (when (and not-found-status?
-              (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
-                  (and (seq entry-uuid)
-                        (= entry-uuid (dis/current-activity-id)))
-                  ;; We are trying to open a post via secure url but it doesn't exists
-                  (and (seq secure-uuid)
-                        (= secure-uuid (dis/current-secure-activity-id)))))
-        ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
-        (if (and (not (jwt/jwt))
-                (not (jwt/id-token))
-                (seq (dis/current-secure-activity-id)))
-          (router/redirect-404!)
-          (dis/dispatch! [:show-login-wall])))
+               no-auth?
+               current-post?)
+      (dis/dispatch! [:show-login-wall]))
+    ;; Show a not found screen if the user is logged out and is trying to access a secure url. No login wall!
+    (when (and not-found-status?
+               no-auth?
+               current-secure-post?)
+      (router/redirect-404!))
     ;; User trying to open a non published post?
-    (when (and (or secure-post?
-                   viewing-post?)
+    (when (and (or current-secure-post?
+                   current-post?)
                success-status?
                (not published?))
       (router/redirect-404!))
