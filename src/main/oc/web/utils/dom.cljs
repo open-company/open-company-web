@@ -116,10 +116,10 @@
           (nil? (oget el "?offsetParent"))))))
 
 (defn stop-propagation! [e]
-  (ocall e "?stopPropagation"))
+  (and e (ocall e "?stopPropagation")))
 
 (defn prevent-default! [e]
-  (ocall e "?preventDefault"))
+  (and e (ocall e "?preventDefault")))
 
 (defn event-stop! [e]
   (prevent-default! e)
