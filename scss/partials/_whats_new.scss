@@ -7,6 +7,10 @@ div#HW_frame_cont {
   border-radius: 0;
   background-color: white;
 
+  &:not(.HW_visible) {
+    z-index: 1 !important;
+  }
+
   iframe {
     height: 100% !important;
   }

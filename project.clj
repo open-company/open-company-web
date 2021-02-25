@@ -130,7 +130,9 @@
             "start" ["pdo" ["auto" "build-site"]
                            ["ocweb"]] ; Site & cljs dev
             ; "watch-ocweb" ["auto" "ocweb"]
-            "ocweb" ["shell" "npm" "run" "dev:watch"] ; start js dev task
+            "ocweb" ["do" "local-env," "ocweb*"]
+            "ocweb*" ["shell" "npm" "run" "dev:watch"] ; start js dev task
+            "local-env" ["shell" "bin/local-env-js"]
             "watch-site" ["auto" "build-site"] ; Build the static website and watch for changes
             "build-site" ["run" "dev"] ; build the static website
 
