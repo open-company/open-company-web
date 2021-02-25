@@ -38,4 +38,4 @@ public/*.html
 electron-builder.env
 
 # Local env file used only in local development
-resources/public/lib/local-env.js
+public/lib/local-env.js

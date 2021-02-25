@@ -1,0 +1,17 @@
+#! /bin/bash
+
+local_env_folder="./public/lib/"
+local_env_example="${local_env_folder}local-env-example.js"
+local_env_file="${local_env_folder}local-env.js"
+ip_address="$LOCAL_DEV_HOST"
+port="$LOCAL_DEV_PORT"
+
+echo -n "Creating local-env.js file with ip $ip_address and port $port... "
+
+if [ ! -f $local_env_file ] ; then
+  sed -e "s/\${LOCAL_DEV_HOST}/$ip_address/" -e "s/\${LOCAL_DEV_PORT}/$port/" $local_env_example > $local_env_file
+  echo "Done"
+else
+  echo "File already exists."
+fi
+

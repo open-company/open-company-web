@@ -92,21 +92,14 @@ If you've done it right, you'll now have 4 terminal sessions running: Storage, A
 
 Open your browser to [http://localhost:3559/](http://localhost:3559/).
 
-If you want to use your local IP address instead of localhost to tests on a different device you just need to create a file named `resources/public/lib/local-env.js` with the following content:
-
-```
-var OCEnv = {
-  "web-hostname": "192.168.1.2",
-  "port": "3559"
-}
-```
-
-also set that same IP address in your environment:
+If you want to use your local IP address instead of `localhost` to tests on a different device you can set them in your environment with the following variable names:
 
 ```console
 export LOCAL_DEV_HOST=192.168.1.2
 export LOCAL_DEV_PORT=3559
 ```
+
+the [startup script](/bin/local-env-js) creates a copy of `resources/public/lib/local-env-example.js` and with those values.
 
 Then you can connect to [http://192.168.1.2:3559](http://192.168.1.2:3559). This file, and any of its keys, is optional.
 
