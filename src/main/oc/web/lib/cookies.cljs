@@ -7,7 +7,8 @@
 (def max-cookie-length Cookies/MAX_COOKIE_LENGTH)
 
 (defn- calc-length [cval]
-  (* (count cval) 2))
+  (when (string? cval)
+    (* (count cval) 2)))
 
 (defn- jwt-value [cname cval]
   (try
@@ -44,7 +45,7 @@
   ([c-name c-value expiry c-path]
     (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path c-domain c-secure]
-   (check-length c-name c-value)
+   (check-length c-name (str c-value))
    (.set cookies-static-obj (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
 (defn ^:export get-cookie
