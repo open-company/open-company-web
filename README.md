@@ -99,7 +99,7 @@ export LOCAL_DEV_HOST=192.168.1.2
 export LOCAL_DEV_PORT=3559
 ```
 
-the [startup script](/bin/local-env-js) creates a copy of `resources/public/lib/local-env-example.js` and with those values.
+the [startup script](/bin/local-env-js) creates a copy of `public/lib/local-env-example.js` and with those values.
 
 Then you can connect to [http://192.168.1.2:3559](http://192.168.1.2:3559). This file, and any of its keys, is optional.
 
