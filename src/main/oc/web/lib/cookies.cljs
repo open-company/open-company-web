@@ -8,7 +8,7 @@
 
 (defn- calc-length [cval]
   (when (string? cval)
-    (* (count cval) 2)))
+    (count cval)))
 
 (defn- jwt-value [cname cval]
   (try
