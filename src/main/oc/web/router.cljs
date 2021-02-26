@@ -1,9 +1,8 @@
 (ns oc.web.router
-  (:require [secretary.core :as secretary]
-            [taoensso.timbre :as timbre]
+  (:require [taoensso.timbre :as timbre]
             [goog.events :as events]
             [goog.history.EventType :as HistoryEventType]
-            [oc.web.lib.sentry :as sentry]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.dispatcher :as dis]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.jwt :as jwt]

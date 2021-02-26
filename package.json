@@ -27,7 +27,7 @@
     "@bago2k4/medium-editor-filedragging": "github:bago2k4/medium-editor-filedragging#mainline",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
     "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector",
-    "@open-company/medium-editor-extentions": "github:open-company/medium-editor-extentions#fix-extentions",
+    "@open-company/medium-editor-extentions": "github:open-company/medium-editor-extentions#mainline",
     "@rangy/core": "^2.1.0",
     "@rangy/selectionsaverestore": "^2.1.0",
     "@sentry/browser": "^5.30.0",

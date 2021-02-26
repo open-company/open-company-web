@@ -1,7 +1,8 @@
 (ns oc.web.lib.cookies
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
-            ["jwt-decode" :as jwt-decode])
+            ["jwt-decode" :as jwt-decode]
+            [oc.web.utils.sentry :as sentry])
   (:import [goog.net Cookies]))
 
 (def max-cookie-length Cookies/MAX_COOKIE_LENGTH)
@@ -22,13 +23,13 @@
   (let [value-length (calc-length cval)]
     (when (> value-length max-cookie-length)
       (timbre/warnf "Max cookie allowed size (%d) exceeded: %s is %d" max-cookie-length cname value-length)
-      (oc.web.lib.sentry/capture-message-with-extra-context! {:max-cookie-length max-cookie-length
-                                                              :current-length value-length
-                                                              :user (:user-id (jwt-value cname cval))
-                                                              :cookie-name (if (keyword? cname)
-                                                                            (name cname)
-                                                                            (str cname))}
-                                                              "Cookie value exceeds max allowed length"))))
+      (sentry/capture-message-with-extra-context! {:max-cookie-length max-cookie-length
+                                                   :current-length value-length
+                                                   :user (:user-id (jwt-value cname cval))
+                                                   :cookie-name (if (keyword? cname)
+                                                                 (name cname)
+                                                                 (str cname))}
+                                                   "Cookie value exceeds max allowed length"))))
 
 (def default-cookie-expire (* 60 60 24 6))
 
