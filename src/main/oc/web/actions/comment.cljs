@@ -1,5 +1,6 @@
 (ns oc.web.actions.comment
-  (:require [oc.web.api :as api]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -83,6 +84,7 @@
                                                      :expire 3
                                                      :id :first-comment-follow-post})))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (timbre/infof "Loading comments for entry %s" (:uuid activity-data))
           (api/get-comments comments-link
            #(let [current-board-slug (dis/current-board-slug)
                   entry-links (-> activity-data

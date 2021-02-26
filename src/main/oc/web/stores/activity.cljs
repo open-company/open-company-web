@@ -531,9 +531,9 @@
                                                              :uuid activity-uuid
                                                              :board-slug board-slug
                                                              :board-uuid board-uuid}]
-                                  (if (map? %)
-                                    (merge % updated-activity-data)
-                                    updated-activity-data)))))
+                                  (-> (or % {})
+                                      (merge updated-activity-data)
+                                      (dissoc :error))))))
 
 (defmethod dispatcher/action :activity-get/not-found
   [db [_ org-slug activity-uuid secure-uuid]]
@@ -549,8 +549,10 @@
                        (dispatcher/activity-key org-slug activity-uuid))
         old-activity-data (get-in db activity-key)
         failed-activity-data (if (map? old-activity-data)
-                               (dissoc old-activity-data :loading)
-                               old-activity-data)]
+                               (-> old-activity-data
+                                   (dissoc :loading)
+                                   (assoc :error :500))
+                               :500)]
     (assoc-in db activity-key failed-activity-data)))
 
 (defmethod dispatcher/action :activity-get/finish

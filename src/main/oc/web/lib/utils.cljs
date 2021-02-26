@@ -2,8 +2,10 @@
   (:require [clojure.string]
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
+            [goog.string :refer (format)]
             [oops.core :refer (oget)]
             [oc.lib.cljs.useragent :as ua]
+            [oc.web.urls :as oc-urls]
             [oc.web.utils.drafts :as du]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.local-settings :as ls]
@@ -334,6 +336,14 @@
                  "Thanks for understanding.")
    :id :internal-error
    :server-error true
+   :dismiss true})
+
+(def entry-get-error
+  {:server-error true
+   :id :entry-load-error
+   :title "Error loading the specified post"
+   :description (format "We've been notified of this error. Please contact %s for additional help." oc-urls/contact-email)
+   :expire 5
    :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]

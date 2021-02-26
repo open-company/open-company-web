@@ -627,7 +627,7 @@
    (parse-entry entry-data board-data changes active-users nil))
 
   ([entry-data board-data changes active-users container-seen-at :guard #(or (nil? %) (string? %))]
-  (if (or (= entry-data :404)
+  (if (or (not (map? entry-data))
           (:loading entry-data))
     entry-data
     (let [comments-link (utils/link-for (:links entry-data) "comments")
@@ -646,6 +646,7 @@
                             (get active-users (-> entry-data :publisher :user-id)))
           org-data (dis/org-data)]
       (-> entry-data
+        (dissoc :error)
         (assoc :resource-type :entry)
         (assoc :published? published?)
         (as-> e

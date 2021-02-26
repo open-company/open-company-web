@@ -1151,7 +1151,7 @@
 
   ([activity-data]
    (when (and activity-data
-              (not= activity-data :404)
+              (map? activity-data)
               (au/entry? activity-data)
               (not (:loading activity-data)))
      (send-item-read (:uuid activity-data))
