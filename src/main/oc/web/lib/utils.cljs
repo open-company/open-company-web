@@ -341,7 +341,7 @@
 (def entry-get-error
   {:server-error true
    :id :entry-load-error
-   :title "Error loading the specified post"
+   :title "Error loading the post"
    :description (format "We've been notified of this error. Please contact %s for additional help." oc-urls/contact-email)
    :expire 5
    :dismiss true})
