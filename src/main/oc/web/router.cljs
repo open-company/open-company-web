@@ -57,15 +57,20 @@
 
 (defn ^:export rewrite-org-uuid-as-slug
   [org-uuid org-slug]
-  (timbre/info "Navigate from org" org-uuid "to slug:" org-slug)
+  (timbre/infof "Navigate from org uuid %s to slug %s" org-uuid org-slug)
   (nav! (cstr/replace (get-token) (re-pattern org-uuid) org-slug)))
 
 (defn ^:export rewrite-board-uuid-as-slug
   [board-uuid board-slug]
-  (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
-  (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
-    (dis/dispatch! [:route/rewrite :board board-slug])
-    (ocall js/window "history.replaceState" #js {} (oget js/window "title") new-path)))
+  (timbre/infof "Rewrite board slug in URL %s %s" board-uuid board-slug)
+  (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)
+        route-key (cond (= (dis/current-board-slug) board-uuid)
+                        :board
+                        (= (dis/current-entry-board-slug) board-uuid)
+                        :entry-board)]
+    (when route-key
+      (dis/dispatch! [:route/rewrite route-key board-slug])
+      (ocall js/window "history.replaceState" #js {} (oget js/document "?title") new-path))))
 
 (defn ^:export redirect! [loc]
   (timbre/info "redirect!" loc)

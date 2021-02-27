@@ -14,8 +14,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.notifications :as notification-actions]
-            [cuerdas.core :as string]
-            [goog.string :refer (format)]))
+            [cuerdas.core :as string]))
 
 ;; Cached items
 
@@ -140,8 +139,7 @@
         fixed-board-slug (or board-slug
                              (:board-slug entry-data)
                              (:board-uuid entry-data))]
-    (if (and (map? entry-data)
-             fixed-board-slug)
+    (if fixed-board-slug
       (do
         (dis/dispatch! [:activity-get {:org-slug org-slug :board-slug fixed-board-slug :activity-uuid entry-uuid}])
         (api/get-entry-with-uuid org-slug fixed-board-slug entry-uuid
@@ -149,7 +147,7 @@
                                    (get-entry-finished org-slug entry-uuid resp)
                                    (when (fn? loaded-cb)
                                      (utils/after 100 #(loaded-cb success status))))))
-      (timbre/warnf "Can't load entry %s: not missing board slug. Entry data: %s" entry-uuid entry-data))))
+      (timbre/warnf "Can't load entry %s, missing board slug: %s" entry-uuid fixed-board-slug))))
 
 ;; Cmail
 
