@@ -1,7 +1,7 @@
 (ns oc.web.actions.org
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
-            [oops.core :refer (oget oset)]
+            [oops.core :refer (oget oset!)]
             [clojure.string :as clj-str]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -290,7 +290,7 @@
   (payments-actions/maybe-load-payments-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
-  (oset js/document "title" (str ls/product-name  " | " (:name org-data)))))
+  (oset! js/document "title" (str ls/product-name  " | " (:name org-data)))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (when success (json->cljs body))]
