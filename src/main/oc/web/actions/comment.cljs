@@ -75,7 +75,8 @@
         (save-done-cb success)
         (when success
           (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
-          (dis/dispatch! [:route/rewrite :refresh true])
+          (when (= (keyword (dis/current-board-slug)) :replies)
+            (dis/dispatch! [:route/rewrite :refresh true]))
           (when should-show-follow-notification?
             ;; If the user is not the publisher of the post and is leaving his first comment on it
             ;; let's inform them that they are now following the post
