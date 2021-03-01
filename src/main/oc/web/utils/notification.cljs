@@ -44,7 +44,7 @@
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
                 (oc-urls/entry board-slug entry-uuid))]
       #(let [activity-data (dis/activity-data entry-uuid)]
-         (if (or (map? activity-data) (seq activity-data))
+         (if (or (keyword? activity-data) (seq activity-data))
            (router/nav! url)
            (cmail-actions/get-entry-with-uuid board-slug entry-uuid
                                               (fn [success status]
