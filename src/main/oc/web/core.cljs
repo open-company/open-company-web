@@ -463,7 +463,7 @@
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (when-not (seq (:token (:query-params params)))
         (router/redirect! (if (jwt/jwt) (urls/your-digest-url) urls/home)))
-      (cook/remove-cookie! :jwt)
+      (jwt/remove-jwt!)
       (cook/remove-cookie! :show-login-overlay)
       (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
 
@@ -479,7 +479,7 @@
                  (empty? (:invite-token query-params)))
         (router/redirect! urls/home))
       (when (jwt/jwt)
-        (cook/remove-cookie! :jwt)
+        (jwt/remove-jwt!)
         (cook/remove-cookie! :show-login-overlay))
       (let [invitee-type (if (contains? query-params :invite-token)
                           :invitee-team-lander
@@ -544,7 +544,7 @@
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
-      (cook/remove-cookie! :jwt)
+      (jwt/remove-jwt!)
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! (if ua/pseudo-native?
                           urls/native-login
