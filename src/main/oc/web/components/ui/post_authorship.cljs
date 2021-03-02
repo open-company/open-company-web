@@ -7,11 +7,10 @@
             [oc.web.components.ui.info-hover-views :refer (user-info-hover)])); board-info-hover)]))
 
 (rum/defc post-authorship < rum/static
-  [{{:keys [publisher author status board-name board-slug board-access board-uuid] :as activity-data} :activity-data
+  [{{:keys [publisher author status board-name board-slug board-access board-uuid published?] :as activity-data} :activity-data
     user-avatar? :user-avatar? user-hover? :user-hover? board-hover? :board-hover? leave-delay? :leave-delay?
     activity-board? :activity-board? current-user-id :current-user-id hide-last-name? :hide-last-name? short-name? :short-name?}]
-  (let [published? (= status "published")
-        author-data (cond
+  (let [author-data (cond
                       published?
                       publisher
                       (sequential? author)
