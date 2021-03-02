@@ -28,11 +28,12 @@
                                                 :pinned-at
                                                 :else
                                                 :published-at)
-                                 activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))]
+                                 activity-data (dispatcher/activity-data (:uuid item))
+                                 full-item (merge activity-data item)]
                              (if (= sort-key :pinned-at)
-                               (str (get-in activity-data [:pins (keyword container-id) :pinned-at] pins-store/no-pin-sort-value) ;; default to min iso8601
-                                    (:published-at activity-data))
-                               (get activity-data sort-key))))))
+                               (str (get-in full-item [:pins (keyword container-id) :pinned-at] pins-store/no-pin-sort-value) ;; default to min iso8601
+                                    (:published-at full-item))
+                               (get full-item sort-key))))))
 
 (defn- add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
@@ -177,7 +178,7 @@
         ra-activity-item (when old-fl-ra-data
                            (as-> activity-item item
                                  (assoc item :container-seen-at (:last-seen-at old-fl-ra-data))
-                                 (update-sort-value dispatcher/recently-posted-sort item ls/seen-home-container-id)
+                                 (update-sort-value dispatcher/recent-activity-sort item ls/seen-home-container-id)
                                  (assoc item :unseen false)
                                  (assoc item :unread false)))
         sort-posts-list-fn (fn [item posts-list]
