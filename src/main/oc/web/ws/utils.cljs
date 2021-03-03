@@ -3,8 +3,8 @@
             [taoensso.sente :as sente]
             [oc.web.lib.jwt :as j]
             [oc.lib.time :as lib-time]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.lib.fullstory :as fullstory]))
 

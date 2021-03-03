@@ -1,6 +1,5 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            ;; [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [defun.core :refer (defun-)]
             [oc.web.urls :as oc-urls]
@@ -53,22 +52,61 @@
     (reset! (::sections-list-collapsed s) next-value)
     (utils/after 100 #(fix-navbar-position s))))
 
+(defn- get-drafts-board [org-data]
+  (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data)))
+
+(defn- drafts-link [org-data]
+  (utils/link-for (-> org-data (get-drafts-board) :links) "self"))
+
+(defn- show-drafts? [org-data]
+  (and (:member? org-data)
+       (drafts-link org-data)))
+
+(defn- show-following? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "following")))
+
+(defn- show-topics? [org-data]
+  (:member? org-data))
+
+(defn- show-bookmarks? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "bookmarks")))
+
+(defn- show-boards? [s org-data]
+  (or (utils/link-for (:links org-data) "create")
+      (seq @(drv/get-ref s :follow-boards-list))))
+
+(defn- show-replies? [org-data]
+  (and (:member? org-data)
+       (utils/link-for (:links org-data) "replies")))
+
+(defn- show-profile? [s org-data]
+  (or (:member? org-data)
+      (seq @(drv/get-ref s :contributions-id))))
+
 (defn- home-clicked [e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "following" (oc-urls/following)))
 
 (defn- explore-clicked [e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
 
 (defn- activity-clicked [e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
 
 (defn- profile-clicked [user-id e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id)))
 
 (defn- bookmarks-clicked [e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
 
 (defn- board-clicked [board-slug e]
+  (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
@@ -133,32 +171,23 @@
         ;                                          (and (not (s/starts-with? container-uuid drafts-board-prefix))
         ;                                               (not (= container-uuid (:uuid org-data)))))
         ;                                       change-data))
-        all-boards (:boards org-data)
         follow-boards-list (drv/react s :follow-boards-list)
         sorted-follow-boards (filter-sort-boards follow-boards-list)
-        user-is-part-of-the-team? (:member? org-data)
         is-replies (= (keyword current-board-slug) :replies)
         is-following (= (keyword current-board-slug) :following)
-        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         is-topics (= (keyword current-board-slug) :topics)
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
         is-contributions (seq current-contributions-id)
-        is-self-profile? (and is-contributions
-                              (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
-        show-boards (or create-link (seq follow-boards-list))
-        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
+        show-boards (show-boards? s org-data)
+        drafts-board (get-drafts-board org-data)
         drafts-link (utils/link-for (:links drafts-board) "self")
-        show-following (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "following"))
-        show-bookmarks (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "bookmarks"))
-        show-drafts (and user-is-part-of-the-team?
-                         drafts-link)
-        show-replies (and user-is-part-of-the-team?
-                          (utils/link-for (:links org-data) "replies"))
-        show-profile (or user-is-part-of-the-team?
-                         is-contributions)
+        show-following (show-following? org-data)
+        show-bookmarks (show-bookmarks? org-data)
+        show-drafts (show-drafts? org-data)
+        show-replies (show-replies? org-data)
+        show-profile (show-profile? s org-data)
+        show-topics (show-topics? org-data)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -170,7 +199,6 @@
         show-invite-people? (and org-slug
                                  is-admin-or-author?
                                  show-invite-box)
-        show-topics user-is-part-of-the-team?
         ; show-add-post-tooltip (drv/react s :show-add-post-tooltip)
         cmail-state (drv/react s :cmail-state)
         show-plus-button? (:can-compose? org-data)]
@@ -237,35 +265,18 @@
                 (when replies-badge
                   [:span.unread-dot])]])
         (when show-profile
-          (let [contrib-user-id (if is-contributions current-contributions-id (:user-id current-user-data))]
-            [:div.left-navigation-sidebar-top
-              {:class (when (and (or show-following show-topics)
-                                 (not show-replies))
-                        "top-border")}
-              [:a.nav-link.profile.hover-item.group
-                {:class (utils/class-set {:item-selected is-contributions})
-                 :href (oc-urls/contributions (:user-id current-user-data))
-                 :on-click (partial profile-clicked (:user-id current-user-data))}
-                [:div.nav-link-icon]
-                [:div.nav-link-label
+          [:div.left-navigation-sidebar-top
+           {:class (when (and (or show-following show-topics)
+                              (not show-replies))
+                     "top-border")}
+           [:a.nav-link.profile.hover-item.group
+            {:class (utils/class-set {:item-selected is-contributions})
+             :href (oc-urls/contributions (:user-id current-user-data))
+             :on-click (partial profile-clicked (:user-id current-user-data))}
+            [:div.nav-link-icon]
+            [:div.nav-link-label
                   ; {:class (utils/class-set {:new (seq all-unread-items)})}
-                  "Profile"]]]))
-        ;; You
-        ; (when show-you
-        ;   [:div.left-navigation-sidebar-top.top-border
-        ;     [:a.nav-link.my-posts.hover-item.group
-        ;       {:class (utils/class-set {:item-selected is-my-posts})
-        ;        :href (oc-urls/contributions (:user-id current-user-data))
-        ;        :on-click (fn [e]
-        ;                    (utils/event-stop e)
-        ;                    (nav-actions/nav-to-author! e (:user-id current-user-data) (oc-urls/contributions (:user-id current-user-data))))}
-        ;       [:div.nav-link-icon]
-        ;       [:div.nav-link-label
-        ;         ; {:class (utils/class-set {:new (seq all-unread-items)})}
-        ;         "You"]
-        ;         ; (when (pos? (:contributions-count org-data))
-        ;         ;   [:span.count (:contributions-count org-data)])
-        ;         ]])
+             "Profile"]]])
         ;; Bookmarks
         (when show-bookmarks
           [:div.left-navigation-sidebar-top

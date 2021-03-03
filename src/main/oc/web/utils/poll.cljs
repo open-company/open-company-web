@@ -2,10 +2,10 @@
   (:require [defun.core :refer (defun)]
             [oops.core :refer (oget oset!)]
             [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.lib.sentry :as sentry]))
+            [oc.web.lib.utils :as utils]))
 
 (defonce ^:export poll-selector-prefix "oc-poll-portal-")
 

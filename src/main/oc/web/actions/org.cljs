@@ -1,6 +1,7 @@
 (ns oc.web.actions.org
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.api :as api]
+            [oops.core :refer (oget oset!)]
             [clojure.string :as clj-str]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -112,6 +113,13 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
+(defn- check-board-rewrite [org-data]
+  (let [cur-board-uuid (or (dis/current-entry-board-slug) (dis/current-board-slug))
+        board-data (some #(when (= (:uuid %) cur-board-uuid) %) (:boards org-data))]
+    ;; Rewrite the URL in case it's using the board UUID instead of the slug
+    (when board-data
+      (router/rewrite-board-uuid-as-slug cur-board-uuid (:slug board-data)))))
+
 (def other-resources-delay 1500)
 
 (defn org-loaded
@@ -155,9 +163,7 @@
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
-        route (dis/route-param :route)
-        logged-in? (jwt/jwt)]
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))]
     (ou/set-brand-color! org-data)
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
@@ -199,8 +205,7 @@
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
           ;; Preload unfollowing data with recently posted sort
           (when (and is-unfollowing? unfollowing-link)
-            (aa/unfollowing-get org-data))
-          ))
+            (aa/unfollowing-get org-data))))
       (when (:badge-following org-data)
         (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
       (when (:badge-replies org-data)
@@ -212,10 +217,9 @@
       (and (not current-board-slug)
            (not (map? org-data)))
       (check-org-404)
-      ;; If it's all posts page or must see, loads AP and must see for the current org
+      ;; If it's home, bookmarks or activity, check of the link is present in the
       (dis/is-container? current-board-slug)
-      (when (or
-                ;; (and is-inbox?
+      (when (or ;; (and is-inbox?
                 ;;     (not inbox-link))
                 ;; (and is-all-posts?
                 ;;      (not all-posts-link))
@@ -233,15 +237,11 @@
 
       ; If there is a board slug let's load the board data
       current-board-slug
-      (if-let [board-data (first (filter #(or (= (:slug %) current-board-slug)
-                                              (= (:uuid %) current-board-slug)) boards))]
+      (if-let [board-data (some #(when (#{(:uuid %) (:slug %)} current-board-slug) %) boards)]
         ;; Load the board data except for drafts if there is a link in the boards list
         ;; except for drafts which is preloaded with the rest
         (when-not is-drafts?
-          ;; Rewrite the URL in case it's using the board UUID instead of the slug
-          (when (= (:uuid board-data) current-board-slug)
-            (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
-          (when-let* [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (sa/section-get (:slug board-data) board-link)))
         ; The board wasn't found, showing a 404 page
         (if is-drafts?
@@ -264,8 +264,7 @@
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
-            (oc-urls/default-landing (:slug org-data)))))))
-
+            (oc-urls/default-landing (:slug org-data))))))
   ;; Change service connection
   (when (or (jwt/jwt)
             (jwt/id-token)) ; only for logged in users
@@ -282,6 +281,7 @@
     (when-let [ws-link (utils/link-for (:links org-data) "notifications")]
       (ws-nc/reconnect ws-link (jwt/user-id))))
 
+  (check-board-rewrite org-data)
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data)
@@ -290,7 +290,7 @@
   (payments-actions/maybe-load-payments-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
-  (set! (.-title js/document) (str ls/product-name  " | " (:name org-data))))
+  (oset! js/document "title" (str ls/product-name  " | " (:name org-data)))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (when success (json->cljs body))]
@@ -382,7 +382,7 @@
     (when-let [org-data (when success (json->cljs body))]
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
-      (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
+      (.replaceState js/history #js {} (oget js/document "title") (oc-urls/sign-up-update-team (:slug org-data)))
       (org-loaded org-data nil email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))

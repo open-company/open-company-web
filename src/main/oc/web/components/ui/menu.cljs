@@ -7,6 +7,7 @@
             [oc.web.utils.wrt :as wu]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as  dom-utils]

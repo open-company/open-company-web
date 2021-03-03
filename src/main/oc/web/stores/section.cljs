@@ -223,7 +223,7 @@
           old-posts (get-in db posts-data-key)
           prepare-board-data (merge next-board-data {:posts-list (:posts-list container-data)
                                                      :old-links (:links container-data)})
-          fixed-posts-data (au/parse-board prepare-board-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list) direction)
+          fixed-posts-data (au/parse-board prepare-board-data (dispatcher/change-data db) (dispatcher/active-users) (dispatcher/follow-boards-list) sort-type direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)

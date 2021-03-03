@@ -38,13 +38,13 @@
 
 (defn- load-item-if-needed [board-slug entry-uuid interaction-uuid]
   (when (and entry-uuid
-             (not= entry-uuid :404)
+             (not (keyword? entry-uuid)) ;; can be :404 or :500
              board-slug)
     (let [url (if interaction-uuid
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
                 (oc-urls/entry board-slug entry-uuid))]
       #(let [activity-data (dis/activity-data entry-uuid)]
-         (if (or (= activity-data :404) (seq activity-data))
+         (if (or (keyword? activity-data) (seq activity-data))
            (router/nav! url)
            (cmail-actions/get-entry-with-uuid board-slug entry-uuid
                                               (fn [success status]

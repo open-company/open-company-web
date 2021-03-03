@@ -1,7 +1,7 @@
 (ns oc.web.rum-utils
   (:require [org.martinklepsch.derivatives :as drv]
             [rum.core :as rum]
-            [oc.web.lib.sentry :as sentry]))
+            [oc.web.utils.sentry :as sentry]))
 
 (rum/defcs app < (drv/rum-derivatives* first)
                  {:did-catch (fn [s error error-info]

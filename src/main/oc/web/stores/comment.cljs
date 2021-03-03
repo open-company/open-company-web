@@ -1,13 +1,9 @@
 (ns oc.web.stores.comment
-  (:require [taoensso.timbre :as timbre]
-            [defun.core :refer (defun)]
-            [cuerdas.core :as string]
+  (:require [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
-            [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :add-comment/reply
@@ -35,8 +31,7 @@
 (defmethod dispatcher/action :add-comment-reset
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid]]
   (let [add-comment-key (dispatcher/add-comment-key org-slug)
-        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)
-        add-comment-activity-key (dispatcher/add-comment-activity-key org-slug comment-key)]
+        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)]
     (-> db
       ;; Lose the cached body
       (update-in add-comment-key dissoc comment-key)
@@ -211,10 +206,7 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-update
   [db [_ comments-key interaction-data]]
-  (let [activity-uuid (:resource-uuid interaction-data)
-        org-data (dispatcher/org-data db)
-        activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
-        ws-comment-data (:interaction interaction-data)
+  (let [ws-comment-data (:interaction interaction-data)
         item-uuid (:uuid ws-comment-data)
         sorted-comments-key (vec (conj comments-key dispatcher/sorted-comments-key))
         comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
@@ -296,8 +288,6 @@
           sorted-comments-key (dispatcher/activity-sorted-comments-key org-slug activity-uuid)
           all-old-comments-data (cu/ungroup-comments (get-in db sorted-comments-key))
           replies-badge-key (dispatcher/replies-badge-key org-slug)
-          follow-boards-list (dispatcher/follow-boards-list org-slug db)
-          follow-boards-set (set (map :uuid follow-boards-list))
           replies-data (dispatcher/replies-data org-slug db)
           should-badge-replies? (and (not (:author? comment-data))
                                      ;; If unfollow link is present it means the user is following the entry

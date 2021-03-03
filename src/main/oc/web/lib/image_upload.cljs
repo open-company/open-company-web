@@ -1,7 +1,7 @@
 (ns oc.web.lib.image-upload
   (:require [oc.web.local-settings :as ls]
             [goog.object :as gobj]
-            [oc.web.lib.sentry :as sentry]
+            [oc.web.utils.sentry :as sentry]
             ["filestack-js" :as filestack]))
 
 (def _fs (atom nil))

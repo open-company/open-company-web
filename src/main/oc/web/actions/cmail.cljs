@@ -1,10 +1,9 @@
 (ns oc.web.actions.cmail
-  (:require [defun.core :refer (defun)]
+  (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -13,7 +12,9 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.notifications :as notification-actions]
+            [cuerdas.core :as string]))
 
 ;; Cached items
 
@@ -86,44 +87,67 @@
 
 (defn get-entry-finished [org-slug entry-uuid {:keys [status success body]} & [secure-uuid]]
   ;; Redirect to the real post page in case user has access to it
-  (let [activity-data (when success (json->cljs body))]
-    (when (and secure-uuid
-               (jwt/jwt)
+  (let [activity-data (when success (json->cljs body))
+        published? (au/is-published? activity-data)
+        not-found-status? (<= 400 status 499)
+        error-status? (<= 500 status 599)
+        success-status? (<= 200 status 299)
+        current-secure-post? (and (seq (dis/current-secure-activity-id))
+                                  (= (dis/current-secure-activity-id) secure-uuid))
+        current-post? (and (seq (dis/current-activity-id))
+                           (= (dis/current-activity-id) entry-uuid))
+        no-jwt-auth? (string/empty-or-nil? (jwt/jwt))
+        no-auth? (and no-jwt-auth?
+                      (string/empty-or-nil? (jwt/id-token)))]
+    (when (and current-secure-post?
+               published?
+               (not no-jwt-auth?)
                (:member? (dis/org-data)))
-      (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data)))))
-  (when (and (< 399 status 500)
-             (or ;; We are trying to open a post but it doesn't exists or we don't have access to it
-                 (and (seq entry-uuid)
-                      (= entry-uuid (dis/current-activity-id)))
-                 ;; We are trying to open a post via secure url but it doesn't exists
-                 (and (seq secure-uuid)
-                      (= secure-uuid (dis/current-secure-activity-id)))))
-      ;; Let's force a not found screen if the user is logged out and is trying to access a secure url. No login wall!
-      (if (and (not (jwt/jwt))
-               (not (jwt/id-token))
-               (seq (dis/current-secure-activity-id)))
-        (router/redirect-404!)
-        (dis/dispatch! [:show-login-wall])))
-  (cond
-    (< 399 status 500)
-    (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
-    (not success)
-    (dis/dispatch! [:activity-get/failed org-slug entry-uuid secure-uuid])
-    :else
-    (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) secure-uuid])))
+      (router/redirect! (oc-urls/entry org-slug (:board-slug activity-data) (:uuid activity-data))))
+    ;; Show the login wall if trying to access a non-public post
+    (when (and not-found-status?
+               no-auth?
+               current-post?)
+      (dis/dispatch! [:show-login-wall]))
+    ;; Show a not found screen if the user is logged out and is trying to access a secure url. No login wall!
+    (when (and not-found-status?
+               no-auth?
+               current-secure-post?)
+      (router/redirect-404!))
+    ;; User trying to open a non published post?
+    (when (and (or current-secure-post?
+                   current-post?)
+               success-status?
+               (not published?))
+      (router/redirect-404!))
+    (when (and current-post?
+               error-status?)
+      (notification-actions/show-notification utils/entry-get-error))
+    (cond
+      not-found-status?
+      (dis/dispatch! [:activity-get/not-found org-slug entry-uuid secure-uuid])
+      (not success)
+      (dis/dispatch! [:activity-get/failed org-slug entry-uuid secure-uuid])
+      :else
+      (dis/dispatch! [:activity-get/finish org-slug (when success (json->cljs body)) secure-uuid]))))
 
-(defn get-entry-with-uuid [board-slug entry-uuid & [loaded-cb]]
+(defn get-entry-with-uuid
+  [board-slug entry-uuid & [loaded-cb]]
+  (timbre/infof "Loading entry %s of board %s" entry-uuid board-slug)
   (let [org-slug (dis/current-org-slug)
-        entry-data (dis/activity-data entry-uuid)]
-    (when (and (not= entry-data :404)
-               (or board-slug
-                   (:board-slug entry-data)))
-      (dis/dispatch! [:activity-get {:org-slug org-slug :board-slug (or board-slug (:board-slug entry-data)) :activity-uuid entry-uuid}])
-      (api/get-entry-with-uuid org-slug board-slug entry-uuid
-       (fn [{:keys [status success] :as resp}]
-         (get-entry-finished org-slug entry-uuid resp)
-         (when (fn? loaded-cb)
-           (utils/after 100 #(loaded-cb success status))))))))
+        entry-data (dis/activity-data entry-uuid)
+        fixed-board-slug (or board-slug
+                             (:board-slug entry-data)
+                             (:board-uuid entry-data))]
+    (if fixed-board-slug
+      (do
+        (dis/dispatch! [:activity-get {:org-slug org-slug :board-slug fixed-board-slug :activity-uuid entry-uuid}])
+        (api/get-entry-with-uuid org-slug fixed-board-slug entry-uuid
+                                 (fn [{:keys [status success] :as resp}]
+                                   (get-entry-finished org-slug entry-uuid resp)
+                                   (when (fn? loaded-cb)
+                                     (utils/after 100 #(loaded-cb success status))))))
+      (timbre/warnf "Can't load entry %s, missing board slug: %s" entry-uuid fixed-board-slug))))
 
 ;; Cmail
 

@@ -24,16 +24,16 @@
                                                 :last-activity-at
                                                 (= sort-type :bookmarked-at)
                                                 :bookmarked-at
-                                                (and container-id
-                                                     (contains? item :pinned-at))
+                                                container-id
                                                 :pinned-at
                                                 :else
                                                 :published-at)
-                                 activity-data (if (contains? item sort-key) item (dispatcher/activity-data (:uuid item)))
-                                 sort-val (.getTime (utils/js-date (get activity-data sort-key)))]
+                                 activity-data (dispatcher/activity-data (:uuid item))
+                                 full-item (merge activity-data item)]
                              (if (= sort-key :pinned-at)
-                               (+ sort-val pins-store/pins-sort-pivot-ms)
-                               sort-val)))))
+                               (str (get-in full-item [:pins (keyword container-id) :pinned-at] pins-store/no-pin-sort-value) ;; default to min iso8601
+                                    (:published-at full-item))
+                               (get full-item sort-key))))))
 
 (defn- add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
@@ -178,7 +178,7 @@
         ra-activity-item (when old-fl-ra-data
                            (as-> activity-item item
                                  (assoc item :container-seen-at (:last-seen-at old-fl-ra-data))
-                                 (update-sort-value dispatcher/recently-posted-sort item ls/seen-home-container-id)
+                                 (update-sort-value dispatcher/recent-activity-sort item ls/seen-home-container-id)
                                  (assoc item :unseen false)
                                  (assoc item :unread false)))
         sort-posts-list-fn (fn [item posts-list]
@@ -532,9 +532,9 @@
                                                              :uuid activity-uuid
                                                              :board-slug board-slug
                                                              :board-uuid board-uuid}]
-                                  (if (map? %)
-                                    (merge % updated-activity-data)
-                                    updated-activity-data)))))
+                                  (-> (or % {})
+                                      (merge updated-activity-data)
+                                      (dissoc :error))))))
 
 (defmethod dispatcher/action :activity-get/not-found
   [db [_ org-slug activity-uuid secure-uuid]]
@@ -550,8 +550,10 @@
                        (dispatcher/activity-key org-slug activity-uuid))
         old-activity-data (get-in db activity-key)
         failed-activity-data (if (map? old-activity-data)
-                               (dissoc old-activity-data :loading)
-                               old-activity-data)]
+                               (-> old-activity-data
+                                   (dissoc :loading)
+                                   (assoc :error :500))
+                               :500)]
     (assoc-in db activity-key failed-activity-data)))
 
 (defmethod dispatcher/action :activity-get/finish
@@ -744,11 +746,13 @@
 (defmethod dispatcher/action :activities-count
   [db [_ org-slug items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
-        ks (vec (map :item-id items-count))
-        vs (map #(zipmap [:count :reads :item-id]
-                         [(:count %)
-                          (get-in old-reads-data [(:item-id %) :reads])
-                          (:item-id %)]) items-count)
+        ks (map :item-id items-count)
+        vs (map #(let [author? (:publisher? (dispatcher/activity-data org-slug (:item-id %) db))
+                       cnt (if author? (max (dec (:count %)) 0) (:count %))]
+                   {:count cnt
+                    :reads (get-in old-reads-data [(:item-id %) :reads])
+                    :item-id (:item-id %)})
+                items-count)
         new-items-count (zipmap ks vs)
         last-read-at-map (zipmap ks (map :last-read-at items-count))]
     (as-> db tdb
