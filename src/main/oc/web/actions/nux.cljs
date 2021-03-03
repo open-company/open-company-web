@@ -179,6 +179,7 @@
         next-step (calc-next-step user-type current-value)
         same-step? (= (:key current-value) next-step)
         prepare-cb (when (and (= next-step :ready)
+                              (not= user-type :viewer)
                               (not same-step?))
                      expand-cmail)
         delay (if (fn? prepare-cb)
