@@ -8,7 +8,7 @@
 
 (rum/defcs lazy-stream < rum/static
                          rum/reactive
-                         (rum/local true ::delay)
+                         (rum/local false ::delay)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
                          (drv/drv :board-slug)
