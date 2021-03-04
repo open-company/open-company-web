@@ -348,6 +348,19 @@
       (na/new-user-registered "google"))
     (user-actions/lander-check-team-redirect)))
 
+(defn- redirect-route? [params check-keys]
+  (let [rx #"^((\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4})[^/?#]+$"
+        matches (into {} (remove nil?
+                 (map (fn [[k v]]
+                        (when-let [m (re-matches rx v)]
+                          (hash-map k (second m))))
+                      (select-keys params check-keys))))]
+    (when (seq matches)
+      (merge params matches))))
+
+(defn- append-url-parts [url]
+  (str url (oget js/window "location.search") (oget js/window "location.hash")))
+
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
 (if-let [target (sel1 :div#app)]
@@ -678,19 +691,27 @@
 
     (defroute entry-route (urls/entry ":org" ":entry-board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":entry-board" ":entry"))
-      (entry-handler target params))
+      (if-let [redirect-map (redirect-route? params [:entry])]
+        (router/redirect! (append-url-parts (urls/entry (:org redirect-map) (:entry-board redirect-map) (:entry redirect-map))))
+        (entry-handler target params)))
 
     (defroute entry-slash-route (str (urls/entry ":org" ":entry-board" ":entry") "/") {:as params}
-      (timbre/info "Routing entry-route" (str (urls/entry ":org" ":entry-board" ":entry") "/"))
-      (entry-handler target params))
+      (timbre/info "Routing entry-route-slash" (str (urls/entry ":org" ":entry-board" ":entry") "/"))
+      (if-let [redirect-map (redirect-route? params [:entry])]
+        (router/redirect! (append-url-parts (urls/entry (:org redirect-map) (:entry-board redirect-map) (:entry redirect-map))))
+        (entry-handler target params)))
 
     (defroute comment-route (urls/comment-url ":org" ":entry-board" ":entry" ":comment") {:as params}
       (timbre/info "Routing comment-route" (urls/comment-url ":org" ":entry-board" ":entry" ":comment"))
-      (entry-handler target params))
+      (if-let [redirect-map (redirect-route? params [:entry :comment])]
+        (router/redirect! (append-url-parts (urls/comment-url (:org redirect-map) (:entry-board redirect-map) (:entry redirect-map) (:comment redirect-map))))
+        (entry-handler target params)))
 
     (defroute comment-slash-route (str (urls/comment-url ":org" ":entry-board" ":entry" ":comment") "/") {:as params}
       (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":entry-board" ":entry" ":comment") "/"))
-      (entry-handler target params))
+      (if-let [redirect-map (redirect-route? params [:entry :comment])]
+        (router/redirect! (append-url-parts (urls/comment-url (:org redirect-map) (:entry-board redirect-map) (:entry redirect-map) (:comment redirect-map))))
+        (entry-handler target params)))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
