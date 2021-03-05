@@ -23,7 +23,7 @@
                  ;; ***************** (JWT schema changes, more info here: *****************
                  ;; ******* https://github.com/open-company/open-company-lib/pull/82) ******
                  ;; ************************************************************************
-                 [open-company/lib "0.17.33-alpha5"]
+                 [open-company/lib "0.17.34-alpha9"]
                  ;; ************************************************************************
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]

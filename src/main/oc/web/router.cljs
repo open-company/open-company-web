@@ -192,3 +192,28 @@
 
 (defn is-home? []
   (= (oget js/window "location.pathname") (oc-urls/following)))
+
+(defn needs-uuid-fixes?
+  "Given the route parameters and a list of keys to check, search for uuids with
+   additional chars most probably added by accident, if so replace them values and return
+   the correct list of params.
+
+   This can happen with our editor if the link placed immediately before a closing round bracket, the editor
+   will wrap the whole thing in the url as a link, the resulting url is:
+   /carrot/general/post/1234-1234-1234)
+
+   Ie:
+   (guess-uuid-fixes {:org 'carrot'
+                      :board 'general'
+                      :entry '1234-1234-1234)'}
+                     [:entry])
+   => {:org 'carrot' :board 'general' :entry '1234-1234-1234'}"
+  [params check-keys]
+  (let [rx #"^((\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4})[^/?#]+$"
+        matches (into {} (remove nil?
+                                 (map (fn [[k v]]
+                                        (when-let [m (re-matches rx v)]
+                                          (hash-map k (second m))))
+                                      (select-keys params check-keys))))]
+    (when (seq matches)
+      (merge params matches))))
