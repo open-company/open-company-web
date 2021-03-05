@@ -1,11 +1,15 @@
 (ns oc.web.lib.sentry
-  (:require [oc.web.local-settings :as ls]
+  (:require [rum.core :as rum]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.jwt :as jwt]
             [oops.core :refer (oget ocall)]
-            ["@sentry/browser" :as sentry-browser]
+            [oc.web.lib.react-utils :as react-utils]
+            ["@sentry/react" :as sentry :refer (ErrorBoundary)]
             [taoensso.timbre :as timbre]
             [oc.web.utils.sentry :as sentry-utils]))
+
+(js/console.log "DBG sentry/react" sentry)
 
 (defn init-parameters [dsn]
   {:tags {:isMobile (responsive/is-mobile-size?)
@@ -20,12 +24,12 @@
    :environment ls/sentry-env})
 
 (defn sentry-setup []
-  (when (and (fn? (oget sentry-browser "init")) ls/local-dsn)
-    (timbre/info "Setup Sentry")
+  (when ls/local-dsn
+    (timbre/infof "Setup Sentry SDK v%s" (oget sentry "SDK_VERSION"))
     (let [sentry-params (init-parameters ls/local-dsn)]
-      (ocall sentry-browser "init" (clj->js sentry-params))
+      (ocall sentry "init" (clj->js sentry-params))
       (timbre/debug "Sentry params:" sentry-params)
-      (.configureScope ^js sentry-browser (fn [scope]
+      (.configureScope ^js sentry (fn [scope]
         (.setTag ^js scope "isMobile" (responsive/is-mobile-size?))
         (.setTag ^js scope "hasJWT" (not (not (jwt/jwt))))
         (when (jwt/jwt)
@@ -53,3 +57,9 @@
 (def capture-error-with-extra-context! sentry-utils/capture-error-with-extra-context!)
 
 (def capture-error-with-message! sentry-utils/capture-error-with-message!)
+
+(rum/defc react-error-boundary
+  [component]
+  (react-utils/build ErrorBoundary
+                     {}
+                     (component)))
