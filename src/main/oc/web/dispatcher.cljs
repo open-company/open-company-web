@@ -1202,7 +1202,8 @@
 
 (defn ^:export teams-data
   ([] (teams-data @app-state))
-  ([data] (get-in data teams-data-key)))
+  ([data] (get-in data teams-data-key))
+  ([data team-id] (some #(when (= (:team-id %) team-id) %) (get-in data teams-data-key))))
 
 (defn team-data
   ([] (team-data (:team-id (org-data))))

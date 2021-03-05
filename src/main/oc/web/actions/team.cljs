@@ -221,7 +221,9 @@
      :last-name last-name}))
 
 (defn invite-user-link []
-  (let [team-data (or (dis/team-data) (dis/team-roster))]
+  (let [org-data (dis/org-data)
+        team-data (or (dis/team-data)
+                      (dis/teams-data @dis/app-state (:team-id org-data)))]
     (utils/link-for (:links team-data) "add" "POST"
                     {:content-type "application/vnd.open-company.team.invite.v1"})))
 

@@ -374,10 +374,10 @@
                         mixins/first-render-mixin
                         section-mixins/container-nav-in
                         ; section-mixins/window-focus-auto-loader
-                        (section-mixins/load-entry-comments (fn [s]
-                          (let [container-data @(drv/get-ref s :container-data)]
-                            (when (= (:container-slug container-data) :replies)
-                              container-data))))
+                        ;; (section-mixins/load-entry-comments (fn [s]
+                        ;;   (let [container-data @(drv/get-ref s :container-data)]
+                        ;;     (when (= (:container-slug container-data) :replies)
+                        ;;       container-data))))
                         {:will-mount (fn [s]
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
