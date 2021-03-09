@@ -10,12 +10,12 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.dom :as  dom-utils]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -80,6 +80,11 @@
   (dom-utils/prevent-default! e)
   (menu-close s)
   (nav-actions/toggle-premium-picker!))
+
+(defn labels-click [s e]
+  (dom-utils/prevent-default! e)
+  (menu-close s)
+  (label-actions/show-labels-manager))
 
 (defn manage-subscription-click [s payments-data e]
   (dom-utils/prevent-default! e)
@@ -260,6 +265,14 @@
               :on-click #(reminders-click s %)}
               [:div.oc-menu-item.reminders
                 "Recurring updates"]])
+          ;; Reminders
+          (when (and ls/labels-enabled?
+                     (not is-mobile?))
+            [:a
+             {:href "#"
+              :on-click #(labels-click s %)}
+             [:div.oc-menu-item.labels
+              "Labels"]])
           ;; Settings separator
           (when (or current-org-slug
                     show-invite-people?

@@ -71,6 +71,11 @@
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
 
+;; Labels
+
+(defn org-labels-key [org-slug]
+  (vec (conj (org-key org-slug) :org-labels)))
+
 ;; Editable boards keys
 
 (defn editable-boards-key [org-slug]
@@ -363,6 +368,8 @@
 ;; Functions needed by derivatives
 
 (declare org-data)
+(declare org-labels)
+(declare editing-label)
 (declare board-data)
 (declare contributions-data)
 (declare editable-boards-data)
@@ -692,7 +699,8 @@
                                :show-premium-picker? (:show-premium-picker? base)
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
                                :nux nux
-                               :ui-tooltip (:ui-tooltip base)})]
+                               :ui-tooltip (:ui-tooltip base)
+                               :show-labels-manager (:show-labels-manager base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -723,7 +731,9 @@
    :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
    :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
-   })
+   :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels base org-slug))]
+   :show-label-editor     [[:base] (fn [base] (:show-label-editor base))]
+   :editing-label         [[:base] (fn [base] (editing-label base))]})
 
 ;; Action Loop =================================================================
 
@@ -892,6 +902,26 @@
     (org-data data (current-org-slug)))
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
+
+(defn ^:export org-labels
+  "Get the org labels"
+  ([] (org-labels @app-state (current-org-slug)))
+  ([data] (org-labels data (current-org-slug)))
+  ([data org-slug]
+   (get-in data (org-labels-key org-slug))))
+
+(defn ^:export org-label
+  "Get the org labels"
+  ([label-uuid] (org-label @app-state (current-org-slug label-uuid)))
+  ([data label-uuid] (org-label data (current-org-slug) label-uuid))
+  ([data org-slug label-uuid]
+   (let [labels (org-labels data org-slug)]
+     (some #(when (= (:uuid %) label-uuid) %) labels))))
+
+(defn ^:export editing-label
+  "Get the current editing label"
+  ([] (editing-label @app-state))
+  ([data] (get data :editing-label)))
 
 (defn ^:export posts-data
   "Get org all posts data."

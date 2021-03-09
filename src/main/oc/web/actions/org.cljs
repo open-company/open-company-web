@@ -14,6 +14,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
+            [oc.web.actions.label :as la]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.chat :as chat]
             [oc.web.lib.json :refer (json->cljs)]
@@ -145,6 +146,7 @@
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         replies-link (utils/link-for (:links org-data) "replies")
         active-users-link (utils/link-for (:links org-data) "active-users")
+        org-labels-link (utils/link-for (:links org-data) "labels")
         ;; is-inbox? (= current-board-slug "inbox")
         ;; is-all-posts? (= current-board-slug "all-posts")
         is-following? (= current-board-slug "following")
@@ -205,7 +207,10 @@
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
           ;; Preload unfollowing data with recently posted sort
           (when (and is-unfollowing? unfollowing-link)
-            (aa/unfollowing-get org-data))))
+            (aa/unfollowing-get org-data))
+          ;; Load labels if necessary
+          (when org-labels-link
+            (la/get-labels org-data))))
       (when (:badge-following org-data)
         (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
       (when (:badge-replies org-data)

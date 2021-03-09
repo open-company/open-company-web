@@ -258,6 +258,8 @@
 
 (def new-comment-allowed-keys (concat comment-allowed-keys [:uuid :author-wants-follow?]))
 
+(def label-allowed-keys [:uuid :name :color :org-uuid])
+
 
 (def user-allowed-keys [:first-name :last-name :current-password :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles :digest-delivery])
 
@@ -1081,3 +1083,30 @@
       :body container-id}
      callback)
     (handle-missing-link "mark-unread" mark-unread-link callback)))
+
+;; Labels
+
+(defn get-labels [labels-link callback]
+  (if labels-link
+    (storage-http (method-for-link labels-link) (relative-href labels-link)
+     {:headers (headers-for-link labels-link)}
+     callback)
+    (handle-missing-link "labels" labels-link callback)))
+
+(defn create-label [create-label-link label-data callback]
+  (if create-label-link
+    (let [cleaned-label-data (-> label-data
+                                 (select-keys label-allowed-keys)
+                                 (cljs->json))]
+      (storage-http (method-for-link create-label-link) (relative-href create-label-link)
+      {:headers (headers-for-link create-label-link)
+        :json-params cleaned-label-data}
+      callback))
+    (handle-missing-link "create-label" create-label-link callback {:label-data label-data})))
+
+(defn delete-label [delete-label-link callback]
+  (if delete-label-link
+    (storage-http (method-for-link delete-label-link) (relative-href delete-label-link)
+                  {:headers (headers-for-link delete-label-link)}
+                  callback)
+    (handle-missing-link "delete-label" delete-label-link callback)))

@@ -1,13 +1,15 @@
 (ns oc.web.components.ui.alert-modal
   (:require [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [cljs.core.async :refer (go)]
+            [cljs.core.async.interop :refer-macros (<p!)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]))
 
 (defn show-alert [modal-data]
-  (dis/dispatch! [:input [:alert-modal] modal-data]))
+  (let []
+    (dis/dispatch! [:input [:alert-modal] modal-data])))
 
 (defn hide-alert []
   (dis/dispatch! [:input [:alert-modal :dismiss] true]))

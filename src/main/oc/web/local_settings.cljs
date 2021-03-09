@@ -119,3 +119,6 @@
    :dark default-color})
 
 (defonce default-csv-days 30)
+
+;; Labels
+(defonce labels-enabled? true)
