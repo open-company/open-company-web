@@ -169,6 +169,10 @@ div.expanded-post {
             flex: 0 1 auto;
             flex-flow: row nowrap;
           }
+
+          div.user-hover-container {
+            display: initial;
+          }
         }
 
         time {
