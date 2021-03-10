@@ -1,6 +1,7 @@
 (ns oc.web.actions.cmail
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [clojure.set :as clj-set]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -37,7 +38,7 @@
        (if (and (not err)
                 (map? item)
                 (= (:updated-at entry-data) (:updated-at item)))
-         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name :publisher-board]))]
+         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name :board-uuid :board-access :publisher-board]))]
            (dis/dispatch! [:input [edit-key] entry-to-save]))
          (do
            ;; If we got an item remove it since it won't be used
@@ -50,38 +51,41 @@
 
 ;; Last used and default board for editing
 
-(defn get-default-board [& [editable-boards]]
-  (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (dis/current-org-slug))))
-        cookie-value (au/last-used-section)
-        board-from-cookie (when cookie-value
-                            (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
-                             editable-boards))
-        filtered-boards (filterv #(and (not (:draft %))
-                                       ;; Pick publisher board only if they are enabled
-                                       (or (and (:publisher-board %)
-                                                ls/publisher-board-enabled?)
-                                           (not (:publisher-board %))))
-                         editable-boards)
-        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
-    (when board-data
-      {:board-name (:name board-data)
-       :board-slug (:slug board-data)
-       :publisher-board (:publisher-board board-data)})))
+(defn- ->entry-board [board-data]
+  (-> board-data
+      (clj-set/rename-keys {:name :board-name
+                            :access :board-access
+                            :uuid :board-uuid
+                            :slug :board-slug})
+      (select-keys [:board-name :board-access :board-uuid :board-slug :publisher-board])))
 
-(defn get-board-for-edit [& [board-slug editable-boards]]
-  (let [sorted-editable-boards (sort-by :name editable-boards)
-        board-data (or
-                    (some #(when (= (:slug %) board-slug) %) sorted-editable-boards)
-                    (some #(when (= (:slug %) (dis/current-board-slug)) %) sorted-editable-boards)
-                    (first sorted-editable-boards))]
-    (if (or (not board-data)
-            (= (:slug board-data) utils/default-drafts-board-slug)
-            (:draft board-data)
-            (not (utils/link-for (:links board-data) "create")))
-      (get-default-board sorted-editable-boards)
-      {:board-name (:name board-data)
-       :board-slug (:slug board-data)
-       :publisher-board (:publisher-board board-data)})))
+(defn get-default-board
+  ([] (get-default-board (vals (dis/editable-boards-data))))
+  ([editable-boards]
+   (let [editable-boards (if (seq editable-boards)
+                           editable-boards
+                           (vals (dis/editable-boards-data)))
+         last-used-slug (au/last-used-section)
+         last-used-board (when last-used-slug
+                           (some #(when (and (not (:draft %)) (= (:slug %) last-used-slug)) %) editable-boards))
+         board-data (or last-used-board (first editable-boards))]
+     (when board-data
+       (->entry-board board-data)))))
+
+(defn get-board-for-edit
+  ([] (get-board-for-edit nil (vals (dis/editable-boards-data))))
+  ([board-slug] (get-board-for-edit board-slug (dis/editable-boards-data)))
+  ([board-slug editable-boards-list]
+   (let [editable-boards (if (seq editable-boards-list)
+                           editable-boards-list
+                           (dis/editable-boards-data))
+         sorted-editable-boards (sort-by :name editable-boards)
+         required-board (when board-slug
+                          (some #(when (= (:slug %) board-slug) %) sorted-editable-boards))
+         current-board-slug (dis/current-board-slug)
+         current-board (when current-board-slug
+                         (some #(when (= (:slug %) (dis/current-board-slug)) %) sorted-editable-boards))]
+     (->entry-board (or required-board current-board (get-default-board sorted-editable-boards))))))
 
 ;; Entry
 
@@ -177,20 +181,22 @@
                (not (:collapsed cmail-state)))
       (save-edit-open-cookie initial-entry-data))
     (load-cached-item initial-entry-data (first dis/cmail-data-key)
-     #(dis/dispatch! [:input dis/cmail-state-key fixed-cmail-state]))))
+     #(dis/dispatch! [:cmail-state/update fixed-cmail-state]))))
 
-(defn cmail-expand [initial-entry-data cmail-state]
+(defn cmail-expand [initial-entry-data & [cmail-state]]
   (cook/remove-cookie! (cmail-fullscreen-cookie))
   (save-edit-open-cookie initial-entry-data)
   (load-cached-item initial-entry-data (first dis/cmail-data-key)
-   #(dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed false})])))
+   #(dis/dispatch! [:cmail-expand])))
 
-(defn cmail-collapse [cmail-state]
-  (dis/dispatch! [:input dis/cmail-state-key (merge cmail-state {:collapsed true :fullscreen false})]))
+(defn cmail-collapse [& [cmail-state]]
+  (dis/dispatch! [:cmail-collapse]))
 
 (defn cmail-reset []
-  (dis/dispatch! [:input dis/cmail-data-key (get-default-board)])
-  (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}]))
+  (dis/dispatch! [:cmail-reset]))
+
+(defn maybe-reset-cmail []
+  (utils/after 100 #(when (:collapsed (dis/cmail-state)) (cmail-reset))))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
@@ -253,7 +259,7 @@
                   ;; If it's simply true open a new post with the data saved in the local DB
                   (cmail-show {} cmail-state)
                   ;; If it's composed by board-slug/activity-uuid
-                  (let [[board-slug activity-uuid] (clojure.string/split edit-activity-param #"/")
+                  (let [[board-slug activity-uuid] (string/split edit-activity-param #"/")
                         edit-activity-data (dis/activity-data activity-uuid)]
                     (if edit-activity-data
                       ;; Open the activity in edit if it's already present in the app-state
@@ -264,3 +270,25 @@
                          (fn [success status]
                            (when success
                              (cmail-show (dis/activity-data activity-uuid) cmail-state)))))))))))))))
+
+(defn cmail-data-update
+  ([cmail-data] (cmail-data-update cmail-data false))
+  ([cmail-data no-changes-flag?]
+   (dis/dispatch! [:cmail-data/update (if no-changes-flag? cmail-data (assoc cmail-data :has-changes true))])))
+
+(defn cmail-data-replace
+  ([cmail-data] (cmail-data-replace cmail-data true))
+  ([cmail-data update-changes-flag?]
+   (dis/dispatch! [:cmail-data/replace (if update-changes-flag? (assoc cmail-data :has-changes true) cmail-data)])))
+
+(defn cmail-data-changed []
+  (dis/dispatch! [:cmail-data/update {:has-changes true}]))
+
+(defn cmail-data-remove-has-changes []
+  (dis/dispatch! [:cmail-data/remove-has-changes]))
+
+(defn toggle-cmail-label [label]
+  (dis/dispatch! [:cmail-toggle-label label]))
+
+(defn toggle-cmail-labels-view []
+  (dis/dispatch! [:toggle-cmail-labels-view]))

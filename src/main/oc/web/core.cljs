@@ -18,6 +18,7 @@
             [oc.web.stores.team]
             [oc.web.stores.user]
             [oc.web.stores.search]
+            [oc.web.stores.cmail]
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reply]

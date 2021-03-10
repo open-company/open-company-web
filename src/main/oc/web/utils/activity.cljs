@@ -41,7 +41,7 @@
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
    :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
-   :for-you-context :last-activity-at :pinned-at])
+   :for-you-context :last-activity-at :pinned-at :labels])
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date

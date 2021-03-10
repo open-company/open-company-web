@@ -19,8 +19,9 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.image-modal :as image-modal]
-            [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.labels :refer (labels-list)]
             [oc.web.components.ui.poll :refer (polls-wrapper)]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.stream-comments :refer (stream-comments)]
@@ -244,6 +245,9 @@
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner
+            [:div.expanded-post-labels
+             (when (seq (:labels activity-data))
+               (labels-list (:labels activity-data)))]
             [:div.expanded-post-headline
               {:class utils/hide-class}
               (:headline activity-data)]

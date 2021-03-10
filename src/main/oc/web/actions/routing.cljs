@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.theme :as theme-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.notify-client :as ws-nc]))
@@ -36,4 +37,5 @@
   (router/nav! (oc-urls/default-landing (:slug org))))
 
 (defn routing! [next-route-map]
-  (dis/dispatch! [:routing next-route-map]))
+  (dis/dispatch! [:routing next-route-map])
+  (cmail-actions/maybe-reset-cmail))

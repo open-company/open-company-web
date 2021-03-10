@@ -1,6 +1,7 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
             [oops.core :refer (oget)]
+            [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
@@ -141,7 +142,7 @@
                                                             (cond replies?
                                                                   (str (:uuid item) "-" (:last-activity-at item) "-" (count (:replies-data item)))
                                                                   :else
-                                                                  (clojure.string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
+                                                                  (string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
                                                             (str (:uuid item)
                                                                  (:sort-value item)
                                                                  (:last-activity-at item))))
@@ -179,12 +180,12 @@
 
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
-        static-part (str (name (:resource-type item)) "-" (:uuid item))
+        static-part [(name (:resource-type item)) (:uuid item)]
         variable-part (cond entry?
-                            (or (:updated-at item) (:created-at item))
+                            [(:created-at item) (:updated-at item) (count (:labels item))]
                             :else
-                            (:last-activity-at item))]
-    (str static-part "-" variable-part)))
+                            [(:last-activity-at item)])]
+    (string/join "-" (concat static-part variable-part))))
 
 (defn- clear-cell-measure
 
@@ -288,9 +289,7 @@
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
-  ([s] (did-scroll s (responsive/is-mobile-size?) nil))
-  ([s mobile?] (did-scroll s mobile? nil))
-  ([s mobile? e]
+  [s]
   (let [scroll-top (or (oget js/document "scrollingElement.?scrollTop") (oget js/window "pageYOffset"))
         direction (if (> @last-scroll-top scroll-top)
                     :up
@@ -299,9 +298,9 @@
                       :stale))
         win-height (dom-utils/viewport-height)
         max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) win-height)
-        is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
 
         ;; Calculate the Point of No Return based on the card height
+        ; is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
         ; card-height (calc-card-height is-mobile? @(drv/get-ref s :foc-layout))
         ; scroll-threshold* (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
         ; scroll-threshold (* scroll-threshold* card-height)
@@ -344,7 +343,7 @@
         (not (dis/is-container? current-board-slug))
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
-    (reset! last-scroll-top (max 0 scroll-top)))))
+    (reset! last-scroll-top (max 0 scroll-top))))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
@@ -381,7 +380,7 @@
                         {:will-mount (fn [s]
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
+                           (events/listen js/window EventType/SCROLL #(did-scroll s)))
                           s)
                          :did-mount (fn [s]
                           (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
@@ -412,7 +411,6 @@
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
         add-comment-force-update (drv/react s :add-comment-force-update)
-        viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
         member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)

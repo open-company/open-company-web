@@ -5,16 +5,16 @@ div.oc-labels {
   padding: 16px;
   height: auto;
   min-width: 160px;
-  background-color: var(--background-color);
+  background-color: white;
   box-shadow: var(--box-shadow);
 
   div.oc-labels-title {
     @include OC_Body_Bold();
     font-size: 14px;
     line-height: 18px;
-    color: var(--color);
+    color: $deep_navy;
   }
-  
+
   div.oc-label {
     display: flex;
     flex-flow: row nowrap;
@@ -23,9 +23,23 @@ div.oc-labels {
     height: 16px;
     margin-top: 12px;
 
-    .carrot-checkbox {
-      margin-right: 8px;
+    div.carrot-checkbox {
+      border: 1px solid #{$deep_navy};
       order: 1;
+      margin-right: 8px;
+
+      &.selected {
+        border: 1px solid #{$deep_navy};
+        background-color: $deep_navy;
+      }
+
+      &.disabled {
+        border: 1px solid #{$deep_navy};
+      }
+
+      &.selected.disabled {
+        background-color: #{$deep_navy};
+      }
     }
 
     span.oc-label-dot {
@@ -41,28 +55,33 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: var(--color);
+      color: $deep_navy;
       max-width: 180px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-right: 2px;
     }
-    
-    button.edit-bt {
-      @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, var(--light-color));
+
+    div.edit-bt-container {
       width: 16px;
       height: 16px;
       margin-left: 8px;
       order: 4;
 
-      @include big_web() {
-        display: none;
+      button.edit-bt {
+        @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, $ui_grey);
+        width: 16px;
+        height: 16px;
+
+        @include big_web() {
+          display: none;
+        }
       }
     }
 
     @include big_web() {
-      &:hover button.edit-bt {
+      &:hover div.edit-bt-container button.edit-bt {
         display: initial;
       }
     }
@@ -72,7 +91,7 @@ div.oc-labels {
     @include OC_Body_Book_Italic();
     font-size: 14px;
     line-height: 18px;
-    color: var(--ultralight-color);
+    color: $ui_grey;
     margin-top: auto;
     margin-bottom: auto;
     align-self: center;
@@ -90,7 +109,7 @@ div.oc-labels {
     span.add-label-plus {
       width: 16px;
       height: 16px;
-      @include svgBgColor("/img/ML/add_label_plus.svg", center, 12px 12px, var(--light-color));
+      @include svgBgColor("/img/ML/add_label_plus.svg", center, 12px 12px, $ui_grey);
     }
 
     span.add-label-span {
@@ -98,7 +117,7 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: var(--light-color);
+      color: $ui_grey;
     }
   }
 
@@ -114,7 +133,7 @@ div.oc-labels {
       height: 16px;
       line-height: 16px;
       font-size: 14px;
-      color: var(--color);
+      color: $ui_grey;
       order: 1;
     }
 
@@ -144,10 +163,21 @@ div.org-labels-manager {
   justify-content: center;
   align-items: center;
   z-index: #{$navbar_zindex + 156};
-  
+
   div.org-labels-manager-inner {
     display: block;
-    
+  }
+}
+
+div.labels-picker {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  z-index: #{$navbar_zindex + 156};
+
+  div.labels-picker-inner {
+    display: block;
   }
 }
 
@@ -158,26 +188,36 @@ div.oc-label-edit {
   padding: 16px;
   height: auto;
   width: 240px;
-  background-color: var(--background-color);
+  background-color: white;
   box-shadow: var(--box-shadow);
 
   div.oc-label-edit-title {
     @include OC_Body_Bold();
     font-size: 14px;
     line-height: 18px;
-    color: var(--color);
+    color: $deep_navy;
   }
 
   div.oc-label-edit-name-header, div.oc-label-edit-color-header {
     @include OC_Body_Book();
     font-size: 16px;
     line-height: 16px;
-    color: var(--color);
+    color: $deep_navy;
     margin-top: 12px;
   }
 
   & > input.field-value.oc-input {
     margin-top: 8px;
+    background-color: #{rgba($deep_navy, 0.1)};
+    color: $deep_navy;
+
+    @include placeholder(){
+      color: #{rgba(white,0.25)};
+    }
+
+    &:focus, &:active {
+      border: 1px solid #{rgba($deep_navy, 0.1)};
+    }
   }
 
   div.oc-label-edit-picker-wrapper {
@@ -206,9 +246,19 @@ div.oc-label-edit {
       z-index: 1;
       padding: 7px 8px 7px 32px;
       margin-top: 0;
+      background-color: #{rgba($deep_navy, 0.1)};
+      color: $deep_navy;
+
+      @include placeholder(){
+        color: #{rgba(white,0.25)};
+      }
+
+      &:focus, &:active {
+        border: 1px solid #{rgba($deep_navy, 0.1)};
+      }
     }
   }
- 
+
   div.oc-label-footer {
     display: flex;
     flex-flow: row nowrap;
@@ -230,7 +280,7 @@ div.oc-label-edit {
       height: 16px;
       line-height: 16px;
       font-size: 14px;
-      color: var(--color);
+      color: $deep_navy;
       order: 1;
     }
 
@@ -244,6 +294,7 @@ div.oc-label-edit {
       height: 30px;
       order: 2;
       margin-left: 8px;
+      border-radius: 8px;
     }
   }
 
@@ -255,5 +306,18 @@ div.oc-label-edit {
       position: absolute;
       top: 8px;
     }
+  }
+}
+
+div.oc-labels-list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 16px;
+
+  div.oc-labels-item {
+    margin-right: 4px;
+    @include label();
   }
 }

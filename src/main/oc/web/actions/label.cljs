@@ -8,13 +8,16 @@
 
 ;; Data parse
 
+(defn parse-label [label-map]
+  (-> label-map
+      (assoc :can-edit? (hateoas/link-for (:links label-map) "partial-update"))
+      (assoc :can-delete? (hateoas/link-for (:links label-map) "delete"))))
+
 (defn parse-labels [labels-resp]
   (->> labels-resp
       :collection
       :items
-      (mapv #(-> %
-                 (assoc :can-edit? (hateoas/link-for (:links %) "partial-update"))
-                 (assoc :can-delete? (hateoas/link-for (:links %) "delete"))))))
+      (mapv parse-label)))
 
 (defn get-labels-finished
   ([org-slug resp] (get-labels-finished org-slug resp nil))
@@ -58,9 +61,11 @@
         editing-label (:editing-label @dis/app-state)]
     (timbre/infof "Saving label with name %s and color %s" (:name editing-label) (:color editing-label))
     (api/create-label create-label-link editing-label
-                      #(do
+                      (fn [{:keys [body success]}]
                          (dismiss-label-editor)
-                         (get-labels)))))
+                         (get-labels)
+                         (let [label (when success (parse-label (json->cljs body)))]
+                           (dis/dispatch! [:label-saved (dis/current-org-slug) label]))))))
 
 (defn edit-label [label]
   (timbre/infof "Editing label" (:uuid label))
@@ -70,9 +75,7 @@
   (timbre/infof "Deleting label %s" (:uuid label))
   (let [delete-link (hateoas/link-for (:links label) "delete")]
     (dis/dispatch! [:delete-label (dis/current-org-slug) label])
-    (api/delete-label delete-link
-                      (fn []
-                        (get-labels)))))
+    (api/delete-label delete-link #(get-labels))))
 
 (defn show-labels-manager []
   (timbre/info "Open labels manager")

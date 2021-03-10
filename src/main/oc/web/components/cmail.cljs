@@ -28,6 +28,7 @@
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
+            [oc.web.components.ui.labels :refer (labels-picker labels-list)]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
@@ -109,7 +110,7 @@
 
 (defn- clean-body [s]
   (when (body-element)
-    (dis/dispatch! [:input (conj dis/cmail-data-key :body) (cleaned-body)])))
+    (cmail-actions/cmail-data-update {:body (cleaned-body)})))
 
 ;; Local cache for outstanding edits
 
@@ -162,7 +163,7 @@
 ;; Data change handling
 
 (defn body-on-change [state]
-  (dis/dispatch! [:input (conj dis/cmail-data-key :has-changes) true])
+  (cmail-actions/cmail-data-changed)
   (debounced-autosave! state)
   (when-let [body-el (body-element)]
     (reset! (::last-body state) (oget body-el "innerHTML"))))
@@ -176,8 +177,7 @@
   (when-let [headline (headline-element state)]
     (let [clean-headline (fix-headline (oget headline "innerText"))
           post-button-title (when-not (seq clean-headline) :title)]
-      (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline clean-headline
-                                                            :has-changes true})])
+      (cmail-actions/cmail-data-update {:headline clean-headline})
       (reset! (::post-tt-kw state) post-button-title)
       (debounced-autosave! state))
     (setup-top-padding state)))
@@ -239,7 +239,7 @@
          fixed-headline (fix-headline (:headline cmail-data))
          published? (= (:status cmail-data) "published")]
      (if (is-publishable? cmail-data)
-       (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
+       (let [_ (cmail-actions/cmail-data-update {:headline fixed-headline} false) ;; Skip has-changes flag update to avoid problems during save
              updated-cmail-data @(drv/get-ref s :cmail-data)]
          (if published?
            (do
@@ -266,7 +266,7 @@
 
 ;; Delete handling
 
-(defn delete-clicked [s e activity-data]
+(defn delete-clicked [_ _ activity-data]
   (if (or (:uuid activity-data)
            (:links activity-data)
            (:auto-saving activity-data))
@@ -289,7 +289,7 @@
       ;; In case the data are queued up to be saved but the request didn't started yet
       (when (:has-changes activity-data)
         ;; Remove them
-        (dis/dispatch! [:update dis/cmail-data-key #(dissoc % :has-changes)]))
+        (cmail-actions/cmail-data-remove-has-changes))
       (cmail-actions/cmail-hide))))
 
 (defn win-width []
@@ -555,14 +555,14 @@
                                       (seq (:name board-data)))
                             (let [has-changes (or (:has-changes cmail-data)
                                                   (seq (:uuid cmail-data))
-                                                  (:auto-saving cmail-data))]
-                              (dis/dispatch! [:input dis/cmail-data-key
-                               (merge cmail-data {:board-slug (:slug board-data)
-                                                  :board-name (:name board-data)
-                                                  :board-access (:access board-data)
-                                                  :publisher-board (:publisher-board board-data)
-                                                  :has-changes has-changes
-                                                  :invite-note note})])
+                                                  (:auto-saving cmail-data))
+                                  updated-cmail-data (merge cmail-data {:board-slug (:slug board-data)
+                                                                        :board-name (:name board-data)
+                                                                        :board-access (:access board-data)
+                                                                        :publisher-board (:publisher-board board-data)
+                                                                        :has-changes has-changes
+                                                                        :invite-note note})]
+                              (cmail-actions/cmail-data-replace updated-cmail-data)
                               (when has-changes
                                 (debounced-autosave! s)))
                             (when (fn? dismiss-action)
@@ -603,15 +603,33 @@
               "New update")]
          [:button.mlb-reset.mobile-close-bt
            {:on-click (partial close-cmail s)}]]
-        [:div.dismiss-inline-cmail-container
+        [:div.cmail-floating-left
+         [:div.dismiss-inline-cmail-container
           {:class (when-not (:published? cmail-data) "long-tooltip")}
           [:button.mlb-reset.dismiss-inline-cmail
-            {:on-click (partial close-cmail s)
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title (if-not (:published? cmail-data)
-                      "Save & Close"
-                      "Close")}]]
+           {:on-click (partial close-cmail s)
+            :data-toggle "tooltip"
+            :data-placement "top"
+            :title (if (:published? cmail-data)
+                     "Close"
+                     "Save & Close")}]]]
+        [:div.cmail-floating-right
+         [:div.floating-delete-bt-container
+          [:button.mlb-reset.floating-delete-bt
+           {:on-click #(if (:uuid cmail-data)
+                         (delete-clicked s % cmail-data)
+                         (close-cmail s %))}
+           [:span.floating-delete-bt-icon]
+           [:span.floating-delete-bt-text
+            "Delete"]]]
+         [:div.floating-labels-bt-container
+          [:button.mlb-reset.floating-labels-bt
+           {:on-click #(cmail-actions/toggle-cmail-labels-view)}
+           [:span.floating-labels-bt-icon]
+           [:span.floating-labels-bt-text
+            "Labels"]]
+          (when (:show-labels-view cmail-state)
+            (labels-picker))]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
@@ -693,6 +711,9 @@
                               :dispatch-key (first dis/cmail-data-key)
                               :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
+      (when-not (:collapsed cmail-state)
+        [:div.cmail-labels
+         (labels-list (:labels cmail-data))])
       [:div.cmail-footer
         [:div.post-button-container.group
           (post-to-button {:on-submit #(post-clicked s)
@@ -733,13 +754,13 @@
            :data-container "body"
            :title "Add attachment"}]
         [:div.cmail-footer-media-picker-container.group]
-        (when (:uuid cmail-data)
-          [:div.delete-bt-container
-           [:button.mlb-reset.delete-bt
-            {:on-click #(delete-clicked s % cmail-data)
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Delete"}]])
+        ;; (when (:uuid cmail-data)
+        ;;   [:div.delete-bt-container
+        ;;    [:button.mlb-reset.delete-bt
+        ;;     {:on-click #(delete-clicked s % cmail-data)
+        ;;      :data-toggle (when-not is-mobile? "tooltip")
+        ;;      :data-placement "top"
+        ;;      :title "Delete"}]])
         ; (when-not (:fullscreen cmail-state)
         ;   [:div.fullscreen-bt-container
         ;     [:button.mlb-reset.fullscreen-bt

@@ -236,6 +236,12 @@
     (following org-slug)
     login))
 
+;; Labels
+
+(defn label
+  ([label-slug] (label (dis/current-org-slug) label-slug))
+  ([org-slug label-slug] (str (org org-slug) "/l/" (name label-slug))))
+
 ;; CSV download
 
 (defn wrt-csv

@@ -309,10 +309,15 @@ div.expanded-post {
     }
 
     div.expanded-post-container-inner {
-      padding: #{$expanded_post_header_height + 51}px 120px 32px;
+      padding: #{$expanded_post_header_height + 26}px 120px 32px;
 
       @include mobile() {
         padding: 0;
+      }
+
+      div.expanded-post-labels {
+        margin-bottom: 8px;
+        min-height: 16px;
       }
 
       div.expanded-post-headline {

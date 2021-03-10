@@ -3,14 +3,18 @@
             [taoensso.timbre :as timbre]
             [oops.core :refer (oget)]
             [cuerdas.core :as string]
+            [oc.web.urls :as oc-urls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.color :as color-utils]
             [oc.web.lib.react-utils :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.dispatcher :as dis]
+            ;; [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.label :as label-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             ["react-color" :as react-color :refer (ChromePicker)]))
 
 (def color-picker (partial rutils/build ChromePicker))
@@ -18,7 +22,7 @@
 (defn- select-label [s label]
   (timbre/infof "Label %s selected" (:slug label)))
 
-(rum/defcs labels <
+(rum/defcs org-labels <
   rum/static
   rum/reactive
   (drv/drv :org-labels)
@@ -39,10 +43,11 @@
           [:span.oc-label-name
           (:name label)]
           (when (:can-edit? label)
-            [:button.mlb-reset.edit-bt
-             {:on-click (fn [e]
-                          (dom-utils/stop-propagation! e)
-                          (label-actions/edit-label label))}])])
+            [:div.edit-bt-container
+             [:button.mlb-reset.edit-bt
+              {:on-click (fn [e]
+                           (dom-utils/stop-propagation! e)
+                           (label-actions/edit-label label))}]])])
        [:div.oc-labels-empty
         "No labels yet"])
      [:button.mlb-reset.add-label-bt
@@ -157,4 +162,99 @@
     {:ref :org-labels-manager-inner}
     (if (drv/react s :show-label-editor)
       (label-editor)
-      (labels))]])
+      (org-labels))]])
+
+(rum/defcs labels-picker-list <
+  rum/static
+  rum/reactive
+  (drv/drv :org-labels)
+  (drv/drv :cmail-data)
+  [s]
+  (let [org-labels (drv/react s :org-labels)
+        cmail-data (drv/react s :cmail-data)
+        label-slugs (->> cmail-data
+                         :labels
+                         (map :slug)
+                         set)]
+    [:div.oc-labels
+     [:div.oc-labels-title
+      "Add labels"]
+     (if (seq org-labels)
+       (for [label org-labels]
+         [:div.oc-label
+          {:data-label-slug (:slug label)
+           :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
+           :on-click #(cmail-actions/toggle-cmail-label label)}
+          (carrot-checkbox {:selected (label-slugs (:slug label))})
+          [:span.oc-label-dot
+           {:style {:background-color (:color label)}}]
+          [:span.oc-label-name
+           (:name label)]
+          (when (:can-edit? label)
+            [:div.edit-bt-container
+             [:button.mlb-reset.edit-bt
+              {:on-click (fn [e]
+                           (dom-utils/stop-propagation! e)
+                           (label-actions/edit-label label))}]])])
+       [:div.oc-labels-empty
+        "No labels yet"])
+     [:button.mlb-reset.add-label-bt
+      {:on-click #(label-actions/new-label)}
+      [:span.add-label-plus]
+      [:span.add-label-span
+       "Add label"]]
+    ;;  [:div.oc-labels-footer
+    ;;   [:button.mlb-reset.cancel-bt
+    ;;    {:on-click #(label-actions/hide-labels-manager)}
+    ;;    "Cancel"]
+    ;;   [:button.mlb-reset.save-bt
+    ;;    "Save"]]
+     [:div.oc-labels-footer
+      [:button.mlb-reset.cancel-bt
+       {:on-click #(cmail-actions/toggle-cmail-labels-view)}
+       "Close"]]]))
+
+(rum/defcs labels-picker <
+  rum/static
+  rum/reactive
+  (drv/drv :show-label-editor)
+  (ui-mixins/on-click-out :labels-picker-inner (fn [s e]
+    (timbre/info "Click out labels picker")
+    (when-not (dom-utils/event-cotainer-has-class e "alert-modal")
+      (cmail-actions/toggle-cmail-labels-view))))
+  [s]
+  [:div.labels-picker
+   [:div.labels-picker-inner
+    {:ref :labels-picker-inner}
+    (if (drv/react s :show-label-editor)
+      (label-editor)
+      (labels-picker-list))]])
+
+(rum/defc label-item <
+  rum/static
+  [label]
+  [:div.oc-label
+   {:data-uuid (:uuid label)
+    :data-slug (:slug label)}
+   [:a
+    {:href (oc-urls/label (:slug label))
+     :on-click (fn [e]
+                 (dom-utils/prevent-default! e)
+                ;;  (nav-actions/nav-to-url! (oc-urls/label (:slug label)))
+                 )}
+    [:div.oc-label-bg
+     {:style {:background-color (:color label)}}]
+   ;;  [:span.oc-label-dot
+   ;;   {:style {:background-color (:color label)}}]
+    [:span.oc-label-text
+     {:style {:color (:color label)}}
+     (:name label)]]])
+
+(rum/defc labels-list <
+  rum/static
+  [labels]
+  [:div.oc-labels-list
+   (for [label labels]
+     [:div.oc-labels-item
+      {:key (str "oc-labels-item-" (or (:uuid label) (:slug label)))}
+      (label-item label)])])

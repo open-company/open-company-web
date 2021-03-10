@@ -18,6 +18,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
+            [oc.web.components.ui.labels :refer (labels-list)]
             [oc.web.components.ui.post-authorship :refer (post-authorship)]
             [oc.web.components.ui.comments-summary :refer (foc-comments-summary)]))
 
@@ -197,6 +198,9 @@
                     (show-mobile-menu s))}
         [:span.mobile-more-bt-icon]
         [:span.mobile-more-bt-text "More"]]
+      (when (seq (:labels activity-data))
+        [:div.stream-item-labels.group
+         (labels-list (:labels activity-data))])
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (post-authorship {:activity-data activity-data

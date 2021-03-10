@@ -1,3 +1,236 @@
+@mixin mobile-header() {
+  div.cmail-mobile-header {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      width: 100vw;
+      height: #{$mobile_navbar_height}px;
+      padding: 11px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid var(--divider-line);
+      background-color: var(--mobile-background-color);
+      z-index: 2;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-items: center;
+      align-items: center;
+
+      div.cmail-mobile-header-left {
+        margin-right: auto;
+        flex: 0 0 auto;
+        height: 32px;
+
+        button.mobile-attachment-button {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 16px 18px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          opacity: 1;
+          border-radius: 4px;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+        }
+      }
+
+      div.cmail-mobile-header-title {
+        @include OC_Body_Book();
+        font-size: 16px;
+        flex: 0 1 auto;
+        max-width: 50vw;
+      }
+
+      button.mobile-close-bt {
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-size: 16px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 4px;
+        flex: 0 0 auto;
+        margin-left: auto;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+  }
+}
+
+@mixin left-floating-div-distraction-free (){
+  div.cmail-floating-left {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+
+    div.dismiss-inline-cmail-container {
+      button.dismiss-inline-cmail {
+        background-color: transparent;
+        @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 16px 16px, var(--light-color));
+      }
+    }
+  }
+}
+
+@mixin left-floating-div() {
+  div.cmail-floating-left {
+    position: absolute;
+    top: 0;
+    right: calc(100% + 16px);
+    display: block;
+
+    div.dismiss-inline-cmail-container {
+      position: relative;
+      display: block;
+
+      @include mobile() {
+        display: none;
+      }
+
+      button.dismiss-inline-cmail {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        background-size: 12px 12px;
+        background-color: var(--color);
+        border-radius: 50%;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 1;
+        display: block;
+        border: none;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        }
+
+        &:not(.disabled):hover {
+          opacity: 0.9;
+        }
+      }
+
+      &.long-tooltip {
+        .tooltip {
+          width: 88px;
+        }
+      }
+    }
+  }
+}
+
+@mixin right-floating-div() {
+  div.cmail-floating-right {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 16px);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: left;
+
+    div.floating-delete-bt-container {
+      position: relative;
+      display: block;
+      margin-bottom: 8px;
+
+      @include mobile() {
+        display: none;
+      }
+
+      button.floating-delete-bt {
+        width: auto;
+        height: 34px;
+        padding: 9px 12px;
+        border-radius: 4px;
+        background-color: var(--tooltip-background-color);
+        opacity: 1;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        border: none;
+
+        span.floating-delete-bt-icon {
+          @include svgBgColor("/img/ML/cmail_delete.svg", center, 12px 16px, var(--tooltip-color));
+          width: 12px;
+          height: 16px;
+        }
+
+        span.floating-delete-bt-text {
+          font-size: 14;
+          line-height: 16px;
+          color: var(--tooltip-color);
+          margin-left: 8px;
+          @include OC_Body_Book();
+        }
+
+        &:not(.disabled):hover {
+          opacity: 0.9;
+        }
+      }
+
+      &.long-tooltip {
+        .tooltip {
+          width: 88px;
+        }
+      }
+    }
+
+    div.floating-labels-bt-container {
+      position: relative;
+      display: block;
+
+      @include mobile() {
+        display: none;
+      }
+
+      button.floating-labels-bt {
+        width: auto;
+        height: 34px;
+        padding: 9px 12px;
+        border-radius: 4px;
+        background-color: var(--tooltip-background-color);
+        opacity: 1;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        border: none;
+        margin-bottom: 8px;
+
+        span.floating-labels-bt-icon {
+          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 16px, var(--tooltip-color));
+          width: 16px;
+          height: 16px;
+        }
+
+        span.floating-labels-bt-text {
+          font-size: 14;
+          line-height: 16px;
+          color: var(--tooltip-color);
+          margin-left: 8px;
+          @include OC_Body_Book();
+        }
+
+        &:not(.disabled):hover {
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
 div.cmail-outer {
   position: relative;
   width: 100%;
@@ -27,7 +260,7 @@ div.cmail-outer {
     &.quick-post-collapsed {
       div.cmail-container {
 
-        div.dismiss-inline-cmail-container {
+        div.cmail-floating-left, div.cmail-floating-right {
           display: none;
         }
 
@@ -91,112 +324,10 @@ div.cmail-outer {
       padding-top: #{$mobile_navbar_height}px;
     }
 
-    div.cmail-mobile-header {
-      display: none;
+    @include mobile-header();
 
-      @include mobile() {
-        display: block;
-        width: 100vw;
-        height: #{$mobile_navbar_height}px;
-        padding: 11px 16px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        border-bottom: 1px solid var(--divider-line);
-        background-color: var(--mobile-background-color);
-        z-index: 2;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-items: center;
-        align-items: center;
-
-        div.cmail-mobile-header-left {
-          margin-right: auto;
-          flex: 0 0 auto;
-          height: 32px;
-
-          button.mobile-attachment-button {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 16px 18px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            opacity: 1;
-            border-radius: 4px;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-            }
-          }
-        }
-
-        div.cmail-mobile-header-title {
-          @include OC_Body_Book();
-          font-size: 16px;
-          flex: 0 1 auto;
-          max-width: 50vw;
-        }
-
-        button.mobile-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 16px 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 32px;
-          height: 32px;
-          padding: 0;
-          border-radius: 4px;
-          flex: 0 0 auto;
-          margin-left: auto;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-        }
-      }
-    }
-
-    div.dismiss-inline-cmail-container {
-      position: absolute;
-      top: -16px;
-      right: -16px;
-      display: block;
-
-      @include mobile() {
-        display: none;
-      }
-
-      button.dismiss-inline-cmail {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        background-size: 12px 12px;
-        background-color: var(--color);
-        border-radius: 50%;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 1;
-        display: block;
-        border: none;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        }
-
-        &:not(.disabled):hover {
-          opacity: 0.9;
-        }
-      }
-
-      &.long-tooltip {
-        .tooltip {
-          width: 88px;
-        }
-      }
-    }
+    @include left-floating-div();
+    @include right-floating-div();
 
     div.post-button-container {
       position: relative;
@@ -208,7 +339,7 @@ div.cmail-outer {
     }
 
     div.cmail-content-outer {
-      padding: 16px 16px 16px 24px;
+      padding: 16px 16px 0 24px;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
 
@@ -471,6 +602,11 @@ div.cmail-outer {
           }
         }
       }
+    }
+
+    div.cmail-labels {
+      height: 32px;
+      padding: 16px 24px 0;
     }
 
     div.cmail-footer {
@@ -862,16 +998,7 @@ div.cmail-outer {
         display: flex;
         flex-flow: column nowrap;
 
-        div.dismiss-inline-cmail-container {
-          position: fixed;
-          top: 32px;
-          right: 32px;
-
-          button.dismiss-inline-cmail {
-            background-color: transparent;
-            @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 16px 16px, var(--light-color));
-          }
-        }
+        @include left-floating-div-distraction-free();
 
         div.cmail-content-outer {
           padding: 0 24px;
