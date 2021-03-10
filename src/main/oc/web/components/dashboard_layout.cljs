@@ -5,11 +5,13 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.user-profile :refer (user-profile)]
@@ -204,6 +206,7 @@
                                           :topics-view is-topics})}
                 ;; Board name and settings button
                 [:div.board-name
+                 {:class (when is-topics "topics-header")}
                   (cond
                     current-contributions-id
                     [:div.board-name-with-icon.contributions
@@ -277,25 +280,33 @@
                     [:button.mlb-reset.explore-view-block.create-topic-bt
                      {:on-click #(nav-actions/show-section-add)}
                      [:span.plus]
-                     [:span.new-topic "Add new topic"]])]
-                [:div.board-name-rightAdd
-                  (when should-show-settings-bt
-                    [:div.board-settings-container
-                      ;; Settings button
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :title (str (:name container-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                  (when (and dismiss-all-link
-                             (pos? (count posts-data)))
-                    [:button.mlb-reset.complete-all-bt
-                      {:on-click #(activity-actions/inbox-dismiss-all)
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Dismiss all"}])]])
+                     [:span.new-topic "Add new topic"]])
+                  (when (and is-topics
+                             (:can-create-label? org-data))
+                    [:button.mlb-reset.explore-view-block.manage-labels-bt
+                     {:on-click #(label-actions/show-labels-manager)}
+                     [:span.manage-labels-bt-icon]
+                     [:span.manage-labels-bt-text
+                       "Manage labels"]])]
+                (when-not is-topics
+                  [:div.board-name-right
+                    (when should-show-settings-bt
+                      [:div.board-settings-container
+                        ;; Settings button
+                        [:button.mlb-reset.board-settings-bt
+                          {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                          :data-placement "top"
+                          :data-container "body"
+                          :title (str (:name container-data) " settings")
+                          :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
+                    (when (and dismiss-all-link
+                              (pos? (count posts-data)))
+                      [:button.mlb-reset.complete-all-bt
+                        {:on-click #(activity-actions/inbox-dismiss-all)
+                        :data-toggle (when-not is-mobile? "tooltip")
+                        :data-placement "top"
+                        :data-container "body"
+                        :title "Dismiss all"}])])])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view
                 (cond

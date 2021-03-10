@@ -21,8 +21,18 @@ div.explore-view {
       margin: 4px;
       border-radius: 8px;
       height: 190px;
-      width: calc(50% - 8px);
+      width: calc(50% - 4px);
       order: 2;
+
+      @include big_web() {
+        &:nth-child(even) {
+          margin-right: 0;
+        }
+
+        &:nth-child(odd) {
+          margin-left: 0;
+        }
+      }
 
       &.premium-lock {
         @include premium_lock() {
@@ -172,7 +182,7 @@ div.explore-view {
         flex: 0 1 auto;
         display: -webkit-box;
         -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;  
+        -webkit-box-orient: vertical;
         overflow: hidden;
       }
 

@@ -697,7 +697,8 @@
           premium? (jwt/premium? (:team-id org-data))
           can-compose? (boolean (seq (some #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST")) (:boards org-data))))
           create-public-board-link (utils/link-for (:links org-data) "create-public")
-          create-private-board-link (utils/link-for (:links org-data) "create-private")]
+          create-private-board-link (utils/link-for (:links org-data) "create-private")
+          create-label (utils/link-for (:links org-data) "create-label")]
       (-> org-data
           (update :brand-color #(or % ls/default-brand-color))
           (assoc :premium? premium?)
@@ -710,7 +711,8 @@
           (assoc :unfollowing-count (ou/disappearing-count-value previous-bookmarks-count (:unfollowing-count org-data)))
           (assoc :can-compose? can-compose?)
           (assoc :can-create-public-board? (map? create-public-board-link))
-          (assoc :can-create-private-board? (map? create-private-board-link))))))
+          (assoc :can-create-private-board? (map? create-private-board-link))
+          (assoc :can-create-label? (map? create-label))))))
 
 (defn parse-board
   "Parse board data coming from the API."
