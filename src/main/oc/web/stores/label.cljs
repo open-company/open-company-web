@@ -2,16 +2,16 @@
   (:require [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :labels-loaded
-  [db [_ org-slug labels]]
-  (assoc-in db (dispatcher/org-labels-key org-slug) labels))
+  [db [_ org-slug labels-data]]
+  (assoc-in db (dispatcher/labels-key org-slug) labels-data))
 
-(defmethod dispatcher/action :editing-label
+(defmethod dispatcher/action :label-editor/start
   [db [_ label-data]]
   (-> db
       (assoc :show-label-editor true)
       (assoc :editing-label label-data)))
 
-(defmethod dispatcher/action :dismiss-editing-label
+(defmethod dispatcher/action :label-editor/dismiss
   [db [_]]
   (-> db
       (assoc :show-label-editor false)
@@ -25,7 +25,6 @@
 
 (defmethod dispatcher/action :cmail-toggle-label
   [db [_ toggle-label]]
-  (js/console.log "DBG :cmail-toggle-label" toggle-label)
   (update-in db (concat dispatcher/cmail-data-key [:labels])
              (fn [labels]
                (let [cmail-labels-set (set (map :slug labels))]
@@ -39,7 +38,6 @@
 
 (defmethod dispatcher/action :label-saved
   [db [_ org-slug saved-label]]
-  (js/console.log "DBG :label-saved" org-slug saved-label)
   (as-> db tdb
     (update-in tdb (dispatcher/org-labels-key org-slug)
                  (fn [labels]
@@ -68,7 +66,25 @@
                          next-labels (if @found?
                                        updated-labels
                                        (vec (conj labels new-label)))]
-                     (js/console.log "DBG updating cmail labels" labels)
-                     (js/console.log "DBG    updated labels" next-labels)
                      next-labels)))
       tdb)))
+
+(defmethod dispatcher/action :label-editor/update
+  [db [_ label-data]]
+  (update-in db [:editing-label] merge (assoc label-data :has-changes true)))
+
+(defmethod dispatcher/action :label-editor/replace
+  [db [_ label-data]]
+  (-> db
+      (assoc :editing-label label-data)
+      (assoc :show-label-editor true)))
+  
+(defmethod dispatcher/action :labels-manager/show
+  [db [_]]
+  (assoc db :show-labels-manager true))
+
+(defmethod dispatcher/action :labels-manager/hide
+  [db [_]]
+  (-> db
+      (assoc :show-labels-manager false)
+      (dissoc :show-label-editor)))

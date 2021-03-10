@@ -19,15 +19,25 @@
       :items
       (mapv parse-label)))
 
+(defn user-labels [org-labels-list]
+   (reverse (sort-by :count org-labels-list)))
+
+(defn org-labels [org-labels-list]
+  (sort-by :name org-labels-list))
+
 (defn get-labels-finished
   ([org-slug resp] (get-labels-finished org-slug resp nil))
   ([org-slug finish-cb {:keys [body success]}]
    (let [response-body (when success (json->cljs body))
-         labels (parse-labels response-body)]
-     (timbre/infof "Labels load success %s, loaded %d labels" success (count labels))
-     (dis/dispatch! [:labels-loaded org-slug labels])
+         parsed-labels (parse-labels response-body)
+         org-labels-data (-> response-body
+                             (dissoc :items)
+                             (assoc :org-labels (org-labels parsed-labels))
+                             (assoc :user-labels (user-labels parsed-labels)))]
+     (timbre/infof "Labels load success %s, loaded %d labels" success (count (:org-labels org-labels-data)))
+     (dis/dispatch! [:labels-loaded org-slug org-labels-data])
       (when (fn? finish-cb)
-        (finish-cb labels)))))
+        (finish-cb (:org-labels org-labels-data))))))
 
 (defn get-labels
   ([] (get-labels (dis/org-data) nil))
@@ -37,23 +47,20 @@
    (let [labels-link (hateoas/link-for (:links org-data) "labels")]
      (api/get-labels labels-link (partial get-labels-finished (:slug org-data) finish-cb)))))
 
-(defn most-used-labels []
-  (reverse (sort-by :count (dis/org-labels))))
-
 (defn new-label []
   (let [org-data (dis/org-data)
         random-color (-> color-utils/default-css-color-names
                          vals
                          shuffle
                          first)]
-    (timbre/infof "New labe for org %s, random color %s" (:uuid org-data) random-color)
-    (dis/dispatch! [:editing-label {:name ""
-                                    :color random-color
-                                    :org-uuid (:uuid org-data)}])))
+    (timbre/infof "New label for org %s, random color %s" (:uuid org-data) random-color)
+    (dis/dispatch! [:label-editor/replace {:name ""
+                                           :color random-color
+                                           :org-uuid (:uuid org-data)}])))
 
 (defn dismiss-label-editor []
   (timbre/info "Dismiss label editor")
-  (dis/dispatch! [:dismiss-editing-label]))
+  (dis/dispatch! [:label-editor/dismiss]))
 
 (defn save-label []
   (let [org-data (dis/org-data)
@@ -69,7 +76,7 @@
 
 (defn edit-label [label]
   (timbre/infof "Editing label" (:uuid label))
-  (dis/dispatch! [:editing-label label]))
+  (dis/dispatch! [:label-editor/start label]))
 
 (defn delete-label [label]
   (timbre/infof "Deleting label %s" (:uuid label))
@@ -79,8 +86,11 @@
 
 (defn show-labels-manager []
   (timbre/info "Open labels manager")
-  (dis/dispatch! [:input [:show-labels-manager] true]))
+  (dis/dispatch! [:labels-manager/show]))
 
 (defn hide-labels-manager []
   (timbre/info "Close labels manager")
-  (dis/dispatch! [:input [:show-labels-manager] false]))
+  (dis/dispatch! [:labels-manager/hide]))
+
+(defn label-editor-update [label-data]
+  (dis/dispatch! [:label-editor/update label-data]))

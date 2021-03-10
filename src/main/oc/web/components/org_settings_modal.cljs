@@ -20,29 +20,11 @@
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.email-domains :refer (email-domains)]
+            [oc.web.components.ui.colors-presets :refer (colors-presets)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             ["react-color" :as react-color :refer (ChromePicker)]))
 
 (def color-picker (partial rutils/build ChromePicker))
-
-(def color-presets [{:rgb {:r 251 :g 94 :b 72}
-                     :hex "#FB5E48"
-                     :name "Carrot orange"}
-                    {:rgb {:r 248 :g 155 :b 68}
-                     :hex "#F89A44"
-                     :name "Orange"}
-                    {:rgb {:r 33 :g 178 :b 104}
-                     :hex "#21B268"
-                     :name "Carrot green"}
-                    {:rgb {:r 105 :g 184 :b 171}
-                     :hex "#69B8AB"
-                     :name "Teal"}
-                    {:rgb {:r 97 :g 135 :b 248}
-                     :hex "#6187F8"
-                     :name "Blue"}
-                    {:rgb {:r 120 :g 83 :b 215}
-                     :hex "#7853D7"
-                     :name "Purple"}])
 
 (def brand-colors-list [{:label "White (default)" :value "#FFFFFF" :rgb {:r 244 :g 244 :b 244}}
                         {:label "Deep navy" :value "#34414F" :rgb {:r 52 :g 65 :b 79}}
@@ -290,7 +272,7 @@
                           (let [v (string/lower (.. e -target -value))]
                             (reset! (::primary-color-value s) v)
                             (when (.. e -target checkValidity)
-                              (let [is-hex-color? (.match v (js/RegExp. color-utils/hex-reg-string))
+                              (let [is-hex-color? (color-utils/valid-hex-color? v)
                                     hex-color (if is-hex-color? v (-> v keyword color-utils/default-css-color-names))
                                     rgb-color (color-utils/rgb-from-hex hex-color)]
                                 (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
@@ -307,20 +289,12 @@
            [:div.field-description.colors-preset.group
             [:span.color-preset-label "Presets:"]
             [:div.colors-list.group
-             (for [c color-presets
-                   :let [lower-hex (comp string/lower :hex)
-                         active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
-               [:button.mlb-reset.color-preset-bt
-                {:key (str "color-preset-" (:hex c))
-                 :on-click #(do
-                              (reset! (::primary-color-value s) (:hex c))
-                              (change-brand-color (select-keys c [:hex :rgb])
-                                                  (:secondary current-brand-color)))
-                 :class (when active? "active")}
-                [:span.dot
-                 {:data-color-hex (:hex c)
-                  :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
-                  :style {:background-color (:hex c)}}]])]]
+             (colors-presets {:color-list color-utils/colors-presets-list
+                              :current-selected (-> current-brand-color :primary :hex)
+                              :on-change-cb (fn [c]
+                                              (reset! (::primary-color-value s) (:hex c))
+                                              (change-brand-color (select-keys c [:hex :rgb])
+                                                                  (:secondary current-brand-color)))})]]
            [:div.field-description
             "Button text color"]
            [:select.oc-input.field-value.button-text-color

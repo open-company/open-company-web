@@ -6,6 +6,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.color :as color-utils]
+            [oc.web.components.ui.colors-presets :refer (colors-presets)]
             [oc.web.lib.react-utils :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.mixins.ui :as ui-mixins]
@@ -17,12 +18,17 @@
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             ["react-color" :as react-color :refer (ChromePicker)]))
 
+(def refresh-labels-mixin
+  {:will-mount (fn [s]
+    (label-actions/get-labels)
+    s)})
+
 (def color-picker (partial rutils/build ChromePicker))
 
 (defn- select-label [s label]
   (timbre/infof "Label %s selected" (:slug label)))
 
-(rum/defcs org-labels <
+(rum/defcs org-labels-list <
   rum/static
   rum/reactive
   (drv/drv :org-labels)
@@ -32,22 +38,23 @@
      [:div.oc-labels-title
       "Add labels"]
      (if (seq org-labels)
-       (for [label org-labels]
-        [:div.oc-label
+       (for [label org-labels
+             :let [label-click (when (:can-edit? label)
+                                 (fn [e]
+                                   (dom-utils/stop-propagation! e)
+                                   (label-actions/edit-label label)))]]
+        [:button.mlb-reset.oc-label
           {:data-label-slug (:slug label)
+           :class (when label-click "editable")
            :key (str "label-" (or (:uuid label) (rand 1000)))
-           :on-click #(select-label s label)}
+           :on-click (when (:can-edit? label)
+                       label-click)}
           ;; (carrot-checkbox {:selected false})
           [:span.oc-label-dot
-          {:style {:background-color (:color label)}}]
+           {:style {:background-color (:color label)}}]
           [:span.oc-label-name
-          (:name label)]
-          (when (:can-edit? label)
-            [:div.edit-bt-container
-             [:button.mlb-reset.edit-bt
-              {:on-click (fn [e]
-                           (dom-utils/stop-propagation! e)
-                           (label-actions/edit-label label))}]])])
+           (:name label)]
+          [:span.oc-label-edit-pen]])
        [:div.oc-labels-empty
         "No labels yet"])
      [:button.mlb-reset.add-label-bt
@@ -55,12 +62,6 @@
       [:span.add-label-plus]
       [:span.add-label-span
        "Add label"]]
-    ;;  [:div.oc-labels-footer
-    ;;   [:button.mlb-reset.cancel-bt
-    ;;    {:on-click #(label-actions/hide-labels-manager)}
-    ;;    "Cancel"]
-    ;;   [:button.mlb-reset.save-bt
-    ;;    "Save"]]
      [:div.oc-labels-footer
       [:button.mlb-reset.cancel-bt
        {:on-click #(label-actions/hide-labels-manager)}
@@ -88,9 +89,14 @@
   (rum/local false ::show-color-picker)
   ;; Mixins
   (ui-mixins/on-click-out :color-picker-container
-                          (fn [s _]
-                            (when @(::show-color-picker s)
+                          (fn [s e]
+                            (when (and @(::show-color-picker s)
+                                       (not (dom-utils/event-cotainer-has-class e :oc-input)))
                               (reset! (::show-color-picker s) false))))
+  (ui-mixins/on-key-press ["Esc" "Escape"]
+                          (fn [s e]
+                            (js/console.log "DBG on-key-press cb called" e)
+                            (reset! (::show-color-picker s) false)))
   {:will-mount (fn [s]
                  (reset! (::color-value s) (:color @(drv/get-ref s :editing-label)))
                  s)}
@@ -124,18 +130,20 @@
                       (let [v (string/lower (.. e -target -value))]
                         (reset! (::color-value s) v)
                         (when (.. e -target checkValidity)
-                          (let [is-hex-color? (.match v (js/RegExp. color-utils/hex-reg-string))
+                          (let [is-hex-color? (color-utils/valid-hex-color? v)
                                 hex-color (if is-hex-color? v (-> v keyword color-utils/default-css-color-names))]
-                            (dis/dispatch! [:input [:editing-label :color] hex-color])))))}]]
+                            (label-actions/label-editor-update {:color hex-color})))))}]]
       (when @(::show-color-picker s)
         [:div.color-picker-container
          {:ref :color-picker-container}
-         (color-picker {:color @(::color-value s) ;; (-> current-brand-color :primary :hex)
+         (color-picker {:color (:color editing-label) ;; (-> current-brand-color :primary :hex)
                         :onChangeComplete (fn [color]
-                                            (when color
-                                              (let [hex-color (oget color "?hex")]
-                                                (reset! (::color-value s) hex-color)
-                                                (dis/dispatch! [:input [:editing-label :color] hex-color]))))})])
+                                            (when-let [hex-color (oget color "?hex")]
+                                              ;; (reset! (::color-value s) hex-color)
+                                              (label-actions/label-editor-update {:color hex-color})))})])
+      (colors-presets {:color-list color-utils/colors-presets-list
+                       :on-change-cb #(label-actions/label-editor-update {:color (:hex %)})
+                       :current-selected (:color editing-label)})
       [:div.oc-label-footer
        (when (:can-delete? editing-label)
          [:button.mlb-reset.delete-bt
@@ -152,25 +160,28 @@
   rum/static
   rum/reactive
   (drv/drv :show-label-editor)
-  (ui-mixins/on-click-out :org-labels-manager-inner (fn [_ e]
-    (timbre/info "Click out labels manager dismiss")
-    (when-not (dom-utils/event-cotainer-has-class e "alert-modal")
+  (ui-mixins/on-click-out :org-labels-manager-inner (fn [s e]
+    (when (and (not (dom-utils/event-cotainer-has-class e "alert-modal"))
+               (not @(::show-label-editor s)))
       (label-actions/hide-labels-manager))))
+  refresh-labels-mixin
   [s]
   [:div.org-labels-manager
    [:div.org-labels-manager-inner
     {:ref :org-labels-manager-inner}
+    [:button.mlb-reset.modal-close-bt
+     {:on-click #(label-actions/hide-labels-manager)}]
     (if (drv/react s :show-label-editor)
       (label-editor)
-      (org-labels))]])
+      (org-labels-list))]])
 
 (rum/defcs labels-picker-list <
   rum/static
   rum/reactive
-  (drv/drv :org-labels)
+  (drv/drv :user-labels)
   (drv/drv :cmail-data)
   [s]
-  (let [org-labels (drv/react s :org-labels)
+  (let [org-labels (drv/react s :user-labels)
         cmail-data (drv/react s :cmail-data)
         label-slugs (->> cmail-data
                          :labels
@@ -203,24 +214,19 @@
       [:span.add-label-plus]
       [:span.add-label-span
        "Add label"]]
-    ;;  [:div.oc-labels-footer
-    ;;   [:button.mlb-reset.cancel-bt
-    ;;    {:on-click #(label-actions/hide-labels-manager)}
-    ;;    "Cancel"]
-    ;;   [:button.mlb-reset.save-bt
-    ;;    "Save"]]
      [:div.oc-labels-footer
-      [:button.mlb-reset.cancel-bt
+      [:button.mlb-reset.save-bt
        {:on-click #(cmail-actions/toggle-cmail-labels-view)}
-       "Close"]]]))
+       "Save"]]]))
 
 (rum/defcs labels-picker <
   rum/static
   rum/reactive
+  refresh-labels-mixin
   (drv/drv :show-label-editor)
   (ui-mixins/on-click-out :labels-picker-inner (fn [s e]
-    (timbre/info "Click out labels picker")
-    (when-not (dom-utils/event-cotainer-has-class e "alert-modal")
+    (when (and (not (dom-utils/event-cotainer-has-class e "alert-modal"))
+               (not @(::show-label-editor s)))
       (cmail-actions/toggle-cmail-labels-view))))
   [s]
   [:div.labels-picker
@@ -244,8 +250,6 @@
                  )}
     [:div.oc-label-bg
      {:style {:background-color (:color label)}}]
-   ;;  [:span.oc-label-dot
-   ;;   {:style {:background-color (:color label)}}]
     [:span.oc-label-text
      {:style {:color (:color label)}}
      (:name label)]]])

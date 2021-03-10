@@ -4,7 +4,7 @@
 
 (def carrot-log-level (atom nil))
 
-(defn config-log-level! [level]
+(defn ^:export config-log-level! [level]
   (let [level-kw (keyword (s/lower level))]
     (when (#{:trace :debug :info :warn :error :fatal :report} level-kw)
       (timbre/info "Log level:" level-kw)
@@ -14,5 +14,3 @@
 (defn dbg [& args]
   (when (= @carrot-log-level :debug)
     (apply js/console.log args)))
-
-(set! (.-OCWebConfigLogLevel js/window) config-log-level!)

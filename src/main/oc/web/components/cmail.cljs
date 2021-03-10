@@ -629,7 +629,7 @@
            [:span.floating-labels-bt-text
             "Labels"]]
           (when (:show-labels-view cmail-state)
-            (labels-picker))]]
+            (labels-picker {:sort :by-usage}))]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)

@@ -729,7 +729,5 @@
 
 ;; Debug
 
-(defn force-jwt-refresh []
+(defn ^:export force-jwt-refresh []
   (when (jwt/jwt) (jwt-actions/jwt-refresh)))
-
-(set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

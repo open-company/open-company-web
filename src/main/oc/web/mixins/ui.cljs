@@ -1,11 +1,12 @@
 (ns oc.web.mixins.ui
   (:require [rum.core :as rum]
             [dommy.core :as dommy]
+            [clojure.set :as clj-set]
+            [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.utils.dom :as dom-utils]))
+            [oc.web.lib.utils :as utils]))
 
 (def refresh-tooltips-mixin
   {:did-mount (fn [s]
@@ -342,3 +343,20 @@
            (events/unlistenByKey (click-out-kw s))
            (dissoc s click-out-kw))
          s))})))
+
+(defn on-key-press
+  "Mixin used to listen for every click outside of a certain node.
+  If only the callback is provided it uses the main node of the component,
+  it uses the ref instead."
+  [keys callback]
+  (let [keypress-key (keyword (str "on-keypress"))]
+    {:will-mount (fn [s]
+                   (assoc s keypress-key
+                          (events/listen js/window EventType/KEYUP
+                                         (fn [e]
+                                           (when (seq (clj-set/intersection (set keys) (set [(.-key e) (.-keyCode e)])))
+                                             (callback s e))))))
+     :will-unmount (fn [s]
+                     (when-let [listener (get s keypress-key)]
+                       (events/unlistenByKey listener))
+                     (dissoc s keypress-key))}))

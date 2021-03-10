@@ -300,6 +300,23 @@
     ;; render component
     (drv-root component target)))
 
+;; Component specific to a label
+;; (defn label-handler [route target component params]
+;;   (let [org (:org params)
+;;         label (:label params)
+;;         query-params (:query-params params)]
+;;     (pre-routing params true {:query-params query-params})
+;;     ;; save the route
+;;     (routing-actions/routing! {:org org
+;;                                :label label
+;;                                :query-params query-params
+;;                                :route [org label route]
+;;                                dis/router-opts-key [dis/router-dark-allowed-key]})
+;;     (check-nux query-params)
+;;     (post-routing)
+;;     ;; render component
+;;     (drv-root component target)))
+
 ;; Component specific to a secure activity
 (defn secure-activity-handler [component route target params pre-routing?]
   (let [org (:org params)
@@ -680,6 +697,14 @@
     (defroute contributions-slash-route (str (urls/contributions ":org" ":contributions") "/") {:as params}
       (timbre/info "Routing contributions-slash-route" (str (urls/board ":org" ":contributions") "/"))
       (contributions-handler "dashboard" target org-dashboard params))
+    
+    ;; (defroute label-route (urls/label ":org" ":label") {:as params}
+    ;;   (timbre/info "Routing label-route" (urls/label ":org" ":label"))
+    ;;   (label-handler "dashboard" target org-dashboard params))
+
+    ;; (defroute label-slash-route (str (urls/label ":org" ":label") "/") {:as params}
+    ;;   (timbre/info "Routing label-slash-route" (str (urls/label ":org" ":label") "/"))
+    ;;   (label-handler "dashboard" target org-dashboard params))
 
     (defroute entry-route (urls/entry ":org" ":entry-board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":entry-board" ":entry"))
