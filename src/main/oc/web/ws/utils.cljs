@@ -75,15 +75,15 @@
     #(when (or (not @ch-state)
                (not @@ch-state)
                (not (:open? @@ch-state)))
-       (timbre/debug "WS check-interval connection down for " service-name)
+       (timbre/info "WS check-interval connection down for " service-name)
        ;; WS connection is closed
        (if (:udt-next-reconnect @@ch-state)
          ;; There is an auto reconnect set, let's wait for it
-         (timbre/debug "Will reconnect automatically at " (utils/js-date (:udt-next-reconnect @@ch-state)))
+         (timbre/info "Will reconnect automatically at " (utils/js-date (:udt-next-reconnect @@ch-state)))
          ;; no auto reconnect, let's force a reconnect
          (do
-           (timbre/debug "No auto reconnect set, forcing reconnection")
-           (sentry-report (str "No auto reconnect set for " service-name ". Forcing reconnect!") chsk-send! ch-state)
+           (timbre/info "No auto reconnect set, forcing reconnection")
+          ;;  (sentry-report (str "No auto reconnect set for " service-name ". Forcing reconnect!") chsk-send! ch-state)
            (utils/after 0 reconnect-cb))))
     (* ls/ws-monitor-interval 1000))))
 
