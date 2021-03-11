@@ -634,6 +634,7 @@
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
                              (:fullscreen cmail-state)
+                             (not (:collapsed cmail-state))
                              (not (:distraction-free? cmail-state)))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
