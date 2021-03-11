@@ -251,7 +251,7 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (api/get-auth-settings (fn [body status]
+  (api/get-auth-settings (dis/current-org-slug) (fn [body status]
     (if body
       (do
         ;; auth settings loaded
@@ -286,7 +286,7 @@
 
 ;; Token authentication
 (defn auth-with-token-success [token-type jwt]
-  (api/get-auth-settings
+  (api/get-auth-settings (dis/current-org-slug)
    (fn [auth-body]
      (api/get-entry-point (dis/current-org-slug)
       (fn [success body]

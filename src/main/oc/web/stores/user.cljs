@@ -30,10 +30,20 @@
 
 ;; Auth Settings
 
+(defn parse-auth-settings [auth-settings]
+  (let [can-slack-login? (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "slack"})
+        can-google-login? (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "google"})
+        can-email-login? (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})]
+    (-> auth-settings
+        (assoc :can-slack-login? can-slack-login?)
+        (assoc :can-google-login? can-google-login?)
+        (assoc :can-email-login? can-email-login?))))
+
 (defmethod dispatcher/action :auth-settings
   [db [_ body]]
-  (let [next-db (assoc db :latest-auth-settings (.getTime (js/Date.)))]
-    (assoc-in next-db dispatcher/auth-settings-key body)))
+  (-> db
+      (assoc :latest-auth-settings (.getTime (js/Date.)))
+      (assoc-in dispatcher/auth-settings-key (parse-auth-settings body))))
 
 (defn- fixed-avatar-url [avatar-url]
   (if (empty? avatar-url)

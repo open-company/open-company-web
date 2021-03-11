@@ -296,16 +296,17 @@
       (let [fixed-body (when success (json->cljs body))]
         (callback success fixed-body)))))
 
-(defn get-auth-settings [callback]
+(defn get-auth-settings [requested-org callback]
   (let [invite-token (dispatcher/invite-token)
         default-headers (headers-for-link {:access-control-allow-headers nil
                                            :content-type "application/json"})
         with-auth-token (if invite-token
                           (merge default-headers {"Authorization" (str "Bearer " invite-token)})
                           default-headers)
-        header-options {:headers with-auth-token}]
+        header-options {:headers with-auth-token
+                        :query-params {:requested requested-org}}]
     (auth-http http/get "/" header-options
-     (fn [{:keys [status success body] :as response}]
+     (fn [{:keys [status success body]}]
        (let [body (when success body)]
          (callback body status))))))
 

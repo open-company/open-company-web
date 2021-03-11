@@ -89,93 +89,98 @@
             {:aria-label "Login"
              :class (when-not login-enabled "disabled")
              :on-click login-action}]]
-        ;; Slack button
-        [:button.mlb-reset.signin-with-slack
-          {:on-click #(do
-                       (.preventDefault %)
-                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                             {:auth-source "slack"})]
-                         (user-actions/maybe-save-login-redirect)
-                         (user-actions/login-with-slack auth-link)))
-           :on-touch-start identity}
-          [:div.signin-with-slack-content
-            [:div.slack-icon
-              {:aria-label "slack"}]
-            "Continue with Slack"]]
-        ;; Google button
-        [:button.mlb-reset.signin-with-google
-          {:on-click #(do
-                       (.preventDefault %)
-                       (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                            {:auth-source "google"})]
-                         (user-actions/maybe-save-login-redirect)
-                         (user-actions/login-with-google auth-link)))
-           :on-touch-start identity}
-          [:div.signin-with-google-content
-            [:div.google-icon
-              {:aria-label "google"}]
-            "Continue with Google"]]
-        ;; Or with email
-        [:div.or-with-email
-          [:div.or-with-email-copy
-            "Or, sign in with email"]]
-        ;; Email fields
-        [:div.group
-          ;; Error messages
-          (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
-            (cond
-              (= (:login-with-email-error (rum/react dis/app-state)) :verify-email)
-              [:span.small-caps.green
-                "Hey buddy, go verify your email, again, eh?"]
-              (= (:login-with-email-error (rum/react dis/app-state)) 401)
-              [:span.small-caps.red
-                "The email or password you entered is incorrect."
-                [:br]
-                "Please try again, or "
-                [:a.underline.red
-                  {:on-click #(user-actions/show-login :password-reset)}
-                  "reset your password"]
-                "."]
-              :else
-              [:span.small-caps.red
-                "System troubles logging in."
-                [:br]
-                "Please try again, then "
-                [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
-                "."]))
-          [:form.sign-in-form {:class utils/hide-class}
-            ;; Email label
-            [:div.sign-in-label-container
-              [:label.sign-in-label "Work Email"]]
-            ;; Email field
-            [:div.sign-in-field-container
-              [:input.sign-in-field.email.oc-input
-                {:value (:email login-with-email)
-                 :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
-                 :type "email"
-                 :auto-focus true
-                 :tabIndex 1
-                 :autoCapitalize "none"
-                 :name "email"}]]
-            [:div.sign-in-label-container
-              [:label.sign-in-label "Password"]]
-            [:div.sign-in-field-container
-              [:input.sign-in-field.pswd.oc-input
-                {:value (:pswd login-with-email)
-                 :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
-                 :type "password"
-                 :tabIndex 2
-                 :name "pswd"}]
-              [:div.forgot-password
-                [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
-            ;; Login button
-            [:button.mlb-reset.mlb-default.continue
-              {:class (when-not login-enabled "disabled")
-               :on-touch-start identity
-               :on-click login-action
-               :disabled (or (not (seq (:email login-with-email)))
-                             (not (seq (:pswd login-with-email))))}
-              "Sign In"]]]
+        [:div.login-with-buttons
+          ;; Slack button
+          (when (:can-slack-login? auth-settings)
+            [:button.mlb-reset.signin-with-slack
+              {:on-click #(do
+                          (.preventDefault %)
+                          (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                {:auth-source "slack"})]
+                            (user-actions/maybe-save-login-redirect)
+                            (user-actions/login-with-slack auth-link)))
+              :on-touch-start identity}
+              [:div.signin-with-slack-content
+                [:div.slack-icon
+                  {:aria-label "slack"}]
+                "Continue with Slack"]])
+          ;; Google button
+          (when (:can-google-login? auth-settings)
+            [:button.mlb-reset.signin-with-google
+              {:on-click #(do
+                          (.preventDefault %)
+                          (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                {:auth-source "google"})]
+                            (user-actions/maybe-save-login-redirect)
+                            (user-actions/login-with-google auth-link)))
+              :on-touch-start identity}
+              [:div.signin-with-google-content
+                [:div.google-icon
+                  {:aria-label "google"}]
+                "Continue with Google"]])]
+        (when (:can-email-login? auth-settings)
+          [:div.email-login
+            ;; Or with email
+            [:div.or-with-email
+              [:div.or-with-email-copy
+                "Or, sign in with email"]]
+            ;; Email fields
+            [:div.group
+              ;; Error messages
+              (when-not (nil? (:login-with-email-error (rum/react dis/app-state)))
+                (cond
+                  (= (:login-with-email-error (rum/react dis/app-state)) :verify-email)
+                  [:span.small-caps.green
+                    "Hey buddy, go verify your email, again, eh?"]
+                  (= (:login-with-email-error (rum/react dis/app-state)) 401)
+                  [:span.small-caps.red
+                    "The email or password you entered is incorrect."
+                    [:br]
+                    "Please try again, or "
+                    [:a.underline.red
+                      {:on-click #(user-actions/show-login :password-reset)}
+                      "reset your password"]
+                    "."]
+                  :else
+                  [:span.small-caps.red
+                    "System troubles logging in."
+                    [:br]
+                    "Please try again, then "
+                    [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
+                    "."]))
+              [:form.sign-in-form {:class utils/hide-class}
+                ;; Email label
+                [:div.sign-in-label-container
+                  [:label.sign-in-label "Work Email"]]
+                ;; Email field
+                [:div.sign-in-field-container
+                  [:input.sign-in-field.email.oc-input
+                    {:value (:email login-with-email)
+                    :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
+                    :type "email"
+                    :auto-focus true
+                    :tabIndex 1
+                    :autoCapitalize "none"
+                    :name "email"}]]
+                [:div.sign-in-label-container
+                  [:label.sign-in-label "Password"]]
+                [:div.sign-in-field-container
+                  [:input.sign-in-field.pswd.oc-input
+                    {:value (:pswd login-with-email)
+                    :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
+                    :type "password"
+                    :tabIndex 2
+                    :name "pswd"}]
+                  [:div.forgot-password
+                    [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
+                ;; Login button
+                [:button.mlb-reset.mlb-default.continue
+                  {:class (when-not login-enabled "disabled")
+                  :on-touch-start identity
+                  :on-click login-action
+                  :disabled (or (not (seq (:email login-with-email)))
+                                (not (seq (:pswd login-with-email))))}
+                  "Sign In"]]]])
         ;; Link to signup
         [:div.footer-link
           "Don't have an account yet?"

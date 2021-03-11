@@ -143,6 +143,17 @@ div.login-overlay-container {
       margin-top: 16px !important;
     }
 
+    div.login-with-buttons {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+
+      button:nth-child(2) {
+        margin-left: auto;
+      }
+    }
+
     button.signin-with-slack, button.signin-with-google {
       width: 340px;
       height: 40px;
