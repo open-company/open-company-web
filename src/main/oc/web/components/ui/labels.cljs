@@ -38,17 +38,15 @@
      [:div.oc-labels-title
       "Add labels"]
      (if (seq org-labels)
-       (for [label org-labels
-             :let [label-click (when (:can-edit? label)
-                                 (fn [e]
-                                   (dom-utils/stop-propagation! e)
-                                   (label-actions/edit-label label)))]]
+       (for [label org-labels]
         [:button.mlb-reset.oc-label
           {:data-label-slug (:slug label)
-           :class (when label-click "editable")
+           :class (when (:can-edit? label) "editable")
            :key (str "label-" (or (:uuid label) (rand 1000)))
            :on-click (when (:can-edit? label)
-                       label-click)}
+                       (fn [e]
+                         (dom-utils/stop-propagation! e)
+                         (label-actions/edit-label label)))}
           ;; (carrot-checkbox {:selected false})
           [:span.oc-label-dot
            {:style {:background-color (:color label)}}]
@@ -187,9 +185,11 @@
       "Add labels"]
      (if (seq org-labels)
        (for [label org-labels]
-         [:div.oc-label
+         [:button.mlb-reset.oc-label
           {:data-label-slug (:slug label)
            :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
+           :class (when (:can-edit? label)
+                    "editable")
            :on-click #(cmail-actions/toggle-cmail-label label)}
           (carrot-checkbox {:selected (label-slugs (:slug label))})
           [:span.oc-label-dot
@@ -197,11 +197,10 @@
           [:span.oc-label-name
            (:name label)]
           (when (:can-edit? label)
-            [:div.edit-bt-container
-             [:button.mlb-reset.edit-bt
-              {:on-click (fn [e]
-                           (dom-utils/stop-propagation! e)
-                           (label-actions/edit-label label))}]])])
+            [:button.mlb-reset.edit-bt
+             {:on-click (fn [e]
+                          (dom-utils/stop-propagation! e)
+                          (label-actions/edit-label label))}])])
        [:div.oc-labels-empty
         "No labels yet"])
      [:button.mlb-reset.add-label-bt
@@ -221,7 +220,7 @@
   (drv/drv :show-label-editor)
   (ui-mixins/on-click-out :labels-picker-inner (fn [s e]
     (when (and (not (dom-utils/event-cotainer-has-class e "alert-modal"))
-               (not @(::show-label-editor s)))
+               (not @(drv/get-ref s :show-label-editor)))
       (cmail-actions/toggle-cmail-labels-view))))
   [s]
   [:div.labels-picker

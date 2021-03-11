@@ -24,13 +24,18 @@ div.oc-labels {
     margin-top: 12px;
     padding: 0;
     cursor: default;
+    max-width: 200px;
 
     &.editable {
       cursor: pointer;
 
       @include big_web() {
-        &:hover span.oc-label-edit-pen {
-          display: initial;
+        &:hover {
+          padding: 0;
+
+          span.oc-label-edit-pen, button.edit-bt {
+            visibility: visible;
+          }
         }
       }
     }
@@ -39,6 +44,7 @@ div.oc-labels {
       border: 1px solid #{$deep_navy};
       order: 1;
       margin-right: 8px;
+      flex: 0 0 auto;
 
       &.selected {
         border: 1px solid #{$deep_navy};
@@ -60,6 +66,7 @@ div.oc-labels {
       border-radius: 50%;
       margin-right: 4px;
       order: 2;
+      flex: 0 0 auto;
     }
 
     span.oc-label-name {
@@ -73,16 +80,19 @@ div.oc-labels {
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-right: 2px;
+      text-align: left;
+      flex: 0 1 auto;
     }
 
-    span.oc-label-edit-pen {
+    span.oc-label-edit-pen, button.edit-bt {
       width: 16px;
       height: 16px;
       margin-left: 8px;
       order: 4;
+      padding: 0;
       @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, $ui_grey);
       @include big_web() {
-        display: none;
+        visibility: hidden;
       }
     }
   }
