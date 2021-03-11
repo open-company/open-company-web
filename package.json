@@ -20,7 +20,7 @@
     "node-sass-chokidar": "^1.5.0",
     "nodemon": "^2.0.4",
     "normalize.scss": "^0.1.0",
-    "shadow-cljs": "^2.11.6"
+    "shadow-cljs": "^2.11.22"
   },
   "dependencies": {
     "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete",
