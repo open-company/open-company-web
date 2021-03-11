@@ -85,7 +85,6 @@
   rum/static
   rum/reactive
   (drv/drv :editing-label)
-  (rum/local false ::color-value)
   (rum/local false ::show-color-picker)
   ;; Mixins
   (ui-mixins/on-click-out :color-picker-container
@@ -97,9 +96,6 @@
                           (fn [s e]
                             (js/console.log "DBG on-key-press cb called" e)
                             (reset! (::show-color-picker s) false)))
-  {:will-mount (fn [s]
-                 (reset! (::color-value s) (:color @(drv/get-ref s :editing-label)))
-                 s)}
   [s]
   (let [editing-label (drv/react s :editing-label)]
     [:div.oc-label-edit.fields-modal
@@ -122,13 +118,12 @@
        {:style {:background-color (:color editing-label)}}]
       [:input.field-value.oc-input
         {:type "text"
-        :value @(::color-value s)
+        :value (:color editing-label)
         :pattern color-utils/colors-reg-exp
         :placeholder "Ie: red, green or #0000ff"
         :on-focus #(reset! (::show-color-picker s) true)
         :on-change (fn [e]
                       (let [v (string/lower (.. e -target -value))]
-                        (reset! (::color-value s) v)
                         (when (.. e -target checkValidity)
                           (let [is-hex-color? (color-utils/valid-hex-color? v)
                                 hex-color (if is-hex-color? v (-> v keyword color-utils/default-css-color-names))]
