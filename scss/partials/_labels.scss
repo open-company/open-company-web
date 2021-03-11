@@ -15,7 +15,7 @@ div.oc-labels {
     color: $deep_navy;
   }
 
-  button.oc-label {
+  button.oc-label, div.oc-label {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -178,10 +178,23 @@ div.org-labels-manager {
     display: block;
     position: relative;
 
-    button.modal-close-bt {
+    button.labels-modal-close-bt {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-color: $deep_navy;
+      border-radius: 4px;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      background-image: cdnUrl("/img/ML/carrot_2_modal_close.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 32px 32px;
       position: absolute;
       top: 0;
-      left: calc(100% + 16px);
+      left: calc(100% + 8px);
     }
   }
 }

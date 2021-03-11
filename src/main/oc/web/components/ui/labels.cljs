@@ -162,7 +162,7 @@
   [:div.org-labels-manager
    [:div.org-labels-manager-inner
     {:ref :org-labels-manager-inner}
-    [:button.mlb-reset.modal-close-bt
+    [:button.mlb-reset.labels-modal-close-bt
      {:on-click #(label-actions/hide-labels-manager)}]
     (if (drv/react s :show-label-editor)
       (label-editor)
@@ -185,7 +185,7 @@
       "Add labels"]
      (if (seq org-labels)
        (for [label org-labels]
-         [:button.mlb-reset.oc-label
+         [:div.oc-label
           {:data-label-slug (:slug label)
            :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
            :class (when (:can-edit? label)
