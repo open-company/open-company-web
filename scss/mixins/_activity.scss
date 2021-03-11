@@ -83,7 +83,7 @@ $header_top_margin: 24;
       line-height: 16px;
       display: block;
       z-index: 2;
-      text-shadow: 1px 1px 0 var(--opac-background-color-32);
+      // text-shadow: 1px 1px 0 var(--opac-background-color-32);
     }
 
     @content
