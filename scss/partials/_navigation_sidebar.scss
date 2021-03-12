@@ -478,6 +478,10 @@ div.left-navigation-sidebar {
               border-radius: 50%;
               left: 4px;
               top: 11px;
+
+              @include mobile() {
+                top: 6px;
+              }
             }
           }
 

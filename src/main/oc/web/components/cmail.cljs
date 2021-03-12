@@ -309,6 +309,7 @@
                     false)]
     (when-not (or (:fullscren cmail-state)
                   (:collapsed cmail-state)
+                  (:show-labels-view cmail-state)
                   event-in?
                   (:has-changes cmail-data)
                   (:auto-saving cmail-data)
@@ -432,12 +433,14 @@
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
 
-                   (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
-                                                                     (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
-                                                                     (not (-> %1 (drv/get-ref :cmail-state) deref :distraction-free?))
-                                                                     (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper"))
-                                                                     (not (dom-utils/event-cotainer-has-class %2 "nux-tooltip-container")))
-                                                            (close-cmail %1 %2)))
+                   (mixins/on-click-out :cmail-container (fn [s e]
+                                                           (when (and (not (responsive/is-mobile-size?))
+                                                                      (:fullscreen @(drv/get-ref s :cmail-state))
+                                                                      (not (:distraction-free? @(drv/get-ref s :cmail-state)))
+                                                                      (not (dom-utils/event-cotainer-has-class e "modal-wrapper"))
+                                                                      (not (dom-utils/event-cotainer-has-class e "nux-tooltip-container"))
+                                                                      (not (dom-utils/event-cotainer-has-class e "label-modal-view")))
+                                                             (close-cmail s e))))
 
                    {:will-mount (fn [s]
                     (reset-cmail s)

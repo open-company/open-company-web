@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -61,7 +62,7 @@
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
-             click dismiss-x] :as notification-data}]
+             click dismiss-x inline-sentry-dialog sentry-event-id] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update web-app-update
@@ -105,10 +106,20 @@
       (when slack-icon
         [:span.slack-icon])
       title]
-    (when (seq description)
+    (if inline-sentry-dialog
       [:div.notification-description
-        {:dangerouslySetInnerHTML #js {"__html" description}
-         :class (when mention "oc-mentions")}])
+       {:class (when mention "oc-mentions")}
+       description
+       [:button.mlb-reset.inline-sentry-dialog-bt
+        {:on-click #(do
+                      (notification-actions/remove-notification (first (:rum/args s)))
+                      (sentry/show-report-dialog sentry-event-id))}
+        "Add feedback"]
+       "if you like. Thank you."]
+      (when (seq description)
+        [:div.notification-description
+          {:dangerouslySetInnerHTML #js {"__html" description}
+           :class (when mention "oc-mentions")}]))
     (when (seq secondary-bt-title)
       (button-wrapper s :second-bt secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)

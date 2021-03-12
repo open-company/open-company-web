@@ -4,8 +4,8 @@ function OCWebHelp(){
   console.log("Debug app-state functions:\n\n" +
               "oc.web.dispatcher.db() // to print the whole app-state\n" +
               "oc.web.lib.logging.config_log_level_BANG_(\"debug\") // to change log level\n" +
-              "oc.web.actions.force_jwt_refresh() // force a JWT token refresh with our auth server\n" +
-              "oc.web.dispatcher // object containing all the other debug functions\n" +
+              "oc.web.actions.user.force_jwt_refresh() // force a JWT token refresh with our auth server\n" +
+              "oc.web.dispatcher // namespace containing a bunch of debug functions\n" +
               "OCWebHelp(): print this help\n")
 }
 

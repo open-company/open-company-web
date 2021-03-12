@@ -321,29 +321,27 @@
       :else (recur (inc idx) (rest items)))))
 
 (def network-error
- {:title "Network request"
-  :description (if ua/pseudo-native?
-                "Probably just a temporary issue. Please try again later if this persists."
-                "Probably just a temporary issue. Please refresh if this persists.")
+ {:title "Network connection lost"
+  :description "Please refresh"
   :server-error true
   :id :generic-network-error
   :dismiss true})
 
 (def internal-error
   {:title "Internal error occurred"
-   :description (str "An internal error occurrent, we have been informed of the "
-                 "problem and we will be working on it as soon as possible. "
-                 "Thanks for understanding.")
+   :description "We have been notified and are working on it."
    :id :internal-error
    :server-error true
+   :inline-sentry-dialog true
    :dismiss true})
 
 (def entry-get-error
   {:server-error true
    :id :entry-load-error
    :title "Error loading the post"
-   :description (format "We've been notified of this error. Please contact %s for additional help." oc-urls/contact-email)
+   :description "We have been notified and are working on it."
    :expire 5
+   :inline-sentry-dialog true
    :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]

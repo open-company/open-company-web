@@ -95,7 +95,7 @@
                             (reset! (::show-color-picker s) false)))
   [s]
   (let [editing-label (drv/react s :editing-label)]
-    [:div.oc-label-edit.fields-modal
+    [:div.oc-label-edit.fields-modal.label-modal-view
      [:div.oc-label-edit-title
       (if (:uuid editing-label)
         "Edit label"
@@ -158,7 +158,7 @@
       (label-actions/hide-labels-manager))))
   refresh-labels-mixin
   [s]
-  [:div.org-labels-manager
+  [:div.org-labels-manager.label-modal-view
    [:div.org-labels-manager-inner
     {:ref :org-labels-manager-inner}
     [:button.mlb-reset.labels-modal-close-bt
@@ -167,67 +167,55 @@
       (label-editor)
       (org-labels-list))]])
 
-(rum/defcs labels-picker-list <
-  rum/static
-  rum/reactive
-  (drv/drv :user-labels)
-  (drv/drv :cmail-data)
-  [s]
-  (let [org-labels (drv/react s :user-labels)
-        cmail-data (drv/react s :cmail-data)
-        label-slugs (->> cmail-data
-                         :labels
-                         (map :slug)
-                         set)]
-    [:div.oc-labels
-     [:div.oc-labels-title
-      "Add labels"]
-     (if (seq org-labels)
-       (for [label org-labels]
-         [:div.oc-label
-          {:data-label-slug (:slug label)
-           :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
-           :class (when (:can-edit? label)
-                    "editable")
-           :on-click #(cmail-actions/toggle-cmail-label label)}
-          (carrot-checkbox {:selected (label-slugs (:slug label))})
-          [:span.oc-label-dot
-           {:style {:background-color (:color label)}}]
-          [:span.oc-label-name
-           (:name label)]
-          (when (:can-edit? label)
-            [:button.mlb-reset.edit-bt
-             {:on-click (fn [e]
-                          (dom-utils/stop-propagation! e)
-                          (label-actions/edit-label label))}])])
-       [:div.oc-labels-empty
-        "No labels yet"])
-     [:button.mlb-reset.add-label-bt
-      {:on-click #(label-actions/new-label)}
-      [:span.add-label-plus]
-      [:span.add-label-span
-       "Add label"]]
-     [:div.oc-labels-footer
-      [:button.mlb-reset.save-bt
-       {:on-click #(cmail-actions/toggle-cmail-labels-view)}
-       "Save"]]]))
-
 (rum/defcs labels-picker <
   rum/static
   rum/reactive
   refresh-labels-mixin
-  (drv/drv :show-label-editor)
-  (ui-mixins/on-click-out :labels-picker-inner (fn [s e]
-    (when (and (not (dom-utils/event-cotainer-has-class e "alert-modal"))
-               (not @(drv/get-ref s :show-label-editor)))
+  (drv/drv :user-labels)
+  (drv/drv :cmail-data)
+  (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
+    (when-not (dom-utils/event-cotainer-has-class e "alert-modal")
       (cmail-actions/toggle-cmail-labels-view))))
   [s]
-  [:div.labels-picker
-   [:div.labels-picker-inner
-    {:ref :labels-picker-inner}
-    (if (drv/react s :show-label-editor)
-      (label-editor)
-      (labels-picker-list))]])
+  (let [org-labels (drv/react s :user-labels)
+        cmail-data (drv/react s :cmail-data)
+        label-slugs (->> cmail-data
+                          :labels
+                          (map :slug)
+                          set)]
+    [:div.labels-picker.label-modal-view
+     [:div.labels-picker-inner
+      {:ref :labels-picker-inner}
+      [:button.mlb-reset.labels-modal-close-bt
+       {:on-click #(cmail-actions/toggle-cmail-labels-view)}]
+      [:div.oc-labels
+       [:div.oc-labels-title
+        "Add labels"]
+       (if (seq org-labels)
+         (for [label org-labels]
+           [:div.oc-label
+            {:data-label-slug (:slug label)
+             :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
+             :class (when (:can-edit? label)
+                      "editable")
+             :on-click #(cmail-actions/toggle-cmail-label label)}
+            (carrot-checkbox {:selected (label-slugs (:slug label))})
+            [:span.oc-label-dot
+             {:style {:background-color (:color label)}}]
+            [:span.oc-label-name
+             (:name label)]
+            (when (:can-edit? label)
+              [:button.mlb-reset.edit-bt
+               {:on-click (fn [e]
+                            (dom-utils/stop-propagation! e)
+                            (label-actions/edit-label label))}])])
+         [:div.oc-labels-empty
+          "No labels yet"])
+       [:button.mlb-reset.add-label-bt
+        {:on-click #(label-actions/new-label)}
+        [:span.add-label-plus]
+        [:span.add-label-span
+         "Add label"]]]]]))
 
 (rum/defc label-item <
   rum/static

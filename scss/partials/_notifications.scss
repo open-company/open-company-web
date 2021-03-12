@@ -191,6 +191,14 @@ div.notifications {
       margin-top: 4px;
       overflow-wrap: break-word;
       @include activity-body-foc(14, 18, var(--notification-color), 3);
+
+      button.inline-sentry-dialog-bt {
+        display: inline;
+        font-size: 14px;
+        line-height: 18px;
+        // color: var(--notification-color);
+        text-decoration: underline;
+      }
     }
 
     button.notification-button {

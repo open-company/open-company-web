@@ -1,5 +1,6 @@
 (ns oc.web.utils.sentry
   (:require ["@sentry/browser" :as sentry-browser]
+            [oc.web.actions.notifications :as notification-actions]
             [taoensso.timbre :as timbre]))
 
 
@@ -54,3 +55,18 @@
     (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
     (catch :default e
       (capture-error! e))))
+
+(defn ^:export show-report-dialog
+  ([] (.showReportDialog ^js sentry-browser #js {}))
+  ([event-id]
+   (.showReportDialog ^js sentry-browser #js {:eventId event-id})))
+
+(defn ^:export test-error-dialog []
+   (notification-actions/show-notification {:title "Error loading the post"
+                                            :description "We have been notified and are working on it."
+                                            :server-error true
+                                            :id :generic-network-error
+                                            :inline-sentry-dialog true
+                                            :expire 15
+                                            :dismiss true})
+   (capture-error-with-message! "Test error with user feedback!"))

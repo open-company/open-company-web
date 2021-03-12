@@ -123,10 +123,7 @@
                                      (not is-contributions)
                                      (not (:read-only container-data)))
         should-show-label-edit-bt (and current-label-slug
-                                       (not is-container?)
-                                       (not is-topics)
-                                       (not is-contributions)
-                                       (not (:read-only container-data)))
+                                       (:can-edit? label-data))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         member? (:member? org-data)
@@ -265,7 +262,7 @@
                                                    "Activity"
 
                                                    is-label
-                                                   (:name label-data)
+                                                   (or (:name label-data) (:slug label-data) current-label-slug)
 
                                                    :default
                                                    ;; Fallback to the org board data
