@@ -17,6 +17,7 @@
             [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.activity-refresh-button :refer (activity-refresh-button)]
             [oc.web.actions.contributions :as contributions-actions]
+            [oc.web.actions.label :as label-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
@@ -54,7 +55,6 @@
            is-mobile
            clear-cell-measure-cb
            current-user-data
-           add-comment-force-update
            row-index
            foc-menu-open] :as props}]
   (let [member? (:member? org-data)
@@ -125,7 +125,6 @@
              container-data
              current-user-data
              clear-cell-measure-cb
-             add-comment-force-update
              row-index
              foc-menu-open]
     :as derivatives}
@@ -165,7 +164,6 @@
                                                  :is-mobile is-mobile?
                                                  :foc-layout foc-layout
                                                  :container-data container-data
-                                                 :add-comment-force-update add-comment-force-update
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
                                                  :foc-menu-open (boolean (= foc-menu-open (:uuid item)))})))]))
@@ -207,30 +205,31 @@
       (clear-cell-measure s idx 0))
     (reset! resource-types next-row-keys)))
 
-(rum/defcs virtualized-stream < rum/static
-                                (seen-mixins/container-nav-mixin)
-                                (rum/local nil ::row-keys)
-                                (rum/local nil ::cache)
-                                (rum/local nil ::force-re-render)
-                                mixins/mounted-flag
-                                {:will-mount (fn [s]
-                                  (let [props (-> s :rum/args s first)
-                                        replies? (-> props :container-data :container-slug (= :replies))
-                                        next-row-keys (mapv unique-row-string (:items props))]
-                                    (reset! (::force-re-render s) (utils/activity-uuid))
-                                    (reset! (::cache s)
-                                     (RVCellMeasurerCache.
-                                      (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (or (:foc-layout props) replies?))
-                                                :minHeight 1
-                                                :fixedWidth true})))
-                                    (reset! (::row-keys s) next-row-keys))
-                                  s)
-                                 :did-remount (fn [_ s]
-                                  (let [props (-> s :rum/args first)
-                                        next-row-keys (mapv unique-row-string (:items props))]
-                                    (when-not (= @(::row-keys s) next-row-keys)
-                                      (clear-changed-cells-cache s next-row-keys)))
-                                  s)}
+(rum/defcs virtualized-stream <
+  rum/static
+  (seen-mixins/container-nav-mixin)
+  (rum/local nil ::row-keys)
+  (rum/local nil ::cache)
+  (rum/local nil ::force-re-render)
+  mixins/mounted-flag
+  {:will-mount (fn [s]
+    (let [props (-> s :rum/args s first)
+          replies? (-> props :container-data :container-slug (= :replies))
+          next-row-keys (mapv unique-row-string (:items props))]
+      (reset! (::force-re-render s) (utils/activity-uuid))
+      (reset! (::cache s)
+        (RVCellMeasurerCache.
+        (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (or (:foc-layout props) replies?))
+                  :minHeight 1
+                  :fixedWidth true})))
+      (reset! (::row-keys s) next-row-keys))
+    s)
+   :did-remount (fn [_ s]
+    (let [props (-> s :rum/args first)
+          next-row-keys (mapv unique-row-string (:items props))]
+      (when-not (= @(::row-keys s) next-row-keys)
+        (clear-changed-cells-cache s next-row-keys)))
+    s)}
   [s {:keys [items
              activities-read
              foc-layout
@@ -247,15 +246,15 @@
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         key-prefix (if is-mobile? "mobile" foc-layout)
         cell-measurer-renderer (fn [{:keys [cache]} props]
-                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
-                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
+                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)
+                                       derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
                                      (cell-measurer (clj->js {:cache cache
                                                               :columnIndex columnIndex
                                                               :rowIndex rowIndex
                                                               :index rowIndex
                                                               :key key
                                                               :parent parent})
-                                      (partial list-item derived-props row-props)))))
+                                      (partial list-item derived-props row-props))))
         width (if is-mobile?
                 js/window.innerWidth
                 620)
@@ -310,7 +309,7 @@
         pnr (- max-scroll win-height)
         current-board-slug @(drv/get-ref s :board-slug)
         current-contributions-id @(drv/get-ref s :contributions-id)
-        current-contributions-id @(drv/get-ref s :contributions-id)
+        current-label-slug @(drv/get-ref s :label-slug)
         board-kw (keyword current-board-slug)]
     ;; scrolling down
     (when (and ;; not already loading more
@@ -332,6 +331,8 @@
         (activity-actions/following-more @(::has-next s) :down)
         (seq current-contributions-id)
         (contributions-actions/contributions-more @(::has-next s) :down)
+        (seq current-label-slug)
+        (label-actions/label-entries-more @(::has-next s) :down)
         (= board-kw :inbox)
         (activity-actions/inbox-more @(::has-next s) :down)
         (= board-kw :all-posts)
@@ -352,67 +353,65 @@
     (did-scroll s)))
 
 (rum/defcs paginated-stream  <
-                        rum/static
-                        rum/reactive
-                        ;; Derivatives
-                        (drv/drv :org-data)
-                        (drv/drv :items-to-render)
-                        (drv/drv :container-data)
-                        (drv/drv :activities-read)
-                        (drv/drv :editable-boards)
-                        (drv/drv :current-user-data)
-                        (drv/drv :board-slug)
-                        (drv/drv :contributions-id)
-                        (drv/drv :add-comment-force-update)
-                        (drv/drv :foc-menu-open)
-                        ;; Locals
-                        (rum/local nil ::scroll-listener)
-                        (rum/local false ::has-next)
-                        (rum/local nil ::bottom-loading)
-                        ;; Mixins
-                        mixins/first-render-mixin
-                        section-mixins/container-nav-in
-                        ; section-mixins/window-focus-auto-loader
-                        ;; (section-mixins/load-entry-comments (fn [s]
-                        ;;   (let [container-data @(drv/get-ref s :container-data)]
-                        ;;     (when (= (:container-slug container-data) :replies)
-                        ;;       container-data))))
-                        {:will-mount (fn [s]
-                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-                          (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL #(did-scroll s)))
-                          s)
-                         :did-mount (fn [s]
-                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-                          (check-pagination s)
-                          s)
-                         :did-remount (fn [_ s]
-                          (check-pagination s)
-                         s)
-                         :before-render (fn [s]
-                          (let [container-data @(drv/get-ref s :container-data)]
-                            (when (and (not (:loading-more container-data))
-                                       @(::bottom-loading s))
-                              (reset! (::bottom-loading s) false)
-                              (check-pagination s)))
-                          s)
-                         :will-unmount (fn [s]
-                          (when @(::scroll-listener s)
-                            (events/unlistenByKey @(::scroll-listener s))
-                            (reset! (::scroll-listener s) nil))
-                          s)}
+  rum/static
+  rum/reactive
+  ;; Derivatives
+  (drv/drv :org-data)
+  (drv/drv :items-to-render)
+  (drv/drv :container-data)
+  (drv/drv :activities-read)
+  (drv/drv :editable-boards)
+  (drv/drv :current-user-data)
+  (drv/drv :board-slug)
+  (drv/drv :contributions-id)
+  (drv/drv :label-slug)
+  (drv/drv :foc-menu-open)
+  ;; Locals
+  (rum/local nil ::scroll-listener)
+  (rum/local false ::has-next)
+  (rum/local nil ::bottom-loading)
+  ;; Mixins
+  mixins/first-render-mixin
+  section-mixins/container-nav-in
+  ; section-mixins/window-focus-auto-loader
+  ;; (section-mixins/load-entry-comments (fn [s]
+  ;;   (let [container-data @(drv/get-ref s :container-data)]
+  ;;     (when (= (:container-slug container-data) :replies)
+  ;;       container-data))))
+  {:will-mount (fn [s]
+    (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+    (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
+    s)
+   :did-mount (fn [s]
+    (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+    (check-pagination s)
+    s)
+   :did-remount (fn [_ s]
+    (check-pagination s)
+    s)
+   :before-render (fn [s]
+    (let [container-data @(drv/get-ref s :container-data)]
+      (when (and (not (:loading-more container-data))
+                 @(::bottom-loading s))
+        (reset! (::bottom-loading s) false)
+        (check-pagination s)))
+    s)
+   :will-unmount (fn [s]
+    (when @(::scroll-listener s)
+      (events/unlistenByKey @(::scroll-listener s))
+      (reset! (::scroll-listener s) nil))
+    s)}
   [s]
   (let [org-data (drv/react s :org-data)
         _board-slug (drv/react s :board-slug)
         _contributions-id (drv/react s :contributions-id)
+        _label-slug (drv/react s :label-slug)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
-        add-comment-force-update (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
-        member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)]
     [:div.paginated-stream.group
@@ -431,4 +430,4 @@
                                         :current-user-data current-user-data
                                         :activities-read activities-read
                                         :editable-boards editable-boards
-                                        :foc-menu-open foc-menu-open}))]]]));)]]]))
+                                        :foc-menu-open foc-menu-open}))]]]))

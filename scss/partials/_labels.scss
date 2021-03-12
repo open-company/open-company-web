@@ -7,6 +7,9 @@ div.oc-labels {
   min-width: 160px;
   background-color: white;
   box-shadow: var(--box-shadow);
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   div.oc-labels-title {
     @include OC_Body_Bold();
@@ -105,6 +108,7 @@ div.oc-labels {
     margin-top: auto;
     margin-bottom: auto;
     align-self: center;
+    margin-top: 12px;
   }
 
   button.add-label-bt {

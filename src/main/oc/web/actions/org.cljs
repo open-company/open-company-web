@@ -14,7 +14,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
-            [oc.web.actions.label :as la]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.chat :as chat]
             [oc.web.lib.json :refer (json->cljs)]
@@ -22,6 +21,7 @@
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.contributions :as contributions-actions]
@@ -142,6 +142,7 @@
         following-link (utils/link-for (:links org-data) "following")
         unfollowing-link (utils/link-for (:links org-data) "unfollowing")
         contrib-link (utils/link-for (:links org-data) "partial-contributions")
+        label-link (utils/link-for (:links org-data) "partial-label-entries")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         replies-link (utils/link-for (:links org-data) "replies")
@@ -155,6 +156,7 @@
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         is-topics? (= current-board-slug "topics")
         is-contributions? (seq (dis/current-contributions-id))
+        is-label? (seq (dis/current-label-slug))
         is-unfollowing? (= current-board-slug "unfollowing")
         sort-type (dis/current-sort-type)
         delay-count (atom 1)
@@ -165,7 +167,8 @@
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
         ; unfollowing-delay (if (and is-unfollowing? (= sort-type dis/recently-posted-sort)) 0 (* other-resources-delay (swap! delay-count inc)))
-        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))]
+        contributions-delay (if is-contributions? 0 (* other-resources-delay (swap! delay-count inc)))
+        label-entries-delay (if is-label? 0 (* other-resources-delay (swap! delay-count inc)))]
     (ou/set-brand-color! org-data)
     (when is-bookmarks?
       (dis/dispatch! [:bookmarks-nav/show (:slug org-data)]))
@@ -205,12 +208,15 @@
           (when (and contrib-link
                      (dis/current-contributions-id))
             (utils/maybe-after contributions-delay #(contributions-actions/contributions-get org-data (dis/current-contributions-id))))
+          (when (and label-link
+                     (dis/current-label-slug))
+            (utils/maybe-after label-entries-delay #(label-actions/label-entries-get org-data (dis/current-label-slug))))
           ;; Preload unfollowing data with recently posted sort
           (when (and is-unfollowing? unfollowing-link)
             (aa/unfollowing-get org-data))
           ;; Load labels if necessary
           (when org-labels-link
-            (la/get-labels org-data))))
+            (label-actions/get-labels org-data))))
       (when (:badge-following org-data)
         (dis/dispatch! [:maybe-badge-following (:slug org-data) current-board-slug]))
       (when (:badge-replies org-data)
@@ -263,7 +269,8 @@
            (not (dis/in-route? :email-wall))
            (not (dis/in-route? :confirm-invitation))
            (not (dis/in-route? :secure-activity))
-           (not (dis/current-contributions-id)))
+           (not (dis/current-contributions-id))
+           (not (dis/current-label-slug)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]
         (router/nav!

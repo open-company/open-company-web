@@ -292,7 +292,6 @@
             editing-board (cmail-actions/get-board-for-edit)]
         ;; If Quick Post is still collapsed expand it
         (when (:collapsed cmail-state)
-          (js/console.log "DBG mem get-board-for-edit" editing-board)
           (cmail-actions/cmail-show editing-board {:collapsed false
                                                    :fullscreen false
                                                    :key (:key cmail-state)}))

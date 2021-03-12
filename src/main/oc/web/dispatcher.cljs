@@ -27,6 +27,7 @@
 (declare current-org-slug)
 (declare current-board-slug)
 (declare current-contributions-id)
+(declare current-label-slug)
 (declare current-sort-type)
 (declare current-activity-id)
 (declare current-secure-activity-id)
@@ -132,6 +133,27 @@
    (conj (contributions-key org-slug slug-or-uuid sort-type) :contrib-data))
   ([org-slug slug-or-uuid]
    (conj (contributions-key org-slug slug-or-uuid) :contrib-data)))
+
+;; Label entries
+
+(defn ^:export label-entries-list-key [org-slug]
+  (vec (conj (org-key org-slug) :label-entries)))
+
+(defn ^:export label-entries-key
+  ([org-slug label-slug]
+   (label-entries-key org-slug label-slug recently-posted-sort))
+  ([org-slug label-slug sort-type]
+   (if sort-type
+     (vec (concat (label-entries-list-key org-slug) [(keyword label-slug) (keyword sort-type)]))
+     (vec (conj (label-entries-list-key org-slug) (keyword label-slug))))))
+
+(defn ^:export label-entries-data-key
+  ([org-slug slug-or-uuid sort-type]
+   (conj (label-entries-key org-slug slug-or-uuid sort-type) :label-data))
+  ([org-slug slug-or-uuid]
+   (conj (label-entries-key org-slug slug-or-uuid) :label-data)))
+
+;; Containers
 
 (defn ^:export containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
@@ -345,6 +367,8 @@
   (let [cnt-key (cond
                   (is-container? container-slug)
                   (container-key org-slug container-slug sort-type)
+                  (seq (current-label-slug))
+                  (label-entries-data-key org-slug container-slug)
                   (seq (current-contributions-id))
                   (contributions-data-key org-slug container-slug)
                   :else
@@ -380,6 +404,7 @@
 (declare editing-label)
 (declare board-data)
 (declare contributions-data)
+(declare label-entries-data)
 (declare editable-boards-data)
 (declare private-boards-data)
 (declare public-boards-data)
@@ -400,6 +425,7 @@
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :contributions-id    [[:route] (fn [route] (:contributions route))]
+   :label-slug          [[:route] (fn [route] (:label route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :entry-board-slug    [[:route] (fn [route] (:entry-board route))]
    :sort-type           [[:route] (fn [route] (:sort-type route))]
@@ -501,7 +527,7 @@
                                (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
-                           (let [container-slug (or (:contributions route) (:board route))]
+                           (let [container-slug (or (:contributions route) (:label route) (:board route))]
                              (when (and base org-data container-slug posts-data)
                                (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
    :team-channels       [[:base :org-data]
@@ -521,14 +547,18 @@
    :public-boards       [[:base :org-slug]
                          (fn [base org-slug]
                            (public-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
-                         (fn [base org-slug board-slug contributions-id sort-type]
+   :container-data      [[:base :org-slug :board-slug :contributions-id :label-slug :sort-type]
+                         (fn [base org-slug board-slug contributions-id label-slug sort-type]
                            (when (and org-slug
                                       (or board-slug
-                                          contributions-id))
+                                          contributions-id
+                                          label-slug))
                              (let [is-contributions? (seq contributions-id)
+                                   is-label? (seq label-slug)
                                    cnt-key (cond is-contributions?
                                                  (contributions-data-key org-slug contributions-id)
+                                                 is-label?
+                                                 (label-entries-data-key org-slug label-slug)
                                                  (is-container? board-slug)
                                                  (container-key org-slug board-slug sort-type)
                                                  :else
@@ -538,6 +568,10 @@
                          (fn [org-slug contributions-id]
                            (when (and org-slug contributions-id)
                              (contributions-data org-slug contributions-id)))]
+   :label-entries-data    [[:org-slug :label-slug]
+                           (fn [org-slug label-slug]
+                             (when (and org-slug label-slug)
+                               (label-entries-data org-slug label-slug)))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
@@ -545,6 +579,10 @@
                              (fn [active-users contributions-id]
                               (when (and active-users contributions-id)
                                 (get active-users contributions-id)))]
+   :label-data          [[:org-labels :label-slug]
+                         (fn [org-labels label-slug]
+                           (when (and org-labels label-slug)
+                             (some #(when ((set [(:slug %) (:uuid %)]) label-slug) %) org-labels)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -579,8 +617,8 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data :contributions-user-data :org-slug :board-slug :contributions-id :activity-uuid :current-user-data]
-                          (fn [base org-data board-data contributions-user-data org-slug board-slug contributions-id activity-uuid current-user-data]
+   :navbar-data         [[:base :org-data :board-data :contributions-user-data :label-data :org-slug :board-slug :contributions-id :label-slug :activity-uuid :current-user-data]
+                          (fn [base org-data board-data contributions-user-data label-data org-slug board-slug contributions-id label-slug activity-uuid current-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
@@ -590,10 +628,12 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
+                                (assoc :label-data label-data)
                                 (assoc :contributions-user-data contributions-user-data)
                                 (assoc :current-org-slug org-slug)
                                 (assoc :current-board-slug board-slug)
                                 (assoc :current-contributions-id contributions-id)
+                                (assoc :current-label-slug label-slug)
                                 (assoc :current-activity-id activity-uuid)
                                 (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
@@ -668,12 +708,14 @@
                                 (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                             user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                   (get active-users user-id))))]
-   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :nux
+   :org-dashboard-data    [[:base :orgs :org-data :label-entries-data :container-data :posts-data :nux
                             :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
-                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
-                            (fn [base orgs org-data contributions-data container-data posts-data nux
+                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id
+                            :label-slug :entry-board-slug :activity-uuid :label-data]
+                            (fn [base orgs org-data label-entries-data container-data posts-data nux
                                  entry-editing jwt loading payments search-active user-info-data current-user-data
-                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
+                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id
+                                 label-slug entry-board-slug activity-uuid label-data]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -682,9 +724,10 @@
                                :current-org-slug org-slug
                                :current-board-slug board-slug
                                :current-contributions-id contributions-id
+                               :current-label-slug label-slug
                                :current-entry-board-slug entry-board-slug
                                :current-activity-id activity-uuid
-                               :contributions-data contributions-data
+                               :label-entries-data label-entries-data
                                :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
@@ -702,6 +745,7 @@
                                :user-info-data user-info-data
                                :current-user-data current-user-data
                                :active-users active-users
+                               :label-data label-data
                                :follow-publishers-list follow-publishers-list
                                :follow-boards-list follow-boards-list
                                :show-premium-picker? (:show-premium-picker? base)
@@ -788,6 +832,10 @@
 (defn ^:export current-contributions-id
   ([] (current-contributions-id @app-state))
   ([data] (get-in data [router-key :contributions])))
+
+(defn ^:export current-label-slug
+  ([] (current-label-slug @app-state))
+  ([data] (get-in data [router-key :label])))
 
 (defn ^:export current-sort-type
   ([] (current-sort-type @app-state))
@@ -935,19 +983,12 @@
 
 (defn ^:export label-data
   "Get a label by uuid"
-  ([label-uuid] (label-data @app-state (current-org-slug) label-uuid))
-  ([data label-uuid] (label-data data (current-org-slug) label-uuid))
-  ([data org-slug label-uuid]
+  ([] (label-data @app-state (current-org-slug) (current-label-slug)))
+  ([label-uuid-or-slug] (label-data @app-state (current-org-slug) label-uuid-or-slug))
+  ([data label-uuid-or-slug] (label-data data (current-org-slug) label-uuid-or-slug))
+  ([data org-slug label-uuid-or-slug]
    (let [labels (org-labels-data data org-slug)]
-     (some #(when (= (:uuid %) label-uuid) %) labels))))
-
-(defn ^:export label-data-by-slug
-  "Get the org labels"
-  ([label-slug] (label-data-by-slug @app-state (current-org-slug) label-slug))
-  ([data label-slug] (label-data-by-slug data (current-org-slug) label-slug))
-  ([data org-slug label-slug]
-   (let [labels (org-labels-data data org-slug)]
-     (some #(when (= (:slug %) label-slug) %) labels))))
+     (some #(when ((set [(:uuid %) (:slug %)]) label-uuid-or-slug) %) labels))))
 
 (defn ^:export editing-label
   "Get the current editing label"
@@ -1016,6 +1057,22 @@
     (when (and org-slug contributions-id)
       (get-in data (contributions-data-key org-slug contributions-id)))))
 
+(defun ^:export label-entries-data
+  "Get label entries data"
+  ([]
+   (label-entries-data @app-state))
+  ([data :guard map?]
+   (label-entries-data data (current-org-slug data) (current-label-slug data)))
+  ([label-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state (current-org-slug) label-slug))
+  ([org-slug :guard #(or (keyword? %) (string? %)) label-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state org-slug label-slug))
+  ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state org-slug (current-label-slug data)))
+  ([data org-slug label-slug]
+   (when (and org-slug label-slug)
+     (get-in data (label-entries-data-key org-slug label-slug)))))
+
 (defn ^:export editable-boards-data
   ([] (editable-boards-data @app-state (current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
@@ -1049,8 +1106,11 @@
 
 (defn ^:export current-container-data []
   (let [board-slug (current-board-slug)
-        contributions-id (current-contributions-id)]
+        contributions-id (current-contributions-id)
+        label-slug (current-label-slug)]
     (cond
+      (seq label-slug)
+      (label-entries-data @app-state (current-org-slug) label-slug)
       (seq contributions-id)
       (contributions-data @app-state (current-org-slug) contributions-id)
       (is-container? board-slug)

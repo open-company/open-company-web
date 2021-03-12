@@ -50,6 +50,23 @@ div.empty-board {
           @include user-profile(56);
         }
 
+        &.label {
+          position: relative;
+          background-image: none;
+          display: block;
+
+          &:before {
+            content: "";
+            display: block;
+            width: 24px;
+            height: 24px;
+            @include svgBgColor("/img/ML/label_icon.svg", center, 24px 24px, var(--color));
+            position: absolute;
+            top: 18px;
+            left: 18px;
+          }
+        }
+
         &.all-posts {
           background-image: cdnUrl("/img/ML/nav_all.svg");
           background-size: 24px 24px;
@@ -77,6 +94,10 @@ div.empty-board {
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
+
+          &.label {
+            background-image: none;
+          }
 
           &.all {
             background-image: cdnUrl("/img/ML/nav_all@dark.svg");

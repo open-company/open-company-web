@@ -71,6 +71,7 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
+                current-label-slug
                 current-entry-board-slug
                 current-activity-id
                 initial-section-editing
@@ -85,6 +86,7 @@
                 app-loading
                 user-info-data
                 active-users
+                label-data
                 search-active
                 show-premium-picker?
                 payments-ui-upgraded-banner
@@ -98,10 +100,11 @@
                   app-loading
                      ;; the org data are not loaded yet
                   (not org-data)
-                     ;; No board or contributions specified
+                     ;; No board nor contributions nor label specified
                   (and (not current-board-slug)
                        (not current-contributions-id)
-                          ;; but there are some
+                       (not current-label-slug)
+                       ;; but there are some
                        (pos? (count (:boards org-data))))
                      ;; Active users have not been loaded yet:
                      ;; they are blocking since they are used to:
@@ -114,8 +117,13 @@
         section-not-found (and (not org-not-found)
                                org-data
                                (not current-contributions-id)
+                               (not current-label-slug)
                                (not (dis/is-container? current-board-slug))
                                (not ((set (map :slug (:boards org-data))) current-board-slug)))
+        label-not-found (and (not org-not-found)
+                             org-data
+                             current-label-slug
+                             (map? label-data))
         contributions-not-found (and (not org-not-found)
                                      org-data
                                      current-contributions-id
@@ -143,6 +151,7 @@
                                  (and current-activity-id
                                       (or org-not-found
                                           section-not-found
+                                          label-not-found
                                           contributions-not-found
                                           entry-not-found))))
         show-activity-removed (and jwt-data

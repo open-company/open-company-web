@@ -5,7 +5,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
-            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -13,7 +12,6 @@
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.label :as label-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.user-notifications :as user-notifications]
@@ -32,10 +30,13 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :contributions-user-data)
+                              (drv/drv :label-data)
+                              (drv/drv :label-entries-data)
                               (drv/drv :container-data)
                               (drv/drv :contributions-data)
                               (drv/drv :org-slug)
                               (drv/drv :board-slug)
+                              (drv/drv :label-slug)
                               (drv/drv :contributions-id)
                               (drv/drv :activity-uuid)
                               (drv/drv :filtered-posts)
@@ -66,12 +67,15 @@
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
         contributions-data (drv/react s :contributions-data)
-        posts-data (drv/react s :filtered-posts)
+        label-entries-data (drv/react s :label-entries-data)
+        label-data (drv/react s :label-data)
+        _posts-data (drv/react s :filtered-posts)
         _items-to-render (drv/react s :items-to-render)
-        foc-layout (drv/react s :foc-layout)
+        _foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
         _comment-reply-to (drv/react s :comment-reply-to)
         current-board-slug (drv/react s :board-slug)
+        current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
         current-activity-id (drv/react s :activity-uuid)
         current-org-slug (drv/react s :org-slug)
@@ -88,9 +92,9 @@
                                         show-invite-box)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
-        route (drv/react s :route)
-        team-data (drv/react s :team-data)
-        activity-data (drv/react s :activity-data)
+        _route (drv/react s :route)
+        _team-data (drv/react s :team-data)
+        _activity-data (drv/react s :activity-data)
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
@@ -99,9 +103,11 @@
         is-unfollowing (= current-board-slug "unfollowing")
         is-topics (= current-board-slug "topics")
         is-contributions (seq current-contributions-id)
+        is-label (seq current-label-slug)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-container? (dis/is-container? current-board-slug)
         container-data (if (and (not is-contributions)
+                                (not is-label)
                                 (not is-container?)
                                 (not container-data*))
                          org-board-data
@@ -111,22 +117,22 @@
         empty-container? (and (not loading-container?)
                               (not (seq (:posts-list container-data*))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
-        board-view-cookie (router/last-board-view-cookie current-org-slug)
-        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
-        drafts-link (utils/link-for (:links drafts-board) "self")
-        show-drafts (pos? (:count drafts-link))
         should-show-settings-bt (and current-board-slug
                                      (not is-container?)
                                      (not is-topics)
+                                     (not is-contributions)
                                      (not (:read-only container-data)))
+        should-show-label-edit-bt (and current-label-slug
+                                       (not is-container?)
+                                       (not is-topics)
+                                       (not is-contributions)
+                                       (not (:read-only container-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        dismiss-all-link (when is-inbox
-                           (utils/link-for (:links container-data) "dismiss-all"))
         member? (:member? org-data)
-        is-own-contributions (= (:user-id contributions-user-data) (:user-id current-user-data))
         show-follow-banner? (and (not is-container?)
                                  (not (seq current-contributions-id))
+                                 (not (seq current-label-slug))
                                  (not is-drafts-board)
                                  (map? org-board-data)
                                  (false? (:following org-board-data)))
@@ -139,13 +145,16 @@
         paginated-stream-key (str "paginated-posts-component-"
                               (cond is-contributions
                                     current-contributions-id
+                                    is-label
+                                    current-label-slug
                                     current-board-slug
                                     (name current-board-slug))
                               (when (:last-seen-at container-data)
                                 (str "-" (:last-seen-at container-data))))
         show-feed? (or (not is-contributions)
                        (not= (:role contributions-user-data) :viewer)
-                       (pos? (count (:posts-list contributions-data))))
+                       (pos? (count (:posts-list contributions-data)))
+                       (pos? (count (:posts-list label-entries-data))))
         no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
         can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
       ;; Entries list
@@ -219,6 +228,7 @@
                         {:class (utils/class-set {:private (and (= (:access container-data) "private")
                                                                 (not is-drafts-board))
                                                   :public (= (:access container-data) "public")
+                                                  :label-icon is-label
                                                   :home-icon is-following
                                                   :unfollowing-icon is-unfollowing
                                                   :all-icon is-all-posts
@@ -230,6 +240,7 @@
                                                                    (not is-contributions)
                                                                    (not is-topics)
                                                                    (not is-drafts-board)
+                                                                   (not is-label)
                                                                    (not current-activity-id))})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
@@ -252,6 +263,9 @@
 
                                                    is-replies
                                                    "Activity"
+
+                                                   is-label
+                                                   (:name label-data)
 
                                                    :default
                                                    ;; Fallback to the org board data
@@ -299,14 +313,15 @@
                           :data-container "body"
                           :title (str (:name container-data) " settings")
                           :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                    (when (and dismiss-all-link
-                              (pos? (count posts-data)))
-                      [:button.mlb-reset.complete-all-bt
-                        {:on-click #(activity-actions/inbox-dismiss-all)
-                        :data-toggle (when-not is-mobile? "tooltip")
+                   (when should-show-label-edit-bt
+                     [:div.board-settings-container
+                        ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                       {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                         :data-placement "top"
                         :data-container "body"
-                        :title "Dismiss all"}])])])
+                        :title (str (:name label-data) " edit")
+                        :on-click #(label-actions/edit-label label-data)}]])])])
               (when show-feed?
                 ;; Board content: empty org, all posts, empty board, drafts view, entries view
                 (cond

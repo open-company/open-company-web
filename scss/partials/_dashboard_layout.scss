@@ -366,6 +366,13 @@ div.dashboard-layout {
                 }
               }
 
+              &.label-icon {
+                padding-left: 28px;
+                &:before {
+                  @include svgBgColor("/img/ML/label_icon.svg", center, 16px 16px, var(--color));
+                }
+              }
+
               span.count {
                 @include OC_Body_Book();
                 font-size: 14px;

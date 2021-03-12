@@ -473,13 +473,15 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link callback]
+(defn get-entries [activity-link callback]
   (if activity-link
     (let [href (relative-href activity-link)]
       (storage-http (method-for-link activity-link) href
         {:headers (headers-for-link activity-link)}
         callback))
-    (handle-missing-link "get-all-posts" activity-link callback)))
+    (handle-missing-link "get-entries" activity-link callback)))
+
+(def get-all-posts get-entries)
 
 (defn load-more-items [more-link direction callback]
   (if (and more-link direction)
@@ -1110,3 +1112,10 @@
                   {:headers (headers-for-link delete-label-link)}
                   callback)
     (handle-missing-link "delete-label" delete-label-link callback)))
+
+(defn get-label-entries [label-entries-link callback]
+  (if label-entries-link
+    (storage-http (method-for-link label-entries-link) (relative-href label-entries-link)
+                  {:headers (headers-for-link label-entries-link)}
+                  callback)
+    (handle-missing-link "get-label-entries" label-entries-link callback)))

@@ -5,7 +5,6 @@
 (rum/defc colors-presets <
   rum/static
   [{:keys [color-list current-selected on-change-cb]}]
-  (js/console.log "DBG colors-presets, selected:" current-selected)
   [:div.colors-presets.group
    [:span.colors-presets-label "Presets:"]
    [:div.colors-list.group

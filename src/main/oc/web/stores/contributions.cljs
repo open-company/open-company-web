@@ -1,9 +1,5 @@
 (ns oc.web.stores.contributions
-  (:require [cuerdas.core :as str]
-            [taoensso.timbre :as timbre]
-            [oc.web.dispatcher :as dispatcher]
-            [oc.web.lib.jwt :as j]
-            [oc.web.lib.utils :as utils]
+  (:require [oc.web.dispatcher :as dispatcher]
             [oc.web.utils.activity :as au]))
 
 (defmethod dispatcher/action :contributions-get/finish
@@ -12,9 +8,7 @@
         prepare-container-data (-> contrib-data :collection (assoc :container-slug :contributions))
         fixed-contrib-data (au/parse-contributions prepare-container-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) (dispatcher/follow-publishers-list org-slug db) sort-type)
         contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid sort-type)
-        posts-key (dispatcher/posts-data-key org-slug)
-        merged-items (merge (get-in db posts-key)
-                            (:fixed-items fixed-contrib-data))]
+        posts-key (dispatcher/posts-data-key org-slug)]
     (-> db
      (update-in posts-key merge (:fixed-items fixed-contrib-data))
      (assoc-in contrib-data-key (dissoc fixed-contrib-data :fixed-items)))))

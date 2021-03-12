@@ -19,6 +19,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -614,6 +615,7 @@
    (when-not (dis/current-activity-id)
      (let [current-board-slug (dis/current-board-slug)
            current-contrib-id (dis/current-contributions-id)
+           current-label-slug (dis/current-label-slug)
            org-data (dis/org-data)
            board-kw (keyword current-board-slug)]
        (cond (= board-kw :topics)
@@ -630,6 +632,8 @@
              (unfollowing-refresh org-data (not refresh-seen-at?))
              (seq current-contrib-id)
              (contrib-actions/contributions-refresh org-data current-contrib-id)
+             (seq current-label-slug)
+             (label-actions/label-entries-refresh org-data current-label-slug)
              (not (dis/is-container? current-board-slug))
              (sa/section-refresh current-board-slug)
              :else

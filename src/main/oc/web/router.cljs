@@ -171,6 +171,11 @@
   []
   (str "collapse-sections-list-" (jwt/user-id)))
 
+(defn collapse-labels-list-cookie
+  "Cookie used to remember if the labels list was collapsed or not."
+  []
+  (str "collapse-labels-list-" (jwt/user-id)))
+
 (defn collapse-users-list-cookie
   "Cookie used to remember if the users list was collapsed or not."
   []

@@ -14,6 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notif-actions]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -42,6 +43,10 @@
   (when author-uuid
     (contributions-actions/contributions-get author-uuid)))
 
+(defn- refresh-label-data [label-slug]
+  (when label-slug
+    (label-actions/label-entries-get label-slug)))
+
 (def ^:private click-throttle-ms (* 1000 15))
 
 (defonce refresh-delays (atom {}))
@@ -61,7 +66,7 @@
 (defn nav-to-author!
   ([e author-uuid url]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
-  
+
   ([e author-uuid url refresh?]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
@@ -91,10 +96,43 @@
           (when refresh?
             (refresh-contributions-data author-uuid)))))))))
 
+(defn nav-to-label!
+  ([e label-slug url]
+   (nav-to-label! e label-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+
+  ([e label-slug url refresh?]
+   (nav-to-label! e label-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
+
+  ([e label-slug url back-y refresh?]
+   (dom-utils/prevent-default! e)
+   (when (responsive/is-mobile-size?)
+     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+     (notif-actions/hide-mobile-user-notifications))
+   (utils/after 0 (fn []
+    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+          org-slug (dis/current-org-slug)
+          sort-type (activity-actions/saved-sort-type org-slug label-slug)]
+      (if (= current-path url)
+        (maybe-refresh-container (str "-label-" label-slug))
+        (do ;; If user clicked on a different section/container
+            ;; let's switch to it using pushState and changing
+            ;; the internal router state
+          (routing-actions/routing! {:org org-slug
+                                     :label label-slug
+                                     :sort-type sort-type
+                                     :scroll-y back-y
+                                     :query-params (dis/query-params)
+                                     :route [org-slug label-slug sort-type "dashboard"]
+                                     dis/router-opts-key [dis/router-dark-allowed-key]})
+          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (when refresh?
+            (refresh-label-data label-slug)))))))))
+
 (defn nav-to-url!
   ([e board-slug url]
    (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
-  
+
   ([e board-slug url refresh?]
    (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 

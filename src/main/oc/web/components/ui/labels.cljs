@@ -11,7 +11,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.dispatcher :as dis]
-            ;; [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.label :as label-actions]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -91,8 +91,7 @@
                                        (not (dom-utils/event-cotainer-has-class e :oc-input)))
                               (reset! (::show-color-picker s) false))))
   (ui-mixins/on-key-press ["Esc" "Escape"]
-                          (fn [s e]
-                            (js/console.log "DBG on-key-press cb called" e)
+                          (fn [s _]
                             (reset! (::show-color-picker s) false)))
   [s]
   (let [editing-label (drv/react s :editing-label)]
@@ -155,7 +154,7 @@
   (drv/drv :show-label-editor)
   (ui-mixins/on-click-out :org-labels-manager-inner (fn [s e]
     (when (and (not (dom-utils/event-cotainer-has-class e "alert-modal"))
-               (not @(::show-label-editor s)))
+               (not @(drv/get-ref s :show-label-editor)))
       (label-actions/hide-labels-manager))))
   refresh-labels-mixin
   [s]
@@ -238,10 +237,7 @@
     :data-slug (:slug label)}
    [:a
     {:href (oc-urls/label (:slug label))
-     :on-click (fn [e]
-                 (dom-utils/prevent-default! e)
-                ;;  (nav-actions/nav-to-url! (oc-urls/label (:slug label)))
-                 )}
+     :on-click #(nav-actions/nav-to-label! % (:slug label) (oc-urls/label (:slug label)))}
     [:div.oc-label-bg
      {:style {:background-color (:color label)}}]
     [:span.oc-label-text

@@ -1,10 +1,17 @@
 (ns oc.web.actions.label
+  (:require-macros [if-let.core :refer (if-let*)])
   (:require [oc.web.dispatcher :as dis]
+            [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
             [oc.web.utils.color :as color-utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.api :as api]))
+            [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
+            [oc.web.utils.activity :as au]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]))
 
 ;; Data parse
 
@@ -54,9 +61,9 @@
                          shuffle
                          first)]
     (timbre/infof "New label for org %s, random color %s" (:uuid org-data) random-color)
-    (dis/dispatch! [:label-editor/replace {:name ""
-                                           :color random-color
-                                           :org-uuid (:uuid org-data)}])))
+    (dis/dispatch! [:label-editor/start {:name ""
+                                         :color random-color
+                                         :org-uuid (:uuid org-data)}])))
 
 (defn dismiss-label-editor []
   (timbre/info "Dismiss label editor")
@@ -94,3 +101,122 @@
 
 (defn label-editor-update [label-data]
   (dis/dispatch! [:label-editor/update label-data]))
+
+(defun get-label-entries
+  ([label] (get-label-entries label (dis/org-data) nil))
+  ([label org-data] (get-label-entries label org-data nil))
+  ([label :guard map? org-data cb] (get-label-entries label org-data nil))
+  ([label-slug :guard string? org-data cb]
+   (timbre/infof "Loading entries for label %s" label-slug)
+   (let [label-entries-link (hateoas/link-for (:links org-data) "partial-label-entries" {} {:label-slug label-slug})]
+     (api/get-entries label-entries-link
+                      ()))))
+
+;; Label entries list
+
+(defn- watch-boards [posts-data]
+  (when (jwt/jwt) ; only for logged in users
+    (let [board-slugs (distinct (map :board-slug posts-data))
+          org-data (dis/org-data)
+          org-boards (:boards org-data)
+          org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
+      (ws-ic/board-unwatch (fn [rep]
+                             (let [board-uuids (map org-board-map board-slugs)]
+                               (timbre/debug "Watching on socket " board-slugs board-uuids)
+                               (ws-ic/boards-watch board-uuids)))))))
+
+(defn- is-currently-shown? [label-slug]
+  (= (dis/current-label-slug) label-slug))
+
+(defn- request-reads-count
+  "Request the reads count data only for the items we don't have already."
+  [label-slug label-entries-data]
+  (let [member? (:member? (dis/org-data))]
+    (when (and member?
+               (seq (:items label-entries-data)))
+      (let [item-ids (map :uuid (:items label-entries-data))
+            cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activity-read-data))]
+        (when (seq cleaned-ids)
+          (api/request-reads-count cleaned-ids))))))
+
+(defn- label-entries-get-success [org-slug label-slug sort-type label-entries-data]
+  (let [is-currently-shown (is-currently-shown? label-slug)
+        member? (:member? (dis/org-data))]
+    (when is-currently-shown
+      (when member?
+        ;; only watch the boards of the posts actually shown
+        (when (= (dis/current-label-slug) (:label-slug (:collection label-entries-data)))
+          ; (request-reads-count (->> contrib-data :collection :items (map :uuid)))
+          (watch-boards (:items (:collection label-entries-data))))
+        ;; Retrieve reads count if there are items in the loaded section
+        (request-reads-count label-slug (:collection label-entries-data))))
+    (dis/dispatch! [:label-entries-get/finish org-slug label-slug sort-type label-entries-data])))
+
+(defn- label-entries-get-finish [org-slug label-slug sort-type {:keys [status body success]}]
+  (if (= status 404)
+    (router/redirect-404!)
+    (label-entries-get-success org-slug label-slug sort-type (if success (json->cljs body) {}))))
+
+(defn- label-entries-real-get [org-data label-slug label-entries-link]
+  (api/get-label-entries label-entries-link
+                         (fn [resp]
+                           (label-entries-get-finish (:slug org-data) label-slug dis/recently-posted-sort resp))))
+
+(defn- label-entries-link [org-data label-slug]
+  (hateoas/link-for (:links org-data) "partial-label-entries" {} {:label-slug label-slug}))
+
+(defn label-entries-get
+  ([label-slug] (label-entries-get (dis/org-data) label-slug))
+
+  ([org-data label-slug]
+   (when-let [label-entries-link (label-entries-link org-data label-slug)]
+     (label-entries-real-get org-data label-slug label-entries-link))))
+
+(defn label-entries-refresh
+  "If the user is looking at a label entries view we need to reload all the items that are visible right now.
+  Instead, if the user is looking at another view we can just reload the first page."
+  ([label-slug] (label-entries-refresh (dis/org-data) label-slug))
+  ([org-data label-slug]
+   (if-let* [label-entries-data (dis/label-entries-data label-slug)
+             refresh-link (hateoas/link-for (:links label-entries-data) "refresh")]
+     (label-entries-real-get org-data label-slug refresh-link)
+     (label-entries-get org-data label-slug))))
+
+(defn- label-entries-more-finish [org-slug label-slug sort-type direction {:keys [success body]}]
+  (let [label-entries-data (when success (json->cljs body))]
+    (when success
+      (when (= (dis/current-label-slug) (:label-slug (:collection label-entries-data)))
+        ;; only watch the boards of the posts of the contributor
+        (watch-boards (:items (:collection label-entries-data))))
+      ;; Retrieve reads count if there are items in the loaded section
+      (request-reads-count label-slug (:collection label-entries-data)))
+    (dis/dispatch! [:label-entries-more/finish org-slug label-slug sort-type
+                    direction (when success (:collection label-entries-data))])))
+
+(defn label-entries-more [more-link direction]
+  (let [org-slug (dis/current-org-slug)
+        label-slug (dis/current-label-slug)]
+    (api/load-more-items more-link direction (partial label-entries-more-finish org-slug label-slug dis/recently-posted-sort direction))
+    (dis/dispatch! [:label-entries-more org-slug label-slug dis/recently-posted-sort])))
+
+;; Change service actions
+
+(defn subscribe []
+  (ws-cc/subscribe :item/change
+                   (fn [data]
+                     (when (dis/current-contributions-id)
+                       (let [change-data (:data data)
+                             activity-uuid (:item-id change-data)
+                             change-type (:change-type change-data)
+                             activity-data (dis/activity-data (dis/current-org-slug) activity-uuid)
+                             current-label-slug (dis/current-label-slug)
+                             contains-current-label? (->> activity-data
+                                                          :labels
+                                                          (map :slug)
+                                                          set
+                                                          current-label-slug)]
+          ;; On update or delete of a post from the currently shown user
+                         (when (or (= change-type :add)
+                                   (and (#{:update :delete} change-type)
+                                        contains-current-label?))
+                           (label-entries-get current-label-slug)))))))

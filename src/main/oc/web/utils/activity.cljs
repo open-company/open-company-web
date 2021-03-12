@@ -2,6 +2,7 @@
   (:require [cuerdas.core :as s]
             [defun.core :refer (defun)]
             [cljs-time.format :as time-format]
+            [clojure.set :as clj-set]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
@@ -858,6 +859,74 @@
           (assoc :items-to-render with-ending-item)
           (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
 
+(defn parse-label-entries
+  "Parse data coming from the API for a certain user's posts."
+  ([label-entries-data]
+   (parse-label-entries label-entries-data {} (dis/org-data) (dis/active-users) dis/recently-posted-sort))
+
+  ([label-entries-data change-data]
+   (parse-label-entries label-entries-data change-data (dis/org-data) (dis/active-users) dis/recently-posted-sort))
+
+  ([label-entries-data change-data org-data]
+   (parse-label-entries label-entries-data change-data org-data (dis/active-users) dis/recently-posted-sort))
+
+  ([label-entries-data change-data org-data active-users]
+   (parse-label-entries label-entries-data change-data org-data active-users dis/recently-posted-sort))
+
+  ([label-entries-data change-data org-data active-users sort-type & [direction]]
+   (when label-entries-data
+     (let [all-boards (:boards org-data)
+           boards-map (zipmap (map :slug all-boards) all-boards)
+           with-fixed-activities* (reduce (fn [ret item]
+                                            (let [board-data (get boards-map (:board-slug item))
+                                                  fixed-entry (parse-entry item board-data change-data active-users (:last-seen-at label-entries-data))]
+                                              (assoc-in ret [:fixed-items (:uuid item)] fixed-entry)))
+                                          label-entries-data
+                                          (:items label-entries-data))
+           with-fixed-activities (reduce (fn [ret item]
+                                           (if (contains? (:fixed-items ret) (:uuid item))
+                                             ret
+                                             (let [entry-board-data (get boards-map (:board-slug item))
+                                                   app-state-entry (dis/activity-data (:uuid item))
+                                                   full-entry (when (map? app-state-entry)
+                                                                (-> app-state-entry
+                                                                    (merge item)
+                                                                    (parse-entry entry-board-data change-data active-users (:last-seen-at label-entries-data))))]
+                                               (if (map? app-state-entry)
+                                                 (assoc-in ret [:fixed-items (:uuid item)] full-entry)
+                                                 ret))))
+                                         with-fixed-activities*
+                                         (:posts-list label-entries-data))
+           keep-link-rel (if (= direction :down) "previous" "next")
+           next-links (when direction
+                        (vec (remove #(= (:rel %) keep-link-rel) (:links label-entries-data))))
+           link-to-move (when direction
+                          (utils/link-for (:old-links label-entries-data) keep-link-rel))
+           fixed-next-links (if direction
+                              (if link-to-move
+                                (vec (conj next-links link-to-move))
+                                next-links)
+                              (:links label-entries-data))
+           items-list (when (contains? label-entries-data :items)
+                         ;; In case we are parsing a fresh response from server
+                        (map #(-> %
+                                  (assoc :resource-type :entry)
+                                  (select-keys preserved-keys))
+                             (:items label-entries-data)))
+           full-items-list (merge-items-lists items-list (:posts-list label-entries-data) direction)
+           grouped-items (if (show-separators? :label sort-type)
+                           (grouped-posts full-items-list)
+                           full-items-list)
+           next-link (utils/link-for fixed-next-links "next")
+           with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
+           with-ending-item (insert-ending-item with-open-close-items next-link)]
+       (-> with-fixed-activities
+           (assoc :resource-type :label)
+           (dissoc :old-links :items)
+           (assoc :links fixed-next-links)
+           (assoc :posts-list full-items-list)
+           (assoc :items-to-render with-ending-item))))))
+
 (defn parse-container
   "Parse container data coming from the API, like Following or Replies (AP, Bookmarks etc)."
   ([container-data]
@@ -952,7 +1021,7 @@
   [item-ids activities-read-data]
   (let [all-items (set (keys activities-read-data))
         request-set (set item-ids)
-        diff-ids (clojure.set/difference request-set all-items)]
+        diff-ids (clj-set/difference request-set all-items)]
     (vec diff-ids)))
 
 ;; Last used section
@@ -1004,6 +1073,28 @@
                    tdb*))))
      db
      (keys (get-in db contributions-list-key)))))
+
+(defn update-label-entries [db org-data change-data active-users]
+  (let [org-slug (:slug org-data)
+        label-entries-list-key (dis/label-entries-list-key org-slug)]
+    (reduce (fn [tdb label-entries-key]
+              (let [rp-label-entries-data-key (dis/label-entries-data-key org-slug label-entries-key dis/recently-posted-sort)
+                    ra-label-entries-data-key (dis/label-entries-data-key org-slug label-entries-key dis/recent-activity-sort)]
+                (as-> tdb tdb*
+                  (if (contains? (get-in tdb* (butlast rp-label-entries-data-key)) (last rp-label-entries-data-key))
+                    (update-in tdb* rp-label-entries-data-key
+                               #(-> %
+                                    (parse-label-entries change-data org-data active-users dis/recently-posted-sort)
+                                    (dissoc :fixed-items)))
+                    tdb*)
+                  (if (contains? (get-in tdb* (butlast ra-label-entries-data-key)) (last ra-label-entries-data-key))
+                    (update-in tdb* ra-label-entries-data-key
+                               #(-> %
+                                    (parse-label-entries change-data org-data active-users dis/recent-activity-sort)
+                                    (dissoc :fixed-items)))
+                    tdb*))))
+            db
+            (keys (get-in db label-entries-list-key)))))
 
 (defn update-board [db board-slug org-data change-data active-users]
   (let [org-slug (:slug org-data)
@@ -1080,4 +1171,5 @@
    (update-posts org-data change-data active-users)
    (update-boards org-data change-data active-users)
    (update-containers org-data change-data active-users)
-   (update-contributions org-data change-data active-users follow-publishers-list)))
+   (update-contributions org-data change-data active-users follow-publishers-list)
+   (update-label-entries org-data change-data active-users)))
