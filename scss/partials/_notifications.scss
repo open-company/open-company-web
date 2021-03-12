@@ -247,10 +247,11 @@ div.notifications {
         float: unset;
         margin-top: 8px;
         height: 16px;
-        @include OC_Body_Book();
+        @include OC_Body_Bold();
+        text-decoration: underline;
         font-size: 14px;
         line-height: 16px;
-        color: white
+        color: white;
         background-color: transparent;
         opacity: 0.9;
       }

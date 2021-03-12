@@ -66,3 +66,13 @@
   ([] (.showReportDialog ^js sentry-browser #js {}))
   ([event-id]
    (.showReportDialog ^js sentry-browser #js {:eventId event-id})))
+
+(defn ^:export test-error-dialog []
+   (notification-actions/show-notification {:title "This is a generic error, click the feedback button below!"
+                                            :description "Probably just a temporary issue. Please refresh if this persists."
+                                            :server-error true
+                                            :id :generic-network-error
+                                            :sentry-dialog true
+                                            :expire 15
+                                            :dismiss true})
+   (capture-error-with-message! "Test error with user feedback!"))
