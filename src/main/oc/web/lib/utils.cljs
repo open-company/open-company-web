@@ -327,6 +327,7 @@
                 "Probably just a temporary issue. Please refresh if this persists.")
   :server-error true
   :id :generic-network-error
+  :sentry-dialog true
   :dismiss true})
 
 (def internal-error
@@ -336,6 +337,7 @@
                  "Thanks for understanding.")
    :id :internal-error
    :server-error true
+   :sentry-dialog true
    :dismiss true})
 
 (def entry-get-error
@@ -344,6 +346,7 @@
    :title "Error loading the post"
    :description (format "We've been notified of this error. Please contact %s for additional help." oc-urls/contact-email)
    :expire 5
+   :sentry-dialog true
    :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]

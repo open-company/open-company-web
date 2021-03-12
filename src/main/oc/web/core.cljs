@@ -787,3 +787,7 @@
   (when ua/mobile-app?
     (expo/bridge-get-color-scheme))
   (theme-actions/setup-theme))
+
+(defn ^:export test-sentry-feedback []
+  (notification-actions/show-notification (assoc utils/network-error :expire 15 :title "This is a generic error, click the feedback button below!"))
+  (sentry/capture-error-with-message! "Test error with user feedback!"))

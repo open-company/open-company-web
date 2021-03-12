@@ -41,3 +41,13 @@
   (let [current-notifications (get-in db dispatcher/notifications-key)
         next-notifications (filter #(not= (:id %) notification-id) current-notifications)]
     (assoc-in db dispatcher/notifications-key next-notifications)))
+
+(defmethod dispatcher/action :notification/sentry
+  [db [_ event-id]]
+  (update-in db dispatcher/notifications-key (fn [notifs]
+                                                (mapv (fn [notif]
+                                                        (if (and (:sentry-dialog notif)
+                                                                (not (:sentry-event-id notif)))
+                                                          (assoc notif :sentry-event-id event-id)
+                                                          notif))
+                                                      notifs))))

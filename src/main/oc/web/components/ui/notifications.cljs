@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -14,6 +15,7 @@
                                        (notification-actions/remove-notification (first (:rum/args s)))))
                          :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
+                                                  :red-link (= bt-style :red-link)
                                                   :default-link (= bt-style :default-link)})}
         button-map (if has-html
                      (assoc button-base-map :dangerouslySetInnerHTML #js {"__html" bt-title})
@@ -61,7 +63,7 @@
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
-             click dismiss-x] :as notification-data}]
+             click dismiss-x sentry-dialog sentry-event-id] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update web-app-update
@@ -109,6 +111,8 @@
       [:div.notification-description
         {:dangerouslySetInnerHTML #js {"__html" description}
          :class (when mention "oc-mentions")}])
+    (when sentry-dialog
+     (button-wrapper s :sentry-dialog #(sentry/show-report-dialog sentry-event-id) "Send feedback" :red-link true))
     (when (seq secondary-bt-title)
       (button-wrapper s :second-bt secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)
