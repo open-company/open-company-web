@@ -125,6 +125,9 @@
                                        (fn [e]
                                          (when (= (.-key e) "Escape")
                                            (cond
+                                             ;; If showing an expanded image from the post
+                                             @(drv/get-ref s :expand-image-src)
+                                             (image-modal/dismiss-image-modal)
                                              ;; If more menu is open let's close it
                                              @(::force-show-menu s)
                                              (reset! (::force-show-menu s) false)

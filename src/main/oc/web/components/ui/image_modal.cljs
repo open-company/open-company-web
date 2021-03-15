@@ -3,16 +3,21 @@
             [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]))
 
-(rum/defc image-modal
+(defn dismiss-image-modal
+  ([e]
+   (dom-utils/stop-propagation! e)
+   (dismiss-image-modal))
+  ([]
+   (dis/dispatch! [:input [:expand-image-src] nil])))
+
+(rum/defc image-modal <
+  rum/static
   [{:keys [src]}]
   (when src
-    (let [close-cb (fn [e]
-                     (dom-utils/stop-propagation! e)
-                     (dis/dispatch! [:input [:expand-image-src] nil]))]
-      [:div.image-modal-container
-        {:on-click close-cb}
-        [:span.image-modal-close
-          {:on-click close-cb}]
-        [:img.image-modal-content
-          {:src src}]
-        ])))
+    [:div.image-modal-container
+      {:on-click dismiss-image-modal}
+      [:span.image-modal-close
+        {:on-click dismiss-image-modal}]
+      [:img.image-modal-content
+        {:src src}]
+      ]))
