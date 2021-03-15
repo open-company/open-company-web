@@ -46,6 +46,13 @@ div.notifications {
         @include activity-body-foc(14, 18, white, 3);
       }
 
+      div.notification-footer {
+        @include OC_Body_Book();
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+      }
+
       button.notification-dismiss-bt {
         color: white;
       }
@@ -191,6 +198,22 @@ div.notifications {
       margin-top: 4px;
       overflow-wrap: break-word;
       @include activity-body-foc(14, 18, var(--notification-color), 3);
+    }
+
+    div.notification-footer {
+      @include OC_Body_Book();
+      font-size: 14px;
+      font-weight: normal;
+      color: var(--notification-color);
+      margin-top: 4px;
+      overflow-wrap: break-word;
+      padding: 0;
+      display: inline-block;
+
+      button.feedback-bt {
+        text-decoration: underline;;
+        padding: 0 4px;
+      }
     }
 
     button.notification-button {

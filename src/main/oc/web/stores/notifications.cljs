@@ -46,8 +46,7 @@
   [db [_ event-id]]
   (update-in db dispatcher/notifications-key (fn [notifs]
                                                 (mapv (fn [notif]
-                                                        (if (and (:sentry-dialog notif)
-                                                                (not (:sentry-event-id notif)))
+                                                        (if-not (:sentry-event-id notif)
                                                           (assoc notif :sentry-event-id event-id)
                                                           notif))
                                                       notifs))))

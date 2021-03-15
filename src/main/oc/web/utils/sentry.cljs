@@ -72,7 +72,7 @@
                                             :description "Probably just a temporary issue. Please refresh if this persists."
                                             :server-error true
                                             :id :generic-network-error
-                                            :sentry-dialog true
+                                            :feedback-bt true
                                             :expire 15
                                             :dismiss true})
    (capture-error-with-message! "Test error with user feedback!"))
