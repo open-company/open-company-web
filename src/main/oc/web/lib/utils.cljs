@@ -322,9 +322,12 @@
 
 (def network-error
  {:title "Network connection lost"
-  :description "Please refresh"
+  :description (if ua/pseudo-native?
+                "In case this persists, please restart."
+                "Please refresh.")
   :server-error true
   :id :generic-network-error
+  :feedback-bt true
   :dismiss true})
 
 (def internal-error
@@ -332,7 +335,7 @@
    :description "We have been notified and are working on it."
    :id :internal-error
    :server-error true
-   :inline-sentry-dialog true
+   :feedback-bt true
    :dismiss true})
 
 (def entry-get-error
@@ -341,7 +344,7 @@
    :title "Error loading the post"
    :description "We have been notified and are working on it."
    :expire 5
-   :inline-sentry-dialog true
+   :feedback-bt true
    :dismiss true})
 
 (defn clean-google-chart-url [gchart-url]

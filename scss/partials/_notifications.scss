@@ -46,6 +46,13 @@ div.notifications {
         @include activity-body-foc(14, 18, white, 3);
       }
 
+      div.notification-footer {
+        @include OC_Body_Book();
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+      }
+
       button.notification-dismiss-bt {
         color: white;
       }
@@ -201,6 +208,22 @@ div.notifications {
       }
     }
 
+    div.notification-footer {
+      @include OC_Body_Book();
+      font-size: 14px;
+      font-weight: normal;
+      color: var(--notification-color);
+      margin-top: 4px;
+      overflow-wrap: break-word;
+      padding: 0;
+      display: inline-block;
+
+      button.feedback-bt {
+        text-decoration: underline;;
+        padding: 0 4px;
+      }
+    }
+
     button.notification-button {
       color: $carrot_green;
       background-color: transparent;
@@ -249,6 +272,19 @@ div.notifications {
         color: var(--notification-color);
         background-color: transparent;
         opacity: 0.6;
+      }
+
+      &.red-link {
+        float: unset;
+        margin-top: 8px;
+        height: 16px;
+        @include OC_Body_Bold();
+        text-decoration: underline;
+        font-size: 14px;
+        line-height: 16px;
+        color: white;
+        background-color: transparent;
+        opacity: 0.9;
       }
     }
   }
