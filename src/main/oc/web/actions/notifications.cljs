@@ -35,3 +35,6 @@
 
 (defn toggle-mobile-user-notifications []
   (dis/dispatch! [:update [:mobile-user-notifications] not]))
+
+(defn sentry-event-id [event-id]
+  (dis/dispatch! [:notification/sentry event-id]))

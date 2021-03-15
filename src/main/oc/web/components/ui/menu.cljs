@@ -10,7 +10,6 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.dom :as  dom-utils]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.whats-new :as whats-new]
@@ -18,6 +17,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.notifications :as notif-actions]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -356,9 +357,17 @@
           ;; Support
           [:a
             {:class "intercom-chat-link"
-            :href oc-urls/contact-mail-to}
+             :href oc-urls/contact-mail-to}
             [:div.oc-menu-item.support
               "Get support"]]
+          ;; Test error with feedback
+          [:a
+            {:href "#"
+             :on-click (fn [e]
+                         (dom-utils/prevent-default! e)
+                         (sentry/test-error-dialog))}
+            [:div.oc-menu-item.support
+              "Test feedback"]]
           ;; Desktop app
           (when native-app-data
             [:a

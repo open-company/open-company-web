@@ -169,12 +169,25 @@
           (jwt-refresh-error-hn))))
     (jwt-refresh-error-hn)))
 
+(defn- sentry-capture [origin method path params {:keys [status] :as response}]
+  (when (or (<= 500 status 599)
+            (= status 400)
+            (= status 422))
+    (let [report {:response response
+                  :path path
+                  :method (method-name method)
+                  :jwt (j/jwt)
+                  :params params
+                  :sessionURL (fullstory/session-url)}]
+      (timbre/error "xhr response error:" (method-name method) ":" (str origin path) " -> " status)
+      (sentry/capture-error-with-extra-context! report (str "xhr response error:" status)))))
+
 (defn- req [origin method path params on-complete & [{:keys [report-errors? second-attempt?] :as opts}]]
   (timbre/debug "Req:" (method-name method) (str origin path))
   (if (and (j/get-contents)
            (j/refresh?)
            (not second-attempt?))
-    
+
     (do
       (timbre/info "Expired token, force JWToken refresh.")
       (real-refresh-jwt (j/get-contents)
@@ -198,22 +211,14 @@
                            (and (= status 440)
                                 second-attempt?)))
               (router/redirect! oc-urls/logout))
-            ; If it was a 5xx or a 0 show a banner for network issues
-            (when (or (zero? status)
-                      (<= 500 status 599))
-              (network-error-handler report-errors?))
             ; report all 5xx to sentry
-            (when (or (<= 500 status 599)
-                      (= status 400)
-                      (= status 422))
-              (let [report {:response response
-                            :path path
-                            :method (method-name method)
-                            :jwt (j/jwt)
-                            :params params
-                            :sessionURL (fullstory/session-url)}]
-                (timbre/error "xhr response error:" (method-name method) ":" (str origin path) " -> " status)
-                (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
+            (let [sentry-event-id (sentry-capture origin method path params response)]
+              ; If it was a 5xx or a 0 show a banner for network issues
+              (when (and report-errors?
+                         (or (zero? status)
+                             (<= 500 status 599)))
+                (network-error-handler sentry-event-id)))
+
             (on-complete response)))))))
 
 (def ^:private web-http (partial req web-origin))

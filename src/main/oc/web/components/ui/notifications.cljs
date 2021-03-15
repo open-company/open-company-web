@@ -2,8 +2,19 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.sentry :as sentry]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.notifications :as notification-actions]))
+
+(defn clear-timeout [rum-state]
+  (when @(::timeout rum-state)
+    (js/clearTimeout @(::timeout rum-state))
+    (reset! (::timeout rum-state) nil)))
+
+(defn- remove-notification [rum-state]
+  (clear-timeout rum-state)
+  (notification-actions/remove-notification (first (:rum/args rum-state))))
 
 (defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
@@ -11,9 +22,10 @@
                                      (when (fn? bt-cb)
                                        (bt-cb e))
                                      (when bt-dismiss
-                                       (notification-actions/remove-notification (first (:rum/args s)))))
+                                       (remove-notification s)))
                          :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
+                                                  :red-link (= bt-style :red-link)
                                                   :default-link (= bt-style :default-link)})}
         button-map (if has-html
                      (assoc button-base-map :dangerouslySetInnerHTML #js {"__html" bt-title})
@@ -22,11 +34,6 @@
       button-map
       (when-not has-html
         bt-title)]))
-
-(defn clear-timeout [s]
-  (when @(::timeout s)
-    (js/clearTimeout @(::timeout s))
-    (reset! (::timeout s) nil)))
 
 (defn setup-timeout [s]
   (clear-timeout s)
@@ -55,13 +62,13 @@
                             (when @(::dismiss s)
                               (when (compare-and-set! (::notification-removed s) false true)
                                 ;; remove notification from list
-                                (notification-actions/remove-notification (first (:rum/args s)))))
+                                (remove-notification s)))
                             s)}
   [s {:keys [id title description slack-icon opac server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
-             click dismiss-x] :as notification-data}]
+             click dismiss-x feedback-bt sentry-event-id] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update web-app-update
@@ -86,16 +93,14 @@
                            (not (utils/event-inside? % (rum/ref-node s :first-bt)))
                            (not (utils/event-inside? % (rum/ref-node s :second-bt))))
                   (click %)
-                  (clear-timeout s)
-                  (notification-actions/remove-notification notification-data))
+                  (remove-notification s))
      :data-notificationid id}
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
                       (when (fn? dismiss)
                         (dismiss %))
-                      (clear-timeout s)
-                      (notification-actions/remove-notification notification-data))
+                      (remove-notification s))
          :class (when dismiss-x "dismiss-x")
          :ref :dismiss-bt}
         (when-not dismiss-x
@@ -107,8 +112,18 @@
       title]
     (when (seq description)
       [:div.notification-description
-        {:dangerouslySetInnerHTML #js {"__html" description}
-         :class (when mention "oc-mentions")}])
+       {:dangerouslySetInnerHTML #js {"__html" description}
+        :class (when mention "oc-mentions")}])
+    (when feedback-bt
+      [:div.notification-footer
+       "You can"
+       [:button.mlb-reset.feedback-bt
+        {:on-click (fn [e]
+                     (dom-utils/event-stop! e)
+                     (remove-notification s)
+                     (sentry/show-report-dialog sentry-event-id))}
+        "add feedback"]
+       "if you like. Thank you."])
     (when (seq secondary-bt-title)
       (button-wrapper s :second-bt secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss))
     (when (seq primary-bt-title)
