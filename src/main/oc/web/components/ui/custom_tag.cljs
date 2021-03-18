@@ -1,10 +1,8 @@
 (ns oc.web.components.ui.custom-tag
-  (:require [rum.core :as rum]
-            [cuerdas.core :as string]
+  (:require [cuerdas.core :as string]
             [oops.core :refer (oget oget+ oset! ocall)]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
-            [oc.web.lib.react-utils :as react-utils]
             ["react" :as react :refer (createElement PureComponent)]
             ["react-dom" :as react-dom :refer (findDOMNode)]
             [goog.events :as events]
@@ -118,7 +116,7 @@
                        (oset! this "keyPress" (.bind (oget this "keyPress") this))
                        (oset! this "hoverItem" (.bind (oget this "hoverItem") this))
                        (oset! this "selectItem" (.bind (oget this "selectItem") this))
-                       (oset! this "!hidePanel" (.bind (oget this "hidePanel") this))
+                       (oset! this "hidePanel" (.bind (oget this "hidePanel") this))
                        this))
              (hidePanel []
                         (this-as this
