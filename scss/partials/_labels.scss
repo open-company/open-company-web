@@ -354,6 +354,187 @@ div.oc-labels-list {
 
   div.oc-labels-item {
     margin-right: 4px;
-    @include label();
+
+    div.oc-label {
+      @include label();
+    }
+  }
+}
+
+div.cmail-labels-list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 16px;
+  position: relative;
+
+  div.cmail-add-label-container {
+    margin-right: 4px;
+    padding: 0;
+    height: 16px;
+
+    button.add-label-bt {
+      margin-right: 4px;
+      @include OC_Body_Book();
+      font-size: 12px;
+      line-height: 16px;
+      height: 16px;
+      padding: 0;
+      color: var(--color);
+      opacity: 0.6;
+      margin: 0;
+      display: block;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  div.cmail-labels-item {
+    margin-right: 4px;
+
+    button.cmail-label {
+      @include label();
+      margin-right: 4px;
+
+      &.active {
+        opacity: 1;
+      }
+
+      &.suggestion {
+        opacity: 0.6;
+      }
+
+      &.add-label-bt {
+        color: var(--color);
+        background-color: var(--opac-background-color-05);
+      }
+    }
+  }
+
+  div.labels-picker {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+  }
+}
+
+div.cmail-label-autocomplete {
+  opacity: 1;
+  position: relative;
+  display: block;
+
+  div.cmail-label-autocomplete-suggestion {
+    @include label() {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.8;
+      z-index: 2;
+      pointer-events: none;
+
+      span.oc-label-text {
+        text-shadow: 0.2px 0.2px var(--color);
+      }
+    }
+  }
+
+  div.label-autocomplete-field-container {
+    padding: 0 2px;
+    width: auto;
+    position: relative;
+    z-index: 1;
+
+    div.label-autocomplete-tooltip {
+      z-index: 1070;
+      display: block;
+      font-size: 12px;
+      text-align: left;
+      text-align: start;
+      text-decoration: none;
+      text-shadow: none;
+      text-transform: none;
+      letter-spacing: normal;
+      word-break: normal;
+      word-spacing: normal;
+      word-wrap: normal;
+      white-space: normal;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      line-break: auto;
+      max-width: 200px;
+      width: auto;
+      transition: opacity 180ms;
+      padding: 5px 0;
+      margin-top: -3px;
+      position: absolute;
+      left: 0;
+      transform: translateX(calc(-50% + 1px));
+      bottom: 18px;
+      pointer-events: none;
+
+      &.duplicated div.tooltip-inner {
+        opacity: 0.9;
+      }
+
+      &.visible {
+        opacity: 1;
+      }
+
+      div.tooltip-arrow {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-color: transparent;
+        border-style: solid;
+
+        // Top arrow
+        bottom: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px 5px 0;
+        border-top-color: var(--tooltip-background-color);
+        opacity: 1;
+      }
+
+
+      div.tooltip-inner {
+        padding: 3px 8px;
+        background-color: var(--tooltip-background-color);
+        white-space:pre-wrap;
+        text-align: left;
+        opacity: 1;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: var(--tooltip-color);
+        line-height: 18px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        box-shadow: none;
+        border: none;
+        width: auto; //152px;
+        min-width: 160px;
+      }
+    }
+
+    input.label-autocomplete-field {
+      background-color: transparent;
+      padding: 0;
+      @include OC_Body_Book();
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.5px;
+      display: block;
+      height: 16px;
+      letter-spacing: 0.5px;
+      color: var(--label-autocomplete-color);
+      min-width: 20px;
+      border: none;
+      outline: none;
+      width: 152px;
+    }
   }
 }

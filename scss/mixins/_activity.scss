@@ -53,41 +53,47 @@ $header_top_margin: 24;
 }
 
 @mixin label() {
-  div.oc-label {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0 2px;
-    position: relative;
-    height: 16px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 2px;
+  position: relative;
+  height: 16px;
 
-    a, a:hover, a:active, a:focus {
+  a, button {
+    &, &:hover, &:active, &:focus {
       text-decoration: none; 
     }
-
-    div.oc-label-bg {
-      opacity: 0.16;
-      border-radius: 2px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    span.oc-label-text {
-      @include OC_Body_Book();
-      font-size: 12px;
-      line-height: 16px;
-      display: block;
-      z-index: 2;
-      // text-shadow: 1px 1px 0 var(--opac-background-color-32);
-    }
-
-    @content
   }
+
+  div.oc-label-bg {
+    opacity: 0.16;
+    border-radius: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  span.oc-label-text {
+    @include OC_Body_Book();
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    display: block;
+    z-index: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+    // text-shadow: 1px 1px 0 var(--opac-background-color-32);
+    @include no-user-select();
+  }
+
+  @content
 }
 
 @mixin must-see-tag() {

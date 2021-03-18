@@ -13,6 +13,8 @@
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.ws.interaction-client :as ws-ic]))
 
+(def max-label-name-length 40)
+
 ;; Data parse
 
 (defn parse-label [label-map]
@@ -54,16 +56,18 @@
    (let [labels-link (hateoas/link-for (:links org-data) "labels")]
      (api/get-labels labels-link (partial get-labels-finished (:slug org-data) finish-cb)))))
 
-(defn new-label []
-  (let [org-data (dis/org-data)
-        random-color (-> color-utils/default-css-color-names
-                         vals
-                         shuffle
-                         first)]
-    (timbre/infof "New label for org %s, random color %s" (:uuid org-data) random-color)
-    (dis/dispatch! [:label-editor/start {:name ""
-                                         :color random-color
-                                         :org-uuid (:uuid org-data)}])))
+(defn new-label
+  ([] (new-label ""))
+  ([label-name]
+   (let [org-data (dis/org-data)
+         random-color (-> color-utils/default-css-color-names
+                          vals
+                          shuffle
+                          first)]
+     (timbre/infof "New label for org %s, random color %s" (:uuid org-data) random-color)
+     (dis/dispatch! [:label-editor/start {:name label-name
+                                          :color random-color
+                                          :org-uuid (:uuid org-data)}]))))
 
 (defn dismiss-label-editor []
   (timbre/info "Dismiss label editor")

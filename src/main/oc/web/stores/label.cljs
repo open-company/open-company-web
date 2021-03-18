@@ -31,19 +31,6 @@
       (update-in (dispatcher/org-labels-key org-slug) (fn [labels] (filterv #(not= (:uuid %) (:uuid label-data)) labels)))
       (assoc :show-label-editor false)))
 
-(defmethod dispatcher/action :cmail-toggle-label
-  [db [_ toggle-label]]
-  (update-in db (concat dispatcher/cmail-data-key [:labels])
-             (fn [labels]
-               (let [cmail-labels-set (set (map :slug labels))]
-                 (if (cmail-labels-set (:slug toggle-label))
-                   (filterv #(not= (:slug %) (:slug toggle-label)) labels)
-                   (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])])))))))
-
-(defmethod dispatcher/action :toggle-cmail-labels-view
-  [db [_]]
-  (update-in db (concat dispatcher/cmail-state-key [:show-labels-view]) not))
-
 (defmethod dispatcher/action :label-saved
   [db [_ org-slug saved-label]]
   (as-> db tdb
@@ -60,7 +47,7 @@
                      (if @found?
                        updated-labels
                        (concat labels [saved-label])))))
-    (if (get-in db (conj dispatcher/cmail-state-key :show-labels-view))
+    (if (get-in db (conj dispatcher/cmail-state-key :labels-floating-view))
       (update-in tdb (conj dispatcher/cmail-data-key :labels)
                  (fn [labels]
                    (let [found? (atom false)
