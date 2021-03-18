@@ -67,9 +67,9 @@
             (seq (:email user-data))
             [:div.user-info-subline
               (:email user-data)])
-          [:div.user-info-subline
-            (when (pos? followers-count)
-              (str followers-count " follower" (when (not= followers-count 1) "s")))]
+          (when (pos? followers-count)
+            [:div.user-info-subline
+              (str followers-count " follower" (when (not= followers-count 1) "s"))])
           (when-not hide-buttons
             [:button.mlb-reset.profile-bt
               {:on-click #(nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributions (:user-id user-data)))}
