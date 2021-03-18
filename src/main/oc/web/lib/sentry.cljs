@@ -21,10 +21,9 @@
 
 (defn sentry-setup []
   (when (and (fn? (oget sentry-browser "init")) ls/local-dsn)
-    (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)]
+      (timbre/infof "Setup Sentry: %s" sentry-params)
       (ocall sentry-browser "init" (clj->js sentry-params))
-      (timbre/debug "Sentry params:" sentry-params)
       (.configureScope ^js sentry-browser (fn [scope]
         (.setTag ^js scope "isMobile" (responsive/is-mobile-size?))
         (.setTag ^js scope "hasJWT" (not (not (jwt/jwt))))
