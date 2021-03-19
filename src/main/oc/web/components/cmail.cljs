@@ -740,9 +740,10 @@
       (when-not (:collapsed cmail-state)
         [:div.cmail-labels
         ;;  (labels-list (:labels cmail-data))
-         (cmail-labels-list {;:labels-preview? true
-                             :inline-type? true
-                             :add-label-bt true})])
+         (cmail-labels-list {;;  :labels-preview? true
+                             :label-autocompleter {:visibility :on-hover}
+                             ;; :add-label-bt true
+                             })])
       [:div.cmail-footer
         [:div.post-button-container.group
           (post-to-button {:on-submit #(post-clicked s)

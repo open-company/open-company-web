@@ -1,13 +1,10 @@
 (ns oc.web.components.ui.labels
   (:require [rum.core :as rum]
-            [clojure.set :as clj-set]
             [taoensso.timbre :as timbre]
             [oops.core :refer (oget)]
-            [goog.string :refer (format)]
             [cuerdas.core :as string]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.color :as color-utils]
             [oc.lib.color :as lib-color]
@@ -21,6 +18,7 @@
             [oc.web.actions.label :as label-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            [oc.web.components.ui.label-autocomplete :refer (label-autocomplete)]
             ["react-color" :as react-color :refer (ChromePicker)]))
 
 (def refresh-labels-mixin
@@ -29,9 +27,6 @@
     s)})
 
 (def color-picker (partial rutils/build ChromePicker))
-
-(defn- select-label [s label]
-  (timbre/infof "Label %s selected" (:slug label)))
 
 (rum/defcs org-labels-list <
   rum/static
@@ -249,187 +244,12 @@
     {:style {:color label-color}}
     label-name]])
 
-(defn- active-label? [label labels-list]
-  (let [label-set-fn #(set [(:uuid %) (:slug %)])
-        label-set (label-set-fn label)
-        existing-labels-set (set (apply concat (mapv label-set-fn labels-list)))]
-    (seq (clj-set/intersection existing-labels-set label-set))))
-
-(defn- show-tt [s]
-  (reset! (::show-tooltip s) true))
-
-(defn- hide-tt [s]
-  (reset! (::show-tooltip s) false))
-
-(defn- focus [s]
-  (when-let [input (rum/ref-node s :label-autocomplete-input)]
-    (.focus input)
-    (show-tt s)))
-
-(defn- delay-focus [s]
-  (utils/after 100 #(focus s)))
-
-(defn- update-suggestion [s act]
-  (let [idx @(::suggested-idx s)
-        next-idx* (cond (= act :next) (inc idx)
-                        (= act :prev) (dec idx))
-        next-idx (mod next-idx* (count @(::suggested-labels s)))]
-    (reset! (::suggested-idx s) next-idx)
-    (delay-focus s)))
-
-(defn- reset-suggestion [s]
-  (reset! (::suggested-labels s) [])
-  (reset! (::query s) "")
-  (hide-tt s))
-
-(defn- select-suggestion [s label]
-  (if label
-    (do
-      (cmail-actions/toggle-cmail-label (dissoc label :suggested-name))
-      (reset-suggestion s)
-      (delay-focus s)
-      (show-tt s))
-    (label-actions/new-label @(::query s))))
-
-(defn- maybe-delete-suggestion [s]
-  (when-not (seq @(::query s))
-    (cmail-actions/cmail-label-remove-last-label)
-    (show-tt s)))
-
-(defn- label-matches? [reg label]
-  (re-matches reg label))
-
-(def regex-char-esc-smap
-  (let [esc-chars "()*&^%$#!."]
-    (zipmap esc-chars
-            (map #(str "\\" %) esc-chars))))
-
-(defn- ^:export escape-query
-  [s]
-  (->> s
-       (replace regex-char-esc-smap)
-       (reduce str)))
-
-(defn- ^:export re-pattern-from-query [query start-with?]
-  (re-pattern (str "(?i)^" (escape-query query)
-                   (if start-with? ".*" "$"))))
-
-(defn- labels-matching-query
-  ([query labels] (labels-matching-query query labels true))
-  ([query labels start-with?]
-   (let [re-query (re-pattern-from-query query start-with?)]
-     (filterv #(label-matches? re-query (:name %)) labels))))
-
-(defn- suggestions-for [s query labels]
-  (if (seq query)
-    (let [filtered-labels (labels-matching-query query labels)
-          suggested-labels (mapv #(assoc % :suggested-name (str query (subs (:name %) (count query) (count (:name %))))) filtered-labels)]
-      (reset! (::suggested-labels s) suggested-labels)
-      (reset! (::suggested-idx s) 0))
-    (reset! (::suggested-labels s) [])))
-
-(def ^{:private true} keys-copy "use ↑, ↓, ␛ or ⮐.")
-
-(def ^{:private true} no-matches-tooltip-title "⮐ to create a new label.")
-
-(def ^{:private true} no-matches-duplicate-tooltip-title "Label already added.")
-
-(def ^{:private true} one-match-tooltip-title "1 label matches. ⮐ to select.")
-
-(def ^{:private true} multiple-matches-tooltip-title "%d labels match, %s.")
-
-(def ^{:private true} empty-tooltip-title "Type to find a label.")
-
-(def ^{:private true} empty-has-labels-tooltip-title "Start typing a label name, Backspace to delete the previous label.")
-
-(defn- label-autocomplete-on-change [s e]
-  (let [q (.. e -target -value)
-        args (-> s :rum/args first)
-        cmail-labels (-> args :cmail-data :labels)
-        user-labels (:user-labels args)
-        labels-suggestions (filterv #(not (active-label? % cmail-labels)) user-labels)]
-    (reset! (::query s) q)
-    (suggestions-for s q labels-suggestions)
-    (delay-focus s)))
-
-(rum/defcs label-autocomplete-field <
-  rum/static
-  (rum/local [] ::suggested-labels)
-  (rum/local 0 ::suggested-idx)
-  (rum/local false ::show-tooltip)
-  (rum/local "" ::query)
-  ;; ui-mixins/strict-refresh-tooltips-mixin
-  ;; {:did-mount (fn [s] (init-tt s) s)
-  ;;  :will-unmount (fn [s] (hide-tt s) s)}
-  [s {:keys [cmail-data user-labels]}]
-  (let [suggested-labels @(::suggested-labels s)
-        idx @(::suggested-idx s)
-        suggestion (get suggested-labels idx)
-        query (::query s)]
-    [:div.cmail-label.cmail-label-autocomplete
-     (when suggestion
-       [:div.cmail-label-autocomplete-suggestion
-        [:div.oc-label-bg
-          {:style {:background-color (:color suggestion)}}]
-        [:span.oc-label-text
-          {:style {:color (:color suggestion)}}
-          (:suggested-name suggestion)]])
-     [:div.label-autocomplete-field-container
-      (let [no-query? (string/empty-or-nil? @query)
-            suggestions-num (count suggested-labels)
-            query-duplicate? (seq (labels-matching-query @query (:labels cmail-data) false))]
-        [:div.label-autocomplete-tooltip
-         {:class (utils/class-set {:visible @(::show-tooltip s)
-                                   :duplicated (and (not no-query?)
-                                                    (zero? suggestions-num)
-                                                    query-duplicate?)})}
-         [:div.tooltip-arrow]
-         [:div.tooltip-inner
-          (cond (and no-query?
-                     (count (:labels cmail-data)))
-                empty-has-labels-tooltip-title
-                no-query?
-                empty-tooltip-title
-                (= 1 suggestions-num)
-                one-match-tooltip-title
-                (and (zero? suggestions-num)
-                     query-duplicate?)
-                no-matches-duplicate-tooltip-title
-                (zero? suggestions-num)
-                no-matches-tooltip-title
-                :else
-                (format multiple-matches-tooltip-title suggestions-num keys-copy))]])
-      [:input.label-autocomplete-field
-       {:value @query
-        :placeholder "Type…"
-        :ref :label-autocomplete-input
-        :max-length label-actions/max-label-name-length
-        :on-mouse-down (fn [e]
-                         (dom-utils/stop-propagation! e)
-                         (delay-focus s))
-        :on-change  (partial label-autocomplete-on-change s)
-        :on-focus #(show-tt s)
-        :on-blur #(hide-tt s)
-        :on-key-up (fn [e]
-                     (case (.-key e)
-                       "ArrowUp"
-                       (do (dom-utils/prevent-default! e)
-                           (update-suggestion s :prev))
-                       "ArrowDown"
-                       (do (dom-utils/prevent-default! e)
-                           (update-suggestion s :next))
-                       "Escape"
-                       (do (dom-utils/prevent-default! e)
-                           (reset-suggestion s))
-                       "Enter"
-                       (do (dom-utils/prevent-default! e)
-                           (select-suggestion s suggestion))
-                       "Backspace"
-                       (maybe-delete-suggestion s)
-                       ;; else
-                       true))}]]]))
-
-(rum/defcs cmail-labels-list <
+(rum/defcs cmail-labels-list
+           "Options:
+   {:add-label-bt true/false/nil ;> show/hide the + Add a label button with the dropdown menu
+    :label-autocompleter true/false
+   }"
+  <
   rum/static
   rum/reactive
   (drv/drv :cmail-state)
@@ -439,7 +259,7 @@
   (ui-mixins/on-click-out (fn [s _]
                             (when (:labels-inline-view @(drv/get-ref s :cmail-state))
                               (cmail-actions/toggle-cmail-inline-labels-view false))))
-  [s {:keys [inline-type? add-label-bt]}]
+  [s {add-label-bt :add-label-bt label-autocompleter :label-autocompleter}]
   (let [cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
         user-labels (drv/react s :user-labels)
@@ -469,11 +289,11 @@
                            :class-name "cmail-label-item active"
                            :tooltip (when-not is-mobile? {:title "Remove label"})
                            :on-click-cb #(cmail-actions/toggle-cmail-label label)})])
-     (when (and inline-type?
+     (when (and label-autocompleter
                 (> (count user-labels) (count (:labels cmail-data))))
        [:div.cmail-labels-item
-        (label-autocomplete-field {:cmail-data cmail-data
-                                   :user-labels user-labels})])]))
+        (label-autocomplete {:cmail-data cmail-data
+                             :user-labels user-labels})])]))
 
 (rum/defc label-item <
   rum/static
