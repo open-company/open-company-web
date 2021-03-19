@@ -4,6 +4,7 @@
             [oops.core :refer (oget)]
             [cuerdas.core :as string]
             [oc.web.utils.color :as color-utils]
+            [oc.lib.color :as lib-color]
             [oc.web.lib.react-utils :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -265,16 +266,16 @@
            [:input.field-value.oc-input
             {:type "text"
              :value @(::primary-color-value s)
-             :pattern color-utils/colors-reg-exp
+             :pattern lib-color/valid-color?
              :placeholder "Ie: red, green or #0000ff"
              :on-focus #(reset! (::show-color-picker s) true)
              :on-change (fn [e]
                           (let [v (string/lower (.. e -target -value))]
                             (reset! (::primary-color-value s) v)
                             (when (.. e -target checkValidity)
-                              (let [is-hex-color? (color-utils/valid-hex-color? v)
-                                    hex-color (if is-hex-color? v (-> v keyword color-utils/default-css-color-names))
-                                    rgb-color (color-utils/rgb-from-hex hex-color)]
+                              (let [is-hex-color? (lib-color/valid-hex-color? v)
+                                    hex-color (if is-hex-color? v (-> v keyword lib-color/default-css-color-names))
+                                    rgb-color (lib-color/hex->rgb hex-color)]
                                 (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
            (when @(::show-color-picker s)
              [:div.color-picker-container

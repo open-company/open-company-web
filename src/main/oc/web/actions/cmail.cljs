@@ -10,7 +10,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
@@ -289,6 +288,12 @@
 
 (defn toggle-cmail-label [label]
   (dis/dispatch! [:cmail-toggle-label label]))
+
+(defn add-cmail-label [label]
+  (dis/dispatch! [:cmail-add-label label]))
+
+(defn remove-cmail-label [label]
+  (dis/dispatch! [:cmail-remove-label label]))
 
 (defn toggle-cmail-floating-labels-view
   ([] (toggle-cmail-floating-labels-view nil))

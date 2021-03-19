@@ -5,12 +5,12 @@
             [oops.core :refer (oget)]
             [goog.string :refer (format)]
             [cuerdas.core :as string]
-            [clojure.string :as clj-str]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.color :as color-utils]
+            [oc.lib.color :as lib-color]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.colors-presets :refer (colors-presets)]
             [oc.web.lib.react-utils :as rutils]
@@ -126,14 +126,14 @@
       [:input.field-value.oc-input
         {:type "text"
         :value (:color editing-label)
-        :pattern color-utils/colors-reg-exp
+        :pattern lib-color/color-reg-ex
         :placeholder "Ie: red, green or #0000ff"
         :on-focus #(reset! (::show-color-picker s) true)
         :on-change (fn [e]
                       (let [v (string/lower (.. e -target -value))]
                         (when (.. e -target checkValidity)
-                          (let [is-hex-color? (color-utils/valid-hex-color? v)
-                                hex-color (if is-hex-color? v (-> v keyword color-utils/default-css-color-names))]
+                          (let [is-hex-color? (lib-color/valid-hex-color? v)
+                                hex-color (if is-hex-color? v (-> v keyword lib-color/default-css-color-names))]
                             (label-actions/label-editor-update {:color hex-color})))))}]]
       (when @(::show-color-picker s)
         [:div.color-picker-container
@@ -328,17 +328,17 @@
       (reset! (::suggested-idx s) 0))
     (reset! (::suggested-labels s) [])))
 
-(def ^{:private true} keys-copy "use up, down, Enter or Esc.")
+(def ^{:private true} keys-copy "use ↑, ↓, ␛ or ⮐.")
 
-(def ^{:private true} no-matches-tooltip-title "Press Enter to create a new label.")
+(def ^{:private true} no-matches-tooltip-title "⮐ to create a new label.")
 
-(def ^{:private true} no-matches-duplicate-tooltip-title "This label has been added already.")
+(def ^{:private true} no-matches-duplicate-tooltip-title "Label already added.")
 
-(def ^{:private true} one-match-tooltip-title "1 label matches, %s.")
+(def ^{:private true} one-match-tooltip-title "1 label matches. ⮐ to select.")
 
 (def ^{:private true} multiple-matches-tooltip-title "%d labels match, %s.")
 
-(def ^{:private true} empty-tooltip-title "Start typing a label name.")
+(def ^{:private true} empty-tooltip-title "Type to find a label.")
 
 (def ^{:private true} empty-has-labels-tooltip-title "Start typing a label name, Backspace to delete the previous label.")
 
@@ -391,7 +391,7 @@
                 no-query?
                 empty-tooltip-title
                 (= 1 suggestions-num)
-                (format one-match-tooltip-title keys-copy)
+                one-match-tooltip-title
                 (and (zero? suggestions-num)
                      query-duplicate?)
                 no-matches-duplicate-tooltip-title
@@ -452,12 +452,16 @@
         ;; (cmail-label-item {:label add-label-map
         ;;                    :tooltip (when-not is-mobile? {:title "Click to add a label"})})
         [:button.mlb-reset.add-label-bt
-         {:on-click #(cmail-actions/toggle-cmail-inline-labels-view)
+         {:on-click #(if (seq user-labels)
+                       (cmail-actions/toggle-cmail-inline-labels-view)
+                       (label-actions/new-label))
           :data-toggle (when-not is-mobile? "toggle")
           :data-placement "top"
           :data-container "body"
           :title "Click to add a label"}
-         "+ Add label"]])
+         (if (seq user-labels)
+           "+ Add label"
+           "+ Create label")]])
      (for [label (:labels cmail-data)]
        [:div.cmail-labels-item
         {:key (str "cmail-label-item" (or (:uuid label) (:slug label)))}

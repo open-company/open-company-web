@@ -4,13 +4,14 @@
             [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
-            [oc.web.utils.color :as color-utils]
+            [oc.lib.color :as lib-color]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]))
 
 (def max-label-name-length 40)
@@ -60,7 +61,7 @@
   ([] (new-label ""))
   ([label-name]
    (let [org-data (dis/org-data)
-         random-color (-> color-utils/default-css-color-names
+         random-color (-> lib-color/default-css-color-names
                           vals
                           shuffle
                           first)]
@@ -83,7 +84,9 @@
                          (dismiss-label-editor)
                          (get-labels)
                          (let [label (when success (parse-label (json->cljs body)))]
-                           (dis/dispatch! [:label-saved (dis/current-org-slug) label]))))))
+                           (dis/dispatch! [:label-saved (dis/current-org-slug) label])
+                           (when-not (:collapsed (dis/cmail-state))
+                             (cmail-actions/add-cmail-label label)))))))
 
 (defn edit-label [label]
   (timbre/infof "Editing label" (:uuid label))

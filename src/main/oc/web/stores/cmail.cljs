@@ -1,6 +1,7 @@
 (ns oc.web.stores.cmail
   (:require [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.utils :as utils]
+            [clojure.set :as clj-set]
             [oc.web.actions.cmail :as cmail-actions]))
 
 (defmethod dispatcher/action :cmail-expand
@@ -49,6 +50,27 @@
                  (if (cmail-labels-set (:slug toggle-label))
                    (filterv #(not= (:slug %) (:slug toggle-label)) labels)
                    (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])])))))))
+
+(defmethod dispatcher/action :cmail-add-label
+  [db [_ add-label]]
+  (update-in db (concat dispatcher/cmail-data-key [:labels])
+             (fn [labels]
+               (let [label-vals #(vec [(:slug %) (:uuid %)])
+                     cmail-labels-set (set (mapcat label-vals labels))
+                     add-label-map (select-keys add-label [:uuid :name :color :slug])
+                     add-label-set (set (label-vals add-label))
+                     label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
+                 (if (seq label-intersect)
+                   (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
+                            add-label-map
+                            %)
+                         labels)
+                   (vec (conj labels add-label-map)))))))
+
+(defmethod dispatcher/action :cmail-remove-label
+  [db [_ remove-label]]
+  (update-in db (concat dispatcher/cmail-data-key [:labels]) (fn [labels]
+                                                               (filterv #(not= (:slug %) (:slug remove-label)) labels))))
 
 (defn- labels-value-update [optional-value current-value]
   (if (boolean? optional-value) optional-value (not current-value)))
