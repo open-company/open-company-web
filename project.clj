@@ -16,14 +16,14 @@
 
   ;; All profile dependencies
   :dependencies [;; Lisp on the JVM http://clojure.org/documentation
-                 [org.clojure/clojure "1.10.2-alpha3"]
+                 [org.clojure/clojure "1.10.3"]
                  ;; Library for OC projects https://github.com/open-company/open-company-lib
                  ;; ************************************************************************
                  ;; ****************** NB: don't go under 0.17.29-alpha60 ******************
                  ;; ***************** (JWT schema changes, more info here: *****************
                  ;; ******* https://github.com/open-company/open-company-lib/pull/82) ******
                  ;; ************************************************************************
-                 [open-company/lib "0.17.34-alpha9"]
+                 [open-company/lib "0.18.0-alpha1"]
                  ;; ************************************************************************
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]
@@ -83,7 +83,7 @@
         ;; pretty-print the lein project map https://github.com/technomancy/leiningen/tree/master/lein-pprint
         [lein-pprint "1.3.2"]
         ;; Check for outdated dependencies https://github.com/xsc/lein-ancient
-        [lein-ancient "0.6.15"]
+        [lein-ancient "1.0.0-RC3"]
         ;; Catch spelling mistakes in docs and docstrings https://github.com/cldwalker/lein-spell
         [lein-spell "0.1.0"]
         ;; Dead code finder https://github.com/venantius/yagni
