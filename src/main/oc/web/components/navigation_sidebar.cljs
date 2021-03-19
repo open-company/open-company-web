@@ -390,7 +390,7 @@
                   [:div.private])])])
         ;; Labels list
         (when show-labels
-          [:div.left-navigation-sidebar-top.top-border.group
+          [:div.left-navigation-sidebar-top.group
             ;; Boards header
            [:h3.left-navigation-sidebar-top-title.group
             [:button.mlb-reset.left-navigation-sidebar-sections-arrow
