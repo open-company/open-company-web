@@ -342,7 +342,6 @@
                            (if (seq (:headline cmail-data))
                              (:headline cmail-data)
                              ""))
-        body-text (.text (.html (js/$ "<div/>") initial-body))
         scroll-lock? (or (responsive/is-mobile-size?)
                          (:fullscreen cmail-state))]
     (reset! (::last-body s) initial-body)
