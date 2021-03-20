@@ -2,6 +2,7 @@
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [oc.web.lib.responsive :as responsive]
+            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
 (defonce _lock-counter (atom 0))
@@ -9,24 +10,23 @@
 (defn lock-page-scroll
   "Add no-scroll class to the page body tag to lock the scroll"
   []
-  (timbre/debugf "Increase page scroll count (%d -> %d)" @_lock-counter (swap! _lock-counter inc))
-  (when (= 1 @_lock-counter)
-    (timbre/info "Page scroll lock (%d)" @_lock-counter)
-    (dommy/add-class! (sel1 [:html]) :no-scroll)))
+  (timbre/infof "Page scroll lock %d" @_lock-counter)
+  (swap! _lock-counter inc)
+  (dommy/add-class! (sel1 [:html]) :no-scroll))
 
 (defn unlock-page-scroll
   "Remove no-scroll class from the page body tag to unlock the scroll"
   []
-  (let [cur-lock @_lock-counter
+  (let [current-lock-counter @_lock-counter
         lock-counter (swap! _lock-counter dec)]
-    (timbre/debugf "Decrement page scroll count (%d -> %d)" cur-lock lock-counter)
+    (timbre/infof "Page scroll unlock %d -> %d" current-lock-counter @_lock-counter)
     (when-not (pos? lock-counter)
-      (timbre/info "Page scroll unlock (%d)" lock-counter)
+      (timbre/infof "Page scroll unlocked")
       (reset! _lock-counter 0)
       (dommy/remove-class! (sel1 [:html]) :no-scroll))))
 
 (defn force-unlock-page-scroll []
-  (timbre/infof "Force page scroll unlock (%d)" @_lock-counter)
+  (timbre/infof "Force page scroll unlock %d" @_lock-counter)
   (reset! _lock-counter 0)
   (dommy/remove-class! (sel1 [:html]) :no-scroll))
 
