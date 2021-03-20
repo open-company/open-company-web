@@ -14,55 +14,15 @@
         existing-labels-set (set (apply concat (mapv label-set-fn labels-list)))]
     (seq (clj-set/intersection existing-labels-set label-set))))
 
-(def -tt-delay 3500)
-
-(def -type-delay 500)
-
-(defn- clear-tt-timeout [s]
-  (when @(::tt-timeout s)
-    (.clearTimeout ^js js/window @(::tt-timeout s))
-    (reset! (::tt-timeout s) nil)))
-
-(defn- reset-tt-timeout [s]
-  (reset! (::tt-timeout s) (.setTimeout ^js js/window #(clear-tt-timeout s) -tt-delay)))
-
-(defn- reset-type-timeout [s]
-  (when-let [type-timeout @(::type-timeout s)]
-    (.clearTimeout ^js js/window type-timeout)
-    (reset! (::type-timeout s) nil)))
-
-(defn- show-type-tooltip [s]
-  (reset-type-timeout s)
-  (reset-tt-timeout s))
-
-(defn- maybe-show-type-tooltip [s e]
-  (when (or (seq (.. e -target -value))
-            (seq @(::query s)))
-    (reset-type-timeout s)
-    (reset! (::type-timeout s)
-            (.setTimeout ^js js/window
-                         #(reset-tt-timeout s)
-                         -type-delay))))
-
 (defn- on-focus [s]
-  (reset! (::focused s) true)
-  (reset-tt-timeout s))
+  (reset! (::focused s) true))
 
 (defn- on-blur [s]
-  (reset! (::focused s) false)
-  (clear-tt-timeout s))
-
-;; (defn- show-tt [s]
-;;   (reset! (::autocomplete-focused s) true))
-
-;; (defn- hide-tt [s]
-;;   (reset! (::autocomplete-focused s) false))
+  (reset! (::focused s) false))
 
 (defn- focus [s]
   (when-let [input (rum/ref-node s :label-autocomplete-input)]
-    (.focus input)
-    ;; (show-tt s)
-    ))
+    (.focus input)))
 
 (defn- delay-focus [s]
   (utils/after 100 #(focus s)))
@@ -77,25 +37,19 @@
 
 (defn- reset-suggestion [s]
   (reset! (::suggested-labels s) [])
-  (reset! (::query s) "")
-  ;; (hide-tt s)
-  )
+  (reset! (::query s) ""))
 
 (defn- select-suggestion [s label]
   (if label
     (do
       (cmail-actions/toggle-cmail-label (dissoc label :suggested-name))
       (reset-suggestion s)
-      (delay-focus s)
-      ;; (show-tt s)
-      )
+      (delay-focus s))
     (label-actions/new-label @(::query s))))
 
-(defn- maybe-delete-suggestion [s]
+(defn- maybe-delete-last-label [s]
   (when-not (seq @(::query s))
-    (cmail-actions/cmail-label-remove-last-label)
-    ;; (show-tt s)
-    ))
+    (cmail-actions/cmail-label-remove-last-label)))
 
 (defn- label-matches? [reg label]
   (re-matches reg label))
@@ -151,8 +105,7 @@
         labels-suggestions (filterv #(not (active-label? % cmail-labels)) user-labels)]
     (reset! (::query s) q)
     (suggestions-for s q labels-suggestions)
-    (delay-focus s)
-    (maybe-show-type-tooltip s e)))
+    (delay-focus s)))
 
 (rum/defcs label-autocomplete <
   rum/static
@@ -160,12 +113,8 @@
   (rum/local 0 ::suggested-idx)
   ;; (rum/local false ::autocomplete-focused)
   (rum/local "" ::query)
-  (rum/local nil ::tt-timeout)
-  (rum/local nil ::type-timeout)
   (rum/local false ::focused)
   ;; ui-mixins/strict-refresh-tooltips-mixin
-  ;; {:did-mount (fn [s] (init-tt s) s)
-  ;;  :will-unmount (fn [s] (hide-tt s) s)}
   [s {:keys [cmail-data user-labels]}]
   (let [suggested-labels @(::suggested-labels s)
         idx @(::suggested-idx s)
@@ -173,9 +122,7 @@
         query (::query s)]
     [:div.cmail-label.cmail-label-autocomplete
      {:class (utils/class-set {:sticky (or (seq @(::query s))
-                                           suggestion
-                                           @(::tt-timeout s))
-                               :show-tooltip @(::tt-timeout s)
+                                           suggestion)
                                :focused  @(::focused s)})}
      (when suggestion
        [:div.cmail-label-autocomplete-suggestion
@@ -218,28 +165,26 @@
                          (dom-utils/stop-propagation! e)
                          (delay-focus s))
         :on-change (partial label-autocomplete-on-change s)
-        :on-click #(show-type-tooltip s)
         :on-focus #(on-focus s)
         :on-blur #(on-blur s)
-        :on-key-up (fn [e]
-                     (case (.-key e)
-                       "ArrowUp"
-                       (do (dom-utils/prevent-default! e)
-                           (update-suggestion s :prev)
-                           false)
-                       "ArrowDown"
-                       (do (dom-utils/prevent-default! e)
-                           (update-suggestion s :next)
-                           false)
-                       "Escape"
-                       (do (dom-utils/prevent-default! e)
-                           (reset-suggestion s)
-                           false)
-                       ("Tab" "Enter")
-                       (do (dom-utils/prevent-default! e)
-                           (select-suggestion s suggestion))
-                       "Backspace"
-                       (when-not (seq @(::query s))
-                         (maybe-delete-suggestion s))
-                       ;; else
-                       true))}]]]))
+        :on-key-down (fn [e]
+                       (case (.-key e)
+                         "ArrowUp"
+                         (do (dom-utils/prevent-default! e)
+                             (update-suggestion s :prev)
+                             false)
+                         "ArrowDown"
+                         (do (dom-utils/prevent-default! e)
+                             (update-suggestion s :next)
+                             false)
+                         "Escape"
+                         (do (dom-utils/prevent-default! e)
+                             (reset-suggestion s)
+                             false)
+                         ("Tab" "Enter")
+                         (do (dom-utils/prevent-default! e)
+                             (select-suggestion s suggestion))
+                         "Backspace"
+                         (maybe-delete-last-label s)
+                         ;; else
+                         true))}]]]))

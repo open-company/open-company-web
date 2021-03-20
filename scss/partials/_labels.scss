@@ -432,7 +432,7 @@ div.cmail-label-autocomplete {
     transition: opacity 180ms linear;
   }
 
-  &.show-tooltip {
+  &:hover {
     opacity: 1;
     transition: opacity 180ms linear;
 
@@ -448,6 +448,7 @@ div.cmail-label-autocomplete {
       top: 0;
       left: 0;
       opacity: 0.8;
+      transition: opacity 180ms linear;
       z-index: 2;
       pointer-events: none;
 
@@ -479,9 +480,7 @@ div.cmail-label-autocomplete {
       white-space: normal;
       opacity: 0;
       line-break: auto;
-      // max-width: 200px;
       width: auto;
-      // transition: opacity 180ms;
       padding: 5px 0;
       margin-top: -3px;
       position: absolute;
@@ -489,11 +488,7 @@ div.cmail-label-autocomplete {
       transform: translateX(calc(-50% + 1px));
       bottom: 18px;
       pointer-events: none;
-
-      // Remove this, show the tooltip only on hover
-      // &.visible {
-      //   opacity: 1;
-      // }
+      transition: opacity 180ms linear;
 
       div.tooltip-arrow {
         position: absolute;
