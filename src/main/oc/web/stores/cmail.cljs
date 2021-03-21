@@ -22,6 +22,7 @@
   (-> db
       (assoc-in dispatcher/cmail-data-key (cmail-actions/get-board-for-edit))
       (update-in dispatcher/cmail-state-key merge {:collapsed true
+                                                   :fullscreen false
                                                    :key (utils/activity-uuid)
                                                    :labels-floating-view false
                                                    :labels-inline-view false})))

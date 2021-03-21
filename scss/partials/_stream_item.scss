@@ -211,121 +211,133 @@ div.stream-item {
 
   div.stream-item-header {
     position: relative;
-    height: 24px;
+    min-height: 24px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: flex-start;
 
-    @include mobile() {
-      width: 100%;
-      height: 32px;
-      display: block;
-    }
-
-    div.stream-header-head-author {
-      height: 24px;
-      flex: 0 0 auto;
-      margin-right: 8px;
+    div.stream-item-header-left {
+      position: relative;
+      min-height: 24px;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       flex-wrap: nowrap;
+      align-items: flex-start;
       justify-content: flex-start;
-      align-items: center;
-      max-width: calc(100% - 108px);
-
-      &.has-inbox {
-        max-width: calc(100% - 138px);
-      }
+      flex: 1 1 auto;
 
       @include mobile() {
+        width: 100%;
         min-height: 32px;
-        height: auto;
-        margin-right: 0;
-        max-width: 100%;
-        white-space: nowrap;
-      }
-
-      div.post-authorship {
-        flex: 0 1 auto;
-        z-index: 2;
-        max-width: 100%;
-        display: contents;
-      }
-
-      div.separator-dot {
-        width: 3px;
-        height: 3px;
-        background-color: var(--light-color);
-        border-radius: 50%;
-        margin: 1px 5px 0 5px;
-        flex: 0 0 auto;
-
-        @include mobile() {
-          display: none;
-        }
-      }
-
-      span.time-since {
         display: block;
+      }
+
+      div.stream-header-head-author {
         height: 24px;
-        line-height: 24px;
-        text-align: left;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: var(--color);
-        position: relative;
-        white-space: nowrap;
         flex: 0 0 auto;
-        overflow: hidden;
+        margin-right: 8px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        max-width: calc(100% - 108px);
+
+        &.has-inbox {
+          max-width: calc(100% - 138px);
+        }
 
         @include mobile() {
-          color: var(--light-color);
-          margin-left: 6px;
-          height: 32px;
-          line-height: 32px;
+          min-height: 32px;
+          height: auto;
+          margin-right: 0;
+          max-width: 100%;
+          white-space: nowrap;
+        }
 
-          time {
-            vertical-align: baseline;
-            line-height: 32px;
-            font-size: 14px;
+        div.post-authorship {
+          flex: 0 1 auto;
+          z-index: 2;
+          max-width: 100%;
+          display: contents;
+        }
+
+        div.separator-dot {
+          width: 3px;
+          height: 3px;
+          background-color: var(--light-color);
+          border-radius: 50%;
+          margin: 1px 5px 0 5px;
+          flex: 0 0 auto;
+
+          @include mobile() {
+            display: none;
           }
         }
-      }
 
-      div.new-item-tag {
-        flex: 0 0 auto;
-      }
+        span.time-since {
+          display: block;
+          height: 24px;
+          line-height: 24px;
+          text-align: left;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: var(--color);
+          position: relative;
+          white-space: nowrap;
+          flex: 0 0 auto;
+          overflow: hidden;
 
-      div.pin-tag {
-        flex: 0 0 auto;
-      }
+          @include mobile() {
+            color: var(--light-color);
+            margin-left: 6px;
+            height: 32px;
+            line-height: 32px;
 
-      div.bookmark-tag-small {
-        margin-right: 0;
-        flex: 0 0 auto;
-        align-self: center;
-      }
-
-      @include mobile() {
-        div.bookmark-tag-small {
-          margin-left: auto;
+            time {
+              vertical-align: baseline;
+              line-height: 32px;
+              font-size: 14px;
+            }
+          }
         }
-      }
 
-      div.bookmark-tag {
-        flex: 0 0 auto;
-        align-self: center;
-      }
+        div.new-item-tag {
+          flex: 0 0 auto;
+        }
 
-      div.muted-activity {
-        align-self: center;
-        opacity: 0.5;
-        flex: 0 0 auto;
+        div.pin-tag {
+          flex: 0 0 auto;
+        }
 
+        div.bookmark-tag-small {
+          margin-right: 0;
+          flex: 0 0 auto;
+          align-self: center;
+        }
 
         @include mobile() {
-          margin-right: 8px;
+          div.bookmark-tag-small {
+            margin-left: auto;
+          }
+        }
+
+        div.bookmark-tag {
+          flex: 0 0 auto;
+          align-self: center;
+        }
+
+        div.muted-activity {
+          align-self: center;
+          opacity: 0.5;
+          flex: 0 0 auto;
+
+
+          @include mobile() {
+            margin-right: 8px;
+          }
         }
       }
     }

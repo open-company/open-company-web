@@ -198,10 +198,11 @@
                     (show-mobile-menu s))}
         [:span.mobile-more-bt-icon]
         [:span.mobile-more-bt-text "More"]]
-      (when (seq (:labels activity-data))
-        [:div.stream-item-labels.group
-         (labels-list (:labels activity-data))])
       [:div.stream-item-header.group
+       [:div.stream-item-header-left
+        (when (seq (:labels activity-data))
+          [:div.stream-item-labels.group
+           (labels-list (:labels activity-data))])
         [:div.stream-header-head-author
           (post-authorship {:activity-data activity-data
                             :user-avatar? true
@@ -232,7 +233,7 @@
             [:div.new-item-tag])
           [:div.bookmark-tag-small.mobile-only]
           [:div.bookmark-tag.big-web-tablet-only]
-          [:div.pinned-tag]]
+          [:div.pinned-tag]]]
         (when is-published?
           (if is-mobile?
             (when mobile-more-menu?

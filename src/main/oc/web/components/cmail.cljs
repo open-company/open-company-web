@@ -589,7 +589,7 @@
                             (not expanded-state?)
                             (not (:fullscreen cmail-state)))
                    (fn [e]
-                      (cmail-actions/cmail-expand cmail-data cmail-state)
+                      (cmail-actions/cmail-expand cmail-data)
                       (utils/after 280
                        #(when-let [el (headline-element s)]
                           (utils/to-end-of-content-editable el)))))}

@@ -355,6 +355,10 @@ div.oc-labels-list {
   div.oc-labels-item {
     margin-right: 4px;
 
+    a:hover {
+      opacity: 0.9;
+    }
+
     div.oc-label {
       @include label();
     }

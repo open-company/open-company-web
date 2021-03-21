@@ -182,13 +182,13 @@
     (load-cached-item initial-entry-data (first dis/cmail-data-key)
      #(dis/dispatch! [:cmail-state/update fixed-cmail-state]))))
 
-(defn cmail-expand [initial-entry-data & [cmail-state]]
+(defn cmail-expand [initial-entry-data]
   (cook/remove-cookie! (cmail-fullscreen-cookie))
   (save-edit-open-cookie initial-entry-data)
   (load-cached-item initial-entry-data (first dis/cmail-data-key)
    #(dis/dispatch! [:cmail-expand])))
 
-(defn cmail-collapse [& [cmail-state]]
+(defn cmail-collapse []
   (dis/dispatch! [:cmail-collapse]))
 
 (defn cmail-reset []

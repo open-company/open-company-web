@@ -8,9 +8,9 @@
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
-(def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data) (dis/cmail-state)))
+(def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data)))
 
-(def collapse-cmail #(cmail-actions/cmail-collapse (dis/cmail-state)))
+(def collapse-cmail cmail-actions/cmail-collapse)
 
 (defn step-intro [steps _viewer?]
   {:title "Welcome!"

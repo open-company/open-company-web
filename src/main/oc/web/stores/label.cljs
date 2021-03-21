@@ -47,7 +47,8 @@
                      (if @found?
                        updated-labels
                        (concat labels [saved-label])))))
-    (if (get-in db (conj dispatcher/cmail-state-key :labels-floating-view))
+    (if (or (get-in db (conj dispatcher/cmail-state-key :labels-floating-view))
+            (get-in db (conj dispatcher/cmail-state-key :labels-inline-view)))
       (update-in tdb (conj dispatcher/cmail-data-key :labels)
                  (fn [labels]
                    (let [found? (atom false)
