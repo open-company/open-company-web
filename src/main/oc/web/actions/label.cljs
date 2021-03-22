@@ -3,6 +3,7 @@
   (:require [oc.web.dispatcher :as dis]
             [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
+            [cuerdas.core :as string]
             [taoensso.timbre :as timbre]
             [oc.lib.color :as lib-color]
             [oc.web.lib.json :refer (json->cljs)]
@@ -12,14 +13,38 @@
             [oc.web.utils.activity :as au]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.ws.interaction-client :as ws-ic]))
+            [oc.web.ws.interaction-client :as ws-ic]
+            [cljs.reader :refer (read-string)]))
 
 (def max-label-name-length 40)
 
 ;; Data parse
 
+(defn hex->rgb [hex-color]
+  (let [splitted-color (->> (string/split hex-color #"")
+                            (remove #(or (string/empty-or-nil? %)
+                                         (= "#" %)))
+                            vec)
+        colors (rest splitted-color)
+        fixed-colors (if (= 3 (count colors))
+                       (mapcat (partial repeat 2) colors)
+                       colors)
+        red (take 2 fixed-colors)
+        green (take 2 (drop 2 fixed-colors))
+        blue (take 2 (drop 4 fixed-colors))]
+    (mapv #(let [conjed-c (conj % "0x")
+                 joined-c (string/join conjed-c)]
+             (read-string joined-c))
+          [red green blue])))
+
+
 (defn parse-label [label-map]
+  
+  (hex->rgb (:color label-map))
+
   (-> label-map
+      (assoc :rgb-color (when (:color label-map)
+                          (lib-color/hex->rgb (:color label-map))))
       (assoc :can-edit? (hateoas/link-for (:links label-map) "partial-update"))
       (assoc :can-delete? (hateoas/link-for (:links label-map) "delete"))))
 

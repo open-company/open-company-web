@@ -28,6 +28,14 @@
 
 (def color-picker (partial rutils/build ChromePicker))
 
+(defn- add-label-bt [{label-text :label-text on-click :on-click}]
+  [:button.mlb-reset.add-label-bt
+   {:on-click (when (fn? on-click)
+                on-click)}
+   [:span.add-label-plus]
+   [:span.add-label-span
+    label-text]])
+
 (rum/defcs org-labels-list <
   rum/static
   rum/reactive
@@ -55,11 +63,8 @@
           [:span.oc-label-edit-pen]])
        [:div.oc-labels-empty
         "No labels yet"])
-     [:button.mlb-reset.add-label-bt
-      {:on-click #(label-actions/new-label)}
-      [:span.add-label-plus]
-      [:span.add-label-span
-       "Add label"]]
+     (add-label-bt {:label-text "Add label"
+                    :on-click #(label-actions/new-label)})
      [:div.oc-labels-footer
       [:button.mlb-reset.cancel-bt
        {:on-click #(label-actions/hide-labels-manager)}
@@ -218,11 +223,8 @@
                             (label-actions/edit-label label))}])])
          [:div.oc-labels-empty
           "No labels yet"])
-       [:button.mlb-reset.add-label-bt
-        {:on-click #(label-actions/new-label)}
-        [:span.add-label-plus]
-        [:span.add-label-span
-         "Add label"]]]]]))
+       (add-label-bt {:label-text "Add label"
+                      :on-click #(label-actions/new-label)})]]]))
 
 (rum/defc cmail-label-item <
   rum/static
@@ -247,7 +249,7 @@
     label-name]])
 
 (rum/defcs cmail-labels-list
-           "Options:
+  "Options:
    {:add-label-bt true/false/nil ;> show/hide the + Add a label button with the dropdown menu
     :label-autocompleter true/false
    }"
@@ -261,29 +263,16 @@
   (ui-mixins/on-click-out (fn [s _]
                             (when (:labels-inline-view @(drv/get-ref s :cmail-state))
                               (cmail-actions/toggle-cmail-inline-labels-view false))))
-  [s {add-label-bt :add-label-bt label-autocompleter :label-autocompleter}]
+  [s {add-label-bt? :add-label-bt label-autocompleter :label-autocompleter}]
   (let [cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
         user-labels (drv/react s :user-labels)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.cmail-labels-list
+     {:class (when (seq (:labels cmail-data))
+               "has-labels")}
      (when (:labels-inline-view cmail-state)
        (labels-picker))
-     (when add-label-bt
-       [:div.cmail-add-label-container
-        ;; (cmail-label-item {:label add-label-map
-        ;;                    :tooltip (when-not is-mobile? {:title "Click to add a label"})})
-        [:button.mlb-reset.add-label-bt
-         {:on-click #(if (seq user-labels)
-                       (cmail-actions/toggle-cmail-inline-labels-view)
-                       (label-actions/new-label))
-          :data-toggle (when-not is-mobile? "toggle")
-          :data-placement "top"
-          :data-container "body"
-          :title "Click to add a label"}
-         (if (seq user-labels)
-           "+ Add label"
-           "+ Create label")]])
      (for [label (:labels cmail-data)]
        [:div.cmail-labels-item
         {:key (str "cmail-label-item" (or (:uuid label) (:slug label)))}
@@ -291,11 +280,19 @@
                            :class-name "cmail-label-item active"
                            :tooltip (when-not is-mobile? {:title "Remove label"})
                            :on-click-cb #(cmail-actions/toggle-cmail-label label)})])
-     (when (and label-autocompleter
-                (> (count user-labels) (count (:labels cmail-data))))
-       [:div.cmail-labels-item
-        (label-autocomplete {:cmail-data cmail-data
-                             :user-labels user-labels})])]))
+     (if add-label-bt?
+       [:div.cmail-add-label-container
+        (add-label-bt {:label-text (if (seq user-labels)
+                                     "Add a label"
+                                     "Create a new label")
+                       :on-click #(if (seq user-labels)
+                                    (cmail-actions/toggle-cmail-inline-labels-view)
+                                    (label-actions/new-label))})]
+       (when (and label-autocompleter
+                  (> (count user-labels) (count (:labels cmail-data))))
+         [:div.cmail-labels-item
+          (label-autocomplete {:cmail-data cmail-data
+                               :user-labels user-labels})]))]))
 
 (rum/defc label-item <
   rum/static
@@ -305,7 +302,9 @@
     :data-slug (:slug label)}
    [:a
     {:href (oc-urls/label (:slug label))
-     :on-click #(nav-actions/nav-to-label! % (:slug label) (oc-urls/label (:slug label)))}
+     :on-click (fn [e]
+                 (dom-utils/stop-propagation! e)
+                 (nav-actions/nav-to-label! e (:slug label) (oc-urls/label (:slug label))))}
     [:div.oc-label-bg
      {:style {:background-color (:color label)}}]
     [:span.oc-label-text

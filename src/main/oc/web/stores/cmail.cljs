@@ -52,7 +52,7 @@
                      (if (cmail-labels-set (:slug toggle-label))
                        (filterv #(not= (:slug %) (:slug toggle-label)) labels)
                        (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])]))))))
-      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
+      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
 
 (defmethod dispatcher/action :cmail-add-label
   [db [_ add-label]]
@@ -70,7 +70,7 @@
                                 %)
                              labels)
                        (vec (conj labels add-label-map))))))
-      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
+      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
 
 (defmethod dispatcher/action :cmail-remove-label
   [db [_ remove-label]]
@@ -78,7 +78,7 @@
       (update-in (conj dispatcher/cmail-data-key :labels)
                  (fn [labels]
                    (filterv #(not= (:slug %) (:slug remove-label)) labels)))
-      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
+      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
 
 (defn- labels-value-update [optional-value current-value]
   (if (boolean? optional-value) optional-value (not current-value)))
@@ -101,4 +101,4 @@
   [db [_]]
   (-> db
       (update-in (conj dispatcher/cmail-data-key :labels) (comp vec butlast))
-      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
+      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))

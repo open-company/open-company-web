@@ -1,6 +1,7 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -296,10 +297,6 @@
   (or (oget js/document "documentElement.clientWidth")
       (oget js/window "innerWidth")))
 
-(defn calc-video-height [s]
-  (when (responsive/is-mobile-size?)
-    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
-
 (defn- collapse-if-needed [s & [e]]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
@@ -409,7 +406,6 @@
                    (rum/local false ::publishing)
                    (rum/local false ::disable-post)
                    (rum/local nil ::debounced-autosave)
-                   (rum/local 0 ::mobile-video-height)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
@@ -423,7 +419,6 @@
                    (rum/local false ::unlock-scroll)
                    (rum/local nil ::headline-autocomplete)
                    ;; Mixins
-                   (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
                    ;; Go back to collapsed state on desktop if user didn't touch anything
                    (when-not (responsive/is-mobile-size?)
@@ -446,7 +441,6 @@
                     (reset! (::last-fullscreen-state s) (-> s (drv/get-ref :cmail-state) deref :fullscreen))
                     s)
                    :did-mount (fn [s]
-                    (calc-video-height s)
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (setup-top-padding s)
                     s)
@@ -465,9 +459,10 @@
                         (when (:fullscreen cmail-state)
                           (fullscreen-focus-headline s))
                         (reset! (::last-fullscreen-state s) (:fullscreen cmail-state))))
-                    (when (:debounce-autosave @(drv/get-ref s :cmail-data))
-                      (debounced-autosave! s)
-                      (dis/dispatch! [:update (conj dis/cmail-data-key :debounce-autosave) false]))
+                    (let [cmail-data @(drv/get-ref s :cmail-data)]
+                      (when (and (:has-changes cmail-data)
+                                 (not (:auto-saving cmail-data)))
+                        (debounced-autosave! s)))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -532,12 +527,6 @@
                     #(if (:publisher-board cmail-data*)
                        self-board-name
                        %))
-        published? (= (:status cmail-data) "published")
-        video-size (if is-mobile?
-                     {:width (win-width)
-                      :height @(::mobile-video-height s)}
-                     {:width 548
-                      :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         publishable? (is-publishable? cmail-data)
@@ -547,31 +536,22 @@
                       (not publishable?)
                       @(::publishing s)
                       @(::disable-post s))
-        working? (or (and published?
-                          @(::saving s))
-                     (and (not published?)
-                          @(::publishing s)))
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
                             "Share update")
         did-pick-board (fn [board-data note dismiss-action]
-                           (hide-board-picker! s)
-                           (when (and board-data
-                                      (seq (:name board-data)))
-                            (let [has-changes (or (:has-changes cmail-data)
-                                                  (seq (:uuid cmail-data))
-                                                  (:auto-saving cmail-data))
-                                  updated-cmail-data (merge cmail-data {:board-slug (:slug board-data)
-                                                                        :board-name (:name board-data)
-                                                                        :board-access (:access board-data)
-                                                                        :publisher-board (:publisher-board board-data)
-                                                                        :has-changes has-changes
-                                                                        :invite-note note})]
-                              (cmail-actions/cmail-data-replace updated-cmail-data)
-                              (when has-changes
-                                (debounced-autosave! s)))
-                            (when (fn? dismiss-action)
-                              (dismiss-action))))
+                         (hide-board-picker! s)
+                         (when (and board-data
+                                    (seq (:name board-data)))
+                           (let [updated-cmail-data (merge cmail-data {:board-slug (:slug board-data)
+                                                                       :board-name (:name board-data)
+                                                                       :board-access (:access board-data)
+                                                                       :publisher-board (:publisher-board board-data)
+                                                                       :has-changes (seq (:uuid cmail-data))
+                                                                       :invite-note note})]
+                             (cmail-actions/cmail-data-replace updated-cmail-data))
+                           (when (fn? dismiss-action)
+                             (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         editable-boards (drv/react s :editable-boards)
         show-board-picker? (or ;; Publisher board can still be created
@@ -656,7 +636,8 @@
            [:span.floating-labels-bt-text
             "Labels"]]
           (when (:labels-floating-view cmail-state)
-            (labels-picker))]]
+            (labels-picker {:inline-add-bt true
+                            }))]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
@@ -743,8 +724,8 @@
         [:div.cmail-labels
         ;;  (labels-list (:labels cmail-data))
          (cmail-labels-list {;;  :labels-preview? true
-                             :label-autocompleter {:visibility :on-hover}
-                             ;; :add-label-bt true
+                             ;; :label-autocompleter {:visibility :on-hover}
+                             :add-label-bt true
                              })])
       [:div.cmail-footer
         [:div.post-button-container.group
