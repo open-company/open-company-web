@@ -199,6 +199,8 @@
         [:span.mobile-more-bt-icon]
         [:span.mobile-more-bt-text "More"]]
       [:div.stream-item-header.group
+       {:class (when (seq (:labels activity-data))
+                 "has-labels")}
        [:div.stream-item-header-left
         (when (seq (:labels activity-data))
           [:div.stream-item-labels.group

@@ -218,6 +218,10 @@ div.stream-item {
     align-items: center;
     justify-content: flex-start;
 
+    &.has-labels {
+      height: 48px;
+    }
+
     div.stream-item-header-left {
       position: relative;
       height: 24px;
