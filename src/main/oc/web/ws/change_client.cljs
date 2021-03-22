@@ -84,63 +84,37 @@
 ;; Follow
 
 (defn follow-list []
-  (timbre/debug "Sending follow-list for user-id:" @current-uid "org-slug:" @current-org)
+  (timbre/debug "Sending follow-list for user-id:" @current-uid "org-id:" @current-org)
   (send! chsk-send! [:follow/list {:user-id @current-uid
-                                   :org-slug @current-org}]))
+                                   :org-id @current-org}]))
 
 ;; Followers count
 
 (defn followers-count []
-  (timbre/debug "Sending followers-count for org-slug:" @current-org)
-  (send! chsk-send! [:followers/count {:org-slug @current-org}]))
-
-;; Publishers follow
-
-(defn publisher-watch []
-  (send! chsk-send! [:user/watch {:org-slug @current-org :user-ids [@current-uid]}]))
-
-(defn publishers-follow [publisher-uuids]
-  (timbre/debug "Sending publishers/follow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuids:" publisher-uuids)
-  (send! chsk-send! [:publishers/follow {:user-id @current-uid
-                                         :org-slug @current-org
-                                         :publisher-uuids (vec publisher-uuids)}]))
-
-(defn publisher-follow [publisher-uuid]
-  (timbre/debug "Sending publisher/follow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuid:" publisher-uuid)
-  (send! chsk-send! [:publisher/follow {:user-id @current-uid
-                                        :org-slug @current-org
-                                        :publisher-uuid publisher-uuid}]))
-
-(defn publisher-unfollow [publisher-uuid]
-  (timbre/debug "Sending publisher/unfollow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuid:" publisher-uuid)
-  (send! chsk-send! [:publisher/unfollow {:user-id @current-uid
-                                          :org-slug @current-org
-                                          :publisher-uuid publisher-uuid}]))
+  (timbre/debug "Sending followers-count for org-id:" @current-org)
+  (send! chsk-send! [:followers/count {:org-id @current-org}]))
 
 ;; Boards follow
 
 (defn boards-unfollow [board-uuids]
   (timbre/debug "Sending boards/unfollow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuids:" board-uuids)
+   "org-id:" @current-org "with uuids:" board-uuids)
   (send! chsk-send! [:boards/unfollow {:user-id @current-uid
-                                       :org-slug @current-org
+                                       :org-id @current-org
                                        :board-uuids (vec board-uuids)}]))
 
 (defn board-follow [board-uuid]
   (timbre/debug "Sending board/follow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuid:" board-uuid)
+   "org-id:" @current-org "with uuid:" board-uuid)
   (send! chsk-send! [:board/follow {:user-id @current-uid
-                                    :org-slug @current-org
+                                    :org-id @current-org
                                     :board-uuid board-uuid}]))
 
 (defn board-unfollow [board-uuid]
   (timbre/debug "Sending board/unfollow for user-id:" @current-uid
-   "org-slug:" @current-org "with uuid:" board-uuid)
+   "org-id:" @current-org "with uuid:" board-uuid)
   (send! chsk-send! [:board/unfollow {:user-id @current-uid
-                                      :org-slug @current-org
+                                      :org-id @current-org
                                       :board-uuid board-uuid}]))
 
 (defn subscribe
@@ -211,7 +185,7 @@
 
 (defmethod event-handler :followers/count
   [_ body]
-  (timbre/debug "Change event :follow/list" body)
+  (timbre/debug "Change event :follow/count" body)
   (go (>! ch-pub { :topic :followers/count :data body })))
 
 ;; ----- Sente event handlers -----
@@ -249,7 +223,6 @@
     (timbre/debug "Handshake:" ?uid ?csrf-token ?handshake-data)
     (follow-list)
     (container-watch)
-    (publisher-watch)
     (ws-utils/after 1000 followers-count)))
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
@@ -268,11 +241,11 @@
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the change service"
-  ([ws-link uid org-slug containers]
+  ([ws-link uid org-id containers]
    (when ws-link
      (reset! last-ws-link ws-link)
      (reset! current-uid uid)
-     (reset! current-org org-slug)
+     (reset! current-org org-id)
      (reset! container-ids containers)
      (reconnect)))
   ([]

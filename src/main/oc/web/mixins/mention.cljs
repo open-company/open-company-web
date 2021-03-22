@@ -34,9 +34,7 @@
                                (rum/mount
                                 (user-info-otf {:user-data user-data
                                                 :portal-el this
-                                                :my-profile (= (:user-id current-user-data) user-id)
-                                                :following (utils/in? (mapv :user-id @(drv/get-ref s :follow-publishers-list)) user-id)
-                                                :followers-count (get @(drv/get-ref s :followers-publishers-count) user-id)})
+                                                :my-profile (= (:user-id current-user-data) user-id)})
                                 mount-el)
                                (let [user-data {:first-name (oget this "dataset" "?firstName")
                                                 :last-name (oget this "dataset" "?lastName")
@@ -79,9 +77,7 @@
    To use click? it needs the following mixins:
    - rum/reactive
    - (drv/drv :current-user-data)
-   - (drv/drv :users-info-hover)
-   - (drv/drv :follow-publishers-list)
-   - (drv/drv :followers-publishers-count)"
+   - (drv/drv :users-info-hover)"
   [& [{:keys [click?]}]]
   (let [events-list (atom [])]
     {:did-mount (fn [s]

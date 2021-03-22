@@ -269,7 +269,7 @@
   (when (or (jwt/jwt)
             (jwt/id-token)) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
-      (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
+      (ws-cc/reconnect ws-link (jwt/user-id) (:uuid org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
 
   ;; Interaction service connection
   (when (jwt/jwt) ; only for logged in users

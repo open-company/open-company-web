@@ -45,24 +45,20 @@
 (defn- pointed-name [{:keys [first-name last-name]}]
   (str first-name " " (first last-name) "."))
 
-(defn parse-users [users-list org-data follow-publishers-list]
-  (let [follow-publishers-set (if (every? map? follow-publishers-list)
-                                (set (map :user-id follow-publishers-list))
-                                (set follow-publishers-list))]
-    (mapv (fn [u] (-> u
-                      (update :name #(or % (user-lib/name-for u)))
-                      (update :short-name #(or % (user-lib/short-name-for u)))
-                      (update :pointed-name #(or % (pointed-name u)))
-                      (assoc :follow (follow-publishers-set (:user-id u)))
-                      (as-> user
-                            (if (map? org-data)
-                              (assoc user :role (uu/get-user-type user org-data))
-                              user)
-                        (if (:role user)
-                          (assoc user :role-string (uu/user-role-string (:role user)))
-                          user))
-                      (assoc :self? (= (:user-id u) (j/user-id)))))
-          users-list)))
+(defn parse-users [users-list org-data]
+  (mapv (fn [u] (-> u
+                    (update :name #(or % (user-lib/name-for u)))
+                    (update :short-name #(or % (user-lib/short-name-for u)))
+                    (update :pointed-name #(or % (pointed-name u)))
+                    (as-> user
+                          (if (map? org-data)
+                            (assoc user :role (uu/get-user-type user org-data))
+                            user)
+                      (if (:role user)
+                        (assoc user :role-string (uu/user-role-string (:role user)))
+                        user))
+                    (assoc :self? (= (:user-id u) (j/user-id)))))
+        users-list))
 
 (defn- pin-tooltip [db]
   {:title "New! Increase visibility with Pins."
@@ -385,23 +381,20 @@
 
 (defn- update-contributions-and-boards
   "Given the new list of board and publisher followers, update the following flag in each board and contributions data we have."
-  [db org-slug follow-boards-list follow-publishers-list]
+  [db org-slug follow-boards-list]
   (let [change-data (dispatcher/change-data db)
         org-data (dispatcher/org-data db org-slug)
-        follow-publisher-uuids-set (set (map :user-id follow-publishers-list))
         contributions-list-key (dispatcher/contributions-list-key org-slug)
-        next-active-users (apply merge
-                           (map (fn [[k v]] (hash-map k (assoc v :following (-> v :user-id follow-publisher-uuids-set))))
-                            (dispatcher/active-users org-slug db)))
-        next-db* (assoc-in db (dispatcher/active-users-key org-slug) next-active-users)
+        active-users (dispatcher/active-users org-slug db)
+        next-db* (assoc-in db (dispatcher/active-users-key org-slug) active-users)
         next-db (reduce (fn [tdb contrib-key]
                          (let [rp-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recently-posted-sort)
                                ra-contrib-data-key (dispatcher/contributions-data-key org-slug contrib-key dispatcher/recent-activity-sort)]
                            (-> tdb
                             (update-in rp-contrib-data-key
-                             #(dissoc (au/parse-contributions % change-data org-data next-active-users follow-publishers-list dispatcher/recently-posted-sort) :fixed-items))
+                             #(dissoc (au/parse-contributions % change-data org-data active-users dispatcher/recently-posted-sort) :fixed-items))
                             (update-in ra-contrib-data-key
-                             #(dissoc (au/parse-contributions % change-data org-data next-active-users follow-publishers-list dispatcher/recent-activity-sort) :fixed-items)))))
+                             #(dissoc (au/parse-contributions % change-data org-data active-users dispatcher/recent-activity-sort) :fixed-items)))))
                   next-db*
                   (keys (get-in db contributions-list-key)))
         boards-key (dispatcher/boards-key org-slug)]
@@ -411,33 +404,30 @@
                  (-> tdb
                   (update-in rp-board-data-key
                              #(-> %
-                                  (au/parse-board change-data next-active-users follow-boards-list dispatcher/recently-posted-sort)
+                                  (au/parse-board change-data active-users follow-boards-list dispatcher/recently-posted-sort)
                                   (dissoc :fixed-items)))
                   (update-in ra-board-data-key
                              #(-> %
-                                  (au/parse-board change-data next-active-users follow-boards-list dispatcher/recent-activity-sort)
+                                  (au/parse-board change-data active-users follow-boards-list dispatcher/recent-activity-sort)
                                   (dissoc :fixed-items))))))
        next-db
        (keys (get-in db boards-key)))))
 
 (defmethod dispatcher/action :follow/loaded
-  [db [_ org-slug {:keys [follow-publisher-uuids unfollow-board-uuids] :as resp}]]
+  [db [_ org-slug {:keys [unfollow-board-uuids] :as resp}]]
   (if (= org-slug (:org-slug resp))
     (let [org-data-key (dispatcher/org-data-key org-slug)
           org-data (get-in db org-data-key)
           unfollow-boards-uuids-set (set unfollow-board-uuids)
           updated-org-data (update org-data :boards (fn [boards] (map #(assoc % :following (not (unfollow-boards-uuids-set (:uuid %)))) boards)))
           active-users (dispatcher/active-users org-slug db)
-          follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
           follow-boards-list-key (dispatcher/follow-boards-list-key org-slug)
-          next-follow-boards-data (enrich-boards-list unfollow-board-uuids (:boards org-data))
-          next-follow-publishers-data (enrich-publishers-list follow-publisher-uuids active-users)]
+          next-follow-boards-data (enrich-boards-list unfollow-board-uuids (:boards org-data))]
       (-> db
        (assoc-in org-data-key updated-org-data)
-       (assoc-in follow-publishers-list-key next-follow-publishers-data)
        (assoc-in follow-boards-list-key next-follow-boards-data)
        (assoc-in (dispatcher/unfollow-board-uuids-key org-slug) unfollow-board-uuids)
-       (update-contributions-and-boards org-slug next-follow-boards-data next-follow-publishers-data)))
+       (update-contributions-and-boards org-slug next-follow-boards-data)))
       db))
 
 (defmethod dispatcher/action :followers-count/finish
@@ -464,30 +454,8 @@
                                                               (:active-users-count %))})
                            all-boards-uuid-and-count))]
     (-> db
-     (update-contributions-and-boards org-slug all-boards-count publishers-map)
-     (assoc-in (dispatcher/followers-publishers-count-key org-slug) publishers-map)
+     (update-contributions-and-boards org-slug all-boards-count)
      (assoc-in (dispatcher/followers-boards-count-key org-slug) all-boards-count))))
-
-(defmethod dispatcher/action :publisher/follow
-  [db [_ org-slug {:keys [publisher-uuids follow? publisher-uuid] :as resp}]]
-  (if (= org-slug (:org-slug resp))
-    (let [follow-publishers-list-key (dispatcher/follow-publishers-list-key org-slug)
-          active-users (dispatcher/active-users org-slug db)
-          next-follow-publishers-data (enrich-publishers-list publisher-uuids active-users)
-          followers-count-key (dispatcher/followers-publishers-count-key org-slug)
-          publisher-count-key (conj followers-count-key publisher-uuid)
-          fn (cond (true? follow?) inc (false? follow?) dec :else identity)
-          follow-boards-data (dispatcher/follow-boards-list org-slug db)]
-      (-> db
-       (assoc-in follow-publishers-list-key next-follow-publishers-data)
-       (update-in publisher-count-key #(if %
-                                         (update % :count fn)
-                                         {:org-slug org-slug
-                                          :resource-uuid publisher-uuid
-                                          :resource-type :user
-                                          :count (if follow? 1 0)}))
-       (update-contributions-and-boards org-slug follow-boards-data next-follow-publishers-data)))
-    db))
 
 (defmethod dispatcher/action :board/follow
   [db [_ org-slug {:keys [board-uuids follow? board-uuid] :as resp}]]
@@ -503,8 +471,7 @@
           next-follow-boards-data (enrich-boards-list next-unfollow-uuids org-boards)
           followers-count-key (dispatcher/followers-boards-count-key org-slug)
           board-count-key (conj followers-count-key board-uuid)
-          fn (cond (true? follow?) inc (false? follow?) dec :else identity)
-          follow-publishers-data (dispatcher/follow-publishers-list org-slug db)]
+          fn (cond (true? follow?) inc (false? follow?) dec :else identity)]
       (-> db
        (assoc-in follow-boards-list-key next-follow-boards-data)
        (assoc-in unfollow-board-uuids-key next-unfollow-uuids)
@@ -515,7 +482,7 @@
                                       :resource-uuid board-uuid
                                       :resource-type :board
                                       :count (if follow? 1 0)}))
-       (update-contributions-and-boards org-slug next-follow-boards-data follow-publishers-data)))
+       (update-contributions-and-boards org-slug next-follow-boards-data)))
     db))
 
 (defmethod dispatcher/action :follow-list-last-added

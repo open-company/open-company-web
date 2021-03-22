@@ -94,8 +94,6 @@
   (drv/drv :editable-boards)
   (drv/drv :users-info-hover)
   (drv/drv :current-user-data)
-  (drv/drv :follow-publishers-list)
-  (drv/drv :followers-publishers-count)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -149,8 +147,6 @@
         _panel-stack (drv/react s :panel-stack)
         _add-comment-focus (drv/react s :add-comment-focus)
         _users-info-hover (drv/react s :users-info-hover)
-        _follow-publishers-list (drv/react s :follow-publishers-list)
-        _followers-publishers-count (drv/react s :followers-publishers-count)
         activities-read (drv/react s :activities-read)
         read-data (get activities-read (:uuid activity-data))
         editable-boards (drv/react s :editable-boards)

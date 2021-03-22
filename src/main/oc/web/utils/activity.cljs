@@ -785,21 +785,18 @@
 (defn parse-contributions
   "Parse data coming from the API for a certain user's posts."
   ([contributions-data]
-   (parse-contributions contributions-data {} (dis/org-data) (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
+   (parse-contributions contributions-data {} (dis/org-data) (dis/active-users) dis/recently-posted-sort))
 
   ([contributions-data change-data]
-   (parse-contributions contributions-data change-data (dis/org-data) (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
+   (parse-contributions contributions-data change-data (dis/org-data) (dis/active-users) dis/recently-posted-sort))
 
   ([contributions-data change-data org-data]
-   (parse-contributions contributions-data change-data org-data (dis/active-users) (dis/follow-publishers-list) dis/recently-posted-sort))
+   (parse-contributions contributions-data change-data org-data (dis/active-users) dis/recently-posted-sort))
 
   ([contributions-data change-data org-data active-users]
-   (parse-contributions contributions-data change-data org-data active-users (dis/follow-publishers-list) dis/recently-posted-sort))
+   (parse-contributions contributions-data change-data org-data active-users dis/recently-posted-sort))
 
-  ([contributions-data change-data org-data active-users follow-publishers-list]
-   (parse-contributions contributions-data change-data org-data active-users follow-publishers-list dis/recently-posted-sort))
-
-  ([contributions-data change-data org-data active-users follow-publishers-list sort-type & [direction]]
+  ([contributions-data change-data org-data active-users sort-type & [direction]]
     (when contributions-data
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
@@ -845,16 +842,14 @@
                             full-items-list)
             next-link (utils/link-for fixed-next-links "next")
             with-open-close-items (insert-open-close-item grouped-items #(not= (:resource-type %2) (:resource-type %3)))
-            with-ending-item (insert-ending-item with-open-close-items next-link)
-            follow-publishers-ids (set (map :user-id follow-publishers-list))]
+            with-ending-item (insert-ending-item with-open-close-items next-link)]
         (-> with-fixed-activities
           (assoc :resource-type :contributions)
           (dissoc :old-links :items)
           (assoc :links fixed-next-links)
           (assoc :self? (is-author? contributions-data))
           (assoc :posts-list full-items-list)
-          (assoc :items-to-render with-ending-item)
-          (assoc :following (boolean (follow-publishers-ids (:author-uuid contributions-data)))))))))
+          (assoc :items-to-render with-ending-item))))))
 
 (defn parse-container
   "Parse container data coming from the API, like Following or Replies (AP, Bookmarks etc)."
@@ -981,7 +976,7 @@
         f (if show-year date-format-year date-format)]
     (time-format/unparse f d)))
 
-(defn update-contributions [db org-data change-data active-users follow-publishers-list]
+(defn update-contributions [db org-data change-data active-users]
   (let [org-slug (:slug org-data)
         contributions-list-key (dis/contributions-list-key org-slug)]
     (reduce (fn [tdb contrib-key]
@@ -991,13 +986,13 @@
                  (if (contains? (get-in tdb* (butlast rp-contrib-data-key)) (last rp-contrib-data-key))
                    (update-in tdb* rp-contrib-data-key
                     #(-> %
-                      (parse-contributions change-data org-data active-users follow-publishers-list dis/recently-posted-sort)
+                      (parse-contributions change-data org-data active-users dis/recently-posted-sort)
                       (dissoc :fixed-items)))
                    tdb*)
                  (if (contains? (get-in tdb* (butlast ra-contrib-data-key)) (last ra-contrib-data-key))
                    (update-in tdb* ra-contrib-data-key
                      #(-> %
-                       (parse-contributions change-data org-data active-users follow-publishers-list dis/recent-activity-sort)
+                       (parse-contributions change-data org-data active-users dis/recent-activity-sort)
                        (dissoc :fixed-items)))
                    tdb*))))
      db
@@ -1073,9 +1068,9 @@
      db
      (keys (get-in db posts-key)))))
 
-(defn update-all-containers [db org-data change-data active-users follow-publishers-list]
+(defn update-all-containers [db org-data change-data active-users]
   (-> db
-   (update-posts org-data change-data active-users)
-   (update-boards org-data change-data active-users)
-   (update-containers org-data change-data active-users)
-   (update-contributions org-data change-data active-users follow-publishers-list)))
+      (update-posts org-data change-data active-users)
+      (update-boards org-data change-data active-users)
+      (update-containers org-data change-data active-users)
+      (update-contributions org-data change-data active-users)))

@@ -175,8 +175,8 @@
                                                  (when (and editable-board?
                                                             (:collapsed (dis/cmail-state)))
                                                    (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug section-data)
-                                                                                                     :board-name (:name section-data)
-                                                                                                     :publisher-board (:publisher-board section-data)}])
+                                                                                              :board-name (:name section-data)
+                                                                                              :publisher-board (:publisher-board section-data)}])
                                                    (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))
                                  (utils/after 500 refresh-org-data)
                                  (ws-cc/container-watch (:uuid section-data))
@@ -227,9 +227,9 @@
     (fn [data]
       (let [status-by-uuid (group-by :container-id (:data data))
             clean-change-data (zipmap (keys status-by-uuid) (->> status-by-uuid
-                                                              vals
-                                                              ; remove the sequence of 1 from group-by
-                                                              (map first)))]
+                                                                 vals
+                                                                 ; remove the sequence of 1 from group-by
+                                                                 (map first)))]
         (dis/dispatch! [:container/status clean-change-data]))))
 
   (ws-cc/subscribe :container/change

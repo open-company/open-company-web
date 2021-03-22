@@ -283,14 +283,13 @@
             change-data (dispatcher/change-data db org-slug)
             org-data (dispatcher/org-data db org-slug)
             active-users (dispatcher/active-users org-slug db)
-            follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
             parsed-rp-data (when rp-old-data
                              (-> rp-new-posts-list
-                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort)
+                              (au/parse-contributions change-data org-data active-users dispatcher/recently-posted-sort)
                               (dissoc :fixed-items)))
             parsed-ra-data (when ra-old-data
                              (-> ra-new-posts-list
-                              (au/parse-contributions change-data org-data active-users follow-publishers-list dispatcher/recent-activity-sort)
+                              (au/parse-contributions change-data org-data active-users dispatcher/recent-activity-sort)
                               (dissoc :fixed-items)))]
         (as-> db tdb
          (if rp-old-data
@@ -425,7 +424,6 @@
         change-data (dispatcher/change-data db org-slug)
         org-data (get-in db org-data-key)
         active-users (dispatcher/active-users org-slug db)
-        follow-publishers-list (dispatcher/follow-publishers-list org-slug db)
         follow-boards-list (dispatcher/follow-boards-list org-slug db)
         with-fixed-containers (reduce
                                (fn [ndb ckey]
@@ -460,7 +458,7 @@
                                      contrib-data (get-in ndb contrib-data-key)
                                      updated-contrib-data (update contrib-data :posts-list (fn [posts-list]
                                                                                             (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
-                                     parsed-contrib-data (au/parse-contributions updated-contrib-data change-data org-data active-users follow-publishers-list dispatcher/recently-posted-sort)]
+                                     parsed-contrib-data (au/parse-contributions updated-contrib-data change-data org-data active-users dispatcher/recently-posted-sort)]
                                   (assoc-in ndb contrib-data-key
                                    (dissoc parsed-contrib-data :fixed-items))))
                              with-fixed-containers

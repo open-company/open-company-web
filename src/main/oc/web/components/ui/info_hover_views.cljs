@@ -155,8 +155,6 @@
   rum/static
   rum/reactive
   (drv/drv :users-info-hover)
-  (drv/drv :follow-publishers-list)
-  (drv/drv :followers-publishers-count)
   (rum/local nil ::mouse-enter)
   (rum/local nil ::mouse-leave)
   (rum/local nil ::click)
@@ -195,11 +193,7 @@
           pos @(::positioning s)
           users-info (drv/react s :users-info-hover)
           active-user-data (get users-info (:user-id user-data))
-          complete-user-data (merge user-data active-user-data)
-          follow-publishers-list (set (map :user-id (drv/react s :follow-publishers-list)))
-          following? (follow-publishers-list (:user-id user-data))
-          followers-publishers-count (drv/react s :followers-publishers-count)
-          followers-count (get followers-publishers-count (:user-id user-data))]
+          complete-user-data (merge user-data active-user-data)]
       [:div.info-hover-view
         {:class (utils/class-set {:show @(::hovering s)
                                   (:vertical-position pos) true})
@@ -211,9 +205,7 @@
                          :hide-buttons (not active-user-data)
                          :hide-last-name? hide-last-name?
                          :short-name? short-name?
-                         :my-profile? my-profile?
-                         :following following?
-                         :followers-count (:count followers-count)})])))
+                         :my-profile? my-profile?})])))
 
 (rum/defcs board-info-hover <
   rum/static

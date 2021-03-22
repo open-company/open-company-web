@@ -615,25 +615,6 @@
     ; (utils/maybe-after unfollowing-delay #(activity-actions/unfollowing-get org-data))
     ))
 
-(defn toggle-publisher [publisher-uuid]
-  (let [org-slug (dis/current-org-slug)
-        current-publishers (map :user-id (dis/follow-publishers-list org-slug))
-        follow? (not (utils/in? current-publishers publisher-uuid))
-        next-publishers (if follow?
-                          (vec (conj (set current-publishers) publisher-uuid))
-                          (vec (disj (set current-publishers) publisher-uuid)))]
-    (dis/dispatch! [:publisher/follow (dis/current-org-slug)
-                                      {:org-slug org-slug
-                                       :publisher-uuids next-publishers
-                                       :follow? follow?
-                                       :publisher-uuid publisher-uuid}])
-    (when follow?
-      (dis/dispatch! [:follow-list-last-added org-slug {:last-added-uuid publisher-uuid
-                                                        :resource-type :user}]))
-    (if follow?
-      (ws-cc/publisher-follow publisher-uuid)
-      (ws-cc/publisher-unfollow publisher-uuid))))
-
 (defn toggle-board [board-uuid]
   (let [org-slug (dis/current-org-slug)
         current-boards (map :uuid (dis/follow-boards-list org-slug))

@@ -208,8 +208,6 @@
                          (drv/drv :attachment-uploading)
                          (drv/drv :users-info-hover)
                          (drv/drv :current-user-data)
-                         (drv/drv :follow-publishers-list)
-                         (drv/drv :followers-publishers-count)
                          (drv/drv :comment-reply-to)
                          ;; Locals
                          (rum/local nil ::add-comment-key)
@@ -339,8 +337,6 @@
         _mention-users (drv/react s :mention-users)
         _users-info-hover (drv/react s :users-info-hover)
         _current-user-data (drv/react s :current-user-data)
-        _follow-publishers-list (drv/react s :follow-publishers-list)
-        _followers-publishers-count (drv/react s :followers-publishers-count)
         _reply-to (drv/react s :comment-reply-to)
         _current-user-data (drv/react s :current-user-data)
         container-class (add-comment-unique-class s)

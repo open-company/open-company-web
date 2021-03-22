@@ -23,9 +23,8 @@
                                 :default-copy (not (map? button-copy))
                                 :disabled disabled})
        :on-click #(when-not disabled
-                    (if (= resource-type :board)
-                      (user-actions/toggle-board resource-uuid)
-                      (user-actions/toggle-publisher resource-uuid)))}
+                    (when (= resource-type :board)
+                      (user-actions/toggle-board resource-uuid)))}
       [:span.main-title
         (if following
           active-on

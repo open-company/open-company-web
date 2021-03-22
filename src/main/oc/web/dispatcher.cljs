@@ -216,9 +216,6 @@
 (defn follow-list-last-added-key [org-slug]
   (vec (conj (org-key org-slug) :follow-list-last-added)))
 
-(defn follow-publishers-list-key [org-slug]
-  (vec (conj (follow-list-key org-slug) :publisher-uuids)))
-
 (defn follow-boards-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :follow-boards-list)))
 
@@ -227,9 +224,6 @@
 
 (defn followers-count-key [org-slug]
   (vec (conj (org-key org-slug) :followers-count)))
-
-(defn followers-publishers-count-key [org-slug]
-  (vec (conj (followers-count-key org-slug) :publishers)))
 
 (defn followers-boards-count-key [org-slug]
   (vec (conj (followers-count-key org-slug) :boards)))
@@ -655,10 +649,10 @@
                                   (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :nux
                             :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
-                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
+                            :active-users :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
                             (fn [base orgs org-data contributions-data container-data posts-data nux
                                  entry-editing jwt loading payments search-active user-info-data current-user-data
-                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
+                                 active-users follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -687,7 +681,6 @@
                                :user-info-data user-info-data
                                :current-user-data current-user-data
                                :active-users active-users
-                               :follow-publishers-list follow-publishers-list
                                :follow-boards-list follow-boards-list
                                :show-premium-picker? (:show-premium-picker? base)
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
@@ -715,9 +708,7 @@
    :follow-list           [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-key org-slug)))]
    :follow-list-last-added [[:base :org-slug] (fn [base org-slug] (get-in base (follow-list-last-added-key org-slug)))]
    :followers-count       [[:base :org-slug] (fn [base org-slug] (get-in base (followers-count-key org-slug)))]
-   :followers-publishers-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-publishers-count-key org-slug)))]
    :followers-boards-count [[:base :org-slug] (fn [base org-slug] (get-in base (followers-boards-count-key org-slug)))]
-   :follow-publishers-list [[:base :org-slug] (fn [base org-slug] (get-in base (follow-publishers-list-key org-slug)))]
    :follow-boards-list    [[:base :org-slug] (fn [base org-slug] (get-in base (follow-boards-list-key org-slug)))]
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
@@ -1235,20 +1226,10 @@
   ([org-slug] (followers-count org-slug @app-state))
   ([org-slug data] (get-in data (followers-count-key org-slug))))
 
-(defn ^:export followers-publishers-count
-  ([] (followers-publishers-count (:slug (org-data)) @app-state))
-  ([org-slug] (followers-publishers-count org-slug @app-state))
-  ([org-slug data] (get-in data (followers-publishers-count-key org-slug))))
-
 (defn ^:export followers-boards-count
   ([] (followers-boards-count (:slug (org-data)) @app-state))
   ([org-slug] (followers-boards-count org-slug @app-state))
   ([org-slug data] (get-in data (followers-boards-count-key org-slug))))
-
-(defn ^:export follow-publishers-list
-  ([] (follow-publishers-list (:slug (org-data)) @app-state))
-  ([org-slug] (follow-publishers-list org-slug @app-state))
-  ([org-slug data] (get-in data (follow-publishers-list-key org-slug))))
 
 (defn ^:export follow-boards-list
   ([] (follow-boards-list (:slug (org-data)) @app-state))

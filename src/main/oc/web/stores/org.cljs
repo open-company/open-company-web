@@ -64,7 +64,6 @@
         ;; Follow/Unfollow boards/users
         follow-boards-list-key (dispatcher/follow-boards-list-key (:slug fixed-org-data))
         unfollow-board-uuids (get-in db (dispatcher/unfollow-board-uuids-key (:slug fixed-org-data)))
-        follow-publishers-list (dispatcher/follow-publishers-list (:slug fixed-org-data) db)
         ;; Team data
         team-data-key (dispatcher/team-data-key (:team-id fixed-org-data))
         update-team-users? (contains? (get-in db team-data-key) :users)
@@ -91,10 +90,10 @@
         (update-in ndb dispatcher/cmail-data-key merge editing-board)
         ndb)
      (if update-team-users?
-       (update-in ndb (conj team-data-key :users) #(user-store/parse-users % fixed-org-data follow-publishers-list))
+       (update-in ndb (conj team-data-key :users) #(user-store/parse-users % fixed-org-data))
        ndb)
      (if update-roster-users?
-       (update-in ndb (conj team-roster-key :users) #(user-store/parse-users % fixed-org-data follow-publishers-list))
+       (update-in ndb (conj team-roster-key :users) #(user-store/parse-users % fixed-org-data))
        ndb)
      (assoc-in ndb boards-key next-boards)
      (update-in ndb follow-boards-list-key #(user-store/enrich-boards-list unfollow-board-uuids (:boards fixed-org-data))))))

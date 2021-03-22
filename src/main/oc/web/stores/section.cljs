@@ -152,12 +152,11 @@
           old-change-data (dispatcher/change-data db)
           new-change-data (merge old-change-data change-data)
           ; active-users (dispatcher/active-users (:slug org-data) db)
-          ; follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)
           ]
       (timbre/debug "Change status data:" new-change-data)
       (-> db
         ; (fix-posts-new-label new-change-data)
-        ; (au/update-all-containers org-data change-data active-users follow-publishers-list)
+        ; (au/update-all-containers org-data change-data active-users)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 

@@ -256,8 +256,6 @@
                              (drv/drv :add-comment-data)
                              (drv/drv :users-info-hover)
                              (drv/drv :current-user-data)
-                             (drv/drv :follow-publishers-list)
-                             (drv/drv :followers-publishers-count)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
                              (rum/local nil ::show-picker)
@@ -306,8 +304,6 @@
   [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix loading-comments-count]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _current-user-data (drv/react s :current-user-data)
-        _follow-publishers-list (drv/react s :follow-publishers-list)
-        _followers-publishers-count (drv/react s :followers-publishers-count)
         add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads (filter au/comment? @(::threads s))

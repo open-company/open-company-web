@@ -10,7 +10,7 @@
   [db [_ org-slug author-uuid sort-type contrib-data]]
   (let [org-data (dispatcher/org-data db org-slug)
         prepare-container-data (-> contrib-data :collection (assoc :container-slug :contributions))
-        fixed-contrib-data (au/parse-contributions prepare-container-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) (dispatcher/follow-publishers-list org-slug db) sort-type)
+        fixed-contrib-data (au/parse-contributions prepare-container-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) sort-type)
         contrib-data-key (dispatcher/contributions-data-key org-slug author-uuid sort-type)
         posts-key (dispatcher/posts-data-key org-slug)
         merged-items (merge (get-in db posts-key)
@@ -37,7 +37,7 @@
                                                          :old-links (:links contrib-data)
                                                          :container-slug :contributions})
           org-data (dispatcher/org-data db org-slug)
-          fixed-contrib-data (au/parse-contributions prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) (dispatcher/follow-publishers-list org-slug db) sort-type direction)
+          fixed-contrib-data (au/parse-contributions prepare-contrib-data (dispatcher/change-data db) org-data (dispatcher/active-users org-slug db) sort-type direction)
           new-items-map (merge old-posts (:fixed-items fixed-contrib-data))
           new-contrib-data (-> fixed-contrib-data
                             (assoc :direction direction)
