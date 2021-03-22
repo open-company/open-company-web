@@ -49,20 +49,22 @@
                        (concat labels [saved-label])))))
     (if (or (get-in db (conj dispatcher/cmail-state-key :labels-floating-view))
             (get-in db (conj dispatcher/cmail-state-key :labels-inline-view)))
-      (update-in tdb (conj dispatcher/cmail-data-key :labels)
-                 (fn [labels]
-                   (let [found? (atom false)
-                         new-label (select-keys saved-label [:uuid :slug :color :name])
-                         updated-labels (mapv (fn [label]
-                                                (if (= (:uuid label) (:uuid saved-label))
-                                                  (do (reset! found? true)
-                                                      new-label)
-                                                  label))
-                                              labels)
-                         next-labels (if @found?
-                                       updated-labels
-                                       (vec (conj labels new-label)))]
-                     next-labels)))
+      (-> tdb
+          (update-in (conj dispatcher/cmail-data-key :labels)
+                     (fn [labels]
+                       (let [found? (atom false)
+                             new-label (select-keys saved-label [:uuid :slug :color :name])
+                             updated-labels (mapv (fn [label]
+                                                    (if (= (:uuid label) (:uuid saved-label))
+                                                      (do (reset! found? true)
+                                                          new-label)
+                                                      label))
+                                                  labels)
+                             next-labels (if @found?
+                                           updated-labels
+                                           (vec (conj labels new-label)))]
+                         next-labels)))
+          (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true))
       tdb)))
 
 (defmethod dispatcher/action :label-editor/update

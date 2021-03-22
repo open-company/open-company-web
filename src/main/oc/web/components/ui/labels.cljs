@@ -203,7 +203,9 @@
              :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
              :class (when (:can-edit? label)
                       "editable")
-             :on-click #(cmail-actions/toggle-cmail-label label)}
+             :on-click (fn [e]
+                         (dom-utils/event-stop! e)
+                         (cmail-actions/toggle-cmail-label label))}
             (carrot-checkbox {:selected (label-slugs (:slug label))})
             [:span.oc-label-dot
              {:style {:background-color (:color label)}}]

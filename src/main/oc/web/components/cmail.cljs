@@ -465,6 +465,9 @@
                         (when (:fullscreen cmail-state)
                           (fullscreen-focus-headline s))
                         (reset! (::last-fullscreen-state s) (:fullscreen cmail-state))))
+                    (when (:debounce-autosave @(drv/get-ref s :cmail-data))
+                      (debounced-autosave! s)
+                      (dis/dispatch! [:update (conj dis/cmail-data-key :debounce-autosave) false]))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component

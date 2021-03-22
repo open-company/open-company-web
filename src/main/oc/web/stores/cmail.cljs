@@ -45,33 +45,40 @@
 
 (defmethod dispatcher/action :cmail-toggle-label
   [db [_ toggle-label]]
-  (update-in db (concat dispatcher/cmail-data-key [:labels])
-             (fn [labels]
-               (let [cmail-labels-set (set (map :slug labels))]
-                 (if (cmail-labels-set (:slug toggle-label))
-                   (filterv #(not= (:slug %) (:slug toggle-label)) labels)
-                   (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])])))))))
+  (-> db
+      (update-in (conj dispatcher/cmail-data-key :labels)
+                 (fn [labels]
+                   (let [cmail-labels-set (set (map :slug labels))]
+                     (if (cmail-labels-set (:slug toggle-label))
+                       (filterv #(not= (:slug %) (:slug toggle-label)) labels)
+                       (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])]))))))
+      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
 
 (defmethod dispatcher/action :cmail-add-label
   [db [_ add-label]]
-  (update-in db (concat dispatcher/cmail-data-key [:labels])
-             (fn [labels]
-               (let [label-vals #(vec [(:slug %) (:uuid %)])
-                     cmail-labels-set (set (mapcat label-vals labels))
-                     add-label-map (select-keys add-label [:uuid :name :color :slug])
-                     add-label-set (set (label-vals add-label))
-                     label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
-                 (if (seq label-intersect)
-                   (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
-                            add-label-map
-                            %)
-                         labels)
-                   (vec (conj labels add-label-map)))))))
+  (-> db
+      (update-in (conj dispatcher/cmail-data-key :labels)
+                 (fn [labels]
+                   (let [label-vals #(vec [(:slug %) (:uuid %)])
+                         cmail-labels-set (set (mapcat label-vals labels))
+                         add-label-map (select-keys add-label [:uuid :name :color :slug])
+                         add-label-set (set (label-vals add-label))
+                         label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
+                     (if (seq label-intersect)
+                       (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
+                                add-label-map
+                                %)
+                             labels)
+                       (vec (conj labels add-label-map))))))
+      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
 
 (defmethod dispatcher/action :cmail-remove-label
   [db [_ remove-label]]
-  (update-in db (concat dispatcher/cmail-data-key [:labels]) (fn [labels]
-                                                               (filterv #(not= (:slug %) (:slug remove-label)) labels))))
+  (-> db
+      (update-in (conj dispatcher/cmail-data-key :labels)
+                 (fn [labels]
+                   (filterv #(not= (:slug %) (:slug remove-label)) labels)))
+      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
 
 (defn- labels-value-update [optional-value current-value]
   (if (boolean? optional-value) optional-value (not current-value)))
@@ -92,4 +99,6 @@
 
 (defmethod dispatcher/action :cmail-label-remove-last-label
   [db [_]]
-  (update-in db (conj dispatcher/cmail-data-key :labels) (comp vec butlast)))
+  (-> db
+      (update-in (conj dispatcher/cmail-data-key :labels) (comp vec butlast))
+      (assoc-in (conj dispatcher/cmail-data-key :debounce-autosave) true)))
