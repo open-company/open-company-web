@@ -211,7 +211,7 @@ div.stream-item {
 
   div.stream-item-header {
     position: relative;
-    min-height: 24px;
+    height: 24px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -220,17 +220,18 @@ div.stream-item {
 
     div.stream-item-header-left {
       position: relative;
-      min-height: 24px;
+      height: 24px;
       display: flex;
       flex-direction: column;
       flex-wrap: nowrap;
       align-items: flex-start;
       justify-content: flex-start;
       flex: 1 1 auto;
+      overflow: hidden;
 
       @include mobile() {
         width: 100%;
-        min-height: 32px;
+        height: 32px;
         display: block;
       }
 
