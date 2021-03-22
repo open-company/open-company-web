@@ -186,7 +186,7 @@
         current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
         show-invite-box (drv/react s :show-invite-box)
-        org-labels (drv/react s :org-labels)
+        org-labels (filter :slug (drv/react s :org-labels))
         ; filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
         ;                                          (and (not (s/starts-with? container-uuid drafts-board-prefix))
         ;                                               (not (= container-uuid (:uuid org-data)))))
