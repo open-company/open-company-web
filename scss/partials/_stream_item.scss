@@ -220,6 +220,10 @@ div.stream-item {
 
     &.has-labels {
       height: 48px;
+
+      div.stream-item-header-left {
+        height: 48px;
+      }
     }
 
     div.stream-item-header-left {
