@@ -20,19 +20,21 @@
    :environment ls/sentry-env})
 
 (defn sentry-setup []
-  (when (and (fn? (oget sentry-browser "init")) ls/local-dsn)
-    (let [sentry-params (init-parameters ls/local-dsn)]
-      (timbre/infof "Setup Sentry: %s" sentry-params)
-      (ocall sentry-browser "init" (clj->js sentry-params))
-      (.configureScope ^js sentry-browser (fn [scope]
-        (.setTag ^js scope "isMobile" (responsive/is-mobile-size?))
-        (.setTag ^js scope "hasJWT" (not (not (jwt/jwt))))
-        (when (jwt/jwt)
-          (timbre/debug "Set Sentry user:" (jwt/get-key :user-id))
-          (.setUser ^js scope (clj->js {:user-id (jwt/get-key :user-id)
-                                    :id (jwt/get-key :user-id)
-                                    :first-name (jwt/get-key :first-name)
-                                    :last-name (jwt/get-key :last-name)}))))))))
+  (let [sentry-params (init-parameters ls/local-dsn)]
+    (if-not (:dsn sentry-params)
+      (timbre/warnf "Empty Sentry DSN: %s" sentry-params)
+      (do
+        (timbre/debugf "Setup Sentry: %s" sentry-params)
+        (ocall sentry-browser "init" (clj->js sentry-params))
+        (.configureScope ^js sentry-browser (fn [scope]
+                                              (.setTag ^js scope "isMobile" (responsive/is-mobile-size?))
+                                              (.setTag ^js scope "hasJWT" (not (not (jwt/jwt))))
+                                              (when (jwt/jwt)
+                                                (timbre/debugf "Set Sentry user: %s" (jwt/get-key :user-id))
+                                                (.setUser ^js scope (clj->js {:user-id (jwt/get-key :user-id)
+                                                                              :id (jwt/get-key :user-id)
+                                                                              :first-name (jwt/get-key :first-name)
+                                                                              :last-name (jwt/get-key :last-name)})))))))))
 
 (def capture-error! sentry-utils/capture-error!)
 
