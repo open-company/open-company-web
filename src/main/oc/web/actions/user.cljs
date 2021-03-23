@@ -390,10 +390,10 @@
           (if password-reset?
             (do
               (cook/remove-cookie! :show-login-overlay)
-              (utils/after 200 #(router/nav! oc-urls/login)))
+              (utils/after 600 #(router/nav! oc-urls/login)))
             (do
               (nux-actions/new-user-registered "email")
-              (utils/after 200 #(router/nav! oc-urls/confirm-invitation-profile)))))
+              (utils/after 600 #(router/nav! oc-urls/confirm-invitation-profile)))))
         (dis/dispatch! [:pswd-collect/finish status]))))
   (dis/dispatch! [:pswd-collect password-reset?]))
 

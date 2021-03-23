@@ -138,15 +138,12 @@
                                       (let [times (if selected?
                                                     (disj digest-times-set t)
                                                     (conj digest-times-set t))
-                                            next-digest-delivery (map #(if (= (:team-id %) (:team-id org-data))
-                                                                         {:digest-times times
-                                                                          ;; add a flag so the server can distinguish what
-                                                                          ;; is changing to filter out not-allowed times
-                                                                          ;; if the team has no premium plan
-                                                                          :changed true
-                                                                          :team-id (:team-id org-data)}
-                                                                         %)
-                                                                       digest-delivery)]
+                                            rest-digest-delivery (filterv #(not= (:team-id %) (:team-id org-data)) digest-delivery)
+                                            existing-team-digest-delivery (or (some #(when (= (:team-id %) (:team-id org-data)) %) digest-delivery)
+                                                                              {:team-id (:team-id org-data)})
+                                            next-digest-delivery (vec (conj rest-digest-delivery (assoc existing-team-digest-delivery
+                                                                                                        :changed true
+                                                                                                        :digest-times times)))]
                                         (change! [:digest-delivery] next-digest-delivery)))]]
                 [:div.field-value.group
                   {:key (name t)
