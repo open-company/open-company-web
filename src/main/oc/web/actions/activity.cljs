@@ -545,6 +545,7 @@
     (secure-activity-get)
     (let [org-slug (dis/current-org-slug)
           entry-link (utils/link-for (:links entry-data) "self")]
+      (timbre/infof "Loading entry %s for org %s with link %s" (:uuid entry-data) org-slug entry-link)
       (dis/dispatch! [:activity-get {:org-slug org-slug
                                      :board-slug (:board-slug entry-data)
                                      :activity-uuid (:uuid entry-data)}])
@@ -883,6 +884,7 @@
   ([cb secure-uuid]
    (let [link-with-replacements (utils/link-for (:links (dis/api-entry-point)) "partial-secure" {} {:org-slug (dis/current-org-slug) :secure-uuid secure-uuid})
          secure-link (or link-with-replacements (build-secure-activity-link (dis/current-org-slug) secure-uuid))]
+     (timbre/infof "Loading secure entry %s for org %s with link %s" secure-uuid (dis/current-org-slug) secure-link)
      (api/get-secure-entry secure-link
       (fn [resp]
         (secure-activity-get-finish secure-uuid resp)
