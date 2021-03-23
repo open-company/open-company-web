@@ -44,7 +44,7 @@
 (def preserved-keys
   [:resource-type :uuid :sort-value :unseen :unseen-comments :replies-data :board-slug :ignore-comments
    :container-seen-at :publisher? :published-at :expanded-replies :comments-loaded? :comments-count
-   :for-you-context :last-activity-at :pinned-at :labels])
+   :for-you-context :last-activity-at :pinned-at])
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -487,7 +487,7 @@
 (defun parse-comment
   ([nil _ _ & _]
    {})
-  
+
   ([_ nil _ & _]
    {})
 
@@ -948,6 +948,7 @@
 
   ([container-data change-data org-data active-users sort-type {:keys [direction _load-comments?] :as _options}]
     (when container-data
+
       (let [all-boards (:boards org-data)
             boards-map (zipmap (map :slug all-boards) all-boards)
             with-fixed-activities* (reduce (fn [ret item]
@@ -1170,8 +1171,8 @@
 
 (defn update-all-containers [db org-data change-data active-users follow-publishers-list]
   (-> db
-   (update-posts org-data change-data active-users)
-   (update-boards org-data change-data active-users)
-   (update-containers org-data change-data active-users)
-   (update-contributions org-data change-data active-users follow-publishers-list)
-   (update-label-entries org-data change-data active-users)))
+      (update-posts org-data change-data active-users)
+      (update-boards org-data change-data active-users)
+      (update-containers org-data change-data active-users)
+      (update-contributions org-data change-data active-users follow-publishers-list)
+      (update-label-entries org-data change-data active-users)))
