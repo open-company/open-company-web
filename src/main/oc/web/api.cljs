@@ -11,6 +11,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.poll :as poll-utils]
             [oc.web.utils.sentry :as sentry]
+            [oc.web.utils.label :as label-utils]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
@@ -434,8 +435,9 @@
   (if (and create-board-link board-data)
     (let [fixed-board-data (select-keys board-data board-allowed-keys)
           fixed-entries (mapv #(-> %
-                                (select-keys (conj entry-allowed-keys :uuid :secure-uuid))
-                                (poll-utils/clean-polls))
+                                   (select-keys (conj entry-allowed-keys :uuid :secure-uuid))
+                                   (poll-utils/clean-polls)
+                                   (label-utils/clean-entry-labels))
                          (:entries board-data))
           with-entries (if (pos? (count fixed-entries))
                          (assoc fixed-board-data :entries fixed-entries)
@@ -836,8 +838,9 @@
   [create-entry-link entry-data edit-key callback]
   (if (and create-entry-link entry-data)
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
        {:headers (headers-for-link create-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -850,8 +853,9 @@
   [publish-entry-link entry-data callback]
   (if (and entry-data publish-entry-link)
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
@@ -863,8 +867,9 @@
   [patch-entry-link entry-data edit-key callback]
   (if patch-entry-link
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link patch-entry-link) (relative-href patch-entry-link)
        {:headers (headers-for-link patch-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -1103,7 +1108,7 @@
 (defn create-label [create-label-link label-data callback]
   (if create-label-link
     (let [cleaned-label-data (-> label-data
-                                 (select-keys label-allowed-keys)
+                                 (label-utils/clean-label)
                                  (cljs->json))]
       (storage-http (method-for-link create-label-link) (relative-href create-label-link)
       {:headers (headers-for-link create-label-link)

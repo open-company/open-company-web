@@ -3,7 +3,6 @@
   (:require [oc.web.dispatcher :as dis]
             [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
-            [cuerdas.core :as string]
             [taoensso.timbre :as timbre]
             [oc.lib.color :as lib-color]
             [oc.web.lib.json :refer (json->cljs)]
@@ -11,48 +10,12 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.label :as label-utils]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.ws.interaction-client :as ws-ic]
-            [cljs.reader :refer (read-string)]))
+            [oc.web.ws.interaction-client :as ws-ic]))
 
 (def max-label-name-length 40)
-
-;; Data parse
-
-(defn hex->rgb [hex-color]
-  (let [splitted-color (->> (string/split hex-color #"")
-                            (remove #(or (string/empty-or-nil? %)
-                                         (= "#" %)))
-                            vec)
-        colors (rest splitted-color)
-        fixed-colors (if (= 3 (count colors))
-                       (mapcat (partial repeat 2) colors)
-                       colors)
-        red (take 2 fixed-colors)
-        green (take 2 (drop 2 fixed-colors))
-        blue (take 2 (drop 4 fixed-colors))]
-    (mapv #(let [conjed-c (conj % "0x")
-                 joined-c (string/join conjed-c)]
-             (read-string joined-c))
-          [red green blue])))
-
-
-(defn parse-label [label-map]
-  
-  (hex->rgb (:color label-map))
-
-  (-> label-map
-      (assoc :rgb-color (when (:color label-map)
-                          (lib-color/hex->rgb (:color label-map))))
-      (assoc :can-edit? (hateoas/link-for (:links label-map) "partial-update"))
-      (assoc :can-delete? (hateoas/link-for (:links label-map) "delete"))))
-
-(defn parse-labels [labels-resp]
-  (->> labels-resp
-      :collection
-      :items
-      (mapv parse-label)))
 
 (defn user-labels [org-labels-list]
    (reverse (sort-by :count org-labels-list)))
@@ -64,7 +27,7 @@
   ([org-slug resp] (get-labels-finished org-slug resp nil))
   ([org-slug finish-cb {:keys [body success]}]
    (let [response-body (when success (json->cljs body))
-         parsed-labels (parse-labels response-body)
+         parsed-labels (label-utils/parse-labels response-body)
          org-labels-data (-> response-body
                              (dissoc :items)
                              (assoc :org-labels (org-labels parsed-labels))
@@ -108,7 +71,7 @@
                       (fn [{:keys [body success]}]
                          (dismiss-label-editor)
                          (get-labels)
-                         (let [label (when success (parse-label (json->cljs body)))]
+                         (let [label (when success (label-utils/parse-label (json->cljs body)))]
                            (dis/dispatch! [:label-saved (dis/current-org-slug) label])
                            (when-not (:collapsed (dis/cmail-state))
                              (cmail-actions/add-cmail-label label)))))))

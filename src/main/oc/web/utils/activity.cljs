@@ -7,12 +7,14 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as ou]
             [oc.web.utils.pin :as pi]
+            [oc.web.utils.label :as lu]
             [oc.web.urls :as oc-urls]
             [oc.lib.html :as html-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.lib.color :as lib-color]
             [oc.web.utils.comment :as cu]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
@@ -641,7 +643,6 @@
                                (or (:board-access entry-data) (:access board-data))
                                "private")
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
-          is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
           fixed-publisher (when published?
                             (get active-users (-> entry-data :publisher :user-id)))
@@ -676,7 +677,8 @@
         (assoc :home-pinned (map? (get-in  entry-data [:pins (keyword ls/seen-home-container-id)])))
         (assoc :board-pinned (map? (get-in  entry-data [:pins (keyword (:board-uuid entry-data))])))
         (pi/can-home-pin? (jwt/user-id) org-data)
-        (pi/can-board-pin? (jwt/user-id) org-data board-data))))))
+        (pi/can-board-pin? (jwt/user-id) org-data board-data)
+        (update :labels lu/parse-entry-labels))))))
 
 (defn parse-org
   "Fix org data coming from the API."
