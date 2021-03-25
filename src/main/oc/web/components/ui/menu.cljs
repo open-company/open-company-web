@@ -162,7 +162,7 @@
                                  (team-actions/invite-user-link))
         native-app-data (detect-native-app)
         web-app-version client-version
-        build-version (when (seq ls/sentry-release-deploy) (str "build: " ls/sentry-release-deploy))
+        build-version (when (seq ls/sentry-deploy) (str "build: " ls/sentry-deploy))
         short-app-version (cond
                             ua/mobile-app? (str "Version " expo-app-version)
                             ua/desktop-app? (get-desktop-version)

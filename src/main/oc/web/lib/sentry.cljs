@@ -13,7 +13,7 @@
           :deployKey ls/deploy-key}
    :sourceRoot ls/web-server
    :release ls/sentry-release
-   :deploy ls/sentry-release-deploy
+   :deploy ls/sentry-deploy
    :debug (= ls/log-level "debug")
    :dsn dsn
    :normalizeDepth 6
