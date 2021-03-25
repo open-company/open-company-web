@@ -1364,6 +1364,15 @@ $header_top_margin: 24;
   *.carrot-no-preview {
     display: none !important;
     height: 0 !important;
+    min-height: unset!important;
+  }
+
+  // Do not hide paragraph, sometimes they have content to show in FoC
+  // for example FF keeps using the same element and class when new Ps
+  // are added in content-editable mode
+  p.carrot-no-preview {
+    height: auto!important;
+    display: block!important;
   }
 
   blockquote, pre, code {
