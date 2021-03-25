@@ -41,6 +41,6 @@
             ;;                        "px")}}]
             (or delay?
                 (not data-ready?))
-            [:div]
+            [:div.lazy-stream-pre-render-view]
             :else
             (stream-comp))]))
