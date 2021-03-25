@@ -32,14 +32,15 @@
         collapsed-foc? (or (= foc-layout dis/other-foc-layout)
                            (= current-board-slug "replies"))]
     [:div.lazy-stream
-      (cond (not data-ready?)
-            [:div.lazy-stream-interstitial
-             {:class (when collapsed-foc? "collapsed")
-              :style {:height (str (+ (dis/route-param :scroll-y)
-                                      (or (.. js/document -documentElement -clientHeight)
-                                          (.-innerHeight js/window)))
-                                   "px")}}]
-            delay?
+      (cond ;; (not data-ready?)
+            ;; [:div.lazy-stream-interstitial
+            ;;  {:class (when collapsed-foc? "collapsed")
+            ;;   :style {:height (str (+ (dis/route-param :scroll-y)
+            ;;                           (or (.. js/document -documentElement -clientHeight)
+            ;;                               (.-innerHeight js/window)))
+            ;;                        "px")}}]
+            (or delay?
+                (not data-ready?))
             [:div]
             :else
             (stream-comp))]))
