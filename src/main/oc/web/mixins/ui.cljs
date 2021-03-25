@@ -25,9 +25,10 @@
    s)
    :did-update (fn [s]
                  (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
-                        #(doto (js/$ %2)
-                           (.tooltip "fixTitle")
-                           (.tooltip "hide")))
+                        (fn [_ el]
+                          (doto (js/$ el)
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide"))))
                  s)})
 
 (def no-scroll-mixin

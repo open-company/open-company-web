@@ -122,3 +122,4 @@
 
 ;; Labels
 (defonce labels-enabled? true)
+(defonce max-entry-labels 3)

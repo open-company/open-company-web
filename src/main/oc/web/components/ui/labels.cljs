@@ -1,9 +1,9 @@
 (ns oc.web.components.ui.labels
   (:require [rum.core :as rum]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget)]
             [cuerdas.core :as string]
             [oc.web.urls :as oc-urls]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.color :as color-utils]
@@ -183,6 +183,7 @@
   refresh-labels-mixin
   (drv/drv :user-labels)
   (drv/drv :cmail-data)
+  ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
     (when-not (dom-utils/event-cotainer-has-class e "alert-modal")
       (cmail-actions/toggle-cmail-labels-views false))))
@@ -192,7 +193,9 @@
         label-slugs (->> cmail-data
                           :labels
                           (map :slug)
-                          set)]
+                          set)
+        is-mobile? (responsive/is-mobile-size?)
+        lock-add? (>= (count (:labels cmail-data)) ls/max-entry-labels)]
     [:div.labels-picker.label-modal-view
      [:div.labels-picker-inner
       {:ref :labels-picker-inner}
@@ -202,16 +205,28 @@
        [:div.oc-labels-title
         "Add labels"]
        (if (seq org-labels)
-         (for [label org-labels]
+         (for [label org-labels
+               :let [selected? (label-slugs (:slug label))
+                     click-cb (fn [e]
+                                (when e
+                                  (dom-utils/event-stop! e))
+                                (when (or (not lock-add?)
+                                          selected?)
+                                  (cmail-actions/toggle-cmail-label label)))]]
            [:div.oc-label
             {:data-label-slug (:slug label)
              :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
              :class (when (:can-edit? label)
                       "editable")
-             :on-click (fn [e]
-                         (dom-utils/event-stop! e)
-                         (cmail-actions/toggle-cmail-label label))}
-            (carrot-checkbox {:selected (label-slugs (:slug label))})
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-original-title (if (and lock-add?
+                                           (not selected?))
+                                    "Max labels limit reached, remove another label before adding one."
+                                    "")
+             :on-click click-cb}
+            (carrot-checkbox {:selected selected?})
             [:span.oc-label-dot
              {:style {:background-color (:color label)}}]
             [:span.oc-label-name

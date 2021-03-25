@@ -1,6 +1,7 @@
 (ns oc.web.stores.label
   (:require [oc.web.dispatcher :as dispatcher]
-            [oc.web.utils.activity :as au]))
+            [oc.web.utils.activity :as au]
+            [oc.web.utils.label :as label-utils]))
 
 (defmethod dispatcher/action :labels-loaded
   [db [_ org-slug labels-data]]
@@ -48,7 +49,8 @@
                        updated-labels
                        (concat labels [saved-label])))))
     (if (or (get-in db (conj dispatcher/cmail-state-key :labels-floating-view))
-            (get-in db (conj dispatcher/cmail-state-key :labels-inline-view)))
+            (get-in db (conj dispatcher/cmail-state-key :labels-inline-view))
+            (label-utils/can-add-label? (get-in db (conj dispatcher/cmail-data-key :labels))))
       (-> tdb
           (update-in (conj dispatcher/cmail-data-key :labels)
                      (fn [labels]

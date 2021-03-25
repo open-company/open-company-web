@@ -1,6 +1,7 @@
 (ns oc.web.utils.label
   (:require [oc.lib.color :as lib-color]
-            [oc.lib.hateoas :as hateoas]))
+            [oc.lib.hateoas :as hateoas]
+            [oc.web.local-settings :as ls]))
 
 ;; Data parse
 
@@ -38,3 +39,6 @@
 
 (defn clean-labels [labels-data]
   (mapv clean-label labels-data))
+
+(defn can-add-label? [labels]
+  (< (count labels) ls/max-entry-labels))

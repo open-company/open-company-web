@@ -2,7 +2,8 @@
   (:require [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.utils :as utils]
             [clojure.set :as clj-set]
-            [oc.web.actions.cmail :as cmail-actions]))
+            [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.utils.label :as label-utils]))
 
 (defmethod dispatcher/action :cmail-expand
   [db [_]]
@@ -45,32 +46,46 @@
 
 (defmethod dispatcher/action :cmail-toggle-label
   [db [_ toggle-label]]
-  (-> db
-      (update-in (conj dispatcher/cmail-data-key :labels)
-                 (fn [labels]
-                   (let [cmail-labels-set (set (map :slug labels))]
-                     (if (cmail-labels-set (:slug toggle-label))
-                       (filterv #(not= (:slug %) (:slug toggle-label)) labels)
-                       (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])]))))))
-      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
+  (let [cmail-labels (get-in db (conj dispatcher/cmail-data-key :labels))
+        cmail-labels-set (set (map :slug cmail-labels))
+        label-is-present? (cmail-labels-set (:slug toggle-label))
+        can-change? (or label-is-present?
+                        (label-utils/can-add-label? cmail-labels))]
+    (if can-change?
+      (-> db
+          (update-in (conj dispatcher/cmail-data-key :labels)
+                    (fn [labels]
+                      (let [cmail-labels-set (set (map :slug labels))]
+                        (if (cmail-labels-set (:slug toggle-label))
+                          (filterv #(not= (:slug %) (:slug toggle-label)) labels)
+                          (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])]))))))
+          (assoc-in (conj dispatcher/cmail-data-key :has-changes) true))
+      db)))
 
 (defmethod dispatcher/action :cmail-add-label
   [db [_ add-label]]
-  (-> db
-      (update-in (conj dispatcher/cmail-data-key :labels)
-                 (fn [labels]
-                   (let [label-vals #(vec [(:slug %) (:uuid %)])
-                         cmail-labels-set (set (mapcat label-vals labels))
-                         add-label-map (select-keys add-label [:uuid :name :color :slug])
-                         add-label-set (set (label-vals add-label))
-                         label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
-                     (if (seq label-intersect)
-                       (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
-                                add-label-map
-                                %)
-                             labels)
-                       (vec (conj labels add-label-map))))))
-      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
+  (let [cmail-labels (get-in db (conj dispatcher/cmail-data-key :labels))
+        cmail-labels-set (set (map :slug cmail-labels))
+        label-is-present? (cmail-labels-set (:slug add-label))
+        can-change? (or label-is-present?
+                        (label-utils/can-add-label? cmail-labels))]
+    (if can-change?
+      (-> db
+          (update-in (conj dispatcher/cmail-data-key :labels)
+                     (fn [labels]
+                       (let [label-vals #(vec [(:slug %) (:uuid %)])
+                             cmail-labels-set (set (mapcat label-vals labels))
+                             add-label-map (select-keys add-label [:uuid :name :color :slug])
+                             add-label-set (set (label-vals add-label))
+                             label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
+                         (if (seq label-intersect)
+                           (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
+                                    add-label-map
+                                    %)
+                                 labels)
+                           (vec (conj labels add-label-map))))))
+          (assoc-in (conj dispatcher/cmail-data-key :has-changes) true))
+      db)))
 
 (defmethod dispatcher/action :cmail-remove-label
   [db [_ remove-label]]
