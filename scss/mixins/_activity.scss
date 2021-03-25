@@ -1323,7 +1323,7 @@ $header_top_margin: 24;
   max-height: #{$line_height * $preview_lines}px;
 
   & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2 {
-    &:not(:empty) {
+    &:not(.carrot-no-preview):not(:empty) {
       margin-top: 0!important;
       margin-bottom: 0!important;
       padding-top: 0!important;
@@ -1357,12 +1357,13 @@ $header_top_margin: 24;
     font-weight: normal;
   }
 
-  .carrot-no-preview {
-    display: none;
+  *:empty, * > *:only-child:empty {
+    display: none !important;
   }
 
-  *:empty, * > *:only-child:empty {
-    display: none;
+  *.carrot-no-preview {
+    display: none !important;
+    height: 0 !important;
   }
 
   blockquote, pre, code {
