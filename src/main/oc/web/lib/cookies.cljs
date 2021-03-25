@@ -38,11 +38,14 @@
 (defn- ^:private cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
 
+(def default-expire -1)
+(def default-path "/")
+
 (defn ^:export set-cookie!
   ([c-name c-value]
-    (set-cookie! c-name c-value -1))
+    (set-cookie! c-name c-value default-expire default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry]
-    (set-cookie! c-name c-value expiry "/"))
+    (set-cookie! c-name c-value expiry default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path]
     (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path c-domain c-secure]
