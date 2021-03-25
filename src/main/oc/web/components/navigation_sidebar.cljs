@@ -177,7 +177,8 @@
         is-following (= (keyword current-board-slug) :following)
         is-topics (= (keyword current-board-slug) :topics)
         is-bookmarks (= (keyword current-board-slug) :bookmarks)
-        is-contributions (seq current-contributions-id)
+        is-profile (and (seq current-contributions-id)
+                        (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
         show-boards (show-boards? s org-data)
         drafts-board (get-drafts-board org-data)
@@ -270,7 +271,7 @@
                               (not show-replies))
                      "top-border")}
            [:a.nav-link.profile.hover-item.group
-            {:class (utils/class-set {:item-selected is-contributions})
+            {:class (utils/class-set {:item-selected is-profile})
              :href (oc-urls/contributions (:user-id current-user-data))
              :on-click (partial profile-clicked (:user-id current-user-data))}
             [:div.nav-link-icon]
@@ -360,8 +361,8 @@
                   [:div.internal
                     {:class (utils/class-set {:new (seq (:unread board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
-                     :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]
+                     :key (str "board-list-" (name (:slug board)) "-internal")}
+                    (or (:name board) (:slug board))]]
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")

@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.lib.utils :as utils]))
 
 (def last-container-slug (atom nil))
@@ -18,7 +19,7 @@
                              (when-not (= container-slug @last-container-slug)
                                (reset! (::delay s) true)
                                (reset! last-container-slug container-slug)
-                               (utils/after 10 #(reset! (::delay s) false)))
+                               (utils/after nav-actions/feed-render-delay #(reset! (::delay s) false)))
                              s))
                           :did-mount (fn [s]
                            (utils/scroll-to-y (dis/route-param :scroll-y) 0)
@@ -29,8 +30,9 @@
         foc-layout (drv/react s :foc-layout)
         data-ready? (map? container-data)
         delay? @(::delay s)
-        collapsed-foc? (or (= foc-layout dis/other-foc-layout)
-                           (= current-board-slug "replies"))]
+        ;; collapsed-foc? (or (= foc-layout dis/other-foc-layout)
+        ;;                    (= current-board-slug "replies"))
+        ]
     [:div.lazy-stream
       (cond ;; (not data-ready?)
             ;; [:div.lazy-stream-interstitial

@@ -204,57 +204,53 @@
                                           :topics-view is-topics})}
                 ;; Board name and settings button
                 [:div.board-name
-                  (cond
-                    current-contributions-id
-                    [:div.board-name-with-icon.contributions
-                      [:div.board-name-with-icon-internal
-                        ; (str (:total-count container-data) " posts")
-                        (str "Latest from " (:short-name contributions-user-data))]]
-                    :else
-                    [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access container-data) "public")
-                                                  :home-icon is-following
-                                                  :unfollowing-icon is-unfollowing
-                                                  :all-icon is-all-posts
-                                                  :topics-icon is-topics
-                                                  :saved-icon is-bookmarks
-                                                  :drafts-icon is-drafts-board
-                                                  :replies-icon is-replies
-                                                  :board-icon (and (not is-container?)
-                                                                   (not is-contributions)
-                                                                   (not is-topics)
-                                                                   (not is-drafts-board)
-                                                                   (not current-activity-id))})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-inbox
-                                                   "Unread"
+                  [:div.board-name-with-icon
+                   [:div.board-name-with-icon-internal
+                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                            (not is-drafts-board))
+                                              :public (= (:access container-data) "public")
+                                              :contributions is-contributions
+                                              :home-icon is-following
+                                              :unfollowing-icon is-unfollowing
+                                              :all-icon is-all-posts
+                                              :topics-icon is-topics
+                                              :saved-icon is-bookmarks
+                                              :drafts-icon is-drafts-board
+                                              :replies-icon is-replies
+                                              :board-icon (and (not is-container?)
+                                                               (not is-contributions)
+                                                               (not is-topics)
+                                                               (not is-drafts-board)
+                                                               (not current-activity-id))})}
+                    (cond is-contributions
+                          (str "Latest from " (:short-name contributions-user-data))
 
-                                                   is-all-posts
-                                                   "All"
+                          is-inbox
+                          "Unread"
 
-                                                   is-topics
-                                                   "Explore"
+                          is-all-posts
+                          "All"
 
-                                                   is-bookmarks
-                                                   "Bookmarks"
+                          is-topics
+                          "Explore"
 
-                                                   is-following
-                                                   "Home"
+                          is-bookmarks
+                          "Bookmarks"
 
-                                                   is-unfollowing
-                                                   "Unfollowing"
+                          is-following
+                          "Home"
 
-                                                   is-replies
-                                                   "Activity"
+                          is-unfollowing
+                          "Unfollowing"
 
-                                                   :default
-                                                   ;; Fallback to the org board data
-                                                   ;; to avoid showing an empty name while loading
-                                                   ;; the board data
-                                                   (:name container-data)))}]])
+                          is-replies
+                          "Activity"
+
+                          :else
+                             ;; Fallback to the org board data
+                             ;; to avoid showing an empty name while loading
+                             ;; the board data
+                          (:name container-data))]]
                   (when (and (= (:access container-data) "private")
                              (not is-drafts-board))
                     [:div.private-board

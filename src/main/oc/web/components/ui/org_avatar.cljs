@@ -26,17 +26,21 @@
                    (.. (rum/dom-node s) -style (setProperty "--secondary-color" (or org-secondary-color (get-in ls/default-brand-color [theme-key :secondary])))))
                  s)}
   [s org-data show-org-avatar? show-org-name?]
-  [:div.org-avatar-container.group
-    {:class (utils/class-set {:no-avatar (or (not show-org-avatar?)
-                                             @(::img-load-failed s))})
-     :data-first-letter (first (:name org-data))}
-    (when show-org-avatar?
-      [:img.org-avatar-img
-       {:src (-> org-data :logo-url (img/optimize-org-avatar-url default-max-logo-height))
-        :on-error #(reset! (::img-load-failed s) true)}])
-    (when show-org-name?
-      [:span.org-name
-        {:dangerouslySetInnerHTML (utils/emojify (:name org-data))}])])
+  (let [has-name (seq (:name org-data))
+        org-name (if has-name
+                   (:name org-data)
+                   (utils/camel-case-str (:slug org-data)))]
+    [:div.org-avatar-container.group
+      {:class (utils/class-set {:no-avatar (or (not show-org-avatar?)
+                                              @(::img-load-failed s))})
+      :data-first-letter (first (:name org-data))}
+      (when show-org-avatar?
+        [:img.org-avatar-img
+        {:src (-> org-data :logo-url (img/optimize-org-avatar-url default-max-logo-height))
+          :on-error #(reset! (::img-load-failed s) true)}])
+      (when show-org-name?
+        [:span.org-name
+          org-name])]))
 
 (rum/defcs org-avatar
   "Org avatar component, params:
@@ -53,10 +57,6 @@
       {:class (when (string/blank? org-logo) "missing-logo")}
       (when org-data
         (let [org-slug (:slug org-data)
-              has-name (seq (:name org-data))
-              org-name (if has-name
-                          (:name org-data)
-                          (utils/camel-case-str org-slug))
               show-org-avatar? (not (string/blank? org-logo))
               show-org-name? (case show-org-name
                                :always
