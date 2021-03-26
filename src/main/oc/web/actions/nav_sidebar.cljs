@@ -39,9 +39,25 @@
 ;; :user-info-{uuid}
 ;; :follow-picker
 
-(defn- refresh-contributions-data [author-uuid]
+(def feed-render-delay 100)
+
+(defn- refresh-contributions-data! [author-uuid]
   (when author-uuid
-    (contributions-actions/contributions-get author-uuid)))
+    (utils/after feed-render-delay #(contributions-actions/contributions-get author-uuid))))
+
+(defn- reload-current-container! []
+  (utils/after feed-render-delay #(activity-actions/reload-current-container)))
+
+(defn- reset-cmail-component! [to-slug]
+  ;; Let's change the QP section if it's not active and going to an editable section
+  (when (and (:collapsed (dis/cmail-state))
+             (not= to-slug utils/default-drafts-board-slug))
+    (utils/after (/ feed-render-delay 2)
+     #(when-let* [nav-to-board-data (dis/org-board-data to-slug)
+                  edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
+       (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
+                                                  :board-name (:name nav-to-board-data)}])
+       (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)])))))
 
 (defn- refresh-label-data [label-slug]
   (when label-slug
@@ -94,7 +110,7 @@
           (.pushState (.-history js/window) #js {} (.-title js/document) url)
           (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
           (when refresh?
-            (refresh-contributions-data author-uuid)))))))))
+            (refresh-contributions-data! author-uuid)))))))))
 
 (defn nav-to-label!
   ([e label-slug url]
@@ -141,13 +157,11 @@
    (when (responsive/is-mobile-size?)
      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
      (notif-actions/hide-mobile-user-notifications))
-   (utils/after 0 (fn []
+  ;;  (utils/after 0 (fn []
     (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
           org-slug (dis/current-org-slug)
           sort-type (activity-actions/saved-sort-type org-slug board-slug)
-          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
-          is-container? (dis/is-container? board-slug)
-          org-data (dis/org-data)]
+          is-container? (dis/is-container? board-slug)]
       (if (= current-path url)
         (maybe-refresh-container (str "-container-" board-slug))
         (do ;; If user clicked on a different section/container
@@ -162,17 +176,8 @@
                                      dis/router-opts-key [dis/router-dark-allowed-key]})
           (.pushState (.-history js/window) #js {} (.-title js/document) url)
           (when refresh?
-            (activity-actions/reload-current-container))
-          ;; Let's change the QP section if it's not active and going to an editable section
-          (when (and (not is-container?)
-                     (not is-drafts-board?)
-                     (:collapsed (dis/cmail-state)))
-            (when-let* [nav-to-board-data (dis/org-board-data org-data board-slug)
-                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
-              (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
-                                                         :board-name (:name nav-to-board-data)
-                                                         :publisher-board (:publisher-board nav-to-board-data)}])
-              (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)]))))))))))
+            (reload-current-container!))
+          (reset-cmail-component! board-slug)))))) ;;))
 
 (defn dismiss-post-modal [e]
   (let [route (dis/route)

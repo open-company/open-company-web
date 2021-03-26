@@ -6,7 +6,7 @@
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.utils :as utils]))
 
-(def default-avatar "/img/ML/happy_face_purple.svg")
+(def default-avatar "/img/ML/happy_face_red.svg")
 (def other-default-avatars
  ["/img/ML/happy_face_green.svg"
   "/img/ML/happy_face_blue.svg"

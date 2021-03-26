@@ -213,62 +213,57 @@
                 ;; Board name and settings button
                 [:div.board-name
                  {:class (when is-topics "topics-header")}
-                  (cond
-                    current-contributions-id
-                    [:div.board-name-with-icon.contributions
-                      [:div.board-name-with-icon-internal
-                        ; (str (:total-count container-data) " posts")
-                        (str "Latest from " (:short-name contributions-user-data))]]
-                    :else
-                    [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access container-data) "public")
-                                                  :label-icon is-label
-                                                  :home-icon is-following
-                                                  :unfollowing-icon is-unfollowing
-                                                  :all-icon is-all-posts
-                                                  :topics-icon is-topics
-                                                  :saved-icon is-bookmarks
-                                                  :drafts-icon is-drafts-board
-                                                  :replies-icon is-replies
-                                                  :board-icon (and (not is-container?)
-                                                                   (not is-contributions)
-                                                                   (not is-topics)
-                                                                   (not is-drafts-board)
-                                                                   (not is-label)
-                                                                   (not current-activity-id))})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-inbox
-                                                   "Unread"
+                  [:div.board-name-with-icon
+                   [:div.board-name-with-icon-internal
+                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                            (not is-drafts-board))
+                                              :public (= (:access container-data) "public")
+                                              :contributions is-contributions
+                                              :label-icon is-label
+                                              :home-icon is-following
+                                              :unfollowing-icon is-unfollowing
+                                              :all-icon is-all-posts
+                                              :topics-icon is-topics
+                                              :saved-icon is-bookmarks
+                                              :drafts-icon is-drafts-board
+                                              :replies-icon is-replies
+                                              :board-icon (and (not is-container?)
+                                                               (not is-contributions)
+                                                               (not is-topics)
+                                                               (not is-drafts-board)
+                                                               (not current-activity-id))})}
+                    (cond is-contributions
+                          (str "Latest from " (:short-name contributions-user-data))
 
-                                                   is-all-posts
-                                                   "All"
+                          is-inbox
+                          "Unread"
 
-                                                   is-topics
-                                                   "Explore"
+                          is-all-posts
+                          "All"
 
-                                                   is-bookmarks
-                                                   "Bookmarks"
+                          is-topics
+                          "Explore"
 
-                                                   is-following
-                                                   "Home"
+                          is-bookmarks
+                          "Bookmarks"
 
-                                                   is-unfollowing
-                                                   "Unfollowing"
+                          is-following
+                          "Home"
 
-                                                   is-replies
-                                                   "Activity"
+                          is-unfollowing
+                          "Unfollowing"
 
-                                                   is-label
-                                                   (or (:name label-data) (:slug label-data) current-label-slug)
+                          is-label
+                          (or (:name label-data) (:slug label-data) current-label-slug)
+                          
+                          is-replies
+                          "Activity"
 
-                                                   :default
-                                                   ;; Fallback to the org board data
-                                                   ;; to avoid showing an empty name while loading
-                                                   ;; the board data
-                                                   (:name container-data)))}]])
+                          :else
+                             ;; Fallback to the org board data
+                             ;; to avoid showing an empty name while loading
+                             ;; the board data
+                          (:name container-data))]]
                   (when (and (= (:access container-data) "private")
                              (not is-drafts-board))
                     [:div.private-board

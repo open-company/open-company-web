@@ -5,7 +5,7 @@
             [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
-(defonce _lock-counter (atom 0))
+(defonce ^{:export true} _lock-counter (atom 0))
 
 (defn lock-page-scroll
   "Add no-scroll class to the page body tag to lock the scroll"
