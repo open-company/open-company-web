@@ -536,7 +536,7 @@
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-personal-note.oc-input
               {:class utils/hide-class
-               :content-editable true
+               :content-editable "plaintext-only"
                :placeholder "Add a personal note to your invitation..."
                :ref "personal-note"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "personal-note") %)
