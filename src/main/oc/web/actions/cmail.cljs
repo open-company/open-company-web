@@ -199,8 +199,11 @@
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
-  (cmail-reset)
-  (dom-utils/unlock-page-scroll))
+  (let [cmail-state (dis/cmail-state)]
+    (when (and (:fullscreen cmail-state)
+               (not (:collapsed cmail-state)))
+      (dom-utils/unlock-page-scroll)))
+  (cmail-reset))
 
 (defn cmail-fullscreen []
   (let [saved-distractoin-free-state (cook/get-cookie (cmail-distraction-free-cookie))]
