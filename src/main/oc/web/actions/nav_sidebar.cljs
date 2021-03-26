@@ -61,7 +61,7 @@
 
 (defn- refresh-label-data [label-slug]
   (when label-slug
-    (label-actions/label-entries-get label-slug)))
+    (utils/after feed-render-delay #(label-actions/label-entries-get label-slug))))
 
 (def ^:private click-throttle-ms (* 1000 15))
 
@@ -123,26 +123,25 @@
    (when (responsive/is-mobile-size?)
      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
      (notif-actions/hide-mobile-user-notifications))
-   (utils/after 0 (fn []
-    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-          org-slug (dis/current-org-slug)
-          sort-type (activity-actions/saved-sort-type org-slug label-slug)]
-      (if (= current-path url)
-        (maybe-refresh-container (str "-label-" label-slug))
-        (do ;; If user clicked on a different section/container
-            ;; let's switch to it using pushState and changing
-            ;; the internal router state
-          (routing-actions/routing! {:org org-slug
-                                     :label label-slug
-                                     :sort-type sort-type
-                                     :scroll-y back-y
-                                     :query-params (dis/query-params)
-                                     :route [org-slug label-slug sort-type "dashboard"]
-                                     dis/router-opts-key [dis/router-dark-allowed-key]})
-          (.pushState (.-history js/window) #js {} (.-title js/document) url)
-          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-          (when refresh?
-            (refresh-label-data label-slug)))))))))
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+         org-slug (dis/current-org-slug)
+         sort-type (activity-actions/saved-sort-type org-slug label-slug)]
+     (if (= current-path url)
+       (maybe-refresh-container (str "-label-" label-slug))
+       (do ;; If user clicked on a different section/container
+           ;; let's switch to it using pushState and changing
+           ;; the internal router state
+         (routing-actions/routing! {:org org-slug
+                                    :label label-slug
+                                    :sort-type sort-type
+                                    :scroll-y back-y
+                                    :query-params (dis/query-params)
+                                    :route [org-slug label-slug sort-type "dashboard"]
+                                    dis/router-opts-key [dis/router-dark-allowed-key]})
+         (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         (when refresh?
+           (refresh-label-data label-slug)))))))
 
 (defn nav-to-url!
   ([e board-slug url]
@@ -173,6 +172,7 @@
                                     :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
                                     dis/router-opts-key [dis/router-dark-allowed-key]})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
            (reload-current-container!))
          (reset-cmail-component! board-slug))))))
