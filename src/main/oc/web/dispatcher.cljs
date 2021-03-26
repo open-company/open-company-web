@@ -730,7 +730,9 @@
 (defmulti action (fn [_db [action-type & _]]
                    (when (and (not= action-type :input)
                               (not= action-type :update)
-                              (not= action-type :entry-toggle-save-on-exit))
+                              (not= action-type :entry-toggle-save-on-exit)
+                              (not= action-type :cmail-state/update)
+                              (not= action-type :cmail-data/update))
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
