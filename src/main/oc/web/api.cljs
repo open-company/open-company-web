@@ -263,7 +263,6 @@
 
 (def new-comment-allowed-keys (concat comment-allowed-keys [:uuid :author-wants-follow?]))
 
-
 (def user-allowed-keys [:first-name :last-name :current-password :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles :digest-delivery])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
