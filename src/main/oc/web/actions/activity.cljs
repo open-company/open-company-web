@@ -563,7 +563,8 @@
   (get-org (dis/org-data) user-utils/load-follow-data))
 
 (defn- reload-current-container []
-  (when-not (dis/current-activity-id)
+  (when (and (not (dis/current-label-slug))
+             (not (dis/current-activity-id)))
     (let [board-slug (dis/current-board-slug)
           org-data (dis/org-data)
           board-data (dis/current-container-data)]
