@@ -49,11 +49,65 @@
     (.setPathPrefix (oget js/window "location.origin"))
     (.setUseFragment false)))
 
+(defn setup-navigation! [cb-fn]
+  (let [h (doto (make-history)
+            (events/listen HistoryEventType/NAVIGATE
+              ;; wrap in a fn to allow live reloading
+                           cb-fn)
+            (.setEnabled true))]
+    (reset! history h)))
+
+;; Navigation
+
+(defn page-title []
+  (oget js/document "?title"))
+
+(defn set-page-title! [title]
+  (oset! js/document "title" title))
+
+(defn push-state!
+  ([url] (push-state! url (page-title)))
+  ([url title]
+   (ocall @history "pushState" #js {} title url)))
+
+(defn replace-state!
+  ([url] (replace-state! url (page-title)))
+  ([url title]
+  ;;  (ocall js/window "history.replaceState" #js {} (oget js/document "?title") new-path)
+   (ocall @history "replaceState" #js {} title url)))
+
 ; FIXME: remove the warning of history not found
 (defn ^:export nav! [token]
   (timbre/info "nav!" token)
   (timbre/debug "history:" @history)
   (.setToken ^js @history token))
+
+(defn ^:export redirect! [loc]
+  (timbre/info "redirect!" loc)
+  (oset! js/window "location" loc))
+
+(defn ^:export location-replace! [url]
+  (ocall js/window "location.replace" url))
+
+(defn ^:export redirect-404! []
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")
+        loc-hash (oget js/window "location.hash")
+        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
+    (timbre/info "redirect-404!" encoded-url)
+    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
+    (location-replace! (str "/404?path=" encoded-url))))
+
+(defn ^:export redirect-500! []
+  (let [loc-pathname (oget js/window "location.pathname")
+        loc-search (oget js/window "location.search")
+        loc-hash (oget js/window "location.hash")
+        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
+    (timbre/info "redirect-500!" encoded-url)
+    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
+    (location-replace! (str "/500?path=" encoded-url))))
+
+;; Navigation rewrites
 
 (defn ^:export rewrite-org-uuid-as-slug
   [org-uuid org-slug]
@@ -72,39 +126,12 @@
       (dis/dispatch! [:route/rewrite route-key board-slug])
       (ocall js/window "history.replaceState" #js {} (oget js/document "?title") new-path))))
 
-(defn ^:export redirect! [loc]
-  (timbre/info "redirect!" loc)
-  (oset! js/window "location" loc))
-
-(defn ^:export redirect-404! []
-  (let [loc-pathname (oget js/window "location.pathname")
-        loc-search (oget js/window "location.search")
-        loc-hash (oget js/window "location.hash")
-        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
-    (timbre/info "redirect-404!" encoded-url)
-    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (ocall js/window "location.replace" (str "/404?path=" encoded-url))))
-
-(defn ^:export redirect-500! []
-  (let [loc-pathname (oget js/window "location.pathname")
-        loc-search (oget js/window "location.search")
-        loc-hash (oget js/window "location.hash")
-        encoded-url (ocall js/window "encodeURIComponent" (str loc-pathname loc-search loc-hash))]
-    (timbre/info "redirect-500!" encoded-url)
-    ;; FIXME: can't use oc-urls/not-found because importing the ns create a circular deps
-    (ocall js/window "location.replace" (str "/500?path=" encoded-url))))
-
 (defn history-back! []
   (timbre/info "history-back!")
-  (ocall js/window "history.go" -1))
+  ;; (ocall js/window "history.go" -1)
+  (ocall @history :go -1))
 
-(defn setup-navigation! [cb-fn]
-  (let [h (doto (make-history)
-            (events/listen HistoryEventType/NAVIGATE
-              ;; wrap in a fn to allow live reloading
-                           cb-fn)
-            (.setEnabled true))]
-    (reset! history h)))
+;; Cookies
 
 (defn last-org-cookie
   "Cookie to save the last accessed org"

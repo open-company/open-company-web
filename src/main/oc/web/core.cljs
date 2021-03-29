@@ -4,7 +4,7 @@
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
             [cuerdas.core :as s]
-            [oc.web.rum-utils :as ru]
+            [oc.web.utils.rum :as ru]
             [oops.core :refer (oget ocall oset!)]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]
@@ -52,6 +52,7 @@
             [oc.web.urls :as urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.derivatives :as derivatives]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
@@ -70,12 +71,12 @@
 
 (defn drv-root [component target]
   (ru/drv-root {:state dis/app-state
-                :drv-spec (dis/drv-spec dis/app-state)
+                :drv-spec (derivatives/drv-spec dis/app-state)
                 :component component
                 :target target})
   (when-let [notifications-mount-point (sel1 [:div#oc-notifications-container])]
     (ru/drv-root {:state dis/app-state
-                  :drv-spec (dis/drv-spec dis/app-state)
+                  :drv-spec (derivatives/drv-spec dis/app-state)
                   :component notifications
                   :target notifications-mount-point})))
 
@@ -228,10 +229,8 @@
                                    :sort-type sort-type
                                    :query-params (:query-params params)
                                    :route [org route]
-                                   dis/router-opts-key [dis/router-dark-allowed-key]})
-        ;; load data from api
-        (when-not (dis/org-data)
-          (swap! dis/app-state merge {:loading true}))
+                                   dis/router-opts-key [dis/router-dark-allowed-key]}
+                                  (not (dis/org-data @dis/app-state org)))
         (check-nux query-params)
         (post-routing)
         ;; render component
@@ -306,22 +305,19 @@
     (when pre-routing?
       (pre-routing params true))
     ;; save the route
-    (routing-actions/routing! {:org org
-                               :activity (:entry params)
-                               :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
-                               :comment (:comment params)
-                               :query-params query-params
-                               :route (vec (remove nil?
-                                                   [org route secure-id]))
-                               dis/router-opts-key [dis/router-dark-allowed-key]})
-     ;; do we have the company data already?
-    (when (or ;; if the company data are not present
-              (not (dis/board-data))
-              ;; or the entries key is missing that means we have only
-              (not (:posts-list (dis/board-data)))
-              ;; a subset of the company data loaded with a SU
-              (not (dis/secure-activity-data)))
-      (swap! dis/app-state merge {:loading true}))
+    (let [org-data (dis/org-data @dis/app-state org)
+          secure-activity-data (dis/secure-activity-data org secure-id @dis/app-state)
+          loading? (or (not org-data) ;; if the company data are not present
+                       (not secure-activity-data))] ;; a subset of the company data loaded with a SU
+      (routing-actions/routing! {:org org
+                                 :activity (:entry params)
+                                 :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+                                 :comment (:comment params)
+                                 :query-params query-params
+                                 :route (vec (remove nil?
+                                                     [org route secure-id]))
+                                 dis/router-opts-key [dis/router-dark-allowed-key]}
+                                loading?))
     (post-routing)
     ;; render component
     (drv-root component target)))

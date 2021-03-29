@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.theme :as theme-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.ws.change-client :as ws-cc]
@@ -35,5 +36,13 @@
   (ws-nc/reset-connection!)
   (router/nav! (oc-urls/default-landing (:slug org))))
 
-(defn routing! [next-route-map]
-  (dis/dispatch! [:routing next-route-map]))
+(defn routing!
+  ([next-route-map]
+   (routing! next-route-map nil))
+  ([next-route-map loading?]
+   (dis/dispatch! [:routing next-route-map loading?])
+   (cmail-actions/maybe-reset-cmail)))
+
+(defn push-state! [route to-url]
+  (routing! route)
+  (router/push-state! to-url))

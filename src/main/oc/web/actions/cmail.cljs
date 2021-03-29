@@ -192,6 +192,9 @@
   (dis/dispatch! [:input dis/cmail-data-key (get-default-board)])
   (dis/dispatch! [:input dis/cmail-state-key {:collapsed true :key (utils/activity-uuid)}]))
 
+(defn maybe-reset-cmail []
+  (utils/after 100 #(when (:collapsed (dis/cmail-state)) (cmail-reset))))
+
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
   (cmail-reset)

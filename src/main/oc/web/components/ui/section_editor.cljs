@@ -12,7 +12,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
-            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -102,6 +101,18 @@
 (def private-board-tooltip " Premium accounts can create private topics that are invite-only.")
 (def public-board-tooltip "Premium accounts can create public topics for sharing beyond your team.")
 
+(defn- section-add-cb [s]
+  (if @(::editing-existing-section? s)
+    (fn [sec-data note dismiss-action]
+      (if sec-data
+        (section-actions/section-save sec-data note dismiss-action)
+        (dismiss-action)))
+    @(drv/get-ref s :show-section-add-cb)))
+
+(defn- on-change [s section-data note dismiss-action]
+  (let [cb (section-add-cb s)]
+    (cb section-data note dismiss-action)))
+
 (rum/defcs section-editor <
   ;; Mixins
   mixins/strict-refresh-tooltips-mixin
@@ -128,6 +139,7 @@
   (drv/drv :team-roster)
   (drv/drv :current-user-data)
   (drv/drv :payments)
+  (drv/drv :show-section-add-cb)
   (mixins/autoresize-textarea :section-description)
   {:will-mount (fn [s]
    (team-actions/teams-get)
@@ -159,7 +171,7 @@
        (reset! (::slack-enabled s)
                (-> section-editing :slack-mirror :channel-id seq))))
    s)}
-  [s initial-section-data on-change from-section-picker]
+  [s initial-section-data]
   (let [org-data (drv/react s :org-data)
         no-drafts-boards (filter #(and (not (:draft %)) (not= (:slug %) utils/default-drafts-board-slug))
                           (:boards org-data))
@@ -185,7 +197,7 @@
         last-section-standing (= (count no-drafts-boards) 1)
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))
-        wrapped-on-change (fn [exit-cb]
+        wrapped-on-change (fn [state exit-cb]
                             (if (:has-changes @(drv/get-ref s :section-editing))
                               (alert-modal/show-alert
                                {:icon "/img/ML/trash.svg"
@@ -197,8 +209,8 @@
                                 :solid-button-title "Lose changes"
                                 :solid-button-cb #(do
                                                     (alert-modal/hide-alert)
-                                                    (on-change nil nil exit-cb))})
-                              (on-change nil nil exit-cb)))
+                                                    (on-change state nil nil exit-cb))})
+                              (on-change state nil nil exit-cb)))
         private-enabled? (or (= (:access initial-section-data) "private")
                              (:can-create-private-board? org-data))
         public-enabled? (or (= (:access initial-section-data) "public")
@@ -206,9 +218,9 @@
     [:div.section-editor-container
       {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
                     (utils/event-stop %)
-                    (wrapped-on-change nav-actions/close-all-panels))}
+                    (wrapped-on-change s nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(wrapped-on-change nav-actions/close-all-panels)}]
+        {:on-click #(wrapped-on-change s nav-actions/close-all-panels)}]
       [:div.section-editor.group
         {:ref :section-editor
          :on-click (fn [e]
@@ -241,13 +253,13 @@
                                     personal-note-node (rum/ref-node s "personal-note")
                                     personal-note (when personal-note-node (.-innerText personal-note-node))
                                     success-cb #(when (fn? on-change)
-                                                  (on-change % personal-note nav-actions/hide-section-editor))]
+                                                  (on-change s % personal-note nav-actions/hide-section-editor))]
                                 (section-actions/section-save-create section-editing section-name success-cb))))
                 :class (when disable-bt "disabled")}
               "Save"])]
           [:div.section-editor-header-left
             [:button.mlb-reset.cancel-bt
-             {:on-click #(wrapped-on-change nav-actions/hide-section-editor)}
+             {:on-click #(wrapped-on-change s nav-actions/hide-section-editor)}
              "Back"]]]
         [:div.section-editor-add
           [:div.section-editor-add-label

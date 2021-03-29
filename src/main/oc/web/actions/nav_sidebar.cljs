@@ -151,7 +151,9 @@
                                  (not cont-data))
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
-        back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
+        back-y (if (contains? route :back-to)
+                 (.. js/document -scrollingElement -scrollTop)
+                 (utils/page-scroll-top))]
     (if is-contributions?
       (nav-to-author! e contributions-id to-url back-y false)
       (nav-to-url! e board to-url back-y false))
@@ -199,9 +201,8 @@
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)
                      route-path*)]
-    (routing-actions/routing! route-path)
+    (routing-actions/push-state! route-path post-url)
     (cmail-actions/cmail-hide)
-    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)
     ;; Refresh the post data
     (cmail-actions/get-entry-with-uuid entry-board-slug entry-uuid))))
 

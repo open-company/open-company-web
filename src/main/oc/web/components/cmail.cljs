@@ -30,7 +30,7 @@
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]
-            [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
+            [oc.web.mixins.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
 
 (def self-board-name "All")
@@ -330,8 +330,8 @@
 (defn- reset-cmail [s]
   (when @(::unlock-scroll s)
     (dom-utils/unlock-page-scroll))
-  (when-let [tc @(::headline-autocomplete s)]
-    (emoji-autocomplete/destroy tc))
+  ;; (when-let [tc @(::headline-autocomplete s)]
+  ;;   (emoji-autocomplete/destroy tc))
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
         initial-body (if (seq (:body cmail-data))
@@ -355,7 +355,8 @@
     (utils/after 300 (fn []
                       (when-let [headline-el (headline-element s)]
                         (setup-headline s headline-el)
-                        (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete headline-el)))))
+                        ;; (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete headline-el))
+                        )))
     (reset! (::unlock-scroll s) scroll-lock?)
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
@@ -421,7 +422,7 @@
                    (rum/local 68 ::top-padding)
                    (rum/local false ::last-fullscreen-state)
                    (rum/local false ::unlock-scroll)
-                   (rum/local nil ::headline-autocomplete)
+                  ;;  (rum/local nil ::headline-autocomplete)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -431,13 +432,15 @@
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
-
-                   (mixins/on-click-out :cmail-container #(when (and (not (responsive/is-mobile-size?))
-                                                                     (-> %1 (drv/get-ref :cmail-state) deref :fullscreen)
-                                                                     (not (-> %1 (drv/get-ref :cmail-state) deref :distraction-free?))
-                                                                     (not (dom-utils/event-cotainer-has-class %2 "modal-wrapper"))
-                                                                     (not (dom-utils/event-cotainer-has-class %2 "nux-tooltip-container")))
-                                                            (close-cmail %1 %2)))
+                   (when-not (responsive/is-mobile-size?)
+                     (emoji-autocomplete/autocomplete-mixin "headline"))
+                   (mixins/on-click-out :cmail-container (fn [s e]
+                                                           (when (and (not (responsive/is-mobile-size?))
+                                                                      (:fullscreen @(drv/get-ref s :cmail-state))
+                                                                      (not (:distraction-free? @(drv/get-ref s :cmail-state)))
+                                                                      (not (dom-utils/event-cotainer-has-class e "modal-wrapper"))
+                                                                      (not (dom-utils/event-cotainer-has-class e "nux-tooltip-container")))
+                                                             (close-cmail s e))))
 
                    {:will-mount (fn [s]
                     (reset-cmail s)

@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
@@ -12,7 +11,6 @@
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
-            [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.loading :refer (loading)]
@@ -50,10 +48,14 @@
                            rum/reactive
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
+                           (drv/drv :app-loading?)
                            (drv/drv :theme)
+                           (drv/drv :nux)
                            (drv/drv :route/dark-allowed)
+                           (drv/drv :show-login-wall?)
+                           (drv/drv :show-activity-removed?)
+                           (drv/drv :current-panel)
                            (drv/drv :org-dashboard-data)
-                           (drv/drv :user-responded-to-push-permission?)
                            (theme-mixins/theme-mixin)
 
                            {:did-mount (fn [s]
@@ -64,127 +66,55 @@
                              (init-whats-new)
                              s)}
   [s]
-  (let [{:keys [orgs
-                org-data
-                jwt-data
-                current-org-slug
-                current-board-slug
-                current-contributions-id
-                current-entry-board-slug
-                current-activity-id
-                initial-section-editing
-                posts-data
-                is-sharing-activity
-                is-showing-alert
-                show-section-add-cb
+  (let [loading? (drv/react s :app-loading?)
+        theme-data (drv/react s :theme)
+        {:keys [org-data
+                show-alert-modal
                 activity-share-container
-                cmail-state
-                force-login-wall
-                panel-stack
-                app-loading
+                collapsed-cmail
                 user-info-data
-                active-users
-                search-active
+                current-panel
                 show-premium-picker?
                 payments-ui-upgraded-banner
-                nux
-                ui-tooltip]} (drv/react s :org-dashboard-data)
-        theme-data (drv/react s :theme)
+                ui-tooltip
+                show-activity-share?
+                initial-section-editing
+                show-search?
+                show-expanded-post?
+                show-wrt-view?
+                show-push-notification-permissions-modal?
+                show-user-info?]} (drv/react s :org-dashboard-data)
         _route-dark-allowed (drv/react s :route/dark-allowed)
+        nux (drv/react s :nux)
         is-mobile? (responsive/is-mobile-size?)
-        loading? (or ;; force loading screen
-                  app-loading
-                     ;; the org data are not loaded yet
-                  (not org-data)
-                     ;; No board or contributions specified
-                  (and (not current-board-slug)
-                       (not current-contributions-id)
-                          ;; but there are some
-                       (pos? (count (:boards org-data))))
-                     ;; Active users have not been loaded yet:
-                     ;; they are blocking since they are used to:
-                     ;; - init entries body and comments body for mentions
-                     ;; - show user's info on hover and in profile panels
-                     ;; - on mobile it's not blocking since cmail is closed
-                  (not (map? active-users)))
-        org-not-found (and (not (nil? orgs))
-                           (not ((set (map :slug orgs)) current-org-slug)))
-        section-not-found (and (not org-not-found)
-                               org-data
-                               (not current-contributions-id)
-                               (not (dis/is-container? current-board-slug))
-                               (not ((set (map :slug (:boards org-data))) current-board-slug)))
-        contributions-not-found (and (not org-not-found)
-                                     org-data
-                                     current-contributions-id
-                                     (map? active-users)
-                                     (get active-users (keyword current-contributions-id)))
-        current-activity-data (when current-activity-id
-                                (get posts-data current-activity-id))
-                             ;; org is present
-        entry-not-found (and (not org-not-found)
-                             ;; Users for mentions has not been loaded
-                             (map? active-users)
-                             ;; section is present
-                             (not section-not-found)
-                             ;; route is for a single post and it's been loaded
-                             current-activity-data
-                             ;; post wasn't found
-                             (or (= current-activity-data :404)
-                                 ;; route has wrong board slug/uuid for the current post
-                                 (and (map? current-activity-data)
-                                      (not (:loading current-activity-data))
-                                      (not= (:board-slug current-activity-data) current-entry-board-slug)
-                                      (not= (:board-uuid current-activity-data) current-entry-board-slug))))
-        show-login-wall (and (not jwt-data)
-                             (or force-login-wall
-                                 (and current-activity-id
-                                      (or org-not-found
-                                          section-not-found
-                                          contributions-not-found
-                                          entry-not-found))))
-        show-activity-removed (and jwt-data
-                                   entry-not-found)
+        show-login-wall (drv/react s :show-login-wall?)
+        show-activity-removed (drv/react s :show-activity-removed?)
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
-        open-panel (last panel-stack)
-        show-section-editor (= open-panel :section-edit)
-        show-section-add (= open-panel :section-add)
-        show-reminders? (= open-panel :reminders)
-        show-reminder-edit? (and open-panel
-                                 (s/starts-with? (name open-panel) "reminder-"))
-        show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))
-        show-mobile-cmail? (and cmail-state
-                                (not (:collapsed cmail-state))
+        show-section-editor (= current-panel :section-edit)
+        show-section-add (= current-panel :section-add)
+        show-reminders? (= current-panel :reminders)
+        show-reminder-edit? (and current-panel
+                                 (s/starts-with? (name current-panel) "reminder-"))
+        show-mobile-cmail? (and (not collapsed-cmail)
                                 is-mobile?)
-        user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
-        show-push-notification-permissions-modal? (and ua/mobile-app?
-                                                       jwt-data
-                                                       (not user-responded-to-push-permission?))
-        show-user-info? (and open-panel
-                             (s/starts-with? (name open-panel) "user-info-"))
-        ;; show-follow-picker (= open-panel :follow-picker)
+        show-push-notification-permissions-modal?(and ua/mobile-app?
+                                                      show-push-notification-permissions-modal?)
+        ;; show-follow-picker (= current-panel :follow-picker)
         mobile-search? (and is-mobile?
-                            search-active)
-        should-show-expanded-post? (and (not entry-not-found)
-                                        (map? current-activity-data)
-                                        (:published? current-activity-data))]
+                            show-search?)]
     (if is-loading
       [:div.org-dashboard
-        (loading {:loading true
-                  :jwt (map? jwt-data)
-                  :current-org-slug current-org-slug
-                  :current-board-slug current-board-slug})]
+        (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
-                                  :expanded-activity current-activity-id
+                                  :expanded-activity show-expanded-post?
                                   :top-banner payments-ui-upgraded-banner
                                   :showing-upgraded-banner payments-ui-upgraded-banner
-                                  :show-menu (= open-panel :menu)})}
+                                  :show-menu (= current-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (if nux
@@ -202,28 +132,28 @@
           show-login-wall
           (login-wall)
           ;; Org settings
-          (= open-panel :org)
+          (= current-panel :org)
           (org-settings-modal)
           ;; Integrations settings
-          (= open-panel :integrations)
+          (= current-panel :integrations)
           (integrations-settings-modal)
           ;; Invite picker settings
-          (= open-panel :invite-picker)
+          (= current-panel :invite-picker)
           (invite-picker-modal)
           ;; Invite via email
-          (= open-panel :invite-email)
+          (= current-panel :invite-email)
           (invite-email-modal)
           ;; Invite via Slack
-          (= open-panel :invite-slack)
+          (= current-panel :invite-slack)
           (invite-slack-modal)
           ;; Team management
-          (= open-panel :team)
+          (= current-panel :team)
           (team-management-modal)
           ;; User settings
-          (= open-panel :profile)
+          (= current-panel :profile)
           (user-profile-modal)
           ;; User notifications
-          (= open-panel :notifications)
+          (= current-panel :notifications)
           (user-notifications-modal)
           ;; Reminders list
           show-reminders?
@@ -233,23 +163,19 @@
           (edit-recurring-update-modal)
           ;; Mobile create a new section
           show-section-editor
-          (section-editor initial-section-editing
-           (fn [sec-data note dismiss-action]
-            (if sec-data
-              (section-actions/section-save sec-data note dismiss-action)
-              (dismiss-action))))
+          (section-editor initial-section-editing)
           ;; Mobile edit current section data
           show-section-add
-          (section-editor nil show-section-add-cb)
+          (section-editor nil)
           ;; Activity share for mobile
           (and is-mobile?
-               is-sharing-activity)
+               show-activity-share?)
           (activity-share)
           ;; WRT
           show-wrt-view?
           (wrt org-data)
           ;; UI Theme settings panel
-          (= open-panel :theme)
+          (= current-panel :theme)
           (theme-settings-modal theme-data)
           ;; User info modal
           show-user-info?
@@ -264,7 +190,7 @@
           (upgraded-banner))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
-                   is-sharing-activity)
+                   show-activity-share?)
           ;; If we have an element id find the share container inside that element
           ;; and portal the component to that element
           (let [portal-element (when activity-share-container
@@ -280,7 +206,7 @@
         ;; selector for whats-new widget to be present
         (when (or (not is-mobile?)
                   (and is-mobile?
-                       (= open-panel :menu)))
+                       (= current-panel :menu)))
           (menu))
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
@@ -288,12 +214,12 @@
         (when show-premium-picker?
           (premium-picker-modal))
         ;; Alert modal
-        (when is-showing-alert
+        (when show-alert-modal
           (alert-modal))
         ;; Page container
         (when (or ;; On mobile don't show the dashboard/stream when showing another panel
                   (not is-mobile?)
-                  (and (not is-sharing-activity)
+                  (and (not show-activity-share?)
                        (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
@@ -301,5 +227,5 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (dashboard-layout)]
-              (when should-show-expanded-post?
+              (when show-expanded-post?
                 (expanded-post))]])])))
