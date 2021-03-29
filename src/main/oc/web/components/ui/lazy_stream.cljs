@@ -12,26 +12,27 @@
                          (rum/local false ::delay)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
-                         (drv/drv :board-slug)
+                         (drv/drv :container-slug)
                          (drv/drv :foc-layout)
                          {:will-mount (fn [s]
-                           (let [container-slug (dis/current-board-slug)]
+                           (let [container-slug (dis/current-container-slug)]
                              (when-not (= container-slug @last-container-slug)
                                (reset! (::delay s) true)
                                (reset! last-container-slug container-slug)
-                               (utils/after nav-actions/feed-render-delay #(reset! (::delay s) false)))
-                             s))
+                               (utils/after nav-actions/feed-render-delay #(reset! (::delay s) false))))
+                           s)
                           :did-mount (fn [s]
                            (utils/scroll-to-y (dis/route-param :scroll-y) 0)
                            s)}
   [s stream-comp]
   (let [container-data (drv/react s :container-data)
-        current-board-slug (drv/react s :board-slug)
-        foc-layout (drv/react s :foc-layout)
+        _current-container-slug (drv/react s :container-slug)
+        ;; _foc-layout (drv/react s :foc-layout)
         data-ready? (map? container-data)
         delay? @(::delay s)
         ;; collapsed-foc? (or (= foc-layout dis/other-foc-layout)
-        ;;                    (= current-board-slug "replies"))
+        ;;                    (and (= current-container-slug "replies")
+        ;;                         (dis/is-container? current-container-slug)))
         ]
     [:div.lazy-stream
       (cond ;; (not data-ready?)

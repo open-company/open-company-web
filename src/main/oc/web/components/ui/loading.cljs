@@ -42,10 +42,14 @@
   rum/reactive
   (drv/drv :theme)
   (drv/drv :route/dark-allowed)
+  (drv/drv :board-slug)
+  (drv/drv :jwt)
   (theme-mixins/theme-mixin)
 
-  [s {:keys [current-org-slug current-board-slug jwt loading]}]
-  (if (and current-org-slug
-           jwt)
-    (ghost-screen {:loading loading :current-board-slug current-board-slug})
-    (shaky-carrot {:loading loading})))
+  [s {:keys [loading]}]
+  (let [current-board-slug (drv/react s :board-slug)
+        jwt-data (drv/react s :jwt)]
+    (if (and current-board-slug
+            jwt-data)
+      (ghost-screen {:loading loading :current-board-slug current-board-slug})
+      (shaky-carrot {:loading loading}))))

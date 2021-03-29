@@ -214,56 +214,57 @@
                 [:div.board-name
                  {:class (when is-topics "topics-header")}
                   [:div.board-name-with-icon
-                   [:div.board-name-with-icon-internal
-                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                            (not is-drafts-board))
-                                              :public (= (:access container-data) "public")
-                                              :contributions is-contributions
-                                              :label-icon is-label
-                                              :home-icon is-following
-                                              :unfollowing-icon is-unfollowing
-                                              :all-icon is-all-posts
-                                              :topics-icon is-topics
-                                              :saved-icon is-bookmarks
-                                              :drafts-icon is-drafts-board
-                                              :replies-icon is-replies
-                                              :board-icon (and (not is-container?)
-                                                               (not is-contributions)
-                                                               (not is-topics)
-                                                               (not is-drafts-board)
-                                                               (not current-activity-id))})}
-                    (cond is-contributions
-                          (str "Latest from " (:short-name contributions-user-data))
+                    {:class (when current-contributions-id "contributions")}
+                    [:div.board-name-with-icon-internal
+                      {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                              (not is-drafts-board))
+                                                :public (= (:access container-data) "public")
+                                                :label-icon is-label
+                                                :contributions is-contributions
+                                                :home-icon is-following
+                                                :unfollowing-icon is-unfollowing
+                                                :all-icon is-all-posts
+                                                :topics-icon is-topics
+                                                :saved-icon is-bookmarks
+                                                :drafts-icon is-drafts-board
+                                                :replies-icon is-replies
+                                                :board-icon (and (not is-container?)
+                                                                 (not is-contributions)
+                                                                 (not is-topics)
+                                                                 (not is-drafts-board)
+                                                                 (not current-activity-id))})}
+                      (cond is-inbox
+                            "Unread"
 
-                          is-inbox
-                          "Unread"
+                            is-all-posts
+                            "All"
 
-                          is-all-posts
-                          "All"
+                            is-topics
+                            "Explore"
 
-                          is-topics
-                          "Explore"
+                            is-bookmarks
+                            "Bookmarks"
 
-                          is-bookmarks
-                          "Bookmarks"
+                            is-following
+                            "Home"
 
-                          is-following
-                          "Home"
+                            is-unfollowing
+                            "Unfollowing"
 
-                          is-unfollowing
-                          "Unfollowing"
+                            is-replies
+                            "Activity"
 
-                          is-label
-                          (or (:name label-data) (:slug label-data) current-label-slug)
-                          
-                          is-replies
-                          "Activity"
+                            is-label
+                            (or (:name label-data) (:slug label-data) current-label-slug)
 
-                          :else
-                             ;; Fallback to the org board data
-                             ;; to avoid showing an empty name while loading
-                             ;; the board data
-                          (:name container-data))]]
+                            current-contributions-id
+                            (str "Latest from " (:short-name contributions-user-data))
+
+                            :else
+                            ;; Fallback to the org board data
+                            ;; to avoid showing an empty name while loading
+                            ;; the board data
+                            (:name container-data))]]
                   (when (and (= (:access container-data) "private")
                              (not is-drafts-board))
                     [:div.private-board

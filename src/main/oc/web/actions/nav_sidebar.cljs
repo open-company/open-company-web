@@ -59,11 +59,11 @@
                                                   :board-name (:name nav-to-board-data)}])
        (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)])))))
 
-(defn- refresh-label-data [label-slug]
+(defn- refresh-label-data! [label-slug]
   (when label-slug
     (utils/after feed-render-delay #(label-actions/label-entries-get label-slug))))
 
-(def ^:private click-throttle-ms (* 1000 15))
+(def ^{:private true} click-throttle-ms (* 1000 15))
 
 (defonce refresh-delays (atom {}))
 
@@ -141,7 +141,7 @@
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
-           (refresh-label-data label-slug)))))))
+           (refresh-label-data! label-slug)))))))
 
 (defn nav-to-url!
   ([e board-slug url]
@@ -191,7 +191,9 @@
                                  (not cont-data))
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
-        back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
+        back-y (if (contains? route :back-to)
+                 (.. js/document -scrollingElement -scrollTop)
+                 (utils/page-scroll-top))]
     (cond is-label?
           (nav-to-label! e label-slug to-url back-y false)
           is-contributions?
@@ -242,9 +244,8 @@
         route-path (if comment-uuid
                      (assoc route-path* :comment comment-uuid)
                      route-path*)]
-    (routing-actions/routing! route-path)
+    (routing-actions/push-state! route-path post-url)
     (cmail-actions/cmail-hide)
-    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)
     ;; Refresh the post data
     (cmail-actions/get-entry-with-uuid entry-board-slug entry-uuid))))
 

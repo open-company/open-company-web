@@ -1,4 +1,4 @@
-(ns oc.web.rum-utils
+(ns oc.web.utils.rum
   (:require [org.martinklepsch.derivatives :as drv]
             [rum.core :as rum]
             [oc.web.utils.sentry :as sentry]))
