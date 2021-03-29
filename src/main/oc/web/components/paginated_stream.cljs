@@ -3,7 +3,7 @@
             [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.react-utils :as rutils]
+            [oc.web.utils.rum :as rutils]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.dom :as dom-utils]

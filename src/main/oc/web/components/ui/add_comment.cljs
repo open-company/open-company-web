@@ -267,7 +267,7 @@
                              (me-media-utils/setup-editor s did-change me-opts)
                              (reset! (::inline-reply-max-width s) max-width))
                            (maybe-focus s)
-                           (utils/after 2500 #(emoji-autocomplete/autocomplete (rum/ref-node s "editor-node")))
+                           (utils/after 2500 #(emoji-autocomplete/init! (rum/ref-node s "editor-node")))
                            s)
                           :will-update (fn [s]
                            (let [props (-> s :rum/args first)
