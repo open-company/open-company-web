@@ -182,6 +182,8 @@
         board (dis/current-board-slug)
         contributions-id (dis/current-contributions-id)
         is-contributions? (seq contributions-id)
+        label-slug (dis/current-label-slug)
+        is-label? (seq label-slug)
         to-url (or (:back-to route) (oc-urls/following))
         cont-data (dis/current-container-data)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
@@ -190,9 +192,12 @@
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
         back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
-    (if is-contributions?
-      (nav-to-author! e contributions-id to-url back-y false)
-      (nav-to-url! e board to-url back-y false))
+    (cond is-label?
+          (nav-to-label! e label-slug to-url back-y false)
+          is-contributions?
+          (nav-to-author! e contributions-id to-url back-y false)
+          :else
+          (nav-to-url! e board to-url back-y false))
     (when should-refresh-data?
       (utils/after 180 activity-actions/refresh-current-container))))
 
