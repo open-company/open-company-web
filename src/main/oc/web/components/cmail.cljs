@@ -29,7 +29,7 @@
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
-            [oc.web.components.ui.labels :refer (cmail-labels-list labels-picker labels-list)]
+            [oc.web.components.ui.labels :refer (cmail-labels-list)]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
@@ -623,21 +623,22 @@
            [:span.floating-delete-bt-icon]
            [:span.floating-delete-bt-text
             "Delete"]]]
-         [:div.floating-labels-bt-container
-          [:button.mlb-reset.floating-labels-bt
-           {:on-click #(cmail-actions/toggle-cmail-floating-labels-view)
-            :data-toggle (when (:collapsed cmail-state) "tooltip")
-            :data-container "body"
-            :data-placement "bottom"
-            :title (if (:published? cmail-data)
-                    "Labels"
-                    "Labels")}
-           [:span.floating-labels-bt-icon]
-           [:span.floating-labels-bt-text
-            "Labels"]]
-          (when (:labels-floating-view cmail-state)
-            (labels-picker {:inline-add-bt true
-                            }))]]
+        ;;  [:div.floating-labels-bt-container
+        ;;   [:button.mlb-reset.floating-labels-bt
+        ;;    {:on-click #(cmail-actions/toggle-cmail-floating-labels-view)
+        ;;     :data-toggle (when (:collapsed cmail-state) "tooltip")
+        ;;     :data-container "body"
+        ;;     :data-placement "bottom"
+        ;;     :title (if (:published? cmail-data)
+        ;;             "Labels"
+        ;;             "Labels")}
+        ;;    [:span.floating-labels-bt-icon]
+        ;;    [:span.floating-labels-bt-text
+        ;;     "Labels"]]
+        ;;   (when (:labels-floating-view cmail-state)
+        ;;     (labels-picker {:inline-add-bt true
+        ;;                     }))]
+         ]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
@@ -720,12 +721,13 @@
                               :dispatch-key (first dis/cmail-data-key)
                               :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
-      (when-not (:collapsed cmail-state)
+      (when (and (not (:collapsed cmail-state))
+                 (:published? cmail-data))
         [:div.cmail-labels
         ;;  (labels-list (:labels cmail-data))
          (cmail-labels-list {;;  :labels-preview? true
                              ;; :label-autocompleter {:visibility :on-hover}
-                             :add-label-bt true
+                            ;;  :add-label-bt true
                              })])
       [:div.cmail-footer
         [:div.post-button-container.group
