@@ -68,15 +68,14 @@
 (defn push-state!
   ([url] (push-state! url (page-title)))
   ([url title]
-   (ocall @history "pushState" #js {} title url)))
+   (ocall js/window "history.pushState" #js {} title url)))
 
 (defn replace-state!
   ([url] (replace-state! url (page-title)))
   ([url title]
   ;;  (ocall js/window "history.replaceState" #js {} (oget js/document "?title") new-path)
-   (ocall @history "replaceState" #js {} title url)))
+   (ocall js/window "history.replaceState" #js {} title url)))
 
-; FIXME: remove the warning of history not found
 (defn ^:export nav! [token]
   (timbre/info "nav!" token)
   (timbre/debug "history:" @history)
@@ -128,8 +127,7 @@
 
 (defn history-back! []
   (timbre/info "history-back!")
-  ;; (ocall js/window "history.go" -1)
-  (ocall @history :go -1))
+  (ocall js/window "history.go" -1))
 
 ;; Cookies
 
