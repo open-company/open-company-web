@@ -23,7 +23,7 @@
     "shadow-cljs": "^2.11.22"
   },
   "dependencies": {
-    "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete",
+    "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete#improvements",
     "@bago2k4/medium-editor-filedragging": "github:bago2k4/medium-editor-filedragging#mainline",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
     "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector",

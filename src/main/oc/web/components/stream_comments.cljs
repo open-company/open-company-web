@@ -9,7 +9,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.rum :as rutils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
@@ -23,6 +23,8 @@
             ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (def max-reactions-count 5)
+
+(def emoji-mart-picker (partial rutils/build Picker))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
@@ -90,7 +92,7 @@
     [:button.mlb-reset.close-bt
       {:on-click dismiss-cb}
       "Cancel"]
-    (react-utils/build Picker
+    (emoji-mart-picker
       {:native true
        :autoFocus true
        :onClick (fn [emoji _]
