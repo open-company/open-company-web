@@ -69,7 +69,7 @@
   (let [loading? (drv/react s :app-loading?)
         theme-data (drv/react s :theme)
         {:keys [org-data
-                show-alert-modal
+                show-alert-modal?
                 activity-share-container
                 collapsed-cmail
                 user-info-data
@@ -214,7 +214,7 @@
         (when show-premium-picker?
           (premium-picker-modal))
         ;; Alert modal
-        (when show-alert-modal
+        (when show-alert-modal?
           (alert-modal))
         ;; Page container
         (when (or ;; On mobile don't show the dashboard/stream when showing another panel
