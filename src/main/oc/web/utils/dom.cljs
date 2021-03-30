@@ -105,11 +105,20 @@
         (recur (oget element "parentElement")))
       false)))
 
-(defn event-cotainer-has-class [e class-name]
+(defn event-container-has-class [e class-name]
   (when e
     (loop [element (oget e "target")]
       (if element
         (if (.contains (oget element "classList") (if (keyword? class-name) (name class-name) class-name))
+          true
+          (recur (oget element "parentElement")))
+        false))))
+
+(defn event-container-matches [e sel]
+  (when e
+    (loop [element (oget e "target")]
+      (if element
+        (if (ocall element "matches" (if (keyword? sel) (name sel) sel))
           true
           (recur (oget element "parentElement")))
         false))))

@@ -1,5 +1,6 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
+            [oops.core :refer (ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [dommy.core :refer-macros (sel1)]
@@ -8,6 +9,7 @@
             [oc.web.images :as img]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.draft :as draft-utils]
@@ -28,6 +30,81 @@
      :ref :item-body
      :class utils/hide-class
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
+
+(rum/defc stream-item-draft-footer <
+  rum/static
+  [activity-data]
+  [:div.stream-item-footer.group
+   [:div.stream-body-draft-edit
+    [:button.mlb-reset.edit-draft-bt
+     {:on-click #(activity-actions/activity-edit activity-data)}
+     "Continue editing"]]
+   [:div.stream-body-draft-delete
+    [:button.mlb-reset.delete-draft-bt
+     {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+     "Delete draft"]]])
+
+(rum/defc stream-item-attachments <
+  rum/static
+  [{:keys [activity-attachments is-mobile?]}]
+  (when (seq activity-attachments)
+    (if-not is-mobile?
+      [:div.stream-item-attachments.foc-click-stop
+       [:div.stream-item-attachments-count
+        {:data-toggle (when-not is-mobile? "tooltip")
+        :data-placement "top"
+        :data-container "body"
+        :title (str (count activity-attachments)
+                    " attachment"
+                    (when (> (count activity-attachments) 1) "s"))}
+        (count activity-attachments)]
+       [:div.stream-item-attachments-list
+        (for [atc activity-attachments]
+          [:a.stream-item-attachments-item
+          {:href (:file-url atc)
+            :target "_blank"}
+          [:div.stream-item-attachments-item-desc
+            [:span.file-name
+            (:file-name atc)]
+            [:span.file-size
+            (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
+      [:div.stream-item-mobile-attachments
+       [:span.mobile-attachments-icon]
+       [:span.mobile-attachments-count
+        (count activity-attachments)]])))
+
+(rum/defc stream-item-footer <
+  rum/static
+  [s {:keys [activity-data show-wrt? member? current-activity-id
+             show-new-comments? activity-attachments is-mobile?
+             premium? read-data show-view-more?]}]
+  [:div.stream-item-footer.group
+   {:ref "stream-item-reactions"}
+   (when member?
+     [:div.foc-click-stop
+      (reactions {:entity-data activity-data
+                  :only-thumb? true
+                  :hide-picker true})])
+   [:div.stream-item-footer-mobile-group
+    (when member?
+      [:div.stream-item-comments-summary.foc-click-stop
+       (foc-comments-summary {:entry-data activity-data
+                              :add-comment-focus-prefix "main-comment"
+                              :current-activity-id current-activity-id
+                              :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
+    (when show-wrt?
+      [:div.stream-item-wrt.foc-click-stop
+       (wrt-count {:activity-data activity-data
+                   :premium? premium?
+                   :read-data read-data})])
+    (stream-item-attachments {:activity-attachments activity-attachments
+                              :is-mobile? is-mobile?})
+    (when (seq (:labels activity-data))
+      [:div.stream-item-labels.foc-click-stop
+       (labels-list (:labels activity-data))])]
+   (when show-view-more?
+     [:div.stream-item-mobile-view-more
+      "View more"])])
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -163,33 +240,13 @@
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
-       :on-click (fn [e]
-                   (if-not (nil? mobile-swipe-menu-uuid)
-                     (dismiss-swipe-button s e)
-                     (if-not is-published?
-                       (activity-actions/activity-edit activity-data)
-                       (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                             comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)
-                             stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
-                             attachments-el (rum/ref-node s :stream-item-attachments)]
-                         (when (and ;; More menu wasn't clicked
-                                    (not (utils/event-inside? e more-menu-el))
-                                    ;; Comments summary wasn't clicked
-                                    (not (utils/event-inside? e comments-summary-el))
-                                    ;; WRT wasn't clicked
-                                    (not (utils/event-inside? e stream-item-wrt-el))
-                                    ;; Attachments wasn't clicked
-                                    (not (utils/event-inside? e attachments-el))
-                                    ;; Emoji picker wasn't clicked
-                                    (not (utils/event-inside? e emoji-picker))
-                                    ;; a button wasn't clicked
-                                    (not (utils/button-clicked? e))
-                                    ;; No input field clicked
-                                    (not (utils/input-clicked? e))
-                                    ;; No body link was clicked
-                                    (not (utils/anchor-clicked? e)))
-                           (nav-actions/open-post-modal activity-data false))))))
+       :on-click (cond (seq mobile-swipe-menu-uuid)
+                       #(dismiss-swipe-button s %)
+                       (not is-published?)
+                       #(activity-actions/activity-edit activity-data)
+                       :else
+                       #(when-not (dom-utils/event-container-matches % "input, button, a, .foc-click-stop")
+                          (nav-actions/open-post-modal activity-data false)))
        :id dom-element-id}
       [:button.mlb-reset.mobile-more-bt
         {:class (when @(::show-mobile-more-bt s) "visible")
@@ -201,47 +258,44 @@
       [:div.stream-item-header.group
        {:class (when (seq (:labels activity-data))
                  "has-labels")}
-       [:div.stream-item-header-left
-        (when (seq (:labels activity-data))
-          [:div.stream-item-labels.group
-           (labels-list (:labels activity-data))])
-        [:div.stream-header-head-author
-          (post-authorship {:activity-data activity-data
-                            :user-avatar? true
-                            :user-hover? true
-                            :board-hover? true
-                            :short-name? is-mobile?
+       [:div.stream-header-head-author
+        (post-authorship {:activity-data activity-data
+                          :user-avatar? true
+                          :user-hover? true
+                          :board-hover? true
+                          :short-name? is-mobile?
                             ; :show-board? foc-board
-                            :activity-board? (and (not (:publisher-board activity-data))
-                                                  (not= (:board-slug activity-data) current-board-slug)
-                                                  (> boards-count 1))
-                            :current-user-id current-user-id})
-          [:div.separator-dot]
-          (let [t (or (:published-at activity-data) (:created-at activity-data))]
-            [:span.time-since
-              {:data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-               :title (utils/activity-date-tooltip activity-data)}
-              [:time
-                {:date-time t}
-                (utils/time-since t [:short :lower-case])]])
-          [:div.muted-activity
-            {:data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Muted"}]
-          (when show-new-item-tag
-            [:div.new-item-tag])
-          [:div.bookmark-tag-small.mobile-only]
-          [:div.bookmark-tag.big-web-tablet-only]
-          [:div.pinned-tag]]]
+                          :activity-board? (and (not (:publisher-board activity-data))
+                                                (not= (:board-slug activity-data) current-board-slug)
+                                                (> boards-count 1))
+                          :current-user-id current-user-id})
+        [:div.separator-dot]
+        (let [t (or (:published-at activity-data) (:created-at activity-data))]
+          [:span.time-since
+           {:data-toggle (when-not is-mobile? "tooltip")
+            :data-placement "top"
+            :data-container "body"
+            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+            :title (utils/activity-date-tooltip activity-data)}
+           [:time
+            {:date-time t}
+            (utils/time-since t [:short :lower-case])]])
+        [:div.muted-activity
+         {:data-toggle (when-not is-mobile? "tooltip")
+          :data-placement "top"
+          :title "Muted"}]
+        (when show-new-item-tag
+          [:div.new-item-tag])
+        [:div.bookmark-tag-small.mobile-only]
+        [:div.bookmark-tag.big-web-tablet-only]
+        [:div.pinned-tag]]
+       [:div.foc-click-stop
         (when is-published?
-          (if is-mobile?
-            (when mobile-more-menu?
-              (rum/portal (more-menu-comp) mobile-more-menu-el))
-            (more-menu-comp)))
-        [:div.activity-share-container]]
+        (if is-mobile?
+          (when mobile-more-menu?
+            (rum/portal (more-menu-comp) mobile-more-menu-el))
+          (more-menu-comp)))]
+       [:div.activity-share-container]]
       [:div.stream-item-content
         {:class (when show-body-thumbnail? "has-preview")}
         [:div.stream-item-headline.ap-seen-item-headline
@@ -261,58 +315,14 @@
                        :thumbnail
                        (img/optimize-image-url (* 102 3)))}]])]
         (if-not is-published?
-          [:div.stream-item-footer.group
-            [:div.stream-body-draft-edit
-              [:button.mlb-reset.edit-draft-bt
-                {:on-click #(activity-actions/activity-edit activity-data)}
-                "Continue editing"]]
-            [:div.stream-body-draft-delete
-              [:button.mlb-reset.delete-draft-bt
-                {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
-                "Delete draft"]]]
-          [:div.stream-item-footer.group
-            {:ref "stream-item-reactions"}
-            (when member?
-              (reactions {:entity-data activity-data
-                          :only-thumb? true
-                          :hide-picker true}))
-            [:div.stream-item-footer-mobile-group
-              (when member?
-                [:div.stream-item-comments-summary
-                  (foc-comments-summary {:entry-data activity-data
-                                          :add-comment-focus-prefix "main-comment"
-                                          :current-activity-id current-activity-id
-                                          :new-comments-count (when show-new-comments? (:unseen-comments activity-data))})])
-              (when show-wrt?
-                [:div.stream-item-wrt
-                  {:ref :stream-item-wrt}
-                  (wrt-count {:activity-data activity-data
-                              :premium? premium?
-                              :read-data read-data})])
-              (when (seq activity-attachments)
-                (if-not is-mobile?
-                  [:div.stream-item-attachments
-                    {:ref :stream-item-attachments}
-                    [:div.stream-item-attachments-count
-                      {:data-toggle (when-not is-mobile? "tooltip")
-                        :data-placement "top"
-                        :data-container "body"
-                        :title (str (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s"))}
-                      (count activity-attachments)]
-                    [:div.stream-item-attachments-list
-                      (for [atc activity-attachments]
-                        [:a.stream-item-attachments-item
-                          {:href (:file-url atc)
-                            :target "_blank"}
-                          [:div.stream-item-attachments-item-desc
-                            [:span.file-name
-                              (:file-name atc)]
-                            [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
-                  [:div.stream-item-mobile-attachments
-                    [:span.mobile-attachments-icon]
-                    [:span.mobile-attachments-count
-                      (count activity-attachments)]]))]
-            (when @(::show-view-more s)
-              [:div.stream-item-mobile-view-more
-               "View more"])])]))
+          (stream-item-draft-footer activity-data)
+          (stream-item-footer s {:activity-data activity-data
+                                 :show-wrt? show-wrt?
+                                 :member? member?
+                                 :current-activity-id current-activity-id
+                                 :show-new-comments? show-new-comments?
+                                 :activity-attachments activity-attachments
+                                 :is-mobile? is-mobile?
+                                 :premium? premium?
+                                 :read-data read-data
+                                 :show-view-more? @(::show-view-more s)}))]))

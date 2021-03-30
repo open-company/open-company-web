@@ -58,7 +58,7 @@
                       (let [cmail-labels-set (set (map :slug labels))]
                         (if (cmail-labels-set (:slug toggle-label))
                           (filterv #(not= (:slug %) (:slug toggle-label)) labels)
-                          (vec (concat labels [(select-keys toggle-label [:uuid :name :color :slug])]))))))
+                          (vec (concat labels [(label-utils/clean-entry-label toggle-label)]))))))
           (assoc-in (conj dispatcher/cmail-data-key :has-changes) true))
       db)))
 
@@ -75,7 +75,7 @@
                      (fn [labels]
                        (let [label-vals #(vec [(:slug %) (:uuid %)])
                              cmail-labels-set (set (mapcat label-vals labels))
-                             add-label-map (select-keys add-label [:uuid :name :color :slug])
+                             add-label-map (label-utils/clean-entry-label add-label)
                              add-label-set (set (label-vals add-label))
                              label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
                          (if (seq label-intersect)

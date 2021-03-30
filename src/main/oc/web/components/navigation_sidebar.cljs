@@ -12,7 +12,6 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.search :as search-actions]
-            [oc.web.actions.label :as label-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -53,12 +52,6 @@
     (reset! (::sections-list-collapsed s) next-value)
     (utils/after 100 #(fix-navbar-position s))))
 
-(defn- toggle-collapse-labels [s]
-  (let [next-value (not @(::labels-list-collapsed s))]
-    (cook/set-cookie! (router/collapse-labels-list-cookie) next-value (* 60 60 24 365))
-    (reset! (::labels-list-collapsed s) next-value)
-    (utils/after 100 #(fix-navbar-position s))))
-
 (defn- get-drafts-board [org-data]
   (some #(when (= (:slug %) utils/default-drafts-board-slug) %) (:boards org-data)))
 
@@ -74,9 +67,6 @@
        (utils/link-for (:links org-data) "following")))
 
 (defn- show-topics? [org-data]
-  (:member? org-data))
-
-(defn- show-labels? [org-data]
   (:member? org-data))
 
 (defn- show-bookmarks? [org-data]
@@ -119,10 +109,6 @@
   (dom-utils/prevent-default! e)
   (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
 
-(defn- label-clicked [label-slug e]
-  (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-label! e label-slug (oc-urls/label label-slug)))
-
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -130,9 +116,7 @@
                                 ; (drv/drv :board-data)
                                 (drv/drv :org-slug)
                                 (drv/drv :board-slug)
-                                (drv/drv :label-slug)
                                 (drv/drv :contributions-id)
-                                (drv/drv :org-labels)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :replies-badge)
@@ -148,7 +132,6 @@
                                 (rum/local true ::show-invite-people?)
                                 (rum/local false ::absolute-position)
                                 (rum/local false ::sections-list-collapsed)
-                                (rum/local false ::labels-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize fix-navbar-position)
@@ -158,7 +141,6 @@
                                   s)
                                  :will-mount (fn [s]
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
-                                  (reset! (::labels-list-collapsed s) (= (cook/get-cookie (router/collapse-labels-list-cookie)) "true"))
                                   s)
                                  :will-update (fn [s]
                                   (when (responsive/is-mobile-size?)
@@ -183,10 +165,8 @@
         change-data (drv/react s :change-data)
         org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
-        current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
         show-invite-box (drv/react s :show-invite-box)
-        org-labels (filter :slug (drv/react s :org-labels))
         ; filtered-change-data (into {} (filter #(when-let [container-uuid (first %)]
         ;                                          (and (not (s/starts-with? container-uuid drafts-board-prefix))
         ;                                               (not (= container-uuid (:uuid org-data)))))
@@ -200,7 +180,6 @@
         is-profile (and (seq current-contributions-id)
                         (= current-contributions-id (:user-id current-user-data)))
         create-link (utils/link-for (:links org-data) "create")
-        create-label-link (utils/link-for (:links org-data) "create-label")
         show-boards (show-boards? s org-data)
         drafts-board (get-drafts-board org-data)
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -210,7 +189,6 @@
         show-replies (show-replies? org-data)
         show-profile (show-profile? s org-data)
         show-topics (show-topics? org-data)
-        show-labels (show-labels? org-data)
         is-mobile? (responsive/is-mobile-size?)
         drafts-data (drv/react s :drafts-data)
         ; all-unread-items (mapcat :unread (vals filtered-change-data))
@@ -389,43 +367,6 @@
                   [:div.public])
                 (when (= (:access board) "private")
                   [:div.private])])])
-        ;; Labels list
-        (when show-labels
-          [:div.left-navigation-sidebar-top.group
-            ;; Boards header
-           [:h3.left-navigation-sidebar-top-title.group
-            [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-             {:class (when @(::labels-list-collapsed s) "collapsed")
-              :on-click #(toggle-collapse-labels s)}
-             [:span.sections "Labels"]]
-            (when create-label-link
-              [:button.left-navigation-sidebar-top-title-button.btn-reset
-               {:on-click #(label-actions/new-label)
-                :title "Create a new label"
-                :data-placement "top"
-                :data-toggle (when-not is-mobile? "tooltip")
-                :data-container "body"}])]])
-        (when (and show-labels
-                  (not @(::labels-list-collapsed s)))
-          [:div.left-navigation-sidebar-items.group
-          (for [label org-labels
-                :let [label-url (oc-urls/label org-slug (:slug label))
-                      is-current-label ((set [(:slug label) (:uuid label)]) current-label-slug)]]
-            [:a.left-navigation-sidebar-item.hover-item.label-item
-              {:class (utils/class-set {:item-selected is-current-label})
-               :data-label (name (:slug label))
-               :key (str "label-list-" (:slug label))
-               :data-color (:color label)
-               :href label-url
-               :on-click (partial label-clicked (:slug label))}
-              [:span.label-bg-color
-               {:style {:background-color (:color label)}}]
-              [:div.board-name.group
-               [:div.internal.label-item-internal
-                {:key (str "label-list-" (name (:slug label)) "-internal")}
-                [:span.label-dot
-                 {:style {:background-color (:color label)}}]
-                 (:name label)]]])])
         (when show-invite-people?
           [:div.invite-people-box
             [:button.mlb-reset.invite-people-close

@@ -4,7 +4,6 @@
             [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
-            [oc.lib.color :as lib-color]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -48,14 +47,9 @@
 (defn new-label
   ([] (new-label ""))
   ([label-name]
-   (let [org-data (dis/org-data)
-         random-color (-> lib-color/default-css-color-names
-                          vals
-                          shuffle
-                          first)]
-     (timbre/infof "New label for org %s, random color %s" (:uuid org-data) random-color)
+   (let [org-data (dis/org-data)]
+     (timbre/infof "New label for org %s" (:uuid org-data))
      (dis/dispatch! [:label-editor/start {:name label-name
-                                          :color random-color
                                           :org-uuid (:uuid org-data)}]))))
 
 (defn dismiss-label-editor []
@@ -66,7 +60,7 @@
   (let [org-data (dis/org-data)
         create-label-link (hateoas/link-for (:links org-data) "create-label")
         editing-label (:editing-label @dis/app-state)]
-    (timbre/infof "Saving label with name %s and color %s" (:name editing-label) (:color editing-label))
+    (timbre/infof "Saving label with name %s" (:name editing-label))
     (api/create-label create-label-link editing-label
                       (fn [{:keys [body success]}]
                          (dismiss-label-editor)
