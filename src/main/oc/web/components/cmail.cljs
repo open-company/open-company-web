@@ -429,11 +429,12 @@
 
                    (mixins/on-click-out :cmail-container (fn [s e]
                                                            (when (and (not (responsive/is-mobile-size?))
-                                                                      (:fullscreen @(drv/get-ref s :cmail-state))
-                                                                      (not (:distraction-free? @(drv/get-ref s :cmail-state)))
-                                                                      (not (dom-utils/event-cotainer-has-class e "modal-wrapper"))
-                                                                      (not (dom-utils/event-cotainer-has-class e "nux-tooltip-container"))
-                                                                      (not (dom-utils/event-cotainer-has-class e "label-modal-view")))
+                                                                      (not (dom-utils/event-container-matches e
+                                                                            (str ".modal-wrapper, "
+                                                                                 ".nux-tooltip-container, "
+                                                                                 ".label-modal-view, "
+                                                                                 ".cmail-outer.fullscreen, "
+                                                                                 ".cmail-outer.distraction-free"))))
                                                              (close-cmail s e))))
 
                    {:will-mount (fn [s]
@@ -726,8 +727,7 @@
         [:div.cmail-labels
         ;;  (labels-list (:labels cmail-data))
          (cmail-labels-list {;;  :labels-preview? true
-                             ;; :label-autocompleter {:visibility :on-hover}
-                            ;;  :add-label-bt true
+                             ;;  :add-label-bt true
                              })])
       [:div.cmail-footer
         [:div.post-button-container.group

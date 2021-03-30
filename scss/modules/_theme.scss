@@ -163,6 +163,10 @@ $dark_mode: "dark";
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(0, 0, 0, 0.24);
 
+  // Labels
+  --oc-label-background-color: #{rgba($deep_navy, 0.08)};
+  --oc-label-color: #{rgba($deep_navy, 0.72)};
+
   html, body {
     scrollbar-color: light;
   }
@@ -321,6 +325,10 @@ $dark_mode: "dark";
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(255, 255, 255, 0.12);
+
+  // Labels
+  --oc-label-background-color: #{rgba(white, 0.16)};
+  --oc-label-color: #{rgba(white, 0.72)};
 
   &, body {
     scrollbar-color: dark;

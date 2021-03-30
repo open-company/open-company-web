@@ -264,8 +264,7 @@
 
 (def new-comment-allowed-keys (concat comment-allowed-keys [:uuid :author-wants-follow?]))
 
-(def label-allowed-keys [:uuid :name :color :org-uuid])
-
+(def label-allowed-keys [:uuid :name :org-uuid])
 
 (def user-allowed-keys [:first-name :last-name :current-password :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist :title :location :blurb :profiles :digest-delivery])
 

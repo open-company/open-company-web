@@ -55,7 +55,7 @@
           (update-in (conj dispatcher/cmail-data-key :labels)
                      (fn [labels]
                        (let [found? (atom false)
-                             new-label (select-keys saved-label [:uuid :slug :color :name])
+                             new-label (select-keys saved-label [:uuid :slug :name])
                              updated-labels (mapv (fn [label]
                                                     (if (= (:uuid label) (:uuid saved-label))
                                                       (do (reset! found? true)
