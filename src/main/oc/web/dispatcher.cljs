@@ -1134,3 +1134,13 @@
                                     :map map
                                     :clj__GT_js clj->js
                                     :js__GT_clj js->clj})
+
+(defn ^:export js-debug [key]
+  (cond (instance? js/Array key)
+        (let [kkeys (mapv keyword
+                          (js->clj key))]
+          (get-in @app-state kkeys))
+        (sequential? key)
+        (get-in @app-state key)
+        :else
+        (get @app-state (keyword key))))
