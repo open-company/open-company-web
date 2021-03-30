@@ -1,18 +1,18 @@
 (ns oc.web.components.ui.emoji-picker
   (:require [rum.core :as rum]
-            [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.rum :as rutils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
-            [oc.lib.cljs.useragent :as ua]
             ["emoji-mart" :as emoji-mart :refer (Picker)]
             ["@rangy/core" :refer (getSelection)]
             ["@rangy/selectionsaverestore" :refer (saveSelection restoreSelection removeMarkers)]))
+
+(def emoji-mart-picker (partial rutils/build Picker))
 
 (def emojiable-class "emojiable")
 
@@ -169,7 +169,7 @@
                         (reset! visible false))}
           "Cancel"]
          (when-not (utils/is-test-env?)
-           (react-utils/build Picker
+           (emoji-mart-picker
              {:native true
               :autoFocus true
               :onClick (fn [emoji event]

@@ -1,7 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -26,7 +25,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.rich-body-editor :refer (rich-body-editor)]
+            [oc.web.components.ui.cmail-body :refer (cmail-body)]
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
@@ -115,9 +114,10 @@
 (defn autosave
   ([s] (autosave s false))
   ([s reset-cmail?]
-  (let [cmail-data @(drv/get-ref s :cmail-data)]
-    (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body)
-     (when reset-cmail? #(when % (cmail-actions/cmail-reset)))))))
+   (let [cmail-data @(drv/get-ref s :cmail-data)]
+     (activity-actions/entry-save-on-exit (first dis/cmail-data-key) cmail-data (cleaned-body)
+     (when reset-cmail? #(when %
+                           (cmail-actions/cmail-reset)))))))
 
 (defn debounced-autosave!
   [s]
@@ -191,7 +191,8 @@
 (defn- setup-headline [state headline-el]
   (when headline-el
     (reset! (::headline-input-listener state) (events/listen headline-el EventType/INPUT #(headline-on-change state)))
-    (fullscreen-focus-headline state)))
+    (fullscreen-focus-headline state)
+    (reset! (::headline-autocomplete state) (emoji-autocomplete/init! headline-el))))
 
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
@@ -312,6 +313,17 @@
       (real-close)
       (.blur (headline-element s)))))
 
+(defn- dispose-cmail [s]
+  (when @(::unlock-scroll s)
+    (reset! (::unlock-scroll s) false)
+    (dom-utils/unlock-page-scroll))
+  (when @(::headline-input-listener s)
+    (events/unlistenByKey @(::headline-input-listener s))
+    (reset! (::headline-input-listener s) nil))
+  (when-let [tc @(::headline-autocomplete s)]
+    (emoji-autocomplete/destroy! tc))
+  (reset! (::headline-autocomplete s) false))
+
 (defn close-cmail [s e]
   (let [cmail-data (-> s (drv/get-ref :cmail-data) deref)]
     (if (au/has-content? (assoc cmail-data :body (cleaned-body)))
@@ -322,11 +334,7 @@
       (cancel-clicked s)
       (cmail-actions/cmail-hide))))
 
-(defn- reset-cmail [s]
-  (when @(::unlock-scroll s)
-    (dom-utils/unlock-page-scroll))
-  ;; (when-let [tc @(::headline-autocomplete s)]
-  ;;   (emoji-autocomplete/destroy tc))
+(defn- init-cmail [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
         initial-body (if (seq (:body cmail-data))
@@ -343,14 +351,17 @@
     (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
     (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
     (reset! (::latest-key s) (:key cmail-state))
-    (utils/after 300 (fn []
-                      (when-let [headline-el (headline-element s)]
-                        (setup-headline s headline-el)
-                        ;; (reset! (::headline-autocomplete s) (emoji-autocomplete/autocomplete headline-el))
-                        )))
     (reset! (::unlock-scroll s) scroll-lock?)
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
+
+(defn- post-init-cmail [s]
+  (when-not @(::headline-autocomplete s)
+    (setup-headline s (headline-element s))))
+
+(defn- reset-cmail [s]
+  (dispose-cmail s)
+  (init-cmail s))
 
 (defn- hide-board-picker! [s]
   (reset! (::show-board-picker s) false))
@@ -412,7 +423,8 @@
                    (rum/local 68 ::top-padding)
                    (rum/local false ::last-fullscreen-state)
                    (rum/local false ::unlock-scroll)
-                  ;;  (rum/local nil ::headline-autocomplete)
+                   (rum/local nil ::headline-autocomplete)
+                   (rum/local false ::needs-post-init)
                    ;; Mixins
                    mixins/refresh-tooltips-mixin
                    ;; Go back to collapsed state on desktop if user didn't touch anything
@@ -421,8 +433,8 @@
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
-                   (when-not (responsive/is-mobile-size?)
-                     (emoji-autocomplete/autocomplete-mixin "headline"))
+                  ;;  (when-not (responsive/is-mobile-size?)
+                  ;;    (emoji-autocomplete/autocomplete-mixin "headline"))
                    (mixins/on-click-out :cmail-container (fn [s e]
                                                            (when (and (not (responsive/is-mobile-size?))
                                                                       (:fullscreen @(drv/get-ref s :cmail-state))
@@ -431,12 +443,14 @@
                                                                       (not (dom-utils/event-cotainer-has-class e "nux-tooltip-container"))
                                                                       (not (dom-utils/event-cotainer-has-class e "label-modal-view")))
                                                              (close-cmail s e))))
-                   {:will-mount (fn [s]
-                    (reset-cmail s)
+                  {:will-mount (fn [s]
+                    (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
+                    (init-cmail s)
                     (reset! (::last-fullscreen-state s) (-> s (drv/get-ref :cmail-state) deref :fullscreen))
                     s)
                    :did-mount (fn [s]
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
+                    (post-init-cmail s)
                     (setup-top-padding s)
                     s)
                    :will-update (fn [s]
@@ -449,6 +463,7 @@
                           (reset! (::latest-key s) (:key cmail-state)))))
                     s)
                    :did-update (fn [s]
+                    (post-init-cmail s)
                     (when-let [cmail-state @(drv/get-ref s :cmail-state)]
                       (when-not (= (:fullscreen cmail-state) @(::last-fullscreen-state s))
                         (when (:fullscreen cmail-state)
@@ -504,13 +519,10 @@
                     (fix-tooltips s)
                     s)
                    :will-unmount (fn [s]
-                    (when @(::headline-input-listener s)
-                      (events/unlistenByKey @(::headline-input-listener s))
-                      (reset! (::headline-input-listener s) nil))
-                    (when @(::unlock-scroll s)
-                      (dom-utils/unlock-page-scroll))
                     (when-let [debounced-autosave @(::debounced-autosave s)]
-                      (.dispose ^js debounced-autosave))
+                      (.dispose ^js debounced-autosave)
+                      (reset! (::debounced-autosave s) nil))
+                    (dispose-cmail s)
                     s)}
   [s]
   (let [is-mobile? (responsive/is-mobile-size?)
@@ -687,23 +699,23 @@
             (when-not is-mobile?
               [:div.cmail-content-collapsed-placeholder
                 (:new-entry-placeholder org-editing)])
-            (rich-body-editor {:on-change (partial body-on-change s)
-                               :use-inline-media-picker true
-                               :static-positioned-media-picker true
-                               :media-picker-initially-visible false
-                               :media-picker-container-selector "div.cmail-outer div.cmail-container div.cmail-footer div.cmail-footer-media-picker-container"
-                               :initial-body @(::initial-body s)
-                               :show-placeholder @(::show-placeholder s)
-                               :show-h2 true
-                               :placeholder (:new-entry-placeholder org-editing)
-                               :dispatch-input-key (first dis/cmail-data-key)
-                               :cmd-enter-cb #(post-clicked s)
-                               :upload-progress-cb (fn [is-uploading?]
-                                                     (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["poll" "code" "gif" "photo" "video"]
-                               :classes (str "emojiable " utils/hide-class)
-                               :cmail-key (:key cmail-state)
-                               :attachments-enabled true})
+            (cmail-body {:on-change (partial body-on-change s)
+                         :use-inline-media-picker true
+                         :static-positioned-media-picker true
+                         :media-picker-initially-visible false
+                         :media-picker-container-selector "div.cmail-outer div.cmail-container div.cmail-footer div.cmail-footer-media-picker-container"
+                         :initial-body @(::initial-body s)
+                         :show-placeholder @(::show-placeholder s)
+                         :show-h2 true
+                         :placeholder (:new-entry-placeholder org-editing)
+                         :dispatch-input-key (first dis/cmail-data-key)
+                         :cmd-enter-cb #(post-clicked s)
+                         :upload-progress-cb (fn [is-uploading?]
+                                               (reset! (::uploading-media s) is-uploading?))
+                         :media-config ["poll" "code" "gif" "photo" "video"]
+                         :classes (str "emojiable " utils/hide-class)
+                         :cmail-key (:key cmail-state)
+                         :attachments-enabled true})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment (first dis/cmail-data-key) %))

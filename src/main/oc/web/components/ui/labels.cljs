@@ -10,7 +10,7 @@
             [oc.lib.color :as lib-color]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.colors-presets :refer (colors-presets)]
-            [oc.web.lib.react-utils :as rutils]
+            [oc.web.utils.rum :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.dispatcher :as dis]

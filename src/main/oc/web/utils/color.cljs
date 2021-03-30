@@ -1,6 +1,4 @@
-(ns oc.web.utils.color
-  (:require [cuerdas.core :as string]
-            [oc.lib.color :as lib-color]))
+(ns oc.web.utils.color)
 
 (def colors-presets-list
   [{:rgb {:r 251 :g 94 :b 72}

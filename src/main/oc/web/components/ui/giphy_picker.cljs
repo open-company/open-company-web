@@ -2,10 +2,10 @@
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [oc.web.local-settings :as ls]
-            [oc.web.utils.dom :as dom-utils]
-            [oc.web.lib.react-utils :as react-utils]
-            ["@bago2k4/react-giphy-selector" :refer (Selector default) :rename {default GiphySelector}]
-            ))
+            [oc.web.utils.rum :as rutils]
+            ["@bago2k4/react-giphy-selector" :refer (Selector)]))
+
+(def giphy-selector (partial rutils/build Selector))
 
 (def giphy-picker-max-height 408)
 
@@ -31,21 +31,19 @@
                             top-position)]
     [:div.giphy-picker
       {:style {:top (str adjusted-position "px")}}
-      (react-utils/build Selector
-       {:apiKey ls/giphy-api-key
-        :queryInputPlaceholder "Search for GIF"
-        :resultColumns 1
-        :preloadTrending true
-        :containerClassName "giphy-picker-container"
-        :queryFormAutoFocus true
-        :queryFormClassName "giphy-picker-form"
-        :queryFormInputClassName "giphy-picker-form-input"
-        :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
-        :queryFormSubmitContent "Search"
-        :searchResultsClassName (str "giphy-picker-results-container" (when fullscreen " fullscreen"))
-        :searchResultClassName "giphy-picker-results-item"
-        :suggestionsClassName "giphy-picker-suggestions"
-        :suggestionClassName "giphy-picker-suggestions-suggestion"
-        :loaderClassName "giphy-picker-loader"
-        :onGifSelected pick-emoji-cb})
-     ]))
+      (giphy-selector {:apiKey ls/giphy-api-key
+                       :queryInputPlaceholder "Search for GIF"
+                       :resultColumns 1
+                       :preloadTrending true
+                       :containerClassName "giphy-picker-container"
+                       :queryFormAutoFocus true
+                       :queryFormClassName "giphy-picker-form"
+                       :queryFormInputClassName "giphy-picker-form-input"
+                       :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
+                       :queryFormSubmitContent "Search"
+                       :searchResultsClassName (str "giphy-picker-results-container" (when fullscreen " fullscreen"))
+                       :searchResultClassName "giphy-picker-results-item"
+                       :suggestionsClassName "giphy-picker-suggestions"
+                       :suggestionClassName "giphy-picker-suggestions-suggestion"
+                       :loaderClassName "giphy-picker-loader"
+                       :onGifSelected pick-emoji-cb})]))
