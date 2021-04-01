@@ -427,16 +427,15 @@
                                     (:published? current-activity-data))))]
    :show-alert-modal?      [[:alert-modal] (fn [alert-modal] (boolean alert-modal))]
    :ui-tooltip             [[:base] (fn [base] (:ui-tooltip base))]
-   :org-dashboard-data     [[:org-data :show-alert-modal? :show-section-add-cb :activity-share-container :show-activity-share?
+   :org-dashboard-data     [[:show-alert-modal? :show-section-add-cb :activity-share-container :show-activity-share?
                              :collapsed-cmail? :user-info-data :search-active :show-premium-picker? :payments-ui-upgraded-banner
-                             :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post?
-                             :show-push-notification-permissions-modal? :show-user-info? :show-labels-manager?]
-                            (fn [org-data show-alert-modal? show-section-add-cb activity-share-container show-activity-share?
+                             :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post? :show-user-info?
+                             :show-push-notification-permissions-modal? :show-labels-manager?]
+                            (fn [show-alert-modal? show-section-add-cb activity-share-container show-activity-share?
                                  collapsed-cmail? user-info-data search-active show-premium-picker? payments-ui-upgraded-banner
-                                 ui-tooltip initial-section-editing show-wrt-view? show-expanded-post?
-                                 show-push-notification-permissions-modal? show-user-info? show-labels-manager?]
-                              {:org-data org-data
-                               :show-activity-share? show-activity-share?
+                                 ui-tooltip initial-section-editing show-wrt-view? show-expanded-post? show-user-info?
+                                 show-push-notification-permissions-modal?]
+                              {:show-activity-share? show-activity-share?
                                :show-alert-modal? show-alert-modal?
                                :show-section-add-cb show-section-add-cb
                                :activity-share-container activity-share-container

@@ -1,6 +1,5 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
-            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
@@ -18,7 +17,6 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.ui.labels :refer (org-labels-manager)]
-            ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -34,9 +32,7 @@
             [oc.web.components.premium-picker-modal :refer (premium-picker-modal upgraded-banner)]
             [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
-            [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
-            [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
             [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
@@ -53,10 +49,10 @@
                            (drv/drv :theme)
                            (drv/drv :nux)
                            (drv/drv :route/dark-allowed)
-                           (drv/drv :show-login-wall?)
                            (drv/drv :show-activity-removed?)
                            (drv/drv :current-panel)
                            (drv/drv :org-dashboard-data)
+                           (drv/drv :org-data)
                            (theme-mixins/theme-mixin)
 
                            {:did-mount (fn [s]
@@ -69,12 +65,12 @@
   [s]
   (let [loading? (drv/react s :app-loading?)
         theme-data (drv/react s :theme)
-        {:keys [org-data
-                show-alert-modal?
+        current-panel (drv/react s :current-panel)
+        org-data (drv/react s :org-data)
+        {:keys [show-alert-modal?
                 activity-share-container
                 collapsed-cmail?
                 user-info-data
-                current-panel
                 show-premium-picker?
                 payments-ui-upgraded-banner
                 ui-tooltip
@@ -94,16 +90,13 @@
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
-        show-section-editor (= current-panel :section-edit)
-        show-section-add (= current-panel :section-add)
-        show-reminders? (= current-panel :reminders)
-        show-reminder-edit? (and current-panel
-                                 (s/starts-with? (name current-panel) "reminder-"))
+        show-section-editor? (= current-panel :section-edit)
+        show-section-add? (= current-panel :section-add)
+        show-menu? (= current-panel :menu)
         show-mobile-cmail? (and (not collapsed-cmail?)
                                 is-mobile?)
         show-push-notification-permissions-modal?(and ua/mobile-app?
                                                       show-push-notification-permissions-modal?)
-        ;; show-follow-picker (= current-panel :follow-picker)
         mobile-search? (and is-mobile?
                             show-search?)]
     (if is-loading
@@ -116,7 +109,7 @@
                                   :expanded-activity show-expanded-post?
                                   :top-banner payments-ui-upgraded-banner
                                   :showing-upgraded-banner payments-ui-upgraded-banner
-                                  :show-menu (= current-panel :menu)})}
+                                  :show-menu show-menu?})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (if nux
@@ -157,17 +150,11 @@
           ;; User notifications
           (= current-panel :notifications)
           (user-notifications-modal)
-          ;; Reminders list
-          show-reminders?
-          (recurring-updates-modal)
-          ;; Edit a reminder
-          show-reminder-edit?
-          (edit-recurring-update-modal)
           ;; Mobile create a new section
-          show-section-editor
+          show-section-editor?
           (section-editor initial-section-editing)
           ;; Mobile edit current section data
-          show-section-add
+          show-section-add?
           (section-editor nil)
           ;; Activity share for mobile
           (and is-mobile?
@@ -182,9 +169,6 @@
           ;; User info modal
           show-user-info?
           (user-info-modal {:user-data user-info-data :org-data org-data})
-          ;; Follow user picker
-          ;; show-follow-picker
-          ;; (follow-picker)
           ;; Mobile fullscreen search
           mobile-search?
           (search-box))
@@ -208,7 +192,7 @@
         ;; selector for whats-new widget to be present
         (when (or (not is-mobile?)
                   (and is-mobile?
-                       (= current-panel :menu)))
+                       show-menu?))
           (menu))
         (when show-labels-manager?
           (org-labels-manager))
