@@ -72,7 +72,7 @@
         {:keys [org-data
                 show-alert-modal?
                 activity-share-container
-                collapsed-cmail
+                collapsed-cmail?
                 user-info-data
                 current-panel
                 show-premium-picker?
@@ -99,7 +99,7 @@
         show-reminders? (= current-panel :reminders)
         show-reminder-edit? (and current-panel
                                  (s/starts-with? (name current-panel) "reminder-"))
-        show-mobile-cmail? (and (not collapsed-cmail)
+        show-mobile-cmail? (and (not collapsed-cmail?)
                                 is-mobile?)
         show-push-notification-permissions-modal?(and ua/mobile-app?
                                                       show-push-notification-permissions-modal?)
