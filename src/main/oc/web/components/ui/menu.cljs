@@ -365,9 +365,9 @@
             {:href "#"
              :on-click (fn [e]
                          (dom-utils/prevent-default! e)
-                         (sentry/test-error-dialog))}
+                         (sentry/show-report-dialog))}
             [:div.oc-menu-item.support
-              "Test feedback"]]
+              "Report a problem"]]
           ;; Desktop app
           (when native-app-data
             [:a
