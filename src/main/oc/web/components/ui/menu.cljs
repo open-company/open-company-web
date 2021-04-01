@@ -361,13 +361,13 @@
             [:div.oc-menu-item.support
               "Get support"]]
           ;; Test error with feedback
-          [:a
-            {:href "#"
-             :on-click (fn [e]
-                         (dom-utils/prevent-default! e)
-                         (sentry/test-error-dialog))}
-            [:div.oc-menu-item.support
-              "Test feedback"]]
+;;           [:a
+;;             {:href "#"
+;;              :on-click (fn [e]
+;;                          (dom-utils/prevent-default! e)
+;;                          (sentry/show-report-dialog))}
+;;             [:div.oc-menu-item.support
+;;               "Report a problem"]]
           ;; Desktop app
           (when native-app-data
             [:a
