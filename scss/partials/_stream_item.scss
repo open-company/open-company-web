@@ -219,7 +219,7 @@ div.stream-item {
       display: block;
     }
 
-    div.stream-header-head-author {
+    div.stream-item-header-head-author {
       height: 24px;
       flex: 0 0 auto;
       margin-right: 8px;
@@ -710,9 +710,5 @@ div.stream-item {
         display: block;
       }
     }
-  }
-
-  .foc-click-stop {
-    display: contents;
   }
 }

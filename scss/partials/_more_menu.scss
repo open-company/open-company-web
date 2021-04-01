@@ -19,6 +19,12 @@ div.more-menu {
     }
   }
 
+  div.foc-labels-picker-wrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+  }
+
   button.more-menu-bt {
     height: 32px;
     width: 32px;
@@ -38,7 +44,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -68,7 +74,7 @@ div.more-menu {
       border-right: none;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -118,7 +124,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -163,7 +169,7 @@ div.more-menu {
         opacity: 1;
       }
 
-      &:hover, &:active, &:focus {
+      &:hover, &:active, &:focus, &.active {
         opacity: 1;
 
         @include mobile() {
@@ -201,7 +207,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -240,7 +246,7 @@ div.more-menu {
       border-radius: 4px;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -279,7 +285,29 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-edit-labels-bt {
+    height: 32px;
+    width: 32px;
+    @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--color));
+    padding: 0;
+    opacity: 0.5;
+    display: inline-block;
+
+    @include mobile() {
+      border-radius: 4px;
+      opacity: 1;
+    }
+
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -318,7 +346,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -723,6 +751,32 @@ div.more-menu {
               @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 18px 18px, var(--color));
               position: absolute;
               top: 15px;
+              left: 15px;
+            }
+
+            &.pinned:before {
+              transform: rotate(-45deg);
+              margin-top: 2px;
+            }
+          }
+
+          &.edit-labels {
+            padding-left: 56px;
+
+            &.disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+
+            &:before {
+              transition: transform 180ms ease-in, margin-top 180ms ease-in;
+              content: "";
+              width: 18px;
+              height: 14px;
+              margin-top: 0px;
+              @include svgBgColor("/img/ML/label_icon.svg", center, 18px 14px, var(--color));
+              position: absolute;
+              top: 17px;
               left: 15px;
             }
 

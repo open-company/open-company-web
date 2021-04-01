@@ -892,6 +892,22 @@
    (let [entry-pin-key (pin-key org-slug entry-uuid pin-container-uuid)]
      (get-in data entry-pin-key))))
 
+(defn ^:export entry-labels-data
+  ([] (entry-labels-data @app-state (current-org-slug) (current-activity-id)))
+  ([activity-id] (entry-labels-data @app-state (current-org-slug) activity-id))
+  ([org-slug activity-id] (entry-labels-data @app-state org-slug activity-id))
+  ([data org-slug activity-id]
+   (let [entry-with-labels (entry-data org-slug activity-id data)]
+     (:labels entry-with-labels))))
+
+(defn ^:export entry-label-data
+  ([label-uuid] (entry-label-data @app-state (current-org-slug) (current-activity-id) label-uuid))
+  ([activity-id label-uuid] (entry-label-data @app-state (current-org-slug) activity-id label-uuid))
+  ([org-slug activity-id label-uuid] (entry-label-data @app-state org-slug activity-id label-uuid))
+  ([data org-slug activity-id label-uuid]
+   (let [entry-labels (entry-labels-data data org-slug activity-id)]
+     (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
+
 (defn ^:export secure-activity-data
   "Get secure activity data."
   ([]

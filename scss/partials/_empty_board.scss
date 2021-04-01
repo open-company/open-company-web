@@ -60,7 +60,7 @@ div.empty-board {
             display: block;
             width: 24px;
             height: 24px;
-            @include svgBgColor("/img/ML/label_icon.svg", center, 24px 24px, var(--color));
+            @include svgBgColor("/img/ML/label_icon.svg", center, 24px 18px, var(--color));
             position: absolute;
             top: 18px;
             left: 18px;

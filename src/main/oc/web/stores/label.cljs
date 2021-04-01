@@ -129,3 +129,32 @@
           (assoc-in label-entries-data-key new-label-entries-data)
           (assoc-in posts-data-key new-items-map)))
     db))
+
+(defmethod dispatcher/action :toggle-foc-labels-picker
+  [db [_ entry-uuid]]
+  (assoc db :foc-labels-picker entry-uuid))
+
+(defmethod dispatcher/action :entry-label/add
+  [db [_ org-slug entry-uuid label-uuid]]
+  (let [entry-labels-key (conj (dispatcher/activity-key org-slug entry-uuid) :labels)
+        ;; entry-data (get-in db entry-key)
+        label-data (dispatcher/label-data db org-slug label-uuid)
+        entry-label-to-add (label-utils/clean-entry-label label-data)
+        entry-labels (get-in db entry-labels-key)
+        entry-labels-set (set (map :uuid entry-labels))
+        label-is-present? (entry-labels-set (:uuid label-uuid))
+        can-change? (or label-is-present?
+                        (label-utils/can-add-label? entry-labels))]
+    (if can-change?
+      (update-in db entry-labels-key #(vec (conj % entry-label-to-add)))
+      db)))
+
+(defmethod dispatcher/action :entry-label/remove
+  [db [_ org-slug entry-uuid label-uuid]]
+  (let [entry-labels-key (conj (dispatcher/activity-key org-slug entry-uuid) :labels)
+        entry-labels (get-in db entry-labels-key)
+        entry-labels-set (set (map :uuid entry-labels))
+        label-is-not-present? (not (entry-labels-set (:uuid label-uuid)))]
+    (if label-is-not-present?
+      (update-in db entry-labels-key (fn [labels] (filterv #(not= (:uuid %) label-uuid) labels)))
+      db)))

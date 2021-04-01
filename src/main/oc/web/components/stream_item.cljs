@@ -188,7 +188,8 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? foc-menu-open clear-cell-measure-cb premium?]}]
+             current-user-data container-slug show-new-comments? foc-menu-open foc-labels-picker
+             clear-cell-measure-cb premium?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
@@ -205,23 +206,27 @@
                                mobile-more-menu-el)
         is-home? (-> container-slug keyword (= :following))
         is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
-        more-menu-comp #(more-menu
-                          {:entity-data activity-data
-                           :share-container-id dom-element-id
-                           :editable-boards editable-boards
-                           :external-share (not is-mobile?)
-                           :external-bookmark (not is-mobile?)
-                           :external-follow (not is-mobile?)
-                           :show-home-pin is-home?
-                           :show-board-pin is-entry-board?
-                           :show-edit? true
-                           :show-delete? true
-                           :show-move? (not is-mobile?)
-                           :will-open (fn [] (set-foc-menu-open s true))
-                           :will-close (fn [] (set-foc-menu-open s false))
-                           :force-show-menu foc-menu-open
-                           :mobile-tray-menu mobile-more-menu?
-                           :current-user-data current-user-data})
+        more-menu-comp ;;(fn []
+                         (partial more-menu
+                                  {:entity-data activity-data
+                                   :share-container-id dom-element-id
+                                   :editable-boards editable-boards
+                                   :external-share (not is-mobile?)
+                                   :external-bookmark (not is-mobile?)
+                                   :external-follow (not is-mobile?)
+                                   :show-home-pin is-home?
+                                   :show-board-pin is-entry-board?
+                                   :show-edit? true
+                                   :show-delete? true
+                                   :show-move? (not is-mobile?)
+                                   :will-open (fn [] (set-foc-menu-open s true))
+                                   :will-close (fn [] (set-foc-menu-open s false))
+                                   :force-show-menu (or foc-menu-open foc-labels-picker)
+                                   :show-labels-picker foc-labels-picker
+                                   :mobile-tray-menu mobile-more-menu?
+                                   :current-user-data current-user-data
+                                   :external-labels true
+                                   :custom-class "foc-click-stop"}) ;)
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
@@ -258,7 +263,7 @@
       [:div.stream-item-header.group
        {:class (when (seq (:labels activity-data))
                  "has-labels")}
-       [:div.stream-header-head-author
+       [:div.stream-item-header-head-author
         (post-authorship {:activity-data activity-data
                           :user-avatar? true
                           :user-hover? true
@@ -289,12 +294,11 @@
         [:div.bookmark-tag-small.mobile-only]
         [:div.bookmark-tag.big-web-tablet-only]
         [:div.pinned-tag]]
-       [:div.foc-click-stop
-        (when is-published?
+       (when is-published?
         (if is-mobile?
           (when mobile-more-menu?
             (rum/portal (more-menu-comp) mobile-more-menu-el))
-          (more-menu-comp)))]
+          (more-menu-comp)))
        [:div.activity-share-container]]
       [:div.stream-item-content
         {:class (when show-body-thumbnail? "has-preview")}

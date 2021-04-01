@@ -369,7 +369,7 @@ div.dashboard-layout {
               &.label-icon {
                 padding-left: 28px;
                 &:before {
-                  @include svgBgColor("/img/ML/label_icon.svg", center, 16px 16px, var(--color));
+                  @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--color));
                 }
               }
 
@@ -534,7 +534,7 @@ div.dashboard-layout {
             span.manage-labels-bt-icon {
               width: 11px;
               height: 11px;
-              @include svgBgColor("/img/ML/label_icon.svg", center, 11px 11px, var(--primary-color));
+              @include svgBgColor("/img/ML/label_icon.svg", center, 11px 8px, var(--primary-color));
               margin-left: auto;
               margin-right: 4px;
             }

@@ -9,10 +9,12 @@
             [oc.web.utils.ui :as uu]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.pin :as pin-actions]
+            [oc.web.actions.label :as label-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.foc-labels-picker :refer (foc-labels-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
 (defn- currently-shown? [s]
@@ -48,7 +50,7 @@
 
 ;; Delete handling
 
-(defn delete-clicked [e current-org-slug current-board-slug current-contributions-id activity-data]
+(defn delete-clicked [e current-org-slug current-board-slug current-contributions-id current-label-slug activity-data]
   (let [alert-data {:action "delete-entry"
                     :title "Delete this post?"
                     :message "This action cannot be undone."
@@ -69,6 +71,8 @@
                                                             (oc-urls/unfollowing current-org-slug)
                                                             (seq current-contributions-id)
                                                             (oc-urls/contributions current-org-slug current-contributions-id)
+                                                            (seq current-label-slug)
+                                                            (oc-urls/label current-org-slug current-label-slug)
                                                             :else
                                                             (oc-urls/board current-org-slug current-board-slug))]
                                        (router/nav! board-url)
@@ -103,27 +107,43 @@
                                              (reset! (::can-unmount s) false)
                                              (utils/after 1000 #(reset! (::can-unmount s) true)))))
                                        s)}
-  [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
-             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
-             can-comment-share? comment-share-cb can-react? react-cb can-reply? react-disabled?
-             reply-cb external-bookmark remove-bookmark-title
-             show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
-             mark-unread-cb current-user-data hide-bookmark? hide-share?
-             show-home-pin show-board-pin ]}]
-  (let [{current-org-slug :org
+  [s {:keys [entity-data current-user-data
+             hide-share? external-share share-container-id
+             editable-boards
+             will-open will-close tooltip-position force-show-menu mobile-tray-menu custom-class
+             show-edit? edit-cb
+             show-delete? delete-cb
+             show-move?
+             can-comment-share? comment-share-cb
+             can-react? react-cb react-disabled?
+             can-reply? reply-cb
+             external-bookmark hide-bookmark?
+             external-follow
+             show-home-pin show-board-pin
+             external-labels hide-labels? show-labels-picker]}]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        {current-org-slug :org
          current-board-slug :board
          current-contributions-id :contributions
+         current-label-slug :label
          current-activity-id :activity}          (drv/react s :route)
         delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (when-not hide-share? (utils/link-for (:links entity-data) "share"))
-        inbox-unread-link (utils/link-for (:links entity-data) "unread")
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        show-external-share? (and (not is-mobile?)
+                                  external-share
+                                  share-link)
         add-bookmark-link (when-not hide-bookmark? (utils/link-for (:links entity-data) "bookmark" "POST"))
         remove-bookmark-link (when (and (not hide-bookmark?) (:bookmarked-at entity-data))
                                (utils/link-for (:links entity-data) "bookmark" "DELETE"))
+        show-external-bookmarks? (and external-bookmark
+                                         (or add-bookmark-link
+                                             remove-bookmark-link))
         follow-link (utils/link-for (:links entity-data) "follow")
         unfollow-link (utils/link-for (:links entity-data) "unfollow")
+        show-external-follow? (and external-follow
+                                   (or follow-link
+                                       unfollow-link))
         showing-menu? (currently-shown? s)
         can-move-item? (and show-move?
                             edit-link
@@ -154,6 +174,11 @@
                             "Unpin")
                           (str "Pin to #" (:board-name entity-data)))
         pins? (or can-home-pin? can-board-pin?)
+        can-edit-labels? (and ls/labels-enabled?
+                              (not hide-labels?)
+                              edit-link)
+        show-external-labels? (and external-labels
+                                   can-edit-labels?)
         should-show-more-bt (or (and show-edit?
                                      edit-link)
                                 (and show-delete?
@@ -163,12 +188,14 @@
                                 can-reply?
                                 (and (not external-share)
                                      share-link)
-                                (and inbox-unread-link
-                                     show-unread)
+                                (and (not external-bookmark)
+                                     (or add-bookmark-link
+                                         remove-bookmark-link))
+                                (and (not external-labels)
+                                     can-edit-labels?)
                                 pins?)]
     (when (or edit-link
               share-link
-              inbox-unread-link
               delete-link
               can-comment-share?
               can-react?
@@ -177,16 +204,19 @@
               remove-bookmark-link
               follow-link
               unfollow-link
-              pins?)
+              pins?
+              can-edit-labels?
+              show-labels-picker)
       [:div.more-menu
-        {:ref "more-menu"
-         :class (utils/class-set {:menu-expanded showing-menu?
+        {:class (utils/class-set {:menu-expanded showing-menu?
                                   :has-more-menu-bt should-show-more-bt
                                   :mobile-tray-menu mobile-tray-menu
                                   :android-browser (and ua/android?
                                                         (not ua/mobile-app?))
                                   :ios-browser (and ua/ios?
-                                                    (not ua/mobile-app?))})
+                                                    (not ua/mobile-app?))
+                                  custom-class (seq custom-class)})
+         :ref "more-menu"
          :on-click (when mobile-tray-menu
                      #(when (and showing-menu?
                                  @(::can-unmount s))
@@ -195,7 +225,6 @@
         (when should-show-more-bt
           [:button.mlb-reset.more-menu-bt
             {:type "button"
-             :ref "more-menu-bt"
              :on-click #(toggle-menu s will-open will-close)
              :class (when showing-menu? "active")
              :data-toggle (if is-mobile? "" "tooltip")
@@ -203,6 +232,9 @@
              :data-container "body"
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "More"}])
+        (when show-labels-picker
+          [:div.foc-labels-picker-wrapper
+           (foc-labels-picker entity-data)])
         (cond
           @(::move-activity s)
           (activity-move {:activity-data entity-data
@@ -216,7 +248,6 @@
                                       :has-add-bookmark (and remove-bookmark-link
                                                              (or is-mobile?
                                                                  (not external-bookmark)))
-                                      :has-mark-unread inbox-unread-link
                                       :has-pins pins?})}
             (when (and edit-link
                        show-edit?)
@@ -237,7 +268,7 @@
                               (hide-menu s will-close)
                               (if (fn? delete-cb)
                                 (delete-cb entity-data)
-                                (delete-clicked % current-org-slug current-board-slug current-contributions-id entity-data)))}
+                                (delete-clicked % current-org-slug current-board-slug current-contributions-id current-label-slug entity-data)))}
                 "Delete"])
             (when can-move-item?
               [:li.move.top-rounded
@@ -247,6 +278,8 @@
                                             (not external-follow)))
                                   (not (or is-mobile?
                                           (not external-bookmark)))
+                                  (not (or is-mobile?
+                                           (not external-labels)))
                                   (not pins?))
                           "bottom-rounded bottom-margin")
                 :on-click #(do
@@ -256,44 +289,40 @@
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:class (when (and (not inbox-unread-link)
-                                   (not (or is-mobile?
+                {:class (when (and (not (or is-mobile?
                                             (not external-follow)))
                                    (not (or is-mobile?
                                             (not external-bookmark)))
+                                   (not (or is-mobile?
+                                            (not external-labels)))
                                    (not pins?))
                           "bottom-rounded bottom-margin")
                  :on-click #(do
                               (hide-menu s will-close)
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (when (and inbox-unread-link
-                       show-unread)
-              [:li.unread
-                {:class (when (and (not (or is-mobile?
-                                            (not external-follow)))
-                                   (not (or is-mobile?
-                                            (not external-bookmark)))
-                                   (not pins?))
-                          "bottom-rounded bottom-margin")
-                 :on-click #(do
-                              (hide-menu s will-close)
-                              (activity-actions/mark-unread entity-data)
-                              (when (fn? mark-unread-cb)
-                                (mark-unread-cb)))}
-                "Mark as unread"])
             (when (or is-mobile?
                       (not external-follow))
               (if follow-link
                 [:li.follow
-                  {:class (when-not pins? "bottom-rounded bottom-margin")
+                  {:class (when (and (or is-mobile?
+                                         (not external-bookmark))
+                                     (or is-mobile?
+                                         (not external-labels))
+                                     pins?)
+                            "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (hide-menu s will-close)
                                 (activity-actions/entry-follow (:uuid entity-data)))}
                   "Follow"]
                 (when unfollow-link
                   [:li.unfollow
-                    {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
+                    {:class (when (and (or is-mobile?
+                                           (not external-bookmark))
+                                       (or is-mobile?
+                                           (not external-labels))
+                                       pins?)
+                              "bottom-rounded bottom-margin")
                      :on-click #(do
                                   (hide-menu s will-close)
                                   (activity-actions/entry-unfollow (:uuid entity-data)))}
@@ -301,38 +330,46 @@
             (when (or is-mobile?
                       (not external-bookmark))
               (if remove-bookmark-link
-                [:li.remove-bookmark.bottom-rounded.bottom-margin
-                  {:class (when-not pins? "bottom-rounded bottom-margin")
-                   :ref "more-menu-remove-bookmark-bt"
+                [:li.remove-bookmark
+                  {:class (when (and (or is-mobile?
+                                         (not external-labels))
+                                     pins?)
+                            "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (hide-menu s will-close)
                                 (activity-actions/remove-bookmark entity-data remove-bookmark-link))}
                   "Remove bookmark"]
                 (when add-bookmark-link
                   [:li.add-bookmark
-                    {:class (when-not pins? "bottom-rounded bottom-margin")
-                     :ref "more-menu-add-bookmark-bt"
+                    {:class (when (and (or is-mobile?
+                                           (not external-labels))
+                                       pins?)
+                              "bottom-rounded bottom-margin")
                      :data-container "body"
                      :on-click #(do
                                   (hide-menu s will-close)
                                   (activity-actions/add-bookmark entity-data add-bookmark-link))}
                     "Bookmark"])))
+            (when (or is-mobile?
+                      (not external-labels))
+              [:li.edit-labels.bottom-rounded.bottom-margin.top-rounded.top-margin
+               {:on-click #(label-actions/toggle-foc-labels-picker (:uuid entity-data))}
+               "Edit labels"])
             (when can-home-pin?
               [:li.toggle-pin.home-pin
                {:class (utils/class-set {:bottom-rounded (not can-board-pin?)
                                          :bottom-margin (not can-board-pin?)
                                          :pinned home-pinned?
                                          :disabled private-board?})
-                :ref "more-menu-home-pin-bt"
                 :on-click #(do
                              (hide-menu s will-close)
                              (when-not private-board?
                                (pin-actions/toggle-home-pin! entity-data home-pin-link)))
                 :title (when private-board?
                          "Private posts can’t be pinned to the Home feed")
-                :data-toggle (when-not is-mobile? "tooltip"
+                :data-toggle (when-not is-mobile? "tooltip")
                 :data-placement "top"
-                :data-container "body")}
+                :data-container "body"}
                home-pin-title])
             (when can-board-pin?
               [:li.toggle-pin.board-pin
@@ -340,7 +377,6 @@
                                          :bottom-margin true
                                          :pinned board-pinned?
                                          :disabled (not can-board-pin?)})
-                :ref "more-menu-board-pin-bt"
                 :on-click #(do
                              (hide-menu s will-close)
                              (when can-board-pin?
@@ -367,25 +403,25 @@
                               (hide-menu s will-close)
                               (when (fn? comment-share-cb)
                                 (comment-share-cb)))}
-                "Copy link"])
-            (when show-inbox?
-              [:li.dismiss.top-rounded.bottom-rounded
-                {:on-click #(do
-                              (hide-menu s will-close)
-                              (activity-actions/inbox-dismiss (:uuid entity-data))
-                              (when (seq current-activity-id)
-                                (nav-actions/dismiss-post-modal %)))}
-                "Dismiss"])])
-        (when (and external-share
-                   share-link)
+                "Copy link"])])
+        (when show-external-labels?
+          [:button.mlb-reset.more-menu-edit-labels-bt
+           {:type "button"
+            :class (utils/class-set {:has-next-bt (or show-external-share?
+                                                      show-external-follow?
+                                                      show-external-bookmarks?)
+                                     :active show-labels-picker})
+            :on-click #(label-actions/toggle-foc-labels-picker (:uuid entity-data))
+            :data-toggle (if is-mobile? "" "tooltip")
+            :data-placement (or tooltip-position "top")
+            :data-container "body"
+            :title "Edit labels"}])
+        (when show-external-share?
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
-             :ref "tile-menu-share-bt"
-             :class (when (or follow-link
-                              unfollow-link
-                              (and external-bookmark
-                                   (or add-bookmark-link
-                                       remove-bookmark-link))) "has-next-bt")
+             :class (when (or show-external-follow?
+                              show-external-bookmarks?)
+                      "has-next-bt")
              :on-click #(do
                           (hide-menu s will-close)
                           (activity-actions/activity-share-show entity-data share-container-id))
@@ -394,76 +430,52 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
-        (when external-follow
+        (when show-external-follow?
           (if follow-link
             [:button.mlb-reset.more-menu-entry-follow-bt
             {:type "button"
-             :ref "more-menu-entry-follow-bt"
              :key "more-menu-entry-follow-bt"
-             :class (when (and external-bookmark
-                               (or add-bookmark-link
-                                   remove-bookmark-link)) "has-next-bt")
+             :class (when (or show-external-bookmarks?)
+                      "has-next-bt")
              :on-click #(do
                           (hide-menu s will-close)
                           (activity-actions/entry-follow (:uuid entity-data)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :title uu/watch-activity-copy
-             }]
+             :title uu/watch-activity-copy}]
             (when unfollow-link
               [:button.mlb-reset.more-menu-entry-unfollow-bt
                 {:type "button"
-                 :ref "more-menu-entry-unfollow-bt"
                  :key "more-menu-entry-unfollow-bt"
-                 :class (when (and external-bookmark
-                                   (or add-bookmark-link
-                                       remove-bookmark-link)) "has-next-bt")
+                 :class (when (or show-external-bookmarks?)
+                          "has-next-bt")
                  :on-click #(do
                               (hide-menu s will-close)
                               (activity-actions/entry-unfollow (:uuid entity-data)))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title uu/unwatch-activity-copy
-                 }])))
-        (when external-bookmark
+                 :title uu/unwatch-activity-copy}])))
+        (when show-external-bookmarks?
           (if remove-bookmark-link
             [:button.mlb-reset.more-menu-remove-bookmark-bt
               {:type "button"
-               :ref "more-menu-remove-bookmark-bt"
-               :class (when show-inbox? "has-next-bt")
                :on-click #(do
                             (hide-menu s will-close)
                             (activity-actions/remove-bookmark entity-data remove-bookmark-link))
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Remove bookmark"}
-              remove-bookmark-title]
+               :title "Remove bookmark"}]
             (when add-bookmark-link
               [:div.more-menu-add-bookmark-bt-container
                 [:button.mlb-reset.more-menu-add-bookmark-bt
                   {:type "button"
-                   :ref "more-menu-add-bookmark-bt"
-                   :class (when show-inbox? "has-next-bt")
                    :on-click #(do
                                 (hide-menu s will-close)
                                 (activity-actions/add-bookmark entity-data add-bookmark-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
                    :data-container "body"
-                   :title "Bookmark"}]])))
-        (when show-inbox?
-          [:button.mlb-reset.more-menu-inbox-dismiss-bt
-            {:type "button"
-             :ref "more-menu-inbox-dismiss-bt"
-             :on-click #(do
-                          (hide-menu s will-close)
-                          (activity-actions/inbox-dismiss (:uuid entity-data))
-                          (when (seq current-activity-id)
-                            (nav-actions/dismiss-post-modal %)))
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement (or tooltip-position "top")
-             :data-container "body"
-             :title "Dismiss"}])])))
+                   :title "Bookmark"}]])))])))

@@ -1128,3 +1128,26 @@
                   {:headers (headers-for-link label-entries-link)}
                   callback)
     (handle-missing-link "get-label-entries" label-entries-link callback)))
+
+(defn add-entry-label [add-entry-label-link callback]
+  (if add-entry-label-link
+    (storage-http (method-for-link add-entry-label-link) (relative-href add-entry-label-link)
+                  {:headers (headers-for-link add-entry-label-link)}
+                  callback)
+    (handle-missing-link "add-entry-label" add-entry-label-link callback)))
+
+(defn remove-entry-label [remove-entry-label-link callback]
+  (if remove-entry-label-link
+    (storage-http (method-for-link remove-entry-label-link) (relative-href remove-entry-label-link)
+                  {:headers (headers-for-link remove-entry-label-link)}
+                  callback)
+    (handle-missing-link "remove-entry-label" remove-entry-label-link callback)))
+
+(defn entry-label-changes [label-changes-link add-remove-labels-map callback]
+  (if label-changes-link
+    (let [payload (cljs->json add-remove-labels-map)]
+      (storage-http (method-for-link label-changes-link) (relative-href label-changes-link)
+                    {:headers (headers-for-link label-changes-link)
+                     :json-params payload}
+                    callback))
+    (handle-missing-link "entry-label-changes" label-changes-link callback add-remove-labels-map)))
