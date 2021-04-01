@@ -1,5 +1,5 @@
 (ns oc.web.actions.label
-  (:require-macros [if-let.core :refer (if-let*)])
+  (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [oc.web.dispatcher :as dis]
             [defun.core :refer (defun)]
             [oc.lib.hateoas :as hateoas]
@@ -209,3 +209,46 @@
                                    (and (#{:update :delete} change-type)
                                         contains-current-label?))
                            (label-entries-get current-label-slug)))))))
+
+;; Changes to labels inside an entry
+
+(defn entry-label-add [entry-uuid label-uuid]
+  (when-let* [org-slug (dis/current-org-slug)
+              entry-data (dis/entry-data entry-uuid)
+              label-data (dis/label-data label-uuid)
+              add-label-link (hateoas/link-for (:links label-data)
+                                               "partial-add-entry-label" {}
+                                               {:board-slug (:board-slug entry-data)
+                                                :entry-uuid entry-uuid})]
+    (dis/dispatch! [:entry-label/add entry-uuid label-data])
+    (api/add-entry-label add-label-link
+                          (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+(defn entry-label-remove [entry-uuid label-uuid]
+  (when-let* [org-slug (dis/current-org-slug)
+              label-data (dis/entry-label-data entry-uuid label-uuid)
+              remove-label-link (hateoas/link-for (:links label-data) "remove-label")]
+    (dis/dispatch! [:entry-label/remove org-slug entry-uuid label-uuid])
+    (api/remove-entry-label remove-label-link
+                            (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+(defn toggle-entry-label [entry-uuid label-uuid]
+  (when (dis/entry-data entry-uuid)
+    (if (dis/entry-label-data entry-uuid label-uuid)
+      (entry-label-remove entry-uuid label-uuid)
+      (entry-label-add entry-uuid label-uuid))))
+
+(defn entry-label-changes [entry-uuid add-label-uuids remove-label-uuids]
+  (when-let* [org-slug (dis/current-org-slug)
+              entry-data (dis/entry-data entry-uuid)
+              add-remove-labels-map {:add add-label-uuids
+                                     :remove remove-label-uuids}
+              label-changes-link (hateoas/link-for (:links entry-data) "label-changes")]
+    (dis/dispatch! [:entry-label/label-changes org-slug entry-uuid add-remove-labels-map])
+    (api/entry-label-changes label-changes-link add-remove-labels-map
+                            (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+;; FoC Labels picker
+
+(defn toggle-foc-labels-picker [entry-uuid]
+  (dis/dispatch! [:toggle-foc-labels-picker entry-uuid]))

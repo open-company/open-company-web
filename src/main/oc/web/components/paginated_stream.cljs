@@ -52,11 +52,12 @@
            container-data
            editable-boards
            foc-layout
-           is-mobile
+           is-mobile?
            clear-cell-measure-cb
            current-user-data
            row-index
-           foc-menu-open] :as props}]
+           foc-menu-open
+           foc-labels-picker] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
@@ -66,7 +67,8 @@
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
                                :close-item (:close-item item)
-                               :foc-menu-open foc-menu-open})}
+                               :foc-menu-open (or foc-menu-open
+                                                  foc-labels-picker)})}
      (cond
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
@@ -78,12 +80,14 @@
                                :clear-cell-measure-cb clear-cell-measure-cb
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open
+                               :foc-labels-picker  foc-labels-picker
                                :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data
                      :show-wrt?          show-wrt?
                      :foc-menu-open      foc-menu-open
+                     :foc-labels-picker  foc-labels-picker
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
@@ -126,7 +130,8 @@
              current-user-data
              clear-cell-measure-cb
              row-index
-             foc-menu-open]
+             foc-menu-open
+             foc-labels-picker]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -161,12 +166,13 @@
         :else
         (wrapped-stream-item (merge derivatives {:item item
                                                  :read-data read-data
-                                                 :is-mobile is-mobile?
+                                                 :is-mobile? is-mobile?
                                                  :foc-layout foc-layout
                                                  :container-data container-data
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
-                                                 :foc-menu-open (boolean (= foc-menu-open (:uuid item)))})))]))
+                                                 :foc-menu-open (boolean (= foc-menu-open (:uuid item)))
+                                                 :foc-labels-picker (boolean (= foc-labels-picker (:uuid item)))})))]))
 
 ;; (defn- replies-unique-key [entry-data]
 ;;   (let [replies-data (vec (:replies-data entry-data))]
@@ -366,6 +372,7 @@
   (drv/drv :contributions-id)
   (drv/drv :label-slug)
   (drv/drv :foc-menu-open)
+  (drv/drv :foc-labels-picker)
   ;; Locals
   (rum/local nil ::scroll-listener)
   (rum/local false ::has-next)
@@ -413,7 +420,8 @@
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
-        foc-menu-open (drv/react s :foc-menu-open)]
+        foc-menu-open (drv/react s :foc-menu-open)
+        foc-labels-picker (drv/react s :foc-labels-picker)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -430,4 +438,5 @@
                                         :current-user-data current-user-data
                                         :activities-read activities-read
                                         :editable-boards editable-boards
-                                        :foc-menu-open foc-menu-open}))]]]))
+                                        :foc-menu-open foc-menu-open
+                                        :foc-labels-picker foc-labels-picker}))]]]))

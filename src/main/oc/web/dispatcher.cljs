@@ -451,6 +451,7 @@
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
    :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
+   :foc-labels-picker  [[:base] (fn [base] (:foc-labels-picker base))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-price-key [[:base] (fn [base] (get base checkout-update-price-key))]
    :expo                [[:base] (fn [base] (get-in base expo-key))]
@@ -1260,6 +1261,22 @@
   ([org-slug entry-uuid pin-container-uuid data]
    (let [entry-pin-key (pin-key org-slug entry-uuid pin-container-uuid)]
      (get-in data entry-pin-key))))
+
+(defn ^:export entry-labels-data
+  ([] (entry-labels-data @app-state (current-org-slug) (current-activity-id)))
+  ([activity-id] (entry-labels-data @app-state (current-org-slug) activity-id))
+  ([org-slug activity-id] (entry-labels-data @app-state org-slug activity-id))
+  ([data org-slug activity-id]
+   (let [entry-with-labels (entry-data org-slug activity-id data)]
+     (:labels entry-with-labels))))
+
+(defn ^:export entry-label-data
+  ([label-uuid] (entry-label-data @app-state (current-org-slug) (current-activity-id) label-uuid))
+  ([activity-id label-uuid] (entry-label-data @app-state (current-org-slug) activity-id label-uuid))
+  ([org-slug activity-id label-uuid] (entry-label-data @app-state org-slug activity-id label-uuid))
+  ([data org-slug activity-id label-uuid]
+   (let [entry-labels (entry-labels-data data org-slug activity-id)]
+     (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
 
 (defn ^:export secure-activity-data
   "Get secure activity data."

@@ -214,7 +214,7 @@
         margin-bottom: 8px;
 
         span.floating-labels-bt-icon {
-          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 16px, var(--tooltip-color));
+          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--tooltip-color));
           width: 16px;
           height: 16px;
         }
@@ -351,7 +351,7 @@
         margin-bottom: 8px;
 
         span.floating-labels-bt-icon {
-          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 16px, var(--tooltip-color));
+          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--tooltip-color));
           width: 16px;
           height: 16px;
         }
