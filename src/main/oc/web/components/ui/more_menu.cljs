@@ -17,15 +17,17 @@
             [oc.web.components.ui.foc-labels-picker :refer (foc-labels-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
-(defn- currently-shown? [s]
+(defn- menu-visible? [s]
   (or @(::move-activity s)
       @(::showing-menu s)
+      (-> s :rum/args first :foc-labels-picker)
       (-> s :rum/args first :force-show-menu)))
 
 (defn- show-menu
   [s will-open & [force]]
   (when (or force
-            (not (currently-shown? s)))
+            (not (menu-visible? s)))
+    (label-actions/toggle-foc-labels-picker)
     (utils/remove-tooltips)
     (when (fn? will-open)
       (will-open))
@@ -35,22 +37,22 @@
 (defn- hide-menu
   [s will-close & [force]]
   (when (or force
-            (currently-shown? s))
+            (menu-visible? s))
+    (label-actions/toggle-foc-labels-picker)
     (utils/remove-tooltips)
     (when (fn? will-close)
       (will-close))
     (reset! (::move-activity s) false)
     (reset! (::showing-menu s) false)))
 
-(defn- toggle-menu
-  [s will-open will-close]
-  (if (currently-shown? s)
+(defn- toggle-menu [s will-open will-close]
+  (if (menu-visible? s)
     (hide-menu s will-close true)
     (show-menu s will-open true)))
 
 ;; Delete handling
 
-(defn delete-clicked [e current-org-slug current-board-slug current-contributions-id current-label-slug activity-data]
+(defn delete-clicked [current-org-slug current-board-slug current-contributions-id current-label-slug activity-data]
   (let [alert-data {:action "delete-entry"
                     :title "Delete this post?"
                     :message "This action cannot be undone."
@@ -95,7 +97,7 @@
                        (rum/local false ::move-activity)
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
-                       (ui-mixins/on-click-out "more-menu" (fn [s e]
+                       (ui-mixins/on-click-out "more-menu" (fn [s _]
                                                              (hide-menu s (-> s :rum/args first :will-close))))
                        ui-mixins/strict-refresh-tooltips-mixin
                        {:will-update (fn [s]
@@ -120,7 +122,7 @@
              external-bookmark hide-bookmark?
              external-follow
              show-home-pin show-board-pin
-             external-labels hide-labels? show-labels-picker]}]
+             external-labels hide-labels? show-labels-picker foc-labels-picker-prefix]}]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         {current-org-slug :org
          current-board-slug :board
@@ -144,7 +146,7 @@
         show-external-follow? (and external-follow
                                    (or follow-link
                                        unfollow-link))
-        showing-menu? (currently-shown? s)
+        showing-menu? (menu-visible? s)
         can-move-item? (and show-move?
                             edit-link
                             (> (count editable-boards) 1))
@@ -222,16 +224,6 @@
                                  @(::can-unmount s))
                         (.stopPropagation %)
                         (hide-menu s will-close)))}
-        (when should-show-more-bt
-          [:button.mlb-reset.more-menu-bt
-            {:type "button"
-             :on-click #(toggle-menu s will-open will-close)
-             :class (when showing-menu? "active")
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement (or tooltip-position "top")
-             :data-container "body"
-             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
-             :title "More"}])
         (when show-labels-picker
           [:div.foc-labels-picker-wrapper
            (foc-labels-picker entity-data)])
@@ -268,7 +260,7 @@
                               (hide-menu s will-close)
                               (if (fn? delete-cb)
                                 (delete-cb entity-data)
-                                (delete-clicked % current-org-slug current-board-slug current-contributions-id current-label-slug entity-data)))}
+                                (delete-clicked current-org-slug current-board-slug current-contributions-id current-label-slug entity-data)))}
                 "Delete"])
             (when can-move-item?
               [:li.move.top-rounded
@@ -353,7 +345,9 @@
             (when (or is-mobile?
                       (not external-labels))
               [:li.edit-labels.bottom-rounded.bottom-margin.top-rounded.top-margin
-               {:on-click #(label-actions/toggle-foc-labels-picker (:uuid entity-data))}
+               {:on-click #(do
+                             (hide-menu s will-close)
+                             (label-actions/toggle-foc-labels-picker (str foc-labels-picker-prefix (:uuid entity-data))))}
                "Edit labels"])
             (when can-home-pin?
               [:li.toggle-pin.home-pin
@@ -404,6 +398,16 @@
                               (when (fn? comment-share-cb)
                                 (comment-share-cb)))}
                 "Copy link"])])
+        (when should-show-more-bt
+          [:button.mlb-reset.more-menu-bt
+           {:type "button"
+            :on-click #(toggle-menu s will-open will-close)
+            :class (when showing-menu? "active")
+            :data-toggle (if is-mobile? "" "tooltip")
+            :data-placement (or tooltip-position "top")
+            :data-container "body"
+            :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
+            :title "More"}])
         (when show-external-labels?
           [:button.mlb-reset.more-menu-edit-labels-bt
            {:type "button"
@@ -411,7 +415,9 @@
                                                       show-external-follow?
                                                       show-external-bookmarks?)
                                      :active show-labels-picker})
-            :on-click #(label-actions/toggle-foc-labels-picker (:uuid entity-data))
+            :on-click #(do
+                         (hide-menu s will-close)
+                         (label-actions/toggle-foc-labels-picker (str foc-labels-picker-prefix (:uuid entity-data))))
             :data-toggle (if is-mobile? "" "tooltip")
             :data-placement (or tooltip-position "top")
             :data-container "body"
@@ -435,7 +441,9 @@
             [:button.mlb-reset.more-menu-entry-follow-bt
             {:type "button"
              :key "more-menu-entry-follow-bt"
-             :class (when (or show-external-bookmarks?)
+             :class (when (and show-external-bookmarks?
+                               (or remove-bookmark-link
+                                   add-bookmark-link))
                       "has-next-bt")
              :on-click #(do
                           (hide-menu s will-close)
@@ -448,7 +456,9 @@
               [:button.mlb-reset.more-menu-entry-unfollow-bt
                 {:type "button"
                  :key "more-menu-entry-unfollow-bt"
-                 :class (when (or show-external-bookmarks?)
+                 :class (when (and show-external-bookmarks?
+                                   (or remove-bookmark-link
+                                       add-bookmark-link))
                           "has-next-bt")
                  :on-click #(do
                               (hide-menu s will-close)

@@ -315,11 +315,6 @@ div.expanded-post {
         padding: 0;
       }
 
-      div.expanded-post-labels {
-        margin-bottom: 8px;
-        min-height: 16px;
-      }
-
       div.expanded-post-headline {
         @include activity-title(26, 33);
         min-height: 0;
@@ -491,6 +486,12 @@ div.expanded-post {
           float: left;
           margin-left: 32px;
         }
+
+        div.expanded-post-labels {
+          float: left;
+          margin-left: 32px;
+          margin-top: 5px;
+        }
       }
 
       div.expanded-post-comments {
@@ -512,6 +513,10 @@ div.expanded-post {
 
         div.stream-comments {
           z-index: 3;
+
+          &:empty {
+            padding: 12px 0;
+          }
         }
       }
     }

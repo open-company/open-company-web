@@ -1,11 +1,9 @@
 (ns oc.web.stores.org
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.lib.utils :as utils]
+  (:require [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.activity :as activity-utils]
-            [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.stores.user :as user-store]))

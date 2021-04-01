@@ -23,6 +23,8 @@ div.more-menu {
     position: absolute;
     top: 100%;
     right: 0;
+    border: 1px solid var(--divider-line);
+    box-shadow: var(--box-shadow);
   }
 
   button.more-menu-bt {
@@ -364,7 +366,7 @@ div.more-menu {
     z-index: 110;
     background-color: var(--overlay-background-color);
     border: 1px solid var(--divider-line);
-    box-shadow: none;
+    box-shadow: var(--box-shadow);
     border-radius: 4px;
     margin: 0;
     padding: 8px 0;

@@ -19,7 +19,7 @@
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.ui.labels :refer (org-labels-manager)]
+            [oc.web.components.ui.labels :refer (org-labels-list label-editor)]
             ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
@@ -92,7 +92,8 @@
                 payments-ui-upgraded-banner
                 nux
                 ui-tooltip
-                show-labels-manager]} (drv/react s :org-dashboard-data)
+                show-labels-manager
+                show-label-editor]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
@@ -293,8 +294,10 @@
                   (and is-mobile?
                        (= open-panel :menu)))
           (menu))
-        (when show-labels-manager
-          (org-labels-manager))
+        (if show-label-editor
+          (label-editor)
+          (when show-labels-manager
+            (org-labels-list)))
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
           (push-notifications-permission-modal))

@@ -74,6 +74,10 @@
 
 ;; Labels
 
+(def ^{:export true} editing-label-key [:editing-label])
+
+(def ^{:export true} foc-labels-picker-key [:foc-labels-picker])
+
 (defn ^:export labels-key [org-slug]
   (vec (conj (org-key org-slug) :labels)))
 
@@ -183,6 +187,10 @@
 (defn ^:export activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
+    
+(defn ^:export entry-labels-key [org-slug activity-uuid]
+  (let [post-key (activity-key org-slug activity-uuid)]
+    (vec (concat post-key [:labels]))))
 
 (defn ^:export pins-key [org-slug entry-uuid]
   (let [entry-key (activity-key org-slug entry-uuid)]
@@ -451,7 +459,7 @@
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
    :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
-   :foc-labels-picker  [[:base] (fn [base] (:foc-labels-picker base))]
+   :foc-labels-picker  [[:base] (fn [base] (get-in base foc-labels-picker-key))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-price-key [[:base] (fn [base] (get base checkout-update-price-key))]
    :expo                [[:base] (fn [base] (get-in base expo-key))]
@@ -712,11 +720,11 @@
    :org-dashboard-data    [[:base :orgs :org-data :label-entries-data :container-data :posts-data :nux
                             :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id
-                            :label-slug :entry-board-slug :activity-uuid :label-data]
+                            :label-slug :entry-board-slug :activity-uuid :label-data :show-label-editor]
                             (fn [base orgs org-data label-entries-data container-data posts-data nux
                                  entry-editing jwt loading payments search-active user-info-data current-user-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id
-                                 label-slug entry-board-slug activity-uuid label-data]
+                                 label-slug entry-board-slug activity-uuid label-data show-label-editor]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -753,7 +761,8 @@
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
                                :nux nux
                                :ui-tooltip (:ui-tooltip base)
-                               :show-labels-manager (:show-labels-manager base)})]
+                               :show-labels-manager (:show-labels-manager base)
+                               :show-label-editor show-label-editor})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -786,8 +795,8 @@
    :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
    :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (user-labels-data base org-slug))]
-   :show-label-editor     [[:base] (fn [base] (:show-label-editor base))]
-   :editing-label         [[:base] (fn [base] (editing-label base))]})
+   :show-label-editor     [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
+   :editing-label         [[:base] (fn [base] (get-in base editing-label-key))]})
 
 ;; Action Loop =================================================================
 
@@ -994,7 +1003,7 @@
 (defn ^:export editing-label
   "Get the current editing label"
   ([] (editing-label @app-state))
-  ([data] (get data :editing-label)))
+  ([data] (get-in data editing-label-key)))
 
 (defn ^:export posts-data
   "Get org all posts data."
@@ -1267,8 +1276,7 @@
   ([activity-id] (entry-labels-data @app-state (current-org-slug) activity-id))
   ([org-slug activity-id] (entry-labels-data @app-state org-slug activity-id))
   ([data org-slug activity-id]
-   (let [entry-with-labels (entry-data org-slug activity-id data)]
-     (:labels entry-with-labels))))
+   (get-in data (entry-labels-key org-slug activity-id))))
 
 (defn ^:export entry-label-data
   ([label-uuid] (entry-label-data @app-state (current-org-slug) (current-activity-id) label-uuid))
@@ -1277,6 +1285,10 @@
   ([data org-slug activity-id label-uuid]
    (let [entry-labels (entry-labels-data data org-slug activity-id)]
      (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
+
+(defn ^:export foc-labels-picker
+  ([] (foc-labels-picker @app-state))
+  ([data] (get-in data foc-labels-picker-key)))
 
 (defn ^:export secure-activity-data
   "Get secure activity data."
