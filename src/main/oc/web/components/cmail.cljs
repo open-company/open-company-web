@@ -514,7 +514,7 @@
                                              :refresh true})]
                                (when-not following-board?
                                  (user-actions/toggle-board (:board-uuid cmail-data)))
-                               (nav-actions/nav-to-url! nil (:slug to-url) (:url to-url) 0 (:refresh to-url)))))))))
+                               (nav-actions/nav-to-container! nil (:slug to-url) (:url to-url) 0 (:refresh to-url)))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)

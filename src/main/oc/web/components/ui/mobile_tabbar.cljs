@@ -14,21 +14,21 @@
     [:button.mlb-reset.tab-button.following-tab
       {:on-click #(do
                     (.stopPropagation %)
-                    (nav-actions/nav-to-url! % "following" (oc-urls/following)))
+                    (nav-actions/nav-to-container! % "following" (oc-urls/following)))
       :class (when (= :following active-tab) "active")}
       [:span.tab-icon]
       [:span.tab-label "Home"]]
     [:button.mlb-reset.tab-button.topics-tab
       {:on-click #(do
                     (.stopPropagation %)
-                    (nav-actions/nav-to-url! % "topics" (oc-urls/topics)))
+                    (nav-actions/nav-to-container! % "topics" (oc-urls/topics)))
       :class (when (= :topics active-tab) "active")}
       [:span.tab-icon]
       [:span.tab-label "Explore"]]
     [:button.mlb-reset.tab-button.replies-tab
       {:on-click #(do
                     (.stopPropagation %)
-                    (nav-actions/nav-to-url! % "replies" (oc-urls/replies)))
+                    (nav-actions/nav-to-container! % "replies" (oc-urls/replies)))
       :class (when (= :replies active-tab) "active")}
       [:span.tab-icon]
       [:span.tab-label "Activity"]]

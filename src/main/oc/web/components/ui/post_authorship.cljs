@@ -55,7 +55,7 @@
              :href (oc-urls/board board-slug)
              :on-click #(do
                           (utils/event-stop %)
-                          (nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
+                          (nav-actions/nav-to-container! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
             (str board-name
                  (when (= board-access "private")
                    " (private)")

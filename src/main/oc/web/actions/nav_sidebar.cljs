@@ -14,8 +14,6 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notif-actions]
-            [oc.web.actions.label :as label-actions]
-            [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
@@ -41,13 +39,6 @@
 
 (def feed-render-delay 100)
 
-(defn- refresh-contributions-data! [author-uuid]
-  (when author-uuid
-    (utils/after feed-render-delay #(contributions-actions/contributions-get author-uuid))))
-
-(defn- reload-current-container! []
-  (utils/after feed-render-delay #(activity-actions/reload-current-container)))
-
 (defn- reset-cmail-component! [to-slug]
   ;; Let's change the QP section if it's not active and going to an editable section
   (when (and (:collapsed (dis/cmail-state))
@@ -58,10 +49,6 @@
        (dis/dispatch! [:input dis/cmail-data-key {:board-slug (:slug nav-to-board-data)
                                                   :board-name (:name nav-to-board-data)}])
        (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)])))))
-
-(defn- refresh-label-data! [label-slug]
-  (when label-slug
-    (utils/after feed-render-delay #(label-actions/label-entries-get label-slug))))
 
 (def ^{:private true} click-throttle-ms (* 1000 15))
 
@@ -79,6 +66,25 @@
       ;; Refresh container and update the seen at since it's an explicit action from the user
       (activity-actions/refresh-current-container true))))
 
+(defn- current-path []
+  (str (.. js/window -location -pathname) (.. js/window -location -search)))
+
+(defn feed-navigation!
+  "Return true in case the pathname actually changed."
+  [url router-map refresh?]
+  (when (responsive/is-mobile-size?)
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+    (notif-actions/hide-mobile-user-notifications))
+  (if (= (current-path) url)
+    (do
+      (maybe-refresh-container url)
+      false)
+    (do
+      (routing-actions/routing! router-map)
+      (.pushState (.-history js/window) #js {} (.-title js/document) url)
+      (when refresh?
+        (utils/after feed-render-delay #(activity-actions/reload-current-container))))))
+
 (defn nav-to-author!
   ([e author-uuid url]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
@@ -88,28 +94,37 @@
 
   ([e author-uuid url back-y refresh?]
    (dom-utils/prevent-default! e)
-   (when (responsive/is-mobile-size?)
-     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-     (notif-actions/hide-mobile-user-notifications))
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug author-uuid)]
-     (if (= current-path url)
-       (maybe-refresh-container (str "-author-" author-uuid))
-       (do ;; If user clicked on a different section/container
-           ;; let's switch to it using pushState and changing
-           ;; the internal router state
-         (routing-actions/routing! {:org org-slug
-                                    :contributions author-uuid
-                                    :sort-type sort-type
-                                    :scroll-y back-y
-                                    :query-params (dis/query-params)
-                                    :route [org-slug author-uuid sort-type "dashboard"]
-                                    dis/router-opts-key [dis/router-dark-allowed-key]})
-         (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (when refresh?
-           (refresh-contributions-data! author-uuid)))))))
+   (let [org-slug (dis/current-org-slug)
+         sort-type (activity-actions/saved-sort-type org-slug author-uuid)
+         next-router-map {:org org-slug
+                          :contributions author-uuid
+                          :sort-type sort-type
+                          :scroll-y back-y
+                          :query-params (dis/query-params)
+                          :route [org-slug author-uuid sort-type "dashboard"]
+                          dis/router-opts-key [dis/router-dark-allowed-key]}]
+     (feed-navigation! url next-router-map refresh?))))
+
+(defn nav-to-container!
+  ([e board-slug url]
+   (nav-to-container! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+
+  ([e board-slug url refresh?]
+   (nav-to-container! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
+
+  ([e board-slug url back-y refresh?]
+   (dom-utils/prevent-default! e)
+   (let [org-slug (dis/current-org-slug)
+         is-container? (dis/is-container? board-slug)
+         sort-type (activity-actions/saved-sort-type org-slug board-slug)
+         next-router-map {:org org-slug
+                          :board board-slug
+                          :sort-type sort-type
+                          :scroll-y back-y
+                          :query-params (dis/query-params)
+                          :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
+                          dis/router-opts-key [dis/router-dark-allowed-key]}]
+     (feed-navigation! url next-router-map refresh?))))
 
 (defn nav-to-label!
   ([e label-slug url]
@@ -120,62 +135,16 @@
 
   ([e label-slug url back-y refresh?]
    (dom-utils/prevent-default! e)
-   (when (responsive/is-mobile-size?)
-     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-     (notif-actions/hide-mobile-user-notifications))
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug label-slug)]
-     (if (= current-path url)
-       (maybe-refresh-container (str "-label-" label-slug))
-       (do ;; If user clicked on a different section/container
-           ;; let's switch to it using pushState and changing
-           ;; the internal router state
-         (routing-actions/routing! {:org org-slug
-                                    :label label-slug
-                                    :sort-type sort-type
-                                    :scroll-y back-y
-                                    :query-params (dis/query-params)
-                                    :route [org-slug label-slug sort-type "dashboard"]
-                                    dis/router-opts-key [dis/router-dark-allowed-key]})
-         (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (when refresh?
-           (refresh-label-data! label-slug)))))))
-
-(defn nav-to-url!
-  ([e board-slug url]
-   (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
-
-  ([e board-slug url refresh?]
-   (nav-to-url! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
-
-  ([e board-slug url back-y refresh?]
-   (dom-utils/prevent-default! e)
-   (when (responsive/is-mobile-size?)
-     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-     (notif-actions/hide-mobile-user-notifications))
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
-         org-slug (dis/current-org-slug)
-         sort-type (activity-actions/saved-sort-type org-slug board-slug)
-         is-container? (dis/is-container? board-slug)]
-     (if (= current-path url)
-       (maybe-refresh-container (str "-container-" board-slug))
-       (do ;; If user clicked on a different section/container
-           ;; let's switch to it using pushState and changing
-           ;; the internal router state
-         (routing-actions/routing! {:org org-slug
-                                    :board board-slug
-                                    :sort-type sort-type
-                                    :scroll-y back-y
-                                    :query-params (dis/query-params)
-                                    :route [org-slug (if is-container? "dashboard" board-slug) sort-type]
-                                    dis/router-opts-key [dis/router-dark-allowed-key]})
-         (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (when refresh?
-           (reload-current-container!))
-         (reset-cmail-component! board-slug))))))
+   (let [org-slug (dis/current-org-slug)
+         sort-type (activity-actions/saved-sort-type org-slug label-slug)
+         next-router-map {:org org-slug
+                          :label label-slug
+                          :sort-type sort-type
+                          :scroll-y back-y
+                          :query-params (dis/query-params)
+                          :route [org-slug label-slug sort-type "dashboard"]
+                          dis/router-opts-key [dis/router-dark-allowed-key]}]
+     (feed-navigation! url next-router-map refresh?))))
 
 (defn dismiss-post-modal [e]
   (let [route (dis/route)
@@ -199,7 +168,7 @@
           is-contributions?
           (nav-to-author! e contributions-id to-url back-y false)
           :else
-          (nav-to-url! e board to-url back-y false))
+          (nav-to-container! e board to-url back-y false))
     (when should-refresh-data?
       (utils/after 180 activity-actions/refresh-current-container))))
 
