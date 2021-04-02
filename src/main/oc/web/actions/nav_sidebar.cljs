@@ -14,7 +14,6 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notif-actions]
-            [oc.web.actions.label :as label-actions]
             [oc.web.actions.contributions :as contributions-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -42,10 +41,6 @@
 (defn- refresh-contributions-data [author-uuid]
   (when author-uuid
     (contributions-actions/contributions-get author-uuid)))
-
-(defn- refresh-label-data [label-slug]
-  (when label-slug
-    (label-actions/label-entries-get label-slug)))
 
 (def ^:private click-throttle-ms (* 1000 15))
 
@@ -127,7 +122,7 @@
           (.pushState (.-history js/window) #js {} (.-title js/document) url)
           (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
           (when refresh?
-            (refresh-label-data label-slug)))))))))
+            (activity-actions/reload-current-container)))))))))
 
 (defn nav-to-url!
   ([e board-slug url]
