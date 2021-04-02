@@ -1,7 +1,6 @@
 (ns oc.web.components.dashboard-layout
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
@@ -212,7 +211,7 @@
                                           :topics-view is-topics})}
                 ;; Board name and settings button
                 [:div.board-name
-                 {:class (when is-topics "topics-header")}
+                  {:class (when is-topics "topics-header")}
                   [:div.board-name-with-icon
                     {:class (when current-contributions-id "contributions")}
                     [:div.board-name-with-icon-internal
