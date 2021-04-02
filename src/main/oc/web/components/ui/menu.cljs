@@ -360,14 +360,13 @@
              :href oc-urls/contact-mail-to}
             [:div.oc-menu-item.support
               "Get support"]]
-          ;; Test error with feedback
-;;           [:a
-;;             {:href "#"
-;;              :on-click (fn [e]
-;;                          (dom-utils/prevent-default! e)
-;;                          (sentry/show-report-dialog))}
-;;             [:div.oc-menu-item.support
-;;               "Report a problem"]]
+          ;; Report a problem
+          [:a
+            {:href "#"
+             :on-click (fn [e]
+                         (sentry/show-report-dialog))}
+            [:div.oc-menu-item.support
+              "Report a problem"]]
           ;; Desktop app
           (when native-app-data
             [:a
