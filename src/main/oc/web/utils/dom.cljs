@@ -1,5 +1,6 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
+            [taoensso.timbre :as timbre]
             [oc.web.lib.responsive :as responsive]
             [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
@@ -130,3 +131,10 @@
 (defn event-stop! [e]
   (prevent-default! e)
   (stop-propagation! e))
+
+(defn dom-node? [el]
+  (instance? js/Node el))
+
+(defn node-mounted? [el]
+  (and (dom-node? el)
+       (dom-node? (oget el "parentNode"))))

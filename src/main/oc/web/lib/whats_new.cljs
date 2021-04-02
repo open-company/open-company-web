@@ -1,8 +1,9 @@
 (ns oc.web.lib.whats-new
-  (:require [oc.web.lib.utils :as utils]
+  (:require [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.web.lib.utils :as utils]
             [oc.web.dispatcher :as dis]
-            [dommy.core :refer (sel)]
-            [oops.core :refer (oget)]))
+            [oc.web.utils.dom :as dom-utils]
+            [oops.core :refer (oget ocall)]))
 
 (def initialized (atom false))
 (def latest-timeout (atom nil))
@@ -14,11 +15,10 @@
   []
   (reset! latest-timeout nil)
   (let [selector (str whats-new-selector " #HW_badge")
-        $el (sel selector)
-        parsed-val (when-not (seq $el)
-                     (js/parseInt (oget $el "innerText") 10))]
-    (if (or (nil? parsed-val)
-            (js/isNaN parsed-val)) ;; whatsnew not yet initialized, retry
+        el (sel1 selector)
+        parsed-val (when (dom-utils/dom-node? el)
+                     (int (oget el "?innerText")))]
+    (if (nil? parsed-val) ;; whatsnew not yet initialized, retry
       (reset! latest-timeout (utils/after 1000 check-whats-new-badge))
       (dis/dispatch! [:input [:show-whats-new-green-dot] (pos? parsed-val)]))))
 
@@ -30,7 +30,7 @@
    (when (exists? js/Headway)
      (reset! latest-timeout nil)
      (if (and (not @initialized)
-              (pos? (count (sel dom-selector))))
+              (dom-utils/dom-node? (sel1 dom-selector)))
        (do
          (reset! initialized true)
          (let [headway-config (clj->js {:selector dom-selector
