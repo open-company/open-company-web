@@ -563,12 +563,12 @@
   (get-org (dis/org-data) user-utils/load-follow-data))
 
 (defn- reload-current-container []
-  (when (and (not (dis/current-label-slug))
-             (not (dis/current-activity-id)))
-    (let [board-slug (dis/current-board-slug)
-          org-data (dis/org-data)
+  (when-not (dis/current-activity-id)
+    (let [org-data (dis/org-data)
+          board-slug (dis/current-board-slug)
           board-data (dis/current-container-data)
-          contributions-id (dis/current-contributions-id)]
+          contributions-id (dis/current-contributions-id)
+          label-slug (dis/current-label-slug)]
       (cond
 
         (= board-slug "topics")
@@ -609,6 +609,9 @@
 
         (seq contributions-id)
         (contrib-actions/contributions-get contributions-id)
+
+        (seq label-slug)
+        (label-actions/label-entries-get label-slug)
 
         :else
         (let [fixed-board-data (or board-data
