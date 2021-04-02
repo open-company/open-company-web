@@ -140,3 +140,10 @@
 (defn event-stop! [e]
   (prevent-default! e)
   (stop-propagation! e))
+
+(defn dom-node? [el]
+  (instance? js/Node el))
+
+(defn node-mounted? [el]
+  (and (dom-node? el)
+       (dom-node? (oget el "parentNode"))))
