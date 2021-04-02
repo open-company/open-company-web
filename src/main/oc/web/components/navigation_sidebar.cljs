@@ -87,15 +87,15 @@
 
 (defn- home-clicked [e]
   (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-url! e "following" (oc-urls/following)))
+  (nav-actions/nav-to-container! e "following" (oc-urls/following)))
 
 (defn- explore-clicked [e]
   (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-url! e "topics" (oc-urls/topics)))
+  (nav-actions/nav-to-container! e "topics" (oc-urls/topics)))
 
 (defn- activity-clicked [e]
   (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-url! e "replies" (oc-urls/replies)))
+  (nav-actions/nav-to-container! e "replies" (oc-urls/replies)))
 
 (defn- profile-clicked [user-id e]
   (dom-utils/prevent-default! e)
@@ -103,11 +103,11 @@
 
 (defn- bookmarks-clicked [e]
   (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-url! e "bookmarks" (oc-urls/bookmarks)))
+  (nav-actions/nav-to-container! e "bookmarks" (oc-urls/bookmarks)))
 
 (defn- board-clicked [board-slug e]
   (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-url! e board-slug (oc-urls/board board-slug)))
+  (nav-actions/nav-to-container! e board-slug (oc-urls/board board-slug)))
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
