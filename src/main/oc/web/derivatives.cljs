@@ -492,4 +492,3 @@
    :user-labels           [[:base :org-slug] (fn [base org-slug] (dis/user-labels-data base org-slug))]
    :show-label-editor?    [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
    :editing-label         [[:base] (fn [base] (get-in base dis/editing-label-key))]})
-
