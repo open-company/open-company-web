@@ -681,7 +681,7 @@
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline.emojiable
                 {:class utils/hide-class
-                 :content-editable "plaintext-only"
+                 :content-editable (ui-utils/content-editable-value)
                  :key (str "cmail-headline-" (:key cmail-state))
                  :placeholder au/headline-placeholder
                  :ref "headline"
