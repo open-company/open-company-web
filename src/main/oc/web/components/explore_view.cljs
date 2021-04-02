@@ -51,7 +51,7 @@
             :on-click (fn [e]
                         (utils/event-stop e)
                         (when-not (utils/button-clicked? e)
-                          (nav-actions/nav-to-url! e (:slug item) (oc-urls/board (:slug item)))))}
+                          (nav-actions/nav-to-container! e (:slug item) (oc-urls/board (:slug item)))))}
            [:div.explore-view-block-title
             {:class (utils/class-set {:short-name (< (count (:name item)) 15)})}
             [:span.board-name (:name item)]

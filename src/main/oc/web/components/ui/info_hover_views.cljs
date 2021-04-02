@@ -9,7 +9,6 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.follow-button :refer (follow-button)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -29,7 +28,7 @@
       [:button.mlb-reset.posts-bt
         {:on-click #(do
                       (utils/event-stop %)
-                      (nav-actions/nav-to-url! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
+                      (nav-actions/nav-to-container! % (:board-slug activity-data) (oc-urls/board (:board-slug activity-data))))}
         "Posts"]
       (follow-button {:following following
                       :resource-type :board

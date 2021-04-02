@@ -563,7 +563,8 @@
   (when-not (dis/current-activity-id)
     (let [board-slug (dis/current-board-slug)
           org-data (dis/org-data)
-          board-data (dis/current-container-data)]
+          board-data (dis/current-container-data)
+          contributions-id (dis/current-contributions-id)]
       (cond
 
         (= board-slug "topics")
@@ -601,6 +602,9 @@
         (and (= board-slug "unfollowing")
              (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-unfollowing-get org-data)
+
+        (seq contributions-id)
+        (contrib-actions/contributions-get contributions-id)
 
         :else
         (let [fixed-board-data (or board-data
