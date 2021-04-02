@@ -19,7 +19,7 @@
     (label-actions/get-labels)
     s)})
 
-(defn- add-label-bt [{label-text :label-text on-click :on-click}]
+(defn add-label-bt [{label-text :label-text on-click :on-click}]
   [:button.mlb-reset.add-label-bt
    {:on-click (when (fn? on-click)
                 on-click)}
@@ -33,31 +33,32 @@
   (drv/drv :org-labels)
   [s]
   (let [org-labels (drv/react s :org-labels)]
-    [:div.oc-labels
-     [:div.oc-labels-title
-      "Add labels"]
-     (if (seq org-labels)
-       (for [label org-labels]
-        [:button.mlb-reset.oc-label
-          {:data-label-slug (:slug label)
-           :class (when (:can-edit? label) "editable")
-           :key (str "label-" (or (:uuid label) (rand 1000)))
-           :on-click (when (:can-edit? label)
-                       (fn [e]
-                         (dom-utils/stop-propagation! e)
-                         (label-actions/edit-label label)))}
-          ;; (carrot-checkbox {:selected false})
-          [:span.oc-label-name
-           (:name label)]
-          [:span.oc-label-edit-pen]])
-       [:div.oc-labels-empty
-        "No labels yet"])
-     (add-label-bt {:label-text "Add label"
-                    :on-click #(label-actions/new-label)})
-     [:div.oc-labels-footer
-      [:button.mlb-reset.cancel-bt
-       {:on-click #(label-actions/hide-labels-manager)}
-       "Close"]]]))
+    [:div.oc-labels-modal-wrapper
+      [:div.oc-labels.oc-labels-modal
+      [:div.oc-labels-title
+        "Add labels"]
+      (if (seq org-labels)
+        (for [label org-labels]
+          [:button.mlb-reset.oc-label
+            {:data-label-slug (:slug label)
+            :class (when (:can-edit? label) "editable")
+            :key (str "label-" (or (:uuid label) (rand 1000)))
+            :on-click (when (:can-edit? label)
+                        (fn [e]
+                          (dom-utils/stop-propagation! e)
+                          (label-actions/edit-label label)))}
+            ;; (carrot-checkbox {:selected false})
+            [:span.oc-label-name
+            (:name label)]
+            [:span.oc-label-edit-pen]])
+        [:div.oc-labels-empty
+          "No labels yet"])
+      (add-label-bt {:label-text "Add label"
+                      :on-click #(label-actions/new-label)})
+      [:div.oc-labels-footer
+        [:button.mlb-reset.cancel-bt
+        {:on-click #(label-actions/hide-labels-manager)}
+        "Close"]]]]))
 
 (defn- delete-confirm [e label]
   (dom-utils/stop-propagation! e)
@@ -77,77 +78,66 @@
   rum/static
   rum/reactive
   (drv/drv :editing-label)
+  (ui-mixins/on-key-press ["Escape" "Enter"]
+                          (fn [_ e]
+                            (case (.-key e)
+                              "Enter"
+                              (label-actions/save-label)
+                              "Escape"
+                              (label-actions/dismiss-label-editor))))
   {:did-mount (fn [s]
                 (.focus (rum/ref-node s :label-name-field))
                 s)}
   [s]
   (let [editing-label (drv/react s :editing-label)]
-    [:div.oc-label-edit.fields-modal.label-modal-view
-     [:div.oc-label-edit-title
-      (if (:uuid editing-label)
-        "Edit label"
-        "New label")]
-     [:div.oc-label-edit-name-header
-      "Name"]
-     [:input.field-value.oc-input
-      {:value (:name editing-label)
-       :ref :label-name-field
-       :max-length label-actions/max-label-name-length
-       :class (when (:error editing-label)
-                "error")
-       :on-change #(dis/dispatch! [:input [:editing-label :name] (oget % "target.value")])
-       :placeholder "Name your label"}]
-      [:div.oc-label-footer
-       (when (:can-delete? editing-label)
-         [:button.mlb-reset.delete-bt
-          {:on-click #(delete-confirm % editing-label)}
-          "Delete"])
-       [:button.mlb-reset.cancel-bt
-        {:on-click #(label-actions/dismiss-label-editor)}
-        "Cancel"]
-       [:button.mlb-reset.save-bt
-        {:on-click #(label-actions/save-label)}
-        "Save"]]]))
-
-(rum/defcs org-labels-manager <
-  rum/static
-  rum/reactive
-  (drv/drv :show-label-editor)
-  (ui-mixins/on-click-out :org-labels-manager-inner (fn [s e]
-    (when (and (not (dom-utils/event-container-has-class e "alert-modal"))
-               (not @(drv/get-ref s :show-label-editor)))
-      (label-actions/hide-labels-manager))))
-  refresh-labels-mixin
-  [s]
-  [:div.org-labels-manager.label-modal-view
-   [:div.org-labels-manager-inner
-    {:ref :org-labels-manager-inner}
-    [:button.mlb-reset.labels-modal-close-bt
-     {:on-click #(label-actions/hide-labels-manager)}]
-    (if (drv/react s :show-label-editor)
-      (label-editor)
-      (org-labels-list))]])
+    [:div.oc-labels-modal-wrapper
+      [:div.oc-label-edit.fields-modal.oc-labels-modal
+      [:div.oc-label-edit-title
+        (if (:uuid editing-label)
+          "Edit label"
+          "New label")]
+      [:div.oc-label-edit-name-header
+        "Name"]
+      [:input.field-value.oc-input
+        {:value (:name editing-label)
+        :ref :label-name-field
+        :max-length label-actions/max-label-name-length
+        :class (when (:error editing-label)
+                  "error")
+        :on-change #(dis/dispatch! [:input [:editing-label :name] (oget % "target.value")])
+        :placeholder "Name your label"}]
+        [:div.oc-label-footer
+        (when (:can-delete? editing-label)
+          [:button.mlb-reset.delete-bt
+            {:on-click #(delete-confirm % editing-label)}
+            "Delete"])
+        [:button.mlb-reset.cancel-bt
+          {:on-click #(label-actions/dismiss-label-editor)}
+          "Cancel"]
+        [:button.mlb-reset.save-bt
+          {:on-click #(label-actions/save-label)}
+          "Save"]]]]))
 
 (rum/defcs labels-picker <
   rum/static
   rum/reactive
   refresh-labels-mixin
-  (drv/drv :user-labels)
   (drv/drv :cmail-data)
+  (drv/drv :org-labels)
   ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
     (when-not (dom-utils/event-container-has-class e "alert-modal")
       (cmail-actions/toggle-cmail-labels-views false))))
   [s]
-  (let [org-labels (drv/react s :user-labels)
-        cmail-data (drv/react s :cmail-data)
+  (let [cmail-data (drv/react s :cmail-data)
         label-slugs (->> cmail-data
                           :labels
                           (map :slug)
                           set)
+        org-labels (drv/react s :org-labels)
         is-mobile? (responsive/is-mobile-size?)
         lock-add? (>= (count (:labels cmail-data)) ls/max-entry-labels)]
-    [:div.labels-picker.label-modal-view
+    [:div.labels-picker.oc-labels-modal
      [:div.labels-picker-inner
       {:ref :labels-picker-inner}
       [:button.mlb-reset.labels-modal-close-bt
@@ -215,7 +205,7 @@
   rum/reactive
   (drv/drv :cmail-state)
   (drv/drv :cmail-data)
-  (drv/drv :user-labels)
+  (drv/drv :org-labels)
   ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out (fn [s _]
                             (when (:labels-inline-view @(drv/get-ref s :cmail-state))
@@ -223,7 +213,7 @@
   [s {add-label-bt? :add-label-bt}]
   (let [cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
-        user-labels (drv/react s :user-labels)
+        org-labels (drv/react s :org-labels)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.cmail-labels-list
      {:class (when (seq (:labels cmail-data))
@@ -239,10 +229,10 @@
                            :on-click-cb #(cmail-actions/toggle-cmail-label label)})])
      (when add-label-bt?
        [:div.cmail-add-label-container
-        (add-label-bt {:label-text (if (seq user-labels)
+        (add-label-bt {:label-text (if (seq org-labels)
                                      "Add a label"
                                      "Create a new label")
-                       :on-click #(if (seq user-labels)
+                       :on-click #(if (seq org-labels)
                                     (cmail-actions/toggle-cmail-inline-labels-view)
                                     (label-actions/new-label))})])]))
 

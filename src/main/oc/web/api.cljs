@@ -1115,6 +1115,17 @@
       callback))
     (handle-missing-link "create-label" create-label-link callback {:label-data label-data})))
 
+(defn update-label [update-label-link label-data callback]
+  (if update-label-link
+    (let [cleaned-label-data (-> label-data
+                                 (label-utils/clean-label)
+                                 (cljs->json))]
+      (storage-http (method-for-link update-label-link) (relative-href update-label-link)
+                    {:headers (headers-for-link update-label-link)
+                     :json-params cleaned-label-data}
+                    callback))
+    (handle-missing-link "update-label" update-label-link callback {:label-data label-data})))
+
 (defn delete-label [delete-label-link callback]
   (if delete-label-link
     (storage-http (method-for-link delete-label-link) (relative-href delete-label-link)

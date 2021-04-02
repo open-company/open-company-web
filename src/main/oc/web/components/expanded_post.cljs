@@ -97,6 +97,7 @@
   (drv/drv :current-user-data)
   (drv/drv :follow-publishers-list)
   (drv/drv :followers-publishers-count)
+  (drv/drv :foc-labels-picker)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -189,7 +190,10 @@
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))
-                                    :current-user-data current-user-data}))
+                                    :current-user-data current-user-data
+                                    :show-labels-picker (= (drv/react s :foc-labels-picker) (str "exp-" (:uuid activity-data)))
+                                    :external-labels-picker true
+                                    :foc-labels-picker-prefix "exp-"}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
@@ -248,9 +252,6 @@
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner
-            [:div.expanded-post-labels
-             (when (seq (:labels activity-data))
-               (labels-list (:labels activity-data)))]
             [:div.expanded-post-headline
               {:class utils/hide-class}
               (:headline activity-data)]
@@ -288,7 +289,10 @@
                                          :current-activity-id (:uuid activity-data)}))]
               (when (:member? org-data)
                 (wrt-count {:activity-data activity-data
-                            :read-data read-data}))]
+                            :read-data read-data}))
+             [:div.expanded-post-labels
+              (when (seq (:labels activity-data))
+                (labels-list (:labels activity-data)))]]
             [:div.expanded-post-comments.group
               {:class (when ua/android? "android")}
               (stream-comments {:activity-data activity-data

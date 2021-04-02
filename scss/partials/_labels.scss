@@ -165,7 +165,7 @@ div.oc-labels {
   }
 }
 
-div.org-labels-manager {
+div.oc-labels-modal-wrapper {
   background-color: #{$carrot_modal_bg};
   width: 100vw;
   height: 100vh;
@@ -177,8 +177,8 @@ div.org-labels-manager {
   justify-content: center;
   align-items: center;
   z-index: #{$navbar_zindex + 156};
-
-  div.org-labels-manager-inner {
+  
+  div.oc-labels-modal {
     display: block;
     position: relative;
   }

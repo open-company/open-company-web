@@ -72,6 +72,10 @@
 
 ;; Labels
 
+(def ^{:export true} editing-label-key [:editing-label])
+
+(def ^{:export true} foc-labels-picker-key [:foc-labels-picker])
+
 (defn ^:export labels-key [org-slug]
   (vec (conj (org-key org-slug) :labels)))
 
@@ -181,6 +185,10 @@
 (defn ^:export activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
+    
+(defn ^:export entry-labels-key [org-slug activity-uuid]
+  (let [post-key (activity-key org-slug activity-uuid)]
+    (vec (concat post-key [:labels]))))
 
 (defn ^:export pins-key [org-slug entry-uuid]
   (let [entry-key (activity-key org-slug entry-uuid)]
@@ -624,7 +632,7 @@
 (defn ^:export editing-label
   "Get the current editing label"
   ([] (editing-label @app-state))
-  ([data] (get data :editing-label)))
+  ([data] (get-in data editing-label-key)))
 
 (defn ^:export posts-data
   "Get org all posts data."
@@ -897,8 +905,7 @@
   ([activity-id] (entry-labels-data @app-state (current-org-slug) activity-id))
   ([org-slug activity-id] (entry-labels-data @app-state org-slug activity-id))
   ([data org-slug activity-id]
-   (let [entry-with-labels (entry-data org-slug activity-id data)]
-     (:labels entry-with-labels))))
+   (get-in data (entry-labels-key org-slug activity-id))))
 
 (defn ^:export entry-label-data
   ([label-uuid] (entry-label-data @app-state (current-org-slug) (current-activity-id) label-uuid))
@@ -907,6 +914,10 @@
   ([data org-slug activity-id label-uuid]
    (let [entry-labels (entry-labels-data data org-slug activity-id)]
      (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
+
+(defn ^:export foc-labels-picker
+  ([] (foc-labels-picker @app-state))
+  ([data] (get-in data foc-labels-picker-key)))
 
 (defn ^:export secure-activity-data
   "Get secure activity data."

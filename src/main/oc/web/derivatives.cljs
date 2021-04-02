@@ -430,11 +430,11 @@
    :org-dashboard-data     [[:show-alert-modal? :show-section-add-cb :activity-share-container :show-activity-share?
                              :collapsed-cmail? :user-info-data :search-active :show-premium-picker? :payments-ui-upgraded-banner
                              :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post? :show-user-info?
-                             :show-push-notification-permissions-modal? :show-labels-manager?]
+                             :show-push-notification-permissions-modal? :show-labels-manager? :show-label-editor?]
                             (fn [show-alert-modal? show-section-add-cb activity-share-container show-activity-share?
                                  collapsed-cmail? user-info-data search-active show-premium-picker? payments-ui-upgraded-banner
                                  ui-tooltip initial-section-editing show-wrt-view? show-expanded-post? show-user-info?
-                                 show-push-notification-permissions-modal?]
+                                 show-push-notification-permissions-modal? show-labels-manager? show-label-editor?]
                               {:show-activity-share? show-activity-share?
                                :show-alert-modal? show-alert-modal?
                                :show-section-add-cb show-section-add-cb
@@ -450,7 +450,8 @@
                                :show-expanded-post? show-expanded-post?
                                :show-user-info? show-user-info?
                                :show-push-notification-permissions-modal? show-push-notification-permissions-modal?
-                               :show-labels-manager? show-labels-manager?})]
+                               :show-labels-manager? show-labels-manager?
+                               :show-label-editor? show-label-editor?})]
    :initial-section-editing [[:base] (fn [base] (:initial-section-editing base))]
    :payments-ui-upgraded-banner [[:base] (fn [base] (get base dis/payments-ui-upgraded-banner-key))]
    :show-activity-share?  [[:activity-share] (fn [activity-share] (boolean activity-share))]
@@ -489,6 +490,6 @@
    :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
    :org-labels            [[:base :org-slug] (fn [base org-slug] (dis/org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (dis/user-labels-data base org-slug))]
-   :show-label-editor     [[:base] (fn [base] (:show-label-editor base))]
-   :editing-label         [[:base] (fn [base] (dis/editing-label base))]})
+   :show-label-editor?    [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
+   :editing-label         [[:base] (fn [base] (get-in base dis/editing-label-key))]})
 

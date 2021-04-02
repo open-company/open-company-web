@@ -1,0 +1,142 @@
+div.foc-labels-picker {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  z-index: #{$navbar_zindex + 156};
+  position: relative;
+
+  div.foc-labels-picker-inner {
+    display: block;
+
+    div.foc-labels {
+      display: flex;
+      flex-flow: column nowrap;
+      border-radius: 6px;
+      padding: 16px;
+      height: auto;
+      min-width: 160px;
+      background-color: var(--overlay-background-color);
+      border: 1px solid var(--divider-line);
+      box-shadow: var(--box-shadow);
+      max-height: 300px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    
+      div.foc-labels-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+        color: var(--color);
+      }
+    
+      button.foc-label, div.oc-label {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        height: 16px;
+        margin-top: 12px;
+        padding: 0;
+        cursor: default;
+        max-width: 200px;
+    
+        &.editable {
+          cursor: pointer;
+    
+          @include big_web() {
+            &:hover {
+              padding: 0;
+    
+              button.edit-bt {
+                visibility: visible;
+              }
+            }
+          }
+        }
+    
+        div.carrot-checkbox {
+          // border: 1px solid var(--color);
+          order: 1;
+          margin-right: 8px;
+          flex: 0 0 auto;
+    
+          // &.selected {
+          //   border: 1px solid var(--color);
+          //   background-color: var(--color);
+          // }
+    
+          // &.disabled {
+          //   border: 1px solid var(--color);
+          // }
+    
+          // &.selected.disabled {
+          //   background-color: var(--color);
+          // }
+        }
+    
+        span.oc-label-name {
+          order: 3;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+          max-width: 180px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-right: 2px;
+          text-align: left;
+          flex: 0 1 auto;
+        }
+    
+        button.edit-bt {
+          width: 16px;
+          height: 16px;
+          margin-left: 8px;
+          order: 4;
+          padding: 0;
+          @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, var(--color));
+          @include big_web() {
+            visibility: hidden;
+          }
+        }
+      }
+    
+      div.foc-labels-empty {
+        @include OC_Body_Book_Italic();
+        font-size: 14px;
+        line-height: 18px;
+        color: $ui_grey;
+        margin-top: auto;
+        margin-bottom: auto;
+        align-self: center;
+        margin-top: 12px;
+      }
+
+      button.add-label-bt {
+        height: 16px;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 16px;
+        padding: 0;
+    
+        span.add-label-plus {
+          width: 16px;
+          height: 16px;
+          @include svgBgColor("/img/ML/add_label_plus.svg", center, 12px 12px, var(--color));
+        }
+    
+        span.add-label-span {
+          margin-left: 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--color);
+        }
+      }
+    }
+  }
+}

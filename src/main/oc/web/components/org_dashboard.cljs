@@ -16,7 +16,7 @@
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.ui.labels :refer (org-labels-manager)]
+            [oc.web.components.ui.labels :refer (org-labels-list label-editor)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
             [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -81,7 +81,8 @@
                 show-wrt-view?
                 show-push-notification-permissions-modal?
                 show-user-info?
-                show-labels-manager?]} (drv/react s :org-dashboard-data)
+                show-labels-manager?
+                show-label-editor?]} (drv/react s :org-dashboard-data)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         nux (drv/react s :nux)
         is-mobile? (responsive/is-mobile-size?)
@@ -194,8 +195,10 @@
                   (and is-mobile?
                        show-menu?))
           (menu))
-        (when show-labels-manager?
-          (org-labels-manager))
+        (if show-label-editor?
+          (label-editor)
+          (when show-labels-manager?
+            (org-labels-list)))
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
           (push-notifications-permission-modal))

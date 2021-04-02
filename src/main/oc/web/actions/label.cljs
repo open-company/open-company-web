@@ -2,12 +2,14 @@
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [oc.web.dispatcher :as dis]
             [defun.core :refer (defun)]
+            [cuerdas.core :as cstr]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.utils.label :as label-utils]
             [oc.web.ws.change-client :as ws-cc]
@@ -17,68 +19,126 @@
 (def max-label-name-length 40)
 
 (defn user-labels [org-labels-list]
-   (reverse (sort-by :count org-labels-list)))
+   (vec (reverse (sort-by :count org-labels-list))))
 
 (defn org-labels [org-labels-list]
-  (sort-by :name org-labels-list))
+  (vec (sort-by (comp cstr/lower :name) org-labels-list)))
 
-(defn get-labels-finished
-  ([org-slug resp] (get-labels-finished org-slug resp nil))
-  ([org-slug finish-cb {:keys [body success]}]
-   (let [response-body (when success (json->cljs body))
-         parsed-labels (label-utils/parse-labels response-body)
-         org-labels-data (-> response-body
-                             (dissoc :items)
-                             (assoc :org-labels (org-labels parsed-labels))
-                             (assoc :user-labels (user-labels parsed-labels)))]
-     (timbre/infof "Labels load success %s, loaded %d labels" success (count (:org-labels org-labels-data)))
-     (dis/dispatch! [:labels-loaded org-slug org-labels-data])
-      (when (fn? finish-cb)
-        (finish-cb (:org-labels org-labels-data))))))
+(defn get-labels-finished [org-slug {:keys [body success]}]
+  (let [response-body (when success (json->cljs body))
+        parsed-labels (label-utils/parse-labels response-body)
+        retrieved-labels-data (-> response-body
+                                  (dissoc :items)
+                                  (assoc :org-labels (org-labels parsed-labels))
+                                  (assoc :user-labels (user-labels parsed-labels)))]
+    (timbre/infof "Labels load success %s, loaded %d labels" success (count (:org-labels retrieved-labels-data)))
+    (dis/dispatch! [:labels-loaded org-slug retrieved-labels-data])
+    ;; Need to return the labels here
+    retrieved-labels-data))
 
 (defn get-labels
-  ([] (get-labels (dis/org-data) nil))
-  ([org-data] (get-labels org-data nil))
-  ([org-data finish-cb]
+  ([] (get-labels (dis/org-data)))
+  ([org-data]
    (timbre/info "Loading labels")
    (let [labels-link (hateoas/link-for (:links org-data) "labels")]
-     (api/get-labels labels-link (partial get-labels-finished (:slug org-data) finish-cb)))))
+     (api/get-labels labels-link (partial get-labels-finished (:slug org-data))))))
 
 (defn new-label
-  ([] (new-label ""))
-  ([label-name]
+  ([] (new-label "" {}))
+  ([label-name extra]
    (let [org-data (dis/org-data)]
      (timbre/infof "New label for org %s" (:uuid org-data))
-     (dis/dispatch! [:label-editor/start {:name label-name
-                                          :org-uuid (:uuid org-data)}]))))
+     (dis/dispatch! [:label-editor/start (merge (label-utils/new-label-data label-name (:uuid org-data))
+                                                extra)]))))
+
+(defn foc-picker-new-label []
+  (new-label "" {:back-to :foc-picker}))
 
 (defn dismiss-label-editor []
   (timbre/info "Dismiss label editor")
   (dis/dispatch! [:label-editor/dismiss]))
 
-(defn save-label []
-  (let [org-data (dis/org-data)
-        create-label-link (hateoas/link-for (:links org-data) "create-label")
-        editing-label (:editing-label @dis/app-state)]
-    (timbre/infof "Saving label with name %s" (:name editing-label))
-    (api/create-label create-label-link editing-label
-                      (fn [{:keys [body success]}]
-                         (dismiss-label-editor)
-                         (get-labels)
-                         (let [label (when success (label-utils/parse-label (json->cljs body)))]
-                           (dis/dispatch! [:label-saved (dis/current-org-slug) label])
-                           (when-not (:collapsed (dis/cmail-state))
-                             (cmail-actions/add-cmail-label label)))))))
+(declare entry-label-add)
+(declare entry-label-remove)
 
-(defn edit-label [label]
-  (timbre/infof "Editing label" (:uuid label))
-  (dis/dispatch! [:label-editor/start label]))
+(defn create-label-finished [org-slug {success :success :as resp}]
+  (if-not success
+    (get-labels)
+    (let [updated-labels-list (get-labels-finished org-slug resp)
+          new-added-label (last updated-labels-list)]
+      (dismiss-label-editor)
+      (dis/dispatch! [:label-create/finished org-slug updated-labels-list])
+      ;; Add label to entry that has the picker currently opened
+      (when-let [entry-uuid (dis/foc-labels-picker)]
+        (entry-label-add entry-uuid (:uuid new-added-label)))
+      ;; Add label to cmail if picker was opened from there
+      (let [cmail-state (dis/cmail-state)]
+        (when (or (:labels-inline-view cmail-state)
+                  (:labels-floating-view cmail-state))
+          (cmail-actions/add-cmail-label new-added-label))))))
+
+(defn create-label
+  ([label-data]
+   (let [create-label-link (hateoas/link-for (:links (dis/org-data)) "create-label")]
+     (create-label create-label-link label-data)))
+  ([create-label-link editing-label]
+   (timbre/infof "Creating label with name % with link %s" (:name editing-label) (:hread create-label-link))
+   (let [org-slug (dis/current-org-slug)]
+     (dis/dispatch! [:label-create org-slug editing-label])
+     (api/create-label create-label-link editing-label (partial create-label-finished org-slug)))))
+
+(defn update-label-finished [org-slug {success :success body :body}]
+    (if success
+      (let [updated-label (json->cljs body)]
+        (dismiss-label-editor)
+        (dis/dispatch! [:label-update/finished org-slug updated-label])
+                             ;; Add label to entry that has the picker currently opened
+        (when-let [entry-uuid (dis/foc-labels-picker)]
+          (entry-label-add entry-uuid (:uuid updated-label)))
+                             ;; Add label to cmail if picker was opened from there
+        (let [cmail-state (dis/cmail-state)]
+          (when (or (:labels-inline-view cmail-state)
+                    (:labels-floating-view cmail-state))
+            (cmail-actions/add-cmail-label updated-label)))
+                             ;; Delay the complete refresh of the labels list since it's not necessary
+        (utils/after 250 get-labels))
+      (get-labels)))
+
+(defn update-label
+  ([label-data] (update-label (hateoas/link-for (:links label-data) "partial-update") label-data))
+  ([update-label-link label-data]
+   (timbre/infof "Updating label % with link %s" (:uuid label-data) (:hread update-label-link))
+   (let [org-slug (dis/current-org-slug)]
+     (dis/dispatch! [:label-update org-slug label-data])
+     (api/update-label update-label-link label-data (partial update-label-finished org-slug)))))
+
+(defn save-label []
+  (let [editing-label (:editing-label @dis/app-state)]
+    (timbre/debugf "Saving label with name %s" (:name editing-label))
+    (if (:links editing-label)
+      (update-label editing-label)
+      (create-label editing-label))))
+
+(defn edit-label
+  ([label] (edit-label label {}))
+  ([label extra]
+   (timbre/infof "Editing label" (:uuid label))
+   (dis/dispatch! [:label-editor/start (merge label extra)])))
+
+(defn foc-picker-edit-label [label]
+  (edit-label label {:back-to :foc-picker}))
+
+(defn delete-label-finished [label {success :success}]
+  (when success
+    (when-let [entry-uuid (dis/foc-labels-picker)]
+      (entry-label-remove entry-uuid (:uuid label))))
+  (get-labels))
 
 (defn delete-label [label]
-  (timbre/infof "Deleting label %s" (:uuid label))
+  (timbre/infof "Deleting label %s - %s" (:name label) (:uuid label))
   (let [delete-link (hateoas/link-for (:links label) "delete")]
     (dis/dispatch! [:delete-label (dis/current-org-slug) label])
-    (api/delete-label delete-link #(get-labels))))
+    (api/delete-label delete-link (partial delete-label-finished label))))
 
 (defn show-labels-manager []
   (timbre/info "Open labels manager")
@@ -188,6 +248,53 @@
     (api/load-more-items more-link direction (partial label-entries-more-finish org-slug label-slug dis/recently-posted-sort direction))
     (dis/dispatch! [:label-entries-more org-slug label-slug dis/recently-posted-sort])))
 
+;; Changes to labels inside an entry
+
+(defn entry-label-add [entry-uuid label-uuid]
+  (when-let* [org-slug (dis/current-org-slug)
+              entry-data (dis/entry-data entry-uuid)
+              label-data (dis/label-data label-uuid)
+              add-label-link (hateoas/link-for (:links entry-data)
+                                               "partial-add-label" {}
+                                               {:label-uuid label-uuid})]
+             (dis/dispatch! [:entry-label/add org-slug entry-uuid label-data])
+             (api/add-entry-label add-label-link
+                                  (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+(defn entry-label-remove [entry-uuid label-uuid]
+  (when-let* [org-slug (dis/current-org-slug)
+              entry-data (dis/entry-data entry-uuid)
+              label-data (dis/entry-label-data entry-uuid label-uuid)
+              remove-label-link (hateoas/link-for (:links entry-data)
+                                                  "partial-remove-label" {}
+                                                  {:label-uuid label-uuid})]
+             (dis/dispatch! [:entry-label/remove org-slug entry-uuid label-data])
+             (api/remove-entry-label remove-label-link
+                                     (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+(defn toggle-entry-label [entry-uuid label-uuid]
+  (when (dis/entry-data entry-uuid)
+    (if (dis/entry-label-data entry-uuid label-uuid)
+      (entry-label-remove entry-uuid label-uuid)
+      (entry-label-add entry-uuid label-uuid))))
+
+(defn entry-label-changes [entry-uuid add-label-uuids remove-label-uuids]
+  (when-let* [org-slug (dis/current-org-slug)
+              entry-data (dis/entry-data entry-uuid)
+              add-remove-labels-map {:add add-label-uuids
+                                     :remove remove-label-uuids}
+              label-changes-link (hateoas/link-for (:links entry-data) "label-changes")]
+             (dis/dispatch! [:entry-label/label-changes org-slug entry-uuid add-remove-labels-map])
+             (api/entry-label-changes label-changes-link add-remove-labels-map
+                                      (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+
+;; FoC Labels picker
+
+(defn toggle-foc-labels-picker
+  ([] (toggle-foc-labels-picker nil))
+  ([entry-uuid]
+   (dis/dispatch! [:toggle-foc-labels-picker entry-uuid])))
+
 ;; Change service actions
 
 (defn subscribe []
@@ -204,51 +311,8 @@
                                                           (map :slug)
                                                           set
                                                           current-label-slug)]
-          ;; On update or delete of a post from the currently shown user
+                         ;; On update or delete of a post from the currently shown user
                          (when (or (= change-type :add)
                                    (and (#{:update :delete} change-type)
                                         contains-current-label?))
                            (label-entries-get current-label-slug)))))))
-
-;; Changes to labels inside an entry
-
-(defn entry-label-add [entry-uuid label-uuid]
-  (when-let* [org-slug (dis/current-org-slug)
-              entry-data (dis/entry-data entry-uuid)
-              label-data (dis/label-data label-uuid)
-              add-label-link (hateoas/link-for (:links label-data)
-                                               "partial-add-entry-label" {}
-                                               {:board-slug (:board-slug entry-data)
-                                                :entry-uuid entry-uuid})]
-    (dis/dispatch! [:entry-label/add entry-uuid label-data])
-    (api/add-entry-label add-label-link
-                          (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
-
-(defn entry-label-remove [entry-uuid label-uuid]
-  (when-let* [org-slug (dis/current-org-slug)
-              label-data (dis/entry-label-data entry-uuid label-uuid)
-              remove-label-link (hateoas/link-for (:links label-data) "remove-label")]
-    (dis/dispatch! [:entry-label/remove org-slug entry-uuid label-uuid])
-    (api/remove-entry-label remove-label-link
-                            (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
-
-(defn toggle-entry-label [entry-uuid label-uuid]
-  (when (dis/entry-data entry-uuid)
-    (if (dis/entry-label-data entry-uuid label-uuid)
-      (entry-label-remove entry-uuid label-uuid)
-      (entry-label-add entry-uuid label-uuid))))
-
-(defn entry-label-changes [entry-uuid add-label-uuids remove-label-uuids]
-  (when-let* [org-slug (dis/current-org-slug)
-              entry-data (dis/entry-data entry-uuid)
-              add-remove-labels-map {:add add-label-uuids
-                                     :remove remove-label-uuids}
-              label-changes-link (hateoas/link-for (:links entry-data) "label-changes")]
-    (dis/dispatch! [:entry-label/label-changes org-slug entry-uuid add-remove-labels-map])
-    (api/entry-label-changes label-changes-link add-remove-labels-map
-                            (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
-
-;; FoC Labels picker
-
-(defn toggle-foc-labels-picker [entry-uuid]
-  (dis/dispatch! [:toggle-foc-labels-picker entry-uuid]))

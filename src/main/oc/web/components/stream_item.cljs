@@ -221,7 +221,7 @@
                                    :show-move? (not is-mobile?)
                                    :will-open (fn [] (set-foc-menu-open s true))
                                    :will-close (fn [] (set-foc-menu-open s false))
-                                   :force-show-menu (or foc-menu-open foc-labels-picker)
+                                   :force-show-menu foc-menu-open
                                    :show-labels-picker foc-labels-picker
                                    :mobile-tray-menu mobile-more-menu?
                                    :current-user-data current-user-data

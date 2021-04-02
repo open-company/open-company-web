@@ -1,8 +1,20 @@
 (ns oc.web.utils.label
   (:require [oc.lib.hateoas :as hateoas]
+            [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]))
 
 ;; Data parse
+
+(def default-label-slug "-empty-label-slug")
+
+(defn new-label-data
+  ([] (new-label-data "" (:uuid (dis/org-data))))
+  ([label-name] (new-label-data label-name (:uuid (dis/org-data))))
+  ([label-name org-uuid]
+   {:name (or label-name "")
+    :slug default-label-slug
+    :org-uuid org-uuid
+    :uuid ""}))
 
 (defn parse-label [label-map]
   (-> label-map
