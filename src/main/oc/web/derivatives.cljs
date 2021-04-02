@@ -318,8 +318,8 @@
                                (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
                                            user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
                                           (get active-users user-id))))]
-   :app-loading?          [[:loading :board-slug :contributions-id :entry-board-slug :org-data :active-users]
-                           (fn [loading board-slug contributions-id entry-board-slug org-data active-users]
+   :app-loading?          [[:loading :board-slug :contributions-id :label-slug :entry-board-slug :org-data :active-users]
+                           (fn [loading board-slug contributions-id label-slug entry-board-slug org-data active-users]
                              (boolean
                               (or loading ;; force loading screen
                                    ;; the org data are not loaded yet
@@ -327,6 +327,7 @@
                                    ;; No board nor contributions specified
                                   (and (not board-slug)
                                        (not contributions-id)
+                                       (not label-slug)
                                        (not entry-board-slug)
                                         ;; but there are some
                                        (pos? (count (:boards org-data))))
