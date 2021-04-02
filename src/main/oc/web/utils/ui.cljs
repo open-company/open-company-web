@@ -1,6 +1,7 @@
 (ns oc.web.utils.ui
   (:require [oc.web.lib.utils :as utils]
             [cuerdas.core :as string]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn resize-textarea [textarea]
@@ -22,3 +23,6 @@
         (string/replace #"<" "&lt;")
         (string/replace #">" "&gt;"))
     in-str))
+
+(defn content-editable-value []
+  (if (or ua/firefox? ua/ie?) "true" "plaintext-only"))
