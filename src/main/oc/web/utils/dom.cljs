@@ -1,6 +1,7 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.responsive :as responsive]
+            [oc.lib.cljs.useragent :as ua]
             [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
@@ -130,3 +131,6 @@
 (defn event-stop! [e]
   (prevent-default! e)
   (stop-propagation! e))
+
+(defn content-editable-value []
+  (if (or ua/firefox? ua/ie?) "true" "plaintext-only"))
