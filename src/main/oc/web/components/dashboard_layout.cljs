@@ -1,7 +1,6 @@
 (ns oc.web.components.dashboard-layout
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
@@ -213,62 +212,59 @@
                 ;; Board name and settings button
                 [:div.board-name
                  {:class (when is-topics "topics-header")}
-                  (cond
-                    current-contributions-id
-                    [:div.board-name-with-icon.contributions
-                      [:div.board-name-with-icon-internal
-                        ; (str (:total-count container-data) " posts")
-                        (str "Latest from " (:short-name contributions-user-data))]]
-                    :else
-                    [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access container-data) "public")
-                                                  :label-icon is-label
-                                                  :home-icon is-following
-                                                  :unfollowing-icon is-unfollowing
-                                                  :all-icon is-all-posts
-                                                  :topics-icon is-topics
-                                                  :saved-icon is-bookmarks
-                                                  :drafts-icon is-drafts-board
-                                                  :replies-icon is-replies
-                                                  :board-icon (and (not is-container?)
-                                                                   (not is-contributions)
-                                                                   (not is-topics)
-                                                                   (not is-drafts-board)
-                                                                   (not is-label)
-                                                                   (not current-activity-id))})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-inbox
-                                                   "Unread"
+                 [:div.board-name-with-icon
+                   {:class (when is-contributions "contributions")}
+                   [:div.board-name-with-icon-internal
+                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                            (not is-drafts-board))
+                                              :public (= (:access container-data) "public")
+                                              :label-icon is-label
+                                              :home-icon is-following
+                                              :unfollowing-icon is-unfollowing
+                                              :all-icon is-all-posts
+                                              :topics-icon is-topics
+                                              :saved-icon is-bookmarks
+                                              :drafts-icon is-drafts-board
+                                              :replies-icon is-replies
+                                              :board-icon (and (not is-container?)
+                                                                (not is-contributions)
+                                                                (not is-topics)
+                                                                (not is-drafts-board)
+                                                                (not is-label)
+                                                                (not current-activity-id))})
+                      :dangerouslySetInnerHTML (utils/emojify (cond
+                                                is-inbox
+                                                "Unread"
 
-                                                   is-all-posts
-                                                   "All"
+                                                is-all-posts
+                                                "All"
 
-                                                   is-topics
-                                                   "Explore"
+                                                is-topics
+                                                "Explore"
 
-                                                   is-bookmarks
-                                                   "Bookmarks"
+                                                is-bookmarks
+                                                "Bookmarks"
 
-                                                   is-following
-                                                   "Home"
+                                                is-following
+                                                "Home"
 
-                                                   is-unfollowing
-                                                   "Unfollowing"
+                                                is-unfollowing
+                                                "Unfollowing"
 
-                                                   is-replies
-                                                   "Activity"
+                                                is-replies
+                                                "Activity"
 
-                                                   is-label
-                                                   (or (:name label-data) (:slug label-data) current-label-slug)
+                                                is-label
+                                                (or (:name label-data) (:slug label-data) current-label-slug)
 
-                                                   :default
-                                                   ;; Fallback to the org board data
-                                                   ;; to avoid showing an empty name while loading
-                                                   ;; the board data
-                                                   (:name container-data)))}]])
+                                                current-contributions-id
+                                                (str "Latest from " (:short-name contributions-user-data))
+
+                                                :default
+                                                ;; Fallback to the org board data
+                                                ;; to avoid showing an empty name while loading
+                                                ;; the board data
+                                                (:name container-data)))}]]
                   (when (and (= (:access container-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
