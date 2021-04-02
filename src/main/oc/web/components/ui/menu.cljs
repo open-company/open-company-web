@@ -17,7 +17,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
-            [oc.web.actions.notifications :as notif-actions]
             [oc.web.utils.sentry :as sentry]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -35,14 +34,10 @@
   ; (nav-actions/nav-to-author! e user-id (oc-urls/contributions user-id))
   (nav-actions/show-user-settings :profile))
 
-(defn my-profile [_s cur-user-id e]
-  (dom-utils/prevent-default! e)
-  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
-
-(defn my-posts-click [s cur-user-id e]
-  (dom-utils/prevent-default! e)
-  (menu-close s)
-  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
+;; (defn my-posts-click [s cur-user-id e]
+;;   (dom-utils/prevent-default! e)
+;;   (menu-close s)
+;;   (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributions cur-user-id)))
 
 (defn notifications-settings-click [_s e]
   (dom-utils/prevent-default! e)
@@ -363,7 +358,7 @@
           ;; Report a problem
           [:a
             {:href "#"
-             :on-click (fn [e]
+             :on-click (fn [_]
                          (sentry/show-report-dialog))}
             [:div.oc-menu-item.support
               "Report a problem"]]
