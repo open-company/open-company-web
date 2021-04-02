@@ -3,7 +3,6 @@
             [oc.web.actions.notifications :as notification-actions]
             [taoensso.timbre :as timbre]))
 
-
 (defn- custom-error [error-name error-message]
   (let [err (js/Error. error-message)]
     (set! (.-name ^js err) error-name)
@@ -62,8 +61,13 @@
     (catch :default e
       (capture-error! e))))
 
+(defn- sentry-event-id
+  ([] (sentry-event-id "EMPTY MESSAEG" "info"))
+  ([msg] (sentry-event-id msg "info"))
+  ([msg log-level] (.captureMessage ^js sentry-browser msg (or log-level "info"))))
+
 (defn ^:export show-report-dialog
-  ([] (.showReportDialog ^js sentry-browser #js {}))
+  ([] (show-report-dialog (sentry-event-id)))
   ([event-id]
    (.showReportDialog ^js sentry-browser #js {:eventId event-id})))
 
