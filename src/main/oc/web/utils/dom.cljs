@@ -144,4 +144,8 @@
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
-  (cstr/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
+  (->> classes
+       (filter #(and (first %) (second %)))
+       (keys)
+       (map (comp str name))
+       (cstr/join " ")))
