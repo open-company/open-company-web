@@ -1,8 +1,8 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
+            [clojure.string :as cstr]
             [oc.web.lib.responsive :as responsive]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
 (defonce _lock-counter (atom 0))
@@ -140,3 +140,8 @@
 (defn event-stop! [e]
   (prevent-default! e)
   (stop-propagation! e))
+
+(defn class-set
+  "Given a map of class names as keys return a string of the those classes that evaulates as true"
+  [classes]
+  (cstr/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
