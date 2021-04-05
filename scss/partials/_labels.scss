@@ -121,8 +121,8 @@ div.oc-labels {
     padding: 0;
 
     span.add-label-plus {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
       @include svgBgColor("/img/ML/add_label_plus.svg", center, 12px 12px, $ui_grey);
     }
 
