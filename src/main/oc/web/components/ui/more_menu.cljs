@@ -7,6 +7,7 @@
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :as uu]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.pin :as pin-actions]
@@ -36,14 +37,21 @@
 
 (defn- hide-menu
   [s will-close & [force]]
+  (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675") (js/console.log "DBG hide-menu force" force))
   (when (or force
             (menu-visible? s))
-    (label-actions/toggle-foc-labels-picker)
+    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    hide label picker" force))
+    (label-actions/hide-foc-labels-picker)
     (utils/remove-tooltips)
+    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    will-close?"))
     (when (fn? will-close)
+      (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    will close"))
       (will-close))
+    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    closing move activity"))
     (reset! (::move-activity s) false)
-    (reset! (::showing-menu s) false)))
+    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    closing showing menu"))
+    (reset! (::showing-menu s) false)
+    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    done!"))))
 
 (defn- toggle-menu [s will-open will-close]
   (if (menu-visible? s)
@@ -98,6 +106,7 @@
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s _]
+                                                             (js/console.log "DBG more-menu/on-click-out")
                                                              (hide-menu s (-> s :rum/args first :will-close))))
                        ui-mixins/strict-refresh-tooltips-mixin
                        {:will-update (fn [s]
@@ -196,6 +205,13 @@
                                 (and (not external-labels)
                                      can-edit-labels?)
                                 pins?)]
+    (when (= (:uuid entity-data) "6313-49bb-b675")
+      (js/console.log "DBG more-menu/render menu expanded?" showing-menu?)
+      (js/console.log "DBG    menu expanded pieces:")
+      (js/console.log "DBG    move-activity:" @(::move-activity s))
+      (js/console.log "DBG    showing-menu:" @(::showing-menu s))
+      (js/console.log "DBG    foc-labels-picker:" (-> s :rum/args first :foc-labels-picker))
+      (js/console.log "DBG    force-show-menu:" (-> s :rum/args first :force-show-menu)))
     (when (or edit-link
               share-link
               delete-link
@@ -217,12 +233,15 @@
                                                         (not ua/mobile-app?))
                                   :ios-browser (and ua/ios?
                                                     (not ua/mobile-app?))
+                                  :foc-labels-picker show-labels-picker
                                   custom-class (seq custom-class)})
          :ref "more-menu"
          :on-click (when mobile-tray-menu
                      #(when (and showing-menu?
-                                 @(::can-unmount s))
+                                 @(::can-unmount s)
+                                 (not (dom-utils/event-container-matches % "ul.more-menu-list")))
                         (.stopPropagation %)
+                        (js/console.log "DBG more-menu on-click" )
                         (hide-menu s will-close)))}
         (when show-labels-picker
           [:div.foc-labels-picker-wrapper
@@ -399,7 +418,7 @@
                                 (comment-share-cb)))}
                 "Copy link"])])
         (when should-show-more-bt
-          [:button.mlb-reset.more-menu-bt
+          [:button.mlb-reset.menu-item-bt.more-menu-bt
            {:type "button"
             :on-click #(toggle-menu s will-open will-close)
             :class (when showing-menu? "active")
@@ -409,7 +428,7 @@
             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
             :title "More"}])
         (when show-external-labels?
-          [:button.mlb-reset.more-menu-edit-labels-bt
+          [:button.mlb-reset.menu-item-bt.more-menu-edit-labels-bt
            {:type "button"
             :class (utils/class-set {:has-next-bt (or show-external-share?
                                                       show-external-follow?
@@ -423,7 +442,7 @@
             :data-container "body"
             :title "Edit labels"}])
         (when show-external-share?
-          [:button.mlb-reset.more-menu-share-bt
+          [:button.mlb-reset.menu-item-bt.more-menu-share-bt
             {:type "button"
              :class (when (or show-external-follow?
                               show-external-bookmarks?)
@@ -438,7 +457,7 @@
              :title "Share"}])
         (when show-external-follow?
           (if follow-link
-            [:button.mlb-reset.more-menu-entry-follow-bt
+            [:button.mlb-reset.menu-item-bt.more-menu-entry-follow-bt
             {:type "button"
              :key "more-menu-entry-follow-bt"
              :class (when (and show-external-bookmarks?
@@ -453,7 +472,7 @@
              :data-container "body"
              :title uu/watch-activity-copy}]
             (when unfollow-link
-              [:button.mlb-reset.more-menu-entry-unfollow-bt
+              [:button.mlb-reset.menu-item-bt.more-menu-entry-unfollow-bt
                 {:type "button"
                  :key "more-menu-entry-unfollow-bt"
                  :class (when (and show-external-bookmarks?
@@ -469,7 +488,7 @@
                  :title uu/unwatch-activity-copy}])))
         (when show-external-bookmarks?
           (if remove-bookmark-link
-            [:button.mlb-reset.more-menu-remove-bookmark-bt
+            [:button.mlb-reset.menu-item-bt.more-menu-remove-bookmark-bt
               {:type "button"
                :on-click #(do
                             (hide-menu s will-close)
@@ -480,7 +499,7 @@
                :title "Remove bookmark"}]
             (when add-bookmark-link
               [:div.more-menu-add-bookmark-bt-container
-                [:button.mlb-reset.more-menu-add-bookmark-bt
+                [:button.mlb-reset.menu-item-bt.more-menu-add-bookmark-bt
                   {:type "button"
                    :on-click #(do
                                 (hide-menu s will-close)

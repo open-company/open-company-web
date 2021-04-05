@@ -165,10 +165,7 @@
       (str " at " (local-date-time past-js-date))
       (time-since past-date (concat flags [:date-prefix :lower-case])))))
 
-(defn class-set
-  "Given a map of class names as keys return a string of the those classes that evaulates as true"
-  [classes]
-  (clojure.string/join (map #(str " " (name %)) (keys (filter #(and (first %) (second %)) classes)))))
+(def class-set dom-utils/class-set)
 
 (defn link-for [& args]
   (apply hateoas/link-for args))

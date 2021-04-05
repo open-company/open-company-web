@@ -206,6 +206,10 @@
                                mobile-more-menu-el)
         is-home? (-> container-slug keyword (= :following))
         is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
+        sharing-entry? (= (drv/react s :activity-share-container) dom-element-id)
+        menu-open? (or foc-menu-open
+                       (and (not is-mobile?)
+                            sharing-entry?))
         more-menu-comp ;;(fn []
                          (partial more-menu
                                   {:entity-data activity-data
@@ -221,7 +225,7 @@
                                    :show-move? (not is-mobile?)
                                    :will-open (fn [] (set-foc-menu-open s true))
                                    :will-close (fn [] (set-foc-menu-open s false))
-                                   :force-show-menu foc-menu-open
+                                   :force-show-menu menu-open?
                                    :show-labels-picker foc-labels-picker
                                    :mobile-tray-menu mobile-more-menu?
                                    :current-user-data current-user-data
@@ -241,7 +245,7 @@
                                 :muted-item (utils/link-for (:links activity-data) "follow")
                                 :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
-                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
+                                :showing-share sharing-entry?})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing

@@ -23,8 +23,6 @@ div.more-menu {
     position: absolute;
     top: 100%;
     right: 0;
-    border: 1px solid var(--divider-line);
-    box-shadow: var(--box-shadow);
   }
 
   button.more-menu-bt {
@@ -473,6 +471,23 @@ div.more-menu {
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 
+      &.foc-labels-picker {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
+
+        div.foc-labels-picker-wrapper {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
+        }
+
+        ul.more-menu-list {
+          display: none;
+        }
+
+      }
+
       &.menu-expanded {
         visibility: visible;
         opacity: 1;
@@ -491,6 +506,7 @@ div.more-menu {
       & > * {
         display: none;
       }
+
       // Add some extra padding at the bottom of mobile browsers
       //  to avoid having the bottom part of the menu hidden
       &.ios-browser ul.more-menu-list {

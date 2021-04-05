@@ -1,8 +1,8 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
+            [clojure.string :as cstr]
             [oc.web.lib.responsive :as responsive]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
 (defonce ^{:export true} _lock-counter (atom 0))
@@ -147,3 +147,12 @@
 (defn node-mounted? [el]
   (and (dom-node? el)
        (dom-node? (oget el "parentNode"))))
+
+(defn class-set
+  "Given a map of class names as keys return a string of the those classes that evaulates as true"
+  [classes]
+  (->> classes
+       (filter #(and (first %) (second %)))
+       (keys)
+       (map (comp str name))
+       (cstr/join " ")))

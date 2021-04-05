@@ -22,8 +22,9 @@
      {:data-label-slug (:slug label)
       :data-label-uuid (:uuid label)
       :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
-      :class (when (:can-edit? label)
-               "editable")
+      :class (dom-utils/class-set {:editable (:can-edit? label)
+                                   :selected selected?
+                                   :disabled lock-add?})
       :data-toggle (when-not is-mobile? "tooltip")
       :data-placement "top"
       :data-container "body"
@@ -51,11 +52,11 @@
    (fn [s e]
      (when (and (not (dom-utils/event-container-has-class e "alert-modal"))
                 (not @(drv/get-ref s :editing-label)))
-       (label-actions/toggle-foc-labels-picker nil))))
+       (label-actions/hide-foc-labels-picker))))
   (ui-mixins/on-key-press ["Escape"]
    (fn [s _]
      (when-not @(drv/get-ref s :editing-label)
-       (label-actions/toggle-foc-labels-picker nil))))
+       (label-actions/hide-foc-labels-picker))))
   {:will-mount (fn [s]
                  (label-actions/get-labels)
                  s)}
@@ -72,7 +73,9 @@
       {:ref :labels-picker-inner}
       [:div.foc-labels
        [:div.foc-labels-title
-        "Add labels"]
+        "Add labels"
+        [:button.mlb-reset.mobile-close-bt
+         {:on-click #(label-actions/hide-foc-labels-picker)}]]
        (when (seq entry-orphan-labels)
          (foc-labels-list entry-orphan-labels entry-uuid label-uuids lock-add? is-mobile?))
        (when (seq org-labels)
@@ -82,4 +85,7 @@
          [:div.foc-labels-empty
           "No labels yet"])
        (add-label-bt {:label-text "Add label"
-                      :on-click #(label-actions/foc-picker-new-label)})]]]))
+                      :on-click #(label-actions/foc-picker-new-label)})
+       (when lock-add?
+         [:div.mobile-add-lock-description
+          "Limit of 3 labels reached for this update."])]]]))

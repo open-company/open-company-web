@@ -39,7 +39,7 @@ div.virtualized-list-row:not(.collapsed-item) {
           div.more-menu {
             display: block;
 
-            button {
+            button.menu-item-bt {
               display: initial;
             }
           }
@@ -54,7 +54,7 @@ div.virtualized-list-row:not(.collapsed-item) {
             div.more-menu {
               display: block;
 
-              button {
+              button.menu-item-bt {
                 display: initial;
               }
             }
@@ -73,7 +73,7 @@ div.virtualized-list-row:not(.collapsed-item) {
             div.more-menu {
               display: block;
 
-              button {
+              & > button {
                 display: initial;
               }
             }

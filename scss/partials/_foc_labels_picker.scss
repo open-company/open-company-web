@@ -6,8 +6,21 @@ div.foc-labels-picker {
   z-index: #{$navbar_zindex + 156};
   position: relative;
 
+  @include mobile() {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
   div.foc-labels-picker-inner {
     display: block;
+
+    @include mobile() {
+      height: 100%;
+    }
 
     div.foc-labels {
       display: flex;
@@ -22,12 +35,48 @@ div.foc-labels-picker {
       max-height: 300px;
       overflow-x: hidden;
       overflow-y: auto;
+
+      @include mobile() {
+        padding: #{$mobile_navbar_height}px 0 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        min-height: 100%;
+      }
     
       div.foc-labels-title {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 18px;
         color: var(--color);
+
+        @include mobile() {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: #{$mobile_navbar_height}px;
+          text-align: center;
+          border-bottom: 1px solid var(--divider-line);
+          line-height: #{$mobile_navbar_height}px;
+          font-size: 16px;
+        }
+
+        button.mobile-close-bt {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            position: absolute;
+            right: 16px;
+            top: 11px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 4px;
+            @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 12px 12px, var(--color))
+          }
+        }
       }
     
       button.foc-label, div.oc-label {
@@ -40,6 +89,18 @@ div.foc-labels-picker {
         padding: 0;
         cursor: default;
         max-width: 200px;
+
+        @include mobile() {
+          margin-top: 0;
+          padding: 0 16px;
+          width: 100%;
+          height: 32px;
+          max-width: unset;
+
+          &.disabled:not(.selected) {
+            opacity: 0.6;
+          }
+        }
     
         &.editable {
           cursor: pointer;
@@ -56,23 +117,9 @@ div.foc-labels-picker {
         }
     
         div.carrot-checkbox {
-          // border: 1px solid var(--color);
           order: 1;
           margin-right: 8px;
           flex: 0 0 auto;
-    
-          // &.selected {
-          //   border: 1px solid var(--color);
-          //   background-color: var(--color);
-          // }
-    
-          // &.disabled {
-          //   border: 1px solid var(--color);
-          // }
-    
-          // &.selected.disabled {
-          //   background-color: var(--color);
-          // }
         }
     
         span.oc-label-name {
@@ -97,9 +144,14 @@ div.foc-labels-picker {
           order: 4;
           padding: 0;
           @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, var(--color));
-          @include big_web() {
-            visibility: hidden;
-          }
+          visibility: hidden;
+          // @include big_web() {
+          //   visibility: hidden;
+          // }
+
+          // @include mobile() {
+          //   visibility: hidde;
+          // }
         }
       }
     
@@ -122,6 +174,11 @@ div.foc-labels-picker {
         align-items: center;
         margin-top: 16px;
         padding: 0;
+
+        @include mobile() {
+          padding: 12px 16px;
+          display: none;
+        }
     
         span.add-label-plus {
           width: 16px;
@@ -136,6 +193,14 @@ div.foc-labels-picker {
           line-height: 16px;
           color: var(--color);
         }
+      }
+
+      div.mobile-add-lock-description {
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--light-color);
+        padding: 16px;
       }
     }
   }
