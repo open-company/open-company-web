@@ -355,7 +355,11 @@ div.oc-labels-list {
   div.oc-label {
     @include label();
     margin-right: 4px;
-    max-width: calc(33% - 4px) !important; // 3 labels per row with 4px spacing
+    max-width: initial !important;
+
+    @include mobile() {
+      max-width: calc(33% - 4px) !important; // 3 labels per row with 4px spacing
+    }
 
     a:hover {
       opacity: 0.9;
@@ -487,10 +491,6 @@ div.cmail-label-autocomplete {
       transition: opacity 180ms linear;
       z-index: 2;
       pointer-events: none;
-
-      span.oc-label-text {
-        text-shadow: 0.2px 0.2px var(--color);
-      }
     }
   }
 

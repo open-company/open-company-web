@@ -76,10 +76,7 @@ $header_top_margin: 24;
   border-radius: 2px;
   background-color: var(--oc-label-background-color);
   @include no-user-select();
-
-  &, span.oc-label-text {
-    @include label_text($font-size, $line-height);
-  }
+  @include label_text($font-size, $line-height);
 
   a, button {
     &, &:hover, &:active, &:focus {
