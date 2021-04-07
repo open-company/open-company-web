@@ -237,8 +237,8 @@
                :title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]
             [:div.must-see-tag]
-            [:div.bookmark-tag]
-            [:div.bookmark-tag-small]
+            [:div.bookmark-tag.big-web-tablet-only]
+            [:div.bookmark-tag-small.mobile-only]
             [:div.muted-activity
              {:data-toggle (when-not is-mobile? "tooltip")
               :data-placement "top"

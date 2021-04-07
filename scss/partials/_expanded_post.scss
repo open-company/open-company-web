@@ -28,12 +28,12 @@ div.expanded-post {
     div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
       @include big_web() {
         div.bookmark-tag {
-          display: block;
+          display: flex;
         }
       }
       @include mobile() {
         div.bookmark-tag-small {
-          display: block;
+          display: flex;
         }
       }
     }
