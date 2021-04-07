@@ -292,7 +292,8 @@
                             :read-data read-data}))
              [:div.expanded-post-labels
               (when (seq (:labels activity-data))
-                (labels-list (:labels activity-data)))]]
+                (labels-list {:labels (:labels activity-data)
+                              :tooltip? (not is-mobile?)}))]]
             [:div.expanded-post-comments.group
               {:class (when ua/android? "android")}
               (stream-comments {:activity-data activity-data

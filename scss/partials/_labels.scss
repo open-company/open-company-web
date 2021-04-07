@@ -352,15 +352,12 @@ div.oc-labels-list {
   align-items: center;
   min-height: 16px;
 
-  div.oc-labels-item {
+  div.oc-label {
+    @include label();
     margin-right: 4px;
 
     a:hover {
       opacity: 0.9;
-    }
-
-    div.oc-label {
-      @include label();
     }
   }
 }

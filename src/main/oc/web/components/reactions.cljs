@@ -24,7 +24,8 @@
                        (rum/local false ::mounted)
                        ui-mixins/refresh-tooltips-mixin
                        (ui-mixins/on-click-out #(reset! (::show-picker %1) false))
-  [s {:keys [entity-data hide-picker optional-activity-data max-reactions did-react-cb only-thumb? thumb-first?]}]
+  [s {:keys [entity-data hide-picker optional-activity-data max-reactions
+             did-react-cb only-thumb? thumb-first? class-name]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
@@ -51,6 +52,7 @@
     (when (or (seq reactions-data)
               should-show-picker?)
       [:div.reactions
+       {:class-name class-name}
         [:div.reactions-list.group
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))

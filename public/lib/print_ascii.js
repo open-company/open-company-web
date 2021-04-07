@@ -1,12 +1,18 @@
 const carrotContact = "hello@carrot.io";
 
+function formatHelpLine(command, description) {
+  return console.log("%c" + command + " " + "%c" + description,
+                     "font-weight: normal; color:#34414F;",
+                     "font-style: italic; color:rgba(52,65,79,0.8)");
+}
+
 function OCWebHelp(){
-  console.log("Debug app-state functions:\n\n" +
-              "oc.web.dispatcher.db() // to print the whole app-state\n" +
-              "oc.web.lib.logging.config_log_level_BANG_(\"debug\") // to change log level\n" +
-              "oc.web.actions.user.force_jwt_refresh() // force a JWT token refresh with our auth server\n" +
-              "oc.web.dispatcher // namespace containing a bunch of debug functions\n" +
-              "OCWebHelp(): print this help\n")
+  console.log("Debug app-state functions:\n")
+  formatHelpLine("oc.web.dispatcher.db()", "Print the whole app-state");
+  formatHelpLine("oc.web.lib.logging.config_log_level_BANG_(\"debug\")", "Change log level");
+  formatHelpLine("oc.web.actions.user.force_jwt_refresh()", "Force a JWT token refresh");
+  formatHelpLine("oc.web.dispatcher", "Namespace wit more debug functions");
+  formatHelpLine("OCWebHelp()", "Print this help");
 }
 
 function OCWebPrintAsciiArt(){

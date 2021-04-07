@@ -725,7 +725,6 @@
       (when (and (not (:collapsed cmail-state))
                  (:published? cmail-data))
         [:div.cmail-labels
-        ;;  (labels-list (:labels cmail-data))
          (cmail-labels-list {;;  :labels-preview? true
                              ;;  :add-label-bt true
                              })])

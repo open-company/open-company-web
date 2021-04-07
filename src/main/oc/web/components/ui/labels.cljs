@@ -238,22 +238,31 @@
 
 (rum/defc label-item <
   rum/static
-  [label]
+  ui-mixins/refresh-tooltips-mixin
+  [{label :label tooltip-title :tooltip-title}]
   [:div.oc-label
    {:data-uuid (:uuid label)
-    :data-slug (:slug label)}
+    :data-slug (:slug label)
+    :data-container "body"
+    :data-toggle (when (seq tooltip-title) "tooltip")
+    :data-placement "top"
+    :title tooltip-title}
    [:a
     {:href (oc-urls/label (:slug label))
-     :on-click (fn [e]
-                 (dom-utils/stop-propagation! e)
-                 (nav-actions/nav-to-label! e (:slug label) (oc-urls/label (:slug label))))}
+     :on-click #(nav-actions/nav-to-label! % (:slug label) (oc-urls/label (:slug label)))}
     (:name label)]])
 
 (rum/defc labels-list <
   rum/static
-  [labels]
+  [{labels :labels tooltip? :tooltip? class-name :class-name}]
   [:div.oc-labels-list
-   (for [label labels]
-     [:div.oc-labels-item
-      {:key (str "oc-labels-item-" (or (:uuid label) (:slug label)))}
-      (label-item label)])])
+  (for [label labels]
+    (rum/with-key
+     (label-item {:label label
+                  :class-name class-name
+                  :tooltip-title (when tooltip?
+                                   "View all updates with this label")})
+     (str "oc-labels-item-"
+          (or (:uuid label) (:slug label))
+          "-"
+          (or (and tooltip? "tt") "nott"))))])
