@@ -230,6 +230,7 @@
                                                 :board-icon (and (not is-container?)
                                                                  (not is-contributions)
                                                                  (not is-topics)
+                                                                 (not is-label)
                                                                  (not is-drafts-board)
                                                                  (not current-activity-id))})}
                       (cond is-inbox
