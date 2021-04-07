@@ -444,8 +444,6 @@
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
-                  ;;  (when-not (responsive/is-mobile-size?)
-                  ;;    (emoji-autocomplete/autocomplete-mixin "headline"))
                    (mixins/on-click-out :cmail-container (fn [s e]
                                                            (when (and (not (responsive/is-mobile-size?))
                                                                       (:fullscreen @(drv/get-ref s :cmail-state))
