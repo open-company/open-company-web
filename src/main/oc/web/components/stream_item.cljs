@@ -1,6 +1,5 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
-            [oops.core :refer (ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [dommy.core :refer-macros (sel1)]
@@ -34,7 +33,7 @@
 (rum/defc stream-item-draft-footer <
   rum/static
   [activity-data]
-  [:div.stream-item-footer.group
+  [:div.stream-item-draft-footer.group
    [:div.stream-body-draft-edit
     [:button.mlb-reset.edit-draft-bt
      {:on-click #(activity-actions/activity-edit activity-data)}
@@ -79,13 +78,11 @@
              show-new-comments? activity-attachments is-mobile?
              premium? read-data show-view-more?]}]
   [:div.stream-item-footer.group
-   {:ref "stream-item-reactions"}
    (when member?
-     [:div.foc-click-stop
-      (reactions {:entity-data activity-data
-                  :only-thumb? true
-                  :hide-picker true})])
-   [:div.stream-item-footer-mobile-group
+     (reactions {:entity-data activity-data
+                 :only-thumb? true
+                 :hide-picker true
+                 :class-name "foc-click-stop"}))
     (when member?
       [:div.stream-item-comments-summary.foc-click-stop
        (foc-comments-summary {:entry-data activity-data
@@ -101,7 +98,10 @@
                               :is-mobile? is-mobile?})
     (when (seq (:labels activity-data))
       [:div.stream-item-labels.foc-click-stop
-       (labels-list (:labels activity-data))])]
+       [:div.separator-dot]
+       (labels-list {:labels (:labels activity-data)
+                     :tooltip? (not is-mobile?)
+                     :class-name "foc-click-stop"})])
    (when show-view-more?
      [:div.stream-item-mobile-view-more
       "View more"])])
@@ -245,6 +245,7 @@
                                 :muted-item (utils/link-for (:links activity-data) "follow")
                                 :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
+                                :new-item show-new-item-tag
                                 :showing-share sharing-entry?})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
@@ -278,7 +279,8 @@
                                                 (not= (:board-slug activity-data) current-board-slug)
                                                 (> boards-count 1))
                           :current-user-id current-user-id})
-        [:div.separator-dot]
+        [:div.bookmark-tag-small.mobile-only]
+        [:div.pinned-tag.mobile-only]
         (let [t (or (:published-at activity-data) (:created-at activity-data))]
           [:span.time-since
            {:data-toggle (when-not is-mobile? "tooltip")
@@ -289,15 +291,14 @@
            [:time
             {:date-time t}
             (utils/time-since t [:short :lower-case])]])
+        [:div.separator-dot]
         [:div.muted-activity
          {:data-toggle (when-not is-mobile? "tooltip")
           :data-placement "top"
           :title "Muted"}]
-        (when show-new-item-tag
-          [:div.new-item-tag])
-        [:div.bookmark-tag-small.mobile-only]
+        [:div.new-item-tag]
         [:div.bookmark-tag.big-web-tablet-only]
-        [:div.pinned-tag]]
+        [:div.pinned-tag.big-web-tablet-only]]
        (when is-published?
         (if is-mobile?
           (when mobile-more-menu?

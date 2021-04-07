@@ -145,13 +145,6 @@ div.foc-labels-picker {
           padding: 0;
           @include svgBgColor("/img/ML/label_edit.svg", center, 12px 12px, var(--color));
           visibility: hidden;
-          // @include big_web() {
-          //   visibility: hidden;
-          // }
-
-          // @include mobile() {
-          //   visibility: hidde;
-          // }
         }
       }
     
