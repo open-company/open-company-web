@@ -71,7 +71,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(white, 0)}; // #{rgba(241, 240, 240, 0)};
   --foc-new-menu-gradient-from: white;
   --foc-new-menu-gradient-to: #{rgba(white, 0)};
-  --foc-box-shadow: --box-shadow-color;
+  --foc-box-shadow: var(--box-shadow-color);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -101,8 +101,8 @@ $dark_mode: "dark";
   --comments-floating-bt-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
   --comments-floating-bt-border: #DCDDE1;
   --add-comment-background: white;
-  --add-comment-border-color: --divider-line;
-  --add-comment-box-shadow: --box-shadow-color;
+  --add-comment-border-color: var(--divider-line);
+  --add-comment-box-shadow: var(--box-shadow-color);
   --mobile-add-comment-background: white;
 
   // Cmail
@@ -113,9 +113,9 @@ $dark_mode: "dark";
   --cmail-fullscreen-background-color: white;
   --cmail-background-color: white;
   --cmail-border: 1px solid #{rgba($deep_navy, 0.24)};
-  --cmail-box-shadow: --box-shadow;
+  --cmail-box-shadow: var(--box-shadow);
   --cmail-active-border: 1px solid #DCDDE1;
-  --cmail-active-box-shadow: --box-shadow;
+  --cmail-active-box-shadow: var(--box-shadow);
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
@@ -154,7 +154,7 @@ $dark_mode: "dark";
 
   // Explore
   --explore-hover-border-color: #{rgba($deep_navy, 0.32)};
-  --explore-hover-box-shadow: --box-shadow;
+  --explore-hover-box-shadow: var(--box-shadow);
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(0, 0, 0, 0.24);
@@ -225,7 +225,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(45, 49, 59, 0)}; // #{rgba(36, 41, 50, 0)};
   --foc-new-menu-gradient-from: #{rgba(45, 49, 59, 1)};
   --foc-new-menu-gradient-to: #{rgba(45, 49, 59, 0)};
-  --foc-box-shadow: --box-shadow-color;
+  --foc-box-shadow: var(--box-shadow-color);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.11)};
@@ -255,8 +255,8 @@ $dark_mode: "dark";
   --comments-floating-bt-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
   --comments-floating-bt-border: #{rgba(white, 0.08)};
   --add-comment-background: rgb(27, 32, 42);
-  --add-comment-border-color: --divider-line;
-  --add-comment-box-shadow: --box-shadow-color;
+  --add-comment-border-color: var(--divider-line);
+  --add-comment-box-shadow: var(--box-shadow-color);
   --mobile-add-comment-background: #1B202A;
 
   // Cmail
@@ -267,9 +267,9 @@ $dark_mode: "dark";
   --cmail-background-color: #{rgba(white, 0.09)};
   --cmail-fullscreen-background-color: rgb(27, 32, 42);
   --cmail-border: 1px solid #{rgba(white, 0.16)};
-  --cmail-box-shadow: --box-shadow;
+  --cmail-box-shadow: var(--box-shadow);
   --cmail-active-border: 1px solid #{rgba(white, 0.08)};
-  --cmail-active-box-shadow: --box-shadow;
+  --cmail-active-box-shadow: var(--box-shadow);
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
@@ -308,7 +308,7 @@ $dark_mode: "dark";
 
   // Explore
   --explore-hover-border-color: #{rgba(white, 0.32)};
-  --explore-hover-box-shadow: --box-shadow;
+  --explore-hover-box-shadow: var(--box-shadow);
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(255, 255, 255, 0.12);
