@@ -293,7 +293,6 @@
 (defn toggle-foc-labels-picker
   ([] (toggle-foc-labels-picker nil))
   ([entry-uuid]
-   (js/console.log "DBG " (if entry-uuid (str "Showing labels picker for" entry-uuid) "Hide labels picker"))
    (dis/dispatch! [:toggle-foc-labels-picker entry-uuid])))
 
 (defn hide-foc-labels-picker []
