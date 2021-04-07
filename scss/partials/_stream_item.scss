@@ -163,6 +163,10 @@ div.stream-item {
   &.muted-item, &.pinned-item, &.new-item, &.bookmark-item {
     div.stream-item-header div.stream-item-header-head-author div.separator-dot {
       display: block;
+
+      @include mobile() {
+        display: none;
+      }
     }
   }
 
@@ -723,6 +727,10 @@ div.stream-item {
         top: 50%;
         margin-top: -1px;
         left: -19px;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       @include mobile() {

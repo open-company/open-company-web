@@ -37,21 +37,14 @@
 
 (defn- hide-menu
   [s will-close & [force]]
-  (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675") (js/console.log "DBG hide-menu force" force))
   (when (or force
             (menu-visible? s))
-    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    hide label picker" force))
     (label-actions/hide-foc-labels-picker)
     (utils/remove-tooltips)
-    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    will-close?"))
     (when (fn? will-close)
-      (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    will close"))
       (will-close))
-    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    closing move activity"))
     (reset! (::move-activity s) false)
-    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    closing showing menu"))
-    (reset! (::showing-menu s) false)
-    (when (= (-> s :rum/args first :entity-data :uuid) "6313-49bb-b675")(js/console.log "DBG    done!"))))
+    (reset! (::showing-menu s) false)))
 
 (defn- toggle-menu [s will-open will-close]
   (if (menu-visible? s)
@@ -106,7 +99,6 @@
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s _]
-                                                             (js/console.log "DBG more-menu/on-click-out")
                                                              (hide-menu s (-> s :rum/args first :will-close))))
                        ui-mixins/strict-refresh-tooltips-mixin
                        {:will-update (fn [s]
@@ -205,13 +197,6 @@
                                 (and (not external-labels)
                                      can-edit-labels?)
                                 pins?)]
-    (when (= (:uuid entity-data) "6313-49bb-b675")
-      (js/console.log "DBG more-menu/render menu expanded?" showing-menu?)
-      (js/console.log "DBG    menu expanded pieces:")
-      (js/console.log "DBG    move-activity:" @(::move-activity s))
-      (js/console.log "DBG    showing-menu:" @(::showing-menu s))
-      (js/console.log "DBG    foc-labels-picker:" (-> s :rum/args first :foc-labels-picker))
-      (js/console.log "DBG    force-show-menu:" (-> s :rum/args first :force-show-menu)))
     (when (or edit-link
               share-link
               delete-link
@@ -241,7 +226,6 @@
                                  @(::can-unmount s)
                                  (not (dom-utils/event-container-matches % "ul.more-menu-list")))
                         (.stopPropagation %)
-                        (js/console.log "DBG more-menu on-click" )
                         (hide-menu s will-close)))}
         (when show-labels-picker
           [:div.foc-labels-picker-wrapper
