@@ -1150,7 +1150,7 @@ $header_top_margin: 24;
     cursor: text;
   }
 
-  img, a > img, video, a > video {
+  img:not(.user-avatar-img), a > img:not(.user-avatar-img), video, a > video {
     display: block;
     margin: 0;
     width: auto;
