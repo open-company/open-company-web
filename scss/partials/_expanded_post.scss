@@ -442,29 +442,21 @@ div.expanded-post {
 
       div.expanded-post-footer {
         margin-top: 24px;
-        min-height: 26px;
-        position: relative;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
 
         @include mobile() {
           margin-top: 16px;
-          min-height: 26px;
-        }
-
-        div.expanded-post-footer-mobile-group {
-          min-height: 26px;
-          float: left;
-          height: auto;
-          width: auto;
-        }
-
-        div.is-comments {
-          margin-left: 32px;
-          float: left;
-          cursor: pointer;
+          flex-flow: row wrap;
         }
 
         div.reactions {
-          float: left;
+          margin-left: 0;
+          margin-right: 8px;
+          flex: 0 0 auto;
+          order: 2;
 
           div.reactions-picker-container {
             div.emoji-mart {
@@ -482,15 +474,49 @@ div.expanded-post {
           }
         }
 
+        div.is-comments {
+          cursor: pointer;
+          margin-right: 8px;
+          margin-left: 8px;
+          flex: 0 0 auto;
+          order: 3;
+        }
+
         div.wrt-count-container {
-          float: left;
-          margin-left: 32px;
+          margin-right: 8px;
+          margin-left: 8px;
+          flex: 0 0 auto;
+          order: 4;
         }
 
         div.expanded-post-labels {
-          float: left;
-          margin-left: 32px;
-          margin-top: 5px;
+          position: relative;
+          margin-left: 27px;
+          margin-right: 8px;
+          flex: 0 0 auto;
+          order: 5;
+
+          @include mobile() {
+            order: 1;
+            width: 100%;
+            margin: 8px 0 10px 0;
+          }
+
+          div.separator-dot {
+            position: absolute;
+            top: 50%;
+            left: -19px;
+            display: block;
+            width: 3px;
+            height: 3px;
+            background-color: var(--opac-background-color-2);
+            border-radius: 50%;
+            margin: -1px 1px 0 1px;
+
+            @include mobile() {
+              display: none;
+            }
+          }
         }
       }
 

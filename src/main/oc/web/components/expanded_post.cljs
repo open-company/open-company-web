@@ -199,7 +199,6 @@
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :bookmark-item (:bookmarked-at activity-data)
-                                :must-see-item (:must-see activity-data)
                                 :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
@@ -236,7 +235,6 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]
-            [:div.must-see-tag]
             [:div.bookmark-tag.big-web-tablet-only]
             [:div.bookmark-tag-small.mobile-only]
             [:div.muted-activity
@@ -282,18 +280,18 @@
               (reactions {:entity-data activity-data
                           :thumb-first? true
                           :hide-picker true})
-              [:div.expanded-post-footer-mobile-group
-                (when (:member? org-data)
-                  (foc-comments-summary {:entry-data activity-data
-                                         :add-comment-focus-prefix "main-comment"
-                                         :current-activity-id (:uuid activity-data)}))]
+              (when (:member? org-data)
+                (foc-comments-summary {:entry-data activity-data
+                                       :add-comment-focus-prefix "main-comment"
+                                       :current-activity-id (:uuid activity-data)}))
               (when (:member? org-data)
                 (wrt-count {:activity-data activity-data
                             :read-data read-data}))
-             [:div.expanded-post-labels
               (when (seq (:labels activity-data))
-                (labels-list {:labels (:labels activity-data)
-                              :tooltip? (not is-mobile?)}))]]
+                [:div.expanded-post-labels
+                  [:div.separator-dot]
+                  (labels-list {:labels (:labels activity-data)
+                                :tooltip? (not is-mobile?)})])]
             [:div.expanded-post-comments.group
               {:class (when ua/android? "android")}
               (stream-comments {:activity-data activity-data

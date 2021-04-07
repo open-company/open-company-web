@@ -355,6 +355,7 @@ div.oc-labels-list {
   div.oc-label {
     @include label();
     margin-right: 4px;
+    max-width: calc(33% - 4px) !important; // 3 labels per row with 4px spacing
 
     a:hover {
       opacity: 0.9;
