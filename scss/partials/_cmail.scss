@@ -70,15 +70,14 @@
 @mixin left-floating-div-distraction-free() {
   div.cmail-floating-left {
     position: fixed;
-    top: 32px;
-    right: 32px;
+    top: 40px;
+    left: 40px;
+  }
+}
 
-    div.dismiss-inline-cmail-container {
-      button.dismiss-inline-cmail {
-        background-color: transparent;
-        @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 16px 16px, var(--light-color));
-      }
-    }
+@mixin right-floating-div-distraction-free() {
+  div.cmail-floating-right {
+    display: none;
   }
 }
 
@@ -924,7 +923,7 @@ div.cmail-outer {
       div.delete-bt-container {
         flex: 0 0 auto;
         order: 7;
-        margin-left: 16px;
+        margin-left: auto;
 
         @include mobile() {
           display: none;
@@ -933,14 +932,30 @@ div.cmail-outer {
         button.delete-bt {
           position: relative;
           height: 32px;
-          width: 24px;
+          width: auto;
+          opacity: 0.3;
+          // @include svgBgColor("/img/ML/cmail_delete.svg", 0px 8px, 14px 16px, var(--color));
           background-image: cdnUrl("/img/ML/cmail_delete.svg");
           background-size: 14px 16px;
-          background-position: center;
+          background-position: left 0px top 8px;
           background-repeat: no-repeat;
-          padding: 0;
-          opacity: 0.3;
+          padding: 0 16px 0 22px;
           display: block;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 32px;
+          color: var(--color);
+
+          &:after {
+            content: "";
+            height: 16px;
+            width: 1px;
+            position: absolute;
+            right: 0;
+            top: 8px;
+            background-color: var(--color);
+            opacity: 0.48;
+          }
 
           &:not(.disabled):hover {
             opacity: 1;
@@ -986,7 +1001,49 @@ div.cmail-outer {
         margin-left: 6px;
         flex: 0 0 auto;
         order: 5;
-        margin-right: auto;
+      }
+
+      div.cmail-footer-labels-bt-container {
+        width: 24px;
+        height: 32px;
+        flex: 0 0 auto;
+        order: 6;
+        position: relative;
+        margin-left: 6px;
+
+        button.cmail-footer-labels-bt {
+          width: 24px;
+          height: 32px;
+          padding: 0px;
+          cursor: pointer;
+          border-radius: 0;
+          opacity: 0.3;
+          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--color));
+
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+        }
+
+        @include mobile() {
+          display: none;
+        }
+
+        div.labels-picker {
+          position: absolute;
+          top: 0;
+          bottom: unset;
+          right: unset;
+          left: 0;
+          width: auto;
+        }
+
+        &.top-modal {
+          div.labels-picker {
+            bottom: 100%;
+            top: unset;
+          }
+        }
       }
     }
   }
@@ -1124,7 +1181,7 @@ div.cmail-outer {
         div.distraction-free-container {
           flex: 0 0 auto;
           margin-left: auto;
-          order: 6;
+          order: 7;
           height: 32px;
 
           div.carrot-switch {
@@ -1148,8 +1205,10 @@ div.cmail-outer {
         min-height: calc(100vh - 80px);
         display: flex;
         flex-flow: column nowrap;
+        box-shadow: none;
 
         @include left-floating-div-distraction-free();
+        @include right-floating-div-distraction-free();
 
         div.cmail-content-outer {
           padding: 0 24px;
@@ -1200,11 +1259,22 @@ div.cmail-outer {
           }
         }
 
+        div.cmail-labels {
+          padding-top: 24px;
+          height: 44px;
+        }
+
         div.cmail-footer {
           margin-top: auto;
+          padding: 24px 16px 16px 24px;
+          margin-top: 0;
 
           div.cmail-footer-media-picker-container {
             margin-right: 0;
+          }
+
+          div.distraction-free-container {
+            margin-left: 16px;
           }
         }
       }

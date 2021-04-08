@@ -1,7 +1,7 @@
 div.foc-labels-picker {
   display: flex;
   flex-flow: row nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   z-index: #{$navbar_zindex + 156};
   position: relative;

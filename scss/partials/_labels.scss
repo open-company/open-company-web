@@ -5,7 +5,7 @@ div.oc-labels {
   padding: 16px;
   height: auto;
   min-width: 160px;
-  background-color: white;
+  background-color: var(--tooltip-background-color);
   box-shadow: var(--box-shadow);
   max-height: 300px;
   overflow-x: hidden;
@@ -15,7 +15,7 @@ div.oc-labels {
     @include OC_Body_Bold();
     font-size: 14px;
     line-height: 18px;
-    color: $deep_navy;
+    color: var(--tooltip-color);
   }
 
   button.oc-label, div.oc-label {
@@ -44,22 +44,27 @@ div.oc-labels {
     }
 
     div.carrot-checkbox {
-      border: 1px solid #{$deep_navy};
+      border: 1px solid var(--tooltip-color);
       order: 1;
       margin-right: 8px;
       flex: 0 0 auto;
 
       &.selected {
-        border: 1px solid #{$deep_navy};
-        background-color: $deep_navy;
+        border: 1px solid var(--tooltip-color);
+        background-color: var(--tooltip-color);
+        background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
+        }
       }
 
       &.disabled {
-        border: 1px solid #{$deep_navy};
+        border: 1px solid var(--tooltip-color);
       }
 
       &.selected.disabled {
-        background-color: #{$deep_navy};
+        background-color: var(--tooltip-color);
       }
     }
 
@@ -77,7 +82,7 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: $deep_navy;
+      color: var(--tooltip-color);
       max-width: 180px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -104,7 +109,7 @@ div.oc-labels {
     @include OC_Body_Book_Italic();
     font-size: 14px;
     line-height: 18px;
-    color: $ui_grey;
+    color: var(--tooltip-color);
     margin-top: auto;
     margin-bottom: auto;
     align-self: center;
@@ -131,7 +136,7 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: $ui_grey;
+      color: var(--tooltip-color);
     }
   }
 
@@ -147,7 +152,7 @@ div.oc-labels {
       height: 16px;
       line-height: 16px;
       font-size: 14px;
-      color: $ui_grey;
+      color: var(--tooltip-color);
       order: 1;
     }
 
