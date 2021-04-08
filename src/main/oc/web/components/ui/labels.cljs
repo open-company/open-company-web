@@ -185,7 +185,7 @@
   [{on-click-cb :on-click-cb
     {label-name :name :as label} :label
     class-name :class-name
-    {tooltip-title :tooltip-title tooltip-placement :tooltip-placement :or {tooltip-placement "top"}} :tooltip}]
+    {tooltip-title :title tooltip-placement :placement :or {tooltip-placement "top"}} :tooltip}]
   [:button.mlb-reset.cmail-label
    {:data-uuid (:uuid label)
     :data-slug (:slug label)

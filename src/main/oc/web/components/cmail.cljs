@@ -29,7 +29,7 @@
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
-            [oc.web.components.ui.labels :refer (cmail-labels-list)]
+            [oc.web.components.ui.labels :refer (cmail-labels-list labels-picker)]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
@@ -434,7 +434,8 @@
                                                                                  ".nux-tooltip-container, "
                                                                                  ".label-modal-view, "
                                                                                  ".cmail-outer.fullscreen, "
-                                                                                 ".cmail-outer.distraction-free"))))
+                                                                                 ".cmail-outer.distraction-free, "
+                                                                                 ".labels-picker"))))
                                                              (close-cmail s e))))
 
                    {:will-mount (fn [s]
@@ -595,21 +596,21 @@
           [:button.mlb-reset.dismiss-inline-cmail
            {:on-click (partial close-cmail s)
             :data-toggle "tooltip"
-            :data-placement "top"
+            :data-placement (if (:distraction-free? cmail-state) "right" "top")
             :title (if (:published? cmail-data)
                      "Close"
                      "Save & Close")}]]]
         [:div.cmail-floating-right
-         [:div.dismiss-inline-cmail-container
-          ;; {:class (when-not (:published? cmail-data) "long-tooltip")}
-          [:button.mlb-reset.dismiss-inline-cmail
-           {:on-click (partial close-cmail s)
-            :data-toggle (when (:collapsed cmail-state) "tooltip")
-            :data-container "body"
-            :data-placement "top"
-            :title (if (:published? cmail-data)
-                     "Close"
-                     "Save & Close")}]]
+        ;;  [:div.dismiss-inline-cmail-container
+        ;;   ;; {:class (when-not (:published? cmail-data) "long-tooltip")}
+        ;;   [:button.mlb-reset.dismiss-inline-cmail
+        ;;    {:on-click (partial close-cmail s)
+        ;;     :data-toggle (when (:collapsed cmail-state) "tooltip")
+        ;;     :data-container "body"
+        ;;     :data-placement "top"
+        ;;     :title (if (:published? cmail-data)
+        ;;              "Close"
+        ;;              "Save & Close")}]]
          [:div.floating-delete-bt-container
           [:button.mlb-reset.floating-delete-bt
            {:on-click #(if (:uuid cmail-data)
@@ -623,23 +624,7 @@
                     "Delete draft")}
            [:span.floating-delete-bt-icon]
            [:span.floating-delete-bt-text
-            "Delete"]]]
-        ;;  [:div.floating-labels-bt-container
-        ;;   [:button.mlb-reset.floating-labels-bt
-        ;;    {:on-click #(cmail-actions/toggle-cmail-floating-labels-view)
-        ;;     :data-toggle (when (:collapsed cmail-state) "tooltip")
-        ;;     :data-container "body"
-        ;;     :data-placement "bottom"
-        ;;     :title (if (:published? cmail-data)
-        ;;             "Labels"
-        ;;             "Labels")}
-        ;;    [:span.floating-labels-bt-icon]
-        ;;    [:span.floating-labels-bt-text
-        ;;     "Labels"]]
-        ;;   (when (:labels-floating-view cmail-state)
-        ;;     (labels-picker {:inline-add-bt true
-        ;;                     }))]
-         ]
+            "Delete"]]]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
@@ -722,8 +707,7 @@
                               :dispatch-key (first dis/cmail-data-key)
                               :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
-      (when (and (not (:collapsed cmail-state))
-                 (:published? cmail-data))
+      (when-not (:collapsed cmail-state)
         [:div.cmail-labels
          (cmail-labels-list {;;  :labels-preview? true
                              ;;  :add-label-bt true
@@ -768,13 +752,25 @@
            :data-container "body"
            :title "Add attachment"}]
         [:div.cmail-footer-media-picker-container.group]
-        ;; (when (:uuid cmail-data)
-        ;;   [:div.delete-bt-container
-        ;;    [:button.mlb-reset.delete-bt
-        ;;     {:on-click #(delete-clicked s % cmail-data)
-        ;;      :data-toggle (when-not is-mobile? "tooltip")
-        ;;      :data-placement "top"
-        ;;      :title "Delete"}]])
+        [:div.cmail-footer-labels-bt-container
+         {:class (when fullscreen? "top-modal")}
+         [:button.mlb-reset.cmail-footer-labels-bt
+          {:data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :title "Edit labels"
+           :on-click (when (:uuid cmail-data)
+                       #(cmail-actions/toggle-cmail-floating-labels-view))}]
+         (when (:labels-floating-view cmail-state)
+           (labels-picker))]
+        (when (:distraction-free? cmail-state)
+          [:div.delete-bt-container
+           [:button.mlb-reset.delete-bt
+            {:on-click (when (:uuid cmail-data)
+                         #(delete-clicked s % cmail-data))}
+            (if (:published? cmail-data)
+              "Delete post"
+              "Delete draft")]])
         ; (when-not (:fullscreen cmail-state)
         ;   [:div.fullscreen-bt-container
         ;     [:button.mlb-reset.fullscreen-bt
