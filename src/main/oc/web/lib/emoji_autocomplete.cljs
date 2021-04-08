@@ -4,11 +4,9 @@
             ["@bago2k4/emoji-autocomplete" :as emoji-autocomplete :refer (setupAutocomplete destroyAutocomplete)]
             [dommy.core :refer-macros (sel)]))
 
-(def ^{:export true} counter (atom 0))
 
 (defun init!
   ([element :guard (partial instance? js/Node)]
-   (swap! counter inc)
    (setupAutocomplete element))
   ([xs :guard coll?]
    (for [x xs]
@@ -36,8 +34,7 @@
    (for [tc (js->clj tcs)]
      (destroy! tc)))
   ([tc :guard #(.-destroy %)]
-   (destroyAutocomplete tc)
-   (swap! counter dec))
+   (destroyAutocomplete tc))
   ([nil]
    (js/console.warn "Emoji autocomplete not destroyed, passed TextComplete object is null.")
    nil)
