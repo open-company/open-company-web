@@ -606,16 +606,16 @@
                      "Close"
                      "Save & Close")}]]]
         [:div.cmail-floating-right
-        ;;  [:div.dismiss-inline-cmail-container
-        ;;   ;; {:class (when-not (:published? cmail-data) "long-tooltip")}
-        ;;   [:button.mlb-reset.dismiss-inline-cmail
-        ;;    {:on-click (partial close-cmail s)
-        ;;     :data-toggle (when (:collapsed cmail-state) "tooltip")
-        ;;     :data-container "body"
-        ;;     :data-placement "top"
-        ;;     :title (if (:published? cmail-data)
-        ;;              "Close"
-        ;;              "Save & Close")}]]
+         [:div.dismiss-inline-cmail-container
+          {:class (when-not (:published? cmail-data) "long-tooltip")}
+          [:button.mlb-reset.dismiss-inline-cmail
+           {:on-click (partial close-cmail s)
+            :data-toggle "tooltip"
+            :data-placement "right"
+            :data-container "body"
+            :title (if (:published? cmail-data)
+                     "Close"
+                     "Save & Close")}]]
          [:div.floating-delete-bt-container
           [:button.mlb-reset.floating-delete-bt
            {:on-click #(if (:uuid cmail-data)
