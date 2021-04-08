@@ -51,6 +51,7 @@
                            (drv/drv :route/dark-allowed)
                            (drv/drv :show-login-wall?)
                            (drv/drv :show-activity-removed?)
+                           (drv/drv :show-login-wall?)
                            (drv/drv :current-panel)
                            (drv/drv :org-dashboard-data)
                            (drv/drv :org-data)
