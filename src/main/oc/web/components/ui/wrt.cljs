@@ -377,6 +377,7 @@
                       "Remind"])])]])]]))
 
 (rum/defc wrt-count < rum/static
+  mixins/strict-refresh-tooltips-mixin
   [{:keys [activity-data read-data]}]
   (let [item-id (:uuid activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
