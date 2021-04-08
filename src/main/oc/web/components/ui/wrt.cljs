@@ -379,12 +379,8 @@
 (rum/defc wrt-count < rum/static
   [{:keys [activity-data read-data]}]
   (let [item-id (:uuid activity-data)
-        is-author? (:publisher? activity-data)
-        reads-count (if (and is-author?
-                             (:last-read-at activity-data))
-                     (dec (:count read-data))
-                     (:count read-data))
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        reads-count (:count read-data)]
     (when (map? read-data)
       [:div.wrt-count-container
         {:data-toggle (when-not is-mobile? "tooltip")
