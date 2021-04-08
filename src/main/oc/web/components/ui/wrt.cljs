@@ -380,7 +380,9 @@
   [{:keys [activity-data read-data]}]
   (let [item-id (:uuid activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        reads-count (:count read-data)]
+        reads-count (if (:publisher? activity-data)
+                      (max 0 (dec (:count read-data)))
+                      (:count read-data))]
     (when (map? read-data)
       [:div.wrt-count-container
         {:data-toggle (when-not is-mobile? "tooltip")
