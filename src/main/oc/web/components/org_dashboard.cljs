@@ -98,7 +98,8 @@
         show-menu? (= current-panel :menu)
         show-mobile-cmail? (and collapsed-cmail?
                                 is-mobile?)
-        ;; show-follow-picker (= open-panel :follow-picker)
+        show-push-notification-permissions-modal? (and ua/mobile-app?
+                                                       show-push-notification-permissions-modal?)
         mobile-search? (and is-mobile?
                             show-search?)]
     (if is-loading
