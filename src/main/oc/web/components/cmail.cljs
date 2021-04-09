@@ -447,7 +447,7 @@
                                                                                   ".cmail-outer.distraction-free, "
                                                                                   ".labels-picker, "
                                                                                   ".oc-labels-modal-wrapper"))))
-                                                                (close-cmail s e))))
+                                                                (close-cmail s e)))))
                   {:will-mount (fn [s]
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (init-cmail s)
