@@ -429,13 +429,16 @@
 
                    (mixins/on-click-out :cmail-container (fn [s e]
                                                            (when (and (not (responsive/is-mobile-size?))
+                                                                      (not (-> s (drv/get-ref :cmail-state) deref :labels-inline-view))
+                                                                      (not (-> s (drv/get-ref :cmail-state) deref :labels-floating-view))
                                                                       (not (dom-utils/event-container-matches e
                                                                             (str ".modal-wrapper, "
                                                                                  ".nux-tooltip-container, "
                                                                                  ".label-modal-view, "
                                                                                  ".cmail-outer.fullscreen, "
                                                                                  ".cmail-outer.distraction-free, "
-                                                                                 ".labels-picker"))))
+                                                                                 ".labels-picker, "
+                                                                                 ".oc-labels-modal-wrapper"))))
                                                              (close-cmail s e))))
 
                    {:will-mount (fn [s]
@@ -759,8 +762,7 @@
            :data-placement "top"
            :data-container "body"
            :title "Edit labels"
-           :on-click (when (:uuid cmail-data)
-                       #(cmail-actions/toggle-cmail-floating-labels-view))}]
+           :on-click #(cmail-actions/toggle-cmail-floating-labels-view)}]
          (when (:labels-floating-view cmail-state)
            (labels-picker))]
         (when (:distraction-free? cmail-state)

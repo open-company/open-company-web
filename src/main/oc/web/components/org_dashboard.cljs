@@ -1,6 +1,6 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
-            [clojure.string :as s]
+            [clojure.string :as cstr]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
@@ -79,7 +79,6 @@
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
-                activity-share-container
                 cmail-state
                 force-login-wall
                 panel-stack
@@ -165,9 +164,9 @@
         show-section-add (= open-panel :section-add)
         show-reminders? (= open-panel :reminders)
         show-reminder-edit? (and open-panel
-                                 (s/starts-with? (name open-panel) "reminder-"))
+                                 (cstr/starts-with? (name open-panel) "reminder-"))
         show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))
+                            (cstr/starts-with? (name open-panel) "wrt-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
@@ -176,7 +175,7 @@
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
         show-user-info? (and open-panel
-                             (s/starts-with? (name open-panel) "user-info-"))
+                             (cstr/starts-with? (name open-panel) "user-info-"))
         ;; show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
                             search-active)
@@ -274,17 +273,6 @@
           (search-box))
         (when payments-ui-upgraded-banner
           (upgraded-banner))
-        ;; Activity share modal for no mobile
-        (when (and (not is-mobile?)
-                   is-sharing-activity)
-          ;; If we have an element id find the share container inside that element
-          ;; and portal the component to that element
-          (let [portal-element (when activity-share-container
-                                  (.get (.find (js/$ (str "#" activity-share-container))
-                                         ".activity-share-container") 0))]
-            (if portal-element
-              (rum/portal (activity-share) portal-element)
-              (activity-share))))
         ;; Cmail mobile editor
         (when show-mobile-cmail?
           (cmail))

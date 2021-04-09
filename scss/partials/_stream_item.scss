@@ -45,7 +45,7 @@ div.virtualized-list-row:not(.collapsed-item) {
           }
         }
 
-        div.activity-share-container {
+        div.share-entry-container {
           display: block;
         }
 
@@ -170,14 +170,14 @@ div.stream-item {
     }
   }
 
-  div.activity-share-container {
-    display: none;
+  // div.share-entry-container {
+  //   display: none;
 
-    div.activity-share-modal-container {
-      right: -9px;
-      margin-top: 24px;
-    }
-  }
+  //   div.activity-share-modal-container {
+  //     right: -9px;
+  //     margin-top: 24px;
+  //   }
+  // }
 
   // Mobile swipe buttons
   button.mobile-more-bt {
@@ -349,7 +349,7 @@ div.stream-item {
       @include big_web() {
         display: none;
 
-        &:not(.menu-expanded) button {
+        &:not(.menu-expanded) > button {
           display: none;
         }
       }
@@ -720,12 +720,12 @@ div.stream-item {
       order: 6;
       position: relative;
       height: 20px;
-      margin: 5px 16px 5px 16px;
+      margin: 0 16px 0 19px;
 
       div.separator-dot {
         position: absolute;
         top: 50%;
-        margin-top: -1px;
+        margin: -1px 0 5px 0;
         left: -19px;
 
         @include mobile() {

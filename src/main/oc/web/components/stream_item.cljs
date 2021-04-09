@@ -143,7 +143,6 @@
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
-                         (drv/drv :activity-share-container)
                          (drv/drv :mobile-swipe-menu)
                          (drv/drv :board-slug)
                          (drv/drv :activity-uuid)
@@ -189,13 +188,12 @@
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
              current-user-data container-slug show-new-comments? foc-menu-open foc-labels-picker
-             clear-cell-measure-cb premium?]}]
+             clear-cell-measure-cb premium? foc-share-entry]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
-        dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         dom-node-class (str "stream-item-" (:uuid activity-data))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
@@ -206,14 +204,10 @@
                                mobile-more-menu-el)
         is-home? (-> container-slug keyword (= :following))
         is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
-        sharing-entry? (= (drv/react s :activity-share-container) dom-element-id)
-        menu-open? (or foc-menu-open
-                       (and (not is-mobile?)
-                            sharing-entry?))
         more-menu-comp ;;(fn []
                          (partial more-menu
                                   {:entity-data activity-data
-                                   :share-container-id dom-element-id
+                                   :showing-share foc-share-entry
                                    :editable-boards editable-boards
                                    :external-share (not is-mobile?)
                                    :external-bookmark (not is-mobile?)
@@ -225,7 +219,7 @@
                                    :show-move? (not is-mobile?)
                                    :will-open (fn [] (set-foc-menu-open s true))
                                    :will-close (fn [] (set-foc-menu-open s false))
-                                   :force-show-menu menu-open?
+                                   :force-show-menu foc-menu-open
                                    :show-labels-picker foc-labels-picker
                                    :mobile-tray-menu mobile-more-menu?
                                    :current-user-data current-user-data
@@ -246,7 +240,7 @@
                                 :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
                                 :new-item show-new-item-tag
-                                :showing-share sharing-entry?})
+                                :showing-share foc-share-entry})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
@@ -257,7 +251,7 @@
                        :else
                        #(when-not (dom-utils/event-container-matches % "input, button, a, .foc-click-stop")
                           (nav-actions/open-post-modal activity-data false)))
-       :id dom-element-id}
+       :id (activity-actions/activity-share-container-id activity-data)}
       [:button.mlb-reset.mobile-more-bt
         {:class (when @(::show-mobile-more-bt s) "visible")
          :on-click (fn [e]

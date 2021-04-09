@@ -57,7 +57,8 @@
            current-user-data
            row-index
            foc-menu-open
-           foc-labels-picker] :as props}]
+           foc-labels-picker
+           foc-share-entry] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
@@ -68,7 +69,8 @@
                                :open-item (:open-item item)
                                :close-item (:close-item item)
                                :foc-menu-open (or foc-menu-open
-                                                  foc-labels-picker)})}
+                                                  foc-labels-picker
+                                                  foc-share-entry)})}
      (cond
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
@@ -81,6 +83,7 @@
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open
                                :foc-labels-picker  foc-labels-picker
+                               :foc-share-entry   foc-share-entry
                                :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
@@ -88,6 +91,7 @@
                      :show-wrt?          show-wrt?
                      :foc-menu-open      foc-menu-open
                      :foc-labels-picker  foc-labels-picker
+                     :foc-share-entry    foc-share-entry
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
@@ -131,7 +135,8 @@
              clear-cell-measure-cb
              row-index
              foc-menu-open
-             foc-labels-picker]
+             foc-labels-picker
+             activity-share-container]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -172,7 +177,9 @@
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
                                                  :foc-menu-open (boolean (= foc-menu-open (:uuid item)))
-                                                 :foc-labels-picker (boolean (= foc-labels-picker (:uuid item)))})))]))
+                                                 :foc-labels-picker (boolean (= foc-labels-picker (:uuid item)))
+                                                 :foc-share-entry (boolean (= activity-share-container
+                                                                              (activity-actions/activity-share-container-id item)))})))]))
 
 ;; (defn- replies-unique-key [entry-data]
 ;;   (let [replies-data (vec (:replies-data entry-data))]
@@ -373,6 +380,7 @@
   (drv/drv :label-slug)
   (drv/drv :foc-menu-open)
   (drv/drv :foc-labels-picker)
+  (drv/drv :activity-share-container)
   ;; Locals
   (rum/local nil ::scroll-listener)
   (rum/local false ::has-next)
@@ -421,7 +429,8 @@
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)
-        foc-labels-picker (drv/react s :foc-labels-picker)]
+        foc-labels-picker (drv/react s :foc-labels-picker)
+        activity-share-container (drv/react s :activity-share-container)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -439,4 +448,5 @@
                                         :activities-read activities-read
                                         :editable-boards editable-boards
                                         :foc-menu-open foc-menu-open
+                                        :activity-share-container activity-share-container
                                         :foc-labels-picker foc-labels-picker}))]]]))

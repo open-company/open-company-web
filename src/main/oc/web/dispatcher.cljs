@@ -746,7 +746,6 @@
                                :media-input (:media-input base)
                                :show-section-add-cb (:show-section-add-cb base)
                                :entry-editing-board-slug (:board-slug entry-editing)
-                               :activity-share-container (:activity-share-container base)
                                :cmail-state (get-in base cmail-state-key)
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading

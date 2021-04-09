@@ -5,8 +5,8 @@ div.oc-labels {
   padding: 16px;
   height: auto;
   min-width: 160px;
-  background-color: var(--tooltip-background-color);
-  box-shadow: var(--box-shadow);
+  background-color: white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   max-height: 300px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -15,7 +15,7 @@ div.oc-labels {
     @include OC_Body_Bold();
     font-size: 14px;
     line-height: 18px;
-    color: var(--tooltip-color);
+    color: $deep_navy;
   }
 
   button.oc-label, div.oc-label {
@@ -44,27 +44,22 @@ div.oc-labels {
     }
 
     div.carrot-checkbox {
-      border: 1px solid var(--tooltip-color);
       order: 1;
       margin-right: 8px;
       flex: 0 0 auto;
+      border: 1.5px solid $deep_navy;
 
       &.selected {
-        border: 1px solid var(--tooltip-color);
-        background-color: var(--tooltip-color);
-        background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
-        }
+        border: 1.5px solid $deep_navy;
+        background-color: $deep_navy;
       }
-
+    
       &.disabled {
-        border: 1px solid var(--tooltip-color);
+        border: 1.5px solid $deep_navy;
       }
-
+    
       &.selected.disabled {
-        background-color: var(--tooltip-color);
+        background-color: $deep_navy;
       }
     }
 
@@ -82,7 +77,7 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: var(--tooltip-color);
+      color: $deep_navy;
       max-width: 180px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -109,7 +104,7 @@ div.oc-labels {
     @include OC_Body_Book_Italic();
     font-size: 14px;
     line-height: 18px;
-    color: var(--tooltip-color);
+    color: $deep_navy;
     margin-top: auto;
     margin-bottom: auto;
     align-self: center;
@@ -136,7 +131,7 @@ div.oc-labels {
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 16px;
-      color: var(--tooltip-color);
+      color: $deep_navy;
     }
   }
 
@@ -152,7 +147,7 @@ div.oc-labels {
       height: 16px;
       line-height: 16px;
       font-size: 14px;
-      color: var(--tooltip-color);
+      color: $deep_navy;
       order: 1;
     }
 
@@ -229,7 +224,7 @@ div.oc-label-edit {
   height: auto;
   width: 240px;
   background-color: white;
-  box-shadow: var(--box-shadow);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   color: $ui_grey;
 
   div.oc-label-edit-title {
@@ -275,7 +270,7 @@ div.oc-label-edit {
       width: 16px;
       z-index: 2;
       border-radius: 50%;
-      box-shadow: var(--box-shadow);
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     }
 
     input.oc-input.field-value {
@@ -395,22 +390,6 @@ div.cmail-labels-list {
     height: 16px;
     display: none;
 
-    // button.add-label-bt {
-    //   margin-right: 4px;
-    //   @include OC_Body_Book();
-    //   font-size: 12px;
-    //   line-height: 16px;
-    //   height: 16px;
-    //   padding: 0;
-    //   color: var(--color);
-    //   opacity: 0;
-    //   margin: 0;
-    //   display: block;
-    //   transition: opacity 180ms linear;
-
-      
-    // }
-
     button.add-label-bt {
       height: 16px;
       display: flex;
@@ -424,7 +403,7 @@ div.cmail-labels-list {
       span.add-label-plus {
         width: 16px;
         height: 16px;
-        @include svgBgColor("/img/ML/add_label_plus.svg", center, 10px 10px, var(--color));
+        @include svgBgColor("/img/ML/add_label_plus.svg", center, 10px 10px, $deep_navy);
       }
   
       span.add-label-span {
@@ -432,7 +411,7 @@ div.cmail-labels-list {
         @include OC_Body_Book();
         font-size: 12px;
         line-height: 16px;
-        color: var(--color);
+        color: $deep_navy;
       }
     }
   }
@@ -453,8 +432,8 @@ div.cmail-labels-list {
       }
 
       &.add-label-bt {
-        color: var(--color);
-        background-color: var(--opac-background-color-05);
+        color: $deep_navy;
+        background-color: #{rgba($deep_navy, 0.05)};
       }
     }
   }
@@ -463,130 +442,5 @@ div.cmail-labels-list {
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
-  }
-}
-
-div.cmail-label-autocomplete {
-  opacity: 0;
-  position: relative;
-  display: block;
-  transition: opacity 180ms linear;
-
-  &:hover, &.sticky, &.focused {
-    opacity: 1;
-    transition: opacity 180ms linear;
-  }
-
-  &:hover {
-    opacity: 1;
-    transition: opacity 180ms linear;
-
-    div.label-autocomplete-field-container div.label-autocomplete-tooltip {
-      opacity: 1;
-      transition: opacity 180ms linear;
-    }
-  }
-
-  div.cmail-label-autocomplete-suggestion {
-    @include label() {
-      position: absolute;
-      top: 0;
-      left: 0;
-      opacity: 0.8;
-      transition: opacity 180ms linear;
-      z-index: 2;
-      pointer-events: none;
-    }
-  }
-
-  div.label-autocomplete-field-container {
-    padding: 0 2px;
-    width: auto;
-    position: relative;
-    z-index: 1;
-
-    div.label-autocomplete-tooltip {
-      z-index: 1070;
-      display: block;
-      font-size: 12px;
-      text-align: left;
-      text-align: start;
-      text-decoration: none;
-      text-shadow: none;
-      text-transform: none;
-      letter-spacing: normal;
-      word-break: normal;
-      word-spacing: normal;
-      word-wrap: normal;
-      white-space: normal;
-      opacity: 0;
-      line-break: auto;
-      width: auto;
-      padding: 5px 0;
-      margin-top: -3px;
-      position: absolute;
-      left: 0;
-      transform: translateX(calc(-50% + 1px));
-      bottom: 18px;
-      pointer-events: none;
-      transition: opacity 180ms linear;
-
-      div.tooltip-arrow {
-        position: absolute;
-        width: 0;
-        height: 0;
-        border-color: transparent;
-        border-style: solid;
-
-        // Top arrow
-        bottom: 0;
-        bottom: 0;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px 5px 0;
-        border-top-color: var(--tooltip-background-color);
-        opacity: 1;
-      }
-
-
-      div.tooltip-inner {
-        padding: 3px 8px;
-        background-color: var(--tooltip-background-color);
-        white-space:pre-wrap;
-        text-align: left;
-        opacity: 1;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: var(--tooltip-color);
-        line-height: 18px;
-        padding: 5px 8px;
-        border-radius: 4px;
-        box-shadow: none;
-        border: none;
-        width: auto; //152px;
-        // min-width: 160px;
-      }
-
-      &.duplicated div.tooltip-inner {
-        opacity: 0.9;
-      }
-    }
-
-    input.label-autocomplete-field {
-      background-color: transparent;
-      padding: 0;
-      @include OC_Body_Book();
-      font-size: 12px;
-      line-height: 16px;
-      letter-spacing: 0.5px;
-      display: block;
-      height: 16px;
-      letter-spacing: 0.5px;
-      color: var(--label-autocomplete-color);
-      min-width: 20px;
-      border: none;
-      outline: none;
-      width: 152px;
-    }
   }
 }

@@ -43,7 +43,7 @@ div.foc-labels-picker {
         box-shadow: none;
         min-height: 100%;
       }
-    
+
       div.foc-labels-title {
         @include OC_Body_Bold();
         font-size: 14px;
@@ -78,7 +78,7 @@ div.foc-labels-picker {
           }
         }
       }
-    
+
       button.foc-label, div.oc-label {
         display: flex;
         flex-flow: row nowrap;
@@ -101,33 +101,47 @@ div.foc-labels-picker {
             opacity: 0.6;
           }
         }
-    
+
         &.editable {
           cursor: pointer;
-    
+
           @include big_web() {
             &:hover {
               padding: 0;
-    
+
               button.edit-bt {
                 visibility: visible;
               }
             }
           }
         }
-    
+
         div.carrot-checkbox {
           order: 1;
           margin-right: 8px;
           flex: 0 0 auto;
+          border: 1px solid var(--light-color);
+
+          &.selected {
+            border: 1px solid var(--primary-color);
+            background-color: var(--primary-color);
+            background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
+          }
+
+          &.disabled {
+            border: 1px solid var(--color);
+          }
+
+          &.selected.disabled {
+            background-color: var(--color);
+          }
         }
-    
+
         span.oc-label-name {
           order: 3;
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 16px;
-          color: var(--color);
           max-width: 180px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -135,8 +149,9 @@ div.foc-labels-picker {
           margin-right: 2px;
           text-align: left;
           flex: 0 1 auto;
+          color: var(--color);
         }
-    
+
         button.edit-bt {
           width: 16px;
           height: 16px;
@@ -147,7 +162,7 @@ div.foc-labels-picker {
           visibility: hidden;
         }
       }
-    
+
       div.foc-labels-empty {
         @include OC_Body_Book_Italic();
         font-size: 14px;
@@ -172,13 +187,13 @@ div.foc-labels-picker {
           padding: 12px 16px;
           display: none;
         }
-    
+
         span.add-label-plus {
           width: 16px;
           height: 16px;
           @include svgBgColor("/img/ML/add_label_plus.svg", center, 12px 12px, var(--color));
         }
-    
+
         span.add-label-span {
           margin-left: 8px;
           @include OC_Body_Book();

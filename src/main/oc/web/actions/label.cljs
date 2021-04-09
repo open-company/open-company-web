@@ -61,11 +61,17 @@
 (declare entry-label-add)
 (declare entry-label-remove)
 
+(defn latest-updated-label [labels]
+  (let [labels-list (if (contains? labels :org-labels)
+                      (:org-labels labels)
+                      labels)]
+    (last (sort-by :updated-at labels-list))))
+
 (defn create-label-finished [org-slug {success :success :as resp}]
   (if-not success
     (get-labels)
     (let [updated-labels-list (get-labels-finished org-slug resp)
-          new-added-label (last updated-labels-list)]
+          new-added-label (latest-updated-label updated-labels-list)]
       (dismiss-label-editor)
       (dis/dispatch! [:label-create/finished org-slug updated-labels-list])
       ;; Add label to entry that has the picker currently opened

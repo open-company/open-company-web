@@ -15,6 +15,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.activity-share-email :refer (activity-share-email)]
             [oc.web.components.ui.foc-labels-picker :refer (foc-labels-picker)]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
@@ -111,7 +112,7 @@
                                              (utils/after 1000 #(reset! (::can-unmount s) true)))))
                                        s)}
   [s {:keys [entity-data current-user-data
-             hide-share? external-share share-container-id
+             hide-share? external-share showing-share
              editable-boards
              will-open will-close tooltip-position force-show-menu mobile-tray-menu custom-class
              show-edit? edit-cb
@@ -218,6 +219,8 @@
                                                         (not ua/mobile-app?))
                                   :ios-browser (and ua/ios?
                                                     (not ua/mobile-app?))
+                                  :showing-share showing-share
+                                  :move-activity @(::move-activity s)
                                   :foc-labels-picker show-labels-picker
                                   custom-class (seq custom-class)})
          :ref "more-menu"
@@ -231,6 +234,8 @@
           [:div.foc-labels-picker-wrapper
            (foc-labels-picker entity-data)])
         (cond
+          showing-share
+          (activity-share-email {:activity-data entity-data})
           @(::move-activity s)
           (activity-move {:activity-data entity-data
                           :current-user-data current-user-data
@@ -294,7 +299,7 @@
                           "bottom-rounded bottom-margin")
                  :on-click #(do
                               (hide-menu s will-close)
-                              (activity-actions/activity-share-show entity-data share-container-id))}
+                              (activity-actions/activity-share-show entity-data))}
                 "Share"])
             (when (or is-mobile?
                       (not external-follow))
@@ -428,12 +433,12 @@
         (when show-external-share?
           [:button.mlb-reset.menu-item-bt.more-menu-share-bt
             {:type "button"
-             :class (when (or show-external-follow?
-                              show-external-bookmarks?)
-                      "has-next-bt")
+             :class (dom-utils/class-set {:has-next-bt (or show-external-follow?
+                                                           show-external-bookmarks?)
+                                          :active showing-share})
              :on-click #(do
                           (hide-menu s will-close)
-                          (activity-actions/activity-share-show entity-data share-container-id))
+                          (activity-actions/activity-share-show entity-data))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-container "body"
              :data-placement (or tooltip-position "top")

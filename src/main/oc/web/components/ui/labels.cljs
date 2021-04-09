@@ -126,7 +126,9 @@
   (drv/drv :org-labels)
   ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
-    (when-not (dom-utils/event-container-has-class e "alert-modal")
+    (js/console.log "DBG labels-picker-inner/out-clicked" e)
+    (js/console.log "DBG    container matches?" (dom-utils/event-container-matches e ".alert-modal, .oc-labels-modal-wrapper"))
+    (when-not (dom-utils/event-container-matches e ".alert-modal, .oc-labels-modal-wrapper")
       (cmail-actions/toggle-cmail-labels-views false))))
   [s]
   (let [cmail-data (drv/react s :cmail-data)
