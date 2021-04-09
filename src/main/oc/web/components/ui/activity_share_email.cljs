@@ -62,7 +62,6 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         secure-uuid (:secure-uuid activity-data)
         org-data (drv/react s :org-data)]
-    (js/console.log "DBG org-data" org-data (:disallow-public-share (:content-visibility org-data)))
     [:div.activity-share-modal-container
      {:class (dom-utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                    :appear (and (not @(::dismiss s)) @(:first-render-done s))})}

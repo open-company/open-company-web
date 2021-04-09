@@ -416,24 +416,6 @@
    (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 30))
   (cmail-actions/load-cached-item initial-entry-data :entry-editing))
 
-(defn entry-edit-dismiss
-  []
-  ;; If the user was looking at the modal, dismiss it too
-  (when (dis/current-activity-id)
-    (utils/after 1 #(let [is-all-posts (= (dis/current-board-slug) "all-posts")
-                          is-must-see (= (dis/current-board-slug) "must-see")]
-                      (router/nav!
-                        (cond
-                          is-all-posts ; AP
-                          (oc-urls/all-posts (dis/current-org-slug))
-                          is-must-see
-                          (oc-urls/must-see (dis/current-org-slug))
-                          :else
-                          (oc-urls/board (dis/current-org-slug) (dis/current-board-slug)))))))
-  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
-  (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
-  (dis/dispatch! [:entry-edit/dismiss]))
-
 (declare entry-save)
 
 (defn entry-save-on-exit
@@ -823,6 +805,8 @@
     (when (:auto-saving activity-data)
       (utils/after 1000 #(real-activity-delete (dis/cmail-data))))))
 
+(def default-share-prefix "foc-")
+
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
@@ -833,13 +817,16 @@
                        (refresh-current-container)))))
 
 (defun activity-share-container-id
-  ([entry-data :guard map?]
+  ([entry] (activity-share-container-id entry default-share-prefix))
+  ([entry-data :guard map? prefix]
    (activity-share-container-id (:uuid entry-data)))
-  ([entry-uuid]
-   (str "share-entry-" entry-uuid)))
+  ([entry-uuid perfix]
+   (str perfix "share-entry-" entry-uuid)))
 
-(defn activity-share-show [activity-data & [share-medium]]
-  (dis/dispatch! [:activity-share-show activity-data (activity-share-container-id activity-data) (or share-medium :url)]))
+(defn activity-share-show
+  ([activity-data] (activity-share-show activity-data default-share-prefix))
+  ([activity-data prefix]
+  (dis/dispatch! [:activity-share-show activity-data (activity-share-container-id activity-data prefix) :url])))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))

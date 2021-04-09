@@ -79,7 +79,8 @@
                                        ;; And only when there is at least a comment
                                        (pos? comments-count))))))
 
-(def add-comment-prefix "main-comment")
+(def ^{:private true} add-comment-prefix "main-comment")
+(def ^{:private true} share-container-prefix "expanded-post-")
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -98,6 +99,7 @@
   (drv/drv :follow-publishers-list)
   (drv/drv :followers-publishers-count)
   (drv/drv :foc-labels-picker)
+  (drv/drv :activity-share-container)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -160,8 +162,7 @@
         read-data (get activities-read (:uuid activity-data))
         editable-boards (drv/react s :editable-boards)
         comments-data (au/activity-comments activity-data comments-drv)
-        dom-element-id (str "expanded-post-" (:uuid activity-data))
-        dom-node-class (str "expanded-post-" (:uuid activity-data))
+        dom-element-id (str share-container-prefix (:uuid activity-data))
         is-mobile? (responsive/is-mobile-size?)
         _route (drv/react s :route)
         org-data (drv/react s :org-data)
@@ -173,9 +174,13 @@
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                mobile-more-menu-el)
+        activity-share-container (drv/react s :activity-share-container)
+        share-prefix "exp-"
+        showing-share (= activity-share-container (activity-actions/activity-share-container-id activity-data share-prefix))
         more-menu-comp (fn []
                         (more-menu {:entity-data activity-data
-                                    :share-container-id dom-element-id
+                                    :share-prefix share-prefix
+                                    :showing-share showing-share
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
@@ -191,14 +196,13 @@
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))
                                     :current-user-data current-user-data
-                                    :show-labels-picker (= (drv/react s :foc-labels-picker) (str "exp-" (:uuid activity-data)))
-                                    :external-labels-picker true
+                                    :show-labels-picker (= (drv/react s :foc-labels-picker) dom-element-id)
+                                    :external-labels true
                                     :foc-labels-picker-prefix "exp-"}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
-      {:class (utils/class-set {dom-node-class true
-                                :bookmark-item (:bookmarked-at activity-data)
+      {:class (utils/class-set {:bookmark-item (:bookmarked-at activity-data)
                                 :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
@@ -212,7 +216,6 @@
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-container
         {:ref :expanded-post-container}
-        [:div.activity-share-container]
         [:div.expanded-post-header.group
           [:div.back-to-board-container
             [:button.mlb-reset.back-to-board

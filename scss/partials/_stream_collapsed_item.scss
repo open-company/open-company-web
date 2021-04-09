@@ -27,13 +27,13 @@ div.virtualized-list-row.collapsed-item {
       border-bottom: 0;
     }
 
-    &:hover {
+    &:hover, &.foc-menu-open {
       z-index: 2;
+      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
 
       div.stream-collapsed-item {
         background-color: var(--foc-hover-color);
         z-index: 2;
-        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
         border: 1px solid var(--foc-hover-border-color);
 
         div.more-menu {
@@ -50,10 +50,6 @@ div.virtualized-list-row.collapsed-item {
           &:before {
             background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
           }
-        }
-
-        div.activity-share-container {
-          display: block;
         }
 
         &.expandable {
@@ -410,18 +406,6 @@ div.stream-collapsed-item {
       button {
         float: right;
       }
-    }
-  }
-
-  div.activity-share-container {
-    display: none;
-    position: absolute;
-    right: 0;
-    bottom: 8px;
-
-    div.activity-share-modal-container {
-      margin-top: 0;
-      right: 0;
     }
   }
 

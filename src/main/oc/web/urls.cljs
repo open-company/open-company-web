@@ -134,13 +134,6 @@
   ([org-slug]
     (str (org org-slug) "/bookmarks")))
 
-(defn must-see
-  "Org must see url"
-  ([]
-    (must-see (dis/current-org-slug)))
-  ([org-slug]
-    (str (org org-slug) "/must-see")))
-
 (defn replies
   "Org replies url"
   ([]
