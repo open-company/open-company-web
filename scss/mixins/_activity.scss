@@ -1147,7 +1147,7 @@ $header_top_margin: 24;
     cursor: text;
   }
 
-  img:not(.user-avatar-img), a > img:not(.user-avatar-img), video, a > video {
+  img, a > img, video, a > video {
     display: block;
     margin: 0;
     width: auto;
@@ -1358,6 +1358,26 @@ $header_top_margin: 24;
   }
 }
 
+@mixin foc-text-reset($font_size: 16, $line_height: $bottom_margin, $color: var(--color)){
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+  padding-left: 0!important;
+  padding-right: 0!important;
+  display: block!important;
+  @include OC_Body_Book();
+  line-height: #{$line_height}px;
+  color: $color;
+  font-size: #{$font_size}px;
+  background-color: transparent;
+  border: none!important;
+  box-shadow: none!important;
+  border-radius: 0!important;
+  white-space: break-spaces!important;
+  overflow-wrap: break-word!important;
+}
+
 @mixin activity-body-foc($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
 
   @include activity-body($font_size, $line_height, $color, 0);
@@ -1382,34 +1402,21 @@ $header_top_margin: 24;
 
   max-height: #{$line_height * $preview_lines}px;
 
-  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2 {
-    &:not(.carrot-no-preview):not(:empty) {
-      margin-top: 0!important;
-      margin-bottom: 0!important;
-      padding-top: 0!important;
-      padding-bottom: 0!important;
-      display: block;
-      @include OC_Body_Book();
-      line-height: #{$line_height}px;
-      color: $color;
-      font-size: #{$font_size}px;
+  & > p, & > ul, & > blockquote, & > pre, & > div, & > h1, & > h2 {
+    &:not(:empty) {
+      @include foc-text-reset($font-size, $line-height, $color);
+      display: block!important;
     }
   }
 
-  & > blockquote {
-    padding-left: 8px!important;
-    padding-right: 0!important;
-    min-height: #{$line_height}px;
+  & > p code, & > p mark, & > p ul, & > p h1, & > p h2 {
+    &:not(:empty) {
+      @include foc-text-reset($font-size, $line-height, $color);
+    }
   }
 
   h1, h2, mark, mark.highlight {
-    color: $color;
-    @include OC_Body_Book();
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-    background-color: transparent;
-    padding: 0 !important;
-    margin: 0 !important;
+    @include foc-text-reset();
   }
 
   b, strong, &.editing b, &.editing strong {
@@ -1417,28 +1424,12 @@ $header_top_margin: 24;
     font-weight: normal;
   }
 
+  .carrot-no-preview {
+    display: none;
+  }
+
   *:empty, * > *:only-child:empty {
-    display: none !important;
-  }
-
-  *.carrot-no-preview {
-    display: none !important;
-    height: 0 !important;
-    min-height: unset!important;
-  }
-
-  // Do not hide paragraph, sometimes they have content to show in FoC
-  // for example FF keeps using the same element and class when new Ps
-  // are added in content-editable mode
-  p.carrot-no-preview {
-    height: auto!important;
-    display: block!important;
-  }
-
-  blockquote, pre, code {
-    &, &:not(:empty) {
-      display: none;
-    }
+    display: none;
   }
 
   blockquote, pre, code, h1, h2, h3, h4, h5, h6, div, ul, li {
@@ -1499,9 +1490,7 @@ $header_top_margin: 24;
   }
 
   blockquote, pre, code {
-    &, &:not(.carrot-no-preview), &:not(:empty), &:not(.carrot-no-preview):not(:empty) {
-      display: none;
-    }
+    display: none;
   }
 
   @include poll-preview($font_size, $line_height);
