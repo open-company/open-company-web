@@ -88,24 +88,6 @@ $header_top_margin: 24;
   @content
 }
 
-@mixin must-see-tag() {
-  div.must-see-tag {
-    @include image-2x("/img/ML/must_see_tag");
-    background-size: 65px 10px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: rgba($sea_blue, 0.2);
-    height: 18px;
-    width: 74px;
-    margin-right: 8px;
-    position: relative;
-    vertical-align: top;
-    border-radius: 4px;
-
-    @content
-  }
-}
-
 @mixin bookmark-tag() {
   div.bookmark-tag {
     background-color: var(--opac-background-color-08);
@@ -114,11 +96,11 @@ $header_top_margin: 24;
     margin-right: 8px;
     position: relative;
     border-radius: 4px;
-    display: flex;
     flex-flow: row nowrap;
     padding: 3px 3px 3px 6px;
     align-items: center;
     justify-content: center;
+    // display: flex;
 
     &:before {
       content: "";
@@ -149,10 +131,10 @@ $header_top_margin: 24;
     vertical-align: top;
     border-radius: 4px;
     background-color: rgba($sea_blue, 0.2);
-    display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: center;
+    // display: flex;
 
     @include mobile() {
       background-color: transparent;
@@ -266,34 +248,6 @@ $header_top_margin: 24;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
-    }
-  }
-}
-
-@mixin must-see(){
-  div.must-see {
-    display: inline;
-    padding-left: 16px;
-    padding-bottom: 10px;
-    padding-top: 6px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    @include OC_Body_Bold();
-    color: $ui_grey;
-    font-size: 12px;
-    white-space: nowrap;
-    background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
-    background-position: 2px 0px;
-    margin-left: 8px;
-
-    &.must-see-on {
-      background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-    }
-
-    @include mobile() {
-      width: auto;
     }
   }
 }
