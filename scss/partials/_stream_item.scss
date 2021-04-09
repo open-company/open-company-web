@@ -547,7 +547,10 @@ div.stream-item {
 
     div.reactions {
       order: 2;
-      margin-right: 16px;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
 
       div.reactions-picker-container {
 
@@ -568,13 +571,19 @@ div.stream-item {
 
     div.stream-item-comments-summary {
       order: 3;
-      margin-right: 16px;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
     }
 
     div.stream-item-wrt {
       order: 4;
       position: relative;
-      margin-right: 16px;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
     }
 
     div.stream-item-mobile-attachments {
@@ -615,9 +624,12 @@ div.stream-item {
 
     div.stream-item-attachments {
       order: 5;
-      margin-right: 16px;
       height: 26px;
       position: relative;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
 
       @include mobile() {
         display: none;
@@ -720,7 +732,13 @@ div.stream-item {
       order: 6;
       position: relative;
       height: 20px;
-      margin: 0 16px 0 19px;
+      margin-top: 0;
+      margin-bottom: 0;
+
+      &:not(:empty) {
+        margin-right: 16px;
+        margin-left: 19px;
+      }
 
       div.separator-dot {
         position: absolute;
