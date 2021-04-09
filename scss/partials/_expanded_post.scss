@@ -18,12 +18,6 @@ div.expanded-post {
     padding: #{$mobile_navbar_height}px 16px 16px;
   }
 
-  div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
-    div.muted-activity, div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
-      display: none;
-    }
-  }
-
   &.bookmark-item {
     div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
       @include big_web() {
@@ -305,6 +299,10 @@ div.expanded-post {
           top: 34px;
           left: 0px;
         }
+      }
+
+      div.muted-activity, div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+        display: none;
       }
     }
 

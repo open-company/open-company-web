@@ -1499,7 +1499,9 @@ $header_top_margin: 24;
   }
 
   blockquote, pre, code {
-    display: none;
+    &, &:not(.carrot-no-preview), &:not(:empty), &:not(.carrot-no-preview):not(:empty) {
+      display: none;
+    }
   }
 
   @include poll-preview($font_size, $line_height);
