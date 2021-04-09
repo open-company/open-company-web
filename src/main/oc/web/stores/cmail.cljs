@@ -69,6 +69,11 @@
         label-is-present? (cmail-labels-set (:slug add-label))
         can-change? (or label-is-present?
                         (label-utils/can-add-label? cmail-labels))]
+    (js/console.log "DBG :cmail-add-label" add-label)
+    (js/console.log "DBG    cmail-labels" cmail-labels)
+    (js/console.log "DBG    cmail-labels-set" cmail-labels-set)
+    (js/console.log "DBG    label-is-present" label-is-present?)
+    (js/console.log "DBG    can-change" can-change?)
     (if can-change?
       (-> db
           (update-in (conj dispatcher/cmail-data-key :labels)
@@ -78,12 +83,17 @@
                              add-label-map (label-utils/clean-entry-label add-label)
                              add-label-set (set (label-vals add-label))
                              label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
+                         (js/console.log "DBG update cmail labels, old labels" labels)
+                         (js/console.log "DBG    cmail-labels-set" cmail-labels-set)
+                         (js/console.log "DBG    add-label-map" add-label-map)
+                         (js/console.log "DBG    add-label-set" add-label-set)
+                         (js/console.log "DBG    label-intersect" label-intersect)
                          (if (seq label-intersect)
                            (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
                                     add-label-map
                                     %)
                                  labels)
-                           (vec (conj labels add-label-map))))))
+                           (vec (conj (or labels []) add-label-map))))))
           (assoc-in (conj dispatcher/cmail-data-key :has-changes) true))
       db)))
 

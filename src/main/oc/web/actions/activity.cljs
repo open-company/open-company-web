@@ -10,6 +10,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
@@ -831,8 +832,14 @@
                        (create-update-entry-cb entry-data edit-key resp)
                        (refresh-current-container)))))
 
-(defn activity-share-show [activity-data & [element-id share-medium]]
-  (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
+(defun activity-share-container-id
+  ([entry-data :guard map?]
+   (activity-share-container-id (:uuid entry-data)))
+  ([entry-uuid]
+   (str "share-entry-" entry-uuid)))
+
+(defn activity-share-show [activity-data & [share-medium]]
+  (dis/dispatch! [:activity-share-show activity-data (activity-share-container-id activity-data) (or share-medium :url)]))
 
 (defn activity-share-hide []
   (dis/dispatch! [:activity-share-hide]))
@@ -1407,3 +1414,7 @@
 
 (defn foc-menu-open [v]
   (dis/dispatch! [:foc-menu-open v]))
+
+(defn ui-compose []
+  (ui-utils/remove-tooltips)
+  (activity-edit))

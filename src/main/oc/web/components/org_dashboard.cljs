@@ -1,5 +1,6 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
+            [clojure.string :as cstr]
             [org.martinklepsch.derivatives :as drv]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
@@ -70,7 +71,6 @@
         current-panel (drv/react s :current-panel)
         org-data (drv/react s :org-data)
         {:keys [show-alert-modal?
-                activity-share-container
                 collapsed-cmail?
                 user-info-data
                 show-premium-picker?
@@ -96,10 +96,9 @@
         show-section-editor? (= current-panel :section-edit)
         show-section-add? (= current-panel :section-add)
         show-menu? (= current-panel :menu)
-        show-mobile-cmail? (and (not collapsed-cmail?)
+        show-mobile-cmail? (and collapsed-cmail?
                                 is-mobile?)
-        show-push-notification-permissions-modal?(and ua/mobile-app?
-                                                      show-push-notification-permissions-modal?)
+        ;; show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
                             show-search?)]
     (if is-loading
@@ -177,17 +176,6 @@
           (search-box))
         (when payments-ui-upgraded-banner
           (upgraded-banner))
-        ;; Activity share modal for no mobile
-        (when (and (not is-mobile?)
-                   show-activity-share?)
-          ;; If we have an element id find the share container inside that element
-          ;; and portal the component to that element
-          (let [portal-element (when activity-share-container
-                                  (.get (.find (js/$ (str "#" activity-share-container))
-                                         ".activity-share-container") 0))]
-            (if portal-element
-              (rum/portal (activity-share) portal-element)
-              (activity-share))))
         ;; Cmail mobile editor
         (when show-mobile-cmail?
           (cmail))

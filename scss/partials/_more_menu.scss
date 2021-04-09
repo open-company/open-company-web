@@ -6,6 +6,10 @@ div.more-menu {
   opacity: 1;
   position: relative;
 
+  div.activity-share-modal-container {
+    z-index: 1132;
+  }
+
   div.activity-move {
     position: absolute;
     top: 26px;
@@ -471,12 +475,14 @@ div.more-menu {
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 
-      &.foc-labels-picker {
+      &.menu-expanded, &.foc-labels-picker, &.showing-share, &.move-activity {
         visibility: visible;
         opacity: 1;
         top: 0;
         height: 100vh;
+      }
 
+      &.foc-labels-picker {
         div.foc-labels-picker-wrapper {
           display: block;
           z-index: #{$navbar_zindex + 101};
@@ -485,15 +491,21 @@ div.more-menu {
         ul.more-menu-list {
           display: none;
         }
+      }
 
+      &.showing-share {
+        ul.more-menu-list {
+          display: none;
+        }
+      }
+
+      &.move-activity {
+        ul.more-menu-list {
+          display: none;
+        }
       }
 
       &.menu-expanded {
-        visibility: visible;
-        opacity: 1;
-        top: 0;
-        height: 100vh;
-
         & > * {
           display: none;
         }
