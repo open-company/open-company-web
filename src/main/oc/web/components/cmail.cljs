@@ -428,18 +428,20 @@
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
 
                    (mixins/on-click-out :cmail-container (fn [s e]
-                                                           (when (and (not (responsive/is-mobile-size?))
-                                                                      (not (-> s (drv/get-ref :cmail-state) deref :labels-inline-view))
-                                                                      (not (-> s (drv/get-ref :cmail-state) deref :labels-floating-view))
-                                                                      (not (dom-utils/event-container-matches e
-                                                                            (str ".modal-wrapper, "
-                                                                                 ".nux-tooltip-container, "
-                                                                                 ".label-modal-view, "
-                                                                                 ".cmail-outer.fullscreen, "
-                                                                                 ".cmail-outer.distraction-free, "
-                                                                                 ".labels-picker, "
-                                                                                 ".oc-labels-modal-wrapper"))))
-                                                             (close-cmail s e))))
+                                                           (let [cmail-state (-> s (drv/get-ref :cmail-state) deref)]
+                                                             (when (and (not (responsive/is-mobile-size?))
+                                                                        (:fullscreen cmail-state)
+                                                                        (not (:labels-inline-view cmail-state))
+                                                                        (not (:labels-floating-view cmail-state))
+                                                                        (not (dom-utils/event-container-matches e
+                                                                              (str ".modal-wrapper, "
+                                                                                  ".nux-tooltip-container, "
+                                                                                  ".label-modal-view, "
+                                                                                  ".cmail-outer.fullscreen, "
+                                                                                  ".cmail-outer.distraction-free, "
+                                                                                  ".labels-picker, "
+                                                                                  ".oc-labels-modal-wrapper"))))
+                                                              (close-cmail s e)))))
 
                    {:will-mount (fn [s]
                     (reset-cmail s)
