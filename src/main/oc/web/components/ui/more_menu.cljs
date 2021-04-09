@@ -112,7 +112,7 @@
                                              (utils/after 1000 #(reset! (::can-unmount s) true)))))
                                        s)}
   [s {:keys [entity-data current-user-data
-             hide-share? external-share showing-share
+             hide-share? external-share showing-share share-prefix
              editable-boards
              will-open will-close tooltip-position force-show-menu mobile-tray-menu custom-class
              show-edit? edit-cb
@@ -133,6 +133,8 @@
          current-activity-id :activity}          (drv/react s :route)
         delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
+        toggle-labels-link (or (utils/link-for (:links entity-data) "partial-add-labels")
+                               (utils/link-for (:links entity-data) "partial-remove-labels"))
         share-link (when-not hide-share? (utils/link-for (:links entity-data) "share"))
         show-external-share? (and (not is-mobile?)
                                   external-share
@@ -180,8 +182,11 @@
         pins? (or can-home-pin? can-board-pin?)
         can-edit-labels? (and ls/labels-enabled?
                               (not hide-labels?)
-                              edit-link)
+                              toggle-labels-link)
         show-external-labels? (and external-labels
+                                   can-edit-labels?)
+        show-internal-labels? (and (or (not external-labels)
+                                       is-mobile?)
                                    can-edit-labels?)
         should-show-more-bt (or (and show-edit?
                                      edit-link)
@@ -195,8 +200,7 @@
                                 (and (not external-bookmark)
                                      (or add-bookmark-link
                                          remove-bookmark-link))
-                                (and (not external-labels)
-                                     can-edit-labels?)
+                                show-internal-labels?
                                 pins?)]
     (when (or edit-link
               share-link
@@ -299,7 +303,7 @@
                           "bottom-rounded bottom-margin")
                  :on-click #(do
                               (hide-menu s will-close)
-                              (activity-actions/activity-share-show entity-data))}
+                              (activity-actions/activity-share-show entity-data share-prefix))}
                 "Share"])
             (when (or is-mobile?
                       (not external-follow))
@@ -350,8 +354,7 @@
                                   (hide-menu s will-close)
                                   (activity-actions/add-bookmark entity-data add-bookmark-link))}
                     "Bookmark"])))
-            (when (or is-mobile?
-                      (not external-labels))
+            (when show-internal-labels?
               [:li.edit-labels.bottom-rounded.bottom-margin.top-rounded.top-margin
                {:on-click #(do
                              (hide-menu s will-close)
@@ -415,7 +418,8 @@
             :data-placement (or tooltip-position "top")
             :data-container "body"
             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
-            :title "More"}])
+            :title "More"}
+           [:span.menu-item-icon]])
         (when show-external-labels?
           [:button.mlb-reset.menu-item-bt.more-menu-edit-labels-bt
            {:type "button"
@@ -429,7 +433,8 @@
             :data-toggle (if is-mobile? "" "tooltip")
             :data-placement (or tooltip-position "top")
             :data-container "body"
-            :title "Edit labels"}])
+            :title "Edit labels"}
+           [:span.menu-item-icon]])
         (when show-external-share?
           [:button.mlb-reset.menu-item-bt.more-menu-share-bt
             {:type "button"
@@ -438,28 +443,30 @@
                                           :active showing-share})
              :on-click #(do
                           (hide-menu s will-close)
-                          (activity-actions/activity-share-show entity-data))
+                          (activity-actions/activity-share-show entity-data share-prefix))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-container "body"
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
-             :title "Share"}])
+             :title "Share"}
+            [:span.menu-item-icon]])
         (when show-external-follow?
           (if follow-link
             [:button.mlb-reset.menu-item-bt.more-menu-entry-follow-bt
-            {:type "button"
-             :key "more-menu-entry-follow-bt"
-             :class (when (and show-external-bookmarks?
-                               (or remove-bookmark-link
-                                   add-bookmark-link))
-                      "has-next-bt")
-             :on-click #(do
-                          (hide-menu s will-close)
-                          (activity-actions/entry-follow (:uuid entity-data)))
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement (or tooltip-position "top")
-             :data-container "body"
-             :title uu/watch-activity-copy}]
+             {:type "button"
+              :key "more-menu-entry-follow-bt"
+              :class (when (and show-external-bookmarks?
+                                (or remove-bookmark-link
+                                    add-bookmark-link))
+                       "has-next-bt")
+              :on-click #(do
+                           (hide-menu s will-close)
+                           (activity-actions/entry-follow (:uuid entity-data)))
+              :data-toggle (if is-mobile? "" "tooltip")
+              :data-placement (or tooltip-position "top")
+              :data-container "body"
+              :title uu/watch-activity-copy}
+              [:span.menu-item-icon]]
             (when unfollow-link
               [:button.mlb-reset.menu-item-bt.more-menu-entry-unfollow-bt
                 {:type "button"
@@ -474,7 +481,8 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title uu/unwatch-activity-copy}])))
+                 :title uu/unwatch-activity-copy}
+               [:span.menu-item-icon]])))
         (when show-external-bookmarks?
           (if remove-bookmark-link
             [:button.mlb-reset.menu-item-bt.more-menu-remove-bookmark-bt
@@ -485,7 +493,8 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Remove bookmark"}]
+               :title "Remove bookmark"}
+             [:span.menu-item-icon]]
             (when add-bookmark-link
               [:div.more-menu-add-bookmark-bt-container
                 [:button.mlb-reset.menu-item-bt.more-menu-add-bookmark-bt
@@ -496,4 +505,5 @@
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
                    :data-container "body"
-                   :title "Bookmark"}]])))])))
+                   :title "Bookmark"}
+                 [:span.menu-item-icon]]])))])))

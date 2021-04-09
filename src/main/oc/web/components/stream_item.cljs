@@ -304,8 +304,8 @@
         [:div.stream-item-headline.ap-seen-item-headline
           {:ref "activity-headline"
            :data-itemuuid (:uuid activity-data)
-           :class utils/hide-class
-           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+           :class utils/hide-class}
+         (:headline activity-data)]
         (stream-item-summary activity-data)
         (when show-body-thumbnail?
           [:div.stream-item-preview-container

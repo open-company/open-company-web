@@ -5,6 +5,8 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.lib.hateoas :as hateoas]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -15,7 +17,7 @@
 
 (defn- dismiss-swipe-button [s & [e ref-kw]]
   (when e
-    (utils/event-stop e))
+    (dom-utils/event-stop! e))
   (when (or (not ref-kw)
             (= ref-kw ::show-mobile-follow-bt))
     (reset! (::show-mobile-follow-bt s) false))
@@ -29,9 +31,11 @@
 (defn- on-scroll [s]
   (reset! (::show-mobile-follow-bt s) false))
 
+(defn- set-foc-menu-open [s open?]
+  (activity-actions/foc-menu-open (when open? (-> s :rum/args first :activity-data :uuid))))
+
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
-                                   (drv/drv :activity-share-container)
                                    (drv/drv :board-slug)
                                    (drv/drv :activity-uuid)
                                    (drv/drv :mobile-swipe-menu)
@@ -44,8 +48,8 @@
                                                              :disabled #(let [member? (-> % :rum/args first :member?)
                                                                               ad (-> % :rum/args first :activity-data)]
                                                                           (and member?
-                                                                               (not (utils/link-for (:links ad) "follow"))
-                                                                               (not (utils/link-for (:links ad) "unfollow"))))}))
+                                                                               (not (hateoas/link-for (:links ad) "follow"))
+                                                                               (not (hateoas/link-for (:links ad) "unfollow"))))}))
                                    {:will-mount (fn [s]
                                                   (when (responsive/is-mobile-size?)
                                                     (reset! (::on-scroll s)
@@ -65,7 +69,7 @@
                                                       (events/unlistenByKey @(::on-scroll s))
                                                       (reset! (::on-scroll s) nil))
                                                     s)}
-  [s {:keys [activity-data read-data comments-data]}]
+  [s {:keys [activity-data read-data comments-data foc-share-entry]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
@@ -74,17 +78,17 @@
         is-published? (au/is-published? activity-data)
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))
-        follow-link (utils/link-for (:links activity-data) "follow")
-        unfollow-link (utils/link-for (:links activity-data) "unfollow")
+        follow-link (hateoas/link-for (:links activity-data) "follow")
+        unfollow-link (hateoas/link-for (:links activity-data) "unfollow")
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
     [:div.stream-collapsed-item
-      {:class (utils/class-set {dom-node-class true
-                                :draft (not is-published?)
-                                :unseen-item (:unseen activity-data)
-                                :unread-item (or (pos? (:new-comments-count activity-data))
-                                                 (:unread activity-data))
-                                :expandable is-published?
-                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
+      {:class (dom-utils/class-set {dom-node-class true
+                                    :draft (not is-published?)
+                                    :unseen-item (:unseen activity-data)
+                                    :unread-item (or (pos? (:new-comments-count activity-data))
+                                                    (:unread activity-data))
+                                    :expandable is-published?
+                                    :showing-share foc-share-entry})
        :data-last-activity-at (:last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
@@ -94,31 +98,32 @@
                          (seq mobile-swipe-menu-uuid)
                          (dismiss-swipe-button s e)
                          :else
-                         (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                               comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)]
-                           (when (and ;; More menu wasn't clicked
-                                  (not (utils/event-inside? e more-menu-el))
-                                  ;; Comments summary wasn't clicked
-                                  (not (utils/event-inside? e comments-summary-el))
-                                  ;; a button wasn't clicked
-                                  (not (utils/button-clicked? e))
-                                  ;; No input field clicked
-                                  (not (utils/input-clicked? e))
-                                  ;; No body link was clicked
-                                  (not (utils/anchor-clicked? e)))
-                             (nav-actions/open-post-modal activity-data false)))))
+                         #(when-not (dom-utils/event-container-matches e "input, button, a, .exp-click-sotp")
+                        ;;  (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                        ;;        comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)]
+                        ;;    (when (and ;; More menu wasn't clicked
+                        ;;           (not (utils/event-inside? e more-menu-el))
+                        ;;           ;; Comments summary wasn't clicked
+                        ;;           (not (utils/event-inside? e comments-summary-el))
+                        ;;           ;; a button wasn't clicked
+                        ;;           (not (utils/button-clicked? e))
+                        ;;           ;; No input field clicked
+                        ;;           (not (utils/input-clicked? e))
+                        ;;           ;; No body link was clicked
+                        ;;           (not (utils/anchor-clicked? e)))
+                             (nav-actions/open-post-modal activity-data false))))
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
-        {:class (utils/class-set {:must-see-item (:must-see activity-data)
-                                  :bookmark-item (:bookmarked-at activity-data)
-                                  :muted-item follow-link
-                                  :new-item (pos? (:unseen-comments activity-data))
-                                  :no-comments has-zero-comments?})}
+        {:class (dom-utils/class-set {:bookmark-item (:bookmarked-at activity-data)
+                                      :muted-item follow-link
+                                      :new-item (pos? (:unseen-comments activity-data))
+                                      :no-comments has-zero-comments?
+                                      :showing-share foc-share-entry})}
         (when (or follow-link
                   unfollow-link)
           [:button.mlb-reset.mobile-follow-bt
-            {:class (utils/class-set {:visible @(::show-mobile-follow-bt s)
-                                      :follow follow-link})
+            {:class (dom-utils/class-set {:visible @(::show-mobile-follow-bt s)
+                                          :follow follow-link})
              :on-click (fn [e]
                          (dismiss-swipe-button s e ::show-mobile-follow-bt)
                          (if follow-link
@@ -170,8 +175,8 @@
             [:div.stream-item-headline.ap-seen-item-headline
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
-               :class utils/hide-class
-               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+               :class utils/hide-class}
+             (:headline activity-data)]
             [:div.stream-collapsed-item-dot.muted-dot]
             [:div.new-item-tag]
             [:div.bookmark-tag-small]
@@ -189,12 +194,14 @@
                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                   :title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]])]
-      [:div.activity-share-container]
       (when (and is-published?
                  (not is-mobile?))
         (more-menu {:entity-data activity-data
-                    :share-container-id dom-element-id
+                    :will-open (fn [] (set-foc-menu-open s true))
+                    :will-close (fn [] (set-foc-menu-open s false))
+                    :showing-share foc-share-entry
                     :hide-bookmark? true
                     :hide-share? true
+                    :hide-labels? true
                     :external-follow true
-                    :external-labels true}))]))
+                    :custom-class "exp-click-sotp"}))]))

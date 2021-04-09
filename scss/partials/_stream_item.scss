@@ -372,24 +372,7 @@ div.stream-item {
     display: none;
     margin-left: 4px;
     margin-right: 4px;
-    // margin-right: 8px;
-    // margin-left: 0;
-
-    // @include mobile() {
-    //   margin-right: 8px;
-    //   margin-left: 8px;
-    // }
   }
-
-  // div.new-item-tag {
-  //   margin-left: 0;
-  //   margin-right: 8px;
-
-  //   @include mobile() {
-  //     margin-left: 8px;
-  //     margin-right: 8px;
-  //   }
-  // }
 
   & > div.bookmark-tag, & > div.bookmark-tag-small {
     margin-top: 16px;

@@ -19,7 +19,7 @@ div.expanded-post {
   }
 
   div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
-    div.muted-activity, div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+    div.muted-activity, div.bookmark-tag, div.bookmark-tag-small {
       display: none;
     }
   }
@@ -35,14 +35,6 @@ div.expanded-post {
         div.bookmark-tag-small {
           display: flex;
         }
-      }
-    }
-  }
-
-  &.must-see-tag:not(.bookmark-item) {
-    div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
-      div.must-see-tag {
-        display: block;
       }
     }
   }
@@ -66,14 +58,6 @@ div.expanded-post {
       width: 100%;
       margin: 16px auto 40px;
       background-color: var(--mobile-background-color);
-    }
-
-    div.activity-share-container {
-      div.activity-share-modal-container {
-        top: 36px;
-        right: 64px;
-        margin-top: 0;
-      }
     }
 
     div.expanded-post-header {
@@ -185,12 +169,12 @@ div.expanded-post {
         }
 
         @include bookmark-tag();
-        @include must-see-tag();
 
-        div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+        div.bookmark-tag, div.bookmark-tag-small {
           flex: 0 0 auto;
           margin-right: 0;
           margin-left: 6px;
+          display: none;
         }
 
         @include muted-activity();
@@ -259,7 +243,7 @@ div.expanded-post {
           top: 34px;
         }
 
-        & > button:not(.more-menu-bt), & > * > button:not(.more-menu-bt) {
+        button.menu-item-bt:not(.more-menu-bt), button.menu-item-bt:not(.more-menu-bt) {
           width: 32px;
           height: 32px;
           background-color: var(--opac-background-color-2);
@@ -275,31 +259,31 @@ div.expanded-post {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
 
-            & + button:not(.more-menu-bt),
-            & + div > button:not(.more-menu-bt) {
+            & + button.menu-item-bt:not(.more-menu-bt),
+            & + div > button.menu-item-bt:not(.more-menu-bt) {
               border-top-left-radius: 0;
               border-bottom-left-radius: 0;
             }
           }
         }
 
-        button.more-menu-bt {
-          width: 32px;
-          height: 32px;
-          background-color: transparent;
-          padding: 0;
-          margin: 0 9px 0 0;
-          opacity: 0.5;
+        // button.more-menu-bt {
+        //   width: 32px;
+        //   height: 32px;
+        //   background-color: transparent;
+        //   padding: 0;
+        //   margin: 0 9px 0 0;
+        //   opacity: 0.5;
 
-          &:not(.disabled):hover, &:not(.disabled):active {
-            opacity: 1;
-            background-color: transparent;
-          }
+        //   &:not(.disabled):hover, &:not(.disabled):active {
+        //     opacity: 1;
+        //     background-color: transparent;
+        //   }
 
-          &:first-child {
-            border-left: none;
-          }
-        }
+        //   &:first-child {
+        //     border-left: none;
+        //   }
+        // }
 
         ul.more-menu-list {
           top: 34px;
