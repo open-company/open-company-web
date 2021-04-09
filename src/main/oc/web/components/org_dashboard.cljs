@@ -96,7 +96,7 @@
         show-section-editor? (= current-panel :section-edit)
         show-section-add? (= current-panel :section-add)
         show-menu? (= current-panel :menu)
-        show-mobile-cmail? (and collapsed-cmail?
+        show-mobile-cmail? (and (not collapsed-cmail?)
                                 is-mobile?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        show-push-notification-permissions-modal?)
