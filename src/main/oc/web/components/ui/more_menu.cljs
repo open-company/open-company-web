@@ -133,8 +133,8 @@
          current-activity-id :activity}          (drv/react s :route)
         delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
-        toggle-labels-link (or (utils/link-for (:links entity-data) "partial-add-labels")
-                               (utils/link-for (:links entity-data) "partial-remove-labels"))
+        toggle-labels-link (or (utils/link-for (:links entity-data) "partial-add-label")
+                               (utils/link-for (:links entity-data) "partial-remove-label"))
         share-link (when-not hide-share? (utils/link-for (:links entity-data) "share"))
         show-external-share? (and (not is-mobile?)
                                   external-share
