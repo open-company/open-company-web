@@ -11,7 +11,7 @@ function OCWebHelp(){
   formatHelpLine("oc.web.dispatcher.db()", "Print the whole app-state");
   formatHelpLine("oc.web.lib.logging.config_log_level_BANG_(\"debug\")", "Change log level");
   formatHelpLine("oc.web.actions.user.force_jwt_refresh()", "Force a JWT token refresh");
-  formatHelpLine("oc.web.dispatcher", "Namespace wit more debug functions");
+  formatHelpLine("oc.web.dispatcher", "Namespace with more debug functions");
   formatHelpLine("OCWebHelp()", "Print this help");
 }
 
