@@ -174,18 +174,31 @@
    :entry-board-data    [[:base :org-slug :entry-board-slug]
                          (fn [base org-slug entry-board-slug]
                            (dis/board-data base org-slug entry-board-slug))]
-   :label-entries-data    [[:org-slug :label-slug]
-                           (fn [org-slug label-slug]
+    :label-entries-data   [[:base :org-slug :label-slug]
+                           (fn [base org-slug label-slug]
                              (when (and org-slug label-slug)
-                               (dis/label-entries-data org-slug label-slug)))]
+                               (dis/label-entries-data base org-slug label-slug)))]
    :contributions-user-data [[:active-users :contributions-id]
                              (fn [active-users contributions-id]
                                (when (and active-users contributions-id)
                                  (get active-users contributions-id)))]
-   :label-data          [[:org-labels :label-slug]
-                         (fn [org-labels label-slug]
-                           (when (and org-labels label-slug)
-                             (some #(when ((set [(:slug %) (:uuid %)]) label-slug) %) org-labels)))]
+   :label-data-fallback [[:posts-data :label-entries-data :label-slug]
+                         (fn [posts-data label-entries-data label-slug]
+                           (when (and label-entries-data label-slug)
+                             (let [first-uuid (-> label-entries-data :posts-list first :uuid)
+                                   first-entry (get posts-data first-uuid)
+                                   first-entry-labels (get-in posts-data [first-uuid :labels])
+                                   label-data (dis/find-label first-entry-labels {:slug label-slug})]
+                               label-data)))]
+    :label-data          [[:org-labels :label-slug :label-data-fallback]
+                          (fn [org-labels label-slug label-data-fallback]
+                            (when label-slug
+                              (let [label-data* (dis/find-label org-labels label-slug)
+                                    label-data (if (and (not label-data*)
+                                                        (seq org-labels))
+                                                label-data-fallback
+                                                label-data*)]
+                                label-data)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                          (fn [base org-slug activity-uuid]
                            (dis/activity-data org-slug activity-uuid base))]

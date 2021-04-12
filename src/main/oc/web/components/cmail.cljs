@@ -768,7 +768,7 @@
           {:data-toggle (when-not is-mobile? "tooltip")
            :data-placement "top"
            :data-container "body"
-           :title "Edit labels"
+           :title "Add label"
            :on-click #(cmail-actions/cmail-toggle-floating-labels-view)}]
          (when (:labels-floating-view cmail-state)
            (labels-picker))]

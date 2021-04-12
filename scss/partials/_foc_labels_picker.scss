@@ -204,11 +204,16 @@ div.foc-labels-picker {
       }
 
       div.mobile-add-lock-description {
-        @include OC_Body_Book();
+        @include OC_Body_Book_Italic();
         font-size: 14px;
         line-height: 24px;
-        color: var(--light-color);
+        color: #{rgba($carrot_orange, 0.7)};
         padding: 16px;
+        transition: color 180ms linear;
+
+        &.active {
+          color: #{rgba($carrot_orange, 0.8)};
+        }
       }
     }
   }

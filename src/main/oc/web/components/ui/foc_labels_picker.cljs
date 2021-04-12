@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.utils :as utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
@@ -9,7 +10,9 @@
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.actions.label :as label-actions]))
 
-(defn- foc-labels-list [labels entry-uuid label-uuids lock-add? is-mobile?]
+(defn- foc-labels-list
+  [{labels :labels-list entry-uuid :entry-uuid label-uuids :label-uuids
+    lock-add? :lock-add? is-mobile? :is-mobile unactive-clicked-cb :unactive-clicked-cb}]
   (for [label labels
         :let [selected? (label-uuids (:uuid label))
               click-cb (fn [e]
@@ -17,7 +20,9 @@
                            (dom-utils/event-stop! e))
                          (when (or (not lock-add?)
                                    selected?)
-                           (label-actions/toggle-entry-label entry-uuid (:uuid label))))]]
+                           (label-actions/toggle-entry-label entry-uuid (:uuid label)))
+                         (when (fn? unactive-clicked-cb)
+                           (unactive-clicked-cb)))]]
     [:div.oc-label
      {:data-label-slug (:slug label)
       :data-label-uuid (:uuid label)
@@ -47,7 +52,9 @@
   rum/reactive
   (drv/drv :org-labels)
   (drv/drv :editing-label)
+  (rum/local false ::active-lock-desc)
   ui-mixins/strict-refresh-tooltips-mixin
+  ui-mixins/mobile-no-scroll-mixin
   (ui-mixins/on-click-out :labels-picker-inner
    (fn [s e]
      (when (and (not (dom-utils/event-container-has-class e "alert-modal"))
@@ -67,7 +74,11 @@
         is-mobile? (responsive/is-mobile-size?)
         lock-add? (>= (count selected-labels) ls/max-entry-labels)
         org-label-uuids (set (map :uuid org-labels))
-        entry-orphan-labels (filterv #(not (org-label-uuids (:uuid %))) selected-labels)]
+        entry-orphan-labels (filterv #(not (org-label-uuids (:uuid %))) selected-labels)
+        click-cb (when lock-add?
+                   #(when-not @(::active-lock-desc s)
+                      (reset! (::active-lock-desc s) true)
+                      (utils/after 2000 (fn [] (reset! (::active-lock-desc s) false)))))]
     [:div.foc-labels-picker
      [:div.foc-labels-picker-inner
       {:ref :labels-picker-inner}
@@ -77,9 +88,18 @@
         [:button.mlb-reset.mobile-close-bt
          {:on-click #(label-actions/hide-foc-labels-picker)}]]
        (when (seq entry-orphan-labels)
-         (foc-labels-list entry-orphan-labels entry-uuid label-uuids lock-add? is-mobile?))
+         (foc-labels-list {:labels-list entry-orphan-labels
+                           :entry-uuid entry-uuid
+                           :label-uuids label-uuids
+                           :lock-add? lock-add?
+                           :is-mobile? is-mobile?}))
        (when (seq org-labels)
-         (foc-labels-list org-labels entry-uuid label-uuids lock-add? is-mobile?))
+         (foc-labels-list {:labels-list org-labels
+                           :entry-uuid entry-uuid
+                           :label-uuids label-uuids
+                           :lock-add? lock-add?
+                           :is-mobile? is-mobile?
+                           :unactive-clicked-cb click-cb}))
        (when-not (or (seq entry-orphan-labels)
                      (seq org-labels))
          [:div.foc-labels-empty
@@ -88,4 +108,5 @@
                       :on-click #(label-actions/foc-picker-new-label)})
        (when lock-add?
          [:div.mobile-add-lock-description
+          {:class (when @(::active-lock-desc s) "active")}
           "Limit of 3 labels reached for this update."])]]]))

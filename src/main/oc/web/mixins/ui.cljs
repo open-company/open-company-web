@@ -6,6 +6,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
+            [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]))
 
 (def refresh-tooltips-mixin
@@ -42,6 +43,18 @@
    :will-unmount (fn [state]
      (dom-utils/unlock-page-scroll)
      state)})
+
+(def mobile-no-scroll-mixin
+  "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
+   If it doesn't it remember to remove it once the component is going to unmount."
+  {:did-mount (fn [state]
+                (when ua/mobile?
+                  (dom-utils/lock-page-scroll))
+                (assoc state ::mobile-lock? ua/mobile?))
+   :will-unmount (fn [state]
+                   (when (::mobile-lock? state)
+                     (dom-utils/unlock-page-scroll))
+                   (dissoc state ::mobile-lock?))})
 
 (def mounted-flag
   "Adds a flag to the component state with a boolean value.

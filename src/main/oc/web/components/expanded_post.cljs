@@ -196,8 +196,9 @@
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))
                                     :current-user-data current-user-data
-                                    :show-labels-picker (= (drv/react s :foc-labels-picker) dom-element-id)
-                                    :external-labels true}))
+                                    :show-labels-picker (= (drv/react s :foc-labels-picker) (:uuid activity-data))
+                                    :external-labels true
+                                    :custom-class "exp-click-stop"}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
@@ -210,10 +211,10 @@
        :data-last-read-at (:last-read-at activity-data)
        :data-new-comments-count (:new-comments-count activity-data)
        :data-unseen-comments (:unseen-comments activity-data)
-       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :expanded-post-container))
+       :on-click #(when-not (dom-utils/event-container-matches % ".exp-click-stop")
                     (close-expanded-post %))}
       (image-modal/image-modal {:src expand-image-src})
-      [:div.expanded-post-container
+      [:div.expanded-post-container.exp-click-stop
         {:ref :expanded-post-container}
         [:div.expanded-post-header.group
           [:div.back-to-board-container

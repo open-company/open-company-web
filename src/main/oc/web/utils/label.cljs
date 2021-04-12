@@ -1,7 +1,20 @@
 (ns oc.web.utils.label
   (:require [oc.lib.hateoas :as hateoas]
             [oc.web.dispatcher :as dis]
+            [clojure.set :as clj-set]
             [oc.web.local-settings :as ls]))
+
+;; Labels comparison
+
+(defn label-compare-set [label]
+  (set [(:slug label) (:uuid label)]))
+
+(defn compare-label [label-a label-b]
+  (seq (clj-set/intersection (label-compare-set label-a) (label-compare-set label-b))))
+
+(defn compare-labels [labels label]
+  (seq (clj-set/intersection (label-compare-set label) (set (mapcat label-compare-set labels)))))
+
 
 ;; Data parse
 

@@ -135,7 +135,7 @@
                :height (str height "px")}}
       [:button.emoji-button.btn-reset
         {:type "button"
-         :title "Insert emoji"
+         :title "Add emoji"
          :data-placement (or tooltip-position "top")
          :data-container "body"
          :data-toggle "tooltip"

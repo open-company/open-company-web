@@ -67,7 +67,7 @@
             (:file-name atc)]
             [:span.file-size
             (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
-      [:div.stream-item-mobile-attachments
+      [:div.stream-item-mobile-attachments.foc-click-stop
        [:span.mobile-attachments-icon]
        [:span.mobile-attachments-count
         (count activity-attachments)]])))
@@ -252,7 +252,7 @@
                        #(when-not (dom-utils/event-container-matches % "input, button, a, .foc-click-stop")
                           (nav-actions/open-post-modal activity-data false)))
        :id (activity-actions/activity-share-container-id activity-data)}
-      [:button.mlb-reset.mobile-more-bt
+      [:button.mlb-reset.mobile-more-bt.foc-click-stop
         {:class (when @(::show-mobile-more-bt s) "visible")
          :on-click (fn [e]
                     (dismiss-swipe-button s e ::show-mobile-more-bt)

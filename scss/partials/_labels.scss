@@ -6,7 +6,8 @@ div.oc-labels {
   height: auto;
   min-width: 160px;
   background-color: white;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  box-shadow: var(--labels-picker-box-shadow);
+  border: var(--labels-picker-border);
   max-height: 300px;
   overflow-x: hidden;
   overflow-y: auto;

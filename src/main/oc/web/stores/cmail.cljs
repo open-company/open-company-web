@@ -65,21 +65,16 @@
 (defmethod dispatcher/action :cmail-add-label
   [db [_ add-label]]
   (let [cmail-labels (get-in db (conj dispatcher/cmail-data-key :labels))
-        cmail-labels-set (set (map :slug cmail-labels))
-        label-is-present? (cmail-labels-set (:slug add-label))
+        label-is-present? (label-utils/compare-labels cmail-labels add-label)
         can-change? (or label-is-present?
                         (label-utils/can-add-label? cmail-labels))]
     (if can-change?
       (-> db
           (update-in (conj dispatcher/cmail-data-key :labels)
                      (fn [labels]
-                       (let [label-vals #(vec [(:slug %) (:uuid %)])
-                             cmail-labels-set (set (mapcat label-vals labels))
-                             add-label-map (label-utils/clean-entry-label add-label)
-                             add-label-set (set (label-vals add-label))
-                             label-intersect (clj-set/intersection cmail-labels-set add-label-set)]
-                         (if (seq label-intersect)
-                           (mapv #(if (seq (clj-set/intersection (label-vals %) add-label-set))
+                       (let [add-label-map (label-utils/clean-entry-label add-label)]
+                         (if (label-utils/compare-labels labels add-label)
+                           (mapv #(if (label-utils/compare-label % add-label)
                                     add-label-map
                                     %)
                                  labels)
@@ -92,7 +87,7 @@
   (-> db
       (update-in (conj dispatcher/cmail-data-key :labels)
                  (fn [labels]
-                   (filterv #(not= (:slug %) (:slug remove-label)) labels)))
+                   (filterv #(not (label-utils/compare-label % remove-label)) labels)))
       (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))
 
 (defn- labels-value-update [optional-value current-value]

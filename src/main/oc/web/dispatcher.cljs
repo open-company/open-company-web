@@ -1,6 +1,8 @@
 (ns oc.web.dispatcher
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
+            [clojure.string :as s]
+            [clojure.set :as clj-set]
             [cljs-flux.dispatcher :as flux]
             [oc.web.utils.drafts :as du]))
 
@@ -32,6 +34,7 @@
 (declare current-comment-id)
 (declare query-params)
 (declare query-param)
+(declare get-label)
 
 ;; Data key paths
 
@@ -369,6 +372,8 @@
   (when-let [container-slug-kw (keyword container-slug)]
     (#{:replies} container-slug-kw)))
 
+;; Internal getter helpes
+
 (defn- get-container-posts [base posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond
                   (is-container? container-slug)
@@ -394,6 +399,34 @@
                 (filter (comp not :published?) container-posts)
                 container-posts)]
     (vec items)))
+
+;; Label lookup
+
+(def ^{:private true} label-lookup-keys [:uuid :slug])
+
+(defun find-label
+  ([labels-list label-uuid-or-slug]
+   (find-label label-lookup-keys labels-list label-uuid-or-slug))
+
+  ([lookup-keys labels-list label :guard string?]
+   (find-label lookup-keys  labels-list (set [label])))
+
+  ([lookup-keys labels-list labels :guard map?]
+   (find-label lookup-keys  labels-list (-> labels
+                                            (select-keys lookup-keys)
+                                            vals
+                                            set)))
+
+  ([lookup-keys labels-list label-vals]
+   (let [label-values-set (set label-vals)]
+     (some #(when (-> %
+                      (select-keys lookup-keys)
+                      vals
+                      set
+                      (clj-set/intersection label-values-set)
+                      seq)
+            %)
+           labels-list))))
 
 (def ^{:export true} theme-key [:theme])
 (def ^{:export true} theme-setting-key :setting-value)
@@ -627,7 +660,7 @@
   ([data label-uuid-or-slug] (label-data data (current-org-slug) label-uuid-or-slug))
   ([data org-slug label-uuid-or-slug]
    (let [labels (org-labels-data data org-slug)]
-     (some #(when ((set [(:uuid %) (:slug %)]) label-uuid-or-slug) %) labels))))
+     (find-label labels label-uuid-or-slug))))
 
 (defn ^:export editing-label
   "Get the current editing label"
