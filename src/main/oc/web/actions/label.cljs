@@ -27,7 +27,7 @@
 (defn get-labels-finished [org-slug {:keys [body success]}]
   (let [response-body (when success (json->cljs body))
         parsed-labels (label-utils/parse-labels response-body)
-        retrieved-labels-data (-> response-body
+        retrieved-labels-data (-> (:collection response-body)
                                   (dissoc :items)
                                   (assoc :org-labels (org-labels parsed-labels))
                                   (assoc :user-labels (user-labels parsed-labels)))]
@@ -67,16 +67,16 @@
                       labels)]
     (last (sort-by :updated-at labels-list))))
 
-(defn create-label-finished [org-slug {success :success :as resp}]
+(defn create-label-finished [org-slug {success :success headers :headers :as resp}]
   (if-not success
     (get-labels)
-    (let [updated-labels-list (get-labels-finished org-slug resp)
-          new-added-label (latest-updated-label updated-labels-list)]
+    (let [new-label-uuid (get headers "location")
+          new-added-label (dis/label-data new-label-uuid)]
+      (get-labels-finished org-slug resp)
       (dismiss-label-editor)
-      (dis/dispatch! [:label-create/finished org-slug updated-labels-list])
       ;; Add label to entry that has the picker currently opened
       (when-let [entry-uuid (dis/foc-labels-picker)]
-        (entry-label-add entry-uuid (:uuid new-added-label)))
+        (entry-label-add entry-uuid new-label-uuid))
       ;; Add label to cmail if picker was opened from there
       (let [cmail-state (dis/cmail-state)]
         (when (or (:labels-inline-view cmail-state)
@@ -263,9 +263,8 @@
               add-label-link (hateoas/link-for (:links entry-data)
                                                "partial-add-label" {}
                                                {:label-uuid label-uuid})]
-             (dis/dispatch! [:entry-label/add org-slug entry-uuid label-data])
-             (api/add-entry-label add-label-link
-                                  (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
+    (dis/dispatch! [:entry-label/add org-slug entry-uuid label-data])
+    (api/add-entry-label add-label-link (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
 
 (defn entry-label-remove [entry-uuid label-uuid]
   (when-let* [org-slug (dis/current-org-slug)
