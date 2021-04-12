@@ -98,7 +98,7 @@
                        #(dismiss-swipe-button s %)
                        :else
                        (fn [e]
-                         (when-not (dom-utils/event-container-matches e "input, button, a, .exp-click-sotp")
+                         (when-not (dom-utils/event-container-matches e "input, button, a, .foc-collapsed-click-stop")
                            (nav-actions/open-post-modal activity-data false))))
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
@@ -192,4 +192,4 @@
                     :hide-share? true
                     :hide-labels? true
                     :external-follow true
-                    :custom-class "exp-click-sotp"}))]))
+                    :custom-class "foc-collapsed-click-stop"}))]))
