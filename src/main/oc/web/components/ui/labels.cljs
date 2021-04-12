@@ -5,6 +5,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.label :as label-utils]
             [oc.web.actions.cmail :as cmail-actions]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.mixins.ui :as ui-mixins]
@@ -118,6 +119,37 @@
           {:on-click #(label-actions/save-label)}
           "Save"]]]]))
 
+(defn- labels-picker-list [labels-list selected-labels is-mobile? lock-add?]
+  (for [label labels-list
+        :let [selected? (label-utils/compare-labels selected-labels label)
+              click-cb (fn [e]
+                         (when e
+                           (dom-utils/event-stop! e))
+                         (when (or (not lock-add?)
+                                   selected?)
+                           (cmail-actions/cmail-toggle-label label)))]]
+    [:div.oc-label
+     {:data-label-slug (:slug label)
+      :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
+      :class (when (:can-edit? label)
+               "editable")
+      :data-toggle (when-not is-mobile? "tooltip")
+      :data-placement "top"
+      :data-container "body"
+      :data-original-title (if (and lock-add?
+                                    (not selected?))
+                             "Max labels limit reached, remove another label before adding one."
+                             "")
+      :on-click click-cb}
+     (carrot-checkbox {:selected selected?})
+     [:span.oc-label-name
+      (:name label)]
+     (when (:can-edit? label)
+       [:button.mlb-reset.edit-bt
+        {:on-click (fn [e]
+                     (dom-utils/stop-propagation! e)
+                     (label-actions/edit-label label))}])]))
+
 (rum/defcs labels-picker <
   rum/static
   rum/reactive
@@ -130,13 +162,11 @@
       (cmail-actions/cmail-toggle-labels-views false))))
   [s]
   (let [cmail-data (drv/react s :cmail-data)
-        label-slugs (->> cmail-data
-                          :labels
-                          (map :slug)
-                          set)
+        cmail-labels (:labels cmail-data)
         org-labels (drv/react s :org-labels)
+        cmail-orphan-labels (filterv #(not (label-utils/compare-labels org-labels %)) cmail-labels)
         is-mobile? (responsive/is-mobile-size?)
-        lock-add? (>= (count (:labels cmail-data)) ls/max-entry-labels)]
+        lock-add? (>= (count cmail-labels) ls/max-entry-labels)]
     [:div.labels-picker.oc-labels-modal
      [:div.labels-picker-inner
       {:ref :labels-picker-inner}
@@ -145,36 +175,10 @@
       [:div.oc-labels
        [:div.oc-labels-title
         "Add labels"]
-       (if (seq org-labels)
-         (for [label org-labels
-               :let [selected? (label-slugs (:slug label))
-                     click-cb (fn [e]
-                                (when e
-                                  (dom-utils/event-stop! e))
-                                (when (or (not lock-add?)
-                                          selected?)
-                                  (cmail-actions/cmail-toggle-label label)))]]
-           [:div.oc-label
-            {:data-label-slug (:slug label)
-             :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
-             :class (when (:can-edit? label)
-                      "editable")
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-original-title (if (and lock-add?
-                                           (not selected?))
-                                    "Max labels limit reached, remove another label before adding one."
-                                    "")
-             :on-click click-cb}
-            (carrot-checkbox {:selected selected?})
-            [:span.oc-label-name
-             (:name label)]
-            (when (:can-edit? label)
-              [:button.mlb-reset.edit-bt
-               {:on-click (fn [e]
-                            (dom-utils/stop-propagation! e)
-                            (label-actions/edit-label label))}])])
+       (labels-picker-list cmail-orphan-labels cmail-labels is-mobile? lock-add?)
+       (labels-picker-list org-labels cmail-labels is-mobile? lock-add?)
+       (when (and (not (seq org-labels))
+                  (not (seq cmail-labels)))
          [:div.oc-labels-empty
           "No labels yet"])
        (add-label-bt {:label-text "Add label"

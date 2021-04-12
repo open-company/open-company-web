@@ -70,17 +70,20 @@
 (defn create-label-finished [org-slug {success :success headers :headers :as resp}]
   (if-not success
     (get-labels)
-    (let [new-label-uuid (get headers "location")
+    (let [;; Ingest the new labels in the app-state first
+          _ (get-labels-finished org-slug resp)
+          ;; retrieve the label from the app-state
+          new-label-uuid (get headers "location")
           new-added-label (dis/label-data new-label-uuid)]
-      (get-labels-finished org-slug resp)
       (dismiss-label-editor)
       ;; Add label to entry that has the picker currently opened
       (when-let [entry-uuid (dis/foc-labels-picker)]
         (entry-label-add entry-uuid new-label-uuid))
       ;; Add label to cmail if picker was opened from there
       (let [cmail-state (dis/cmail-state)]
-        (when (or (:labels-inline-view cmail-state)
-                  (:labels-floating-view cmail-state))
+        (when (and (not (:collapsed cmail-state))
+                   (or (:labels-inline-view cmail-state)
+                       (:labels-floating-view cmail-state)))
           (cmail-actions/cmail-add-label new-added-label))))))
 
 (defn create-label
@@ -137,7 +140,12 @@
 (defn delete-label-finished [label {success :success}]
   (when success
     (when-let [entry-uuid (dis/foc-labels-picker)]
-      (entry-label-remove entry-uuid (:uuid label))))
+      (entry-label-remove entry-uuid (:uuid label)))
+    (let [cmail-state (dis/cmail-state)]
+      (when (and (not (:collapsed cmail-state))
+                 (or (:labels-inline-view cmail-state)
+                     (:labels-floating-view cmail-state)))
+        (cmail-actions/cmail-remove-label label))))
   (get-labels))
 
 (defn delete-label [label]

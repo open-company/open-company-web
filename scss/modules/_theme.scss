@@ -166,6 +166,8 @@ $dark_mode: "dark";
   // Labels
   --oc-label-background-color: #{rgba($deep_navy, 0.08)};
   --oc-label-color: #{rgba($deep_navy, 0.72)};
+  --labels-picker-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  --labels-picker-border: 1px solid #{rgba($deep_navy, 0.08)};
 
   html, body {
     scrollbar-color: light;
@@ -329,6 +331,8 @@ $dark_mode: "dark";
   // Labels
   --oc-label-background-color: #{rgba(white, 0.16)};
   --oc-label-color: #{rgba(white, 0.72)};
+  --labels-picker-box-shadow: 0 2px 4px 0 rgba(255, 255, 255, 0.07);
+  --labels-picker-border: 1px solid #{rgba(white, 0.4)};
 
   &, body {
     scrollbar-color: dark;

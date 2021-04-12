@@ -34,6 +34,7 @@
 (declare current-comment-id)
 (declare query-params)
 (declare query-param)
+(declare get-label)
 
 ;; Data key paths
 
@@ -371,6 +372,8 @@
   (when-let [container-slug-kw (keyword container-slug)]
     (#{:replies} container-slug-kw)))
 
+;; Internal getter helpes
+
 (defn- get-container-posts [base posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond
                   (is-container? container-slug)
@@ -396,6 +399,34 @@
                 (filter (comp not :published?) container-posts)
                 container-posts)]
     (vec items)))
+
+;; Label lookup
+
+(def ^{:private true} label-lookup-keys [:uuid :slug])
+
+(defun find-label
+  ([labels-list label-uuid-or-slug]
+   (find-label label-lookup-keys labels-list label-uuid-or-slug))
+
+  ([lookup-keys labels-list label :guard string?]
+   (find-label lookup-keys  labels-list (set [label])))
+
+  ([lookup-keys labels-list labels :guard map?]
+   (find-label lookup-keys  labels-list (-> labels
+                                            (select-keys lookup-keys)
+                                            vals
+                                            set)))
+
+  ([lookup-keys labels-list label-vals]
+   (let [label-values-set (set label-vals)]
+     (some #(when (-> %
+                      (select-keys lookup-keys)
+                      vals
+                      set
+                      (clj-set/intersection label-values-set)
+                      seq)
+            %)
+           labels-list))))
 
 (def ^{:export true} theme-key [:theme])
 (def ^{:export true} theme-setting-key :setting-value)
@@ -577,21 +608,34 @@
                          (fn [org-slug contributions-id]
                            (when (and org-slug contributions-id)
                              (contributions-data org-slug contributions-id)))]
-   :label-entries-data    [[:org-slug :label-slug]
-                           (fn [org-slug label-slug]
+   :label-entries-data    [[:base :org-slug :label-slug]
+                           (fn [base org-slug label-slug]
                              (when (and org-slug label-slug)
-                               (label-entries-data org-slug label-slug)))]
-   :board-data          [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (board-data base org-slug board-slug))]
+                               (label-entries-data base org-slug label-slug)))]
+   :board-data            [[:base :org-slug :board-slug]
+                           (fn [base org-slug board-slug]
+                             (board-data base org-slug board-slug))]
    :contributions-user-data [[:active-users :contributions-id]
                              (fn [active-users contributions-id]
                               (when (and active-users contributions-id)
                                 (get active-users contributions-id)))]
-   :label-data          [[:org-labels :label-slug]
-                         (fn [org-labels label-slug]
-                           (when (and org-labels label-slug)
-                             (some #(when ((set [(:slug %) (:uuid %)]) label-slug) %) org-labels)))]
+   :label-data-fallback [[:posts-data :label-entries-data :label-slug]
+                         (fn [posts-data label-entries-data label-slug]
+                           (when (and label-entries-data label-slug)
+                             (let [first-uuid (-> label-entries-data :posts-list first :uuid)
+                                   first-entry (get posts-data first-uuid)
+                                   first-entry-labels (get-in posts-data [first-uuid :labels])
+                                   label-data (find-label first-entry-labels {:slug label-slug})]
+                               label-data)))]
+   :label-data          [[:org-labels :label-slug :label-data-fallback]
+                         (fn [org-labels label-slug label-data-fallback]
+                           (when label-slug
+                             (let [label-data* (find-label org-labels label-slug)
+                                   label-data (if (and (not label-data*)
+                                                       (seq org-labels))
+                                                label-data-fallback
+                                                label-data*)]
+                               label-data)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -997,7 +1041,7 @@
   ([data label-uuid-or-slug] (label-data data (current-org-slug) label-uuid-or-slug))
   ([data org-slug label-uuid-or-slug]
    (let [labels (org-labels-data data org-slug)]
-     (some #(when ((set [(:uuid %) (:slug %)]) label-uuid-or-slug) %) labels))))
+     (find-label labels label-uuid-or-slug))))
 
 (defn ^:export editing-label
   "Get the current editing label"
