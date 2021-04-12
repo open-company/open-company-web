@@ -721,6 +721,11 @@ div.stream-item {
       &:not(:empty) {
         margin-right: 16px;
         margin-left: 19px;
+
+        @include mobile() {
+          margin-right: 0;
+          margin-left: 0;
+        }
       }
 
       div.separator-dot {
