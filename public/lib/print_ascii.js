@@ -2,8 +2,8 @@ const carrotContact = "hello@carrot.io";
 
 function formatHelpLine(command, description) {
   return console.log("%c" + command + " " + "%c" + description,
-                     "font-weight: normal; color:#34414F;",
-                     "font-style: italic; color:rgba(52,65,79,0.8)");
+                     "font-weight: normal;",
+                     "font-style: italic;");
 }
 
 function OCWebHelp(){

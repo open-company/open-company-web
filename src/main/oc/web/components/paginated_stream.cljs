@@ -381,6 +381,7 @@
   (drv/drv :foc-menu-open)
   (drv/drv :foc-labels-picker)
   (drv/drv :activity-share-container)
+  (drv/drv :activity-uuid)
   ;; Locals
   (rum/local nil ::scroll-listener)
   (rum/local false ::has-next)
@@ -429,8 +430,13 @@
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)
-        foc-labels-picker (drv/react s :foc-labels-picker)
-        activity-share-container (drv/react s :activity-share-container)]
+        current-activity-id (drv/react s :activity-uuid)
+        foc-labels-picker* (drv/react s :foc-labels-picker)
+        foc-labels-picker (when-not (seq current-activity-id)
+                            foc-labels-picker*)
+        activity-share-container* (drv/react s :activity-share-container)
+        activity-share-container (when-not (seq current-activity-id)
+                                   activity-share-container*)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group

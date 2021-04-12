@@ -35,6 +35,7 @@
   [db [_ org-slug label-data]]
   (-> db
       (update-in (dispatcher/org-labels-key org-slug) (partial remove-label-from-list label-data))
+      (update-in (dispatcher/user-labels-key org-slug) (partial remove-label-from-list label-data))
       (assoc-in dispatcher/editing-label-key nil)))
 
 (defmethod dispatcher/action :label-create
@@ -49,10 +50,6 @@
           (update-in tdb picker-entry-labels-key (partial upsert-label-in-list (label-utils/clean-entry-label label-data)))
           tdb))
       db)))
-
-(defmethod dispatcher/action :label-create/finished
-  [db [_ org-slug updated-labels-list]]
-  (assoc-in db (dispatcher/org-labels-key org-slug) updated-labels-list))
 
 (defmethod dispatcher/action :label-update
   [db [_ org-slug label-data]]

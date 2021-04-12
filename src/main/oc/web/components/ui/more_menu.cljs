@@ -124,7 +124,7 @@
              external-bookmark hide-bookmark?
              external-follow
              show-home-pin show-board-pin
-             external-labels hide-labels? show-labels-picker foc-labels-picker-prefix]}]
+             external-labels hide-labels? show-labels-picker]}]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         {current-org-slug :org
          current-board-slug :board
@@ -358,7 +358,7 @@
               [:li.edit-labels.bottom-rounded.bottom-margin.top-rounded.top-margin
                {:on-click #(do
                              (hide-menu s will-close)
-                             (label-actions/toggle-foc-labels-picker (str foc-labels-picker-prefix (:uuid entity-data))))}
+                             (label-actions/toggle-foc-labels-picker (:uuid entity-data)))}
                "Edit labels"])
             (when can-home-pin?
               [:li.toggle-pin.home-pin
@@ -429,7 +429,7 @@
                                      :active show-labels-picker})
             :on-click #(do
                          (hide-menu s will-close)
-                         (label-actions/toggle-foc-labels-picker (str foc-labels-picker-prefix (:uuid entity-data))))
+                         (label-actions/toggle-foc-labels-picker (:uuid entity-data)))
             :data-toggle (if is-mobile? "" "tooltip")
             :data-placement (or tooltip-position "top")
             :data-container "body"
