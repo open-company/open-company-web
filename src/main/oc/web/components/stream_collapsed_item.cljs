@@ -92,26 +92,14 @@
        :data-last-activity-at (:last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
-       :on-click (fn [e]
-                   (cond is-drafts-board
-                         (activity-actions/activity-edit activity-data)
-                         (seq mobile-swipe-menu-uuid)
-                         (dismiss-swipe-button s e)
-                         :else
-                         #(when-not (dom-utils/event-container-matches e "input, button, a, .exp-click-sotp")
-                        ;;  (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                        ;;        comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)]
-                        ;;    (when (and ;; More menu wasn't clicked
-                        ;;           (not (utils/event-inside? e more-menu-el))
-                        ;;           ;; Comments summary wasn't clicked
-                        ;;           (not (utils/event-inside? e comments-summary-el))
-                        ;;           ;; a button wasn't clicked
-                        ;;           (not (utils/button-clicked? e))
-                        ;;           ;; No input field clicked
-                        ;;           (not (utils/input-clicked? e))
-                        ;;           ;; No body link was clicked
-                        ;;           (not (utils/anchor-clicked? e)))
-                             (nav-actions/open-post-modal activity-data false))))
+       :on-click (cond is-drafts-board
+                       #(activity-actions/activity-edit activity-data)
+                       (seq mobile-swipe-menu-uuid)
+                       #(dismiss-swipe-button s %)
+                       :else
+                       (fn [e]
+                         (when-not (dom-utils/event-container-matches e "input, button, a, .foc-collapsed-click-stop")
+                           (nav-actions/open-post-modal activity-data false))))
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
         {:class (dom-utils/class-set {:bookmark-item (:bookmarked-at activity-data)
@@ -204,4 +192,4 @@
                     :hide-share? true
                     :hide-labels? true
                     :external-follow true
-                    :custom-class "exp-click-sotp"}))]))
+                    :custom-class "foc-collapsed-click-stop"}))]))
