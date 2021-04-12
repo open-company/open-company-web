@@ -64,6 +64,26 @@
                       (assoc :self? (= (:user-id u) (j/user-id)))))
           users-list)))
 
+(defn- labels-tooltip [db]
+  {:title "New! Improve your posts with labels!"
+   :description "Tag your posts with labels to easily recognize and group them in sub-topics."
+   :back-title nil
+   :scroll :top
+   :arrow-position :bottom-right
+   :position :top-right
+   :key :labels-tooltip
+   :next-title "OK"
+   :show-el-cb #(let [following-data (dispatcher/following-data)
+                      menu-uuid (-> following-data :posts-list first :uuid)]
+                  (when menu-uuid
+                    (dispatcher/dispatch! [:input [:foc-labels-picker] menu-uuid])))
+   :next-cb #(do
+               (dispatcher/dispatch! [:input [:ui-tooltip] nil])
+               (dispatcher/dispatch! [:input [:foc-labels-picker] nil])
+               (user-actions/untag! :labels-tooltip)
+               (user-actions/tag! :labels-tooltip-done))
+   :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
+
 (defn- pin-tooltip [db]
   {:title "New! Increase visibility with Pins."
    :description "Keep important posts at the top of the feed for everyone to see."
@@ -90,10 +110,18 @@
                                ((:tags cur-user-data) :pin-tooltip)
                                (not (:ui-tooltip db))
                                (not (:nux db))
-                               (router/is-home?))]
-    (if show-pin-tooltip?
-      (assoc db :ui-tooltip (pin-tooltip db))
-      db)))
+                               (router/is-home?))
+        show-labels-tooltip? (and (not (responsive/is-mobile-size?))
+                                  ((:tags cur-user-data) :labels-tooltip)
+                                  (not (:ui-tooltip db))
+                                  (not (:nux db))
+                                  (router/is-home?))]
+    (cond show-pin-tooltip?
+          (assoc db :ui-tooltip (pin-tooltip db))
+          show-labels-tooltip?
+          (assoc db :ui-tooltip (labels-tooltip db))
+          :else
+          db)))
 
 (defn parse-user-data [user-data org-data active-users]
   (let [active-user-data (get active-users (:user-id user-data))

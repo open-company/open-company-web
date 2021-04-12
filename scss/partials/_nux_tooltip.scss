@@ -112,6 +112,10 @@ div.nux-tooltip-container {
       transform: translate(#{$half-diagonal}px, -#{$half-diagonal + $side}px);
     }
 
+    &.top-right {
+      transform: translate(calc(-75% + #{$half-diagonal}px), calc(-100% - #{$half-diagonal}px));
+    }
+
     div.triangle {
       position: absolute;
       width: #{$side}px;
@@ -152,6 +156,12 @@ div.nux-tooltip-container {
       &.right-top {
         top: #{$side + ($side - $half-diagonal)}px;
         right: -#{$side / 2}px;
+      }
+
+      &.bottom-right {
+        top: unset;
+        bottom: -#{$side / 2}px;
+        right: #{$half-diagonal + $side}px;
       }
     }
 

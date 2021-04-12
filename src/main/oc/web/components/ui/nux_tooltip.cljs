@@ -30,7 +30,7 @@
         pos (case (:position data)
               :top
               {:x (:x rect)
-              :y (+ (:y rect) (:height rect))}
+               :y (+ (:y rect) (:height rect))}
               :right
               {:x (+ (:x rect) (:width rect))
               :y (+ (:y rect) (/ (:height rect) 2))}
@@ -48,7 +48,10 @@
                :y (+ (:y rect) (/ (:height rect) 2))}
               :left-top
               {:x (:x rect)
-               :y (+ (:y rect) (/ (:height rect) 2))})]
+               :y (+ (:y rect) (/ (:height rect) 2))}
+              :top-right
+              {:x (- (:x rect) (:width rect))
+               :y (:y rect)})]
     (dommy/add-class! el :nux-tooltip-handle)
     (when-not (= @(::pos state) pos)
       (reset! (::pos state) pos))
