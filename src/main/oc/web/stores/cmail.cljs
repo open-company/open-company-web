@@ -98,15 +98,15 @@
 (defn- labels-value-update [optional-value current-value]
   (if (boolean? optional-value) optional-value (not current-value)))
 
-(defmethod dispatcher/action :toggle-cmail-floating-labels-view
+(defmethod dispatcher/action :cmail-toggle-floating-labels-view
   [db [_ optional-value]]
   (update-in db (concat dispatcher/cmail-state-key [:labels-floating-view]) (partial labels-value-update optional-value)))
 
-(defmethod dispatcher/action :toggle-cmail-inline-labels-view
+(defmethod dispatcher/action :cmail-toggle-inline-labels-view
   [db [_ optional-value]]
   (update-in db (concat dispatcher/cmail-state-key [:labels-inline-view]) (partial labels-value-update optional-value)))
 
-(defmethod dispatcher/action :toggle-cmail-labels-views
+(defmethod dispatcher/action :cmail-toggle-labels-views
   [db [_ optional-value]]
   (-> db
       (update-in (concat dispatcher/cmail-state-key [:labels-floating-view]) (partial labels-value-update optional-value))

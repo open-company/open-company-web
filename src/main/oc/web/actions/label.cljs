@@ -81,14 +81,14 @@
       (let [cmail-state (dis/cmail-state)]
         (when (or (:labels-inline-view cmail-state)
                   (:labels-floating-view cmail-state))
-          (cmail-actions/add-cmail-label new-added-label))))))
+          (cmail-actions/cmail-add-label new-added-label))))))
 
 (defn create-label
   ([label-data]
    (let [create-label-link (hateoas/link-for (:links (dis/org-data)) "create-label")]
      (create-label create-label-link label-data)))
   ([create-label-link editing-label]
-   (timbre/infof "Creating label with name % with link %s" (:name editing-label) (:hread create-label-link))
+   (timbre/infof "Creating label with name %s with link %s" (:name editing-label) (:hread create-label-link))
    (let [org-slug (dis/current-org-slug)]
      (dis/dispatch! [:label-create org-slug editing-label])
      (api/create-label create-label-link editing-label (partial create-label-finished org-slug)))))
@@ -105,7 +105,7 @@
         (let [cmail-state (dis/cmail-state)]
           (when (or (:labels-inline-view cmail-state)
                     (:labels-floating-view cmail-state))
-            (cmail-actions/add-cmail-label updated-label)))
+            (cmail-actions/cmail-add-label updated-label)))
                              ;; Delay the complete refresh of the labels list since it's not necessary
         (utils/after 250 get-labels))
       (get-labels)))
@@ -113,7 +113,7 @@
 (defn update-label
   ([label-data] (update-label (hateoas/link-for (:links label-data) "partial-update") label-data))
   ([update-label-link label-data]
-   (timbre/infof "Updating label % with link %s" (:uuid label-data) (:hread update-label-link))
+   (timbre/infof "Updating label %s with link %s" (:uuid label-data) (:hread update-label-link))
    (let [org-slug (dis/current-org-slug)]
      (dis/dispatch! [:label-update org-slug label-data])
      (api/update-label update-label-link label-data (partial update-label-finished org-slug)))))

@@ -127,7 +127,7 @@
   ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
     (when-not (dom-utils/event-container-matches e ".alert-modal, .oc-labels-modal-wrapper")
-      (cmail-actions/toggle-cmail-labels-views false))))
+      (cmail-actions/cmail-toggle-labels-views false))))
   [s]
   (let [cmail-data (drv/react s :cmail-data)
         label-slugs (->> cmail-data
@@ -141,7 +141,7 @@
      [:div.labels-picker-inner
       {:ref :labels-picker-inner}
       [:button.mlb-reset.labels-modal-close-bt
-       {:on-click #(cmail-actions/toggle-cmail-labels-views false)}]
+       {:on-click #(cmail-actions/cmail-toggle-labels-views false)}]
       [:div.oc-labels
        [:div.oc-labels-title
         "Add labels"]
@@ -153,7 +153,7 @@
                                   (dom-utils/event-stop! e))
                                 (when (or (not lock-add?)
                                           selected?)
-                                  (cmail-actions/toggle-cmail-label label)))]]
+                                  (cmail-actions/cmail-toggle-label label)))]]
            [:div.oc-label
             {:data-label-slug (:slug label)
              :key (str "labels-picker-" (or (:uuid label) (rand 1000)))
@@ -209,7 +209,7 @@
   ui-mixins/strict-refresh-tooltips-mixin
   (ui-mixins/on-click-out (fn [s _]
                             (when (:labels-inline-view @(drv/get-ref s :cmail-state))
-                              (cmail-actions/toggle-cmail-inline-labels-view false))))
+                              (cmail-actions/cmail-toggle-inline-labels-view false))))
   [s {add-label-bt? :add-label-bt}]
   (let [cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
@@ -226,14 +226,14 @@
         (cmail-label-item {:label label
                            :class-name "cmail-label-item active"
                            :tooltip (when-not is-mobile? {:title "Remove label"})
-                           :on-click-cb #(cmail-actions/toggle-cmail-label label)})])
+                           :on-click-cb #(cmail-actions/cmail-toggle-label label)})])
      (when add-label-bt?
        [:div.cmail-add-label-container
         (add-label-bt {:label-text (if (seq org-labels)
                                      "Add a label"
                                      "Create a new label")
                        :on-click #(if (seq org-labels)
-                                    (cmail-actions/toggle-cmail-inline-labels-view)
+                                    (cmail-actions/cmail-toggle-inline-labels-view)
                                     (label-actions/new-label))})])]))
 
 (rum/defc label-item <

@@ -285,26 +285,26 @@
 (defn cmail-data-remove-has-changes []
   (dis/dispatch! [:cmail-data/remove-has-changes]))
 
-(defn toggle-cmail-label [label]
+(defn cmail-toggle-label [label]
   (dis/dispatch! [:cmail-toggle-label label]))
 
-(defn add-cmail-label [label]
+(defn cmail-add-label [label]
   (dis/dispatch! [:cmail-add-label label]))
 
-(defn remove-cmail-label [label]
+(defn cmail-remove-label [label]
   (dis/dispatch! [:cmail-remove-label label]))
 
-(defn toggle-cmail-floating-labels-view
-  ([] (toggle-cmail-floating-labels-view nil))
-  ([v] (dis/dispatch! [:toggle-cmail-floating-labels-view v])))
+(defn cmail-toggle-floating-labels-view
+  ([] (cmail-toggle-floating-labels-view nil))
+  ([v] (dis/dispatch! [:cmail-toggle-floating-labels-view v])))
 
-(defn toggle-cmail-inline-labels-view
-  ([] (toggle-cmail-inline-labels-view nil))
-  ([v] (dis/dispatch! [:toggle-cmail-inline-labels-view v])))
+(defn cmail-toggle-inline-labels-view
+  ([] (cmail-toggle-inline-labels-view nil))
+  ([v] (dis/dispatch! [:cmail-toggle-inline-labels-view v])))
 
-(defn toggle-cmail-labels-views
-  ([] (toggle-cmail-labels-views nil))
-  ([v] (dis/dispatch! [:toggle-cmail-labels-views v])))
+(defn cmail-toggle-labels-views
+  ([] (cmail-toggle-labels-views nil))
+  ([v] (dis/dispatch! [:cmail-toggle-labels-views v])))
 
 (defn cmail-label-remove-last-label []
   (dis/dispatch! [:cmail-label-remove-last-label]))

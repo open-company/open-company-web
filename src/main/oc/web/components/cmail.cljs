@@ -764,7 +764,7 @@
            :data-placement "top"
            :data-container "body"
            :title "Edit labels"
-           :on-click #(cmail-actions/toggle-cmail-floating-labels-view)}]
+           :on-click #(cmail-actions/cmail-toggle-floating-labels-view)}]
          (when (:labels-floating-view cmail-state)
            (labels-picker))]
         (when (:distraction-free? cmail-state)
