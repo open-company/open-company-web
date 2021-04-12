@@ -197,8 +197,7 @@
                                                   (fn [] (reset! (::force-show-menu s) false)))
                                     :current-user-data current-user-data
                                     :show-labels-picker (= (drv/react s :foc-labels-picker) dom-element-id)
-                                    :external-labels true
-                                    :foc-labels-picker-prefix "exp-"}))
+                                    :external-labels true}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
