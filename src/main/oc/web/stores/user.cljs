@@ -64,9 +64,9 @@
                       (assoc :self? (= (:user-id u) (j/user-id)))))
           users-list)))
 
-(defn- labels-tooltip [db]
-  {:title "New! Improve your posts with labels!"
-   :description "Tag your posts with labels to easily recognize and group them in sub-topics."
+(defn- labels-tooltip [_db]
+  {:title "🆕 Improve posts with labels❗️"
+   :description "Enrich your posts with labels: thanks to this new feature you'll be able to easily group and find them.\nTry it now."
    :back-title nil
    :scroll :top
    :arrow-position :bottom-right
@@ -79,13 +79,13 @@
                     (dispatcher/dispatch! [:input [:foc-labels-picker] menu-uuid])))
    :next-cb #(do
                (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-               (dispatcher/dispatch! [:input [:foc-labels-picker] nil])
                (user-actions/untag! :labels-tooltip)
-               (user-actions/tag! :labels-tooltip-done))
+               (user-actions/tag! :labels-tooltip-done)
+               (dispatcher/dispatch! [:input [:foc-labels-picker] (-> (dispatcher/items-to-render-data) first :uuid)]))
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
 
-(defn- pin-tooltip [db]
-  {:title "New! Increase visibility with Pins."
+(defn- pin-tooltip [_db]
+  {:title "🆕 Increase visibility with Pins❗️"
    :description "Keep important posts at the top of the feed for everyone to see."
    :back-title nil
    :scroll :top
