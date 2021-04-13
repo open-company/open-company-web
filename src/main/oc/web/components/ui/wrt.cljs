@@ -105,8 +105,8 @@
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
-(def premium-remind-all-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
-(def premium-remind-tooltip "Please upgrade to premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
+(def premium-remind-all-tooltip "Upgrade to Carrot premium for Analytics and “nudges”. Know who saw what, and have one-click reminders so important updates aren’t missed.")
+(def premium-remind-tooltip "Upgrade to Carrot Premium to know specifically which team member saw this post, and to enable one-click “nudge” reminders to ensure important updates aren't missed.")
 
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
@@ -339,8 +339,17 @@
                           is-self-user?       (= (:user-id current-user-data) (:user-id u))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
-                  :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
-                                           :sent user-sending-notice})}
+                   :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
+                                            :sent user-sending-notice})
+                   :on-click (fn [e]
+                               (when-not (:premium? org-data)
+                                 (du/event-stop! e)
+                                 (nav-actions/toggle-premium-picker! premium-remind-tooltip)))
+                   :data-toggle (when (and (not (:premium? org-data))
+                                           (not is-mobile?))
+                                  "tooltip")
+                   :data-placement "top"
+                   :title remind-tooltip}
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
@@ -363,17 +372,11 @@
                              (not is-self-user?)
                              (not user-sending-notice))
                     [:button.mlb-reset.send-reminder-bt
-                      {:on-click #(if (:premium? org-data)
+                      {:on-click #(when (:premium? org-data)
                                     (remind-to s {:activity-data activity-data
                                                   :current-user-data current-user-data
                                                   :users-list [u]
-                                                  :slack-bot-data slack-bot-data})
-                                    (nav-actions/toggle-premium-picker! premium-remind-tooltip))
-                       :data-toggle (when (and (not (:premium? org-data))
-                                               (not is-mobile?))
-                                      "tooltip")
-                       :data-placement "top"
-                       :title remind-tooltip}
+                                                  :slack-bot-data slack-bot-data}))}
                       "Remind"])])]])]]))
 
 (rum/defc wrt-count < rum/static
