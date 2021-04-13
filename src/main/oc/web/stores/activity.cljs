@@ -8,6 +8,7 @@
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
+            [oc.web.stores.user :as user-store]
             [clojure.set :as set]))
 
 (defn- item-from-entity [entry]
@@ -1018,7 +1019,8 @@
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
       (update-in ndb following-badge-key #(if (= (keyword current-container-slug) :following) false (boolean badge-following?)))
       (assoc-in ndb posts-key merged-items)
-      (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data)))))
+      (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
+      (user-store/check-user-tags ndb))))
 
 (defmethod dispatcher/action :following-get/finish
   [db [_ org-slug sort-type current-container-slug keep-seen-at? following-data]]

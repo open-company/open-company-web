@@ -198,13 +198,6 @@
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
-        (if nux
-          (nux-tooltips-manager)
-          (when ui-tooltip
-            (nux-tooltip {:data ui-tooltip
-                          :next-cb (:next-cb ui-tooltip)
-                          :dismiss-cb (:next-cb ui-tooltip)})))
-        
         (cond
           ;; Activity removed
           show-activity-removed
@@ -270,7 +263,15 @@
           ;; (follow-picker)
           ;; Mobile fullscreen search
           mobile-search?
-          (search-box))
+          (search-box)
+          ;; NUX
+          nux
+          (nux-tooltips-manager)
+          ;; Specific tooltips
+          ui-tooltip
+          (nux-tooltip {:data ui-tooltip
+                        :next-cb (:next-cb ui-tooltip)
+                        :dismiss-cb (:next-cb ui-tooltip)}))
         (when payments-ui-upgraded-banner
           (upgraded-banner))
         ;; Cmail mobile editor

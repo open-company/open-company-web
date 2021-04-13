@@ -995,6 +995,25 @@
   ([] (current-user-data @app-state))
   ([data] (get-in data current-user-key)))
 
+(defn ^:export current-user-tags
+  ([] (current-user-tags @app-state))
+  ([data]
+   (let [user-data (current-user-data data)]
+     (-> user-data
+         :tags))))
+
+(defn ^:export user-tagged?
+  ([tag] (user-tagged? @app-state tag))
+  ([data tag]
+   (when tag
+     (let [tag-kw (if-not (keyword? tag)
+                    (keyword tag)
+                    tag)]
+       (-> data
+           current-user-tags
+           set
+           tag-kw)))))
+
 (defn ^:export orgs-data
   ([] (orgs-data @app-state))
   ([data] (get data orgs-key)))
@@ -1521,6 +1540,11 @@
 (defn ^:export cmail-state
   ([] (cmail-state @app-state))
   ([data] (get-in data cmail-state-key)))
+
+(defn ^:export cmail-collapsed?
+  ([] (cmail-collapsed? @app-state))
+  ([data]
+   (get-in data (conj cmail-state-key :collapsed))))
 
 ;; Reminders
 
