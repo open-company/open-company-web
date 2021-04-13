@@ -95,12 +95,15 @@
 (rum/defcs more-menu < rum/reactive
                        rum/static
                        (drv/drv :route)
+                       (drv/drv :ui-tooltip)
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (rum/local false ::can-unmount)
                        (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-click-out "more-menu" (fn [s _]
-                                                             (hide-menu s (-> s :rum/args first :will-close))))
+                                                             ;; Do not dismiss the menu in case the ui-tooltip for pin feature is visible
+                                                             (when (-> s (drv/get-ref :ui-tooltip) deref (get :key) (not= :pin-tooltip))
+                                                               (hide-menu s (-> s :rum/args first :will-close)))))
                        ui-mixins/strict-refresh-tooltips-mixin
                        {:will-update (fn [s]
                                        (let [next-force-show-menu (-> s :rum/args first :force-show-menu)]
@@ -131,6 +134,7 @@
          current-contributions-id :contributions
          current-label-slug :label
          current-activity-id :activity}          (drv/react s :route)
+        _ (drv/react s :ui-tooltip)
         delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         toggle-labels-link (or (utils/link-for (:links entity-data) "partial-add-label")

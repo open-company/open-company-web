@@ -836,11 +836,13 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
-   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
+   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))] ;; Shos the ... and other buttons and expand the ... menu
+   :foc-show-menu         [[:base] (fn [base] (get base :foc-show-menu))] ;; Show only the ... and the other buttons
    :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (user-labels-data base org-slug))]
    :show-label-editor     [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
-   :editing-label         [[:base] (fn [base] (get-in base editing-label-key))]})
+   :editing-label         [[:base] (fn [base] (get-in base editing-label-key))]
+   :ui-tooltip            [[:base] (fn [base] (:ui-tooltip base))]})
 
 ;; Action Loop =================================================================
 

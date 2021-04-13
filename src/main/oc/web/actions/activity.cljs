@@ -1399,6 +1399,9 @@
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
+(defn foc-show-menu [v]
+  (dis/dispatch! [:foc-show-menu v]))
+
 (defn foc-menu-open [v]
   (dis/dispatch! [:foc-menu-open v]))
 

@@ -64,44 +64,59 @@
                       (assoc :self? (= (:user-id u) (j/user-id)))))
           users-list)))
 
+(defn- feed-first-uuid
+  "Get the uuid of the first rendered post in the feed list."
+  []
+  (->> (dispatcher/items-to-render-data)
+       (some #(when (and (= (:resource-type %) :entry) (:uuid %)) %))
+       :uuid))
+
+(defn- dismiss-labels-tooltip []
+  (dispatcher/dispatch! [:input [:ui-tooltip] nil])
+  (dispatcher/dispatch! [:input [:foc-show-menu] nil])
+  (user-actions/untag! :labels-tooltip)
+  (user-actions/tag! :labels-tooltip-done))
+
+(defn- show-labels-tooltip []
+  (when-let [menu-uuid (feed-first-uuid)]
+    (dispatcher/dispatch! [:input [:foc-show-menu] menu-uuid])))
+
 (defn- labels-tooltip [_db]
-  {:title "🆕 Improve posts with labels❗️"
-   :description "Enrich your posts with labels: thanks to this new feature you'll be able to easily group and find them.\nTry it now."
+  {:title "🆕 Tag your posts with labels"
+   :description "Need to group similar posts in a topic, or across topics?\nUse Carrot's new labels to group posts and navigate to all of them with a single click."
    :back-title nil
    :scroll :top
+   :lock-scroll true
    :arrow-position :bottom-right
    :position :top-right
    :key :labels-tooltip
    :next-title "OK"
-   :show-el-cb #(let [rendering-items (dispatcher/items-to-render-data)
-                      menu-uuid (-> rendering-items first :uuid)]
-                  (when menu-uuid
-                    (dispatcher/dispatch! [:input [:foc-labels-picker] menu-uuid])))
-   :next-cb #(do
-               (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-               (user-actions/untag! :labels-tooltip)
-               (user-actions/tag! :labels-tooltip-done)
-               (dispatcher/dispatch! [:input [:foc-labels-picker] (-> (dispatcher/items-to-render-data) first :uuid)]))
+   :show-el-cb show-labels-tooltip
+   :next-cb dismiss-labels-tooltip
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
 
+(defn- dismiss-pin-tooltip []
+  (dispatcher/dispatch! [:input [:ui-tooltip] nil])
+  (dispatcher/dispatch! [:input [:foc-menu-open] nil])
+  (user-actions/untag! :pin-tooltip)
+  (user-actions/tag! :pin-tooltip-done))
+
+(defn- show-pin-tooltip []
+  (when-let [menu-uuid (feed-first-uuid)]
+    (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
+
 (defn- pin-tooltip [_db]
-  {:title "🆕 Increase visibility with Pins❗️"
+  {:title "🆕 Increase visibility with Pins!"
    :description "Keep important posts at the top of the feed for everyone to see."
    :back-title nil
    :scroll :top
+   :lock-scroll true
    :arrow-position :right-top
    :position :left
    :key :pin-tooltip
    :next-title "OK"
-   :show-el-cb #(let [rendering-items (dispatcher/items-to-render-data)
-                      menu-uuid (-> rendering-items first :uuid)]
-                  (when menu-uuid
-                    (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
-   :next-cb #(do
-               (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-               (dispatcher/dispatch! [:input [:foc-menu-open] nil])
-               (user-actions/untag! :pin-tooltip)
-               (user-actions/tag! :pin-tooltip-done))
+   :show-el-cb show-pin-tooltip
+   :next-cb dismiss-pin-tooltip
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :li.toggle-pin]})
 
 (defn check-user-tags [db]

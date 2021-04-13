@@ -705,7 +705,7 @@
 
 ;; Tags
 
-(defun tag!
+(defun ^:export tag!
   ([tag :guard string?] (when tag (tag! (keyword tag))))
   ([tag :guard keyword?]
    (when-let [cur-user (dis/current-user-data)]
@@ -716,7 +716,7 @@
                                 (when-not success
                                   (get-user))))))))
 
-(defun untag!
+(defun ^:export untag!
   ([tag :guard string?] (when tag (untag! (keyword tag))))
   ([tag :guard keyword?]
    (when-let [cur-user (dis/current-user-data)]
