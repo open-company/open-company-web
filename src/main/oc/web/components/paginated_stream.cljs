@@ -56,6 +56,7 @@
            clear-cell-measure-cb
            current-user-data
            row-index
+           foc-show-menu
            foc-menu-open
            foc-labels-picker
            foc-share-entry] :as props}]
@@ -68,7 +69,8 @@
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
                                :close-item (:close-item item)
-                               :foc-menu-open (or foc-menu-open
+                               :foc-show-menu (or foc-show-menu
+                                                  foc-menu-open
                                                   foc-labels-picker
                                                   foc-share-entry)})}
      (cond
@@ -82,6 +84,7 @@
                                :clear-cell-measure-cb clear-cell-measure-cb
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open
+                               :foc-show-menu      foc-show-menu
                                :foc-labels-picker  foc-labels-picker
                                :foc-share-entry   foc-share-entry
                                :premium?          (:premium? org-data)})
@@ -90,6 +93,7 @@
                      :read-data          read-data
                      :show-wrt?          show-wrt?
                      :foc-menu-open      foc-menu-open
+                     :foc-show-menu      foc-show-menu
                      :foc-labels-picker  foc-labels-picker
                      :foc-share-entry    foc-share-entry
                      :show-new-comments? show-new-comments?
@@ -135,6 +139,7 @@
              clear-cell-measure-cb
              row-index
              foc-menu-open
+             foc-show-menu
              foc-labels-picker
              activity-share-container]
     :as derivatives}
@@ -177,6 +182,7 @@
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
                                                  :foc-menu-open (boolean (= foc-menu-open (:uuid item)))
+                                                 :foc-show-menu (boolean (= foc-show-menu (:uuid item)))
                                                  :foc-labels-picker (boolean (= foc-labels-picker (:uuid item)))
                                                  :foc-share-entry (boolean (= activity-share-container
                                                                               (activity-actions/activity-share-container-id item)))})))]))
@@ -249,7 +255,8 @@
              is-mobile?
              container-data
              current-user-data
-             foc-menu-open]
+             foc-menu-open
+             foc-show-menu]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -379,6 +386,7 @@
   (drv/drv :contributions-id)
   (drv/drv :label-slug)
   (drv/drv :foc-menu-open)
+  (drv/drv :foc-show-menu)
   (drv/drv :foc-labels-picker)
   (drv/drv :activity-share-container)
   (drv/drv :activity-uuid)
@@ -430,6 +438,7 @@
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)
+        foc-show-menu (drv/react s :foc-show-menu)
         current-activity-id (drv/react s :activity-uuid)
         foc-labels-picker* (drv/react s :foc-labels-picker)
         foc-labels-picker (when-not (seq current-activity-id)
@@ -454,5 +463,6 @@
                                         :activities-read activities-read
                                         :editable-boards editable-boards
                                         :foc-menu-open foc-menu-open
+                                        :foc-show-menu foc-show-menu
                                         :activity-share-container activity-share-container
                                         :foc-labels-picker foc-labels-picker}))]]]))

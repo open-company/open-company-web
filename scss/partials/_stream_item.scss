@@ -24,7 +24,7 @@ div.virtualized-list-row:not(.collapsed-item) {
   }
 
   @include big_web() {
-    &:hover, &.foc-menu-open {
+    &:hover, &.foc-show-menu {
       z-index: 2;
       box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
       div.stream-item, div.stream-item.open-item, div.stream-item.close-item {

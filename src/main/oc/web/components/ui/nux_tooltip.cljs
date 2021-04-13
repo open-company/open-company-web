@@ -4,16 +4,26 @@
             [dommy.core :as dommy]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.utils :as utils]))
 
-(defn- scroll-to-tooltip [data el]
+(defn- check-scroll-lock [state new-tip-data]
+  (when (and @(::scroll-locked? state)
+             (not (:lock-scroll new-tip-data)))
+    (utils/after 100 #(dom-utils/unlock-page-scroll)))
+  (when (and (not @(::scroll-locked? state))
+             (:lock-scroll new-tip-data))
+    (utils/after 100 #(dom-utils/lock-page-scroll))))
+
+(defn- scroll-to-tooltip [state data el]
   (case (:scroll data)
     :top
     (oset! js/document "scrollingElement.scrollTop" (utils/page-scroll-top))
     :element
     (.scrollIntoView el #js {:block "center"})
-    nil))
+    nil)
+  (check-scroll-lock state data))
 
 (defn- remove-old-tooltip-handle [state key]
   (when (not= key @(::last-key state))
@@ -25,7 +35,7 @@
   (let [key (-> state :rum/args first :key)
         new-key? (not= @(::last-key state) key)
         _ (when new-key?
-            (scroll-to-tooltip data el))
+            (scroll-to-tooltip state data el))
         rect (dom-utils/bounding-rect el)
         pos (case (:position data)
               :top
@@ -77,6 +87,8 @@
   (rum/local nil ::last-key)
   (rum/local nil ::last-sel)
   (rum/local nil ::rand)
+  (rum/local false ::scroll-locked?)
+  ui-mixins/no-scroll-mixin
   {:will-mount (fn [state]
                  (check-data state)
                  state)
@@ -91,12 +103,16 @@
     key                                     :key
     {:keys [title description next-title back-title
             steps arrow-position position sel key
-            post-dismiss-cb post-next-cb post-prev-cb]
+            post-dismiss-cb post-next-cb post-prev-cb
+            scroll-lock]
      :as data}                              :data}]
   (let [{left :x top :y} @(::pos state)]
     (when (and data left top)
-      [:div.nux-tooltip-container
-       {:on-mouse-down utils/event-stop}
+      [:div.nux-tooltip-container.foc-click-stop.exp-click-stop.foc-collapsed-click-stop
+       {:on-mouse-down dom-utils/event-stop!
+        :on-click dom-utils/event-stop!
+        :on-mouse-up dom-utils/event-stop!
+        :on-scroll (when scroll-lock dom-utils/event-stop!)}
         [:div.nux-tooltip
           {:class (utils/class-set {position true})
             :style (clj->js {:left (str left "px")
