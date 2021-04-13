@@ -73,8 +73,8 @@
    :position :top-right
    :key :labels-tooltip
    :next-title "OK"
-   :show-el-cb #(let [following-data (dispatcher/following-data)
-                      menu-uuid (-> following-data :posts-list first :uuid)]
+   :show-el-cb #(let [rendering-items (dispatcher/items-to-render-data)
+                      menu-uuid (-> rendering-items first :uuid)]
                   (when menu-uuid
                     (dispatcher/dispatch! [:input [:foc-labels-picker] menu-uuid])))
    :next-cb #(do
@@ -93,8 +93,8 @@
    :position :left
    :key :pin-tooltip
    :next-title "OK"
-   :show-el-cb #(let [following-data (dispatcher/following-data)
-                      menu-uuid (-> following-data :posts-list first :uuid)]
+   :show-el-cb #(let [rendering-items (dispatcher/items-to-render-data)
+                      menu-uuid (-> rendering-items first :uuid)]
                   (when menu-uuid
                     (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
    :next-cb #(do
@@ -105,17 +105,23 @@
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :li.toggle-pin]})
 
 (defn check-user-tags [db]
-  (let [cur-user-data (dispatcher/current-user-data db)
-        show-pin-tooltip? (and (not (responsive/is-mobile-size?))
-                               ((:tags cur-user-data) :pin-tooltip)
+  (let [cmail-collapsed? (dispatcher/cmail-collapsed? db)
+        rendering-items (dispatcher/items-to-render-data db)
+        mobile? (responsive/is-mobile-size?)
+        show-pin-tooltip? (and (seq rendering-items)
+                               (not mobile?)
+                               (dispatcher/user-tagged? db :pin-tooltip)
                                (not (:ui-tooltip db))
                                (not (:nux db))
-                               (router/is-home?))
-        show-labels-tooltip? (and (not (responsive/is-mobile-size?))
-                                  ((:tags cur-user-data) :labels-tooltip)
+                               (router/is-home?)
+                               cmail-collapsed?)
+        show-labels-tooltip? (and (seq rendering-items)
+                                  (not mobile?)
+                                  (dispatcher/user-tagged? db :labels-tooltip)
                                   (not (:ui-tooltip db))
                                   (not (:nux db))
-                                  (router/is-home?))]
+                                  (router/is-home?)
+                                  cmail-collapsed?)]
     (cond show-pin-tooltip?
           (assoc db :ui-tooltip (pin-tooltip db))
           show-labels-tooltip?
