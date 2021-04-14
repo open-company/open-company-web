@@ -145,6 +145,12 @@ div.user-info-modal {
       @include user-profile(120){
         margin: 24px auto 0;
         text-align: left;
+
+        img.user-avatar-img {
+          max-width: unset!important;
+          width: 120px!important;
+          height: 120px!important;
+        }
       }
 
       div.user-info-name {

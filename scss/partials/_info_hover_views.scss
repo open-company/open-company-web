@@ -64,6 +64,9 @@ div.user-info-view {
         margin-right: 8px;
         white-space: nowrap;
         flex: 0 0 auto;
+        max-width: unset!important;
+        width: 32px!important;
+        height: 32px!important;
       }
 
       div.user-info-right {
@@ -110,7 +113,13 @@ div.user-info-view {
     align-content: center;
     align-items: center;
 
-    @include user-profile(120);
+    @include user-profile(120) {
+      img.user-avatar-img {
+        max-width: unset!important;
+        width: 120px!important;
+        height: 120px!important;
+      }
+    }
 
     div.user-info-right {
       flex: 0 1 auto;
