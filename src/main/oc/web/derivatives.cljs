@@ -501,7 +501,8 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (dis/comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base dis/show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data dis/can-compose-key))]
-   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
+   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))] ;; Show the ... and other buttons and expand the ... menu
+   :foc-show-menu         [[:base] (fn [base] (get base :foc-show-menu))] ;; Show only the ... and the other buttons
    :org-labels            [[:base :org-slug] (fn [base org-slug] (dis/org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (dis/user-labels-data base org-slug))]
    :show-label-editor?    [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
