@@ -177,6 +177,14 @@ div.login-wall-container {
           margin-top: 16px;
         }
 
+        div.org-avatar {
+          margin: 0 auto 24px;
+          float: unset;
+          display: inline-block;
+
+          @include org-avatar(60);
+        }
+
         div.login-overlay-cta {
           text-align: center;
 
@@ -189,17 +197,26 @@ div.login-wall-container {
           }
         }
 
-        button.signup-with-slack {
-          float: left;
-        }
+        // button.signup-with-slack {
+        //   float: left;
+        // }
 
-        button.signup-with-google {
-          float: right;
+        // button.signup-with-google {
+        //   float: right;
+        // }
+
+        div.login-buttons {
+          margin-top: 24px;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: center;
+          align-items: center;
         }
 
         button.signup-with-slack, button.signup-with-google {
           margin-top: 16px;
-          width: calc(50% - 8px);
+          width: auto;
+          max-width: 50%;
           height: 40px;
           background-color: rgba($deep_navy, 0.1);
           color: $deep_navy;
@@ -211,6 +228,7 @@ div.login-wall-container {
           display: flex;
           justify-content: center;
           align-items: center;
+          padding: 10px 40px;
 
           @include big_web() {
             &:hover {

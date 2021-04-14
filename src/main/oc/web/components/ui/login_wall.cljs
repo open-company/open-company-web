@@ -3,15 +3,14 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.theme :as theme-mixins]
+            [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.lib.cljs.useragent :as ua]
-            [oc.web.expo :as expo]))
+            [oc.lib.cljs.useragent :as ua]))
 
 (def default-title (str "Login to " ls/product-name))
 (def default-desc "You need to be logged in to view a post.")
@@ -28,9 +27,11 @@
                         (rum/local "" ::email)
                         (rum/local "" ::pswd)
                         (theme-mixins/theme-mixin)
+                        oc.web.mixins.ui/refresh-tooltips-mixin
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
-        theme-data (drv/react s :theme)
+        ;; Needed by theme-mixin
+        _theme-data (drv/react s :theme)
         router-dark-allowed (drv/react s :route/dark-allowed)
         current-org-slug (drv/react s :org-slug)
         current-board-slug (drv/react s :board-slug)
@@ -65,35 +66,41 @@
               :aria-label "Back"}
               "Back"])]
           [:div.title
-            (or title default-title)]
+            ;; (or title default-title)
+           "Upguard on Carrot"]
           [:div.top-continue-container
            [:button.mlb-reset.top-continue
             {:class (when-not login-enabled "disabled")
              :on-click login-action}
-            "Log in"]]]
+            "Upguard login"]]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
-            
+            ()
             [:div.login-wall-content
+              (org-avatar {:slug "upguard"
+                           :logo-url "https://avatars.slack-edge.com/2015-07-23/8121714144_a056ba6420eecdcde0ec_132.jpg"
+                           :uuid "bf65-43db-8b11"
+                           :team-id "583c-4399-820b"})
               [:div.login-overlay-cta.group
-                
                 [:div.login-title "Log in"]]
-              (when (seq (or desc default-desc))
-                [:div.login-description (or desc default-desc)])
+              ;; (when (seq (or desc default-desc))
+              ;;   [:div.login-description (or desc default-desc)])
+              [:div.login-description "Log in with Google SSO"]
               [:div.login-buttons.group
-                [:button.mlb-reset.signup-with-slack
-                  {:on-touch-start identity
-                   :on-click #(do
-                               (.preventDefault %)
-                               (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                     {:auth-source "slack"})]
-                                 (user-actions/maybe-save-login-redirect)
-                                 (user-actions/login-with-slack auth-link
-                                                                (when ua/mobile-app?
-                                                                  {:redirect-origin deep-link-origin}))))}
-                  [:div.slack-icon
-                    {:aria-label "slack"}]
-                  [:div.slack-text "Slack"]]
+                (when false
+                  [:button.mlb-reset.signup-with-slack
+                    {:on-touch-start identity
+                     :on-click #(do
+                                 (.preventDefault %)
+                                 (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                       {:auth-source "slack"})]
+                                   (user-actions/maybe-save-login-redirect)
+                                   (user-actions/login-with-slack auth-link
+                                                                  (when ua/mobile-app?
+                                                                    {:redirect-origin deep-link-origin}))))}
+                    [:div.slack-icon
+                      {:aria-label "slack"}]
+                    [:div.slack-text "Slack"]])
                 [:button.mlb-reset.signup-with-google
                   {:on-touch-start identity
                    :on-click #(do
@@ -107,65 +114,69 @@
                  [:div.google-icon
                   {:aria-label "google"}]
                  [:div.google-text "Google"]]]
-              [:div.or-login
-                [:div.or-login-copy "Or, login with email"]]
-              ;; Email fields
-              [:div.group
-                ;; Error messages
-                (when-not (nil? login-with-email-error)
-                  (cond
-                    (= login-with-email-error :verify-email)
-                    [:span.small-caps.green
-                      "Hey buddy, go verify your email, again, eh?"]
-                    (= login-with-email-error 401)
-                    [:span.small-caps.red
-                      "The email or password you entered is incorrect."
-                      [:br]
-                      "Please try again, or "
-                      [:a.underline.red
-                        {:on-click #(user-actions/show-login :password-reset)}
-                        "reset your password"]
-                      "."]
-                    :else
-                    [:span.small-caps.red
-                      "System troubles logging in."
-                      [:br]
-                      "Please try again, then "
-                      [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
-                      "."]))
-                [:form.sign-in-form
-                  [:div.fields-container.group
-                    [:div.field-label
-                      "Work email"]
-                    [:input.field-content.email
-                      {:type "email"
-                       :name "email"
-                       :class utils/hide-class
-                       :value @(::email s)
-                       :on-change #(reset! (::email s) (.. % -target -value))}]
-                    [:div.field-label
-                      "Password"]
-                    [:input.field-content.password
-                      {:type "password"
-                       :name "password"
-                       :class utils/hide-class
-                       :value @(::pswd s)
-                       :on-change #(reset! (::pswd s) (.. % -target -value))}]
-                    [:div.forgot-password
-                      [:a
-                        {:on-click #(user-actions/show-login :password-reset)}
-                        "Forgot password?"]]]
-                  [:button.mlb-reset.continue-btn
-                    {:aria-label "Login"
-                     :disabled (not login-enabled)
-                     :on-click login-action}
-                    "Log in"]]]]]]
+              (when false
+                [:div.or-login
+                  [:div.or-login-copy "Or, login with email"]]
+                ;; Email fields
+                [:div.group
+                  ;; Error messages
+                  (when-not (nil? login-with-email-error)
+                    (cond
+                      (= login-with-email-error :verify-email)
+                      [:span.small-caps.green
+                        "Hey buddy, go verify your email, again, eh?"]
+                      (= login-with-email-error 401)
+                      [:span.small-caps.red
+                        "The email or password you entered is incorrect."
+                        [:br]
+                        "Please try again, or "
+                        [:a.underline.red
+                          {:on-click #(user-actions/show-login :password-reset)}
+                          "reset your password"]
+                        "."]
+                      :else
+                      [:span.small-caps.red
+                        "System troubles logging in."
+                        [:br]
+                        "Please try again, then "
+                        [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
+                        "."]))
+                  [:form.sign-in-form
+                    [:div.fields-container.group
+                      [:div.field-label
+                        "Work email"]
+                      [:input.field-content.email
+                        {:type "email"
+                        :name "email"
+                        :class utils/hide-class
+                        :value @(::email s)
+                        :on-change #(reset! (::email s) (.. % -target -value))}]
+                      [:div.field-label
+                        "Password"]
+                      [:input.field-content.password
+                        {:type "password"
+                        :name "password"
+                        :class utils/hide-class
+                        :value @(::pswd s)
+                        :on-change #(reset! (::pswd s) (.. % -target -value))}]
+                      [:div.forgot-password
+                        [:a
+                          {:on-click #(user-actions/show-login :password-reset)}
+                          "Forgot password?"]]]
+                    [:button.mlb-reset.continue-btn
+                      {:aria-label "Login"
+                      :disabled (not login-enabled)
+                      :on-click login-action}
+                      "Log in"]]])]]]
           [:div.footer-link
-            "Don't have an account yet?"
+            "Trouble getting in?"
             [:div.footer-link-inner
               [:a
                 {:href oc-urls/sign-up
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :title "mike@upguard.com"
                  :on-click (fn [e]
                              (utils/event-stop e)
                              (router/nav! oc-urls/sign-up))}
-                "Sign up here"]]]])))
+                "Contact us"]]]])))
