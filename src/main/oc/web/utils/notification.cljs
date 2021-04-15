@@ -14,25 +14,30 @@
         author (:author notification)
         first-name (or (:first-name author) (first (clj-str/split (:name author) #"\s")))
         entry-publisher (:entry-publisher notification)
-        user-id (:user-id notification)]
+        user-id (:user-id notification)
+        ;; And the recipient of the notification is different than the
+        ;; author fo the post it means we are just following this post
+        ;; because we commented too
+        author? (= (:user-id entry-publisher) user-id)
+        comment? (seq (:interaction-id notification))]
     (cond
-      ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
+      ;; Current user was mentioned in a comment
+      (and mention?
+           comment?)
+      (str first-name " mentioned you in a comment")
+      ;; Current user was mentioned in a post
       mention?
-      (str first-name " mentioned you")
+      (str first-name " mentioned you in a post")
       ;; Team related notification: premium changes or add existing user to team
       team?
       (:content notification)
       ;; A comment was added to a post the current is involved in
-      (and ;; if is a commnet
-       (:interaction-id notification)
-           ;; And the recipient of the notification is different than the
-           ;; author fo the post it means we are just following this post
-           ;; because we commented too
-       (not= (:user-id entry-publisher) user-id))
-      (str first-name " replied to a thread")
-      ;; A comment was added to a post the current user published
-      (:interaction-id notification)
+      (and comment?
+           author?)
       (str first-name " commented on your post")
+      ;; A comment was added to a post the current user published
+      comment?
+      (str first-name " replied to a thread")
       :else
       nil)))
 
