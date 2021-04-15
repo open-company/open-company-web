@@ -196,4 +196,5 @@
                     :share-container-id dom-element-id
                     :hide-bookmark? true
                     :hide-share? true
-                    :external-follow true}))]))
+                    :external-follow true
+                    :custom-classes "left-gradient"}))]))

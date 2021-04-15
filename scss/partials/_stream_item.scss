@@ -228,7 +228,7 @@ div.stream-item {
       flex-wrap: nowrap;
       justify-content: flex-start;
       align-items: center;
-      max-width: calc(100% - 108px);
+      width: 100%;
 
       &.has-inbox {
         max-width: calc(100% - 138px);
@@ -328,8 +328,9 @@ div.stream-item {
 
     div.more-menu {
       height: 32px;
-      flex: 0 0 auto;
-      margin-left: auto;
+      position: absolute;
+      top: -4px;
+      right: 0;
 
       @include big_web() {
         display: none;
