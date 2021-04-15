@@ -441,12 +441,13 @@
                                                                         (not (:labels-floating-view cmail-state))
                                                                         (not (dom-utils/event-container-matches e
                                                                               (str ".modal-wrapper, "
-                                                                                  ".nux-tooltip-container, "
-                                                                                  ".label-modal-view, "
-                                                                                  ".cmail-outer.fullscreen, "
-                                                                                  ".cmail-outer.distraction-free, "
-                                                                                  ".labels-picker, "
-                                                                                  ".oc-labels-modal-wrapper"))))
+                                                                                   ".nux-tooltip-container, "
+                                                                                   ".label-modal-view, "
+                                                                                   ".cmail-outer.fullscreen, "
+                                                                                   ".cmail-outer.distraction-free, "
+                                                                                   ".labels-picker, "
+                                                                                   ".oc-labels-modal-wrapper"
+                                                                                   ".emoji-autocomplete-menu"))))
                                                                 (close-cmail s e)))))
                   {:will-mount (fn [s]
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
