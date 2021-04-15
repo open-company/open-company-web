@@ -448,8 +448,9 @@
                                                            (when (and (not (responsive/is-mobile-size?))
                                                                       (:fullscreen @(drv/get-ref s :cmail-state))
                                                                       (not (:distraction-free? @(drv/get-ref s :cmail-state)))
-                                                                      (not (dom-utils/event-cotainer-has-class e "modal-wrapper"))
-                                                                      (not (dom-utils/event-cotainer-has-class e "nux-tooltip-container")))
+                                                                      (not (dom-utils/event-container-has-class e "modal-wrapper"))
+                                                                      (not (dom-utils/event-container-has-class e "nux-tooltip-container"))
+                                                                      (not (dom-utils/event-container-has-class e "emoji-autocomplete-menu")))
                                                              (close-cmail s e))))
                    {:will-mount (fn [s]
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))

@@ -105,7 +105,7 @@
         (recur (oget element "parentElement")))
       false)))
 
-(defn event-cotainer-has-class [e class-name]
+(defn event-container-has-class [e class-name]
   (when e
     (loop [element (oget e "target")]
       (if element
