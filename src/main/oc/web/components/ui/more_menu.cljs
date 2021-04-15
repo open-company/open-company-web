@@ -117,7 +117,7 @@
   [s {:keys [entity-data current-user-data
              hide-share? external-share showing-share share-prefix
              editable-boards
-             will-open will-close tooltip-position force-show-menu mobile-tray-menu custom-class
+             will-open will-close tooltip-position force-show-menu mobile-tray-menu custom-classes
              show-edit? edit-cb
              show-delete? delete-cb
              show-move?
@@ -205,7 +205,18 @@
                                      (or add-bookmark-link
                                          remove-bookmark-link))
                                 show-internal-labels?
-                                pins?)]
+                                pins?)
+        main-classes* (utils/class-set {:menu-expanded showing-menu?
+                                        :has-more-menu-bt should-show-more-bt
+                                        :mobile-tray-menu mobile-tray-menu
+                                        :android-browser (and ua/android?
+                                                              (not ua/mobile-app?))
+                                        :ios-browser (and ua/ios?
+                                                          (not ua/mobile-app?))
+                                        :showing-share showing-share
+                                        :move-activity @(::move-activity s)
+                                        :foc-labels-picker show-labels-picker})
+        main-classes (str main-classes* " " custom-classes)]
     (when (or edit-link
               share-link
               delete-link
@@ -220,17 +231,7 @@
               can-edit-labels?
               show-labels-picker)
       [:div.more-menu
-        {:class (utils/class-set {:menu-expanded showing-menu?
-                                  :has-more-menu-bt should-show-more-bt
-                                  :mobile-tray-menu mobile-tray-menu
-                                  :android-browser (and ua/android?
-                                                        (not ua/mobile-app?))
-                                  :ios-browser (and ua/ios?
-                                                    (not ua/mobile-app?))
-                                  :showing-share showing-share
-                                  :move-activity @(::move-activity s)
-                                  :foc-labels-picker show-labels-picker
-                                  custom-class (seq custom-class)})
+        {:class main-classes
          :ref "more-menu"
          :on-click (when mobile-tray-menu
                      #(when (and showing-menu?

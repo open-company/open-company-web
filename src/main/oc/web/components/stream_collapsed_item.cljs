@@ -192,4 +192,4 @@
                     :hide-share? true
                     :hide-labels? true
                     :external-follow true
-                    :custom-class "foc-collapsed-click-stop"}))]))
+                    :custom-classes "foc-collapsed-click-stop left-gradient"}))]))

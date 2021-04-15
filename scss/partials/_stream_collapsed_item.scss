@@ -44,7 +44,7 @@ div.virtualized-list-row.collapsed-item {
           }
         }
 
-        div.more-menu {
+        div.more-menu.left-gradient {
           background-color: var(--foc-hover-color);
 
           &:before {
@@ -385,17 +385,6 @@ div.stream-collapsed-item {
 
     @include big_web() {
       min-width: 80px;
-    }
-    
-
-    &:before {
-      width: 24px;
-      height: 32px;
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -24px;
-      background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
     }
 
     ul.more-menu-list {
