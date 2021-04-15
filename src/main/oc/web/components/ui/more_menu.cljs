@@ -109,7 +109,7 @@
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
              mark-unread-cb current-user-data hide-bookmark? hide-share?
-             show-home-pin show-board-pin ]}]
+             show-home-pin show-board-pin custom-classes]}]
   (let [{current-org-slug :org
          current-board-slug :board
          current-contributions-id :contributions
@@ -165,7 +165,15 @@
                                      share-link)
                                 (and inbox-unread-link
                                      show-unread)
-                                pins?)]
+                                pins?)
+        main-classes* (utils/class-set {:menu-expanded showing-menu?
+                                        :has-more-menu-bt should-show-more-bt
+                                        :mobile-tray-menu mobile-tray-menu
+                                        :android-browser (and ua/android?
+                                                              (not ua/mobile-app?))
+                                        :ios-browser (and ua/ios?
+                                                          (not ua/mobile-app?))})
+        main-classes (str main-classes* " " custom-classes)]
     (when (or edit-link
               share-link
               inbox-unread-link
@@ -180,13 +188,7 @@
               pins?)
       [:div.more-menu
         {:ref "more-menu"
-         :class (utils/class-set {:menu-expanded showing-menu?
-                                  :has-more-menu-bt should-show-more-bt
-                                  :mobile-tray-menu mobile-tray-menu
-                                  :android-browser (and ua/android?
-                                                        (not ua/mobile-app?))
-                                  :ios-browser (and ua/ios?
-                                                    (not ua/mobile-app?))})
+         :class main-classes
          :on-click (when mobile-tray-menu
                      #(when (and showing-menu?
                                  @(::can-unmount s))
