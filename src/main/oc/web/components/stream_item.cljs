@@ -224,7 +224,7 @@
                                    :mobile-tray-menu mobile-more-menu?
                                    :current-user-data current-user-data
                                    :external-labels true
-                                   :custom-classes "foc-click-stop foc-collapsed-click-stop"}) ;)
+                                   :custom-classes "foc-click-stop foc-collapsed-click-stop left-gradient"}) ;)
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
