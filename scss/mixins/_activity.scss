@@ -90,7 +90,7 @@ $header_top_margin: 24;
 
 @mixin bookmark-tag() {
   div.bookmark-tag {
-    background-color: var(--opac-background-color-08);
+    background-color: var(--very-light-color);
     height: 18px;
     width: auto;
     margin-right: 8px;
@@ -106,13 +106,13 @@ $header_top_margin: 24;
       content: "";
       width: 6px;
       height: 8px;
-      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 6px 8px, var(--opac-background-color-72));
+      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 6px 8px, var(--bright-color));
     }
 
     &:after {
       content: "BOOKMARKED";
       @include OC_Body_Bold();
-      color: var(--opac-background-color-72);
+      color: var(--bright-color);
       font-size: 11px;
       line-height: 12px;
       margin-left: 6px;
@@ -131,10 +131,11 @@ $header_top_margin: 24;
     vertical-align: top;
     border-radius: 4px;
     background-color: rgba($sea_blue, 0.2);
+    background-color: var(--very-light-color);
     flex-flow: row nowrap;
+    align-content: center;
     align-items: center;
     justify-content: center;
-    // display: flex;
 
     @include mobile() {
       background-color: transparent;
@@ -148,7 +149,7 @@ $header_top_margin: 24;
       height: 12px;
       display: block;
 
-      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 10px 12px, $sea_blue);
+      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 10px 12px, var(--bright-color));
 
       @include mobile() {
         @include svgBgColor("/img/ML/bookmark_icon.svg", center, 10px 12px, var(--bright-color));
