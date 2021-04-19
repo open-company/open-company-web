@@ -83,7 +83,7 @@
 
 (defn- labels-tooltip [_db]
   {:title "🆕 Tag your posts with labels"
-   :description "Need to group similar posts in a topic, or across topics?\nUse Carrot's new labels to group posts and navigate to all of them with a single click."
+   :description "Carrot’s new labels let you group similar posts within a topic, or across topics. Click on a label to see all posts with that same label."
    :back-title nil
    :scroll :top
    :lock-scroll true
