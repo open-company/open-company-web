@@ -36,7 +36,15 @@
 
 (rum/defc user-info-view < rum/static
   [{:keys [user-data user-id my-profile? hide-buttons otf above? inline? following followers-count hide-last-name? short-name?]}]
-  (let [timezone-location-string (user-utils/timezone-location-string user-data)]
+  (let [timezone-location-string (user-utils/timezone-location-string user-data)
+        user-name-label (cond (and hide-last-name?
+                                   (seq (:first-name user-data)))
+                              (:first-name user-data)
+                              (and short-name?
+                                   (seq (:pointed-name user-data)))
+                              (:pointed-name user-data)
+                              :else
+                              (:name user-data))]
     [:div.user-info-view
       {:class (utils/class-set {:otf otf
                                 :inline inline?
@@ -44,15 +52,9 @@
       [:div.user-info-header
         (user-avatar-image user-data {:preferred-avatar-size 96})
         [:div.user-info-right
-          [:div.user-info-name
-            (cond (and hide-last-name?
-                       (seq (:first-name user-data)))
-                  (:first-name user-data)
-                  (and short-name?
-                       (seq (:pointed-name user-data)))
-                  (:pointed-name user-data)
-                  :else
-                  (:name user-data))]
+          (when (seq user-name-label)
+            [:div.user-info-name
+             user-name-label])
           (when (seq (:title user-data))
             [:div.user-info-line
               (:title user-data)])
