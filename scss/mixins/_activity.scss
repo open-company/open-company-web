@@ -1298,14 +1298,13 @@ $header_top_margin: 24;
   }
 }
 
-@mixin foc-text-reset($font_size: 16, $line_height: $bottom_margin, $color: var(--color)){
+@mixin foc-text-reset($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $display: block){
   margin-top: 0!important;
   margin-bottom: 0!important;
   padding-top: 0!important;
   padding-bottom: 0!important;
   padding-left: 0!important;
   padding-right: 0!important;
-  display: block!important;
   @include OC_Body_Book();
   line-height: #{$line_height}px;
   color: $color;
@@ -1316,6 +1315,11 @@ $header_top_margin: 24;
   border-radius: 0!important;
   white-space: break-spaces!important;
   overflow-wrap: break-word!important;
+  &:not(:empty) {
+    display: $display!important;
+  }
+
+  @content
 }
 
 @mixin activity-body-foc($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
@@ -1342,26 +1346,16 @@ $header_top_margin: 24;
 
   max-height: #{$line_height * $preview_lines}px;
 
-  & > p, & > ul, & > blockquote, & > pre, & > div, & > h1, & > h2 {
-    &:not(:empty) {
-      @include foc-text-reset($font-size, $line-height, $color);
-      display: block!important;
-    }
+  & > p, & > ul, & > blockquote, & > pre, & > div, & > h1, & > h2, & > p ul, & > p h1, & > p h2 {
+    @include foc-text-reset($font-size, $line-height, $color);
   }
 
-  & > p code, & > p mark, & > p ul, & > p h1, & > p h2 {
-    &:not(:empty) {
-      @include foc-text-reset($font-size, $line-height, $color);
-    }
-  }
-
-  h1, h2, mark, mark.highlight {
-    @include foc-text-reset();
-  }
-
-  b, strong, &.editing b, &.editing strong {
-    @include OC_Body_Book();
-    font-weight: normal;
+  b, & > p b, &.editing b,
+  code, & > p code, &.editing code,
+  mark, & > p mark, &.editing mark,
+  mark.highlight, & > p mark.highlight, &.editing mark.highlight,
+  strong, & > p strong, &.editing strong {
+    @include foc-text-reset($font-size, $line-height, $color, inline-block);
   }
 
   .carrot-no-preview {
