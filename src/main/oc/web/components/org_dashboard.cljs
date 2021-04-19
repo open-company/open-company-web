@@ -17,7 +17,6 @@
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
-            [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -70,7 +69,6 @@
         {:keys [show-alert-modal?
                 activity-share-container
                 collapsed-cmail?
-                user-info-data
                 show-premium-picker?
                 payments-ui-upgraded-banner
                 ui-tooltip
@@ -79,8 +77,7 @@
                 show-search?
                 show-expanded-post?
                 show-wrt-view?
-                show-push-notification-permissions-modal?
-                show-user-info?]} (drv/react s :org-dashboard-data)
+                show-push-notification-permissions-modal?]} (drv/react s :org-dashboard-data)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         nux (drv/react s :nux)
         is-mobile? (responsive/is-mobile-size?)
@@ -165,9 +162,9 @@
           ;; UI Theme settings panel
           (= current-panel :theme)
           (theme-settings-modal theme-data)
-          ;; User info modal
-          show-user-info?
-          (user-info-modal {:user-data user-info-data :org-data org-data})
+          ;; Follow user picker
+          ;; show-follow-picker
+          ;; (follow-picker)
           ;; Mobile fullscreen search
           mobile-search?
           (search-box))

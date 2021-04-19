@@ -297,14 +297,7 @@
                                            wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                  (dis/activity-data-get org-slug wrt-uuid base))))]
-   :user-info-data        [[:active-users :panel-stack]
-                           (fn [active-users panel-stack]
-                             (when (and panel-stack
-                                        (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
-                               (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
-                                           user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
-                                          (get active-users user-id))))]
-   :app-loading?          [[:loading :board-slug :contributions-id :entry-board-slug :org-data :active-users]
+    :app-loading?          [[:loading :board-slug :contributions-id :entry-board-slug :org-data :active-users]
                            (fn [loading board-slug contributions-id entry-board-slug org-data active-users]
                              (boolean
                               (or loading ;; force loading screen
@@ -381,11 +374,6 @@
                               (boolean
                                (and current-panel
                                     (s/starts-with? (name current-panel) "wrt-"))))]
-   :show-user-info?        [[:current-panel]
-                            (fn [current-panel]
-                              (boolean
-                               (and current-panel
-                                    (s/starts-with? (name current-panel) "user-info-"))))]
    :show-push-notification-permissions-modal?
    [[:jwt :user-responded-to-push-permission?]
     (fn [jwt-data user-responded-to-push-permission?]
@@ -406,19 +394,18 @@
    :show-alert-modal?      [[:alert-modal] (fn [alert-modal] (boolean alert-modal))]
    :ui-tooltip             [[:base] (fn [base] (:ui-tooltip base))]
    :org-dashboard-data     [[:show-alert-modal? :show-section-add-cb :activity-share-container :show-activity-share?
-                             :collapsed-cmail? :user-info-data :search-active :show-premium-picker? :payments-ui-upgraded-banner
-                             :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post? :show-user-info?
+                             :collapsed-cmail? :search-active :show-premium-picker? :payments-ui-upgraded-banner
+                             :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post?
                              :show-push-notification-permissions-modal?]
                             (fn [show-alert-modal? show-section-add-cb activity-share-container show-activity-share?
-                                 collapsed-cmail? user-info-data search-active show-premium-picker? payments-ui-upgraded-banner
-                                 ui-tooltip initial-section-editing show-wrt-view? show-expanded-post? show-user-info?
+                                 collapsed-cmail? search-active show-premium-picker? payments-ui-upgraded-banner
+                                 ui-tooltip initial-section-editing show-wrt-view? show-expanded-post?
                                  show-push-notification-permissions-modal?]
                               {:show-activity-share? show-activity-share?
                                :show-alert-modal? show-alert-modal?
                                :show-section-add-cb show-section-add-cb
                                :activity-share-container activity-share-container
                                :collapsed-cmail? collapsed-cmail?
-                               :user-info-data user-info-data
                                :show-search? search-active
                                :show-premium-picker? show-premium-picker?
                                :payments-ui-upgraded-banner payments-ui-upgraded-banner
@@ -426,7 +413,6 @@
                                :initial-section-editing initial-section-editing
                                :show-wrt-view? show-wrt-view?
                                :show-expanded-post? show-expanded-post?
-                               :show-user-info? show-user-info?
                                :show-push-notification-permissions-modal? show-push-notification-permissions-modal?})]
    :initial-section-editing [[:base] (fn [base] (:initial-section-editing base))]
    :payments-ui-upgraded-banner [[:base] (fn [base] (get base dis/payments-ui-upgraded-banner-key))]
