@@ -35,7 +35,7 @@
       :data-container "body"
       :data-original-title (if (and lock-add?
                                     (not selected?))
-                             "Max labels limit reached, remove another label before adding one."
+                             "Up to 3 labels are allowed per post"
                              "")
       :on-click click-cb}
      (carrot-checkbox {:selected selected?})
