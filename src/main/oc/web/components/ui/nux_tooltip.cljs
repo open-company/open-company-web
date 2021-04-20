@@ -109,7 +109,7 @@
                  (check-data state)
                  state)}
   [state
-   {user-type                               :user-type
+   {nux-type                                :nux-type
     dismiss-cb                              :dismiss-cb
     next-cb                                 :next-cb
     prev-cb                                 :prev-cb
@@ -178,11 +178,11 @@
   rum/reactive
   (drv/drv :nux)
   [s]
-  (let [{key :key user-type :user-type} (drv/react s :nux)]
+  (let [{key :key nux-type :nux-type} (drv/react s :nux)]
     (when key
       (nux-tooltip {:key key
-                    :user-type user-type
-                    :data (nux-actions/get-tooltip-data key user-type)
-                    :dismiss-cb #(nux-actions/dismiss-nux)
+                    :nux-type nux-type
+                    :data (nux-actions/get-tooltip-data key nux-type)
+                    :dismiss-cb #(nux-actions/dismiss-nux %)
                     :next-cb #(nux-actions/next-step)
                     :prev-cb #(nux-actions/prev-step)}))))
