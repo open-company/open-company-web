@@ -70,17 +70,30 @@
       (reset! (::last-key state) key)
       (reset! (::last-sel state) (:sel data)))))
 
-(defn- check-data [state]
-  (let [data (-> state :rum/args first :data)
-        el (dommy/sel1 (:sel data))]
-    (if el
-      (next-tooltip state el data)
-      (do
-        (when @(::pos state)
-          (reset! (::pos state) nil))
-        (when (fn? (:show-el-cb data))
-          ((:show-el-cb data))
-          (utils/after 1500 #(reset! (::rand state) (rand 10000))))))))
+(defn- init-tooltip [state data]
+  (when @(::pos state)
+    (reset! (::pos state) nil))
+  (when (fn? (:show-el-cb data))
+    ((:show-el-cb data))
+    (utils/after 1500 #(reset! (::rand state) (rand 10000)))))
+
+(defn- check-data
+  ([state] (check-data state false))
+  ([state init?]
+   (let [args (-> state :rum/args first)
+         data (:data args)
+         el (dommy/sel1 (:sel data))
+         el-rect (when el (dom-utils/bounding-rect el))
+         empty-rect? (and (map? el-rect)
+                          (zero? (:width el-rect))
+                          (zero? (:height el-rect)))]
+     (cond init?
+           (init-tooltip state data)
+           (or (not el) empty-rect?)
+           (when (fn? (:dismiss-cb args))
+             ((:dismiss-cb args) false))
+           :else
+           (next-tooltip state el data)))))
 
 (rum/defcs nux-tooltip < rum/static
   (rum/local nil ::pos)
@@ -90,7 +103,7 @@
   (rum/local false ::scroll-locked?)
   ui-mixins/no-scroll-mixin
   {:will-mount (fn [state]
-                 (check-data state)
+                 (check-data state true)
                  state)
    :did-update (fn [state]
                  (check-data state)
@@ -143,7 +156,7 @@
                               (utils/event-stop e)
                               (when-let [el (dommy/sel1 sel)]
                                 (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
-                              (prev-cb e)
+                              (prev-cb)
                               (when (fn? post-prev-cb)
                                 (post-prev-cb)))}
                   back-title])]
@@ -156,9 +169,9 @@
                              (utils/event-stop e)
                              (when-let [el (dommy/sel1 sel)]
                                (utils/after 100 #(dommy/remove-class! el :nux-tooltip-handle)))
-                             (next-cb e)
+                             (next-cb true)
                              (when (fn? post-next-cb)
-                               (post-next-cb)))}
+                               (post-next-cb true)))}
                  next-title])]]]]])))
 
 (rum/defcs nux-tooltips-manager <
