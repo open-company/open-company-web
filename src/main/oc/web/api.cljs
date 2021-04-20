@@ -609,6 +609,7 @@
                        :org-name (:name org-data)
                        :org-uuid (:uuid org-data)
                        :org-slug (:slug org-data)
+                       :user-type user-type
                        :org-logo-url (:logo-url org-data)}
           with-invited-user (if (= invite-from "slack")
                               (merge

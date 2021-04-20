@@ -620,17 +620,17 @@
      (-> user-data
          :tags))))
 
-(defn ^:export user-tagged?
+(defun ^:export user-tagged?
   ([tag] (user-tagged? @app-state tag))
   ([data tag]
    (when tag
      (let [tag-kw (if-not (keyword? tag)
                     (keyword tag)
                     tag)]
-       (-> data
-           current-user-tags
-           set
-           tag-kw)))))
+       (some-> data
+               current-user-tags
+               set
+               tag-kw)))))
 
 (defn ^:export orgs-data
   ([] (orgs-data @app-state))

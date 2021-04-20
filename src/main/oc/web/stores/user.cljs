@@ -71,11 +71,12 @@
        (some #(when (and (= (:resource-type %) :entry) (:uuid %)) %))
        :uuid))
 
-(defn- dismiss-labels-tooltip []
+(defn- dismiss-labels-tooltip [completed?]
   (dispatcher/dispatch! [:input [:ui-tooltip] nil])
   (dispatcher/dispatch! [:input [:foc-show-menu] nil])
-  (user-actions/untag! :labels-tooltip)
-  (user-actions/tag! :labels-tooltip-done))
+  (when completed?
+    (user-actions/untag! :labels-tooltip)
+    (user-actions/tag! :labels-tooltip-done)))
 
 (defn- show-labels-tooltip []
   (when-let [menu-uuid (feed-first-uuid)]
@@ -95,11 +96,12 @@
    :next-cb dismiss-labels-tooltip
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
 
-(defn- dismiss-pin-tooltip []
+(defn- dismiss-pin-tooltip [completed?]
   (dispatcher/dispatch! [:input [:ui-tooltip] nil])
   (dispatcher/dispatch! [:input [:foc-menu-open] nil])
-  (user-actions/untag! :pin-tooltip)
-  (user-actions/tag! :pin-tooltip-done))
+  (when completed?
+    (user-actions/untag! :pin-tooltip)
+    (user-actions/tag! :pin-tooltip-done)))
 
 (defn- show-pin-tooltip []
   (when-let [menu-uuid (feed-first-uuid)]
