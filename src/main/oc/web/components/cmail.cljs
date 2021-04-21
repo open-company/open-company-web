@@ -15,6 +15,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
@@ -31,7 +32,6 @@
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [oc.web.components.ui.labels :refer (cmail-labels-list labels-picker)]
             [goog.object :as gobj]
-            [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
 
@@ -67,9 +67,6 @@
             mimetype (gobj/get res "mimetype")
             filename (gobj/get res "filename")
             createdat (utils/js-date)
-            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-            icon (au/icon-for-mimetype mimetype)
             attachment-data {:file-name filename
                              :file-type mimetype
                              :file-size size
@@ -335,10 +332,7 @@
         initial-body (if (seq (:body cmail-data))
                        (:body cmail-data)
                        au/empty-body-html)
-        initial-headline (utils/emojify
-                           (if (seq (:headline cmail-data))
-                             (:headline cmail-data)
-                             ""))
+        initial-headline (utils/emojify (ui-utils/prepare-for-plaintext-content-editable (:headline cmail-data)))
         scroll-lock? (or (responsive/is-mobile-size?)
                          (:fullscreen cmail-state))]
     (reset! (::last-body s) initial-body)
@@ -664,7 +658,7 @@
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline.emojiable
                 {:class utils/hide-class
-                 :content-editable true
+                 :content-editable (ui-utils/content-editable-value)
                  :key (str "cmail-headline-" (:key cmail-state))
                  :placeholder au/headline-placeholder
                  :ref "headline"
