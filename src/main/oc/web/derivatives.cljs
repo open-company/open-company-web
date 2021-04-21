@@ -430,18 +430,18 @@
    :show-alert-modal?      [[:alert-modal] (fn [alert-modal] (boolean alert-modal))]
    :ui-tooltip             [[:base] (fn [base] (:ui-tooltip base))]
    :org-dashboard-data     [[:show-alert-modal? :show-section-add-cb :activity-share-container :show-activity-share?
-                             :collapsed-cmail? :search-active :show-premium-picker? :payments-ui-upgraded-banner
+                             :expanded-cmail? :search-active :show-premium-picker? :payments-ui-upgraded-banner
                              :ui-tooltip :initial-section-editing :show-wrt-view? :show-expanded-post?
                              :show-push-notification-permissions-modal? :show-labels-manager? :show-label-editor?]
                             (fn [show-alert-modal? show-section-add-cb activity-share-container show-activity-share?
-                                 collapsed-cmail? search-active show-premium-picker? payments-ui-upgraded-banner
+                                 expanded-cmail? search-active show-premium-picker? payments-ui-upgraded-banner
                                  ui-tooltip initial-section-editing show-wrt-view? show-expanded-post?
                                  show-push-notification-permissions-modal? show-labels-manager? show-label-editor?]
                               {:show-activity-share? show-activity-share?
                                :show-alert-modal? show-alert-modal?
                                :show-section-add-cb show-section-add-cb
                                :activity-share-container activity-share-container
-                               :collapsed-cmail? collapsed-cmail?
+                               :expanded-cmail? expanded-cmail?
                                :show-search? search-active
                                :show-premium-picker? show-premium-picker?
                                :payments-ui-upgraded-banner payments-ui-upgraded-banner
@@ -455,7 +455,8 @@
    :initial-section-editing [[:base] (fn [base] (:initial-section-editing base))]
    :payments-ui-upgraded-banner [[:base] (fn [base] (get base dis/payments-ui-upgraded-banner-key))]
    :show-activity-share?  [[:activity-share] (fn [activity-share] (boolean activity-share))]
-   :collapsed-cmail?      [[:cmail-state] (fn [cmail-state] (:collapsed cmail-state))]
+   :expanded-cmail?       [[:cmail-state] (fn [cmail-state] (and (map? cmail-state)
+                                                                 (not (:collapsed cmail-state))))]
    :show-premium-picker?  [[:base] (fn [base] (:show-premium-picker? base))]
    :show-section-add-cb   [[:base] (fn [base] (:show-section-add-cb base))]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]

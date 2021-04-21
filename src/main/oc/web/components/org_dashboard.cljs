@@ -70,7 +70,7 @@
         current-panel (drv/react s :current-panel)
         org-data (drv/react s :org-data)
         {:keys [show-alert-modal?
-                collapsed-cmail?
+                expanded-cmail?
                 show-premium-picker?
                 payments-ui-upgraded-banner
                 ui-tooltip
@@ -93,7 +93,7 @@
         show-section-editor? (= current-panel :section-edit)
         show-section-add? (= current-panel :section-add)
         show-menu? (= current-panel :menu)
-        show-mobile-cmail? (and (not collapsed-cmail?)
+        show-mobile-cmail? (and expanded-cmail?
                                 is-mobile?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        show-push-notification-permissions-modal?)
