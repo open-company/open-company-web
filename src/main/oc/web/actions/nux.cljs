@@ -222,5 +222,7 @@
   (when (fn? cb)
     (utils/after 100 cb)))
 
-(defn ^:export restart-nux [& [key]]
-  (utils/after 280 #(check-nux true)))
+(defn ^:export restart-nux [nux-type]
+  (user-tags/tag! (if nux-type (keyword nux-type) :nux-admin))
+  (user-tags/untag! :nux-done)
+  (utils/after 850 #(check-nux true)))
