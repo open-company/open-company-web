@@ -375,7 +375,7 @@
                               (and (not org-not-found?)
                                    org-data
                                    label-slug
-                                   (map? label-data))))]
+                                   (not (map? label-data)))))]
    :entry-not-found?      [[:org-not-found? :board-not-found? :activity-data :entry-board-slug :active-users]
                            (fn [org-not-found? board-not-found? current-activity-data current-entry-board-slug active-users]
                              (boolean
