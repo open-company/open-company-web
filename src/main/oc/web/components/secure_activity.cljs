@@ -104,8 +104,8 @@
           [:div.activity-content
             (when (:headline activity-data)
               [:div.activity-title
-                {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
-                 :class utils/hide-class}])
+                {:class utils/hide-class}
+                (:headline activity-data)])
             [:div.activity-content-author
               (user-avatar-image (:publisher activity-data))
               [:div.name

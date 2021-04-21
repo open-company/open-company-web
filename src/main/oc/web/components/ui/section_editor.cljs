@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -548,7 +549,7 @@
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-personal-note.oc-input
               {:class utils/hide-class
-               :content-editable true
+               :content-editable (ui-utils/content-editable-value)
                :placeholder "Add a personal note to your invitation..."
                :ref "personal-note"
                :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "personal-note") %)

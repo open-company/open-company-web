@@ -18,7 +18,6 @@
 
   [s data]
   (let [result (:_source data)
-        title (utils/emojify (:headline result))
         author (first (:author-name result))
         activity-url (oc-urls/entry (:board-slug result) (:uuid result))]
     [:div.search-result
@@ -29,7 +28,7 @@
       (user-avatar-image {:user-id (first (:author-id result))
                           :name author
                           :avatar-url (first (:author-url result))})
-      [:div.title {:dangerouslySetInnerHTML title}]
+      [:div.title (:headline result)]
       [:div.time-since
        (let [t (or (:published-at result) (:created-at result))]
          [:time
