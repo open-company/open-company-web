@@ -14,6 +14,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
@@ -29,7 +30,6 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [goog.object :as gobj]
-            [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
 
@@ -65,9 +65,6 @@
             mimetype (gobj/get res "mimetype")
             filename (gobj/get res "filename")
             createdat (utils/js-date)
-            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-            icon (au/icon-for-mimetype mimetype)
             attachment-data {:file-name filename
                              :file-type mimetype
                              :file-size size
@@ -298,10 +295,6 @@
   (or (oget js/document "documentElement.clientWidth")
       (oget js/window "innerWidth")))
 
-(defn calc-video-height [s]
-  (when (responsive/is-mobile-size?)
-    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
-
 (defn- collapse-if-needed [s & [e]]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         cmail-state @(drv/get-ref s :cmail-state)
@@ -346,10 +339,7 @@
         initial-body (if (seq (:body cmail-data))
                        (:body cmail-data)
                        au/empty-body-html)
-        initial-headline (utils/emojify
-                           (if (seq (:headline cmail-data))
-                             (:headline cmail-data)
-                             ""))
+        initial-headline (utils/emojify (ui-utils/prepare-for-plaintext-content-editable (:headline cmail-data)))
         scroll-lock? (or (responsive/is-mobile-size?)
                          (:fullscreen cmail-state))]
     (reset! (::last-body s) initial-body)
@@ -421,7 +411,6 @@
                    (rum/local false ::publishing)
                    (rum/local false ::disable-post)
                    (rum/local nil ::debounced-autosave)
-                   (rum/local 0 ::mobile-video-height)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
@@ -436,7 +425,6 @@
                    (rum/local nil ::headline-autocomplete)
                    (rum/local false ::needs-post-init)
                    ;; Mixins
-                   (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
                    ;; Go back to collapsed state on desktop if user didn't touch anything
                    (when-not (responsive/is-mobile-size?)
@@ -458,7 +446,6 @@
                     (reset! (::last-fullscreen-state s) (-> s (drv/get-ref :cmail-state) deref :fullscreen))
                     s)
                    :did-mount (fn [s]
-                    (calc-video-height s)
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (post-init-cmail s)
                     (setup-top-padding s)
@@ -541,11 +528,6 @@
                        self-board-name
                        %))
         published? (= (:status cmail-data) "published")
-        video-size (if is-mobile?
-                     {:width (win-width)
-                      :height @(::mobile-video-height s)}
-                     {:width 548
-                      :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         publishable? (is-publishable? cmail-data)
@@ -658,7 +640,7 @@
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline.emojiable
                 {:class utils/hide-class
-                 :content-editable true
+                 :content-editable (ui-utils/content-editable-value)
                  :key (str "cmail-headline-" (:key cmail-state))
                  :placeholder au/headline-placeholder
                  :ref "headline"
