@@ -708,9 +708,7 @@
                               :activity-data cmail-data}))]]
       (when-not (:collapsed cmail-state)
         [:div.cmail-labels
-         (cmail-labels-list {;;  :labels-preview? true
-                             ;;  :add-label-bt true
-                             })])
+         (cmail-labels-list)])
       [:div.cmail-footer
         [:div.post-button-container.group
           (post-to-button {:on-submit #(post-clicked s)
