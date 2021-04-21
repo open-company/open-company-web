@@ -1,8 +1,6 @@
 (ns oc.web.utils.ui
-  (:require [oc.web.lib.utils :as utils]
-            [cuerdas.core :as string]
-            [oc.lib.cljs.useragent :as ua]
-            [oc.web.actions.activity :as activity-actions]))
+  (:require [cuerdas.core :as string]
+            [oc.lib.cljs.useragent :as ua]))
 
 (defn resize-textarea [textarea]
   (when textarea
