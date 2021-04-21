@@ -36,10 +36,6 @@
     (when-not (= @(::comment-height s) cur-height)
       (reset! (::comment-height s) cur-height))))
 
-(defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
-      (.-innerWidth js/window)))
-
 (defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
     (if force?
@@ -57,15 +53,11 @@
   (when @(::mark-as-read? s)
     (activity-actions/mark-read @(::activity-uuid s))))
 
-(def big-web-collapse-min-height 134)
-(def mobile-collapse-min-height 160)
 (def min-body-length-for-truncation 450)
 
 (defn- check-collapse-post [s]
   (when (nil? @(::collapse-post s))
-    (let [is-mobile? (responsive/is-mobile-size?)
-          comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
-          activity-data @(drv/get-ref s :activity-data)
+    (let [activity-data @(drv/get-ref s :activity-data)
           comments-count (-> activity-data :links (utils/link-for "comments") :count)]
       (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
                                        (> (count (:body activity-data)) min-body-length-for-truncation)
