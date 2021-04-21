@@ -63,7 +63,7 @@
 
 ;; (defn- fix-selection [s]
 ;;   (let [el (add-comment-field s)
-;;         sel (js/OCStaticTextareaSaveSelection)]
+;;         sel (dom-utils/textarea-save-selection)] ;; js/OCStaticTextareaSaveSelection
 ;;     (when (and el sel
 ;;                (= (.-anchorTarget sel) el)
 ;;                (.-firstElementChild el)
