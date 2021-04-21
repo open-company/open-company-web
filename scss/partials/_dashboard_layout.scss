@@ -182,6 +182,10 @@ div.dashboard-layout {
         margin: 0;
         float: unset;
         background-color: var(--mobile-background-color);
+
+        & > div.cmail-outer {
+          display: none!important;
+        }
       }
 
       div.user-profile-container {
