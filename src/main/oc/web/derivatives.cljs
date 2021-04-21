@@ -340,7 +340,7 @@
                                       org-data
                                       current-contributions-id
                                       (map? active-users)
-                                      (get active-users (keyword current-contributions-id)))))]
+                                      (not (get active-users (keyword current-contributions-id))))))]
    :entry-not-found?      [[:org-not-found? :board-not-found? :activity-data :entry-board-slug :active-users]
                            (fn [org-not-found? board-not-found? current-activity-data current-entry-board-slug active-users]
                              (boolean
