@@ -14,7 +14,7 @@
                          (drv/drv :board-slug)
                          (drv/drv :foc-layout)
                          {:will-mount (fn [s]
-                           (let [container-slug (dis/current-board-slug)]
+                           (let [container-slug (or (dis/current-board-slug) (dis/current-label-slug) (dis/current-contributions-id) (dis/current-entry-board-slug))]
                              (when-not (= container-slug @last-container-slug)
                                (reset! (::delay s) true)
                                (reset! last-container-slug container-slug)

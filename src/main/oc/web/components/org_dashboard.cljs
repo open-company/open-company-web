@@ -96,47 +96,51 @@
         theme-data (drv/react s :theme)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
-        loading? (or ;; force loading screen
-                  app-loading
+        loading? (or app-loading ;; force loading screen
                      ;; the org data are not loaded yet
-                  (not org-data)
+                     (not org-data)
                      ;; No board nor contributions nor label specified
-                  (and (not current-board-slug)
-                       (not current-contributions-id)
-                       (not current-label-slug)
+                     (and (not current-board-slug)
+                          (not current-contributions-id)
+                          (not current-label-slug)
                        ;; but there are some
-                       (pos? (count (:boards org-data))))
+                          (pos? (count (:boards org-data))))
                      ;; Active users have not been loaded yet:
                      ;; they are blocking since they are used to:
                      ;; - init entries body and comments body for mentions
                      ;; - show user's info on hover and in profile panels
                      ;; - on mobile it's not blocking since cmail is closed
-                  (not (map? active-users)))
+                     (not (map? active-users)))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) current-org-slug)))
-        section-not-found (and (not org-not-found)
+        board-exists? (set (mapcat #(vec [(:slug %) (:uuid %)]) (:boards org-data)))
+        board-not-found (and (not org-not-found)
                                org-data
                                (not current-contributions-id)
                                (not current-label-slug)
                                (not (dis/is-container? current-board-slug))
-                               (not ((set (map :slug (:boards org-data))) current-board-slug)))
+                               current-board-slug
+                               (not (board-exists? current-board-slug)))
         label-not-found (and (not org-not-found)
                              org-data
                              current-label-slug
-                             (map? label-data))
+                             (not (map? label-data)))
         contributions-not-found (and (not org-not-found)
                                      org-data
                                      current-contributions-id
                                      (map? active-users)
-                                     (get active-users (keyword current-contributions-id)))
+                                     (not (get active-users (keyword current-contributions-id))))
+        entry-board-not-found (and (not org-not-found)
+                                   org-data
+                                   current-entry-board-slug
+                                   (not (board-exists? current-entry-board-slug)))
         current-activity-data (when current-activity-id
                                 (get posts-data current-activity-id))
                              ;; org is present
         entry-not-found (and (not org-not-found)
                              ;; Users for mentions has not been loaded
                              (map? active-users)
-                             ;; section is present
-                             (not section-not-found)
+                             (not entry-board-not-found)
                              ;; route is for a single post and it's been loaded
                              current-activity-data
                              ;; post wasn't found
@@ -150,12 +154,14 @@
                              (or force-login-wall
                                  (and current-activity-id
                                       (or org-not-found
-                                          section-not-found
+                                          board-not-found
                                           label-not-found
                                           contributions-not-found
+                                          entry-board-not-found
                                           entry-not-found))))
         show-activity-removed (and jwt-data
-                                   entry-not-found)
+                                   (or entry-board-not-found
+                                       entry-not-found))
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
@@ -179,7 +185,8 @@
         ;; show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
                             search-active)
-        should-show-expanded-post? (and (not entry-not-found)
+        should-show-expanded-post? (and (not entry-board-not-found)
+                                        (not entry-not-found)
                                         (map? current-activity-data)
                                         (:published? current-activity-data))]
     (if is-loading
