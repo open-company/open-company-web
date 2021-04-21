@@ -1,8 +1,8 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
+            [clojure.string :as cstr]
             [taoensso.timbre :as timbre]
             [oc.web.lib.responsive :as responsive]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]))
 
 (defonce ^{:export true} _lock-counter (atom 0))
@@ -138,3 +138,38 @@
 (defn node-mounted? [el]
   (and (dom-node? el)
        (dom-node? (oget el "parentNode"))))
+
+(defn class-set
+  "Given a map of class names as keys return a string of the those classes that evaulates as true"
+  [classes]
+  (->> classes
+       (filter #(and (first %) (second %)))
+       (keys)
+       (map (comp str name))
+       (cstr/join " ")))
+
+(def hide-class "fs-hide") ;; Use fs-hide for FullStory
+
+(defn get-native-emoji [^js emoji-js-map]
+  (oget emoji-js-map :native))
+
+(defn textarea-save-selection []
+  (if (fn? (oget js/window "getSelection"))
+    ;; New gen. browser
+    (let [sel (ocall js/window "getSelection")]
+      (when (and (fn? (oget sel "getRangeAt"))
+               (oget sel "rangeCount"))
+        (ocall sel "getRangeAt" 0)))
+    (when (and (oget js/document "selection")
+               (fn? (oget js/document "selection?.createRange")))
+      (ocall js/document "selection.createRange"))))
+
+(defn textarea-restore-selection [range]
+  (when range
+    (if (fn? (oget js/window "getSelection"))
+      (let [sel (ocall js/window "getSelection")]
+        (ocall sel "removeAllRanges")
+        (ocall sel "addRange" range))
+      (when (and (oget js/document "selection")
+                 (fn? (oget range "select")))
+        (ocall range "select")))))
