@@ -182,18 +182,19 @@
         current-sort-type (dis/current-sort-type)
         current-contributions-id (dis/current-contributions-id)
         current-board-slug (dis/current-board-slug)
-        back-to (cond
-                  (and (seq current-contributions-id)
-                       (not current-board-slug))
-                  (oc-urls/contributions current-contributions-id)
-                  (= (keyword current-board-slug) :replies)
-                  (oc-urls/replies)
-                  (= (keyword current-board-slug) :topics)
-                  (oc-urls/topics)
-                  (= (keyword current-board-slug) :following)
-                  (oc-urls/following)
-                  :else
-                  (oc-urls/board entry-board-slug))
+        current-label-slug (dis/current-label-slug)
+        back-to (cond (seq current-contributions-id)
+                      (oc-urls/contributions current-contributions-id)
+                      (seq current-label-slug)
+                      (oc-urls/label current-label-slug)
+                      (= (keyword current-board-slug) :replies)
+                      (oc-urls/replies)
+                      (= (keyword current-board-slug) :topics)
+                      (oc-urls/topics)
+                      (not (dis/is-container? current-board-slug))
+                      (oc-urls/board current-board-slug)
+                      :else
+                      (oc-urls/following))
         entry-uuid (:uuid entry-data)
         post-url (if comment-uuid
                    (oc-urls/comment-url org entry-board-slug entry-uuid comment-uuid)
@@ -203,7 +204,8 @@
         route-path* {:org org
                      :board current-board-slug
                      :entry-board entry-board-slug
-                     :contributions (dis/current-contributions-id)
+                     :contributions current-contributions-id
+                     :label current-label-slug
                      :sort-type current-sort-type
                      :activity entry-uuid
                      :back-to back-to
