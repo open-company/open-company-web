@@ -29,7 +29,6 @@
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
-            [goog.object :as gobj]
             [oc.web.mixins.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
 
@@ -58,13 +57,12 @@
 
 (defn attachment-upload-success-cb [state res]
   (reset! (::media-attachment-did-success state) true)
-  (let [url (gobj/get res "url")]
+  (let [url (oget res :url)]
     (if-not url
       (attachment-upload-failed-cb state)
-      (let [size (gobj/get res "size")
-            mimetype (gobj/get res "mimetype")
-            filename (gobj/get res "filename")
-            createdat (utils/js-date)
+      (let [size (oget res :size)
+            mimetype (oget res :mimetype)
+            filename (oget res :filename)
             attachment-data {:file-name filename
                              :file-type mimetype
                              :file-size size
