@@ -155,8 +155,8 @@
               [:div.stream-item-headline.ap-seen-item-headline
                {:ref "activity-headline"
                 :data-itemuuid (:uuid activity-data)
-                :class utils/hide-class
-                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]]]
+                :class utils/hide-class}
+               (:headline activity-data)]]]
           [:div.stream-collapsed-item-fill
             [:div.stream-collapsed-item-avatar
               {:class utils/hide-class}
