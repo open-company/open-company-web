@@ -368,7 +368,7 @@
                                       org-data
                                       current-contributions-id
                                       (map? active-users)
-                                      (get active-users (keyword current-contributions-id)))))]
+                                      (not (get active-users (keyword current-contributions-id))))))]
    :label-not-found?      [[:org-not-found? :org-data :label-slug :label-data]
                            (fn [org-not-found? org-data label-slug label-data]
                              (boolean
