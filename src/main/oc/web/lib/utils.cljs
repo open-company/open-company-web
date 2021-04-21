@@ -166,8 +166,7 @@
 
 (def class-set dom-utils/class-set)
 
-(defn link-for [& args]
-  (apply hateoas/link-for args))
+(def link-for hateoas/link-for)
 
 (defn as-of-now []
   (let [date (js-date)]
@@ -541,7 +540,7 @@
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))
 
-(def hide-class "fs-hide") ;; Use fs-hide for FullStory
+(def hide-class dom-utils/hide-class)
 
 (defn- find-node [e fn]
   (loop [el (.-target e)]
