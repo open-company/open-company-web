@@ -462,7 +462,6 @@
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
    :show-invite-people-tooltip [[:nux] (fn [nux] (:show-invite-people-tooltip nux))]
-   :nux-user-type              [[:nux] (fn [nux] (:user-type nux))]
    ;; Cmail
    :cmail-state           [[:base] (fn [base] (get-in base dis/cmail-state-key))]
    :cmail-data            [[:base] (fn [base] (get-in base dis/cmail-data-key))]
