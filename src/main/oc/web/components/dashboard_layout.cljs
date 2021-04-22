@@ -29,7 +29,6 @@
                               (drv/drv :org-data)
                               (drv/drv :contributions-user-data)
                               (drv/drv :container-data)
-                              (drv/drv :contributions-data)
                               (drv/drv :org-slug)
                               (drv/drv :board-slug)
                               (drv/drv :contributions-id)
@@ -54,7 +53,6 @@
   (let [org-data (drv/react s :org-data)
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
-        contributions-data (drv/react s :contributions-data)
         posts-data (drv/react s :filtered-posts)
         current-board-slug (drv/react s :board-slug)
         current-contributions-id (drv/react s :contributions-id)
@@ -118,11 +116,11 @@
                                     (name current-board-slug))
                               (when (:last-seen-at container-data)
                                 (str "-" (:last-seen-at container-data))))
-        show-feed? (or (not is-contributions)
-                       (not= (:role contributions-user-data) :viewer)
-                       (pos? (count (:posts-list contributions-data))))
         no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
-        can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
+        can-create-topic? (utils/link-for (:links org-data) "create" "POST")
+        contrib-headline (if (map? contributions-user-data)
+                           (str "Latest from " (:short-name contributions-user-data))
+                           "Latest posts")]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.mobile-more-menu]
@@ -174,113 +172,111 @@
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner container-data)])
-            (when show-feed?
-              ;; Board name row: board name, settings button and say something button
-              [:div.board-name-container.group
-                {:class (utils/class-set {:drafts-board is-drafts-board
-                                          :topics-view is-topics})}
-                ;; Board name and settings button
-                [:div.board-name
-                  [:div.board-name-with-icon
-                   [:div.board-name-with-icon-internal
-                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                            (not is-drafts-board))
-                                              :public (= (:access container-data) "public")
-                                              :contributions is-contributions
-                                              :home-icon is-following
-                                              :unfollowing-icon is-unfollowing
-                                              :all-icon is-all-posts
-                                              :topics-icon is-topics
-                                              :saved-icon is-bookmarks
-                                              :drafts-icon is-drafts-board
-                                              :replies-icon is-replies
-                                              :board-icon (and (not is-container?)
-                                                               (not is-contributions)
-                                                               (not is-topics)
-                                                               (not is-drafts-board)
-                                                               (not current-activity-id))})}
-                    (cond is-contributions
-                          (str "Latest from " (:short-name contributions-user-data))
+            ;; Board name row: board name, settings button and say something button
+            [:div.board-name-container.group
+              {:class (utils/class-set {:drafts-board is-drafts-board
+                                        :topics-view is-topics})}
+              ;; Board name and settings button
+              [:div.board-name
+                [:div.board-name-with-icon
+                  [:div.board-name-with-icon-internal
+                  {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                          (not is-drafts-board))
+                                            :public (= (:access container-data) "public")
+                                            :contributions is-contributions
+                                            :home-icon is-following
+                                            :unfollowing-icon is-unfollowing
+                                            :all-icon is-all-posts
+                                            :topics-icon is-topics
+                                            :saved-icon is-bookmarks
+                                            :drafts-icon is-drafts-board
+                                            :replies-icon is-replies
+                                            :board-icon (and (not is-container?)
+                                                              (not is-contributions)
+                                                              (not is-topics)
+                                                              (not is-drafts-board)
+                                                              (not current-activity-id))})}
+                  (cond is-contributions
+                        contrib-headline
 
-                          is-inbox
-                          "Unread"
+                        is-inbox
+                        "Unread"
 
-                          is-all-posts
-                          "All"
+                        is-all-posts
+                        "All"
 
-                          is-topics
-                          "Explore"
+                        is-topics
+                        "Explore"
 
-                          is-bookmarks
-                          "Bookmarks"
+                        is-bookmarks
+                        "Bookmarks"
 
-                          is-following
-                          "Home"
+                        is-following
+                        "Home"
 
-                          is-unfollowing
-                          "Unfollowing"
+                        is-unfollowing
+                        "Unfollowing"
 
-                          is-replies
-                          "Activity"
+                        is-replies
+                        "Activity"
 
-                          :else
-                             ;; Fallback to the org board data
-                             ;; to avoid showing an empty name while loading
-                             ;; the board data
-                          (:name container-data))]]
-                  (when (and (= (:access container-data) "private")
-                             (not is-drafts-board))
-                    [:div.private-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= current-board-slug utils/default-drafts-board-slug)
-                               "Only visible to you"
-                               "Only visible to invited team members")}])
-                  (when (= (:access container-data) "public")
-                    [:div.public-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])
-                  (when (and is-topics
-                             can-create-topic?)
-                    [:button.mlb-reset.explore-view-block.create-topic-bt
-                     {:on-click #(nav-actions/show-section-add)}
-                     [:span.plus]
-                     [:span.new-topic "Add new topic"]])]
-                [:div.board-name-rightAdd
-                  (when should-show-settings-bt
-                    [:div.board-settings-container
-                      ;; Settings button
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                         :data-placement "top"
-                         :data-container "body"
-                         :title (str (:name container-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                  (when (and dismiss-all-link
-                             (pos? (count posts-data)))
-                    [:button.mlb-reset.complete-all-bt
-                      {:on-click #(activity-actions/inbox-dismiss-all)
-                       :data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Dismiss all"}])]])
-              (when show-feed?
-                ;; Board content: empty org, all posts, empty board, drafts view, entries view
-                (cond
-                  ;; Explore view
-                  is-topics
-                  (explore-view)
-                  ;; No boards
-                  (zero? (count (:boards org-data)))
-                  (empty-org)
-                  ;; Empty board
-                  empty-container?
-                  (empty-board)
-                  ;; Paginated board/container
-                  :else
-                  (rum/with-key (lazy-stream paginated-stream) paginated-stream-key)))]]]))
+                        :else
+                            ;; Fallback to the org board data
+                            ;; to avoid showing an empty name while loading
+                            ;; the board data
+                        (:name container-data))]]
+                (when (and (= (:access container-data) "private")
+                            (not is-drafts-board))
+                  [:div.private-board
+                    {:data-toggle "tooltip"
+                      :data-placement "top"
+                      :data-container "body"
+                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                      :title (if (= current-board-slug utils/default-drafts-board-slug)
+                              "Only visible to you"
+                              "Only visible to invited team members")}])
+                (when (= (:access container-data) "public")
+                  [:div.public-board
+                    {:data-toggle "tooltip"
+                      :data-placement "top"
+                      :data-container "body"
+                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                      :title "Visible to the world, including search engines"}])
+                (when (and is-topics
+                            can-create-topic?)
+                  [:button.mlb-reset.explore-view-block.create-topic-bt
+                    {:on-click #(nav-actions/show-section-add)}
+                    [:span.plus]
+                    [:span.new-topic "Add new topic"]])]
+              [:div.board-name-rightAdd
+                (when should-show-settings-bt
+                  [:div.board-settings-container
+                    ;; Settings button
+                    [:button.mlb-reset.board-settings-bt
+                      {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                        :data-placement "top"
+                        :data-container "body"
+                        :title (str (:name container-data) " settings")
+                        :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
+                (when (and dismiss-all-link
+                            (pos? (count posts-data)))
+                  [:button.mlb-reset.complete-all-bt
+                    {:on-click #(activity-actions/inbox-dismiss-all)
+                      :data-toggle (when-not is-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title "Dismiss all"}])]]
+              ;; Board content: empty org, all posts, empty board, drafts view, entries view
+              (cond
+                ;; Explore view
+                is-topics
+                (explore-view)
+                ;; No boards
+                (zero? (count (:boards org-data)))
+                (empty-org)
+                ;; Empty board
+                empty-container?
+                (empty-board)
+                ;; Paginated board/container
+                :else
+                (rum/with-key (lazy-stream paginated-stream) paginated-stream-key))]]]))
