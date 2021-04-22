@@ -465,7 +465,10 @@
                        entry-saved (if fixed-items
                                      ;; board creation
                                      (first (vals fixed-items))
-                                     json-body)]
+                                     json-body)
+                       new-entry? (not= (:uuid entry-saved) (:uuid entry-data))
+                       new-draft? (and (not (:published? entry-saved))
+                                       new-entry?)]
                    (cook/set-cookie! (cmail-actions/edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
@@ -481,7 +484,10 @@
                      (dis/dispatch! [:entry-save-with-board/finish (dis/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])
+                   ;; Refresh drafts if needed
+                   (when new-draft?
+                     (sa/drafts-get))))
                (when (fn? callback)
                  (callback success))))
            (dis/dispatch! [:entry-toggle-save-on-exit false]))))))))
