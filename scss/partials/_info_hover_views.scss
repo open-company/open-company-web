@@ -126,11 +126,7 @@ div.user-info-view {
             float: left;
             width: 12px;
             height: 18px;
-            opacity: 0.5;
-            background-image: cdnUrl("/img/ML/slack_mention_icon.svg");
-            background-size: 12px 12px;
-            background-position: center;
-            background-repeat: no-repeat;
+            @include svgBgColor("/img/ML/slack_mention_icon.svg", center, 12px 18px, var(--color));
             margin-right: 5px;
           }
         }

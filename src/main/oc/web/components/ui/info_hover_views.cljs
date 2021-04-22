@@ -3,6 +3,7 @@
   (:require [rum.core :as rum]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [cuerdas.core :as cstr]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
@@ -43,8 +44,10 @@
                               (and short-name?
                                    (seq (:pointed-name user-data)))
                               (:pointed-name user-data)
+                              (seq (:name user-data))
+                              (:name user-data)
                               :else
-                              (:name user-data))]
+                              (cstr/join " " [(:first-name user-data) (:last-name user-data)]))]
     [:div.user-info-view
       {:class (utils/class-set {:otf otf
                                 :inline inline?
