@@ -15,13 +15,16 @@ div.user-profile-container {
       div.user-profile-header-avatar {
         width: 80px;
         flex: 0 0 80px;
-        dispay: flex;
+        display: flex;
         flex-flow: column nowrap;
         align-items: center;
         justify-content: center;
-
         @include user-profile(80) {
           flex: 0 0 80px;
+        }
+
+        &.foggy-avatar {
+          filter: blur(4px);
         }
       }
 
