@@ -131,6 +131,12 @@ div.stream-item {
     cursor: pointer;
   }
 
+  &.new-item {
+    div.new-item-tag {
+      display: block;
+    }
+  }
+
   &.unread-item {
     background-color: var(--foc-new-color);
     z-index: 1;
@@ -369,7 +375,7 @@ div.stream-item {
 
   @include pinned-tag();
 
-  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag {
+  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag, div.new-item-tag {
     display: none;
     margin-left: 4px;
     margin-right: 4px;
