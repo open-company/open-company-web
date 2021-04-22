@@ -146,8 +146,8 @@
    :public-boards       [[:base :org-slug]
                          (fn [base org-slug]
                            (dis/public-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :entry-board-slug :contributions-id :label-slug :activity-uuid :sort-type]
-                         (fn [base org-slug board-slug entry-board-slug contributions-id label-slug activity-uuid sort-type]
+   :container-data      [[:base :org-slug :board-slug :entry-board-slug :contributions-id :label-slug :sort-type]
+                         (fn [base org-slug board-slug entry-board-slug contributions-id label-slug sort-type]
                            (when (and org-slug
                                       (or entry-board-slug
                                           board-slug
