@@ -183,7 +183,6 @@
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :bookmark-item (:bookmarked-at activity-data)
-                                :must-see-item (:must-see activity-data)
                                 :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
@@ -220,7 +219,6 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]
-            [:div.must-see-tag]
             [:div.bookmark-tag]
             [:div.bookmark-tag-small]
             [:div.muted-activity

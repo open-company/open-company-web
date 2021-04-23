@@ -33,14 +33,6 @@ div.expanded-post {
     }
   }
 
-  &.must-see-tag:not(.bookmark-item) {
-    div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
-      div.must-see-tag {
-        display: block;
-      }
-    }
-  }
-
   &.muted-item {
     div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
       div.muted-activity {
@@ -179,9 +171,8 @@ div.expanded-post {
         }
 
         @include bookmark-tag();
-        @include must-see-tag();
 
-        div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+        div.bookmark-tag, div.bookmark-tag-small {
           flex: 0 0 auto;
           margin-right: 0;
           margin-left: 6px;
@@ -301,7 +292,7 @@ div.expanded-post {
         }
       }
 
-      div.muted-activity, div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+      div.muted-activity, div.bookmark-tag, div.bookmark-tag-small {
         display: none;
       }
     }
