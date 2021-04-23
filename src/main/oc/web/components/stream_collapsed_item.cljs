@@ -109,8 +109,7 @@
                              (nav-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
-        {:class (utils/class-set {:must-see-item (:must-see activity-data)
-                                  :bookmark-item (:bookmarked-at activity-data)
+        {:class (utils/class-set {:bookmark-item (:bookmarked-at activity-data)
                                   :muted-item follow-link
                                   :new-item (pos? (:unseen-comments activity-data))
                                   :no-comments has-zero-comments?})}

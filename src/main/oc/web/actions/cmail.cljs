@@ -222,10 +222,6 @@
     (cmail-distraction-free-save next-value)
     (dis/dispatch! [:update dis/cmail-state-key #(merge % {:distraction-free? next-value})])))
 
-(defn cmail-toggle-must-see []
-  (dis/dispatch! [:update dis/cmail-data-key #(merge % {:must-see (not (:must-see %))
-                                                        :has-changes true})]))
-
 (defonce cmail-reopen-only-one (atom false))
 
 (defn cmail-reopen? []
