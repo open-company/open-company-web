@@ -195,7 +195,7 @@
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
       {:class (utils/class-set {:bookmark-item (:bookmarked-at activity-data)
-                                :muted-item muted-post?})
+                                    :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
        :data-last-activity-at (:last-activity-at activity-data)
@@ -253,7 +253,7 @@
                :on-click (when @(::collapse-post s)
                            #(reset! (::collapse-post s) false))
                :class (utils/class-set {utils/hide-class true
-                                        :collapsed @(::collapse-post s)})
+                                            :collapsed @(::collapse-post s)})
                :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
             (when @(::collapse-post s)
               [:button.mlb-reset.expand-button

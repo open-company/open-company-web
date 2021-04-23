@@ -204,27 +204,25 @@
                                mobile-more-menu-el)
         is-home? (-> container-slug keyword (= :following))
         is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
-        more-menu-comp ;;(fn []
-                         (partial more-menu
-                                  {:entity-data activity-data
-                                   :showing-share foc-share-entry
-                                   :editable-boards editable-boards
-                                   :external-share (not is-mobile?)
-                                   :external-bookmark (not is-mobile?)
-                                   :external-follow (not is-mobile?)
-                                   :show-home-pin is-home?
-                                   :show-board-pin is-entry-board?
-                                   :show-edit? true
-                                   :show-delete? true
-                                   :show-move? (not is-mobile?)
-                                   :will-open (fn [] (set-foc-menu-open s true))
-                                   :will-close (fn [] (set-foc-menu-open s false))
-                                   :force-show-menu foc-menu-open
-                                   :show-labels-picker foc-labels-picker
-                                   :mobile-tray-menu mobile-more-menu?
-                                   :current-user-data current-user-data
-                                   :external-labels true
-                                   :custom-classes "foc-click-stop foc-collapsed-click-stop left-gradient"}) ;)
+        more-menu-comp (partial more-menu {:entity-data activity-data
+                                           :showing-share foc-share-entry
+                                           :editable-boards editable-boards
+                                           :external-share (not is-mobile?)
+                                           :external-bookmark (not is-mobile?)
+                                           :external-follow (not is-mobile?)
+                                           :show-home-pin is-home?
+                                           :show-board-pin is-entry-board?
+                                           :show-edit? true
+                                           :show-delete? true
+                                           :show-move? (not is-mobile?)
+                                           :will-open (fn [] (set-foc-menu-open s true))
+                                           :will-close (fn [] (set-foc-menu-open s false))
+                                           :force-show-menu foc-menu-open
+                                           :show-labels-picker foc-labels-picker
+                                           :mobile-tray-menu mobile-more-menu?
+                                           :current-user-data current-user-data
+                                           :external-labels true
+                                           :custom-classes "foc-click-stop left-gradient"})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         show-new-item-tag (and is-home?
                                (:unseen activity-data)

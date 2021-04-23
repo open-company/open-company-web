@@ -410,12 +410,6 @@
 
 ;; Entry
 
-(defn entry-edit
-  [initial-entry-data]
-  (cook/set-cookie! (cmail-actions/edit-open-cookie)
-   (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 30))
-  (cmail-actions/load-cached-item initial-entry-data :entry-editing))
-
 (declare entry-save)
 
 (defn entry-save-on-exit
