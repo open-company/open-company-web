@@ -125,10 +125,6 @@
           (assoc-in posts-data-key new-items-map)))
     db))
 
-(defmethod dispatcher/action :toggle-foc-labels-picker
-  [db [_ entry-uuid]]
-  (assoc-in db dispatcher/foc-labels-picker-key entry-uuid))
-
 (defmethod dispatcher/action :entry-label/add
   [db [_ org-slug entry-uuid label-data]]
   (if (label-utils/can-add-label? (dispatcher/entry-labels-data entry-uuid))

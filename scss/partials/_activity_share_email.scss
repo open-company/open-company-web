@@ -17,6 +17,7 @@ div.activity-share-modal-container {
   border: 1px solid var(--divider-line);
   box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
   text-align: left;
+  opacity: 1;
 
   @include mobile() {
     position: unset;
@@ -29,15 +30,8 @@ div.activity-share-modal-container {
     box-shadow: none;
     padding: 0px;
     border-bottom: 1px solid var(--divider-line);
-    background-color: white;
-  }
-
-  &.will-appear {
-    opacity: 0;
-  }
-
-  &.appear {
-    opacity: 1;
+    // background-color: white;
+    background-color: var(--overlay-background-color);
   }
 
   div.activity-share-modal {

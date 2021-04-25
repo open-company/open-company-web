@@ -31,9 +31,6 @@
 (defn- on-scroll [s]
   (reset! (::show-mobile-follow-bt s) false))
 
-(defn- set-foc-menu-open [s open?]
-  (activity-actions/foc-menu-open (when open? (-> s :rum/args first :activity-data :uuid))))
-
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
                                    (drv/drv :board-slug)
@@ -69,12 +66,12 @@
                                                       (events/unlistenByKey @(::on-scroll s))
                                                       (reset! (::on-scroll s) nil))
                                                     s)}
-  [s {:keys [activity-data read-data comments-data foc-share-entry]}]
+  [s {:keys [activity-data read-data comments-data foc-show-menu foc-share-entry
+             foc-menu-open foc-labels-picker foc-activity-move foc-other-menu]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-board-slug (drv/react s :board-slug)
+        current-activity-id (drv/react s :activity-uuid)
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
-        dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
-        dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))
@@ -82,8 +79,7 @@
         unfollow-link (hateoas/link-for (:links activity-data) "unfollow")
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
     [:div.stream-collapsed-item
-      {:class (dom-utils/class-set {dom-node-class true
-                                    :draft (not is-published?)
+      {:class (dom-utils/class-set {:draft (not is-published?)
                                     :unseen-item (:unseen activity-data)
                                     :unread-item (or (pos? (:new-comments-count activity-data))
                                                     (:unread activity-data))
@@ -96,11 +92,12 @@
                        #(activity-actions/activity-edit activity-data)
                        (seq mobile-swipe-menu-uuid)
                        #(dismiss-swipe-button s %)
+                       (or foc-show-menu foc-menu-open foc-activity-move foc-labels-picker foc-share-entry foc-other-menu)
+                       identity
                        :else
                        (fn [e]
                          (when-not (dom-utils/event-container-matches e "input, button, a, .foc-collapsed-click-stop")
-                           (nav-actions/open-post-modal activity-data false))))
-       :id dom-element-id}
+                           (nav-actions/open-post-modal activity-data false))))}
       [:div.stream-collapsed-item-inner
         {:class (dom-utils/class-set {:bookmark-item (:bookmarked-at activity-data)
                                       :muted-item follow-link
@@ -183,13 +180,19 @@
                   :title (utils/activity-date-tooltip activity-data)}
                 (utils/foc-date-time t)])]])]
       (when (and is-published?
-                 (not is-mobile?))
+                 (not is-mobile?)
+                 (not (seq current-activity-id)))
         (more-menu {:entity-data activity-data
-                    :will-open (fn [] (set-foc-menu-open s true))
-                    :will-close (fn [] (set-foc-menu-open s false))
-                    :showing-share foc-share-entry
+                    :foc-share-entry foc-share-entry
+                    :foc-show-menu foc-show-menu
+                    :foc-labels-picker false ;; foc-labels-picker
+                    :foc-menu-open foc-menu-open
+                    :foc-activity-move false ;; foc-activity-move
                     :hide-bookmark? true
                     :hide-share? true
                     :hide-labels? true
                     :external-follow true
+                    :show-edit? true
+                    :show-delete? true
+                    :show-move? true
                     :custom-class "foc-collapsed-click-stop"}))]))

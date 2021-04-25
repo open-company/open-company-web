@@ -66,7 +66,7 @@ div.expanded-post {
       width: #{$expanded_post_width}px;
       height: #{$expanded_post_header_height}px;
       padding: 8px 16px;
-      z-index: 102;
+      z-index: 103;
       top: 0;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
       display: flex;
@@ -443,7 +443,7 @@ div.expanded-post {
           order: 2;
 
           div.reactions-picker-container {
-            div.emoji-mart {
+            div.emoji-mart, section.emoji-mart {
               bottom: unset;
               top: 0;
               left: calc(100% + 8px);
@@ -523,6 +523,12 @@ div.expanded-post {
 
         div.stream-comments {
           z-index: 3;
+
+          @include mobile() {
+            &.show-picker {
+              z-index: 105;
+            }
+          }
 
           &:empty {
             padding: 12px 0;

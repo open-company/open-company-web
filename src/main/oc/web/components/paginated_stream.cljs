@@ -59,7 +59,9 @@
            foc-show-menu
            foc-menu-open
            foc-labels-picker
-           foc-share-entry] :as props}]
+           foc-activity-move
+           foc-share-entry
+           foc-other-menu] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
@@ -69,9 +71,11 @@
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
                                :close-item (:close-item item)
+                               :foc-other-menu foc-other-menu
                                :foc-show-menu (or foc-show-menu
                                                   foc-menu-open
                                                   foc-labels-picker
+                                                  foc-activity-move
                                                   foc-share-entry)})}
      (cond
        collapsed-item?
@@ -86,7 +90,9 @@
                                :foc-menu-open      foc-menu-open
                                :foc-show-menu      foc-show-menu
                                :foc-labels-picker  foc-labels-picker
-                               :foc-share-entry   foc-share-entry
+                               :foc-activity-move  foc-activity-move
+                               :foc-share-entry    foc-share-entry
+                               :foc-other-menu     foc-other-menu
                                :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
@@ -96,6 +102,8 @@
                      :foc-show-menu      foc-show-menu
                      :foc-labels-picker  foc-labels-picker
                      :foc-share-entry    foc-share-entry
+                     :foc-activity-move  foc-activity-move
+                     :foc-other-menu     foc-other-menu
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
@@ -141,7 +149,8 @@
              foc-menu-open
              foc-show-menu
              foc-labels-picker
-             activity-share-container]
+             foc-activity-move
+             foc-share-entry]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -150,7 +159,22 @@
         entry? (activity-utils/entry? item)
         read-data (when entry?
                     (get activities-read (:uuid item)))
-        replies? (= (:container-slug container-data) :replies)]
+        replies? (= (:container-slug container-data) :replies)
+        foc-item-menu-open (boolean (= foc-menu-open (:uuid item)))
+        foc-item-show-menu (boolean (= foc-show-menu (:uuid item)))
+        foc-item-labels-picker (boolean (= foc-labels-picker (:uuid item)))
+        foc-item-activity-move (boolean (= foc-activity-move (:uuid item)))
+        foc-item-share-entry (boolean (= foc-share-entry (:uuid item)))
+        foc-other-menu (and (not foc-item-menu-open)
+                            (not foc-item-show-menu)
+                            (not foc-item-labels-picker)
+                            (not foc-item-activity-move)
+                            (not foc-item-share-entry)
+                            (or (seq foc-menu-open)
+                                (seq foc-show-menu)
+                                (seq foc-labels-picker)
+                                (seq foc-activity-move)
+                                (seq foc-share-entry)))]
     [:div.virtualized-list-item
       {:key (str (name (:resource-type item)) "-" key "-" (if entry?
                                                             (cond replies?
@@ -181,11 +205,12 @@
                                                  :container-data container-data
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
-                                                 :foc-menu-open (boolean (= foc-menu-open (:uuid item)))
-                                                 :foc-show-menu (boolean (= foc-show-menu (:uuid item)))
-                                                 :foc-labels-picker (boolean (= foc-labels-picker (:uuid item)))
-                                                 :foc-share-entry (boolean (= activity-share-container
-                                                                              (activity-actions/activity-share-container-id item)))})))]))
+                                                 :foc-menu-open foc-item-menu-open
+                                                 :foc-show-menu foc-item-show-menu
+                                                 :foc-labels-picker foc-item-labels-picker
+                                                 :foc-activity-move foc-item-activity-move
+                                                 :foc-share-entry foc-item-share-entry
+                                                 :foc-other-menu foc-other-menu})))]))
 
 ;; (defn- replies-unique-key [entry-data]
 ;;   (let [replies-data (vec (:replies-data entry-data))]
@@ -256,7 +281,10 @@
              container-data
              current-user-data
              foc-menu-open
-             foc-show-menu]
+             foc-show-menu
+             foc-activity-move
+             foc-labels-picker
+             foc-share-entry]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -385,10 +413,7 @@
   (drv/drv :board-slug)
   (drv/drv :contributions-id)
   (drv/drv :label-slug)
-  (drv/drv :foc-menu-open)
-  (drv/drv :foc-show-menu)
-  (drv/drv :foc-labels-picker)
-  (drv/drv :activity-share-container)
+  (drv/drv :foc-menu)
   (drv/drv :activity-uuid)
   ;; Locals
   (rum/local nil ::scroll-listener)
@@ -404,7 +429,7 @@
   ;;       container-data))))
   {:will-mount (fn [s]
     (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-    (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
+    ;; (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
     s)
    :did-mount (fn [s]
     (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
@@ -430,6 +455,7 @@
         _board-slug (drv/react s :board-slug)
         _contributions-id (drv/react s :contributions-id)
         _label-slug (drv/react s :label-slug)
+        current-activity-id (drv/react s :activity-uuid)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
@@ -437,15 +463,21 @@
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
-        foc-menu-open (drv/react s :foc-menu-open)
-        foc-show-menu (drv/react s :foc-show-menu)
-        current-activity-id (drv/react s :activity-uuid)
-        foc-labels-picker* (drv/react s :foc-labels-picker)
+        {foc-menu-open* :foc-menu-open
+         foc-show-menu* :foc-show-menu
+         foc-activity-move* :foc-activity-move
+         foc-labels-picker* :foc-labels-picker
+         foc-share-entry* :foc-share-entry} (drv/react s :foc-menu)
+        foc-menu-open (when-not (seq current-activity-id)
+                        foc-menu-open*)
+        foc-show-menu (when-not (seq current-activity-id)
+                        foc-show-menu*)
+        foc-activity-move (when-not (seq current-activity-id)
+                            foc-activity-move*)
         foc-labels-picker (when-not (seq current-activity-id)
                             foc-labels-picker*)
-        activity-share-container* (drv/react s :activity-share-container)
-        activity-share-container (when-not (seq current-activity-id)
-                                   activity-share-container*)]
+        foc-share-entry (when-not (seq current-activity-id)
+                          foc-share-entry*)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -464,5 +496,6 @@
                                         :editable-boards editable-boards
                                         :foc-menu-open foc-menu-open
                                         :foc-show-menu foc-show-menu
-                                        :activity-share-container activity-share-container
-                                        :foc-labels-picker foc-labels-picker}))]]]))
+                                        :foc-activity-move foc-activity-move
+                                        :foc-labels-picker foc-labels-picker
+                                        :foc-share-entry foc-share-entry}))]]]))

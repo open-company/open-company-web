@@ -570,7 +570,7 @@
                          (fn [base org-data posts-data route]
                            (let [container-slug (or (:contributions route) (:label route) (:board route))]
                              (when (and base org-data container-slug posts-data)
-                               (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
+                               (vec (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -668,7 +668,6 @@
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-share-medium [[:base] (fn [base] (:activity-share-medium base))]
-   :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :contributions-user-data :label-data :org-slug :board-slug :contributions-id :label-slug :activity-uuid :current-user-data]
@@ -838,6 +837,15 @@
    :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
    :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))] ;; Show the ... and other buttons and expand the ... menu
    :foc-show-menu         [[:base] (fn [base] (get base :foc-show-menu))] ;; Show only the ... and the other buttons
+   :foc-activity-move     [[:base] (fn [base] (get base :foc-activity-move))] ;; Show the ... and other buttons plus the activity move modal
+   :foc-share-entry       [[:base] (fn [base] (get base :foc-share-entry))] ;; Show the ... and other buttons plus the activity share modal
+   :foc-menu              [[:foc-show-menu :foc-menu-open :foc-activity-move :foc-labels-picker :foc-share-entry]
+                           (fn [foc-show-menu foc-menu-open foc-activity-move foc-labels-picker foc-share-entry]
+                             {:foc-show-menu foc-show-menu
+                              :foc-menu-open foc-menu-open
+                              :foc-activity-move foc-activity-move
+                              :foc-share-entry foc-share-entry
+                              :foc-labels-picker foc-labels-picker})]
    :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (user-labels-data base org-slug))]
    :show-label-editor     [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
@@ -1520,6 +1528,11 @@
   ([item-id :guard string? data :guard map?]
     (let [all-activities-read (get-in data activities-read-key)]
       (get all-activities-read item-id))))
+
+(defn ^:export foc-menu-data
+  ([] (foc-menu-data @app-state))
+  ([db]
+   (select-keys db [:foc-show-menu :foc-menu-open :foc-labels-picker :foc-activity-move :foc-share-entry])))
 
 ;; Seen
 

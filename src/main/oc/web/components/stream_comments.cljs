@@ -103,11 +103,11 @@
     (when showing-picker?
       (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
-       (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-         (comment-mark-read s (:uuid comment-data))
-         (comment-actions/react-from-picker activity-data comment-data
-          (gobj/get emoji "native")))
-       (reset! (::show-picker s) nil))}))))
+                                     (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                       (comment-mark-read s (:uuid comment-data))
+                                       (comment-actions/react-from-picker activity-data comment-data
+                                                                          (gobj/get emoji "native")))
+                                     (reset! (::show-picker s) nil))}))))
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data dismiss-reply-cb
@@ -133,7 +133,7 @@
            edit-cb delete-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt? member?
            show-more-menu showing-picker? did-react-cb
-           current-user-id]}]
+           current-user-id foc-show-menu foc-menu-open foc-share-entry]}]
   [:div.stream-comment-outer.open-thread
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -155,8 +155,12 @@
                         :can-react? true
                         :react-cb react-cb
                         :can-reply? true
-                        :reply-cb reply-cb})
-            emoji-picker])
+                        :reply-cb reply-cb
+                        :hide-bookmark? true
+                        :hide-labels? true
+                        :foc-show-menu foc-show-menu
+                        :foc-menu-open foc-menu-open
+                        :foc-share-entry foc-share-entry})])
         [:div.stream-comment-right
           [:div.stream-comment-header.group
             {:class utils/hide-class}
@@ -180,17 +184,8 @@
                     (utils/foc-date-time (:created-at comment-data))]]]
               (when (:unread comment-data)
                 [:div.new-comment-tag])
-              (if (responsive/is-mobile-size?)
+              (if is-mobile?
                 [:div.stream-comment-mobile-menu
-                  (more-menu comment-data nil {:entity-type "comment"
-                                               :show-edit? true
-                                               :edit-cb edit-cb
-                                               :show-delete? true
-                                               :delete-cb delete-cb
-                                               :can-react? (fn? did-react-cb)
-                                               :react-cb react-cb
-                                               :can-reply? true
-                                               :reply-cb reply-cb})
                   emoji-picker]
                 [:div.stream-comment-floating-buttons
                   {:key (str "stream-comment-floating-buttons"
@@ -273,7 +268,7 @@
                              (ui-mixins/on-window-click-mixin (fn [s e]
                               (when (and @(::show-picker s)
                                          (not (utils/event-inside? e
-                                          (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
+                                          (.get (js/$ ".emoji-mart" (rum/dom-node s)) 0))))
                                 (reset! (::show-picker s) nil))))
                              {:after-render (fn [s]
                                (let [activity-uuid (-> s :rum/args first :activity-data :uuid)
@@ -303,7 +298,8 @@
                                         fixed-updated-threads (filterv #(not (au/resource-type? % :collapsed-comments)) updated-threads)]
                                     (reset! (::threads s) fixed-updated-threads))))
                               s)}
-  [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix loading-comments-count]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id member? reply-add-comment-prefix loading-comments-count
+             foc-show-menu foc-menu-open foc-share-entry]}]
   (let [_users-info-hover (drv/react s :users-info-hover)
         _current-user-data (drv/react s :current-user-data)
         _follow-publishers-list (drv/react s :follow-publishers-list)
@@ -314,7 +310,8 @@
         all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))
         reply-focus-value (cu/add-comment-focus-value reply-add-comment-prefix (:uuid activity-data))]
     [:div.stream-comments
-      {:class (when (seq @(::editing? s)) "editing")}
+      {:class (utils/class-set {:editing (seq @(::editing? s))
+                                :show-picker @(::show-picker s)})}
       (if (pos? (count threads))
         [:div.stream-comments-list
           (when (pos? loading-comments-count)
@@ -360,4 +357,7 @@
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key
                                :member? member?
-                               :current-user-id current-user-id}))])])]))
+                               :current-user-id current-user-id
+                               :foc-show-menu (= foc-show-menu (:uuid root-comment-data))
+                               :foc-menu-open (= foc-menu-open (:uuid root-comment-data))
+                               :foc-share-entry (= foc-share-entry (:uuid root-comment-data))}))])])]))
