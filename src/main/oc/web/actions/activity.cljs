@@ -408,30 +408,6 @@
 
 ;; Entry
 
-(defn entry-edit
-  [initial-entry-data]
-  (cook/set-cookie! (cmail-actions/edit-open-cookie)
-   (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 30))
-  (cmail-actions/load-cached-item initial-entry-data :entry-editing))
-
-(defn entry-edit-dismiss
-  []
-  ;; If the user was looking at the modal, dismiss it too
-  (when (dis/current-activity-id)
-    (utils/after 1 #(let [is-all-posts (= (dis/current-board-slug) "all-posts")
-                          is-must-see (= (dis/current-board-slug) "must-see")]
-                      (router/nav!
-                        (cond
-                          is-all-posts ; AP
-                          (oc-urls/all-posts (dis/current-org-slug))
-                          is-must-see
-                          (oc-urls/must-see (dis/current-org-slug))
-                          :else
-                          (oc-urls/board (dis/current-org-slug) (dis/current-board-slug)))))))
-  ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
-  (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
-  (dis/dispatch! [:entry-edit/dismiss]))
-
 (declare entry-save)
 
 (defn entry-save-on-exit
@@ -465,7 +441,10 @@
                        entry-saved (if fixed-items
                                      ;; board creation
                                      (first (vals fixed-items))
-                                     json-body)]
+                                     json-body)
+                       new-entry? (not= (:uuid entry-saved) (:uuid entry-data))
+                       new-draft? (and (not (:published? entry-saved))
+                                       new-entry?)]
                    (cook/set-cookie! (cmail-actions/edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
@@ -481,7 +460,10 @@
                      (dis/dispatch! [:entry-save-with-board/finish (dis/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))
+                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])
+                   ;; Refresh drafts if needed
+                   (when new-draft?
+                     (sa/drafts-get))))
                (when (fn? callback)
                  (callback success))))
            (dis/dispatch! [:entry-toggle-save-on-exit false]))))))))
@@ -563,7 +545,8 @@
   (when-not (dis/current-activity-id)
     (let [board-slug (dis/current-board-slug)
           org-data (dis/org-data)
-          board-data (dis/current-container-data)]
+          board-data (dis/current-container-data)
+          contributions-id (dis/current-contributions-id)]
       (cond
 
         (= board-slug "topics")
@@ -601,6 +584,9 @@
         (and (= board-slug "unfollowing")
              (= (dis/current-sort-type) dis/recent-activity-sort))
         (recent-unfollowing-get org-data)
+
+        (seq contributions-id)
+        (contrib-actions/contributions-get contributions-id)
 
         :else
         (let [fixed-board-data (or board-data

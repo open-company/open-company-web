@@ -3,7 +3,7 @@
             [goog.dom :as gdom]
             [oops.core :refer (oget)]
             [cuerdas.core :as string]
-            [oc.web.lib.react-utils :as rutils]
+            [oc.web.utils.rum :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]

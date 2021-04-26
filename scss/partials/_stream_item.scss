@@ -123,6 +123,12 @@ div.stream-item {
     cursor: pointer;
   }
 
+  &.new-item {
+    div.new-item-tag {
+      display: block;
+    }
+  }
+
   &.unread-item {
     background-color: var(--foc-new-color);
     z-index: 1;
@@ -228,7 +234,7 @@ div.stream-item {
       flex-wrap: nowrap;
       justify-content: flex-start;
       align-items: center;
-      max-width: calc(100% - 108px);
+      width: 100%;
 
       &.has-inbox {
         max-width: calc(100% - 138px);
@@ -328,8 +334,9 @@ div.stream-item {
 
     div.more-menu {
       height: 32px;
-      flex: 0 0 auto;
-      margin-left: auto;
+      position: absolute;
+      top: -4px;
+      right: 0;
 
       @include big_web() {
         display: none;
@@ -353,7 +360,7 @@ div.stream-item {
 
   @include pinned-tag();
 
-  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag {
+  div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag, div.new-item-tag {
     display: none;
     margin-right: 0;
     margin-left: 8px;

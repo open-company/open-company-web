@@ -646,18 +646,11 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :user-info-data        [[:active-users :panel-stack]
-                            (fn [active-users panel-stack]
-                              (when (and panel-stack
-                                         (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
-                                (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
-                                            user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
-                                  (get active-users user-id))))]
    :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :nux
-                            :entry-editing :jwt :loading :payments :search-active :user-info-data :current-user-data
+                            :entry-editing :jwt :loading :payments :search-active :current-user-data
                             :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
                             (fn [base orgs org-data contributions-data container-data posts-data nux
-                                 entry-editing jwt loading payments search-active user-info-data current-user-data
+                                 entry-editing jwt loading payments search-active current-user-data
                                  active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
                               {:jwt-data jwt
                                :orgs orgs
@@ -684,7 +677,6 @@
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
                                :search-active search-active
-                               :user-info-data user-info-data
                                :current-user-data current-user-data
                                :active-users active-users
                                :follow-publishers-list follow-publishers-list
@@ -730,7 +722,9 @@
 (defmulti action (fn [_db [action-type & _]]
                    (when (and (not= action-type :input)
                               (not= action-type :update)
-                              (not= action-type :entry-toggle-save-on-exit))
+                              (not= action-type :entry-toggle-save-on-exit)
+                              (not= action-type :cmail-state/update)
+                              (not= action-type :cmail-data/update))
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 

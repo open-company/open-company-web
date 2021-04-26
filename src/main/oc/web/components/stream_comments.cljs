@@ -1,15 +1,15 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
             [clojure.data :refer (diff)]
-            [goog.object :as gobj]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
+            [oc.web.utils.rum :as rutils]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
@@ -23,6 +23,8 @@
             ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
 (def max-reactions-count 5)
+
+(def emoji-mart-picker (partial rutils/build Picker))
 
 (defn stop-editing [s comment-data]
   (reset! (::editing? s) nil))
@@ -64,7 +66,8 @@
     (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node))))
 
 (defn emoji-picked-cb [s comment-data emoji]
-  (comment-actions/react-from-picker (-> s :rum/args first :activity-data) comment-data (get emoji "native")))
+  (let [activity-data (-> s :rum/args first :activity-data)]
+    (comment-actions/react-from-picker activity-data comment-data (dom-utils/get-native-emoji emoji))))
 
 (def add-comment-prefix "edit-comment")
 
@@ -83,14 +86,19 @@
     (swap! (::threads s) (fn [threads]
                            (assoc-in threads [idx :unread] false)))))
 
-(rum/defc emoji-picker < (when (responsive/is-mobile-size?)
-                           ui-mixins/no-scroll-mixin)
+(rum/defc emoji-picker <
+  (when (responsive/is-mobile-size?)
+    ui-mixins/no-scroll-mixin)
+  (ui-mixins/on-click-out (fn [rum-state _event]
+                            (let [dismiss-fn (-> rum-state :rum/args first :dismiss-cb)]
+                              (when (fn? dismiss-fn)
+                                (dismiss-fn)))))
   [{:keys [add-emoji-cb dismiss-cb]}]
   [:div.emoji-picker-container
     [:button.mlb-reset.close-bt
       {:on-click dismiss-cb}
       "Cancel"]
-    (react-utils/build Picker
+    (emoji-mart-picker
       {:native true
        :autoFocus true
        :onClick (fn [emoji _]
@@ -103,11 +111,11 @@
     (when showing-picker?
       (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
-       (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-         (comment-mark-read s (:uuid comment-data))
-         (comment-actions/react-from-picker activity-data comment-data
-          (gobj/get emoji "native")))
-       (reset! (::show-picker s) nil))}))))
+                                     (let [native-emoji (dom-utils/get-native-emoji emoji)]
+                                       (when (reaction-utils/can-pick-reaction? native-emoji (:reactions comment-data))
+                                         (comment-mark-read s (:uuid comment-data))
+                                         (comment-actions/react-from-picker activity-data comment-data native-emoji))
+                                       (reset! (::show-picker s) nil)))}))))
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data dismiss-reply-cb
@@ -137,11 +145,11 @@
   [:div.stream-comment-outer.open-thread
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
-     :class (utils/class-set {:new-comment (:unread comment-data)
-                              :showing-picker showing-picker?})}
+     :class (dom-utils/class-set {:new-comment (:unread comment-data)
+                                  :showing-picker showing-picker?})}
     [:div.stream-comment
       {:ref (str "stream-comment-" (:uuid comment-data))
-       :class (utils/class-set {:editing-other-comment editing?})
+       :class (dom-utils/class-set {:editing-other-comment editing?})
        :on-mouse-leave mouse-leave-cb}
       [:div.stream-comment-inner
         (when is-mobile?
@@ -159,7 +167,7 @@
             emoji-picker])
         [:div.stream-comment-right
           [:div.stream-comment-header.group
-            {:class utils/hide-class}
+            {:class dom-utils/hide-class}
             [:div.stream-comment-author-right
               [:div.stream-comment-author-right-group
                 {:class (when (:unread comment-data) "new-comment")}
@@ -235,8 +243,8 @@
             [:div.stream-comment-body.oc-mentions.oc-mentions-hover
               {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                :ref (str "comment-body-" (:uuid comment-data))
-               :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                        utils/hide-class true})}]]
+               :class (dom-utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                            dom-utils/hide-class true})}]]
           (when (seq (:reactions comment-data))
             [:div.stream-comment-reactions-footer.group
               (reactions {:entity-data comment-data
@@ -270,11 +278,6 @@
                              (mention-mixins/oc-mentions-hover {:click? true})
                              ui-mixins/refresh-tooltips-mixin
                              (ui-mixins/interactive-images-mixin "div.stream-comment-body")
-                             (ui-mixins/on-window-click-mixin (fn [s e]
-                              (when (and @(::show-picker s)
-                                         (not (utils/event-inside? e
-                                          (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
-                                (reset! (::show-picker s) nil))))
                              {:after-render (fn [s]
                                (let [activity-uuid (-> s :rum/args first :activity-data :uuid)
                                      focused-uuid @(drv/get-ref s :add-comment-focus)

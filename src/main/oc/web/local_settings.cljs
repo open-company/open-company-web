@@ -12,7 +12,7 @@
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 (def sentry-env "local")
 (def sentry-release "")
-(def sentry-release-deploy "")
+(def sentry-deploy "")
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network

@@ -143,7 +143,8 @@
                            :will-close (fn [] (set-foc-menu-open s false))
                            :force-show-menu foc-menu-open
                            :mobile-tray-menu mobile-more-menu?
-                           :current-user-data current-user-data})
+                           :current-user-data current-user-data
+                           :custom-classes "left-gradient"})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         show-new-item-tag (and is-home?
                                (:unseen activity-data)

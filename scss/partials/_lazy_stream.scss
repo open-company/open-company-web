@@ -8,6 +8,14 @@ div.lazy-stream {
     margin-top: 0px;
   }
 
+  div.lazy-stream-pre-render-view {
+    height: 1px;
+    background-color: var(--foc-divider-line-color);
+    width: 100%;
+    border: none;
+    margin-top: 16px;
+  }
+
   div.lazy-stream-interstitial {
     width: 100%;
     height: 100%;

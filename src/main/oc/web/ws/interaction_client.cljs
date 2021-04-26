@@ -1,11 +1,9 @@
 (ns oc.web.ws.interaction-client
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [sablono.core :as html :refer-macros [html]]
-            [taoensso.sente :as s]
+  (:require [taoensso.sente :as s]
             [taoensso.timbre :as timbre]
-            [cljs.core.async :refer [chan <! >! timeout pub sub unsub unsub-all]]
+            [cljs.core.async :refer [chan <! >! pub sub]]
             [taoensso.encore :as encore :refer-macros (have)]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.jwt :as j]
             [oc.web.actions.jwt :as ja]
             [oc.web.local-settings :as ls]

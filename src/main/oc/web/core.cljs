@@ -4,7 +4,7 @@
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
             [cuerdas.core :as s]
-            [oc.web.rum-utils :as ru]
+            [oc.web.utils.rum :as ru]
             [oops.core :refer (oget ocall oset!)]
             ;; Pull in functions for interfacing with Expo mobile app
             [oc.web.expo :as expo]

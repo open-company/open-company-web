@@ -1,21 +1,19 @@
 (ns oc.web.components.reactions
-  (:require-macros [dommy.core :refer (sel1)]
-                   [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
-            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent  :as ua]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.rum :as rutils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.reaction :as reaction-actions]
             [oc.web.mixins.ui :as ui-mixins]
-            [goog.object :as gobj]
             ["emoji-mart" :as emoji-mart :refer (Picker)]))
 
+(def emoji-mart-picker (partial rutils/build Picker))
+
 (def default-reaction-number 3)
-(def default-comment-reaction-number 5)
 
 (defn- thumb-reaction? [r]
   (= (:reaction r) "👍"))
@@ -126,14 +124,14 @@
                {:on-click #(reset! (::show-picker s) false)}
                "Cancel"])
            (when-not (utils/is-test-env?)
-             (react-utils/build Picker
+             (emoji-mart-picker
                {:native true
                 :autoFocus true
-                :onClick (fn [emoji event]
-                           (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") reactions-data)
+                :onClick (fn [emoji _event]
+                           (when (reaction-utils/can-pick-reaction? (dom-utils/get-native-emoji emoji) reactions-data)
                              (when (fn? did-react-cb)
                                (did-react-cb))
                              (if optional-activity-data
-                               (comment-actions/react-from-picker optional-activity-data entity-data (gobj/get emoji "native"))
-                               (reaction-actions/react-from-picker entity-data (gobj/get emoji "native"))))
+                               (comment-actions/react-from-picker optional-activity-data entity-data (dom-utils/get-native-emoji emoji))
+                               (reaction-actions/react-from-picker entity-data (dom-utils/get-native-emoji emoji))))
                            (reset! (::show-picker s) false))}))])])))

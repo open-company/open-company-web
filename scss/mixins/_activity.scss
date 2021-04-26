@@ -52,30 +52,6 @@ $header_top_margin: 24;
   @content
 }
 
-
-
-@mixin must-see-tag() {
-  div.must-see-tag {
-    @include image-2x("/img/ML/must_see_tag");
-    background-size: 65px 10px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: rgba($sea_blue, 0.2);
-    height: 18px;
-    width: 74px;
-    margin-right: 8px;
-    position: relative;
-    vertical-align: top;
-    border-radius: 4px;
-
-    &.white-bg {
-      background-color: white;
-    }
-
-    @content
-  }
-}
-
 @mixin bookmark-tag() {
   div.bookmark-tag {
     @include image-2x("/img/ML/bookmark_tag");
@@ -206,34 +182,6 @@ $header_top_margin: 24;
 
     @include dark_mode() {
       background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
-    }
-  }
-}
-
-@mixin must-see(){
-  div.must-see {
-    display: inline;
-    padding-left: 16px;
-    padding-bottom: 10px;
-    padding-top: 6px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    @include OC_Body_Bold();
-    color: $ui_grey;
-    font-size: 12px;
-    white-space: nowrap;
-    background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
-    background-position: 2px 0px;
-    margin-left: 8px;
-
-    &.must-see-on {
-      background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-    }
-
-    @include mobile() {
-      width: auto;
     }
   }
 }
@@ -1298,6 +1246,30 @@ $header_top_margin: 24;
   }
 }
 
+@mixin foc-text-reset($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $display: block){
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+  padding-left: 0!important;
+  padding-right: 0!important;
+  @include OC_Body_Book();
+  line-height: #{$line_height}px;
+  color: $color;
+  font-size: #{$font_size}px;
+  background-color: transparent;
+  border: none!important;
+  box-shadow: none!important;
+  border-radius: 0!important;
+  white-space: break-spaces!important;
+  overflow-wrap: break-word!important;
+  &:not(:empty) {
+    display: $display!important;
+  }
+
+  @content
+}
+
 @mixin activity-body-foc($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
 
   @include activity-body($font_size, $line_height, $color, 0);
@@ -1322,39 +1294,16 @@ $header_top_margin: 24;
 
   max-height: #{$line_height * $preview_lines}px;
 
-  & > p, & > ul, & > blockquote, & > code, & > pre, & > div, & > h1, & > h2 {
-    &:not(:empty) {
-      margin-top: 0!important;
-      margin-bottom: 0!important;
-      padding-top: 0!important;
-      padding-bottom: 0!important;
-      display: block!important;
-      @include OC_Body_Book();
-      line-height: #{$line_height}px;
-      color: $color;
-      font-size: #{$font_size}px;
-    }
+  & > p, & > ul, & > blockquote, & > pre, & > div, & > h1, & > h2, & > p ul, & > p h1, & > p h2 {
+    @include foc-text-reset($font-size, $line-height, $color);
   }
 
-  & > blockquote {
-    padding-left: 8px!important;
-    padding-right: 0!important;
-    min-height: #{$line_height}px;
-  }
-
-  h1, h2, mark, mark.highlight {
-    color: $color;
-    @include OC_Body_Book();
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-    background-color: transparent;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  b, strong, &.editing b, &.editing strong {
-    @include OC_Body_Book();
-    font-weight: normal;
+  b, & > p b, &.editing b,
+  code, & > p code, &.editing code,
+  mark, & > p mark, &.editing mark,
+  mark.highlight, & > p mark.highlight, &.editing mark.highlight,
+  strong, & > p strong, &.editing strong {
+    @include foc-text-reset($font-size, $line-height, $color, inline-block);
   }
 
   .carrot-no-preview {
@@ -1362,10 +1311,6 @@ $header_top_margin: 24;
   }
 
   *:empty, * > *:only-child:empty {
-    display: none;
-  }
-
-  blockquote, pre, code {
     display: none;
   }
 

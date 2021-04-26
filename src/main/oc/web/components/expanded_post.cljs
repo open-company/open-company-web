@@ -36,10 +36,6 @@
     (when-not (= @(::comment-height s) cur-height)
       (reset! (::comment-height s) cur-height))))
 
-(defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
-      (.-innerWidth js/window)))
-
 (defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
     (if force?
@@ -56,27 +52,6 @@
 (defn- mark-read [s]
   (when @(::mark-as-read? s)
     (activity-actions/mark-read @(::activity-uuid s))))
-
-(def big-web-collapse-min-height 134)
-(def mobile-collapse-min-height 160)
-(def min-body-length-for-truncation 450)
-
-(defn- check-collapse-post [s]
-  (when (nil? @(::collapse-post s))
-    (let [is-mobile? (responsive/is-mobile-size?)
-          comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
-          activity-data @(drv/get-ref s :activity-data)
-          comments-count (-> activity-data :links (utils/link-for "comments") :count)]
-      (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
-                                       (> (count (:body activity-data)) min-body-length-for-truncation)
-                                       ;; Never if they have polls
-                                       (not (seq (:polls activity-data)))
-                                       ;; Only for users we can know if they read it or not
-                                       (:member? @(drv/get-ref s :org-data))
-                                       ;; Only when they are read
-                                       (not (:unread activity-data))
-                                       ;; And only when there is at least a comment
-                                       (pos? comments-count))))))
 
 (def add-comment-prefix "main-comment")
 
@@ -110,12 +85,12 @@
   (mixins/interactive-images-mixin "div.expanded-post-body")
   mixins/no-scroll-mixin
   {:will-mount (fn [s]
-                 (check-collapse-post s)
+                 (reset! (::collapse-post s) (-> s (drv/get-ref :activity-data) deref :collapse-body?))
                  (save-initial-read-data s)
                  s)
    :did-mount (fn [s]
                 (save-fixed-comment-height! s)
-                (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
+                (reset! (::activity-uuid s) (-> s (drv/get-ref :activity-data) deref ::uuid))
                 (load-comments s true)
                 (mark-read s)
                 (reset! (::esc-listener s)
@@ -191,7 +166,6 @@
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :bookmark-item (:bookmarked-at activity-data)
-                                :must-see-item (:must-see activity-data)
                                 :muted-item muted-post?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
@@ -228,7 +202,6 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]
-            [:div.must-see-tag]
             [:div.bookmark-tag]
             [:div.bookmark-tag-small]
             [:div.muted-activity
