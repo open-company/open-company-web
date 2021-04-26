@@ -253,7 +253,14 @@
                   [:button.mlb-reset.explore-view-block.create-topic-bt
                     {:on-click #(nav-actions/show-section-add)}
                     [:span.plus]
-                    [:span.new-topic "Add new topic"]])]
+                    [:span.new-topic "Add new topic"]])
+                (when (and is-topics
+                           (:can-create-label? org-data))
+                  [:button.mlb-reset.explore-view-block.manage-labels-bt
+                   {:on-click #(label-actions/show-labels-manager)}
+                   [:span.manage-labels-bt-icon]
+                   [:span.manage-labels-bt-text
+                    "Manage labels"]])]
               [:div.board-name-right
                 (when should-show-settings-bt
                   [:div.board-settings-container
