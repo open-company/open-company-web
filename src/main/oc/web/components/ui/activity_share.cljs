@@ -9,20 +9,15 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.mixins.ui :refer (on-click-out)]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
-(defn dismiss []
-  (activity-actions/activity-share-hide))
-
 (defn close-clicked [s]
-  (reset! (::dismiss s) true)
-  (utils/after 180 dismiss))
+  (foc-menu-actions/toggle-foc-share-entry))
 
 (defn- has-slack-bot?
   "Check if the current team has a bot associated."
@@ -44,19 +39,16 @@
                             (drv/drv :current-user-data)
                             ;; Locals
                             (rum/local {:note ""} ::slack-data)
-                            (rum/local false ::dismiss)
                             (rum/local false ::sharing)
                             (rum/local false ::shared)
                             (rum/local (rand 1000) ::slack-channels-dropdown-key)
                             (rum/local :team ::url-audience)
                             ;; Mixins
-                            mixins/first-render-mixin
-                            (on-click-out #(close-clicked %1))
+                            (mixins/on-click-out #(close-clicked %1))
                             {:will-mount (fn [s]
                               (team-actions/teams-get-if-needed)
                               (let [activity-data (:share-data @(drv/get-ref s :activity-share))
-                                    org-data @(drv/get-ref s :org-data)
-                                    subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
+                                    org-data @(drv/get-ref s :org-data)]
                                (when (and (not @(drv/get-ref s :activity-share-medium))
                                           (has-slack-bot? org-data))
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
@@ -77,7 +69,7 @@
                                           (reset! (::slack-channels-dropdown-key s) (rand 1000))
                                           (reset! (::slack-data s) {:note ""})))))
                                   (utils/after 2000 #(reset! (::shared s) false)))
-                                (activity-actions/activity-share-reset))
+                                (foc-menu-actions/toggle-foc-share-entry))
                               s)}
   [s]
   (let [activity-data (:share-data (drv/react s :activity-share))
@@ -93,8 +85,6 @@
                                  has-bot?)
         disallow-public-share? (get-in org-data [:content-visibility :disallow-public-share])]
     [:div.activity-share-modal-container
-      {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
       [:div.activity-share-modal
         [:div.activity-share-main-cta
           (when is-mobile?

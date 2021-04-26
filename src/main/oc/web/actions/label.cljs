@@ -301,16 +301,6 @@
              (api/entry-label-changes label-changes-link add-remove-labels-map
                                       (partial cmail-actions/get-entry-finished org-slug entry-uuid))))
 
-;; FoC Labels picker
-
-(defn toggle-foc-labels-picker
-  ([] (toggle-foc-labels-picker nil))
-  ([entry-uuid]
-   (dis/dispatch! [:toggle-foc-labels-picker entry-uuid])))
-
-(defn hide-foc-labels-picker []
-  (toggle-foc-labels-picker nil))
-
 ;; Change service actions
 
 (defn subscribe []

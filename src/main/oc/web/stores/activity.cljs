@@ -490,25 +490,6 @@
   [db [_ activity-data _org-slug _board-data]]
   (update db :foc-menu-open #(if (= % (:uuid activity-data)) nil %)))
 
-(defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data container-element-id share-medium]]
-  (-> db
-    (assoc :activity-share {:share-data activity-data})
-    (assoc :activity-share-container container-element-id)
-    (assoc :activity-share-medium share-medium)
-    (dissoc :activity-shared-data)))
-
-(defmethod dispatcher/action :activity-share-hide
-  [db [_]]
-  (-> db
-    (dissoc :activity-share)
-    (dissoc :activity-share-medium)
-    (dissoc :activity-share-container)))
-
-(defmethod dispatcher/action :activity-share-reset
-  [db [_]]
-  (dissoc db :activity-shared-data))
-
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
   (assoc db :activity-share-data share-data))
@@ -1257,9 +1238,3 @@
         change-data (dispatcher/change-data db)
         active-users (dispatcher/active-users org-slug db)]
     (au/update-containers db org-data change-data active-users)))
-
-(defmethod dispatcher/action :foc-menu-open
-  [db [_ val]]
-  (if (not= (:foc-menu-open db) val)
-    (assoc db :foc-menu-open val)
-    db))

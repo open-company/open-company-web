@@ -30,6 +30,7 @@
             [oc.web.stores.contributions]
             [oc.web.stores.pin]
             [oc.web.stores.label]
+            [oc.web.stores.foc-menu]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.ws.change-client :as ws-cc]

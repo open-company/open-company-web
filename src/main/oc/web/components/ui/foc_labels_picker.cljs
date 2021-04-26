@@ -8,6 +8,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.labels :refer (add-label-bt)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.actions.label :as label-actions]))
 
 (defn- foc-labels-list
@@ -59,11 +60,11 @@
    (fn [s e]
      (when (and (not (dom-utils/event-container-has-class e "alert-modal"))
                 (not @(drv/get-ref s :editing-label)))
-       (label-actions/hide-foc-labels-picker))))
+       (foc-menu-actions/toggle-foc-labels-picker))))
   (ui-mixins/on-key-press ["Escape"]
    (fn [s _]
      (when-not @(drv/get-ref s :editing-label)
-       (label-actions/hide-foc-labels-picker))))
+       (foc-menu-actions/toggle-foc-labels-picker))))
   {:will-mount (fn [s]
                  (label-actions/get-labels)
                  s)}
@@ -86,7 +87,7 @@
        [:div.foc-labels-title
         "Add labels"
         [:button.mlb-reset.mobile-close-bt
-         {:on-click #(label-actions/hide-foc-labels-picker)}]]
+         {:on-click #(foc-menu-actions/toggle-foc-labels-picker)}]]
        (when (seq entry-orphan-labels)
          (foc-labels-list {:labels-list entry-orphan-labels
                            :entry-uuid entry-uuid

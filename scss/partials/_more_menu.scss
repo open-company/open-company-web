@@ -459,6 +459,20 @@ div.more-menu {
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 
+      & > * {
+        display: none;
+      }
+
+      &.menu-expanded {
+        & > * {
+          display: none;
+        }
+
+        ul.more-menu-list {
+          height: auto;
+        }
+      }
+
       &.menu-expanded, &.foc-labels-picker, &.showing-share, &.move-activity {
         visibility: visible;
         opacity: 1;
@@ -478,29 +492,25 @@ div.more-menu {
       }
 
       &.showing-share {
+        div.activity-share-modal-container {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
+        }
+
         ul.more-menu-list {
           display: none;
         }
       }
 
       &.move-activity {
-        ul.more-menu-list {
-          display: none;
-        }
-      }
-
-      &.menu-expanded {
-        & > * {
-          display: none;
+        div.activity-move {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
         }
 
         ul.more-menu-list {
-          height: auto;
+          display: none;
         }
-      }
-
-      & > * {
-        display: none;
       }
 
       // Add some extra padding at the bottom of mobile browsers

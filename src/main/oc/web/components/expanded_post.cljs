@@ -17,6 +17,7 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.labels :refer (labels-list)]
@@ -72,7 +73,6 @@
                                        (pos? comments-count))))))
 
 (def ^{:private true} add-comment-prefix "main-comment")
-(def ^{:private true} share-container-prefix "expanded-post-")
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -90,14 +90,12 @@
   (drv/drv :current-user-data)
   (drv/drv :follow-publishers-list)
   (drv/drv :followers-publishers-count)
-  (drv/drv :foc-labels-picker)
-  (drv/drv :activity-share-container)
+  (drv/drv :foc-menu)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local nil ::initial-last-read-at)
   (rum/local nil ::activity-uuid)
-  (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
   (rum/local nil ::esc-listener)
@@ -105,6 +103,12 @@
   (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   mixins/no-scroll-mixin
+  (mixins/on-key-press ["Escape"]
+                       (fn [s e]
+                         (when (and (not (seq @(drv/get-ref s :panel-stack)))
+                                    (not (seq (:foc-show-menu @(drv/get-ref s :foc-menu))))
+                                    (not (seq @(drv/get-ref s :expand-image-src))))
+                           (close-expanded-post e))))
   {:will-mount (fn [s]
                  (check-collapse-post s)
                  (save-initial-read-data s)
@@ -114,21 +118,6 @@
                 (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
                 (load-comments s true)
                 (mark-read s)
-                (reset! (::esc-listener s)
-                        (events/listen js/window
-                                       EventType/KEYUP
-                                       (fn [e]
-                                         (when (= (.-key e) "Escape")
-                                           (cond
-                                             ;; If showing an expanded image from the post
-                                             @(drv/get-ref s :expand-image-src)
-                                             (image-modal/dismiss-image-modal)
-                                             ;; If more menu is open let's close it
-                                             @(::force-show-menu s)
-                                             (reset! (::force-show-menu s) false)
-                                             ;; If there is a sidepanel open do nothing
-                                             (not (seq @(drv/get-ref s :panel-stack)))
-                                             (close-expanded-post e))))))
                 s)
    :did-remount (fn [_ s]
                   (save-initial-read-data s)
@@ -151,10 +140,10 @@
         _follow-publishers-list (drv/react s :follow-publishers-list)
         _followers-publishers-count (drv/react s :followers-publishers-count)
         activities-read (drv/react s :activities-read)
-        read-data (get activities-read (:uuid activity-data))
+        activity-uuid (:uuid activity-data)
+        read-data (get activities-read activity-uuid)
         editable-boards (drv/react s :editable-boards)
         comments-data (au/activity-comments activity-data comments-drv)
-        dom-element-id (str share-container-prefix (:uuid activity-data))
         is-mobile? (responsive/is-mobile-size?)
         _route (drv/react s :route)
         org-data (drv/react s :org-data)
@@ -162,17 +151,22 @@
         current-user-id (:user-id current-user-data)
         expand-image-src (drv/react s :expand-image-src)
         add-comment-force-update* (drv/react s :add-comment-force-update)
-        add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
+        add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key activity-uuid))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
+        foc-menu (drv/react s :foc-menu)
+        foc-show-menu (= (:foc-show-menu foc-menu) activity-uuid)
+        foc-menu-open (= (:foc-menu-open foc-menu) activity-uuid)
+        foc-activity-move (= (:foc-activity-move foc-menu) activity-uuid)
+        foc-labels-picker (= (:foc-labels-picker foc-menu) activity-uuid)
+        foc-share-entry (= (:foc-share-entry foc-menu) activity-uuid)
         show-mobile-menu? (and is-mobile?
-                               mobile-more-menu-el)
-        activity-share-container (drv/react s :activity-share-container)
-        share-prefix "exp-"
-        showing-share (= activity-share-container (activity-actions/activity-share-container-id activity-data share-prefix))
+                               mobile-more-menu-el
+                               (or foc-menu-open
+                                   foc-share-entry
+                                   foc-labels-picker
+                                   foc-activity-move))
         more-menu-comp (fn []
                         (more-menu {:entity-data activity-data
-                                    :share-prefix share-prefix
-                                    :showing-share showing-share
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
                                     :external-bookmark (not is-mobile?)
@@ -183,20 +177,20 @@
                                     :show-delete? true
                                     :show-move? (not is-mobile?)
                                     :tooltip-position "top"
-                                    :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
-                                    :will-close (when show-mobile-menu?
-                                                  (fn [] (reset! (::force-show-menu s) false)))
                                     :current-user-data current-user-data
-                                    :show-labels-picker (= (drv/react s :foc-labels-picker) (:uuid activity-data))
                                     :external-labels true
+                                    :foc-show-menu foc-show-menu
+                                    :foc-menu-open foc-menu-open
+                                    :foc-activity-move foc-activity-move
+                                    :foc-labels-picker foc-labels-picker
+                                    :foc-share-entry foc-share-entry
                                     :custom-class "exp-click-stop"}))
         muted-post? (map? (utils/link-for (:links activity-data) "follow"))
         comments-link (utils/link-for (:links activity-data) "comments")]
     [:div.expanded-post
       {:class (utils/class-set {:bookmark-item (:bookmarked-at activity-data)
-                                    :muted-item muted-post?})
-       :id dom-element-id
+                                :muted-item muted-post?})
        :style {:padding-bottom (str @(::comment-height s) "px")}
        :data-last-activity-at (:last-activity-at activity-data)
        :data-initial-last-read-at @(::initial-last-read-at s)
@@ -240,8 +234,8 @@
             (if show-mobile-menu?
               (rum/portal (more-menu-comp) mobile-more-menu-el)
               (more-menu-comp))
-            [:button.mlb-reset.mobile-more-bt
-              {:on-click #(swap! (::force-show-menu s) not)}]]]
+            [:button.mlb-reset.mobile-more-bt.foc-menu-event-stop
+              {:on-click #(foc-menu-actions/toggle-foc-menu-open (:uuid activity-data))}]]]
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner
@@ -268,9 +262,6 @@
                               :activity-data activity-data
                               :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
             (stream-attachments (:attachments activity-data))
-            ; (when is-mobile?
-            ;   [:div.expanded-post-mobile-reactions
-            ;     (reactions {:entity-data activity-data})])
             [:div.expanded-post-footer.group
               (reactions {:entity-data activity-data
                           :thumb-first? true
@@ -296,7 +287,10 @@
                                 :member? (:member? org-data)
                                 :last-read-at @(::initial-last-read-at s)
                                 :reply-add-comment-prefix add-comment-prefix
-                                :current-user-id current-user-id})
+                                :current-user-id current-user-id
+                                :foc-menu-open (:foc-menu-open foc-menu)
+                                :foc-show-menu (:foc-show-menu foc-menu)
+                                :foc-share-entry (:foc-share-entry foc-menu)})
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :scroll-after-posting? true

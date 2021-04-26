@@ -64,6 +64,23 @@
 
 (def ^{:export true} orgs-key :orgs)
 
+;; FoC Menu
+
+(def ^{:export true} foc-show-menu-key :foc-show-menu)
+
+(def ^{:export true} foc-menu-open-key :foc-menu-open)
+
+(def ^{:export true} foc-share-entry-key :foc-share-entry)
+
+(def ^{:export true} foc-activity-move-key :foc-activity-move)
+
+(def ^{:export true} foc-labels-picker-key :foc-labels-picker)
+
+(def ^{:export true} foc-menu-keys
+  (conj [] foc-show-menu-key foc-menu-open-key foc-share-entry-key foc-activity-move-key foc-labels-picker-key))
+
+
+
 (defn ^:export org-key [org-slug]
   [(keyword org-slug)])
 
@@ -76,8 +93,6 @@
 ;; Labels
 
 (def ^{:export true} editing-label-key [:editing-label])
-
-(def ^{:export true} foc-labels-picker-key [:foc-labels-picker])
 
 (defn ^:export labels-key [org-slug]
   (vec (conj (org-key org-slug) :labels)))
@@ -967,10 +982,6 @@
    (let [entry-labels (entry-labels-data data org-slug activity-id)]
      (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
 
-(defn ^:export foc-labels-picker
-  ([] (foc-labels-picker @app-state))
-  ([data] (get-in data foc-labels-picker-key)))
-
 (defn ^:export secure-activity-data
   "Get secure activity data."
   ([]
@@ -1136,6 +1147,33 @@
   ([item-id :guard string? data :guard map?]
     (let [all-activities-read (get-in data activities-read-key)]
       (get all-activities-read item-id))))
+
+;; FoC Menu
+
+(defn ^:export foc-menu-data
+  ([] (foc-menu-data @app-state))
+  ([db] (select-keys db foc-menu-keys)))
+
+(defn ^:export foc-show-menu
+  ([] (foc-show-menu @app-state))
+  ([db]
+   (get db foc-show-menu-key)))
+
+(defn ^:export foc-menu-open
+  ([] (foc-menu-open @app-state))
+  ([db] (get db foc-menu-open-key)))
+
+(defn ^:export foc-share-entry
+  ([] (foc-share-entry @app-state))
+  ([db] (get db foc-share-entry-key)))
+
+(defn ^:export foc-activity-move
+  ([] (foc-activity-move @app-state))
+  ([db] (get db foc-activity-move-key)))
+
+(defn ^:export foc-labels-picker
+  ([] (foc-labels-picker @app-state))
+  ([db] (get db foc-labels-picker-key)))
 
 ;; Seen
 

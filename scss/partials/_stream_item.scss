@@ -24,6 +24,13 @@ div.virtualized-list-row:not(.collapsed-item) {
   }
 
   @include big_web() {
+    &:hover.foc-other-menu {
+      z-index: 1;
+      div.stream-item, div.stream-item.open-item, div.stream-item.close-item {
+        z-index: 1;
+      }
+    }
+
     &:hover, &.foc-show-menu {
       z-index: 2;
       box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
@@ -80,6 +87,10 @@ div.virtualized-list-row:not(.collapsed-item) {
           }
         }
       }
+    }
+
+    &.foc-show-menu {
+      z-index: 3;
     }
   }
 
@@ -544,7 +555,7 @@ div.stream-item {
 
       div.reactions-picker-container {
 
-        div.emoji-mart {
+        div.emoji-mart, section.emoji-mart {
           bottom: unset;
           top: 0;
           left: calc(100% + 8px);

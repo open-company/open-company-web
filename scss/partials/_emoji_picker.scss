@@ -61,7 +61,7 @@ div.emoji-picker {
         display: block;
       }
 
-      div.emoji-mart {
+      div.emoji-mart, section.emoji-mart {
         position: relative;
         width: 100% !important;
         height: calc(100% - #{$mobile_navbar_height}px);
@@ -93,7 +93,7 @@ div.emoji-picker {
 
 // Override emoji-mart.css
 
-div.emoji-mart {
+div.emoji-mart, section.emoji-mart {
   border: 1px solid rgba($deep_tan, 0.7);
   box-shadow: 0px 2px 4px 0px rgba($deep_tan, 0.8);
   border-radius: 6px;

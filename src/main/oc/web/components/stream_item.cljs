@@ -16,6 +16,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
@@ -97,11 +98,11 @@
     (stream-item-attachments {:activity-attachments activity-attachments
                               :is-mobile? is-mobile?})
     (when (seq (:labels activity-data))
-      [:div.stream-item-labels.foc-click-stop
+      [:div.stream-item-labels
        [:div.separator-dot]
        (labels-list {:labels (:labels activity-data)
                      :tooltip? (not is-mobile?)
-                     :class-name "foc-click-stop"})])
+                     :label-class-name "foc-click-stop"})])
    (when show-view-more?
      [:div.stream-item-mobile-view-more
       "View more"])])
@@ -114,11 +115,8 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- set-foc-menu-open [s open?]
-  (activity-actions/foc-menu-open (when open? (-> s :rum/args first :activity-data :uuid))))
-
 (defn- show-mobile-menu [s]
-  (set-foc-menu-open s true))
+  (foc-menu-actions/toggle-foc-menu-open (-> s :rum/args first :activity-data :uuid)))
 
 (defn- dismiss-swipe-button [s & [e ref-kw]]
   (when e
@@ -146,7 +144,6 @@
                          (drv/drv :mobile-swipe-menu)
                          (drv/drv :board-slug)
                          (drv/drv :activity-uuid)
-                         ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
                          (rum/local false ::show-mobile-more-bt)
@@ -187,50 +184,50 @@
                              (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data show-wrt? editable-boards member? boards-count foc-board
-             current-user-data container-slug show-new-comments? foc-menu-open foc-labels-picker
-             clear-cell-measure-cb premium? foc-share-entry]}]
+             current-user-data container-slug show-new-comments? clear-cell-measure-cb premium?
+             foc-show-menu foc-menu-open foc-share-entry foc-labels-picker foc-activity-move foc-other-menu]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (:user-id current-user-data)
         activity-attachments (:attachments activity-data)
         current-board-slug (drv/react s :board-slug)
         current-activity-id (drv/react s :activity-uuid)
         is-published? (au/is-published? activity-data)
-        dom-node-class (str "stream-item-" (:uuid activity-data))
-        ; post-added-tooltip (drv/react s :show-post-added-tooltip)
-        ; show-post-added-tooltip? (and post-added-tooltip
-        ;                               (= post-added-tooltip (:uuid activity-data)))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
-        mobile-more-menu? (and is-mobile?
-                               mobile-more-menu-el)
+        show-mobile-menu? (and is-mobile?
+                               mobile-more-menu-el
+                               (or foc-menu-open
+                                   foc-share-entry
+                                   foc-labels-picker
+                                   foc-activity-move))
         is-home? (-> container-slug keyword (= :following))
         is-entry-board? (= (dis/current-board-slug) (:board-slug activity-data))
-        more-menu-comp (partial more-menu {:entity-data activity-data
-                                           :showing-share foc-share-entry
-                                           :editable-boards editable-boards
-                                           :external-share (not is-mobile?)
-                                           :external-bookmark (not is-mobile?)
-                                           :external-follow (not is-mobile?)
-                                           :show-home-pin is-home?
-                                           :show-board-pin is-entry-board?
-                                           :show-edit? true
-                                           :show-delete? true
-                                           :show-move? (not is-mobile?)
-                                           :will-open (fn [] (set-foc-menu-open s true))
-                                           :will-close (fn [] (set-foc-menu-open s false))
-                                           :force-show-menu foc-menu-open
-                                           :show-labels-picker foc-labels-picker
-                                           :mobile-tray-menu mobile-more-menu?
-                                           :current-user-data current-user-data
-                                           :external-labels true
-                                           :custom-classes "foc-click-stop left-gradient"})
+        more-menu-comp (partial more-menu
+                                {:entity-data activity-data
+                                 :editable-boards editable-boards
+                                 :external-share (not is-mobile?)
+                                 :external-bookmark (not is-mobile?)
+                                 :external-follow (not is-mobile?)
+                                 :show-home-pin is-home?
+                                 :show-board-pin is-entry-board?
+                                 :show-edit? true
+                                 :show-delete? true
+                                 :show-move? (not is-mobile?)
+                                 :foc-show-menu foc-show-menu
+                                 :foc-menu-open foc-menu-open
+                                 :foc-labels-picker foc-labels-picker
+                                 :foc-activity-move foc-activity-move
+                                 :foc-share-entry foc-share-entry
+                                 :mobile-tray-menu show-mobile-menu?
+                                 :current-user-data current-user-data
+                                 :external-labels true
+                                 :custom-classes "foc-click-stop"})
         mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)
         show-new-item-tag (and is-home?
                                (:unseen activity-data)
                                (not (:publisher? activity-data)))
         show-body-thumbnail? (:body-thumbnail activity-data)]
     [:div.stream-item
-      {:class (utils/class-set {dom-node-class true
-                                :draft (not is-published?)
+      {:class (utils/class-set {:draft (not is-published?)
                                 :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :expandable is-published?
@@ -238,7 +235,7 @@
                                 :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
                                 :new-item show-new-item-tag
-                                :showing-share foc-share-entry})
+                                :show-share-entry foc-share-entry})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing
@@ -246,10 +243,11 @@
                        #(dismiss-swipe-button s %)
                        (not is-published?)
                        #(activity-actions/activity-edit activity-data)
+                       (or foc-menu-open foc-activity-move foc-share-entry foc-labels-picker foc-other-menu)
+                       identity
                        :else
                        #(when-not (dom-utils/event-container-matches % "input, button, a, .foc-click-stop")
-                          (nav-actions/open-post-modal activity-data false)))
-       :id (activity-actions/activity-share-container-id activity-data)}
+                          (nav-actions/open-post-modal activity-data false)))}
       [:button.mlb-reset.mobile-more-bt.foc-click-stop
         {:class (when @(::show-mobile-more-bt s) "visible")
          :on-click (fn [e]
@@ -291,12 +289,12 @@
         [:div.new-item-tag]
         [:div.bookmark-tag.big-web-tablet-only]
         [:div.pinned-tag.big-web-tablet-only]]
-       (when is-published?
+       (when (and is-published?
+                  (not (seq current-activity-id)))
         (if is-mobile?
-          (when mobile-more-menu?
+          (when show-mobile-menu?
             (rum/portal (more-menu-comp) mobile-more-menu-el))
-          (more-menu-comp)))
-       [:div.activity-share-container]]
+          (more-menu-comp)))]
       [:div.stream-item-content
         {:class (when show-body-thumbnail? "has-preview")}
         [:div.stream-item-headline.ap-seen-item-headline

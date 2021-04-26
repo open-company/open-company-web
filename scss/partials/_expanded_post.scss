@@ -66,7 +66,7 @@ div.expanded-post {
       width: #{$expanded_post_width}px;
       height: #{$expanded_post_header_height}px;
       padding: 8px 16px;
-      z-index: 102;
+      z-index: 103;
       top: 0;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
       display: flex;
@@ -95,7 +95,7 @@ div.expanded-post {
 
         @include mobile() {
           order: 3;
-          margin-left: 10px;
+          margin-left: 0;
           // Push the button to the right to align the centered icon with the content
           margin-right: -6px;
           flex: 0 0 auto;
@@ -141,7 +141,7 @@ div.expanded-post {
         @include mobile() {
           order: 1;
           margin-left: 0;
-          max-width: calc(100% - 32px - 8px - 32px - 8px);
+          max-width: calc(100% - 32px - 4px - 32px);
           overflow: hidden;
         }
 
@@ -447,7 +447,7 @@ div.expanded-post {
           order: 2;
 
           div.reactions-picker-container {
-            div.emoji-mart {
+            div.emoji-mart, section.emoji-mart {
               bottom: unset;
               top: 0;
               left: calc(100% + 8px);
@@ -527,6 +527,12 @@ div.expanded-post {
 
         div.stream-comments {
           z-index: 3;
+
+          @include mobile() {
+            &.show-picker {
+              z-index: 105;
+            }
+          }
 
           &:empty {
             padding: 12px 0;

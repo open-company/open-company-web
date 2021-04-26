@@ -27,7 +27,14 @@ div.virtualized-list-row.collapsed-item {
       border-bottom: 0;
     }
 
-    &:hover, &.foc-menu-open {
+    &:hover.foc-other-menu {
+      z-index: 1;
+      div.stream-collapsed-item {
+        z-index: 1;
+      }
+    }
+
+    &:hover, &.foc-show-menu {
       z-index: 2;
       box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
 
@@ -70,6 +77,10 @@ div.virtualized-list-row.collapsed-item {
         }
       }
     }
+
+    &.foc-show-menu {
+      z-index: 3;
+    }
   }
 
   @include mobile() {
@@ -102,10 +113,6 @@ div.stream-collapsed-item {
     background-color: var(--foc-new-color);
     z-index: 1;
     position: relative;
-
-    &.showing-share {
-      z-index: 3;
-    }
 
     div.more-menu {
       background-color: var(--foc-new-color);

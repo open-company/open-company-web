@@ -537,7 +537,7 @@
 (defn get-org [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (fn [{:keys [ body success]}]
+    (api/get-org org-link (fn [{:keys [body success]}]
                             (let [org-data (when success (json->cljs body))]
                               (dis/dispatch! [:org-loaded org-data])
                               (cb success))))))
@@ -815,24 +815,6 @@
                      (fn [entry-data edit-key resp]
                        (create-update-entry-cb entry-data edit-key resp)
                        (refresh-current-container)))))
-
-(defun activity-share-container-id
-  ([entry] (activity-share-container-id entry default-share-prefix))
-  ([entry-data :guard map? prefix]
-   (activity-share-container-id (:uuid entry-data)))
-  ([entry-uuid perfix]
-   (str perfix "share-entry-" entry-uuid)))
-
-(defn activity-share-show
-  ([activity-data] (activity-share-show activity-data default-share-prefix))
-  ([activity-data prefix]
-  (dis/dispatch! [:activity-share-show activity-data (activity-share-container-id activity-data prefix) :url])))
-
-(defn activity-share-hide []
-  (dis/dispatch! [:activity-share-hide]))
-
-(defn activity-share-reset []
-  (dis/dispatch! [:activity-share-reset]))
 
 (defn activity-share-cb [{:keys [success body]}]
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
@@ -1398,12 +1380,6 @@
                                       (inbox-real-dismiss-all)
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
-
-(defn foc-show-menu [v]
-  (dis/dispatch! [:foc-show-menu v]))
-
-(defn foc-menu-open [v]
-  (dis/dispatch! [:foc-menu-open v]))
 
 (defn ui-compose []
   (ui-utils/remove-tooltips)

@@ -2,18 +2,14 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]))
-
-(defn dismiss []
-  (activity-actions/activity-share-hide))
 
 (defn- highlight-url
   "Select the whole content of the share link filed."
@@ -36,8 +32,7 @@
         :id (if copied? :share-url-copied :share-url-copy-error)}))))
 
 (defn close-clicked [s]
-  (reset! (::dismiss s) true)
-  (utils/after 180 dismiss))
+  (foc-menu-actions/toggle-foc-share-entry))
 
 (rum/defcs activity-share-email <
   rum/reactive
@@ -45,16 +40,14 @@
   (drv/drv :activity-shared-data)
   (drv/drv :org-data)
   ;; Locals
-  (rum/local false ::dismiss)
   (rum/local :team ::url-audience)
   ;; Mixins
-  mixins/first-render-mixin
-  (mixins/on-click-out #(close-clicked %1))
+  ;; mixins/first-render-mixin
   {:did-update (fn [s]
                 ;; When we have a sharing response
                  (when @(drv/get-ref s :activity-shared-data)
                    ;; Dismiss the share view
-                   (activity-actions/activity-share-reset))
+                   (foc-menu-actions/toggle-foc-share-entry))
                  s)}
 
   [s {activity-data :activity-data}]
@@ -63,8 +56,6 @@
         secure-uuid (:secure-uuid activity-data)
         org-data (drv/react s :org-data)]
     [:div.activity-share-modal-container
-     {:class (dom-utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
-                                   :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
      [:div.activity-share-modal
       [:div.activity-share-main-cta
        (when is-mobile?
