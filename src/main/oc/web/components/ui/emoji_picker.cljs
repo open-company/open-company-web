@@ -48,7 +48,7 @@
         (reset! (::last-active-element s) active-element)
         (reset! caret-pos
          (if (#{"TEXTAREA" "INPUT"} (.-tagName active-element))
-           {:type "default" :selection (dom-utils/textarea-save-selection)} ;; js/OCStaticTextareaSaveSelection
+           {:type "default" :selection (dom-utils/textarea-save-selection)}
            {:type "rangy" :selection (rangy-save-selection js/window)})))
       (reset! caret-pos nil))))
 
@@ -58,7 +58,7 @@
       (if (= (:type caret-pos) "rangy")
         (do (rangy-restore-selection (:selection caret-pos))
             (js/pasteHtmlAtCaret native-emoji (rangy-get-selection js/window) false))
-        (do (dom-utils/textarea-restore-selection (:selection caret-pos)) ;; js/OCStaticTextareaRestoreSelection
+        (do (dom-utils/textarea-restore-selection (:selection caret-pos))
             (js/pasteTextAtSelection @(::last-active-element s) native-emoji))))))
 
 (defn check-focus [s _]
