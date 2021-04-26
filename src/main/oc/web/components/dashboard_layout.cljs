@@ -254,7 +254,7 @@
                     {:on-click #(nav-actions/show-section-add)}
                     [:span.plus]
                     [:span.new-topic "Add new topic"]])]
-              [:div.board-name-rightAdd
+              [:div.board-name-right
                 (when should-show-settings-bt
                   [:div.board-settings-container
                     ;; Settings button
