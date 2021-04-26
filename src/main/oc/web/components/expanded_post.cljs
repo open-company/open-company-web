@@ -55,24 +55,7 @@
   (when @(::mark-as-read? s)
     (activity-actions/mark-read @(::activity-uuid s))))
 
-(def min-body-length-for-truncation 450)
-
-(defn- check-collapse-post [s]
-  (when (nil? @(::collapse-post s))
-    (let [activity-data @(drv/get-ref s :activity-data)
-          comments-count (-> activity-data :links (utils/link-for "comments") :count)]
-      (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
-                                       (> (count (:body activity-data)) min-body-length-for-truncation)
-                                       ;; Never if they have polls
-                                       (not (seq (:polls activity-data)))
-                                       ;; Only for users we can know if they read it or not
-                                       (:member? @(drv/get-ref s :org-data))
-                                       ;; Only when they are read
-                                       (not (:unread activity-data))
-                                       ;; And only when there is at least a comment
-                                       (pos? comments-count))))))
-
-(def ^{:private true} add-comment-prefix "main-comment")
+(def add-comment-prefix "main-comment")
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -110,12 +93,12 @@
                                     (not (seq @(drv/get-ref s :expand-image-src))))
                            (close-expanded-post e))))
   {:will-mount (fn [s]
-                 (check-collapse-post s)
+                 (reset! (::collapse-post s) (-> s (drv/get-ref :activity-data) deref :collapse-body?))
                  (save-initial-read-data s)
                  s)
    :did-mount (fn [s]
                 (save-fixed-comment-height! s)
-                (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
+                (reset! (::activity-uuid s) (-> s (drv/get-ref :activity-data) deref ::uuid))
                 (load-comments s true)
                 (mark-read s)
                 s)
