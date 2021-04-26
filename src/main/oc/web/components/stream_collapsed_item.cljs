@@ -192,7 +192,4 @@
                     :hide-share? true
                     :hide-labels? true
                     :external-follow true
-                    :show-edit? true
-                    :show-delete? true
-                    :show-move? true
                     :custom-class "foc-collapsed-click-stop"}))]))
