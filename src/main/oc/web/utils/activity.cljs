@@ -618,6 +618,16 @@
         (assoc e :ignore-comments (comments-ignore? e container-seen-at)))
       entry-data)))
 
+(def min-body-length-for-truncation 450)
+
+(defn entry-collapse-body [entry-data org-data]
+  (and (> (count (:body entry-data)) min-body-length-for-truncation)
+       (not (seq (:polls entry-data)))
+       (:member? org-data)
+       (not (:unread entry-data))
+       (or (-> entry-data :comments count pos?)
+           (-> entry-data :links (utils/link-for "comments") :count pos?))))
+
 (defun parse-entry
   "Add `:read-only`, `:board-slug`, `:board-name` and `:resource-type` keys to the entry map."
   ([entry-data board-data changes]
@@ -640,7 +650,6 @@
                                (or (:board-access entry-data) (:access board-data))
                                "private")
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
-          is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
           fixed-video-id (:video-id entry-data)
           fixed-publisher (when published?
                             (get active-users (-> entry-data :publisher :user-id)))
@@ -659,7 +668,8 @@
           (assoc e :unseen (entry-unseen? e container-seen-at))
           (assoc e :unread (entry-unread? e changes))
           (assoc e :read-only (readonly-entry? (:links e)))
-          (update e :comments (fn [comments] (mapv #(parse-comment org-data e % container-seen-at) comments))))
+          (update e :comments (fn [comments] (mapv #(parse-comment org-data e % container-seen-at) comments)))
+          (assoc e :collapse-body? (entry-collapse-body e org-data)))
         (assoc :board-uuid fixed-board-uuid)
         (assoc :board-slug fixed-board-slug)
         (assoc :board-name fixed-board-name)
