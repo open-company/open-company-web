@@ -258,12 +258,12 @@
 
 (rum/defc labels-list <
   rum/static
-  [{labels :labels tooltip? :tooltip? class-name :class-name}]
+  [{labels :labels tooltip? :tooltip? class-name :class-name label-class-name :label-class-name}]
   [:div.oc-labels-list
   (for [label labels]
     (rum/with-key
      (label-item {:label label
-                  :class-name class-name
+                  :class-name label-class-name
                   :tooltip-title (when tooltip?
                                    "View all updates with this label")})
      (str "oc-labels-item-"

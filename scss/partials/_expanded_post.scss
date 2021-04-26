@@ -95,7 +95,7 @@ div.expanded-post {
 
         @include mobile() {
           order: 3;
-          margin-left: 10px;
+          margin-left: 0;
           // Push the button to the right to align the centered icon with the content
           margin-right: -6px;
           flex: 0 0 auto;
@@ -141,7 +141,7 @@ div.expanded-post {
         @include mobile() {
           order: 1;
           margin-left: 0;
-          max-width: calc(100% - 32px - 8px - 32px - 8px);
+          max-width: calc(100% - 32px - 4px - 32px);
           overflow: hidden;
         }
 

@@ -98,11 +98,11 @@
     (stream-item-attachments {:activity-attachments activity-attachments
                               :is-mobile? is-mobile?})
     (when (seq (:labels activity-data))
-      [:div.stream-item-labels.foc-click-stop
+      [:div.stream-item-labels
        [:div.separator-dot]
        (labels-list {:labels (:labels activity-data)
                      :tooltip? (not is-mobile?)
-                     :class-name "foc-click-stop"})])
+                     :label-class-name "foc-click-stop"})])
    (when show-view-more?
      [:div.stream-item-mobile-view-more
       "View more"])])

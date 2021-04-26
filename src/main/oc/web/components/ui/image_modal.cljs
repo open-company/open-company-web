@@ -1,5 +1,6 @@
 (ns oc.web.components.ui.image-modal
   (:require [rum.core :as rum]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]))
 
@@ -12,6 +13,7 @@
 
 (rum/defc image-modal <
   rum/static
+  (ui-mixins/on-key-press ["Escape"] #(dismiss-image-modal))
   [{:keys [src]}]
   (when src
     [:div.image-modal-container

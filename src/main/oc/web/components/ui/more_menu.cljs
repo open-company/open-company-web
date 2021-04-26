@@ -7,6 +7,7 @@
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :as uu]
+            [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
@@ -20,6 +21,7 @@
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
 (defonce click-out-listener (atom nil))
+(defonce esc-press-listener (atom nil))
 
 (def menu-keys [:foc-show-menu :foc-menu-open :foc-activity-move :foc-labels-picker :foc-share-entry])
 
@@ -32,7 +34,7 @@
   (foc-menu-actions/toggle-foc-menu-open (-> s :rum/args first :entity-data :uuid)))
 
 (defn- hide-menu
-  [s]
+  [_s]
   (utils/remove-tooltips)
   (foc-menu-actions/toggle-foc-menu-open))
 
@@ -67,12 +69,17 @@
                     }]
     (alert-modal/show-alert alert-data)))
 
-(defn- maybe-add-listener [s]
+(defn- maybe-add-listeners [s]
   (when-not @click-out-listener
     (reset! click-out-listener (events/listen js/window EventType/CLICK
-                                                    (fn [e]
-                                                      (when-not (dom-utils/event-container-has-class e "more-menu")
-                                                        (foc-menu-actions/hide-foc-menu-if-needed)))))))
+                                              (fn [e]
+                                                (when-not (dom-utils/event-container-matches e ".foc-menu-event-stop")
+                                                  (foc-menu-actions/hide-foc-menu-if-needed))))))
+  (when-not @esc-press-listener
+    (reset! esc-press-listener (events/listen js/window EventType/KEYUP
+                                              (fn [e]
+                                                (when (= (.-key e) "Escape")
+                                                  (foc-menu-actions/hide-foc-menu-if-needed)))))))
 
 (defn- pp [s]
   (-> s :rum/args first (select-keys menu-keys)))
@@ -84,7 +91,7 @@
                        (rum/local nil ::click-out-listener)
                        ui-mixins/strict-refresh-tooltips-mixin
                        {:will-mount (fn [s]
-                                     (maybe-add-listener s)
+                                     (maybe-add-listeners s)
                                      s)}
   [s {:keys [entity-data current-user-data entity-type
              hide-share? external-share
@@ -188,7 +195,7 @@
               pins?
               can-edit-labels?
               foc-labels-picker)
-      [:div.more-menu
+      [:div.more-menu.foc-menu-event-stop
         {:data-entity-type entity-type
          :data-content-type (:content-type entity-data)
          :data-uuid (:uuid entity-data)

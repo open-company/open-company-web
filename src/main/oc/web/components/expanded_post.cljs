@@ -17,6 +17,7 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.labels :refer (labels-list)]
@@ -103,7 +104,6 @@
   (rum/local nil ::comment-height)
   (rum/local nil ::initial-last-read-at)
   (rum/local nil ::activity-uuid)
-  (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
   (rum/local nil ::esc-listener)
@@ -111,6 +111,12 @@
   (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   mixins/no-scroll-mixin
+  (mixins/on-key-press ["Escape"]
+                       (fn [s e]
+                         (when (and (not (seq @(drv/get-ref s :panel-stack)))
+                                    (not (seq (:foc-show-menu @(drv/get-ref s :foc-menu))))
+                                    (not (seq @(drv/get-ref s :expand-image-src))))
+                           (close-expanded-post e))))
   {:will-mount (fn [s]
                  (check-collapse-post s)
                  (save-initial-read-data s)
@@ -120,21 +126,6 @@
                 (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
                 (load-comments s true)
                 (mark-read s)
-                (reset! (::esc-listener s)
-                        (events/listen js/window
-                                       EventType/KEYUP
-                                       (fn [e]
-                                         (when (= (.-key e) "Escape")
-                                           (cond
-                                             ;; If showing an expanded image from the post
-                                             @(drv/get-ref s :expand-image-src)
-                                             (image-modal/dismiss-image-modal)
-                                             ;; If more menu is open let's close it
-                                             @(::force-show-menu s)
-                                             (reset! (::force-show-menu s) false)
-                                             ;; If there is a sidepanel open do nothing
-                                             (not (seq @(drv/get-ref s :panel-stack)))
-                                             (close-expanded-post e))))))
                 s)
    :did-remount (fn [_ s]
                   (save-initial-read-data s)
@@ -251,8 +242,8 @@
             (if show-mobile-menu?
               (rum/portal (more-menu-comp) mobile-more-menu-el)
               (more-menu-comp))
-            [:button.mlb-reset.mobile-more-bt
-              {:on-click #(swap! (::force-show-menu s) not)}]]]
+            [:button.mlb-reset.mobile-more-bt.foc-menu-event-stop
+              {:on-click #(foc-menu-actions/toggle-foc-menu-open (:uuid activity-data))}]]]
         (if-not activity-data
           (small-loading)
           [:div.expanded-post-container-inner
