@@ -405,8 +405,8 @@
   (drv/drv :board-slug)
   (drv/drv :contributions-id)
   (drv/drv :label-slug)
-  (drv/drv :foc-menu)
   (drv/drv :activity-uuid)
+  (drv/drv :foc-menu)
   ;; Locals
   (rum/local nil ::scroll-listener)
   (rum/local false ::has-next)
@@ -472,23 +472,23 @@
         foc-share-entry (when-not (seq current-activity-id)
                           foc-share-entry*)]
     [:div.paginated-stream.group
-      [:div.paginated-stream-cards
-        [:div.paginated-stream-cards-inner.group
-          (when replies?
-            (rum/with-key
-             (activity-refresh-button {:items-to-render items})
-             (str "activity-refresh-button-" (:last-seen-at container-data))))
-          (window-scroller
-           {}
-           (partial virtualized-stream {:org-data org-data
-                                        :items items
-                                        :container-data container-data
-                                        :is-mobile? is-mobile?
-                                        :current-user-data current-user-data
-                                        :activities-read activities-read
-                                        :editable-boards editable-boards
-                                        :foc-menu-open foc-menu-open
-                                        :foc-show-menu foc-show-menu
-                                        :foc-activity-move foc-activity-move
-                                        :foc-labels-picker foc-labels-picker
-                                        :foc-share-entry foc-share-entry}))]]]))
+     [:div.paginated-stream-cards
+      [:div.paginated-stream-cards-inner.group
+       (when replies?
+         (rum/with-key
+           (activity-refresh-button {:items-to-render items})
+           (str "activity-refresh-button-" (:last-seen-at container-data))))
+       (window-scroller
+        {}
+        (partial virtualized-stream {:org-data org-data
+                                     :items items
+                                     :container-data container-data
+                                     :is-mobile? is-mobile?
+                                     :current-user-data current-user-data
+                                     :activities-read activities-read
+                                     :editable-boards editable-boards
+                                     :foc-menu-open foc-menu-open
+                                     :foc-show-menu foc-show-menu
+                                     :foc-activity-move foc-activity-move
+                                     :foc-labels-picker foc-labels-picker
+                                     :foc-share-entry foc-share-entry}))]]]))

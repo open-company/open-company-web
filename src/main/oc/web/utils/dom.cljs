@@ -1,6 +1,5 @@
 (ns oc.web.utils.dom
   (:require [dommy.core :as dommy :refer-macros (sel1)]
-            [clojure.string :as cstr]
             [taoensso.timbre :as timbre]
             [clojure.string :as cstr]
             [oc.web.lib.responsive :as responsive]

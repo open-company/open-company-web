@@ -186,27 +186,28 @@
               [:div.board-name
                 {:class (when is-topics "topics-header")}
                 [:div.board-name-with-icon
-                  {:class (when current-contributions-id "contributions")}
+                  {:class (when is-contributions "contributions")}
                   [:div.board-name-with-icon-internal
-                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                            (not is-drafts-board))
-                                              :public (= (:access container-data) "public")
-                                              :label-icon is-label
-                                              :home-icon is-following
-                                              :unfollowing-icon is-unfollowing
-                                              :all-icon is-all-posts
-                                              :topics-icon is-topics
-                                              :saved-icon is-bookmarks
-                                              :drafts-icon is-drafts-board
-                                              :replies-icon is-replies
-                                              :board-icon (and (not is-container?)
-                                                               (not is-contributions)
-                                                               (not is-label)
-                                                               (not is-topics)
-                                                               (not is-drafts-board)
-                                                               (not current-activity-id))})}
-                    (cond is-all-posts
-                          "All"
+                  {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                          (not is-drafts-board))
+                                            :public (= (:access container-data) "public")
+                                            :contributions is-contributions
+                                            :label-icon is-label
+                                            :home-icon is-following
+                                            :unfollowing-icon is-unfollowing
+                                            :all-icon is-all-posts
+                                            :topics-icon is-topics
+                                            :saved-icon is-bookmarks
+                                            :drafts-icon is-drafts-board
+                                            :replies-icon is-replies
+                                            :board-icon (and (not is-container?)
+                                                             (not is-contributions)
+                                                             (not is-topics)
+                                                             (not is-drafts-board)
+                                                             (not is-label)
+                                                             (not current-activity-id))})}
+                  (cond is-contributions
+                        contrib-headline
 
                           is-topics
                           "Explore"
@@ -261,25 +262,26 @@
                    [:span.manage-labels-bt-icon]
                    [:span.manage-labels-bt-text
                     "Manage labels"]])]
-              [:div.board-name-right
-                (when should-show-settings-bt
-                  [:div.board-settings-container
-                    ;; Settings button
-                    [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                        :data-placement "top"
-                        :data-container "body"
-                        :title (str (:name container-data) " settings")
-                        :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                (when should-show-label-edit-bt
-                  [:div.board-settings-container
+              (when-not is-topics
+                [:div.board-name-right
+                 (when should-show-settings-bt
+                   [:div.board-settings-container
                         ;; Settings button
-                   [:button.mlb-reset.board-settings-bt
-                    {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :title (str (:name label-data) " edit")
-                     :on-click #(label-actions/edit-label label-data)}]])]]
+                    [:button.mlb-reset.board-settings-bt
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title (str (:name container-data) " settings")
+                      :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
+                 (when should-show-label-edit-bt
+                   [:div.board-settings-container
+                        ;; Settings button
+                    [:button.mlb-reset.board-settings-bt
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title (str (:name label-data) " edit")
+                      :on-click #(label-actions/edit-label label-data)}]])])]
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; Explore view

@@ -435,6 +435,7 @@
                                                            (let [cmail-state (-> s (drv/get-ref :cmail-state) deref)]
                                                              (when (and (not (responsive/is-mobile-size?))
                                                                         (:fullscreen cmail-state)
+                                                                        (not (:distraction-free? cmail-state))
                                                                         (not (:labels-inline-view cmail-state))
                                                                         (not (:labels-floating-view cmail-state))
                                                                         (not (dom-utils/event-container-matches e

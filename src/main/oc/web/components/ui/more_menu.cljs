@@ -7,7 +7,6 @@
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :as uu]
-            [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
@@ -207,11 +206,8 @@
               can-edit-labels?
               foc-labels-picker)
       [:div.more-menu.foc-menu-event-stop
-        {:class main-classes
-         :data-entity-type entity-type
-         :data-content-type (:content-type entity-data)
-         :data-uuid (:uuid entity-data)
-         :ref "more-menu"
+        {:ref "more-menu"
+         :class main-classes
          :on-click (when mobile-tray-menu
                      #(when (and foc-menu-open
                                  (not (dom-utils/event-container-matches % "ul.more-menu-list li")))
