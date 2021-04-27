@@ -13,7 +13,7 @@
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
                          (drv/drv :board-slug)
-                         (drv/drv :foc-layout)
+                        ;;  (drv/drv :foc-layout)
                          {:will-mount (fn [s]
                            (let [container-slug (dis/current-board-slug)]
                              (when-not (= container-slug @last-container-slug)
@@ -26,8 +26,8 @@
                            s)}
   [s stream-comp]
   (let [container-data (drv/react s :container-data)
-        current-board-slug (drv/react s :board-slug)
-        foc-layout (drv/react s :foc-layout)
+        _current-board-slug (drv/react s :board-slug)
+        ;; foc-layout (drv/react s :foc-layout)
         data-ready? (map? container-data)
         delay? @(::delay s)
         ;; collapsed-foc? (or (= foc-layout dis/other-foc-layout)
