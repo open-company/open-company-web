@@ -186,6 +186,10 @@ div.dashboard-layout {
 
       div.user-profile-container {
         margin-bottom: 24px;
+
+        @include mobile() {
+          margin-bottom: 0;
+        }
       }
 
       div.board-name-container {
