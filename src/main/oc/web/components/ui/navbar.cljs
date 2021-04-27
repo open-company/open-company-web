@@ -64,6 +64,7 @@
         current-panel (last panel-stack)
         expanded-user-menu (= current-panel :menu)
         org-board-data (dis/org-board-data org-data current-board-slug)
+        board-name (or (:name board-data) (:name org-board-data) current-board-slug)
         mobile-title (cond
                        mobile-user-notifications
                        "Alerts"
@@ -83,10 +84,10 @@
                        "You"
                        (and current-contributions-id (map? contributions-user-data))
                        (:name contributions-user-data)
-                       (seq (:name board-data))
-                       (:name board-data)
+                       (seq board-name)
+                       board-name
                        :else
-                       (:name org-board-data))]
+                       "Loading...")]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
