@@ -13,7 +13,7 @@
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
                          (drv/drv :container-slug)
-                         (drv/drv :foc-layout)
+                        ;;  (drv/drv :foc-layout)
                          {:will-mount (fn [s]
                            (let [container-slug (dis/current-container-slug)]
                              (when-not (= container-slug @last-container-slug)

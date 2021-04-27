@@ -53,7 +53,6 @@
            is-mobile
            clear-cell-measure-cb
            current-user-data
-           add-comment-force-update
            row-index
            foc-menu-open] :as props}]
   (let [member? (:member? org-data)
@@ -124,7 +123,6 @@
              container-data
              current-user-data
              clear-cell-measure-cb
-             add-comment-force-update
              row-index
              foc-menu-open]
     :as derivatives}
@@ -164,18 +162,9 @@
                                                  :is-mobile is-mobile?
                                                  :foc-layout foc-layout
                                                  :container-data container-data
-                                                 :add-comment-force-update add-comment-force-update
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
                                                  :foc-menu-open (boolean (= foc-menu-open (:uuid item)))})))]))
-
-;; (defn- replies-unique-key [entry-data]
-;;   (let [replies-data (vec (:replies-data entry-data))]
-;;     (reduce (fn [n idx]
-;;               (let [item (get replies-data idx)]
-;;                 (+ n (* (inc idx) 100) (if (seq (:reactions item)) 1 0))))
-;;      0
-;;      (range (count replies-data)))))
 
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
@@ -299,9 +288,9 @@
                       :stale))
         win-height (dom-utils/viewport-height)
         max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) win-height)
-        is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
 
         ;; Calculate the Point of No Return based on the card height
+        ; is-mobile? (if (nil? mobile?) (responsive/is-mobile-size?) mobile?)
         ; card-height (calc-card-height is-mobile? @(drv/get-ref s :foc-layout))
         ; scroll-threshold* (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
         ; scroll-threshold (* scroll-threshold* card-height)
@@ -310,7 +299,6 @@
         ;; Let's use the viewport height as point of no return
         pnr (- max-scroll win-height)
         current-board-slug @(drv/get-ref s :board-slug)
-        current-contributions-id @(drv/get-ref s :contributions-id)
         current-contributions-id @(drv/get-ref s :contributions-id)
         board-kw (keyword current-board-slug)]
     ;; scrolling down
@@ -364,7 +352,6 @@
                         (drv/drv :current-user-data)
                         (drv/drv :board-slug)
                         (drv/drv :contributions-id)
-                        (drv/drv :add-comment-force-update)
                         (drv/drv :foc-menu-open)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
@@ -411,10 +398,7 @@
         items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         current-user-data (drv/react s :current-user-data)
-        add-comment-force-update (drv/react s :add-comment-force-update)
-        viewport-height (dom-utils/viewport-height)
         is-mobile? (responsive/is-mobile-size?)
-        member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         foc-menu-open (drv/react s :foc-menu-open)]
     [:div.paginated-stream.group
