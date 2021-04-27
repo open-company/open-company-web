@@ -61,13 +61,12 @@
                 current-board-slug
                 current-contributions-id
                 current-label-slug
-                current-user-data
-                mobile-user-notifications]
-         :as navbar-data} (drv/react s :navbar-data)
+                mobile-user-notifications]} (drv/react s :navbar-data)
         is-mobile? (responsive/is-mobile-size?)
         current-panel (last panel-stack)
         expanded-user-menu (= current-panel :menu)
-        cmail-state (drv/react s :cmail-state)
+        org-board-data (dis/org-board-data org-data current-board-slug)
+        board-name (or (:name board-data) (:name org-board-data) current-board-slug)
         mobile-title (cond
                        mobile-user-notifications
                        "Alerts"
@@ -89,9 +88,10 @@
                        (:name contributions-user-data)
                        (and current-label-slug (map? label-data))
                        (:name label-data)
+                       (seq board-name)
+                       board-name
                        :else
-                       (:name board-data))
-        search-active? (drv/react s search/search-active?)]
+                       "Loading...")]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
