@@ -23,14 +23,14 @@
     "shadow-cljs": "^2.11.22"
   },
   "dependencies": {
-    "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete#f9547903b10a287109ebafb01cfab26c2d9fa187",
+    "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete#f0ebdaa084a9950903eecf18bcd6a764b3e2dd09",
     "@bago2k4/medium-editor-filedragging": "github:bago2k4/medium-editor-filedragging#mainline",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
     "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector",
     "@open-company/medium-editor-extentions": "github:open-company/medium-editor-extentions#mainline",
     "@rangy/core": "^2.1.0",
     "@rangy/selectionsaverestore": "^2.1.0",
-    "@sentry/browser": "^6.2.1",
+    "@sentry/browser": "^6.2.3",
     "clipboard": "2.0.6",
     "create-react-class": "^15.7.0",
     "emoji-mart": "^3.0.0",

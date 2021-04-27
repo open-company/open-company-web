@@ -290,6 +290,10 @@ div.expanded-post {
           left: 0px;
         }
       }
+
+      div.muted-activity, div.bookmark-tag, div.bookmark-tag-small {
+        display: none;
+      }
     }
 
     div.expanded-post-container-inner {

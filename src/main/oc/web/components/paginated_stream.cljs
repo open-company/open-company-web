@@ -4,7 +4,7 @@
             [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.react-utils :as rutils]
+            [oc.web.utils.rum :as rutils]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.dom :as dom-utils]
@@ -212,14 +212,6 @@
                                                  :foc-share-entry foc-item-share-entry
                                                  :foc-other-menu foc-other-menu})))]))
 
-;; (defn- replies-unique-key [entry-data]
-;;   (let [replies-data (vec (:replies-data entry-data))]
-;;     (reduce (fn [n idx]
-;;               (let [item (get replies-data idx)]
-;;                 (+ n (* (inc idx) 100) (if (seq (:reactions item)) 1 0))))
-;;      0
-;;      (range (count replies-data)))))
-
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
         static-part [(name (:resource-type item)) (:uuid item)]
@@ -413,8 +405,8 @@
   (drv/drv :board-slug)
   (drv/drv :contributions-id)
   (drv/drv :label-slug)
-  (drv/drv :foc-menu)
   (drv/drv :activity-uuid)
+  (drv/drv :foc-menu)
   ;; Locals
   (rum/local nil ::scroll-listener)
   (rum/local false ::has-next)
@@ -428,28 +420,29 @@
   ;;     (when (= (:container-slug container-data) :replies)
   ;;       container-data))))
   {:will-mount (fn [s]
-    (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-    (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
-    s)
+                 (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+                 (reset! (::scroll-listener s)
+                         (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
+                 s)
    :did-mount (fn [s]
-    (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-    (check-pagination s)
-    s)
+                (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+                (check-pagination s)
+                s)
    :did-remount (fn [_ s]
-    (check-pagination s)
-    s)
+                  (check-pagination s)
+                  s)
    :before-render (fn [s]
-    (let [container-data @(drv/get-ref s :container-data)]
-      (when (and (not (:loading-more container-data))
-                 @(::bottom-loading s))
-        (reset! (::bottom-loading s) false)
-        (check-pagination s)))
-    s)
+                    (let [container-data @(drv/get-ref s :container-data)]
+                      (when (and (not (:loading-more container-data))
+                                 @(::bottom-loading s))
+                        (reset! (::bottom-loading s) false)
+                        (check-pagination s)))
+                    s)
    :will-unmount (fn [s]
-    (when @(::scroll-listener s)
-      (events/unlistenByKey @(::scroll-listener s))
-      (reset! (::scroll-listener s) nil))
-    s)}
+                   (when @(::scroll-listener s)
+                     (events/unlistenByKey @(::scroll-listener s))
+                     (reset! (::scroll-listener s) nil))
+                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         _board-slug (drv/react s :board-slug)
@@ -479,23 +472,23 @@
         foc-share-entry (when-not (seq current-activity-id)
                           foc-share-entry*)]
     [:div.paginated-stream.group
-      [:div.paginated-stream-cards
-        [:div.paginated-stream-cards-inner.group
-          (when replies?
-            (rum/with-key
-             (activity-refresh-button {:items-to-render items})
-             (str "activity-refresh-button-" (:last-seen-at container-data))))
-          (window-scroller
-           {}
-           (partial virtualized-stream {:org-data org-data
-                                        :items items
-                                        :container-data container-data
-                                        :is-mobile? is-mobile?
-                                        :current-user-data current-user-data
-                                        :activities-read activities-read
-                                        :editable-boards editable-boards
-                                        :foc-menu-open foc-menu-open
-                                        :foc-show-menu foc-show-menu
-                                        :foc-activity-move foc-activity-move
-                                        :foc-labels-picker foc-labels-picker
-                                        :foc-share-entry foc-share-entry}))]]]))
+     [:div.paginated-stream-cards
+      [:div.paginated-stream-cards-inner.group
+       (when replies?
+         (rum/with-key
+           (activity-refresh-button {:items-to-render items})
+           (str "activity-refresh-button-" (:last-seen-at container-data))))
+       (window-scroller
+        {}
+        (partial virtualized-stream {:org-data org-data
+                                     :items items
+                                     :container-data container-data
+                                     :is-mobile? is-mobile?
+                                     :current-user-data current-user-data
+                                     :activities-read activities-read
+                                     :editable-boards editable-boards
+                                     :foc-menu-open foc-menu-open
+                                     :foc-show-menu foc-show-menu
+                                     :foc-activity-move foc-activity-move
+                                     :foc-labels-picker foc-labels-picker
+                                     :foc-share-entry foc-share-entry}))]]]))

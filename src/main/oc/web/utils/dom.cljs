@@ -5,7 +5,7 @@
             [oc.web.lib.responsive :as responsive]
             [oops.core :refer (oget ocall)]))
 
-(defonce _lock-counter (atom 0))
+(defonce ^{:export true} _lock-counter (atom 0))
 
 (defn lock-page-scroll
   "Add no-scroll class to the page body tag to lock the scroll"
@@ -141,6 +141,13 @@
   (prevent-default! e)
   (stop-propagation! e))
 
+(defn dom-node? [el]
+  (instance? js/Node el))
+
+(defn node-mounted? [el]
+  (and (dom-node? el)
+       (dom-node? (oget el "parentNode"))))
+
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
   [classes]
@@ -149,3 +156,29 @@
        (keys)
        (map (comp str name))
        (cstr/join " ")))
+
+(def hide-class "fs-hide") ;; Use fs-hide for FullStory
+
+(defn get-native-emoji [^js emoji-js-map]
+  (oget emoji-js-map :native))
+
+(defn textarea-save-selection []
+  (if (fn? (oget js/window "getSelection"))
+    ;; New gen. browser
+    (let [sel (ocall js/window "getSelection")]
+      (when (and (fn? (oget sel "getRangeAt"))
+               (oget sel "rangeCount"))
+        (ocall sel "getRangeAt" 0)))
+    (when (and (oget js/document "selection")
+               (fn? (oget js/document "selection?.createRange")))
+      (ocall js/document "selection.createRange"))))
+
+(defn textarea-restore-selection [range]
+  (when range
+    (if (fn? (oget js/window "getSelection"))
+      (let [sel (ocall js/window "getSelection")]
+        (ocall sel "removeAllRanges")
+        (ocall sel "addRange" range))
+      (when (and (oget js/document "selection")
+                 (fn? (oget range "select")))
+        (ocall range "select")))))

@@ -25,30 +25,19 @@
 (rum/defcs dashboard-layout < rum/static
                               rum/reactive
                               ;; Derivative
-                              (drv/drv :route)
                               (drv/drv :org-data)
-                              (drv/drv :team-data)
                               (drv/drv :contributions-user-data)
                               (drv/drv :label-data)
-                              (drv/drv :label-entries-data)
                               (drv/drv :container-data)
-                              (drv/drv :contributions-data)
                               (drv/drv :org-slug)
                               (drv/drv :board-slug)
                               (drv/drv :label-slug)
                               (drv/drv :contributions-id)
                               (drv/drv :activity-uuid)
                               (drv/drv :filtered-posts)
-                              (drv/drv :items-to-render)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
-                              (drv/drv :cmail-data)
-                              (drv/drv :activity-data)
-                              (drv/drv :foc-layout)
-                              (drv/drv :activities-read)
-                              (drv/drv :followers-boards-count)
-                              (drv/drv :comment-reply-to)
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :user-notifications)
                               (drv/drv :show-invite-box)
@@ -65,14 +54,8 @@
   (let [org-data (drv/react s :org-data)
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
-        contributions-data (drv/react s :contributions-data)
-        label-entries-data (drv/react s :label-entries-data)
         label-data (drv/react s :label-data)
-        _posts-data (drv/react s :filtered-posts)
-        _items-to-render (drv/react s :items-to-render)
-        _foc-layout (drv/react s :foc-layout)
-        _activities-read (drv/react s :activities-read)
-        _comment-reply-to (drv/react s :comment-reply-to)
+        posts-data (drv/react s :filtered-posts)
         current-board-slug (drv/react s :board-slug)
         current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
@@ -91,9 +74,6 @@
                                         show-invite-box)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (dis/org-board-data org-data current-board-slug)
-        _route (drv/react s :route)
-        _team-data (drv/react s :team-data)
-        _activity-data (drv/react s :activity-data)
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
@@ -124,7 +104,6 @@
         should-show-label-edit-bt (and current-label-slug
                                        (:can-edit? label-data))
         cmail-state (drv/react s :cmail-state)
-        _cmail-data (drv/react s :cmail-data)
         member? (:member? org-data)
         show-follow-banner? (and (not is-container?)
                                  (not (seq current-contributions-id))
@@ -132,7 +111,6 @@
                                  (not is-drafts-board)
                                  (map? org-board-data)
                                  (false? (:following org-board-data)))
-        _followers-boards-count (drv/react s :followers-boards-count)
         can-compose? (:can-compose? org-data)
         show-desktop-cmail? (and (not is-mobile?)
                                  can-compose?
@@ -147,12 +125,11 @@
                                     (name current-board-slug))
                               (when (:last-seen-at container-data)
                                 (str "-" (:last-seen-at container-data))))
-        show-feed? (or (not is-contributions)
-                       (not= (:role contributions-user-data) :viewer)
-                       (pos? (count (:posts-list contributions-data)))
-                       (pos? (count (:posts-list label-entries-data))))
         no-phisical-home-button (^js js/isiPhoneWithoutPhysicalHomeBt)
-        can-create-topic? (utils/link-for (:links org-data) "create" "POST")]
+        can-create-topic? (utils/link-for (:links org-data) "create" "POST")
+        contrib-headline (if (map? contributions-user-data)
+                           (str "Latest from " (:short-name contributions-user-data))
+                           "Latest posts")]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.mobile-more-menu]
@@ -204,129 +181,127 @@
             (when show-follow-banner?
               [:div.dashboard-layout-follow-banner
                 (follow-banner container-data)])
-            (when show-feed?
-              ;; Board name row: board name, settings button and say something button
-              [:div.board-name-container.group
-                {:class (utils/class-set {:drafts-board is-drafts-board
-                                          :topics-view is-topics})}
-                ;; Board name and settings button
-                [:div.board-name
-                 {:class (when is-topics "topics-header")}
-                 [:div.board-name-with-icon
-                   {:class (when is-contributions "contributions")}
-                   [:div.board-name-with-icon-internal
-                    {:class (utils/class-set {:private (and (= (:access container-data) "private")
-                                                            (not is-drafts-board))
-                                              :public (= (:access container-data) "public")
-                                              :label-icon is-label
-                                              :home-icon is-following
-                                              :unfollowing-icon is-unfollowing
-                                              :all-icon is-all-posts
-                                              :topics-icon is-topics
-                                              :saved-icon is-bookmarks
-                                              :drafts-icon is-drafts-board
-                                              :replies-icon is-replies
-                                              :board-icon (and (not is-container?)
-                                                                (not is-contributions)
-                                                                (not is-topics)
-                                                                (not is-drafts-board)
-                                                                (not is-label)
-                                                                (not current-activity-id))})
-                      :dangerouslySetInnerHTML (utils/emojify (cond
-                                                is-inbox
-                                                "Unread"
+            ;; Board name row: board name, settings button and say something button
+            [:div.board-name-container.group
+              {:class (utils/class-set {:drafts-board is-drafts-board
+                                        :topics-view is-topics})}
+              ;; Board name and settings button
+              [:div.board-name
+                {:class (when is-topics "topics-header")}
+                [:div.board-name-with-icon
+                  {:class (when is-contributions "contributions")}
+                  [:div.board-name-with-icon-internal
+                  {:class (utils/class-set {:private (and (= (:access container-data) "private")
+                                                          (not is-drafts-board))
+                                            :public (= (:access container-data) "public")
+                                            :contributions is-contributions
+                                            :label-icon is-label
+                                            :home-icon is-following
+                                            :unfollowing-icon is-unfollowing
+                                            :all-icon is-all-posts
+                                            :topics-icon is-topics
+                                            :saved-icon is-bookmarks
+                                            :drafts-icon is-drafts-board
+                                            :replies-icon is-replies
+                                            :board-icon (and (not is-container?)
+                                                             (not is-contributions)
+                                                             (not is-topics)
+                                                             (not is-drafts-board)
+                                                             (not is-label)
+                                                             (not current-activity-id))})}
+                  (cond is-contributions
+                        contrib-headline
 
-                                                is-all-posts
-                                                "All"
+                        is-inbox
+                        "Unread"
 
-                                                is-topics
-                                                "Explore"
+                        is-all-posts
+                        "All"
 
-                                                is-bookmarks
-                                                "Bookmarks"
+                        is-topics
+                        "Explore"
 
-                                                is-following
-                                                "Home"
+                        is-bookmarks
+                        "Bookmarks"
 
-                                                is-unfollowing
-                                                "Unfollowing"
+                        is-following
+                        "Home"
 
-                                                is-replies
-                                                "Activity"
+                        is-unfollowing
+                        "Unfollowing"
 
-                                                is-label
-                                                (or (:name label-data) (:slug label-data) current-label-slug)
+                        is-replies
+                        "Activity"
 
-                                                current-contributions-id
-                                                (str "Latest from " (:short-name contributions-user-data))
+                        is-label
+                        (or (:name label-data) (:slug label-data) current-label-slug)
 
-                                                :default
-                                                ;; Fallback to the org board data
-                                                ;; to avoid showing an empty name while loading
-                                                ;; the board data
-                                                (:name container-data)))}]]
-                  (when (and (= (:access container-data) "private")
-                             (not is-drafts-board))
-                    [:div.private-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= current-board-slug utils/default-drafts-board-slug)
-                               "Only visible to you"
-                               "Only visible to invited team members")}])
-                  (when (= (:access container-data) "public")
-                    [:div.public-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])
-                  (when (and is-topics
-                             can-create-topic?)
-                    [:button.mlb-reset.explore-view-block.create-topic-bt
-                     {:on-click #(nav-actions/show-section-add)}
-                     [:span.plus]
-                     [:span.new-topic "Add new topic"]])
-                  (when (and is-topics
-                             (:can-create-label? org-data))
-                    [:button.mlb-reset.explore-view-block.manage-labels-bt
-                     {:on-click #(label-actions/show-labels-manager)}
-                     [:span.manage-labels-bt-icon]
-                     [:span.manage-labels-bt-text
-                       "Manage labels"]])]
-                (when-not is-topics
-                  [:div.board-name-right
-                    (when should-show-settings-bt
-                      [:div.board-settings-container
+                        :else
+                            ;; Fallback to the org board data
+                            ;; to avoid showing an empty name while loading
+                            ;; the board data
+                        (:name container-data))]]
+                (when (and (= (:access container-data) "private")
+                            (not is-drafts-board))
+                  [:div.private-board
+                    {:data-toggle "tooltip"
+                      :data-placement "top"
+                      :data-container "body"
+                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                      :title (if (= current-board-slug utils/default-drafts-board-slug)
+                              "Only visible to you"
+                              "Only visible to invited team members")}])
+                (when (= (:access container-data) "public")
+                  [:div.public-board
+                    {:data-toggle "tooltip"
+                      :data-placement "top"
+                      :data-container "body"
+                      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                      :title "Visible to the world, including search engines"}])
+                (when (and is-topics
+                            can-create-topic?)
+                  [:button.mlb-reset.explore-view-block.create-topic-bt
+                    {:on-click #(nav-actions/show-section-add)}
+                    [:span.plus]
+                    [:span.new-topic "Add new topic"]])
+                (when (and is-topics
+                           (:can-create-label? org-data))
+                  [:button.mlb-reset.explore-view-block.manage-labels-bt
+                   {:on-click #(label-actions/show-labels-manager)}
+                   [:span.manage-labels-bt-icon]
+                   [:span.manage-labels-bt-text
+                    "Manage labels"]])]
+              (when-not is-topics
+                [:div.board-name-right
+                 (when should-show-settings-bt
+                   [:div.board-settings-container
                         ;; Settings button
-                        [:button.mlb-reset.board-settings-bt
-                          {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                          :data-placement "top"
-                          :data-container "body"
-                          :title (str (:name container-data) " settings")
-                          :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                   (when should-show-label-edit-bt
-                     [:div.board-settings-container
+                    [:button.mlb-reset.board-settings-bt
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title (str (:name container-data) " settings")
+                      :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
+                 (when should-show-label-edit-bt
+                   [:div.board-settings-container
                         ;; Settings button
-                      [:button.mlb-reset.board-settings-bt
-                       {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                        :data-placement "top"
-                        :data-container "body"
-                        :title (str (:name label-data) " edit")
-                        :on-click #(label-actions/edit-label label-data)}]])])])
-              (when show-feed?
-                ;; Board content: empty org, all posts, empty board, drafts view, entries view
-                (cond
-                  ;; Explore view
-                  is-topics
-                  (explore-view)
-                  ;; No boards
-                  (zero? (count (:boards org-data)))
-                  (empty-org)
-                  ;; Empty board
-                  empty-container?
-                  (empty-board)
-                  ;; Paginated board/container
-                  :else
-                  (rum/with-key (lazy-stream paginated-stream) paginated-stream-key)))]]]))
+                    [:button.mlb-reset.board-settings-bt
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title (str (:name label-data) " edit")
+                      :on-click #(label-actions/edit-label label-data)}]])])]
+              ;; Board content: empty org, all posts, empty board, drafts view, entries view
+              (cond
+                ;; Explore view
+                is-topics
+                (explore-view)
+                ;; No boards
+                (zero? (count (:boards org-data)))
+                (empty-org)
+                ;; Empty board
+                empty-container?
+                (empty-board)
+                ;; Paginated board/container
+                :else
+                (rum/with-key (lazy-stream paginated-stream) paginated-stream-key))]]]))

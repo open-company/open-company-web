@@ -10,6 +10,20 @@ div.more-menu {
     z-index: 1132;
   }
 
+  &.left-gradient {
+    background-color: var(--foc-background-color);
+
+    &:before {
+      width: 24px;
+      height: 32px;
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -24px;
+      background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
+    }
+  }
+
   div.activity-move {
     position: absolute;
     top: 26px;

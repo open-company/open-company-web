@@ -1,5 +1,5 @@
 (ns oc.web.utils.mention
-  (:require [oc.web.lib.react-utils :as react-utils]
+  (:require [oops.core :refer (ocall)]
             ["react" :as react :refer (createElement)]
             ["react-dom" :as react-dom]
             ["medium-editor" :as medium-editor]
@@ -8,9 +8,9 @@
 
 (defn- destroy [editor-node]
   (let [me-editor (.getEditorFromElement ^js medium-editor editor-node)
-        mention-extention (me-editor.base.getExtensionByName "mention")]
-    (when mention-extention
-      (.hidePanel ^js mention-extention))))
+        mention-extension (ocall me-editor "getExtensionByName" "mention")]
+    (when mention-extension
+      (.hidePanel ^js mention-extension))))
 
 (defn mention-ext [editor-node users-list]
   (let [mention-props {:tagName "span"
@@ -22,7 +22,7 @@
                                                              (clj->js {"currentMentionText" current-mention-text
                                                                        "users" (clj->js users-list)
                                                                        "selectMentionCallback" select-mention-callback
-                                                                            ;;  "hidePanel" (fn [] (destroy editor-node))
+                                                                       "hidePanel" (fn [] (destroy editor-node))
                                                                        }))
                                               panel-el))
                        :activeTriggerList ["@"]}]

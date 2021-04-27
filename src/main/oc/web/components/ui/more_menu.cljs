@@ -96,7 +96,7 @@
   [s {:keys [entity-data current-user-data entity-type
              hide-share? external-share
              editable-boards
-             tooltip-position mobile-tray-menu custom-class
+             tooltip-position mobile-tray-menu custom-classes
              show-edit? edit-cb
              show-delete? delete-cb
              show-move?
@@ -181,7 +181,18 @@
                                      (or add-bookmark-link
                                          remove-bookmark-link))
                                 show-internal-labels?
-                                pins?)]
+                                pins?)
+        main-classes* (utils/class-set {:menu-expanded showing-menu?
+                                        :has-more-menu-bt should-show-more-bt
+                                        :mobile-tray-menu mobile-tray-menu
+                                        :android-browser (and ua/android?
+                                                              (not ua/mobile-app?))
+                                        :ios-browser (and ua/ios?
+                                                          (not ua/mobile-app?))
+                                        :showing-share foc-share-entry
+                                        :move-activity foc-activity-move
+                                        :foc-labels-picker foc-labels-picker})
+        main-classes (str main-classes* " " custom-classes)]
     (when (or edit-link
               share-link
               delete-link
@@ -196,21 +207,8 @@
               can-edit-labels?
               foc-labels-picker)
       [:div.more-menu.foc-menu-event-stop
-        {:data-entity-type entity-type
-         :data-content-type (:content-type entity-data)
-         :data-uuid (:uuid entity-data)
-         :class (utils/class-set {:menu-expanded foc-menu-open
-                                  :has-more-menu-bt should-show-more-bt
-                                  :mobile-tray-menu mobile-tray-menu
-                                  :android-browser (and ua/android?
-                                                        (not ua/mobile-app?))
-                                  :ios-browser (and ua/ios?
-                                                    (not ua/mobile-app?))
-                                  :showing-share foc-share-entry
-                                  :move-activity foc-activity-move
-                                  :foc-labels-picker foc-labels-picker
-                                  custom-class (seq custom-class)})
-         :ref "more-menu"
+        {:ref "more-menu"
+         :class main-classes
          :on-click (when mobile-tray-menu
                      #(when (and foc-menu-open
                                  (not (dom-utils/event-container-matches % "ul.more-menu-list li")))

@@ -22,7 +22,6 @@
             [oc.web.components.ui.labels :refer (org-labels-list label-editor)]
             ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
-            [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -262,9 +261,6 @@
           ;; UI Theme settings panel
           (= open-panel :theme)
           (theme-settings-modal theme-data)
-          ;; User info modal
-          show-user-info?
-          (user-info-modal {:user-data user-info-data :org-data org-data})
           ;; Follow user picker
           ;; show-follow-picker
           ;; (follow-picker)

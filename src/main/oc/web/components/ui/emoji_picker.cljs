@@ -1,29 +1,31 @@
 (ns oc.web.components.ui.emoji-picker
   (:require [rum.core :as rum]
-            [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.rum :as rutils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
-            [goog.object :as gobj]
             [goog.events.EventType :as EventType]
-            [oc.lib.cljs.useragent :as ua]
             ["emoji-mart" :as emoji-mart :refer (Picker)]
-            ["@rangy/core" :refer (getSelection)]
-            ["@rangy/selectionsaverestore" :refer (saveSelection restoreSelection removeMarkers)]))
+            ["@rangy/core" :refer (getSelection)
+                           :rename {getSelection rangy-get-selection}]
+            ["@rangy/selectionsaverestore" :refer (saveSelection restoreSelection removeMarkers)
+                                           :rename {saveSelection rangy-save-selection
+                                                    restoreSelection rangy-restore-selection
+                                                    removeMarkers rangy-remove-markers}]))
+
+(def emoji-mart-picker (partial rutils/build Picker))
 
 (def emojiable-class "emojiable")
 
-(defn emojiable-active?
-  []
+(defn emojiable-active? []
   (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0))
 
 (defn remove-markers [s]
   (when-let  [caret-pos @(::caret-pos s)]
     (when (= (:type caret-pos) "rangy")
-      (removeMarkers (:selection caret-pos)))))
+      (rangy-remove-markers (:selection caret-pos)))))
 
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
@@ -46,17 +48,18 @@
         (reset! (::last-active-element s) active-element)
         (reset! caret-pos
          (if (#{"TEXTAREA" "INPUT"} (.-tagName active-element))
-           {:type "default" :selection (js/OCStaticTextareaSaveSelection)}
-           {:type "rangy" :selection (saveSelection js/window)})))
+           {:type "default" :selection (dom-utils/textarea-save-selection)}
+           {:type "rangy" :selection (rangy-save-selection js/window)})))
       (reset! caret-pos nil))))
 
 (defn replace-with-emoji [s emoji]
   (when-let [caret-pos @(::caret-pos s)]
-    (if (= (:type caret-pos) "rangy")
-      (do (restoreSelection (:selection caret-pos))
-          (js/pasteHtmlAtCaret (gobj/get emoji "native") (getSelection js/window) false))
-      (do (js/OCStaticTextareaRestoreSelection (:selection caret-pos))
-          (js/pasteTextAtSelection @(::last-active-element s) (gobj/get emoji "native"))))))
+    (let [native-emoji (dom-utils/get-native-emoji emoji)]
+      (if (= (:type caret-pos) "rangy")
+        (do (rangy-restore-selection (:selection caret-pos))
+            (js/pasteHtmlAtCaret native-emoji (rangy-get-selection js/window) false))
+        (do (dom-utils/textarea-restore-selection (:selection caret-pos))
+            (js/pasteTextAtSelection @(::last-active-element s) native-emoji))))))
 
 (defn check-focus [s _]
   (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
@@ -139,7 +142,9 @@
          :data-placement (or tooltip-position "top")
          :data-container "body"
          :data-toggle "tooltip"
-         :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))
+         :disabled (and (not default-field-selector)
+                        (not force-enabled)
+                        @(::disabled s))
          :on-mouse-down #(when (or default-field-selector force-enabled (not @(::disabled s)))
                            (save-caret-position s)
                            (let [vis (and (or default-field-selector
@@ -148,10 +153,10 @@
                                           (not @visible))]
                              (if vis
                                (do
-                                (when ua/mobile?
-                                  (dom-utils/lock-page-scroll))
-                                (when (fn? will-open-picker)
-                                  (will-open-picker vis)))
+                                 (when ua/mobile?
+                                   (dom-utils/lock-page-scroll))
+                                 (when (fn? will-open-picker)
+                                   (will-open-picker vis)))
                                (do
                                  (when (fn? will-close-picker)
                                    (will-close-picker vis))
@@ -160,30 +165,30 @@
                              (reset! visible vis)))}]
      (when @visible
        [:div.picker-container
-         {:class (utils/class-set {position true})}
-         [:button.mlb-reset.mobile-cancel-bt
-          {:on-click #(do
-                        (remove-markers s)
-                        (when (fn? will-close-picker)
-                          (will-close-picker))
-                        (reset! visible false))}
-          "Cancel"]
-         (when-not (utils/is-test-env?)
-           (react-utils/build Picker
-             {:native true
-              :autoFocus true
-              :onClick (fn [emoji event]
-                         (when (and default-field-selector
-                                    (not @(::caret-pos s)))
-                           (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
-                           (save-caret-position s))
-                         (let [add-emoji? (boolean @(::caret-pos s))]
-                           (when add-emoji?
-                             (replace-with-emoji s emoji)
-                             (remove-markers s)
-                             (.focus @last-active-element))
-                           (when (fn? will-close-picker)
-                             (will-close-picker))
-                           (reset! visible false)
-                           (when (fn? add-emoji-cb)
-                             (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))
+        {:class (utils/class-set {position true})}
+        [:button.mlb-reset.mobile-cancel-bt
+         {:on-click #(do
+                       (remove-markers s)
+                       (when (fn? will-close-picker)
+                         (will-close-picker))
+                       (reset! visible false))}
+         "Cancel"]
+        (when-not (utils/is-test-env?)
+          (emoji-mart-picker
+           {:native true
+            :autoFocus true
+            :onClick (fn [emoji event]
+                       (when (and default-field-selector
+                                  (not @(::caret-pos s)))
+                         (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
+                         (save-caret-position s))
+                       (let [add-emoji? (boolean @(::caret-pos s))]
+                         (when add-emoji?
+                           (replace-with-emoji s emoji)
+                           (remove-markers s)
+                           (.focus @last-active-element))
+                         (when (fn? will-close-picker)
+                           (will-close-picker))
+                         (reset! visible false)
+                         (when (fn? add-emoji-cb)
+                           (add-emoji-cb @last-active-element emoji add-emoji?))))}))])]))
