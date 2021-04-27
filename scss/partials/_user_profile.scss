@@ -4,6 +4,11 @@ div.user-profile-container {
   border: 1px solid var(--divider-line);
   padding: 22px 24px 24px;
 
+  @include mobile() {
+    border-radius: 0;
+    border: none;
+  }
+
   div.user-profile {
     div.user-profile-header {
       display: flex;
@@ -48,12 +53,33 @@ div.user-profile-container {
           max-width: 100%;
           overflow: hidden;
 
+          @include mobile() {
+            min-height: 22px;
+            max-height: 48px; // 2 lines + 4 pixels margin
+            height: auto;
+            flex: 0 0 auto;
+            flex-flow: row wrap;
+
+            span.name {
+              margin-bottom: 4px;
+            }
+
+            span.role {
+              margin-bottom: 4px;
+            }
+
+            button.edit-profile-bt {
+              margin-bottom: 4px;
+            }
+          }
+
           span.name {
             @include OC_Body_Bold();
             color: var(--color);
             font-size: 22px;
             line-height: 24px;
             flex: 0 1 auto;
+            margin-right: 6px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -65,7 +91,6 @@ div.user-profile-container {
             font-size: 16px;
             line-height: 20px;
             flex: 0 0 auto;
-            margin-left: 6px;
             margin-right: 24px;
           }
 
