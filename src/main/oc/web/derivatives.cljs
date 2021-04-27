@@ -186,7 +186,6 @@
                          (fn [posts-data label-entries-data label-slug]
                            (when (and label-entries-data label-slug)
                              (let [first-uuid (-> label-entries-data :posts-list first :uuid)
-                                   first-entry (get posts-data first-uuid)
                                    first-entry-labels (get-in posts-data [first-uuid :labels])
                                    label-data (dis/find-label first-entry-labels {:slug label-slug})]
                                label-data)))]
