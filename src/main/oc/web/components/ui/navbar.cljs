@@ -1,32 +1,20 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
-            [oc.web.urls :as oc-urls]
-            [oc.lib.user :as lib-user]
-            [oc.lib.cljs.useragent :as ua]
-            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
-            [oc.web.components.ui.menu :as menu]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.components.ui.user-avatar :refer (user-avatar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.navigation-sidebar :as navigation-sidebar]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)])
   (:import [goog.async Throttle]))
-
-(defn- mobile-nav! [e board-slug]
-  (router/nav! (oc-urls/board board-slug)))
 
 (def scroll-top-offset 46)
 
@@ -71,13 +59,11 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
-                current-user-data
-                mobile-user-notifications]
-         :as navbar-data} (drv/react s :navbar-data)
+                mobile-user-notifications]} (drv/react s :navbar-data)
         is-mobile? (responsive/is-mobile-size?)
         current-panel (last panel-stack)
         expanded-user-menu (= current-panel :menu)
-        cmail-state (drv/react s :cmail-state)
+        org-board-data (dis/org-board-data org-data current-board-slug)
         mobile-title (cond
                        mobile-user-notifications
                        "Alerts"
@@ -97,9 +83,10 @@
                        "You"
                        (and current-contributions-id (map? contributions-user-data))
                        (:name contributions-user-data)
+                       (seq (:name board-data))
+                       (:name board-data)
                        :else
-                       (:name board-data))
-        search-active? (drv/react s search/search-active?)]
+                       (:name org-board-data))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
