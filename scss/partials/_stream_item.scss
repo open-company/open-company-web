@@ -594,31 +594,24 @@ div.stream-item {
         display: block;
         order: 5;
         height: 22px;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: flex-start;
 
         span.mobile-attachments-icon {
-          display: inline-block;
-          width: 18px;
-          height: 22px;
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 18px 20px;
-          background-repeat: no-repeat;
-          background-position: center;
-          margin-right: 6px;
-          opacity: 0.5;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
+          width: 13px;
+          height: 15px;
+          @include svgBgColor("/img/ML/multi_picker_attachment_icon.svg", center, 13px 15px, var(--light-color));
+          margin-right: 8px;
         }
 
-        span.mobile-attachments-count {
+        div.mobile-attachments-count {
           @include OC_Body_Book();
-          font-size: 17px;
-          line-height: 22px;
+          font-size: 14px;
+          line-height: 14px;
           color: var(--light-color);
-          display: inline-block;
-          height: 22px;
-          vertical-align: top;
+          box-sizing: content-box;
         }
       }
     }

@@ -70,7 +70,7 @@
             (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
       [:div.stream-item-mobile-attachments.foc-click-stop
        [:span.mobile-attachments-icon]
-       [:span.mobile-attachments-count
+       [:div.mobile-attachments-count
         (count activity-attachments)]])))
 
 (rum/defc stream-item-footer <
