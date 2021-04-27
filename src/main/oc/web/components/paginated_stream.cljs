@@ -429,7 +429,7 @@
   ;;       container-data))))
   {:will-mount (fn [s]
     (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-    ;; (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
+    (reset! (::scroll-listener s) (events/listen js/window EventType/SCROLL #(did-scroll s)))
     s)
    :did-mount (fn [s]
     (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
