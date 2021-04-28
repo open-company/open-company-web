@@ -41,6 +41,7 @@
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :user-notifications)
                               (drv/drv :show-invite-box)
+                              (drv/drv :foc-menu)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:did-mount (fn [s]
@@ -55,7 +56,8 @@
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
         label-data (drv/react s :label-data)
-        posts-data (drv/react s :filtered-posts)
+        _posts-data (drv/react s :filtered-posts)
+        _foc-menu (drv/react s :foc-menu)
         current-board-slug (drv/react s :board-slug)
         current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
@@ -117,6 +119,7 @@
                                  (or (not is-contributions)
                                      (not (:collapsed cmail-state))))
         paginated-stream-key (str "paginated-posts-component-"
+                              current-org-slug "-"
                               (cond is-contributions
                                     current-contributions-id
                                     is-label

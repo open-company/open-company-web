@@ -20,8 +20,9 @@
 (defmethod dispatcher/action :org-nav-out
   [db [_ from-org to-org]]
   (-> db
-   (assoc :orgs-dropdown-visible false)
-   (assoc :mobile-navigation-sidebar false)
-   (dissoc (first dispatcher/cmail-state-key))
-   (dissoc (first dispatcher/cmail-data-key))
-   (dissoc dispatcher/payments-ui-upgraded-banner-key)))
+      (assoc :orgs-dropdown-visible false)
+      (assoc :mobile-navigation-sidebar false)
+      (dissoc (first dispatcher/cmail-state-key))
+      (dissoc (first dispatcher/cmail-data-key))
+      (dissoc dispatcher/foc-menu-key)
+      (dissoc dispatcher/payments-ui-upgraded-banner-key)))

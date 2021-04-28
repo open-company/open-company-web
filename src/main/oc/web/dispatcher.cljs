@@ -67,6 +67,8 @@
 
 ;; FoC Menu
 
+(def ^{:export true} foc-menu-key :foc-menu)
+
 (def ^{:export true} foc-show-menu-key :foc-show-menu)
 
 (def ^{:export true} foc-menu-open-key :foc-menu-open)
@@ -77,10 +79,7 @@
 
 (def ^{:export true} foc-labels-picker-key :foc-labels-picker)
 
-(def ^{:export true} foc-menu-keys
-  (conj [] foc-show-menu-key foc-menu-open-key foc-share-entry-key foc-activity-move-key foc-labels-picker-key))
-
-
+;; Org keys
 
 (defn ^:export org-key [org-slug]
   [(keyword org-slug)])
@@ -506,7 +505,6 @@
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
    :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
-   :foc-labels-picker  [[:base] (fn [base] (get base foc-labels-picker-key))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-price-key [[:base] (fn [base] (get base checkout-update-price-key))]
    :expo                [[:base] (fn [base] (get-in base expo-key))]
@@ -841,17 +839,7 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
-   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))] ;; Show the ... and other buttons and expand the ... menu
-   :foc-show-menu         [[:base] (fn [base] (get base :foc-show-menu))] ;; Show only the ... and the other buttons
-   :foc-activity-move     [[:base] (fn [base] (get base :foc-activity-move))] ;; Show the ... and other buttons plus the activity move modal
-   :foc-share-entry       [[:base] (fn [base] (get base :foc-share-entry))] ;; Show the ... and other buttons plus the activity share modal
-   :foc-menu              [[:foc-show-menu :foc-menu-open :foc-activity-move :foc-labels-picker :foc-share-entry]
-                           (fn [foc-show-menu foc-menu-open foc-activity-move foc-labels-picker foc-share-entry]
-                             {:foc-show-menu foc-show-menu
-                              :foc-menu-open foc-menu-open
-                              :foc-activity-move foc-activity-move
-                              :foc-share-entry foc-share-entry
-                              :foc-labels-picker foc-labels-picker})]
+   :foc-menu              [[:base] (fn [base] (get base foc-menu-key))]
    :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (user-labels-data base org-slug))]
    :show-label-editor     [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
@@ -1537,28 +1525,37 @@
 
 (defn ^:export foc-menu-data
   ([] (foc-menu-data @app-state))
-  ([db] (select-keys db foc-menu-keys)))
+  ([db] (get db foc-menu-key)))
 
 (defn ^:export foc-show-menu
   ([] (foc-show-menu @app-state))
-  ([db]
-   (get db foc-show-menu-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-show-menu-key))))
 
 (defn ^:export foc-menu-open
   ([] (foc-menu-open @app-state))
-  ([db] (get db foc-menu-open-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-menu-open-key))))
 
 (defn ^:export foc-share-entry
   ([] (foc-share-entry @app-state))
-  ([db] (get db foc-share-entry-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-share-entry-key))))
 
 (defn ^:export foc-activity-move
   ([] (foc-activity-move @app-state))
-  ([db] (get db foc-activity-move-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-activity-move))))
 
 (defn ^:export foc-labels-picker
   ([] (foc-labels-picker @app-state))
-  ([db] (get db foc-labels-picker-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-labels-picker-key))))
 
 ;; Seen
 

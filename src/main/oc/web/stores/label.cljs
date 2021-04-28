@@ -40,7 +40,7 @@
 
 (defmethod dispatcher/action :label-create
   [db [_ org-slug label-data]]
-  (let [foc-labels-picker (get-in db dispatcher/foc-labels-picker-key)
+  (let [foc-labels-picker (dispatcher/foc-labels-picker db)
         picker-entry-labels-key (when foc-labels-picker
                                   (dispatcher/entry-labels-key org-slug foc-labels-picker))]
     (if (label-utils/can-add-label? (get-in db picker-entry-labels-key))
@@ -53,7 +53,7 @@
 
 (defmethod dispatcher/action :label-update
   [db [_ org-slug label-data]]
-  (let [foc-labels-picker (get-in db dispatcher/foc-labels-picker-key)
+  (let [foc-labels-picker (dispatcher/foc-labels-picker db)
         picker-entry-labels-key (when foc-labels-picker
                                   (dispatcher/entry-labels-key org-slug foc-labels-picker))]
     (if (label-utils/can-add-label? (get-in db picker-entry-labels-key))
