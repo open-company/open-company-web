@@ -412,7 +412,6 @@
   (rum/local false ::has-next)
   (rum/local nil ::bottom-loading)
   ;; Mixins
-  mixins/first-render-mixin
   section-mixins/container-nav-in
   ; section-mixins/window-focus-auto-loader
   ;; (section-mixins/load-entry-comments (fn [s]
