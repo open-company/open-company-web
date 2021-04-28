@@ -720,7 +720,8 @@
                               :dispatch-key (first dis/cmail-data-key)
                               :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
-      (when-not (:collapsed cmail-state)
+      (when (and (map? cmail-state)
+                 (not (:collapsed cmail-state)))
         [:div.cmail-labels
          (cmail-labels-list)])
       [:div.cmail-footer
