@@ -49,7 +49,6 @@
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base dis/add-comment-force-update-root-key))]
    :mobile-swipe-menu   [[:base] (fn [base] (:mobile-swipe-menu base))]
-   :foc-labels-picker  [[:base] (fn [base] (get base dis/foc-labels-picker-key))]
    dis/checkout-result-key [[:base] (fn [base] (get base dis/checkout-result-key))]
    dis/checkout-update-price-key [[:base] (fn [base] (get base dis/checkout-update-price-key))]
    :expo                [[:base] (fn [base] (get-in base dis/expo-key))]
@@ -486,17 +485,7 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (dis/comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base dis/show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data dis/can-compose-key))]
-   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))] ;; Show the ... and other buttons and expand the ... menu
-   :foc-show-menu         [[:base] (fn [base] (get base :foc-show-menu))] ;; Show only the ... and the other buttons
-   :foc-activity-move     [[:base] (fn [base] (get base :foc-activity-move))] ;; Show the ... and other buttons plus the activity move modal
-   :foc-share-entry       [[:base] (fn [base] (get base :foc-share-entry))] ;; Show the ... and other buttons plus the activity share modal
-   :foc-menu              [[:foc-show-menu :foc-menu-open :foc-activity-move :foc-labels-picker :foc-share-entry]
-                           (fn [foc-show-menu foc-menu-open foc-activity-move foc-labels-picker foc-share-entry]
-                             {:foc-show-menu foc-show-menu
-                              :foc-menu-open foc-menu-open
-                              :foc-activity-move foc-activity-move
-                              :foc-share-entry foc-share-entry
-                              :foc-labels-picker foc-labels-picker})]
+   :foc-menu              [[:base] (fn [base] (get base dis/foc-menu-key))]
    :org-labels            [[:base :org-slug] (fn [base org-slug] (dis/org-labels-data base org-slug))]
    :user-labels           [[:base :org-slug] (fn [base org-slug] (dis/user-labels-data base org-slug))]
    :show-label-editor?    [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]

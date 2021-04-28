@@ -1,6 +1,5 @@
 (ns oc.web.mixins.seen
   (:require [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
             [oc.web.actions.activity :as aa]))
 
 (defn container-nav-mixin []

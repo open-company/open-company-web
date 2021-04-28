@@ -66,6 +66,8 @@
 
 ;; FoC Menu
 
+(def ^{:export true} foc-menu-key :foc-menu)
+
 (def ^{:export true} foc-show-menu-key :foc-show-menu)
 
 (def ^{:export true} foc-menu-open-key :foc-menu-open)
@@ -76,10 +78,7 @@
 
 (def ^{:export true} foc-labels-picker-key :foc-labels-picker)
 
-(def ^{:export true} foc-menu-keys
-  (conj [] foc-show-menu-key foc-menu-open-key foc-share-entry-key foc-activity-move-key foc-labels-picker-key))
-
-
+;; Org keys
 
 (defn ^:export org-key [org-slug]
   [(keyword org-slug)])
@@ -1152,28 +1151,37 @@
 
 (defn ^:export foc-menu-data
   ([] (foc-menu-data @app-state))
-  ([db] (select-keys db foc-menu-keys)))
+  ([db] (get db foc-menu-key)))
 
 (defn ^:export foc-show-menu
   ([] (foc-show-menu @app-state))
-  ([db]
-   (get db foc-show-menu-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-show-menu-key))))
 
 (defn ^:export foc-menu-open
   ([] (foc-menu-open @app-state))
-  ([db] (get db foc-menu-open-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-menu-open-key))))
 
 (defn ^:export foc-share-entry
   ([] (foc-share-entry @app-state))
-  ([db] (get db foc-share-entry-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-share-entry-key))))
 
 (defn ^:export foc-activity-move
   ([] (foc-activity-move @app-state))
-  ([db] (get db foc-activity-move-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-activity-move))))
 
 (defn ^:export foc-labels-picker
   ([] (foc-labels-picker @app-state))
-  ([db] (get db foc-labels-picker-key)))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-labels-picker-key))))
 
 ;; Seen
 
