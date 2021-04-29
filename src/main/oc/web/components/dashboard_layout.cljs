@@ -41,6 +41,7 @@
                               (drv/drv :user-notifications)
                               (drv/drv :show-invite-box)
                               (drv/drv :foc-menu)
+                              (drv/drv :activities-read)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:did-mount (fn [s]
@@ -57,6 +58,7 @@
         label-data (drv/react s :label-data)
         _foc-menu (drv/react s :foc-menu)
         _items-to-render (drv/react s :items-to-render)
+        _activities-read (drv/react s :activities-read)
         current-board-slug (drv/react s :board-slug)
         current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
