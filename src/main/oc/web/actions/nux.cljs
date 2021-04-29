@@ -113,7 +113,8 @@
     next-map))
 
 (defn- get-nux-type []
-  (cond (user-tags/user-tagged? :nux-admin)
+  (cond (or (user-tags/user-tagged? :nux-first-user)
+            (user-tags/user-tagged? :nux-admin))
         :admin
         (user-tags/user-tagged? :nux-author)
         :contributor
@@ -135,7 +136,7 @@
              (dis/current-org-slug)
              (router/is-home?)
              (not (user-tags/user-tagged? :nux-done))
-             (user-tags/user-tagged? [:nux-admin :nux-author :nux-viewer]))
+             (user-tags/user-tagged? [:nux-first-user :nux-admin :nux-author :nux-viewer]))
     (let [nux-type (get-nux-type)
           nux-state {:key :intro :nux-type nux-type}]
       (if (= (:key nux-state) :done)
@@ -222,7 +223,9 @@
   (when (fn? cb)
     (utils/after 100 cb)))
 
-(defn ^:export restart-nux [nux-type]
-  (user-tags/tag! (if nux-type (keyword nux-type) :nux-admin))
+(defn ^:export restart-nux
+  "Used for debug to test the nux a second time, triggered from console."
+  [nux-type]
+  (user-tags/tag! (if nux-type (keyword nux-type) :nux-first-user))
   (user-tags/untag! :nux-done)
   (utils/after 850 #(check-nux true)))
