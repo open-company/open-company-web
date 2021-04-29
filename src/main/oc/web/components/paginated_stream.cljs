@@ -430,13 +430,13 @@
    :did-remount (fn [_ s]
                   (check-pagination s)
                   s)
-   :before-render (fn [s]
-                    (let [container-data @(drv/get-ref s :container-data)]
-                      (when (and (not (:loading-more container-data))
-                                 @(::bottom-loading s))
-                        (reset! (::bottom-loading s) false)
-                        (check-pagination s)))
-                    s)
+   :did-update (fn [s]
+                 (let [container-data @(drv/get-ref s :container-data)]
+                   (when (and (not (:loading-more container-data))
+                              @(::bottom-loading s))
+                     (reset! (::bottom-loading s) false)
+                     (check-pagination s)))
+                 s)
    :will-unmount (fn [s]
                    (when @(::scroll-listener s)
                      (events/unlistenByKey @(::scroll-listener s))

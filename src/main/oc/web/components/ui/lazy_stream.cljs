@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
+            [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.lib.utils :as utils]))
 
@@ -45,4 +46,4 @@
                 (not data-ready?))
             [:div.lazy-stream-pre-render-view]
             :else
-            (stream-comp))]))
+            (paginated-stream))]))

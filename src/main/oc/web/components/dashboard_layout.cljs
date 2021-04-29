@@ -15,7 +15,6 @@
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.ui.follow-button :refer (follow-banner)]
-            [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -35,6 +34,7 @@
                               (drv/drv :contributions-id)
                               (drv/drv :activity-uuid)
                               (drv/drv :filtered-posts)
+                              (drv/drv :items-to-render)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :cmail-state)
@@ -56,7 +56,7 @@
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
         label-data (drv/react s :label-data)
-        _posts-data (drv/react s :filtered-posts)
+        _items-to-render (drv/react s :items-to-render)
         _foc-menu (drv/react s :foc-menu)
         current-board-slug (drv/react s :board-slug)
         current-label-slug (drv/react s :label-slug)
@@ -118,8 +118,8 @@
                                  can-compose?
                                  (or (not is-contributions)
                                      (not (:collapsed cmail-state))))
-        paginated-stream-key (str "paginated-posts-component-"
-                              current-org-slug "-"
+        paginated-stream-key (str "ps-"
+                                  current-org-slug "-"
                               (cond is-contributions
                                     current-contributions-id
                                     is-label
@@ -307,4 +307,4 @@
                 (empty-board)
                 ;; Paginated board/container
                 :else
-                (rum/with-key (lazy-stream paginated-stream) paginated-stream-key))]]]))
+                (rum/with-key (lazy-stream) paginated-stream-key))]]]))
