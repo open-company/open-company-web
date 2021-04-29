@@ -12,11 +12,19 @@ div.oc-labels {
   overflow-x: hidden;
   overflow-y: auto;
 
-  div.oc-labels-title {
+  div.oc-labels-title, div.oc-labels-title span {
     @include OC_Body_Bold();
     font-size: 16px;
     line-height: 18px;
     color: $deep_navy;
+
+    span.count {
+      @include OC_Body_Book();
+      font-size: 15px;
+      line-height: 18px;
+      color: $deep_navy;
+      margin-left: 6px;
+    }
   }
 
   button.oc-label, div.oc-label {

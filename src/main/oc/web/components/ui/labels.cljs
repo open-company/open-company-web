@@ -50,7 +50,10 @@
       [:div.oc-labels
         {:ref :oc-labels-ref}
         [:div.oc-labels-title
-        "Manage labels"]
+         (if (seq org-labels)
+           [:span "Manage labels"
+            [:span.count "(" (count org-labels) ")"]]
+           "Add labels")]
         (if (seq org-labels)
           (for [label org-labels]
             [:button.mlb-reset.oc-label
@@ -114,9 +117,9 @@
      [:div.oc-label-edit.fields-modal.oc-labels-modal
       {:ref :oc-labels-modal}
       [:div.oc-label-edit-title
-       (if (:uuid editing-label)
-         "Edit label"
-         "New label")]
+       (if (= (:slug editing-label) label-utils/default-label-slug)
+         "New label"
+         "Edit label")]
       [:div.oc-label-edit-name-header
        "Name"]
       [:input.field-value.oc-input
