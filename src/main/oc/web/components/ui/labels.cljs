@@ -32,34 +32,47 @@
   rum/static
   rum/reactive
   (drv/drv :org-labels)
+  (ui-mixins/on-key-press ["Escape"]
+                          (fn [_s _e]
+                            (label-actions/hide-labels-manager)))
+  (ui-mixins/on-click-out :oc-labels-ref
+                          (fn [_s _e]
+                            (label-actions/hide-labels-manager)))
+  ui-mixins/no-scroll-mixin
   [s]
   (let [org-labels (drv/react s :org-labels)]
     [:div.oc-labels-modal-wrapper
-      [:div.oc-labels.oc-labels-modal
-      [:div.oc-labels-title
-        "Add labels"]
-      (if (seq org-labels)
-        (for [label org-labels]
-          [:button.mlb-reset.oc-label
+     [:div.oc-labels-modal
+      [:button.mlb-reset.modal-close-bt
+       {:on-click (fn [e]
+                    (dom-utils/stop-propagation! e)
+                    (label-actions/hide-labels-manager))}]
+      [:div.oc-labels
+        {:ref :oc-labels-ref}
+        [:div.oc-labels-title
+        "Manage labels"]
+        (if (seq org-labels)
+          (for [label org-labels]
+            [:button.mlb-reset.oc-label
             {:data-label-slug (:slug label)
-            :class (when (:can-edit? label) "editable")
-            :key (str "label-" (or (:uuid label) (rand 1000)))
-            :on-click (when (:can-edit? label)
-                        (fn [e]
-                          (dom-utils/stop-propagation! e)
-                          (label-actions/edit-label label)))}
-            ;; (carrot-checkbox {:selected false})
+              :class (when (:can-edit? label) "editable")
+              :key (str "label-" (or (:uuid label) (rand 1000)))
+              :on-click (when (:can-edit? label)
+                          (fn [e]
+                            (dom-utils/stop-propagation! e)
+                            (label-actions/edit-label label)))}
+              ;; (carrot-checkbox {:selected false})
             [:span.oc-label-name
-            (:name label)]
+              (:name label)]
             [:span.oc-label-edit-pen]])
-        [:div.oc-labels-empty
+          [:div.oc-labels-empty
           "No labels yet"])
-      (add-label-bt {:label-text "Add label"
+        (add-label-bt {:label-text "Add label"
                       :on-click #(label-actions/new-label)})
-      [:div.oc-labels-footer
+        [:div.oc-labels-footer
         [:button.mlb-reset.cancel-bt
-        {:on-click #(label-actions/hide-labels-manager)}
-        "Close"]]]]))
+          {:on-click #(label-actions/hide-labels-manager)}
+          "Close"]]]]]))
 
 (defn- delete-confirm [e label]
   (dom-utils/stop-propagation! e)
@@ -79,12 +92,18 @@
   rum/static
   rum/reactive
   (drv/drv :editing-label)
+  (rum/local false ::has-changes)
   (ui-mixins/on-key-press ["Escape" "Enter"]
-                          (fn [_ e]
+                          (fn [s e]
                             (case (.-key e)
                               "Enter"
                               (label-actions/save-label)
                               "Escape"
+                              (when-not @(::has-changes s)
+                               (label-actions/dismiss-label-editor)))))
+  (ui-mixins/on-click-out :oc-labels-modal
+                          (fn [s _e]
+                            (when-not @(::has-changes s)
                               (label-actions/dismiss-label-editor))))
   {:did-mount (fn [s]
                 (.focus (rum/ref-node s :label-name-field))
@@ -92,32 +111,35 @@
   [s]
   (let [editing-label (drv/react s :editing-label)]
     [:div.oc-labels-modal-wrapper
-      [:div.oc-label-edit.fields-modal.oc-labels-modal
+     [:div.oc-label-edit.fields-modal.oc-labels-modal
+      {:ref :oc-labels-modal}
       [:div.oc-label-edit-title
-        (if (:uuid editing-label)
-          "Edit label"
-          "New label")]
+       (if (:uuid editing-label)
+         "Edit label"
+         "New label")]
       [:div.oc-label-edit-name-header
-        "Name"]
+       "Name"]
       [:input.field-value.oc-input
-        {:value (:name editing-label)
+       {:value (:name editing-label)
         :ref :label-name-field
         :max-length label-actions/max-label-name-length
         :class (when (:error editing-label)
-                  "error")
-        :on-change #(dis/dispatch! [:input [:editing-label :name] (oget % "target.value")])
+                 "error")
+        :on-change #(do
+                      (compare-and-set! (::has-changes s) false true)
+                      (dis/dispatch! [:input [:editing-label :name] (oget % "target.value")]))
         :placeholder "Name your label"}]
-        [:div.oc-label-footer
-        (when (:can-delete? editing-label)
-          [:button.mlb-reset.delete-bt
-            {:on-click #(delete-confirm % editing-label)}
-            "Delete"])
-        [:button.mlb-reset.cancel-bt
-          {:on-click #(label-actions/dismiss-label-editor)}
-          "Cancel"]
-        [:button.mlb-reset.save-bt
-          {:on-click #(label-actions/save-label)}
-          "Save"]]]]))
+      [:div.oc-label-footer
+       (when (:can-delete? editing-label)
+         [:button.mlb-reset.delete-bt
+          {:on-click #(delete-confirm % editing-label)}
+          "Delete"])
+       [:button.mlb-reset.cancel-bt
+        {:on-click #(label-actions/dismiss-label-editor)}
+        "Cancel"]
+       [:button.mlb-reset.save-bt
+        {:on-click #(label-actions/save-label)}
+        "Save"]]]]))
 
 (defn- labels-picker-list [labels-list selected-labels is-mobile? lock-add?]
   (for [label labels-list

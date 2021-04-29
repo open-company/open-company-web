@@ -4,17 +4,17 @@ div.oc-labels {
   border-radius: 6px;
   padding: 16px;
   height: auto;
-  min-width: 160px;
+  width: 240px;
   background-color: white;
   box-shadow: var(--labels-picker-box-shadow);
   border: var(--labels-picker-border);
-  max-height: 300px;
+  max-height: 50vh;
   overflow-x: hidden;
   overflow-y: auto;
 
   div.oc-labels-title {
     @include OC_Body_Bold();
-    font-size: 14px;
+    font-size: 16px;
     line-height: 18px;
     color: $deep_navy;
   }
@@ -178,6 +178,12 @@ div.oc-labels-modal-wrapper {
   justify-content: center;
   align-items: center;
   z-index: #{$navbar_zindex + 156};
+
+  button.modal-close-bt {
+    position: absolute;
+    top: 0;
+    right: -40px;
+  }
   
   div.oc-labels-modal {
     display: block;
