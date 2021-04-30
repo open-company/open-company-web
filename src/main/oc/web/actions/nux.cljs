@@ -12,6 +12,12 @@
 
 (def collapse-cmail cmail-actions/cmail-collapse)
 
+(defn- invite-box? []
+  (get @dis/app-state dis/show-invite-box-key))
+
+(defn- nux-done []
+  (user-tags/tag! :nux-done))
+
 (defn step-intro [steps _viewer?]
   {:title "Welcome!"
    :description "When you’re ready to add an update or some news for your team, click here anytime."
@@ -79,26 +85,33 @@
    :position :right
    :sel [:div.left-navigation-sidebar :div.invite-people-box]})
 
+(defn- dismiss-ready [viewer?]
+  (when-not viewer?
+    (cmail-actions/cmail-hide))
+  (nux-done))
+
 (defn step-ready [steps viewer?]
   {:title "You’re ready to go! 🎉"
    :description (if viewer?
                   "Check the latest update from your team."
                   "Give it a try. Add an update or start a discussion to get started.")
-   :steps (if viewer? (str "4 of " steps) (str "6 of " steps))
+   :steps (str steps " of " steps)
    :back-title "Back"
    :scroll :top
    :arrow-position :top
    :next-title "Done"
    :position :bottom
-   :post-next-cb (when-not viewer? cmail-actions/cmail-hide)
-   :post-dismiss-cb (when-not viewer? cmail-actions/cmail-hide)
+   :post-next-cb dismiss-ready
+   :post-dismiss-cb dismiss-ready
    :sel (if viewer?
           [:div.paginated-stream-cards :div.virtualized-list-item:first-child]
           [:div.cmail-outer])})
 
 (defn get-tooltip-data [step nux-type]
   (let [viewer? (= nux-type :viewer)
-        steps (if viewer? 4 6)
+        steps (cond viewer?       4
+                    (invite-box?) 6
+                    :else         5)
         step (case step
                :intro    (if viewer?
                            (step-news steps viewer?)
@@ -126,7 +139,7 @@
   [completed?]
   (dis/dispatch! [:input [:nux] nil])
   (when completed?
-    (user-tags/tag! :nux-done)))
+    (nux-done)))
 
 (defn check-nux
   [& [force?]]
@@ -154,7 +167,7 @@
      :news     :feed
      :feed     :settings
      :settings (if (or (= nux-type :viewer)
-                       (not (get @dis/app-state dis/show-invite-box-key)))
+                       (not (invite-box?)))
                  :ready
                  :invite)
      :invite   :ready
@@ -177,7 +190,6 @@
     ;; In case we are stalled on a value it means NUX is finished/dismissed
     (when (and (:key current-value)
                same-step?)
-      
       (end-nux true))
     (when (fn? prepare-cb)
       (prepare-cb))

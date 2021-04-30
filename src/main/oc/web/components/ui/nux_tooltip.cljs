@@ -82,17 +82,17 @@
   ([state init?]
    (let [args (-> state :rum/args first)
          data (:data args)
-         el (dommy/sel1 (:sel data))
+         el (when (:sel data) (dommy/sel1 (:sel data)))
          el-rect (when el (dom-utils/bounding-rect el))
          empty-rect? (and (map? el-rect)
                           (zero? (:width el-rect))
                           (zero? (:height el-rect)))]
      (cond init?
            (init-tooltip state data)
-           (or (not el) empty-rect?)
+           (or (not (:sel data)) (not el) empty-rect?)
            (when (fn? (:dismiss-cb args))
              ((:dismiss-cb args) false))
-           :else
+           (and el (not empty-rect?))
            (next-tooltip state el data)))))
 
 (rum/defcs nux-tooltip < rum/static
