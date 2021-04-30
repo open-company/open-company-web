@@ -165,16 +165,6 @@
 (defn label-editor-update [label-data]
   (dis/dispatch! [:label-editor/update label-data]))
 
-(defun get-label-entries
-  ([label] (get-label-entries label (dis/org-data) nil))
-  ([label org-data] (get-label-entries label org-data nil))
-  ([label :guard map? org-data cb] (get-label-entries label org-data nil))
-  ([label-slug :guard string? org-data cb]
-   (timbre/infof "Loading entries for label %s" label-slug)
-   (let [label-entries-link (hateoas/link-for (:links org-data) "partial-label-entries" {} {:label-slug label-slug})]
-     (api/get-entries label-entries-link
-                      ()))))
-
 ;; Label entries list
 
 (defn- watch-boards [posts-data]
