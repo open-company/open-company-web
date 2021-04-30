@@ -305,6 +305,3 @@
 (defn cmail-toggle-labels-views
   ([] (cmail-toggle-labels-views nil))
   ([v] (dis/dispatch! [:cmail-toggle-labels-views v])))
-
-(defn cmail-label-remove-last-label []
-  (dis/dispatch! [:cmail-label-remove-last-label]))
