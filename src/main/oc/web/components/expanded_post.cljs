@@ -92,6 +92,15 @@
                                     (not (seq (:foc-show-menu @(drv/get-ref s :foc-menu))))
                                     (not (seq @(drv/get-ref s :expand-image-src))))
                            (close-expanded-post e))))
+  (mixins/on-window-click-mixin (fn [_s e]
+                                  (when-not (dom-utils/event-container-matches e (str ".expanded-post-container, "
+                                                                                      ".exp-click-stop, "
+                                                                                      ".modal-wrapper, "
+                                                                                      ".label-modal-view, "
+                                                                                      ".labels-picker, "
+                                                                                      ".oc-labels-modal-wrapper, "
+                                                                                      ".emoji-autocomplete-menu"))
+                                    (close-expanded-post e))))
   {:will-mount (fn [s]
                  (reset! (::collapse-post s) (-> s (drv/get-ref :activity-data) deref :collapse-body?))
                  (save-initial-read-data s)
@@ -174,14 +183,7 @@
     [:div.expanded-post
       {:class (utils/class-set {:bookmark-item (:bookmarked-at activity-data)
                                 :muted-item muted-post?})
-       :style {:padding-bottom (str @(::comment-height s) "px")}
-       :data-last-activity-at (:last-activity-at activity-data)
-       :data-initial-last-read-at @(::initial-last-read-at s)
-       :data-last-read-at (:last-read-at activity-data)
-       :data-new-comments-count (:new-comments-count activity-data)
-       :data-unseen-comments (:unseen-comments activity-data)
-       :on-click #(when-not (dom-utils/event-container-matches % ".exp-click-stop")
-                    (close-expanded-post %))}
+       :style {:padding-bottom (str @(::comment-height s) "px")}}
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-container.exp-click-stop
         {:ref :expanded-post-container}
