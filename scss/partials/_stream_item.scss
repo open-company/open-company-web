@@ -187,15 +187,6 @@ div.stream-item {
     }
   }
 
-  // div.share-entry-container {
-  //   display: none;
-
-  //   div.activity-share-modal-container {
-  //     right: -9px;
-  //     margin-top: 24px;
-  //   }
-  // }
-
   // Mobile swipe buttons
   button.mobile-more-bt {
     height: 48px;
@@ -315,7 +306,6 @@ div.stream-item {
         @include mobile() {
           height: 32px;
           line-height: 32px;
-          // margin-left: 0;
 
           time {
             vertical-align: baseline;
@@ -337,7 +327,6 @@ div.stream-item {
       }
 
       div.bookmark-tag-small {
-        // margin-right: 0;
         flex: 0 0 auto;
         align-self: center;
       }
@@ -351,10 +340,6 @@ div.stream-item {
         align-self: center;
         opacity: 0.5;
         flex: 0 0 auto;
-
-        // @include mobile() {
-        //   margin-right: 8px;
-        // }
       }
     }
 

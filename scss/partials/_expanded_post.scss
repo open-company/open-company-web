@@ -267,24 +267,6 @@ div.expanded-post {
           }
         }
 
-        // button.more-menu-bt {
-        //   width: 32px;
-        //   height: 32px;
-        //   background-color: transparent;
-        //   padding: 0;
-        //   margin: 0 9px 0 0;
-        //   opacity: 0.5;
-
-        //   &:not(.disabled):hover, &:not(.disabled):active {
-        //     opacity: 1;
-        //     background-color: transparent;
-        //   }
-
-        //   &:first-child {
-        //     border-left: none;
-        //   }
-        // }
-
         ul.more-menu-list {
           top: 34px;
           left: 0px;
@@ -329,8 +311,8 @@ div.expanded-post {
           }
         }
 
-    $big-web-collapse-height: 134;
-    $mobile-collapse-height: 160;
+        $big-web-collapse-height: 134;
+        $mobile-collapse-height: 160;
         &.collapsed {
           height: #{$big-web-collapse-height}px;
           position: relative;

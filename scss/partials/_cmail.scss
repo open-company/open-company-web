@@ -935,7 +935,6 @@ div.cmail-outer {
           height: 32px;
           width: auto;
           opacity: 0.3;
-          // @include svgBgColor("/img/ML/cmail_delete.svg", 0px 8px, 14px 16px, var(--color));
           background-image: cdnUrl("/img/ML/cmail_delete.svg");
           background-size: 14px 16px;
           background-position: left 0px top 8px;

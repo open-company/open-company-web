@@ -1037,18 +1037,20 @@
         diff-ids (clj-set/difference request-set all-items)]
     (vec diff-ids)))
 
-;; Last used section
+;; Last used board
 
-(defn last-used-section []
-  (when-let [org-slug (dis/current-org-slug)]
-    (let [cookie-name (router/last-used-board-slug-cookie org-slug)]
-      (cook/get-cookie cookie-name))))
+(defn last-used-board
+  ([] (last-used-board (dis/current-org-slug)))
+  ([org-slug]
+   (when org-slug
+     (let [cookie-name (router/last-used-board-slug-cookie org-slug)]
+       (cook/get-cookie cookie-name)))))
 
-(defn save-last-used-section [section-slug]
+(defn save-last-used-board [board-slug]
   (let [org-slug (dis/current-org-slug)
         last-board-cookie (router/last-used-board-slug-cookie org-slug)]
-    (if section-slug
-      (cook/set-cookie! last-board-cookie section-slug (* 60 60 24 365))
+    (if board-slug
+      (cook/set-cookie! last-board-cookie board-slug (* 60 60 24 365))
       (cook/remove-cookie! last-board-cookie))))
 
 (def iso-format (time-format/formatters :date-time))

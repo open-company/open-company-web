@@ -58,13 +58,13 @@
                             :slug :board-slug})
       (select-keys [:board-name :board-access :board-uuid :board-slug :publisher-board])))
 
-(defn get-default-board
+(defn- get-default-board
   ([] (get-default-board (vals (dis/editable-boards-data))))
   ([editable-boards]
    (let [editable-boards (if (seq editable-boards)
                            editable-boards
                            (vals (dis/editable-boards-data)))
-         last-used-slug (au/last-used-section)
+         last-used-slug (au/last-used-board)
          last-used-board (when last-used-slug
                            (some #(when (and (not (:draft %)) (= (:slug %) last-used-slug)) %) editable-boards))
          board-data (or last-used-board (first editable-boards))]
