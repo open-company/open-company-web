@@ -73,7 +73,8 @@
   (when-not @click-out-listener
     (reset! click-out-listener (events/listen js/window EventType/CLICK
                                               (fn [e]
-                                                (when-not (dom-utils/event-container-matches e ".foc-menu-event-stop")
+                                                (when-not (dom-utils/event-container-matches e (str ".foc-menu-event-stop, "
+                                                                                                    ".oc-labels-modal-wrapper"))
                                                   (foc-menu-actions/hide-foc-menu-if-needed))))))
   (when-not @esc-press-listener
     (reset! esc-press-listener (events/listen js/window EventType/KEYUP

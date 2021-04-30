@@ -113,7 +113,7 @@
                 s)}
   [s]
   (let [editing-label (drv/react s :editing-label)]
-    [:div.oc-labels-modal-wrapper
+    [:div.oc-labels-modal-wrapper.foc-menu-event-stop.exp-click-stop.foc-click-stop.foc-collapsed-click-stop
      [:div.oc-label-edit.fields-modal.oc-labels-modal
       {:ref :oc-labels-modal}
       [:div.oc-label-edit-title
