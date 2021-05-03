@@ -98,7 +98,7 @@
                  s)
    :did-mount (fn [s]
                 (save-fixed-comment-height! s)
-                (reset! (::activity-uuid s) (-> s (drv/get-ref :activity-data) deref ::uuid))
+                (reset! (::activity-uuid s) (-> s (drv/get-ref :activity-data) deref :uuid))
                 (load-comments s true)
                 (mark-read s)
                 s)
