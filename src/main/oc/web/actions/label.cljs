@@ -91,7 +91,7 @@
    (let [create-label-link (hateoas/link-for (:links (dis/org-data)) "create-label")]
      (create-label create-label-link label-data)))
   ([create-label-link editing-label]
-   (timbre/infof "Creating label with name %s with link %s" (:name editing-label) (:hread create-label-link))
+   (timbre/infof "Creating label with name %s with link %s" (:name editing-label) (:href create-label-link))
    (let [org-slug (dis/current-org-slug)]
      (dis/dispatch! [:label-create org-slug editing-label])
      (api/create-label create-label-link editing-label (partial create-label-finished org-slug)))))
@@ -101,7 +101,7 @@
       (let [updated-label (json->cljs body)]
         (dismiss-label-editor)
         (dis/dispatch! [:label-update/finished org-slug updated-label])
-                             ;; Add label to entry that has the picker currently opened
+        ;; Add label to entry that has the picker currently opened
         (when-let [entry-uuid (dis/foc-labels-picker)]
           (entry-label-add entry-uuid (:uuid updated-label)))
                              ;; Add label to cmail if picker was opened from there
@@ -116,7 +116,7 @@
 (defn update-label
   ([label-data] (update-label (hateoas/link-for (:links label-data) "partial-update") label-data))
   ([update-label-link label-data]
-   (timbre/infof "Updating label %s with link %s" (:uuid label-data) (:hread update-label-link))
+   (timbre/infof "Updating label %s with link %s" (:uuid label-data) (:href update-label-link))
    (let [org-slug (dis/current-org-slug)]
      (dis/dispatch! [:label-update org-slug label-data])
      (api/update-label update-label-link label-data (partial update-label-finished org-slug)))))
@@ -164,16 +164,6 @@
 
 (defn label-editor-update [label-data]
   (dis/dispatch! [:label-editor/update label-data]))
-
-(defun get-label-entries
-  ([label] (get-label-entries label (dis/org-data) nil))
-  ([label org-data] (get-label-entries label org-data nil))
-  ([label :guard map? org-data cb] (get-label-entries label org-data nil))
-  ([label-slug :guard string? org-data cb]
-   (timbre/infof "Loading entries for label %s" label-slug)
-   (let [label-entries-link (hateoas/link-for (:links org-data) "partial-label-entries" {} {:label-slug label-slug})]
-     (api/get-entries label-entries-link
-                      ()))))
 
 ;; Label entries list
 

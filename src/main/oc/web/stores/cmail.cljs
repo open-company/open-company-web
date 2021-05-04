@@ -106,9 +106,3 @@
   (-> db
       (update-in (concat dispatcher/cmail-state-key [:labels-floating-view]) (partial labels-value-update optional-value))
       (update-in (concat dispatcher/cmail-state-key [:labels-inline-view]) (partial labels-value-update optional-value))))
-
-(defmethod dispatcher/action :cmail-label-remove-last-label
-  [db [_]]
-  (-> db
-      (update-in (conj dispatcher/cmail-data-key :labels) (comp vec butlast))
-      (assoc-in (conj dispatcher/cmail-data-key :has-changes) true)))

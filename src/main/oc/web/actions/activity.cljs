@@ -484,7 +484,7 @@
     (when (and (dis/current-activity-id)
                (not= board-slug (dis/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid entry-data))))
-    (au/save-last-used-section board-slug)
+    (au/save-last-used-board board-slug)
     (when-not is-published?
       (sa/drafts-get))
     ;; Remove saved cached item
@@ -712,8 +712,8 @@
            (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
 (defn- entry-publish-finish [initial-uuid edit-key org-slug board-slug entry-data]
-  ;; Save last used section
-  (au/save-last-used-section board-slug)
+  ;; Save last used board
+  (au/save-last-used-board board-slug)
   ; (refresh-org-data)
   ;; Remove entry cached edits
   (cmail-actions/remove-cached-item initial-uuid)
@@ -736,7 +736,7 @@
 
 (defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [saved-entry-data (first (:entries new-board-data))]
-    (au/save-last-used-section (:slug new-board-data))
+    (au/save-last-used-board (:slug new-board-data))
     (cmail-actions/remove-cached-item entry-uuid)
     ;; reset initial revision after successful publish.
     ;; need a new revision number on the next edit.
@@ -804,8 +804,6 @@
     (real-activity-delete activity-data)
     (when (:auto-saving activity-data)
       (utils/after 1000 #(real-activity-delete (dis/cmail-data))))))
-
-(def default-share-prefix "foc-")
 
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))

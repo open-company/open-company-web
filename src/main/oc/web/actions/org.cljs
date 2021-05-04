@@ -91,7 +91,7 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
-(defn get-default-board [org-data]
+(defn get-default-redirect-board [org-data]
   (let [last-board-slug oc-urls/default-board-slug]
     ; Replace default-board with the following to go back to the last visited board
     ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
@@ -272,7 +272,7 @@
            (not (dis/current-contributions-id))
            (not (dis/current-label-slug)))
       ;; Redirect to the first board if at least one is present
-      (let [board-to (get-default-board org-data)]
+      (let [board-to (get-default-redirect-board org-data)]
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))

@@ -126,9 +126,9 @@
                       (fn [{:keys [status success body]}]
                         (if success
                           (let [org-slug (dis/current-org-slug)
-                                last-used-section-slug (au/last-used-section)]
+                                last-used-section-slug (au/last-used-board)]
                             (when (= last-used-section-slug section-slug)
-                              (au/save-last-used-section nil))
+                              (au/save-last-used-board nil))
                             (when (fn? callback)
                               (callback section-slug))
                             (refresh-org-data)
