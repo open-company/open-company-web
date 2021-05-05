@@ -1,7 +1,5 @@
 (ns oc.web.components.ui.alert-modal
   (:require [rum.core :as rum]
-            [cljs.core.async :refer (go)]
-            [cljs.core.async.interop :refer-macros (<p!)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
