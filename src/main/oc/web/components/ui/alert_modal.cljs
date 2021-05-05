@@ -6,8 +6,7 @@
             [oc.web.mixins.ui :as mixins]))
 
 (defn show-alert [modal-data]
-  (let []
-    (dis/dispatch! [:input [:alert-modal] modal-data])))
+  (dis/dispatch! [:input [:alert-modal] modal-data]))
 
 (defn hide-alert []
   (dis/dispatch! [:input [:alert-modal :dismiss] true]))
