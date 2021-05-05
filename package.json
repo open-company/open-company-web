@@ -20,13 +20,13 @@
     "node-sass-chokidar": "^1.5.0",
     "nodemon": "^2.0.4",
     "normalize.scss": "^0.1.0",
-    "shadow-cljs": "^2.11.22"
+    "shadow-cljs": "^2.12.5"
   },
   "dependencies": {
     "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete#f0ebdaa084a9950903eecf18bcd6a764b3e2dd09",
     "@bago2k4/medium-editor-filedragging": "github:bago2k4/medium-editor-filedragging#mainline",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
-    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector",
+    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector#fix-ts",
     "@open-company/medium-editor-extentions": "github:open-company/medium-editor-extentions#mainline",
     "@rangy/core": "^2.1.0",
     "@rangy/selectionsaverestore": "^2.1.0",

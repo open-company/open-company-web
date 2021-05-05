@@ -18,7 +18,7 @@
   [funcool/cuerdas "2020.03.26-3"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
   [medley "1.2.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
   [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
-  [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
+  [binaryage/oops "0.7.1"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
 
   ;; Library for OC projects https://github.com/open-company/open-company-lib
   ;; ************************************************************************
