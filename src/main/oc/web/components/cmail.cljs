@@ -1,7 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [taoensso.timbre :as timbre]
             [oops.core :refer (oget ocall)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]

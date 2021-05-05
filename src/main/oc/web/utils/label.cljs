@@ -6,15 +6,21 @@
 
 ;; Labels comparison
 
-(defn label-compare-set [label]
-  (set [(:slug label) (:uuid label)]))
+(defn label-compare-set [label deep-check?]
+  (set [(:slug label)
+        (:uuid label)
+        (when deep-check?
+          (:name label))]))
 
-(defn compare-label [label-a label-b]
-  (seq (clj-set/intersection (label-compare-set label-a) (label-compare-set label-b))))
+(defn compare-label
+  ([label-a label-b] (compare-label label-a label-b false))
+  ([label-a label-b deep-check?] (seq (clj-set/intersection (label-compare-set label-a deep-check?) (label-compare-set label-b deep-check?)))))
 
-(defn compare-labels [labels label]
-  (seq (clj-set/intersection (label-compare-set label) (set (mapcat label-compare-set labels)))))
-
+(defn compare-labels
+  ([labels label] (compare-labels labels label false))
+  ([labels label deep-check?]
+   (let [list-values-set (set (mapcat #(label-compare-set % deep-check?) labels))]
+     (seq (clj-set/intersection (label-compare-set label deep-check?) list-values-set)))))
 
 ;; Data parse
 

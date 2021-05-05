@@ -1,7 +1,6 @@
 (ns oc.web.actions.label
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [oc.web.dispatcher :as dis]
-            [defun.core :refer (defun)]
             [cuerdas.core :as cstr]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
@@ -25,16 +24,17 @@
   (vec (sort-by (comp cstr/lower :name) org-labels-list)))
 
 (defn get-labels-finished [org-slug {:keys [body success]}]
-  (let [response-body (when success (json->cljs body))
-        parsed-labels (label-utils/parse-labels response-body)
-        retrieved-labels-data (-> (:collection response-body)
-                                  (dissoc :items)
-                                  (assoc :org-labels (org-labels parsed-labels))
-                                  (assoc :user-labels (user-labels parsed-labels)))]
-    (timbre/infof "Labels load success %s, loaded %d labels" success (count (:org-labels retrieved-labels-data)))
-    (dis/dispatch! [:labels-loaded org-slug retrieved-labels-data])
-    ;; Need to return the labels here
-    retrieved-labels-data))
+  (when success
+    (let [response-body (when success (json->cljs body))
+          parsed-labels (label-utils/parse-labels response-body)
+          retrieved-labels-data (-> (:collection response-body)
+                                    (dissoc :items)
+                                    (assoc :org-labels (org-labels parsed-labels))
+                                    (assoc :user-labels (user-labels parsed-labels)))]
+      (timbre/infof "Labels load success %s, loaded %d labels" success (count (:org-labels retrieved-labels-data)))
+      (dis/dispatch! [:labels-loaded org-slug retrieved-labels-data])
+      ;; Need to return the labels here
+      retrieved-labels-data)))
 
 (defn get-labels
   ([] (get-labels (dis/org-data)))
@@ -257,6 +257,7 @@
 (defn entry-label-add [entry-uuid label-uuid]
   (when-let* [org-slug (dis/current-org-slug)
               entry-data (dis/entry-data entry-uuid)
+              _can-add? (label-utils/can-add-label? (:labels entry-data))
               label-data (dis/label-data label-uuid)
               add-label-link (hateoas/link-for (:links entry-data)
                                                "partial-add-label" {}
