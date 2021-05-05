@@ -418,20 +418,22 @@
 
   ([edit-key entry-data entry-body callback]
   (let [entry-map (assoc entry-data :body entry-body)
-        cache-key (cmail-actions/get-entry-cache-key (:uuid entry-data))]
+        cache-key (cmail-actions/get-entry-cache-key (:uuid entry-data))
+        can-save? (and (not= "published" (:status entry-map))
+                       (:has-changes entry-map)
+                       (not (:auto-saving entry-map)))]
+    ;; dispatch that you are auto saving
+    (when can-save?
+      (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true
+                                                    :body (:body entry-map)
+                                                    :has-changes false})]))
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
      (fn [err]
        (when-not err
          ;; auto save on drafts that have changes
-         (when (and (not= "published" (:status entry-map))
-                    (:has-changes entry-map)
-                    (not (:auto-saving entry-map)))
-           ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true
-                                                         :body (:body entry-map)
-                                                         :has-changes false})])
+         (when can-save?
            (entry-save edit-key entry-map
              (fn [_ _ {:keys [success body]}]
                (if-not success
