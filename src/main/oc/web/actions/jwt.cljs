@@ -12,14 +12,17 @@
 
 ;; Logout
 
-(defn logout []
-  (timbre/info "Removing JWT cookie")
-  (jwt/remove-jwt!)
-  (utils/after 100
-              #(do
-                 (timbre/info "Redirecting user to" location)
-                 (router/redirect! oc-urls/logout)
-                 (dis/dispatch! [:logout]))))
+(defn logout
+  ([]
+   (logout oc-urls/logout))
+  ([location]
+   (timbre/info "Removing JWT cookie")
+   (jwt/remove-jwt!)
+   (utils/after 100
+                #(do
+                   (timbre/info "Redirecting user to" location)
+                   (router/redirect! oc-urls/logout)
+                   (dis/dispatch! [:logout])))))
 
 ;; ID Token
 
