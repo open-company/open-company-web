@@ -80,14 +80,18 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
 }
 
 // Get the jwt cookie to know if the user is logged in
+(function {
+console.debug("Read jwt from cookie");
 var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
 if (jwt) {
+  console.debug("JWT found, reading it and redirecting");
   var decoded_jwt = OCStaticGetDecodedJWT(jwt),
       your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
   if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
     window.location = your_board_url;
   }
 }
+})();
 
 function OCWebSetupStaticPagesJS(){
   var switchFn = function() {

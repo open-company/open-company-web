@@ -117,10 +117,15 @@
   (interval/start-interval! auto-updater))
 
 (defn remove-jwt! []
+  (timbre/debug "Remove jwt")
   (interval/stop-interval! auto-updater)
+  (timbre/debug "- removing cookie")
   (cook/remove-cookie! jwt-cookie-name)
+  (timbre/debug "- removing local version")
   (reset! -jwt nil)
+  (timbre/debug "- removing local content")
   (reset! -jwt-content nil)
+  (timbre/debug "- restart update interval")
   (interval/start-interval! auto-updater))
 
 ;; Keys
