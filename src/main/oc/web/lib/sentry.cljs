@@ -3,21 +3,27 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.jwt :as jwt]
             [oops.core :refer (oget ocall)]
+            [cuerdas.core :as s]
             ["@sentry/browser" :as sentry-browser]
             [taoensso.timbre :as timbre]
             [oc.web.utils.sentry :as sentry-utils]))
 
-(defn init-parameters [dsn]
-  {:tags {:isMobile (responsive/is-mobile-size?)
-          :hasJWT (not (not (jwt/jwt)))
-          :deployKey ls/deploy-key}
-   :sourceRoot ls/web-server
-   :release ls/sentry-release
-   :deploy ls/sentry-deploy
-   :debug (= ls/log-level "debug")
-   :dsn dsn
-   :normalizeDepth 6
-   :environment ls/sentry-env})
+(def p? (comp not s/empty-or-nil?))
+
+(defn ^:export init-parameters [dsn]
+  (cond-> {:tags {:isMobile (responsive/is-mobile-size?)
+                  :hasJWT (not (not (jwt/jwt)))}
+           :sourceRoot ls/web-server
+           :debug (= ls/log-level "debug")
+           :dsn dsn
+           :normalizeDepth 6}
+    (p? ls/sentry-release) (assoc :release ls/sentry-release)
+    (and (p? ls/sentry-release)
+         (p? ls/deploy-key)) (assoc-in [:tags :deploy-key] ls/deploy-key)
+    (and (p? ls/sentry-release)
+         (p? ls/deploy-key)) (merge {:deploy ls/deploy-key
+                                :dist ls/deploy-key})
+    (p? ls/sentry-env) (assoc :environment ls/sentry-env)))
 
 (defn sentry-setup []
   (let [sentry-params (init-parameters ls/local-dsn)]
