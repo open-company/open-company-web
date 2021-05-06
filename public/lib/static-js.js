@@ -80,7 +80,7 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
 }
 
 // Get the jwt cookie to know if the user is logged in
-(function {
+(function(){
 console.debug("Read jwt from cookie");
 var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
 if (jwt) {
