@@ -32,15 +32,15 @@
       (do
         (timbre/debugf "Setup Sentry: %s" sentry-params)
         (ocall sentry-browser "init" (clj->js sentry-params))
-        (.configureScope ^js sentry-browser (fn [scope]
-                                              (.setTag ^js scope "isMobile" (responsive/is-mobile-size?))
-                                              (.setTag ^js scope "hasJWT" (not (not (jwt/jwt))))
-                                              (when (jwt/jwt)
-                                                (timbre/debugf "Set Sentry user: %s" (jwt/get-key :user-id))
-                                                (.setUser ^js scope (clj->js {:user-id (jwt/get-key :user-id)
-                                                                              :id (jwt/get-key :user-id)
-                                                                              :first-name (jwt/get-key :first-name)
-                                                                              :last-name (jwt/get-key :last-name)})))))))))
+        (ocall sentry-browser "configureScope" (fn [scope]
+                                                 (ocall scope "setTag" "isMobile" (responsive/is-mobile-size?))
+                                                 (ocall scope "setTag" "hasJWT" (not (not (jwt/jwt))))
+                                                 (when (jwt/jwt)
+                                                   (timbre/debugf "Set Sentry user: %s" (jwt/get-key :user-id))
+                                                   (ocall scope "setUser" (clj->js {:user-id (jwt/get-key :user-id)
+                                                                                    :id (jwt/get-key :user-id)
+                                                                                    :first-name (jwt/get-key :first-name)
+                                                                                    :last-name (jwt/get-key :last-name)})))))))))
 
 (def capture-error! sentry-utils/capture-error!)
 

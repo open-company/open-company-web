@@ -2,6 +2,7 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
             ["jwt-decode" :as jwt-decode]
+            [oops.core :refer (ocall)]
             [oc.web.utils.sentry :as sentry])
   (:import [goog.net Cookies]))
 
@@ -33,7 +34,7 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def cookies-static-obj (Cookies. js/document))
+(def ^:export cookies-static-obj (Cookies. js/document))
 
 (defn- ^:private cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
@@ -50,17 +51,17 @@
     (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path c-domain c-secure]
    (check-length c-name (str c-value))
-   (.set cookies-static-obj (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
+   (ocall cookies-static-obj "set" (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
-  (.get cookies-static-obj (cookie-name c-name)))
+  (ocall cookies-static-obj "get" (cookie-name c-name)))
 
 (defn remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
   ([c-name]
-  (remove-cookie! (name c-name) "/"))
+   (remove-cookie! (name c-name) "/"))
   
   ([c-name opt-path]
-  (.remove cookies-static-obj (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
+   (ocall cookies-static-obj "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
