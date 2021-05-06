@@ -79,20 +79,6 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
   return url;
 }
 
-// Get the jwt cookie to know if the user is logged in
-(function(){
-console.debug("Read jwt from cookie");
-var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
-if (jwt) {
-  console.debug("JWT found, reading it and redirecting");
-  var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-      your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
-  if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
-    window.location = your_board_url;
-  }
-}
-})();
-
 function OCWebSetupStaticPagesJS(){
   var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
@@ -114,54 +100,6 @@ function OCWebSetupStaticPagesJS(){
   })
   $("button.keep-aligned-section-next-bt").on("click", switchFn);
 }
-
-document.addEventListener("DOMContentLoaded", function(_) {
-
-  if(!document.body?.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
-    document.body?.classList.add("ph-banner")
-  }
-
-  // Initialize tooltips
-  $('[data-toggle="tooltip"]').tooltip();
-  // Sticky header for marketing site
-  if ( $("nav.site-navbar").length > 0) {
-    $(window).on("scroll", function(){
-      if ($(window).scrollTop() < 54) {
-        $("nav.site-navbar").removeClass("sticky");
-      }else{
-        $("nav.site-navbar").addClass("sticky");
-      }
-    });
-  }
-
-  OCWebSetupStaticPagesJS();
-
-  $(window).on("click", function(e){
-    $target = $(e.target);
-    if (!$target.hasClass("tear-price-select") && !$target.parents(".tear-price-select").length) {
-      $("div.tear-price-select-container").removeClass("open");
-    }
-  });
-
-  if (jwt) {
-    $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("anonymous").addClass("your-digest");
-    $(".your-digest-after").attr("href", your_board_url);
-    $(".login-signup-or").hide();
-    // Remove the get started centered button if the user is signed in
-    $("#get-started-centred-bt").hide();
-
-    // Hide get started and login buttons in the footer
-    $("div.footer-small-links.static").hide();
-    // If in 404 page show error message for logged in users
-    $("div.error-page.not-found-page p.not-logged-in").hide();
-
-  }else{ // No logged in user
-    $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("your-digest").addClass("anonymous");
-    // If in 404 page show error message for not logged in users
-    $("div.error-page.not-found-page p.logged-in").show();
-  }
-
-});
 
 function OCStaticGetParameterByName(name, url) {
   if (!url)
@@ -272,29 +210,6 @@ function isiPhoneWithoutPhysicalHomeBt(){
   return false;
 }
 
-var OCYTVideoAutoplay = false;
-
-(function(){
-  $(document).ready(function(){
-    
-    var $appsBt = $("button.apps-bt");
-    if ($appsBt.length > 0) {
-      $appsBt.click(function(event){
-        event.stopPropagation();
-        $("div.apps-container").toggleClass("dropdown-menu-visible");
-      });
-      $(window).click(function(event){
-        $("div.apps-container").removeClass("dropdown-menu-visible");
-      });
-    }
-
-    if (window.location.pathname == "/" && window.location.hash == "#oc-video") {
-      OCYTVideoAutoplay = true;
-      OCStaticShowYTVideo()
-    }
-  });
-})();
-
 var OCYTVideoPlayer = null,
 OCYTVideoFinished = false;
 
@@ -359,3 +274,86 @@ function OCStaticShowYTVideo() {
   $("div.close-communigation-gaps-video").addClass("video-playing");
   OCYTVideoPlay();
 }
+
+(function(){
+  // Get the jwt cookie to know if the user is logged in
+  console.debug("Read jwt from cookie");
+  var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
+  if (jwt) {
+    console.debug("JWT found, reading it and redirecting");
+    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
+        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+    if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
+      window.location = your_board_url;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(_) {
+
+    if(!document.body?.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
+      document.body?.classList.add("ph-banner")
+    }
+
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+    // Sticky header for marketing site
+    if ( $("nav.site-navbar").length > 0) {
+      $(window).on("scroll", function(){
+        if ($(window).scrollTop() < 54) {
+          $("nav.site-navbar").removeClass("sticky");
+        }else{
+          $("nav.site-navbar").addClass("sticky");
+        }
+      });
+    }
+
+    OCWebSetupStaticPagesJS();
+
+    $(window).on("click", function(e){
+      $target = $(e.target);
+      if (!$target.hasClass("tear-price-select") && !$target.parents(".tear-price-select").length) {
+        $("div.tear-price-select-container").removeClass("open");
+      }
+    });
+
+    if (jwt) {
+      $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("anonymous").addClass("your-digest");
+      $(".your-digest-after").attr("href", your_board_url);
+      $(".login-signup-or").hide();
+      // Remove the get started centered button if the user is signed in
+      $("#get-started-centred-bt").hide();
+
+      // Hide get started and login buttons in the footer
+      $("div.footer-small-links.static").hide();
+      // If in 404 page show error message for logged in users
+      $("div.error-page.not-found-page p.not-logged-in").hide();
+
+    }else{ // No logged in user
+      $("div.site-navbar-container, div.site-mobile-menu-footer").removeClass("your-digest").addClass("anonymous");
+      // If in 404 page show error message for not logged in users
+      $("div.error-page.not-found-page p.logged-in").show();
+    }
+
+  });
+
+  var OCYTVideoAutoplay = false;
+
+  $(document).ready(function(){
+
+    var $appsBt = $("button.apps-bt");
+    if ($appsBt.length > 0) {
+      $appsBt.click(function(event){
+        event.stopPropagation();
+        $("div.apps-container").toggleClass("dropdown-menu-visible");
+      });
+      $(window).click(function(event){
+        $("div.apps-container").removeClass("dropdown-menu-visible");
+      });
+    }
+
+    if (window.location.pathname == "/" && window.location.hash == "#oc-video") {
+      OCYTVideoAutoplay = true;
+      OCStaticShowYTVideo()
+    }
+  });
+})();
