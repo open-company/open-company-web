@@ -19,8 +19,10 @@
              oc-urls/home)))
   ([location]
    (jwt/remove-jwt!)
-   (router/redirect! location)
-   (dis/dispatch! [:logout])))
+   (utils/after 10
+                #(do
+                   (router/redirect! location)
+                   (dis/dispatch! [:logout])))))
 
 ;; ID Token
 

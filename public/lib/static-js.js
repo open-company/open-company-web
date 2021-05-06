@@ -113,8 +113,8 @@ function OCWebSetupStaticPagesJS(){
 
 document.addEventListener("DOMContentLoaded", function(_) {
 
-  if(!document.body.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
-    document.body.classList.add("ph-banner")
+  if(!document.body?.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
+    document.body?.classList.add("ph-banner")
   }
 
   // Initialize tooltips
@@ -175,12 +175,12 @@ function OCStaticGetParameterByName(name, url) {
 function OCStaticSiteMobileMenuToggle(){
   var menuClass = "mobile-menu-expanded";
   var body = document.body;
-  if (body.classList.contains(menuClass)) {
+  if (body?.classList.contains(menuClass)) {
     body.querySelector("div.site-mobile-menu").classList.add("hidden");
     body.classList.remove(menuClass);
   } else {
     body.querySelector("div.site-mobile-menu").classList.remove("hidden");
-    body.classList.add(menuClass);
+    body?.classList.add(menuClass);
   }
 }
 
@@ -222,20 +222,20 @@ function OCStaticStartFixFixedPositioning(sel) {
 
 function OCStaticShowPHBanner(){
   OCStaticHideCovidBanner();
-  document.body.classList.add("ph-banner")
+  document.body?.classList.add("ph-banner")
 }
 
 function OCStaticHidePHBanner(){
-  document.body.classList.remove("ph-banner")
+  document.body?.classList.remove("ph-banner")
 }
 
 function OCStaticShowCovidBanner(){
   OCStaticHidePHBanner();
-  document.body.classList.add("covid-banner")
+  document.body?.classList.add("covid-banner")
 }
 
 function OCStaticHideCovidBanner(){
-  document.body.classList.remove("covid-banner")
+  document.body?.classList.remove("covid-banner")
 }
 
 function isiPhoneWithoutPhysicalHomeBt(){
