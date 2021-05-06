@@ -7,10 +7,11 @@
 ;; Labels comparison
 
 (defn label-compare-set [label deep-check?]
-  (set [(:slug label)
-        (:uuid label)
-        (when deep-check?
-          (:name label))]))
+  (set (remove nil?
+               [(:slug label)
+                (:uuid label)
+                (when deep-check?
+                  (:name label))])))
 
 (defn compare-label
   ([label-a label-b] (compare-label label-a label-b false))
@@ -20,6 +21,9 @@
   ([labels label] (compare-labels labels label false))
   ([labels label deep-check?]
    (let [list-values-set (set (mapcat #(label-compare-set % deep-check?) labels))]
+     (js/console.log "DBG compare-labels" labels label deep-check?)
+     (js/console.log "DBG    list-values-set" list-values-set)
+     (js/console.log "DBG    label-compare-set to" (label-compare-set label deep-check?))
      (seq (clj-set/intersection (label-compare-set label deep-check?) list-values-set)))))
 
 ;; Data parse

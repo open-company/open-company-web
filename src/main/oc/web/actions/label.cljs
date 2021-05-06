@@ -308,7 +308,7 @@
                                                           (map :slug)
                                                           set
                                                           current-label-slug)]
-                         ;; On update or delete of a post from the currently shown user
+                         ;; On update or delete of a post that has the currently shown label
                          (when (or (= change-type :add)
                                    (and (#{:update :delete} change-type)
                                         contains-current-label?))

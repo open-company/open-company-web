@@ -50,7 +50,7 @@
     (when (or (seq reactions-data)
               should-show-picker?)
       [:div.reactions
-       {:class-name class-name}
+       {:class class-name}
         [:div.reactions-list.group
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))

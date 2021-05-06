@@ -235,7 +235,7 @@
                                 :pinned-item (:pinned-at activity-data)
                                 :show-mobile-more-bt true
                                 :new-item show-new-item-tag
-                                :show-share-entry foc-share-entry})
+                                :showing-share foc-share-entry})
        :data-last-activity-at (::last-activity-at activity-data)
        :data-last-read-at (:last-read-at activity-data)
        ;; click on the whole tile only for draft editing

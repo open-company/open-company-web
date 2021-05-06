@@ -387,7 +387,7 @@
   (when-let [container-slug-kw (keyword container-slug)]
     (#{:replies} container-slug-kw)))
 
-;; Internal getter helpes
+;; Internal getter helpers
 
 (defn- get-container-posts [base posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond

@@ -100,7 +100,6 @@
   (rum/local nil ::last-key)
   (rum/local nil ::last-sel)
   (rum/local nil ::rand)
-  (rum/local false ::scroll-locked?)
   ui-mixins/no-scroll-mixin
   {:will-mount (fn [state]
                  (check-data state true)
