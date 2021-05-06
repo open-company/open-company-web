@@ -11,9 +11,11 @@
 (defn- check-scroll-lock [state new-tip-data]
   (when (and @(::scroll-locked? state)
              (not (:lock-scroll new-tip-data)))
+    (reset! (::scroll-locked? state) false)
     (utils/after 100 #(dom-utils/unlock-page-scroll)))
   (when (and (not @(::scroll-locked? state))
              (:lock-scroll new-tip-data))
+    (reset! (::scroll-locked? state) true)
     (utils/after 100 #(dom-utils/lock-page-scroll))))
 
 (defn- scroll-to-tooltip [state data el]
@@ -100,6 +102,7 @@
   (rum/local nil ::last-key)
   (rum/local nil ::last-sel)
   (rum/local nil ::rand)
+  (rum/local false ::scroll-locked?)
   ui-mixins/no-scroll-mixin
   {:will-mount (fn [state]
                  (check-data state true)

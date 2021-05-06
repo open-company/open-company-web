@@ -4,9 +4,11 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.actions.user-tags :as user-tags]))
+            [oc.web.actions.user-tags :as user-tags]
+            [oc.web.lib.json :refer (json->cljs)]))
 
 (def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data)))
 
@@ -141,8 +143,39 @@
   (when completed?
     (nux-done)))
 
+(defn- old-nux-cookie-name []
+  (str "nux-" (jwt/user-id)))
+
+(defn- get-old-nux-state []
+  (some-> (old-nux-cookie-name)
+          cook/get-cookie
+          json->cljs
+          (update :key #(when % (keyword %)))))
+
+(defn- convert-nux-cookie-to-tag []
+  (let [old-nux-state (get-old-nux-state)
+        current-user-data (or (dis/current-user-data)
+                              (jwt/get-contents))
+        org-data (dis/org-data)
+        user-type (when (and org-data
+                            current-user-data)
+                    (user-utils/get-user-type current-user-data org-data))
+        nux-type (cond (= (-> org-data :author :user-id) (jwt/user-id))
+                       :nux-first-user
+                       (#{:admin :author} user-type)
+                       :nux-author
+                       :else
+                       :nux-viewer)]
+    (when (and old-nux-state
+               current-user-data
+               org-data
+               (not= (:key old-nux-state) :done))
+      (cook/remove-cookie! (old-nux-cookie-name))
+      (user-tags/tag! nux-type))))
+
 (defn check-nux
   [& [force?]]
+  (convert-nux-cookie-to-tag)
   (when (and (or force?
                  (not (contains? @dis/app-state :nux)))
              (not (responsive/is-mobile-size?))
