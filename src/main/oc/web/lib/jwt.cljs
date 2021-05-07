@@ -7,21 +7,20 @@
             [oc.web.local-settings :as ls]
             [cljs-time.coerce :as tc]
             [cljs-time.core :as t]
-            [schema.core :as schema]
             [oc.lib.cljs.interval :as interval]
             [oops.core :refer (oget)]
             ["jwt-decode" :as jwt-decode]))
 
-(defonce ^:private -jwt (atom nil))
-(defonce ^:private -jwt-content (atom nil))
+(defonce ^{:private true} -jwt (atom nil))
+(defonce ^{:private true} -jwt-content (atom nil))
 
-(defonce ^:private -id-token (atom nil))
-(defonce ^:private -id-token-content (atom nil))
+(defonce ^{:private true} -id-token (atom nil))
+(defonce ^{:private true} -id-token-content (atom nil))
 
-(def ^:private jwt-cookie-name :jwt)
-(def ^:private id-token-cookie-name :id-token)
+(def ^{:private true} jwt-cookie-name :jwt)
+(def ^{:private true} id-token-cookie-name :id-token)
 
-(def ^:private auto-updater (atom nil))
+(def ^{:private true} auto-updater (atom nil))
 
 ;; jwt_decode
 
@@ -111,9 +110,13 @@
 ;; Write/delete JWT
 
 (defn set-jwt! [jwt]
+  (timbre/debug "Stopping update interval...")
   (interval/stop-interval! auto-updater)
+  (timbre/debug "Saving JWT in cookie for later use...")
   (cook/set-cookie! jwt-cookie-name jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure)
+  (timbre/debug "Refresh JWT with the server to make sure it's up to date")
   (refresh-jwt)
+  (timbre/debug "Starting update interval...")
   (interval/start-interval! auto-updater))
 
 (defn remove-jwt! []

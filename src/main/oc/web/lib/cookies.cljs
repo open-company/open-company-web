@@ -50,6 +50,7 @@
   ([c-name c-value expiry c-path]
     (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path c-domain c-secure]
+   (timbre/debug "Setting cookie" c-name c-value)
    (check-length c-name (str c-value))
    (ocall cookies-static-obj "set" (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
 
@@ -64,4 +65,5 @@
    (remove-cookie! (name c-name) "/"))
   
   ([c-name opt-path]
+   (timbre/debug "Removing cookie" c-name)
    (ocall cookies-static-obj "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
