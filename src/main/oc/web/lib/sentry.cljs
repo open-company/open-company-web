@@ -32,7 +32,7 @@
     (p? ls/sentry-env) (assoc :environment ls/sentry-env)))
 
 (defn sentry-setup []
-  (if (seq ls/local-dsn)
+  (if (s/empty-or-nil? ls/local-dsn)
     (timbre/warnf "Empty Sentry DSN: %s" ls/local-dsn)
     (do
       (timbre/debug "Setting up Sentry...")
