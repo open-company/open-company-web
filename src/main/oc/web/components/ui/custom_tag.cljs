@@ -97,7 +97,7 @@
 
 (defn- select-current [that e]
   (when-let [selected-index (oget that "state.?selectedIndex")]
-    (let [user (-> (that.filterUsers (oget that "?props"))
+    (let [user (-> (.call that.filterUsers that (oget that "?props"))
                    vec
                    (nth selected-index))]
       (ocall that "selectItem" user)))
