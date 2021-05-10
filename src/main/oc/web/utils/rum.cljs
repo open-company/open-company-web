@@ -19,3 +19,5 @@
 
 (defn build [component props & children]
   (apply createElement component (clj->js props) children))
+
+(def create-element build)

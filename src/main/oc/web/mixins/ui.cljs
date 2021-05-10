@@ -332,7 +332,7 @@
   it uses the ref instead."
  ([callback] (on-click-out nil callback))
  ([optional-ref callback]
-  (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
+  (let [click-out-kw (keyword (str "on-click-out-listener-" (rand 100)))]
     {:will-mount (fn [s]
        (assoc s ::click-out-mounted? (atom true)))
      :did-mount (fn [s]
@@ -359,11 +359,11 @@
          s))})))
 
 (defn on-key-press
-  "Mixin used to listen for every click outside of a certain node.
+  "Mixin used to listen for every key press that is triggered.
   If only the callback is provided it uses the main node of the component,
   it uses the ref instead."
   [keys callback]
-  (let [keypress-key (keyword (str "on-keypress"))]
+  (let [keypress-key (keyword (str "on-keypress-listener-" (rand 100)))]
     {:will-mount (fn [s]
                    (assoc s keypress-key
                           (events/listen js/window EventType/KEYUP

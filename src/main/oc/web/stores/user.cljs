@@ -162,7 +162,7 @@
       (assoc u :digest-delivery fixed-digest-delivery)
       (update u :tags #(set (map keyword %))))))
 
-(def ^:private empty-user*
+(def ^{:private true} empty-user*
  {:first-name ""
   :last-name ""
   :password ""

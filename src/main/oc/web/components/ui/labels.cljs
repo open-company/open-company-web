@@ -185,7 +185,7 @@
   (ui-mixins/on-click-out :labels-picker-inner (fn [_ e]
     (when-not (dom-utils/event-container-matches e ".alert-modal, .oc-labels-modal-wrapper")
       (cmail-actions/cmail-toggle-labels-views false))))
-  [s]
+  [s {close-bt? :close-bt?}]
   (let [cmail-data (drv/react s :cmail-data)
         cmail-labels (:labels cmail-data)
         org-labels (drv/react s :org-labels)
@@ -195,8 +195,9 @@
     [:div.labels-picker.oc-labels-modal
      [:div.labels-picker-inner
       {:ref :labels-picker-inner}
-      [:button.mlb-reset.labels-modal-close-bt
-       {:on-click #(cmail-actions/cmail-toggle-labels-views false)}]
+      (when close-bt?
+        [:button.mlb-reset.labels-modal-close-bt
+        {:on-click #(cmail-actions/cmail-toggle-labels-views false)}])
       [:div.oc-labels
        [:div.oc-labels-title
         "Add labels"]

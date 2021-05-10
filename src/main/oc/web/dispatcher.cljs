@@ -346,7 +346,7 @@
 (defn ^:export org-seens-key [org-slug]
   (vec (conj (org-key org-slug) :container-seen)))
 
-; (defn ^{:export true} container-seen-key [org-slug container-id]
+; (defn ^:export container-seen-key [org-slug container-id]
 ;   (vec (conj (org-seens-key org-slug) (keyword container-id))))
 
 ;; Cmail keys
@@ -386,7 +386,7 @@
   (when-let [container-slug-kw (keyword container-slug)]
     (#{:replies} container-slug-kw)))
 
-;; Internal getter helpes
+;; Internal getter helpers
 
 (defn- get-container-posts [base posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond

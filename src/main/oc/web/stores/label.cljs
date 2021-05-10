@@ -11,9 +11,15 @@
         labels-list))
 
 (defn- upsert-label-in-list [label-data labels-list]
-  (if (some #(when (= (:uuid %) (:uuid label-data)) %) labels-list)
+  (if (some #(when (label-utils/compare-label label-data % true) %) labels-list)
     (update-label-in-list label-data labels-list)
     (vec (conj labels-list (label-utils/clean-entry-label label-data)))))
+
+(defn- replace-label-in-list [label-data labels-list]
+  (mapv #(if (= (:slug %) label-utils/default-label-slug)
+           (label-utils/clean-entry-label label-data)
+           %)
+        labels-list))
 
 (defn- remove-label-from-list [label labels-list]
   (let [label-uuid (if (map? label) (:uuid label) label)]
@@ -47,7 +53,7 @@
       (as-> db tdb
         (assoc-in tdb (conj dispatcher/editing-label-key :saving) true)
         (if picker-entry-labels-key
-          (update-in tdb picker-entry-labels-key (partial upsert-label-in-list (label-utils/clean-entry-label label-data)))
+          (update-in tdb picker-entry-labels-key (partial replace-label-in-list (label-utils/clean-entry-label label-data)))
           tdb))
       db)))
 

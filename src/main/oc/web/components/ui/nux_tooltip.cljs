@@ -11,9 +11,11 @@
 (defn- check-scroll-lock [state new-tip-data]
   (when (and @(::scroll-locked? state)
              (not (:lock-scroll new-tip-data)))
+    (reset! (::scroll-locked? state) false)
     (utils/after 100 #(dom-utils/unlock-page-scroll)))
   (when (and (not @(::scroll-locked? state))
              (:lock-scroll new-tip-data))
+    (reset! (::scroll-locked? state) true)
     (utils/after 100 #(dom-utils/lock-page-scroll))))
 
 (defn- scroll-to-tooltip [state data el]

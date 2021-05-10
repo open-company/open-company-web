@@ -3,7 +3,7 @@
             [oc.web.dispatcher :as dis]
             [oops.core :refer (oget ocall)]))
 
-(def ^:private theme-class-name-prefix :theme-mode)
+(def ^{:private true} theme-class-name-prefix :theme-mode)
 
 (def theme-default-value :auto)
 

@@ -14,13 +14,15 @@
 
 (defn logout
   ([]
-   (logout (if ua/pseudo-native?
-             oc-urls/native-login
-             oc-urls/home)))
+   (logout oc-urls/logout))
   ([location]
+   (timbre/info "Removing JWT cookie")
    (jwt/remove-jwt!)
-   (router/redirect! location)
-   (dis/dispatch! [:logout])))
+   (utils/after 100
+                #(do
+                   (timbre/info "Redirecting user to" location)
+                   (router/redirect! oc-urls/logout)
+                   (dis/dispatch! [:logout])))))
 
 ;; ID Token
 

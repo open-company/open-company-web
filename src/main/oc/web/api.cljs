@@ -20,21 +20,21 @@
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
-(def ^:private web-origin ls/web-server-domain)
+(def ^{:private true} web-origin ls/web-server-domain)
 
-(def ^:private storage-origin ls/storage-server-domain)
+(def ^{:private true} storage-origin ls/storage-server-domain)
 
-(def ^:private auth-origin ls/auth-server-domain)
+(def ^{:private true} auth-origin ls/auth-server-domain)
 
-(def ^:private payments-origin ls/payments-server-domain)
+(def ^{:private true} payments-origin ls/payments-server-domain)
 
-(def ^:private interaction-origin ls/interaction-server-domain)
+(def ^{:private true} interaction-origin ls/interaction-server-domain)
 
-(def ^:private change-origin ls/change-server-domain)
+(def ^{:private true} change-origin ls/change-server-domain)
 
-(def ^:private search-origin ls/search-server-domain)
+(def ^{:private true} search-origin ls/search-server-domain)
 
-(def ^:private reminders-origin ls/reminder-server-domain)
+(def ^{:private true} reminders-origin ls/reminder-server-domain)
 
 (defun- relative-href
   "Given a link map or a link string return the relative href."
@@ -222,21 +222,21 @@
 
             (on-complete response)))))))
 
-(def ^:private web-http (partial req web-origin))
+(def ^{:private true} web-http (partial req web-origin))
 
-(def ^:private storage-http (partial req storage-origin))
+(def ^{:private true} storage-http (partial req storage-origin))
 
-(def ^:private auth-http (partial req auth-origin))
+(def ^{:private true} auth-http (partial req auth-origin))
 
-(def ^:private payments-http (partial req payments-origin))
+(def ^{:private true} payments-http (partial req payments-origin))
 
-(def ^:private interaction-http (partial req interaction-origin))
+(def ^{:private true} interaction-http (partial req interaction-origin))
 
-(def ^:private change-http (partial req change-origin))
+(def ^{:private true} change-http (partial req change-origin))
 
-(def ^:private search-http (partial req search-origin))
+(def ^{:private true} search-http (partial req search-origin))
 
-(def ^:private reminders-http (partial req reminders-origin))
+(def ^{:private true} reminders-http (partial req reminders-origin))
 
 ;; Report failed api request
 

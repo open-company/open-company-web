@@ -214,10 +214,10 @@
                                  (not (dom-utils/event-container-matches % "ul.more-menu-list li")))
                         (dom-utils/stop-propagation! %)
                         (hide-menu s)))}
-        (when foc-labels-picker
-          [:div.foc-labels-picker-wrapper
-           (labels-picker entity-data)])
         (cond
+          foc-labels-picker
+          [:div.foc-labels-picker-wrapper
+            (labels-picker entity-data)]
           foc-share-entry
           (activity-share-email {:activity-data entity-data})
           foc-activity-move
