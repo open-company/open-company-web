@@ -34,13 +34,20 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def ^:export cookies-static-obj (Cookies. js/document))
+(def ^{:export true} cookies-static-obj (Cookies. js/document))
 
-(defn- ^:private cookie-name [c-name]
+(defn- cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
 
 (def default-expire -1)
 (def default-path "/")
+
+(defn- cookie-options [expiry c-path c-domain c-secure]
+  (clj->js {:sameSite true
+            :secure c-secure
+            :domain c-domain
+            :path c-path
+            :maxAge expiry}))
 
 (defn ^:export set-cookie!
   ([c-name c-value]
@@ -52,14 +59,14 @@
   ([c-name c-value expiry c-path c-domain c-secure]
    (timbre/debug "Setting cookie" c-name c-value)
    (check-length c-name (str c-value))
-   (ocall cookies-static-obj "set" (cookie-name c-name) c-value expiry c-path c-domain c-secure)))
+   (ocall cookies-static-obj "set" (cookie-name c-name) c-value (cookie-options expiry c-path c-domain c-secure))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
   (ocall cookies-static-obj "get" (cookie-name c-name)))
 
-(defn remove-cookie!
+(defn ^:export remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
   ([c-name]
    (remove-cookie! (name c-name) "/"))
