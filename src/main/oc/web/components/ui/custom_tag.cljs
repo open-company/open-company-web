@@ -121,8 +121,8 @@
                    (this-as this
                      (dom-utils/prevent-default! e)
                      (if-let [selected-index (oget this "?state.?selectedIndex")]
-                       (.call this.setState this (clj->js {"selectedIndex" (mod (index-fn selected-index) (oget options "?length"))}))
-                       (.call this.setState this (clj->js {"selectedIndex" index-default})))
+                       (.call (oget this "setState") this (clj->js {"selectedIndex" (mod (index-fn selected-index) (oget options "?length"))}))
+                       (.call (oget this "setState") this (clj->js {"selectedIndex" index-default})))
                      ()
                      (.call (oget this "scrollActiveUserIntoView") this)))
       :selectCurrent (fn [e]
@@ -135,7 +135,7 @@
                                 (utils/event-stop e)))
       :render (fn []
                 (this-as this
-                         (let [filtered-users (.call this.filterUsers this (oget this "props"))]
+                         (let [filtered-users (.call (oget this "filterUsers") this (oget this "props"))]
                            (create-element "div"
                                            {:className "oc-mention-options"
                                             :contentEditable false}
@@ -150,36 +150,33 @@
                                                                                      :hoverItem (.bind (oget this "?hoverItem") this)})))
                                                                  (range (count filtered-users))))))))
       :filterUsers (fn [properties]
-                     (this-as this
-                              (let [current-mention-text (oget properties "currentMentionText")
-                                    current-text (string/lower (subs current-mention-text 1 (count current-mention-text)))
-                                    mapped-users (map (fn [user-index]
-                                                        (let [user (oget+ properties (str "?users.?" user-index))]
-                                                          (cond (value-lookup (oget user "?name") current-text)
-                                                                (js/Object.assign user #js {:selectedKey "name"})
+                     (let [current-mention-text (oget properties "currentMentionText")
+                           current-text (string/lower (subs current-mention-text 1 (count current-mention-text)))
+                           mapped-users (map (fn [user-index]
+                                               (let [user (oget+ properties (str "?users.?" user-index))]
+                                                 (cond (value-lookup (oget user "?name") current-text)
+                                                       (js/Object.assign user #js {:selectedKey "name"})
                                                                  ;;  (oset! user "selectedKey" "name")
-                                                                (value-lookup (oget user "?first-name") current-text)
-                                                                (js/Object.assign user #js {:selectedKey "first-name"})
+                                                       (value-lookup (oget user "?first-name") current-text)
+                                                       (js/Object.assign user #js {:selectedKey "first-name"})
                                                                  ;;  (oset! user "selectedKey" "first-name")
-                                                                (value-lookup (oget user "?last-name") current-text)
-                                                                (js/Object.assign user #js {:selectedKey "last-name"})
+                                                       (value-lookup (oget user "?last-name") current-text)
+                                                       (js/Object.assign user #js {:selectedKey "last-name"})
                                                                  ;;  (oset! user "selectedKey" "last-name")
-                                                                (and (seq (oget user "?slack-usernames"))
-                                                                     (check-slack-usernames user current-text))
-                                                                (check-slack-usernames user current-text)
-                                                                (value-lookup (oget user "?email") current-text)
-                                                                (js/Object.assign user #js {:selectedKey "email"})
+                                                       (and (seq (oget user "?slack-usernames"))
+                                                            (check-slack-usernames user current-text))
+                                                       (check-slack-usernames user current-text)
+                                                       (value-lookup (oget user "?email") current-text)
+                                                       (js/Object.assign user #js {:selectedKey "email"})
                                                                  ;;  (oset! user "selectedKey" "email")
-                                                                :else
-                                                                user)))
-                                                      (range (oget properties "?users.?length")))]
-                                (filterv (fn [user] (seq (oget user "?selectedKey"))) mapped-users))))
+                                                       :else
+                                                       user)))
+                                             (range (oget properties "?users.?length")))]
+                       (filterv (fn [user] (seq (oget user "?selectedKey"))) mapped-users)))
       :addBindedEvent (fn [el e-name cb]
-                        (this-as this
-                                 (events/listen el e-name cb)))
+                        (events/listen el e-name cb))
       :removeBindedEvent (fn [el e-name cb]
-                           (this-as this
-                                    (events/unlisten el e-name cb)))
+                           (events/unlisten el e-name cb))
       :keyPress (fn [e]
                   (this-as this
                            (let [event (or e (oget js/window "event"))
@@ -192,18 +189,18 @@
                                  (37 38) (.call (oget this "arrowKeys") this event options dec (dec (oget options "?length"))) ;; Left and up arrow
                                  13      (.call (oget this "selectCurrent") this event) ;; Enter
                                  9       (.call (oget this "selectCurrent") this event) ;; Tab
-                                 27      (.call this.hidePanel this) ;; Esc
+                                 27      (.call (oget this "hidePanel") this) ;; Esc
                                  this ;; :else
                                  )))))
       :componentDidMount (fn []
                            (this-as this
-                                    (this.addBindedEvent js/window EventType/KEYDOWN (.bind (oget this "keyPress") this))))
+                                    (ocall this "addBindedEvent" js/window EventType/KEYDOWN (.bind (oget this "keyPress") this))))
       :componentWillUnmount (fn []
                               (this-as this
-                                       (this.removeBindedEvent js/window EventType/KEYDOWN (.bind (oget this "keyPress") this))))
+                                       (ocall this "removeBindedEvent" js/window EventType/KEYDOWN (.bind (oget this "keyPress") this))))
       :hoverItem (fn [e idx]
                    (this-as this
-                            (.call this.setState this (clj->js {"selectedIndex" idx}))
+                            (.call (oget this "setState") this (clj->js {"selectedIndex" idx}))
                             (utils/event-stop e)))
       :selectItem (fn [user]
                     (this-as this
