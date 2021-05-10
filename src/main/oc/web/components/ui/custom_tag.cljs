@@ -89,26 +89,50 @@
                                         :slack-username slack-username})))
         (oget user "?slack-usernames")))
 
-(defn- arrow-keys [that e options index-fn index-default]
-  (if-let [selected-index (oget that "?state.?selectedIndex")]
-    (.call that.setState that (clj->js {"selectedIndex" (mod (index-fn selected-index) (oget options "?length"))}))
-    (.call that.setState that (clj->js {"selectedIndex" index-default})))
-  (utils/event-stop e))
-
-(defn- select-current [that e]
-  (when-let [selected-index (oget that "state.?selectedIndex")]
-    (let [user (-> (.call that.filterUsers that (oget that "?props"))
-                   vec
-                   (nth selected-index))]
-      (ocall that "selectItem" user)))
-  (utils/event-stop e))
-
 (def customized-tag-component-methods
   #js{:hidePanel (fn []
                    (this-as this
                             (let [hide-panel-fn (oget this "props.?hidePanel")]
                               (when (fn? hide-panel-fn)
-                                (.call hide-panel-fn this)))))
+                                (hide-panel-fn)))))
+      :scrollActiveUserIntoView (fn []
+                                  (this-as this
+                                           (let [node (oget (findDOMNode this) "parentElement")
+                                                 active-node (when node
+                                                               (ocall node "querySelector" ".oc-mention-option.active"))]
+                                             (when active-node
+                                               (let [node-height (oget node "clientHeight")
+                                                     node-scroll-top (oget node "scrollTop")
+                                                     active-node-offset-top (oget active-node "offsetTop")
+                                                     active-node-height (oget active-node "clientHeight")
+                                                     active-node-scroll-bottom (+ active-node-offset-top active-node-height)
+                                                     position (cond (> active-node-scroll-bottom (+ node-height node-scroll-top))
+                                                                    :bottom
+                                                                    (< active-node-offset-top node-scroll-top)
+                                                                    :top
+                                                                    :else
+                                                                    :stale)
+                                                     y-scroll-top (case position
+                                                                    :bottom (- active-node-scroll-bottom node-height) ;; Mention is at the bottom, not visible or partially visible  
+                                                                    :top    active-node-offset-top ;; Mention is at the top, not visible or partially visible
+                                                                    :stale  node-scroll-top)] ;; Let it where it is, is already visible
+                                                 (ocall node "scrollTo" 0 y-scroll-top)))))) ;; Stale
+      :arrowKeys (fn [e options index-fn index-default]
+                   (this-as this
+                     (dom-utils/prevent-default! e)
+                     (if-let [selected-index (oget this "?state.?selectedIndex")]
+                       (.call this.setState this (clj->js {"selectedIndex" (mod (index-fn selected-index) (oget options "?length"))}))
+                       (.call this.setState this (clj->js {"selectedIndex" index-default})))
+                     ()
+                     (.call (oget this "scrollActiveUserIntoView") this)))
+      :selectCurrent (fn [e]
+                       (this-as this
+                                (when-let [selected-index (oget this "state.?selectedIndex")]
+                                  (let [user (-> (.call (oget this "filterUsers") this (oget this "?props"))
+                                                 vec
+                                                 (nth selected-index))]
+                                    (ocall this "selectItem" user)))
+                                (utils/event-stop e)))
       :render (fn []
                 (this-as this
                          (let [filtered-users (.call this.filterUsers this (oget this "props"))]
@@ -164,11 +188,11 @@
                              (when (and (not (dom-utils/is-hidden node))
                                         (seq options))
                                (case (oget event "?keyCode")
-                                 (39 40) (arrow-keys this event options inc 0) ;; Right and down arrow
-                                 (37 38) (arrow-keys this event options dec (dec (oget options "?length"))) ;; Left and up arrow
-                                 13      (select-current this event) ;; Enter
-                                 9       (select-current this event) ;; Tab
-                                 27      (this.hidePanel) ;; Esc
+                                 (39 40) (.call (oget this "arrowKeys") this event options inc 0) ;; Right and down arrow
+                                 (37 38) (.call (oget this "arrowKeys") this event options dec (dec (oget options "?length"))) ;; Left and up arrow
+                                 13      (.call (oget this "selectCurrent") this event) ;; Enter
+                                 9       (.call (oget this "selectCurrent") this event) ;; Tab
+                                 27      (.call this.hidePanel this) ;; Esc
                                  this ;; :else
                                  )))))
       :componentDidMount (fn []
