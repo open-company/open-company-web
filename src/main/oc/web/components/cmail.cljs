@@ -602,27 +602,19 @@
               "New update")]
          [:button.mlb-reset.mobile-close-bt
            {:on-click (partial close-cmail s)}]]
-        [:div.cmail-floating-left
-         [:div.dismiss-inline-cmail-container
-          {:class (when-not (:published? cmail-data) "long-tooltip")}
-          [:button.mlb-reset.dismiss-inline-cmail
-           {:on-click (partial close-cmail s)
-            :data-toggle "tooltip"
-            :data-placement (if (:distraction-free? cmail-state) "right" "top")
-            :title (if (:published? cmail-data)
-                     "Close"
-                     "Save & Close")}]]]
         [:div.cmail-floating-right
          [:div.dismiss-inline-cmail-container
           {:class (when-not (:published? cmail-data) "long-tooltip")}
           [:button.mlb-reset.dismiss-inline-cmail
            {:on-click (partial close-cmail s)
             :data-toggle "tooltip"
-            :data-placement "right"
+            :data-placement (if (:distraction-free? cmail-state) "right" "top")
             :data-container "body"
-            :title (if (:published? cmail-data)
-                     "Close"
-                     "Save & Close")}]]
+            :title (when-not (:published? cmail-data)
+                     "Save & Close")}
+           [:span.dismiss-inline-cmail-icon]
+           [:span.dismiss-inline-cmail-text
+            "Close"]]]
          [:div.floating-delete-bt-container
           [:button.mlb-reset.floating-delete-bt
            {:on-click #(if (:uuid cmail-data)

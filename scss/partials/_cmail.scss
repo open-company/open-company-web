@@ -67,63 +67,28 @@
   }
 }
 
-@mixin left-floating-div-distraction-free() {
-  div.cmail-floating-left {
-    position: fixed;
-    top: 40px;
-    left: 40px;
-  }
-}
-
 @mixin right-floating-div-distraction-free() {
   div.cmail-floating-right {
-    display: none;
-  }
-}
-
-@mixin left-floating-div() {
-  div.cmail-floating-left {
-    position: absolute;
-    top: 0;
-    right: calc(100% + 16px);
-    display: block;
+    width: 32px;
+    left: calc(100% + 16px);
 
     div.dismiss-inline-cmail-container {
-      position: relative;
-      display: block;
-
-      @include mobile() {
-        display: none;
-      }
+      width: 32px;
+      height: 32px;
 
       button.dismiss-inline-cmail {
         width: 32px;
         height: 32px;
-        padding: 0;
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        background-size: 12px 12px;
-        background-color: var(--color);
+        align-items: center;
         border-radius: 50%;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 1;
-        display: block;
-        border: none;
 
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        }
-
-        &:not(.disabled):hover {
-          opacity: 0.9;
+        span.dismiss-inline-cmail-text {
+          display: none;
         }
       }
-
-      &.long-tooltip {
-        .tooltip {
-          width: 88px;
-        }
-      }
+    }
+    div.floating-delete-bt-container {
+      display: none;
     }
   }
 }
@@ -136,23 +101,71 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    align-items: left;
+    align-items: flex-start;
 
     div.dismiss-inline-cmail-container {
-      display: none;
+      position: relative;
+      display: block;
+      order: 1;
+      margin-bottom: 8px;
+      width: 80px;
+
+      @include mobile() {
+        display: none;
+      }
+
+      button.dismiss-inline-cmail {
+        width: 80px;
+        height: 34px;
+        padding: 9px 12px;
+        border-radius: 4px;
+        background-color: var(--tooltip-background-color);
+        opacity: 1;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        border: none;
+
+        &:not(.disabled):hover {
+          opacity: 0.9;
+        }
+
+        span.dismiss-inline-cmail-icon {
+          width: 12px;
+          height: 12px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
+        }
+
+        span.dismiss-inline-cmail-text {
+          font-size: 14px;
+          line-height: 16px;
+          color: var(--tooltip-color);
+          margin-left: 8px;
+          @include OC_Body_Book();
+        }
+      }
+
+      &.long-tooltip {
+        .tooltip {
+          width: 88px;
+        }
+      }
     }
 
     div.floating-delete-bt-container {
       position: relative;
       display: block;
       margin-bottom: 8px;
+      order: 2;
+      width: 80px;
 
       @include mobile() {
         display: none;
       }
 
       button.floating-delete-bt {
-        width: auto;
+        width: 80px;
         height: 34px;
         padding: 9px 12px;
         border-radius: 4px;
@@ -171,7 +184,7 @@
         }
 
         span.floating-delete-bt-text {
-          font-size: 14;
+          font-size: 14px;
           line-height: 16px;
           color: var(--tooltip-color);
           margin-left: 8px;
@@ -219,7 +232,7 @@
         }
 
         span.floating-labels-bt-text {
-          font-size: 14;
+          font-size: 14px;
           line-height: 16px;
           color: var(--tooltip-color);
           margin-left: 8px;
@@ -242,7 +255,7 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    align-items: left;
+    align-items: flex-start;
 
     div.dismiss-inline-cmail-container {
       position: relative;
@@ -257,22 +270,26 @@
         width: 32px;
         height: 32px;
         padding: 0;
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        background-size: 12px 12px;
         background-color: var(--color);
         border-radius: 50%;
-        background-position: center;
-        background-repeat: no-repeat;
         opacity: 1;
-        display: block;
-        border: none;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        }
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
 
         &:not(.disabled):hover {
           opacity: 0.9;
+        }
+
+        span.dismiss-inline-cmail-icon {
+          width: 12px;
+          height: 12px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
+        }
+
+        span.dismiss-inline-cmail-text {
+          display: none;
         }
       }
 
@@ -460,7 +477,6 @@ div.cmail-outer {
 
   &:not(.quick-post-collapsed).fullscreen {
     div.cmail-container {
-      @include left-floating-div();
       @include right-floating-div();
     }
   }
@@ -1207,7 +1223,6 @@ div.cmail-outer {
         flex-flow: column nowrap;
         box-shadow: none;
 
-        @include left-floating-div-distraction-free();
         @include right-floating-div-distraction-free();
 
         div.cmail-content-outer {
