@@ -50,7 +50,7 @@
                                                   :board-name (:name nav-to-board-data)}])
        (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)])))))
 
-(def ^:private click-throttle-ms (* 1000 15))
+(def ^{:private true} click-throttle-ms (* 1000 15))
 
 (defonce refresh-delays (atom {}))
 

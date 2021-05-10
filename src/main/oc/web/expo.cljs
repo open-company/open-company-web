@@ -59,7 +59,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
 
-(def ^:private deep-link-origin (atom nil))
+(def ^{:private true} deep-link-origin (atom nil))
 
 (defn get-deep-link-origin
   []
@@ -82,7 +82,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the app version from the expo wrapper
 
-(def ^:private app-version (atom nil))
+(def ^{:private true} app-version (atom nil))
 
 (defn get-app-version
   []

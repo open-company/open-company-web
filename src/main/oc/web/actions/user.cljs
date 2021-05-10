@@ -528,7 +528,7 @@
 
 ;; Mobile push notifications
 
-(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
+(def ^{:private true} expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
 
 (defn dispatch-expo-push-token
   "Save the expo push token in a cookie (or re-save to extend the cookie expire time)

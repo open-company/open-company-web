@@ -32,7 +32,7 @@
        (.dispose throttled-refresh)
        s)}))
 
-(def ^:private default-get-comments-delay 0)
+(def ^{:private true} default-get-comments-delay 0)
 
 (defn load-entry-comments
   ([container-data-get] (load-entry-comments container-data-get default-get-comments-delay))

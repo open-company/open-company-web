@@ -231,7 +231,7 @@
      (when comment-uuid
        (str "-" comment-uuid)))))
 
-(def ^:export add-comment-force-update-root-key :add-comment-force-update)
+(def ^{:export true} add-comment-force-update-root-key :add-comment-force-update)
 
 (defn ^:export add-comment-force-update-key [add-comment-string-key]
   (vec (concat [add-comment-force-update-root-key] [add-comment-string-key])))
@@ -347,7 +347,7 @@
 (defn ^:export org-seens-key [org-slug]
   (vec (conj (org-key org-slug) :container-seen)))
 
-; (defn ^{:export true} container-seen-key [org-slug container-id]
+; (defn ^:export container-seen-key [org-slug container-id]
 ;   (vec (conj (org-seens-key org-slug) (keyword container-id))))
 
 ;; Cmail keys
