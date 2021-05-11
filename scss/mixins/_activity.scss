@@ -363,6 +363,7 @@ $header_top_margin: 24;
             font-size: 14px;
             line-height: 18px;
             color: var(--color);
+            min-height: unset;
           }
 
           input.poll-reply-body {
@@ -387,7 +388,7 @@ $header_top_margin: 24;
 
           button.delete-reply {
             position: absolute;
-            top: 30px;
+            top: 40px;
             right: 9px;
             width: 16px;
             height: 24px;
