@@ -63,7 +63,7 @@
   (js/Date. (+ (.getTime (js/Date.)) (* c-max-age 1000))))
 
 (defn- retry [f]
-  (.setTimeout js/window f 100))
+  (.setTimeout js/window #(f true) 100))
 
 (defn ^:export set-cookie!
   ([c-name c-value]
@@ -72,13 +72,13 @@
    (set-cookie! c-name c-value c-max-age default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value c-max-age c-path]
    (set-cookie! c-name c-value c-max-age c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  ([c-name c-value c-max-age c-path c-domain c-secure & [retry?]]
+  ([c-name c-value c-max-age c-path c-domain c-secure & [retrying?]]
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
    (if-let [c (cookies)]
      (ocall c "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))
-     (when-not retry?
-       (retry #(set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
+     (when-not retrying?
+       (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
@@ -91,9 +91,9 @@
   ([c-name]
    (remove-cookie! (name c-name) default-path))
   
-  ([c-name c-path & [retry?]]
+  ([c-name c-path & [retrying?]]
    (timbre/debugf "Removing cookie %s with path %s" c-name c-path)
    (if-let [c (cookies)]
      (ocall c "remove" (cookie-name c-name) c-path ls/jwt-cookie-domain)
-     (when-not retry?
+     (when-not retrying?
        (retry (partial remove-cookie! c-name c-path))))))
