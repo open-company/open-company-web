@@ -17,7 +17,7 @@
             (not force?))
      @--cookies
      (let [c (.getInstance Cookies)]
-       (timbre/debug "Done")
+       (timbre/debug "Get instance of goog.net.Cookies object..." c)
        (reset! --cookies c)))))
 
 (defn ^:export singleton []
@@ -58,11 +58,16 @@
                                                    "Cookie value exceeds max allowed length"))))
 
 (defn- cookie-options [c-max-age c-path c-domain c-secure]
-  (clj->js {:sameSite true
-            :secure c-secure
-            :domain c-domain
-            :path c-path
-            :maxAge c-max-age}))
+  (let [cljs-opts {"sameSite" true
+                   "secure" c-secure
+                   "domain" c-domain
+                   "path" c-path
+                   "maxAge" c-max-age}
+        js-opts (clj->js cljs-opts)]
+    (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
+    (js/console.log "DBG    cljs-opts" cljs-opts)
+    (js/console.log "DBG    js-opts" js-opts)
+    js-opts))
 
 (defn- cookie-expiration-date [c-max-age]
   (js/Date. (+ (.getTime (js/Date.)) (* c-max-age 1000))))
