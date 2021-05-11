@@ -570,9 +570,7 @@
       (timbre/info "Routing logout-route" urls/logout)
       (jwt/remove-jwt!)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if ua/pseudo-native?
-                          urls/native-login
-                          urls/home)))
+      (router/redirect! urls/marketing-landing))
 
     (defroute apps-detect-route urls/apps-detect {:as params}
       (timbre/info "Routing apps-detect-route" urls/apps-detect)

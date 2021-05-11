@@ -14,15 +14,13 @@
 
 (defn logout
   ([]
-   (logout oc-urls/logout))
+   (logout oc-urls/marketing-landing))
   ([location]
-   (timbre/info "Removing JWT cookie")
+   (timbre/info "Logout, removing jwt")
    (jwt/remove-jwt!)
-   (utils/after 100
-                #(do
-                   (timbre/info "Redirecting user to" location)
-                   (router/redirect! oc-urls/logout)
-                   (dis/dispatch! [:logout])))))
+   (timbre/debugf "Will redirect to %s" (or location oc-urls/marketing-landing))
+   (router/redirect! (or location oc-urls/marketing-landing))
+   (dis/dispatch! [:logout])))
 
 ;; ID Token
 

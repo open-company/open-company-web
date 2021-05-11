@@ -8,19 +8,17 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def ^{:export true} expGoogCookies Cookies)
-
 (defonce ^{:private true :export true} --cookies (atom nil))
 
-(defn ^:export setup! []
-  (timbre/debug "Creating Cookies instance...")
-  (js/console.log "DBG Cookies:" Cookies)
-  (js/console.log "DBG Cookies.getInstance:" (.-getInstance Cookies))
-  (js/console.log "DBG Cookies.getInstance():" (.getInstance Cookies))
-  (let [c (.getInstance Cookies)]
-    (timbre/debug "Done..." c)
-    (js/console.log "DBG c:" c)
-    (reset! --cookies c)))
+(defn ^:export setup!
+  ([] (setup! false))
+  ([force?]
+   (if (and (instance? Cookies @--cookies)
+            (not force?))
+     @--cookies
+     (let [c (.getInstance Cookies)]
+       (timbre/debug "Done")
+       (reset! --cookies c)))))
 
 (defn ^:export singleton []
   (if @--cookies

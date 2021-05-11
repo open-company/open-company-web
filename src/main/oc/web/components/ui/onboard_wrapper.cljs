@@ -187,14 +187,10 @@
         [:div.footer-link
           "Already have an account?"
           [:div
-            [:a {:href (if ua/pseudo-native?
-                         oc-urls/native-login
-                         oc-urls/login)
+            [:a {:href oc-urls/device-login
                  :on-click (fn [e]
                              (utils/event-stop e)
-                             (router/nav! (if ua/pseudo-native?
-                              oc-urls/native-login
-                              oc-urls/login)))}
+                             (router/nav! oc-urls/device-login))}
              "Sign in here"]]]]))
 
 (defn- profile-setup-team-data
