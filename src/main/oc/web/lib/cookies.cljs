@@ -9,6 +9,8 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
+(def ^{:export true} expGoogCookies Cookies)
+
 (defonce ^{:private true :export true} --cookies (atom nil))
 
 (defn ^:export setup! []
