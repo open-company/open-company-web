@@ -4,7 +4,6 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
             ["jwt-decode" :as jwt-decode]
-            [oops.core :refer (oget ocall)]
             [oc.web.utils.sentry :as sentry]))
 
 (def default-cookie-expire (* 60 60 24 6))
@@ -16,9 +15,9 @@
 (defn ^:export setup! []
   (timbre/debug "Creating Cookies instance...")
   (js/console.log "DBG Cookies:" Cookies)
-  (js/console.log "DBG Cookies.getInstance:" (oget Cookies "getInstance"))
-  (js/console.log "DBG Cookies.getInstance():" (ocall Cookies "getInstance"))
-  (let [c (ocall Cookies "getInstance")]
+  (js/console.log "DBG Cookies.getInstance:" (.-getInstance Cookies))
+  (js/console.log "DBG Cookies.getInstance():" (.getInstance Cookies))
+  (let [c (.getInstance Cookies)]
     (timbre/debug "Done..." c)
     (js/console.log "DBG c:" c)
     (reset! --cookies c)))
@@ -84,7 +83,7 @@
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
    (if-let [c (singleton)]
-     (ocall c "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))
+     (.set c (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))
      (when-not retrying?
        (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
 
@@ -92,7 +91,7 @@
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
   (when-let [c (singleton)]
-    (ocall c "get" (cookie-name c-name))))
+    (.get c (cookie-name c-name))))
 
 (defn ^:export remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
@@ -102,6 +101,6 @@
   ([c-name c-path & [retrying?]]
    (timbre/debugf "Removing cookie %s with path %s" c-name c-path)
    (if-let [c (singleton)]
-     (ocall c "remove" (cookie-name c-name) c-path ls/jwt-cookie-domain)
+     (.remove c (cookie-name c-name) c-path ls/jwt-cookie-domain)
      (when-not retrying?
        (retry (partial remove-cookie! c-name c-path))))))
