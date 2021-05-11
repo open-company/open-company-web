@@ -80,7 +80,7 @@
     (reset! esc-press-listener (events/listen js/window EventType/KEYUP
                                               (fn [e]
                                                 (when (= (.-key e) "Escape")
-                                                  (foc-menu-actions/hide-foc-menu-if-needed)))))))
+                                                  (utils/after 100 foc-menu-actions/hide-foc-menu-if-needed)))))))
 
 (defn- pp [s]
   (-> s :rum/args first (select-keys menu-keys)))
