@@ -1,32 +1,38 @@
 (ns oc.web.lib.cookies
+  (:import [goog.net Cookies]
+           [goog.string format])
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
             ["jwt-decode" :as jwt-decode]
-            [oops.core :refer (ocall)]
-            [oc.web.utils.sentry :as sentry])
-  (:import [goog.net Cookies]
-           [goog.string format]))
+            [oops.core :refer (oget ocall)]
+            [oc.web.utils.sentry :as sentry]))
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def ^{:private true :export true} --cookies (atom nil))
+(defonce ^{:private true :export true} --cookies (atom nil))
 
-(defn ^:export cookies []
-  (when-not @--cookies
-    (timbre/debug "Creating Cookies instance...")
-    (let [c (ocall Cookies "getInstance")]
-      (timbre/debug "Done..." c)
-      (reset! --cookies c)))
-  (timbre/debug "Return cookies instance:" @--cookies)
-  @--cookies)
+(defn ^:export setup! []
+  (timbre/debug "Creating Cookies instance...")
+  (js/console.log "DBG Cookies:" Cookies)
+  (js/console.log "DBG Cookies.getInstance:" (oget Cookies "getInstance"))
+  (js/console.log "DBG Cookies.getInstance():" (ocall Cookies "getInstance"))
+  (let [c (ocall Cookies "getInstance")]
+    (timbre/debug "Done..." c)
+    (js/console.log "DBG c:" c)
+    (reset! --cookies c)))
+
+(defn ^:export singleton []
+  (if @--cookies
+    @--cookies
+    (setup!)))
 
 (defn- cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
 
-(def default-expire -1)
-(def default-path "/")
+(defonce default-expire -1)
+(defonce default-path "/")
 
-(def max-cookie-length Cookies/MAX_COOKIE_LENGTH)
+(defonce max-cookie-length Cookies/MAX_COOKIE_LENGTH)
 
 (defn- calc-length [cval]
   (when (string? cval)
@@ -75,7 +81,7 @@
   ([c-name c-value c-max-age c-path c-domain c-secure & [retrying?]]
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
-   (if-let [c (cookies)]
+   (if-let [c (singleton)]
      (ocall c "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))
      (when-not retrying?
        (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
@@ -83,7 +89,7 @@
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
-  (when-let [c (cookies)]
+  (when-let [c (singleton)]
     (ocall c "get" (cookie-name c-name))))
 
 (defn ^:export remove-cookie!
@@ -93,7 +99,7 @@
   
   ([c-name c-path & [retrying?]]
    (timbre/debugf "Removing cookie %s with path %s" c-name c-path)
-   (if-let [c (cookies)]
+   (if-let [c (singleton)]
      (ocall c "remove" (cookie-name c-name) c-path ls/jwt-cookie-domain)
      (when-not retrying?
        (retry (partial remove-cookie! c-name c-path))))))

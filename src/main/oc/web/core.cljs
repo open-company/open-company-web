@@ -1,8 +1,8 @@
 (ns oc.web.core
-  (:require [secretary.core :as secretary :refer-macros (defroute)]
+  (:require [oc.web.lib.cookies :as cook]
+            [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
-            [oc.web.lib.cookies :as cook]
             [rum.core :as rum]
             [cuerdas.core :as s]
             [oc.web.utils.rum :as ru]
@@ -763,7 +763,7 @@
 
 (defn ^:export init []
   ;; Init cookies
-  (cook/cookies)
+  (cook/setup!)
   ;; Setup timbre log level
   (logging/config-log-level! (or (cook/get-cookie :log-level) ls/log-level))
   ;; Read JWT
