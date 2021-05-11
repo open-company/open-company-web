@@ -9,11 +9,15 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def ^{:private true} --cookies (atom nil))
+(def ^{:private true :export true} --cookies (atom nil))
 
 (defn ^:export cookies []
   (when-not @--cookies
-    (reset! --cookies (ocall Cookies "getInstance" js/document)))
+    (timbre/debug "Creating Cookies instance...")
+    (let [c (ocall Cookies "getInstance")]
+      (timbre/debug "Done..." c)
+      (reset! --cookies c)))
+  (timbre/debug "Return cookies instance:" @--cookies)
   @--cookies)
 
 (defn- cookie-name [c-name]
@@ -68,12 +72,14 @@
   ([c-name c-value c-max-age c-path c-domain c-secure]
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
-   (ocall (cookies) "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))))
+   (when-let [c (cookies)]
+     (ocall c "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure)))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
-  (ocall (cookies) "get" (cookie-name c-name)))
+  (when-let [c (cookies)]
+    (ocall c "get" (cookie-name c-name))))
 
 (defn ^:export remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
@@ -82,4 +88,5 @@
   
   ([c-name opt-path]
    (timbre/debug "Removing cookie" c-name)
-   (ocall (cookies) "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
+   (when-let [c (cookies)]
+     (ocall c "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain))))
