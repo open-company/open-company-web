@@ -3,6 +3,7 @@
            [goog.string format])
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
+            [oops.core :refer (oget)]
             ["jwt-decode" :as jwt-decode]
             [oc.web.utils.sentry :as sentry]))
 
@@ -58,14 +59,12 @@
                                                    "Cookie value exceeds max allowed length"))))
 
 (defn- cookie-options [c-max-age c-path c-domain c-secure]
-  (let [cljs-opts {"sameSite" true
-                   "secure" c-secure
-                   "domain" c-domain
-                   "path" c-path
-                   "maxAge" c-max-age}
-        js-opts (clj->js cljs-opts)]
+  (let [js-opts #js {"sameSite" true
+                     "secure" c-secure
+                     "domain" c-domain
+                     "path" c-path
+                     "maxAge" c-max-age}]
     (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
-    (js/console.log "DBG    cljs-opts" cljs-opts)
     (js/console.log "DBG    js-opts" js-opts)
     js-opts))
 
@@ -86,7 +85,10 @@
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
    (if-let [c (singleton)]
-     (.set c (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))
+     (let [opts (cookie-options c-max-age c-path c-domain c-secure)]
+       (js/console.log "DBG typeof opts" (type opts))
+       (js/console.log "DBG    oget maxAge" (oget opts "maxAge"))
+       (.set c (cookie-name c-name) c-value ))
      (when-not retrying?
        (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
 
