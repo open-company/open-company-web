@@ -2,11 +2,12 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.local-settings :as ls]
             ["jwt-decode" :as jwt-decode]
-            [oops.core :refer (ocall)]
+            [oops.core :refer (oget ocall)]
             [oc.web.utils.sentry :as sentry])
-  (:import [goog.net Cookies]))
+  (:import [goog.net Cookies]
+           [goog.string format]))
 
-(def max-cookie-length Cookies/MAX_COOKIE_LENGTH)
+(def max-cookie-length (oget Cookies "MAX_COOKIE_LENGTH"))
 
 (defn- calc-length [cval]
   (when (string? cval)
@@ -49,15 +50,18 @@
             :path c-path
             :maxAge expiry}))
 
+(defn- cookie-expiration-date [expiry]
+  (js/Date. (+ (.getTime (js/Date.)) (* expiry 1000))))
+
 (defn ^:export set-cookie!
   ([c-name c-value]
-    (set-cookie! c-name c-value default-expire default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
+   (set-cookie! c-name c-value default-expire default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry]
-    (set-cookie! c-name c-value expiry default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
+   (set-cookie! c-name c-value expiry default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path]
-    (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
+   (set-cookie! c-name c-value expiry c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value expiry c-path c-domain c-secure]
-   (timbre/debug "Setting cookie" c-name c-value)
+   (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date expiry) expiry c-value))
    (check-length c-name (str c-value))
    (ocall cookies-static-obj "set" (cookie-name c-name) c-value (cookie-options expiry c-path c-domain c-secure))))
 
