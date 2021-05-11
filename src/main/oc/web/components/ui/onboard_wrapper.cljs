@@ -647,7 +647,6 @@
   [s]
   (let [team-invite-drv (drv/react s :team-invite)
         auth-settings (:auth-settings team-invite-drv)
-        email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
         team-data (:team auth-settings)
         signup-with-email (drv/react s user-store/signup-with-email)
         continue-fn (fn []
@@ -658,7 +657,14 @@
                             (reset! (::email-error s) true))
                           (when (<= (count @(::pswd s)) 7)
                             (reset! (::password-error s) true)))
-                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true)))]
+                        (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true)))
+        is-mobile? (responsive/is-mobile-size?)
+        header-title (if is-mobile?
+                       (str "Join " (:name team-data) " on " ls/product-name)
+                       (str "Your team is using the " ls/product-name " news feed to share the latest updates."))
+        body-subtitle (if is-mobile?
+                        (str "Your team is using the " ls/product-name " news feed to share the latest updates.")
+                        (str "Join " (:name team-data) " on " ls/product-name))]
     [:div.onboard-container-inner.invitee-team-lander
       [:header.main-cta
        [:div.top-back-button-container
@@ -670,7 +676,7 @@
        (if auth-settings
          (if (:team auth-settings)
            [:div.title
-            (str "Your team is using the " ls/product-name " news feed to share the latest updates.")]
+            header-title]
            [:div.title
             "Oh oh..."])
          [:div.title
@@ -686,7 +692,7 @@
                 [:div.team-logo-container
                   (org-avatar team-data false :never)]
                 [:div.title.main-lander
-                  (str "Join " (:name team-data) " on " ls/product-name)]]
+                  body-subtitle]]
               [:div.field-label.email-field
                 "Work email"
                 (cond
@@ -796,8 +802,7 @@
         continue-disabled? (<= (count (:pswd collect-pswd)) 7)
         continue-fn #(if continue-disabled?
                       (reset! (::password-error s) true)
-                      (user-actions/pswd-collect collect-pswd false))
-        is-mobile? (responsive/is-mobile-size?)]
+                      (user-actions/pswd-collect collect-pswd false))]
     [:div.onboard-container-inner.invitee-lander-password
       [:header.main-cta
        [:div.top-back-button-container]
