@@ -9,7 +9,12 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def ^{:export true} cookies-static-obj (ocall Cookies "getInstance" js/document))
+(def ^{:private true} --cookies (atom nil))
+
+(defn ^:export cookies []
+  (when-not @--cookies
+    (reset! --cookies (ocall Cookies "getInstance" js/document)))
+  @--cookies)
 
 (defn- cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))
@@ -63,12 +68,12 @@
   ([c-name c-value c-max-age c-path c-domain c-secure]
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
-   (ocall cookies-static-obj "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))))
+   (ocall (cookies) "set" (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
   [c-name]
-  (ocall cookies-static-obj "get" (cookie-name c-name)))
+  (ocall (cookies) "get" (cookie-name c-name)))
 
 (defn ^:export remove-cookie!
   "Remove a cookie with the name provided pre-fixed by the environment."
@@ -77,4 +82,4 @@
   
   ([c-name opt-path]
    (timbre/debug "Removing cookie" c-name)
-   (ocall cookies-static-obj "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
+   (ocall (cookies) "remove" (cookie-name c-name) opt-path ls/jwt-cookie-domain)))
