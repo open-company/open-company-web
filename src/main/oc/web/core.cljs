@@ -2,6 +2,7 @@
   (:require [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.cookies :as cook]
             [rum.core :as rum]
             [cuerdas.core :as s]
             [oc.web.utils.rum :as ru]
@@ -59,7 +60,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.utils.dom :as dom-utils]
@@ -130,7 +130,7 @@
         (dommy/add-class! body "win-electron"))))
   ;; Setup timbre log level
   (when (-> params :query-params :log-level)
-    (logging/config-log-level! (-> params :query-params :log-level)))
+    (logging/config-log-level! (-> params :query-params :log-level) true))
   ; make sure the menu is closed
   (let [window-location (oget js/window "location")
         location-pathname (oget window-location "pathname")]
@@ -762,9 +762,12 @@
     (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn ^:export init []
-  (jwt/init)
+  ;; Init cookies
+  (cook/cookies)
   ;; Setup timbre log level
-  (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
+  (logging/config-log-level! (or (cook/get-cookie :log-level) ls/log-level))
+  ;; Read JWT
+  (jwt/init)
   ;; Setup API requests
   (api/config-request
    #(ja/update-jwt %) ;; success jwt refresh after expire
