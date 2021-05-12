@@ -59,6 +59,15 @@
                                                                  (str cname))}
                                                    "Cookie value exceeds max allowed length"))))
 
+(defn- cookie-options [c-max-age c-path c-domain c-secure]
+  (let [set-options (goog.net.Cookies/SetOptions.)]
+    (set! (.-secure set-options) (boolean c-secure))
+    (set! (.-domain set-options) (or c-domain ls/jwt-cookie-domain))
+    (set! (.-path set-options) (or c-path default-path))
+    (set! (.-maxAge set-options) (or c-max-age default-expire))
+    (set! (.-sameSite set-options) default-same-site)
+    set-options))
+
 (defn- cookie-expiration-date [c-max-age]
   (js/Date. (+ (.getTime (js/Date.)) (* c-max-age 1000))))
 
@@ -73,11 +82,7 @@
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
    (when-let [c (singleton)]
-     (.set c (cookie-name c-name) c-value #js {:secure (boolean c-secure)
-                                               :path (or c-path default-path)
-                                               :domain (or c-domain ls/jwt-cookie-domain)
-                                               :maxAge (or c-max-age default-expire)
-                                               :sameSite default-same-site}))))
+     (.set c (cookie-name c-name) c-value (cookie-options c-max-age c-path c-domain c-secure)))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
