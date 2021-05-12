@@ -2,6 +2,7 @@
   (:import [goog.net Cookies]
            [goog.string format])
   (:require [taoensso.timbre :as timbre]
+            [goog.net.Cookies]
             [oc.web.local-settings :as ls]
             [oops.core :refer (oget)]
             ["jwt-decode" :as jwt-decode]
@@ -31,7 +32,7 @@
 
 (defonce default-expire -1)
 (defonce default-path "/")
-(defonce default-same-site "lax")
+(defonce default-same-site (.-LAX ^js goog.net.Cookies/SameSite))
 
 (defonce max-cookie-length Cookies/MAX_COOKIE_LENGTH)
 
