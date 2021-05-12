@@ -31,6 +31,7 @@
 
 (defonce default-expire -1)
 (defonce default-path "/")
+(defonce default-same-site "lax")
 
 (defonce max-cookie-length Cookies/MAX_COOKIE_LENGTH)
 
@@ -62,7 +63,8 @@
   (let [js-opts (js-obj "secure" (boolean c-secure)
                         "domain" (or c-domain ls/jwt-cookie-domain)
                         "path" (or c-path default-path)
-                        "maxAge" (or c-max-age default-expire))]
+                        "maxAge" (or c-max-age default-expire)
+                        "sameSite" default-same-site)]
     (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
     (js/console.log "DBG    js-opts" js-opts)
     js-opts))
