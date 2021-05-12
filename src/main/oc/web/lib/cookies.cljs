@@ -4,7 +4,6 @@
   (:require [taoensso.timbre :as timbre]
             [goog.net.Cookies]
             [oc.web.local-settings :as ls]
-            [oops.core :refer (oget oset!)]
             ["jwt-decode" :as jwt-decode]
             [oc.web.utils.sentry :as sentry]))
 
@@ -60,22 +59,8 @@
                                                                  (str cname))}
                                                    "Cookie value exceeds max allowed length"))))
 
-(defn- cookie-options [c-max-age c-path c-domain c-secure]
-  (let [set-options (goog.net.Cookies/SetOptions.)]
-    (set! (.-secure set-options) (boolean c-secure))
-    (set! (.-domain set-options) (or c-domain ls/jwt-cookie-domain))
-    (set! (.-path set-options) (or c-path default-path))
-    (set! (.-maxAge set-options) (or c-max-age default-expire))
-    (set! (.-sameSite set-options) default-same-site)
-    (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
-    (js/console.log "DBG    options obj" set-options)
-    set-options))
-
 (defn- cookie-expiration-date [c-max-age]
   (js/Date. (+ (.getTime (js/Date.)) (* c-max-age 1000))))
-
-(defn- retry [f]
-  (.setTimeout js/window #(f true) 100))
 
 (defn ^:export set-cookie!
   ([c-name c-value]
@@ -84,16 +69,15 @@
    (set-cookie! c-name c-value c-max-age default-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
   ([c-name c-value c-max-age c-path]
    (set-cookie! c-name c-value c-max-age c-path ls/jwt-cookie-domain ls/jwt-cookie-secure))
-  ([c-name c-value c-max-age c-path c-domain c-secure & [retrying?]]
+  ([c-name c-value c-max-age c-path c-domain c-secure]
    (timbre/debug (format "Setting cookie \"%s\" with expiration %s (%d seconds from now). Value: %s" c-name (cookie-expiration-date c-max-age) c-max-age c-value))
    (check-length c-name (str c-value))
-   (if-let [c (singleton)]
-     (let [opts (cookie-options c-max-age c-path c-domain c-secure)]
-       (js/console.log "DBG typeof opts" (type opts))
-       (js/console.log "DBG    oget maxAge" (oget opts "maxAge"))
-       (.set c (cookie-name c-name) c-value opts))
-     (when-not retrying?
-       (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
+   (when-let [c (singleton)]
+     (.set c (cookie-name c-name) c-value #js {:secure (boolean c-secure)
+                                               :path (or c-path default-path)
+                                               :domain (or c-domain ls/jwt-cookie-domain)
+                                               :maxAge (or c-max-age default-expire)
+                                               :sameSite default-same-site}))))
 
 (defn ^:export get-cookie
   "Get a cookie with the name provided pre-fixed by the environment."
@@ -106,9 +90,7 @@
   ([c-name]
    (remove-cookie! (name c-name) default-path))
   
-  ([c-name c-path & [retrying?]]
+  ([c-name c-path]
    (timbre/debugf "Removing cookie %s with path %s" c-name c-path)
-   (if-let [c (singleton)]
-     (.remove c (cookie-name c-name) c-path ls/jwt-cookie-domain)
-     (when-not retrying?
-       (retry (partial remove-cookie! c-name c-path))))))
+   (when-let [c (singleton)]
+     (.remove c (cookie-name c-name) c-path ls/jwt-cookie-domain))))
