@@ -4,7 +4,7 @@
   (:require [taoensso.timbre :as timbre]
             [goog.net.Cookies]
             [oc.web.local-settings :as ls]
-            [oops.core :refer (oget)]
+            [oops.core :refer (oget oset!)]
             ["jwt-decode" :as jwt-decode]
             [oc.web.utils.sentry :as sentry]))
 
@@ -61,14 +61,15 @@
                                                    "Cookie value exceeds max allowed length"))))
 
 (defn- cookie-options [c-max-age c-path c-domain c-secure]
-  (let [js-opts (js-obj "secure" (boolean c-secure)
-                        "domain" (or c-domain ls/jwt-cookie-domain)
-                        "path" (or c-path default-path)
-                        "maxAge" (or c-max-age default-expire)
-                        "sameSite" default-same-site)]
+  (let [set-options (goog.net.Cookies/SetOptions.)]
+    (oset! set-options "secure" (boolean c-secure))
+    (oset! set-options "domain" (or c-domain ls/jwt-cookie-domain))
+    (oset! set-options "path" (or c-path default-path))
+    (oset! set-options "maxAge" (or c-max-age default-expire))
+    (oset! set-options "sameSite" default-same-site)
     (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
-    (js/console.log "DBG    js-opts" js-opts)
-    js-opts))
+    (js/console.log "DBG    options obj" set-options)
+    set-options))
 
 (defn- cookie-expiration-date [c-max-age]
   (js/Date. (+ (.getTime (js/Date.)) (* c-max-age 1000))))
