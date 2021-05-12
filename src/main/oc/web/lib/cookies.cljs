@@ -59,8 +59,7 @@
                                                    "Cookie value exceeds max allowed length"))))
 
 (defn- cookie-options [c-max-age c-path c-domain c-secure]
-  (let [js-opts #js {"sameSite" "none"
-                     "secure" (boolean c-secure)
+  (let [js-opts #js {"secure" (boolean c-secure)
                      "domain" (or c-domain ls/jwt-cookie-domain)
                      "path" (or c-path default-path)
                      "maxAge" (or c-max-age default-expire)}]
@@ -88,7 +87,7 @@
      (let [opts (cookie-options c-max-age c-path c-domain c-secure)]
        (js/console.log "DBG typeof opts" (type opts))
        (js/console.log "DBG    oget maxAge" (oget opts "maxAge"))
-       (.set c (cookie-name c-name) c-value ))
+       (.set c (cookie-name c-name) c-value opts))
      (when-not retrying?
        (retry (partial set-cookie! c-name c-value c-max-age c-path c-domain c-secure))))))
 
