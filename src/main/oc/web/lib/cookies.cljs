@@ -62,11 +62,11 @@
 
 (defn- cookie-options [c-max-age c-path c-domain c-secure]
   (let [set-options (goog.net.Cookies/SetOptions.)]
-    (oset! set-options "secure" (boolean c-secure))
-    (oset! set-options "domain" (or c-domain ls/jwt-cookie-domain))
-    (oset! set-options "path" (or c-path default-path))
-    (oset! set-options "maxAge" (or c-max-age default-expire))
-    (oset! set-options "sameSite" default-same-site)
+    (set! set-options "secure" (boolean c-secure))
+    (set! set-options "domain" (or c-domain ls/jwt-cookie-domain))
+    (set! set-options "path" (or c-path default-path))
+    (set! set-options "maxAge" (or c-max-age default-expire))
+    (set! set-options "sameSite" default-same-site)
     (js/console.log "DBG cookie-options" c-max-age c-path c-domain c-secure)
     (js/console.log "DBG    options obj" set-options)
     set-options))
