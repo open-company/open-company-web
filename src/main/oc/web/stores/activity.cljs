@@ -477,14 +477,30 @@
                                    parsed-board-data (au/parse-board updated-board-data change-data active-users follow-boards-list dispatcher/recently-posted-sort)]
                                 (assoc-in ndb board-data-key (dissoc parsed-board-data :fixed-items))))
                            with-fixed-contribs
-                           (keys (get-in db boards-key)))]
-    ;; Now if the post is the one being edited in cmail let's remove it from there too
-    (if (= (get-in db (conj dispatcher/cmail-data-key :uuid)) (:uuid activity-data))
-      (-> with-fixed-boards
-          (update-in contributions-count-key dec)
-          (assoc-in dispatcher/cmail-data-key {:delete true})
-          (assoc-in posts-key next-posts))
-      (assoc-in with-fixed-boards posts-key next-posts))))
+                           (keys (get-in db boards-key)))
+        label-entries-list-key (dispatcher/label-entries-list-key org-slug)
+        with-fixed-label-entries (reduce
+                                  (fn [ndb lkey]
+                                    (let [label-entries-data-key (dispatcher/label-entries-data-key org-slug lkey)
+                                          label-entries-data (get-in ndb label-entries-data-key)
+                                          updated-label-entries-data (update label-entries-data :posts-list (fn [posts-list]
+                                                                                                  (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
+                                          parsed-label-entries-data (au/parse-label-entries updated-label-entries-data change-data org-data active-users dispatcher/recently-posted-sort)]
+                                      (assoc-in ndb label-entries-data-key
+                                                (dissoc parsed-label-entries-data :fixed-items))))
+                                  with-fixed-boards
+                                  (keys (get-in db label-entries-list-key)))
+        cmail-editing? (= (get-in db (conj dispatcher/cmail-data-key :uuid)) (:uuid activity-data))]
+    (as-> with-fixed-label-entries ndb
+          (assoc-in ndb posts-key next-posts)
+          ;; If the post is being edited, remove it from cmail
+          (if cmail-editing?
+            (assoc-in ndb dispatcher/cmail-data-key {:delete true})
+            ndb)
+          ;; If post is from current publishers list, decrease posts count
+          (if (= (-> activity-data :publisher :user-id) (dispatcher/current-contributions-id))
+            (update-in ndb contributions-count-key dec)
+            ndb))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data _org-slug _board-data]]
