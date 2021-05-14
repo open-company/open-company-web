@@ -352,6 +352,10 @@
     (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
     (reset! (::latest-key s) (:key cmail-state))
     (reset! (::unlock-scroll s) scroll-lock?)
+    (when-let [delete-bt (rum/ref-node s :floating-delete-bt)]
+      (.tooltip (js/$ delete-bt) "destroy"))
+    (when-let [close-bt (rum/ref-node s :dismiss-inline-cmail-bt)]
+      (.tooltip (js/$ close-bt) "destroy"))
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
 
@@ -607,9 +611,11 @@
           {:class (when-not (:published? cmail-data) "long-tooltip")}
           [:button.mlb-reset.dismiss-inline-cmail
            {:on-click (partial close-cmail s)
-            :data-toggle "tooltip"
+            :data-toggle (when-not (:published? cmail-data) "tooltip")
             :data-placement (if (:distraction-free? cmail-state) "right" "top")
+            :data-published (:published? cmail-data)
             :data-container "body"
+            :ref :dismiss-inline-cmail-bt
             :title (when-not (:published? cmail-data)
                      "Save & Close")}
            [:span.dismiss-inline-cmail-icon]
@@ -617,14 +623,15 @@
             "Close"]]]
          [:div.floating-delete-bt-container
           [:button.mlb-reset.floating-delete-bt
-           {:on-click #(if (:uuid cmail-data)
+           {:ref :floating-delete-bt
+            :on-click #(if (:uuid cmail-data)
                          (delete-clicked s % cmail-data)
                          (close-cmail s %))
-            :data-toggle (when (:collapsed cmail-state) "tooltip")
+            :data-toggle (when-not (:published? cmail-data) "tooltip")
+            :data-published (:published? cmail-data)
             :data-container "body"
             :data-placement "right"
-            :title (if (:published? cmail-data)
-                    "Delete"
+            :title (when-not (:published? cmail-data)
                     "Delete draft")}
            [:span.floating-delete-bt-icon]
            [:span.floating-delete-bt-text

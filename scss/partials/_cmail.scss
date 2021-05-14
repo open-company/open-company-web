@@ -108,14 +108,14 @@
       display: block;
       order: 1;
       margin-bottom: 8px;
-      width: 80px;
+      width: 84px;
 
       @include mobile() {
         display: none;
       }
 
       button.dismiss-inline-cmail {
-        width: 80px;
+        width: 84px;
         height: 34px;
         padding: 9px 12px;
         border-radius: 4px;
@@ -132,9 +132,10 @@
         }
 
         span.dismiss-inline-cmail-icon {
-          width: 12px;
-          height: 12px;
-          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
+          width: 16px;
+          height: 16px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 16px 16px, var(--tooltip-color));
+          flex: 0 0 auto;
         }
 
         span.dismiss-inline-cmail-text {
@@ -143,6 +144,7 @@
           color: var(--tooltip-color);
           margin-left: 8px;
           @include OC_Body_Book();
+          flex: 0 0 auto;
         }
       }
 
@@ -158,14 +160,14 @@
       display: block;
       margin-bottom: 8px;
       order: 2;
-      width: 80px;
+      width: 84px;
 
       @include mobile() {
         display: none;
       }
 
       button.floating-delete-bt {
-        width: 80px;
+        width: 84px;
         height: 34px;
         padding: 9px 12px;
         border-radius: 4px;
@@ -178,12 +180,14 @@
         border: none;
 
         span.floating-delete-bt-icon {
-          @include svgBgColor("/img/ML/cmail_delete.svg", center, 12px 16px, var(--tooltip-color));
-          width: 12px;
+          @include svgBgColor("/img/ML/cmail_delete.svg", center, 14px 16px, var(--tooltip-color));
+          width: 14px;
           height: 16px;
+          flex: 0 0 auto;
         }
 
         span.floating-delete-bt-text {
+          display: block;
           font-size: 14px;
           line-height: 16px;
           color: var(--tooltip-color);
@@ -283,9 +287,10 @@
         }
 
         span.dismiss-inline-cmail-icon {
-          width: 12px;
-          height: 12px;
-          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
+          width: 16px;
+          height: 16px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 16px 16px, var(--tooltip-color));
+          flex: 0 0 auto;
         }
 
         span.dismiss-inline-cmail-text {
@@ -323,9 +328,10 @@
         border: none;
 
         span.floating-delete-bt-icon {
-          @include svgBgColor("/img/ML/cmail_delete.svg", center, 12px 16px, var(--tooltip-color));
-          width: 12px;
+          @include svgBgColor("/img/ML/cmail_delete.svg", center, 14px 16px, var(--tooltip-color));
+          width: 14px;
           height: 16px;
+          flex: 0 0 auto;
         }
 
         span.floating-delete-bt-text {
@@ -1216,9 +1222,9 @@ div.cmail-outer {
       div.cmail-container {
         border: none;
         margin: 40px auto;
-        width: calc(100% - 80px);
+        width: calc(100% - 84px);
         max-width: 1024px;
-        min-height: calc(100vh - 80px);
+        min-height: calc(100vh - 84px);
         display: flex;
         flex-flow: column nowrap;
         box-shadow: none;
