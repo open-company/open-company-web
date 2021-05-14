@@ -132,9 +132,9 @@
         }
 
         span.dismiss-inline-cmail-icon {
-          width: 16px;
-          height: 16px;
-          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 16px 16px, var(--tooltip-color));
+          width: 12px;
+          height: 12px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
           flex: 0 0 auto;
         }
 
@@ -287,9 +287,9 @@
         }
 
         span.dismiss-inline-cmail-icon {
-          width: 16px;
-          height: 16px;
-          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 16px 16px, var(--tooltip-color));
+          width: 12px;
+          height: 12px;
+          @include svgBgColor("/img/ML/mobile_dark_x@dark.svg", center, 12px 12px, var(--tooltip-color));
           flex: 0 0 auto;
         }
 
@@ -373,9 +373,9 @@
         margin-bottom: 8px;
 
         span.floating-labels-bt-icon {
-          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--tooltip-color));
+          @include svgBgColor("/img/ML/label_icon.svg", center, 16px 14px, var(--tooltip-color));
           width: 16px;
-          height: 16px;
+          height: 14px;
         }
 
         span.floating-labels-bt-text {
