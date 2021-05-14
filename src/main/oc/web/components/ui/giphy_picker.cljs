@@ -1,36 +1,47 @@
 (ns oc.web.components.ui.giphy-picker
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.local-settings :as ls]
             [oc.web.utils.rum :as rutils]
+            [oc.web.utils.dom :as dom-utils]
             ["@bago2k4/react-giphy-selector" :refer (Selector)]))
 
 (def giphy-selector (partial rutils/build Selector))
 
 (def giphy-picker-max-height 408)
 
-(rum/defcs giphy-picker < (rum/local 0 ::offset-top)
-                          {:will-mount (fn [s]
-                            (let [outer-container-selector (:outer-container-selector (first (:rum/args s)))]
-                              (when-let [picker-el (sel1 (concat outer-container-selector [:div.medium-editor-media-picker]))]
-                                (reset! (::offset-top s) (.-offsetTop picker-el))))
-                           s)}
-  [s {:keys [fullscreen pick-emoji-cb outer-container-selector offset-element-selector]}]
-  (let [scrolling-element (if fullscreen (sel1 outer-container-selector) (.-scrollingElement js/document))
-        win-height (or (.-clientHeight (.-documentElement js/document))
-                       (.-innerHeight js/window))
-        top-offset-limit (if offset-element-selector (.-offsetTop (sel1 offset-element-selector)) 0)
-        scroll-top (if offset-element-selector (.-scrollTop scrolling-element) 0)
-        top-position (max 0 @(::offset-top s))
-        relative-position (+ top-position
-                             top-offset-limit
-                             (* scroll-top -1)
-                             giphy-picker-max-height)
-        adjusted-position (if (> relative-position win-height)
-                            (max 0 (- top-position (- relative-position win-height) 16))
-                            top-position)]
+(defn- maybe-save-position [s]
+  (when (nil? @(::pos s))
+    (let [trigger-selector (-> s :rum/args first :trigger-selector)
+          el (sel1 trigger-selector)]
+      (when-let [rect (dom-utils/bounding-rect el)]
+        (let [viewport-height (dom-utils/viewport-height)
+              below-middle-screen? (> (int (:top rect)) (/ (int viewport-height) 2))
+              pos (cond-> {:left (str (int (:left rect)) "px")
+                           :top (str (int (+ (:top rect) (:height rect))) "px")}
+                    below-middle-screen? (assoc :transform (str "translateY(calc(-100% - " (int (:height rect)) "px))")))]
+          (reset! (::pos s) pos))))))
+
+(rum/defcs giphy-picker < rum/static
+  (rum/local nil ::pos)
+  {:will-mount (fn [s]
+                 (when-not (responsive/is-mobile-size?)
+                   (maybe-save-position s))
+                 s)
+   :did-mount (fn [s]
+                (when-not (responsive/is-mobile-size?)
+                  (maybe-save-position s))
+                s)
+   :will-remount (fn [_ s]
+                (when-not (responsive/is-mobile-size?)
+                  (maybe-save-position s))
+                s)}
+  [s {:keys [fullscreen pick-emoji-cb trigger-selector]}]
+  (let [style @(::pos s)]
     [:div.giphy-picker
-      {:style {:top (str adjusted-position "px")}}
+      {:style style
+       :class (if (map? style) "fixed-anchor" "absolute-anchor")}
       (giphy-selector {:apiKey ls/giphy-api-key
                        :queryInputPlaceholder "Search for GIF"
                        :resultColumns 1

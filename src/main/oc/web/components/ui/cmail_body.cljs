@@ -104,6 +104,7 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
+             media-picker-container-selector
              fullscreen
              cmail-key]}]
   (let [_mention-users (drv/react s :mention-users)
@@ -139,5 +140,5 @@
                        :pick-emoji-cb (fn [gif-obj]
                                        (reset! (::me-media-utils/showing-gif-selector s) false)
                                        (me-media-utils/media-gif-add s @(::me-media-utils/media-picker-ext s) gif-obj))
-                       :offset-element-selector [:div.rich-body-editor-outer-container]
-                       :outer-container-selector [:div.cmail-content-outer]}))]))
+                       :trigger-selector (str media-picker-container-selector " button.media.media-gif")
+                       }))]))
