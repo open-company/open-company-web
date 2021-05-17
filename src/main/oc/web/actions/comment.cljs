@@ -25,14 +25,14 @@
   (dis/dispatch! [:add-comment-blur focus-value]))
 
 (defn edit-comment [activity-uuid comment-data]
-  (dis/dispatch! [:add-comment-change (dis/current-org-slug) activity-uuid (:reply-parent comment-data) (:uuid comment-data) (:body comment-data)]))
+  (dis/dispatch! [:add-comment/update (dis/current-org-slug) activity-uuid (:reply-parent comment-data) (:uuid comment-data) (:body comment-data)]))
 
 (defn stop-comment-edit [activity-uuid comment-data]
-  (dis/dispatch! [:add-comment-change (dis/current-org-slug) activity-uuid (:reply-parent comment-data) (:uuid comment-data) nil]))
+  (dis/dispatch! [:add-comment/update (dis/current-org-slug) activity-uuid (:reply-parent comment-data) (:uuid comment-data) nil]))
 
 (defn add-comment-change [activity-data parent-comment-uuid comment-uuid comment-body]
   ;; Save the comment change in the app state to remember it
-  (dis/dispatch! [:add-comment-change (dis/current-org-slug) (:uuid activity-data) parent-comment-uuid comment-uuid comment-body]))
+  (dis/dispatch! [:add-comment/update (dis/current-org-slug) (:uuid activity-data) parent-comment-uuid comment-uuid comment-body]))
 
 (defn add-comment-reset [prefix activity-uuid parent-comment-uuid comment-uuid]
   (add-comment-blur (comment-utils/add-comment-focus-value prefix activity-uuid parent-comment-uuid comment-uuid))
@@ -104,7 +104,7 @@
           ;; Remove the newly added comment if still in the list
           (dis/dispatch! [:comment-add/failed activity-data new-comment-map comments-key])
           ;; Move the comment back in the body field
-          (dis/dispatch! [:add-comment-change (dis/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))
+          (dis/dispatch! [:add-comment/update (dis/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))
     new-comment-map))
 
 (defn get-comments [activity-data]
@@ -186,7 +186,7 @@
           ;; Remove the newly added comment if still in the list
           (dis/dispatch! [:comment-save/failed activity-data comment-data comments-key])
           ;; Move the comment back in the body field
-          (dis/dispatch! [:add-comment-change org-slug (:uuid activity-data) (:parent-uuid comment-data) (:uuid comment-data) new-body true]))
+          (dis/dispatch! [:add-comment/update org-slug (:uuid activity-data) (:parent-uuid comment-data) (:uuid comment-data) new-body true]))
         (when (not= (keyword current-board-slug) :replies)
           (activity-actions/replies-get (dis/org-data)))))
     updated-comment-map))
