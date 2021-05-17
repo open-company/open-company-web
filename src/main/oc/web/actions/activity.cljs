@@ -1097,7 +1097,7 @@
 (defonce last-seen-at (atom nil))
 
 (defn container-nav-in [container-slug sort-type]
-  (let [container-data (dis/container-data @dis/app-state (dis/current-org-slug) container-slug sort-type)
+  (let [container-data (dis/current-container-data)
         next-seen-at (str "last-seen-at-" (:container-slug container-data) "-" (:next-seen-at container-data))]
     (when (and (:container-id container-data)
                (not= @last-seen-at next-seen-at))
