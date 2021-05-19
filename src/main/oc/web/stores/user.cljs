@@ -6,6 +6,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
@@ -72,15 +73,15 @@
        :uuid))
 
 (defn- dismiss-labels-tooltip [completed?]
-  (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-  (dispatcher/dispatch! [:input [:foc-show-menu] nil])
+  (dispatcher/dispatch! [:labels-tooltip/dismiss])
+  (foc-menu-actions/toggle-foc-menu-open)
   (when completed?
     (user-actions/untag! :labels-tooltip)
     (user-actions/tag! :labels-tooltip-done)))
 
 (defn- show-labels-tooltip []
   (when-let [menu-uuid (feed-first-uuid)]
-    (dispatcher/dispatch! [:input [:foc-show-menu] menu-uuid])))
+    (foc-menu-actions/toggle-foc-show-menu menu-uuid)))
 
 (defn- labels-tooltip [_db]
   {:title "🆕 Tag your posts with labels"
@@ -97,15 +98,15 @@
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
 
 (defn- dismiss-pin-tooltip [completed?]
-  (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-  (dispatcher/dispatch! [:input [:foc-menu-open] nil])
+  (dispatcher/dispatch! [:pin-tooltip/dismiss])
+  (foc-menu-actions/toggle-foc-show-menu)
   (when completed?
     (user-actions/untag! :pin-tooltip)
     (user-actions/tag! :pin-tooltip-done)))
 
 (defn- show-pin-tooltip []
   (when-let [menu-uuid (feed-first-uuid)]
-    (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
+    (foc-menu-actions/toggle-foc-menu-open menu-uuid)))
 
 (defn- pin-tooltip [_db]
   {:title "🆕 Increase visibility with Pins!"
@@ -582,3 +583,11 @@
 (defmethod dispatcher/action :user/untag!
   [db [_ tag]]
   (update-in db (conj dispatcher/current-user-key :tags) #(disj (or % #{}) tag)))
+
+(defmethod dispatcher/action :labels-tooltip/dismiss
+  [db [_]]
+  (dissoc db :ui-tooltip))
+
+(defmethod dispatcher/action :pin-tooltip/dismiss
+  [db [_]]
+  (dissoc db :ui-tooltip))
