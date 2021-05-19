@@ -4,6 +4,7 @@
             [defun.core :refer (defun)]
             [clojure.set :as set]
             [oc.web.api :as api]
+            [oc.lib.time :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -1079,8 +1080,10 @@
   (when-let* [entry-data (dis/entry-data (dis/current-org-slug) entry-uuid)
               publisher-id (:user-id (:publisher entry-data))
               container-id (:board-uuid entry-data)
-              org-id (:org-uuid entry-data)]
-    (ws-cc/item-seen publisher-id org-id container-id entry-uuid)))
+              org-id (:org-uuid entry-data)
+              seen-at (time/current-timestamp)]
+    (dis/dispatch! [:item-seen (dis/current-org-slug) container-id entry-uuid seen-at])
+    (ws-cc/item-seen publisher-id org-id container-id entry-uuid seen-at)))
 
 (defn- send-container-seen
   "Send a seen message for the given container-id to Change service."
@@ -1120,7 +1123,7 @@
               user-name (:name token-data)
               avatar-url (:avatar-url token-data)
               org-id (:uuid (dis/org-data))]
-    (ws-cc/item-seen publisher-id org-id container-id activity-id)
+    (ws-cc/item-seen publisher-id org-id container-id activity-id (time/current-timestamp))
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn send-item-read

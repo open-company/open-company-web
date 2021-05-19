@@ -882,6 +882,11 @@
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (assoc-in activity-key next-activity-data))))
 
+(defmethod dispatcher/action :item-seen
+  [db [_ org-slug container-id _entry-uuid seen-at]]
+  (let [container-last-seen-at-key (concat (dispatcher/change-data-key org-slug) [container-id :last-seen-at])]
+    (update-in db container-last-seen-at-key #(max seen-at %))))
+
 ;; Inbox
 
 (defmethod dispatcher/action :inbox-get/finish

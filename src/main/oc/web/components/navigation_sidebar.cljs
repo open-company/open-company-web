@@ -359,7 +359,8 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
+                    {:class (utils/class-set {:new (and (:last-entry-at board)
+                                                        (> (:last-entry-at board) (:last-seen-at board-change-data)))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")}
                     (or (:name board) (:slug board))]]
