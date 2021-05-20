@@ -1,5 +1,8 @@
 (ns oc.web.mixins.seen
-  (:require [oc.web.dispatcher :as dis]
+  (:require [rum.core :as rum]
+            [oops.core :refer (oget ocall)]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.dispatcher :as dis]
             [oc.web.actions.activity :as aa]))
 
 (defn container-nav-mixin []
@@ -17,9 +20,53 @@
       (aa/container-nav-out @container-slug @sort-type)
      s)}))
 
-(def item-render-mixin
+(declare maybe-mark-element-seen)
+(declare unobserve-element)
+
+(defn- entry-uuid-from-entry [intersection-entry]
+  (oget intersection-entry :target.?dataset.?entryUuid))
+
+(defn- seen-observer-cb [intersection-entries _observer]
+  (doseq [intersection-entry (vec intersection-entries)]
+    (maybe-mark-element-seen intersection-entry)
+    (when (or (-> intersection-entry entry-uuid-from-entry aa/unseen-item? not)
+              (oget intersection-entry :isIntersecting))
+      (unobserve-element (oget intersection-entry :target)))))
+
+(defonce --seen-intersection-observer (atom nil))
+
+(defn- intersection-observer
+  "Return the intersection observer singleton, creates it if it's not
+   initialized yet."
+  []
+  (let [opts {:rootMargin (str responsive/navbar-height "px 0px 0px 0px")
+              :threshold 1.0} ]
+    (or @--seen-intersection-observer
+        (reset! --seen-intersection-observer
+                (js/IntersectionObserver. seen-observer-cb (clj->js opts))))))
+
+(defn- unobserve-element
+  "Remove an observed element from the list."
+  [observable-element]
+  (ocall (intersection-observer) :unobserve observable-element))
+
+(defn- maybe-mark-element-seen
+  "If the passed intersection entry is intersecting with the viewport and it has
+   the unseen-item class."
+  [intersection-entry]
+  (let [entry-uuid (entry-uuid-from-entry intersection-entry)]
+    (when (and (oget intersection-entry :isIntersecting)
+               (aa/unseen-item? entry-uuid))
+      (aa/send-item-seen entry-uuid))))
+
+(defn- observe-element [observable-element]
+  (ocall (intersection-observer) :observe observable-element))
+
+(def item-visible-mixin
   {:did-mount (fn [s]
-                (let [activity-data (-> s :rum/args first :activity-data)]
-                  (when (:unseen activity-data)
-                    (aa/send-item-seen (:uuid activity-data))))
-                s)})
+                (when (-> s :rum/args first :activity-data :unseen)
+                  (observe-element (rum/dom-node s)))
+                s)
+   :will-unmount (fn [s]
+                   (unobserve-element (rum/dom-node s))
+                   s)})

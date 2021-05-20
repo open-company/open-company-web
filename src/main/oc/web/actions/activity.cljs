@@ -1073,6 +1073,11 @@
 
 ;; AP Seen
 
+(defn unseen-item?
+  "Check the unseen flag in the post data."
+  [entry-uuid]
+  (some->> entry-uuid (dis/entry-data (dis/current-org-slug)) :unseen))
+
 (defn send-item-seen
   "Actually send the seen. Needs to get the entry data from the app-state
   to read the published-at."
