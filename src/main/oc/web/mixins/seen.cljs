@@ -16,3 +16,10 @@
      :will-unmount (fn [s]
       (aa/container-nav-out @container-slug @sort-type)
      s)}))
+
+(def item-render-mixin
+  {:did-mount (fn [s]
+                (let [activity-data (-> s :rum/args first :activity-data)]
+                  (when (:unseen activity-data)
+                    (aa/send-item-seen (:uuid activity-data))))
+                s)})

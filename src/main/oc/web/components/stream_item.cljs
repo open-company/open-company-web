@@ -11,6 +11,7 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.mixins.seen :as seen-mixins]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -152,6 +153,7 @@
                          (rum/local false ::show-view-more)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
+                         seen-mixins/item-render-mixin
                          (when (responsive/is-mobile-size?)
                            (swipe-gesture-manager {:swipe-left swipe-left-handler
                                                    :long-press long-press-handler
