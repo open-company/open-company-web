@@ -33,7 +33,7 @@
               (oget intersection-entry :isIntersecting))
       (unobserve-element (oget intersection-entry :target)))))
 
-(defonce --seen-intersection-observer (atom nil))
+(defonce ^{:export true} --seen-intersection-observer (atom nil))
 
 (defn- intersection-observer
   "Return the intersection observer singleton, creates it if it's not
