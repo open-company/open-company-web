@@ -885,7 +885,7 @@
 (defmethod dispatcher/action :item-seen
   [db [_ org-slug container-id entry-uuid seen-at]]
   (let [container-last-seen-at-key (concat (dispatcher/change-data-key org-slug) [container-id :last-seen-at])
-        entry-unseen-key (vec (conj (dispatcher/activity-key org-slug entry-uuid) :unseen))]
+        entry-unseen-key (vec (conj (dispatcher/activity-key org-slug entry-uuid) :board-item-unseen))]
     (-> db
         (update-in container-last-seen-at-key #(max seen-at %))
         (assoc entry-unseen-key false))))

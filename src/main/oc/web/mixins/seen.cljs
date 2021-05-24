@@ -3,6 +3,7 @@
             [oops.core :refer (oget ocall)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.dispatcher :as dis]
+            [oc.web.utils.activity :as au]
             [oc.web.actions.activity :as aa]))
 
 (defn container-nav-mixin []
@@ -23,13 +24,13 @@
 (declare maybe-mark-element-seen)
 (declare unobserve-element)
 
-(defn- entry-uuid-from-entry [intersection-entry]
+(defn- entry-uuid-from-intersection-entry [intersection-entry]
   (oget intersection-entry :target.?dataset.?entryUuid))
 
 (defn- seen-observer-cb [intersection-entries _observer]
   (doseq [intersection-entry (vec intersection-entries)]
     (maybe-mark-element-seen intersection-entry)
-    (when (or (-> intersection-entry entry-uuid-from-entry aa/unseen-item? not)
+    (when (or (-> intersection-entry entry-uuid-from-intersection-entry au/need-item-seen? not)
               (oget intersection-entry :isIntersecting))
       (unobserve-element (oget intersection-entry :target)))))
 
@@ -51,12 +52,12 @@
   (ocall (intersection-observer) :unobserve observable-element))
 
 (defn- maybe-mark-element-seen
-  "If the passed intersection entry is intersecting with the viewport and it has
-   the unseen-item class."
+  "If the passed intersection entry is intersecting with the viewport and
+   it is unseen in its board."
   [intersection-entry]
-  (let [entry-uuid (entry-uuid-from-entry intersection-entry)]
+  (let [entry-uuid (entry-uuid-from-intersection-entry intersection-entry)]
     (when (and (oget intersection-entry :isIntersecting)
-               (aa/unseen-item? entry-uuid))
+               (au/need-item-seen? entry-uuid))
       (aa/send-item-seen entry-uuid))))
 
 (defn- observe-element [observable-element]
@@ -64,7 +65,7 @@
 
 (def item-visible-mixin
   {:did-mount (fn [s]
-                (when (-> s :rum/args first :activity-data :unseen)
+                (when (-> s :rum/args first :activity-data :board-item-unseen)
                   (observe-element (rum/dom-node s)))
                 s)
    :will-unmount (fn [s]
