@@ -1,11 +1,9 @@
 (ns oc.web.stores.org
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.lib.utils :as utils]
+  (:require [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.utils.org :as org-utils]
             [oc.web.utils.activity :as activity-utils]
-            [oc.web.utils.user :as user-utils]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.stores.user :as user-store]))
@@ -36,8 +34,10 @@
                           (update :new-entry-cta #(or % org-utils/default-entry-cta))
                           (update :new-entry-placeholder #(or % org-utils/default-entry-placeholder))
                           (dissoc :has-changes))
-        editable-boards* (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
-                          (:boards org-data))
+        editable-boards* (filter #(and (not (:draft %))
+                                       (not= (:slug %) utils/default-drafts-board-slug)
+                                       (utils/link-for (:links %) "create" "POST"))
+                                 (:boards org-data))
         editable-boards (zipmap (map :slug editable-boards*) editable-boards*)
         premium? (jwt/premium? (:team-id org-data))
         user-id (jwt/user-id)

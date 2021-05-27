@@ -50,7 +50,7 @@
                                                   :board-name (:name nav-to-board-data)}])
        (dis/dispatch! [:input (conj dis/cmail-state-key :key) (utils/activity-uuid)])))))
 
-(def ^:private click-throttle-ms (* 1000 15))
+(def ^{:private true} click-throttle-ms (* 1000 15))
 
 (defonce refresh-delays (atom {}))
 
@@ -85,10 +85,33 @@
       (when refresh?
         (utils/after feed-render-delay #(activity-actions/reload-current-container))))))
 
+(defn nav-to-label!
+  ([e label-slug url]
+   (nav-to-label! e label-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
+
+  ([e label-slug url refresh?]
+   (nav-to-label! e label-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
+
+  ([e label-slug url back-y refresh?]
+   (dom-utils/prevent-default! e)
+   (when (responsive/is-mobile-size?)
+     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+     (notif-actions/hide-mobile-user-notifications))
+   (let [org-slug (dis/current-org-slug)
+         sort-type (dis/current-sort-type)
+         next-router-map {:org org-slug
+                          :label label-slug
+                          :sort-type sort-type
+                          :scroll-y back-y
+                          :query-params (dis/query-params)
+                          :route [org-slug label-slug sort-type "dashboard"]
+                          dis/router-opts-key [dis/router-dark-allowed-key]}]
+     (feed-navigation! url next-router-map refresh?))))
+
 (defn nav-to-author!
   ([e author-uuid url]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
-  
+
   ([e author-uuid url refresh?]
    (nav-to-author! e author-uuid url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
@@ -131,6 +154,8 @@
         board (dis/current-board-slug)
         contributions-id (dis/current-contributions-id)
         is-contributions? (seq contributions-id)
+        label-slug (dis/current-label-slug)
+        is-label? (seq label-slug)
         to-url (or (:back-to route) (oc-urls/following))
         cont-data (dis/current-container-data)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
@@ -139,9 +164,12 @@
         ;; Scroll back to the previous scroll position only if the posts are
         ;; not going to refresh, if they refresh the old scroll position won't be right anymore
         back-y (if (contains? route :back-to) (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))]
-    (if is-contributions?
-      (nav-to-author! e contributions-id to-url back-y false)
-      (nav-to-container! e board to-url back-y false))
+    (cond is-label?
+          (nav-to-label! e label-slug to-url back-y false)
+          is-contributions?
+          (nav-to-author! e contributions-id to-url back-y false)
+          :else
+          (nav-to-container! e board to-url back-y false))
     (when should-refresh-data?
       (utils/after 180 activity-actions/refresh-current-container))))
 
@@ -155,18 +183,19 @@
         current-sort-type (dis/current-sort-type)
         current-contributions-id (dis/current-contributions-id)
         current-board-slug (dis/current-board-slug)
-        back-to (cond
-                  (and (seq current-contributions-id)
-                       (not current-board-slug))
-                  (oc-urls/contributions current-contributions-id)
-                  (= (keyword current-board-slug) :replies)
-                  (oc-urls/replies)
-                  (= (keyword current-board-slug) :topics)
-                  (oc-urls/topics)
-                  (= (keyword current-board-slug) :following)
-                  (oc-urls/following)
-                  :else
-                  (oc-urls/board entry-board-slug))
+        current-label-slug (dis/current-label-slug)
+        back-to (cond (seq current-contributions-id)
+                      (oc-urls/contributions current-contributions-id)
+                      (seq current-label-slug)
+                      (oc-urls/label current-label-slug)
+                      (= (keyword current-board-slug) :replies)
+                      (oc-urls/replies)
+                      (= (keyword current-board-slug) :topics)
+                      (oc-urls/topics)
+                      (not (dis/is-container? current-board-slug))
+                      (oc-urls/board current-board-slug)
+                      :else
+                      (oc-urls/following))
         entry-uuid (:uuid entry-data)
         post-url (if comment-uuid
                    (oc-urls/comment-url org entry-board-slug entry-uuid comment-uuid)
@@ -176,7 +205,8 @@
         route-path* {:org org
                      :board current-board-slug
                      :entry-board entry-board-slug
-                     :contributions (dis/current-contributions-id)
+                     :contributions current-contributions-id
+                     :label current-label-slug
                      :sort-type current-sort-type
                      :activity entry-uuid
                      :back-to back-to

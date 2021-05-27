@@ -18,16 +18,22 @@ div.expanded-post {
     padding: #{$mobile_navbar_height}px 16px 16px;
   }
 
+  div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
+    div.muted-activity, div.bookmark-tag, div.bookmark-tag-small {
+      display: none;
+    }
+  }
+
   &.bookmark-item {
     div.expanded-post-container div.expanded-post-header div.expanded-post-header-center {
       @include big_web() {
         div.bookmark-tag {
-          display: block;
+          display: flex;
         }
       }
       @include mobile() {
         div.bookmark-tag-small {
-          display: block;
+          display: flex;
         }
       }
     }
@@ -54,21 +60,13 @@ div.expanded-post {
       background-color: var(--mobile-background-color);
     }
 
-    div.activity-share-container {
-      div.activity-share-modal-container {
-        top: 36px;
-        right: 64px;
-        margin-top: 0;
-      }
-    }
-
     div.expanded-post-header {
       position: absolute;
       // Add 32 pixels to the width to account for the overflwoing comment menu
       width: #{$expanded_post_width}px;
       height: #{$expanded_post_header_height}px;
       padding: 8px 16px;
-      z-index: 102;
+      z-index: 103;
       top: 0;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.07);
       display: flex;
@@ -97,7 +95,7 @@ div.expanded-post {
 
         @include mobile() {
           order: 3;
-          margin-left: 10px;
+          margin-left: 0;
           // Push the button to the right to align the centered icon with the content
           margin-right: -6px;
           flex: 0 0 auto;
@@ -143,7 +141,7 @@ div.expanded-post {
         @include mobile() {
           order: 1;
           margin-left: 0;
-          max-width: calc(100% - 32px - 8px - 32px - 8px);
+          max-width: calc(100% - 32px - 4px - 32px);
           overflow: hidden;
         }
 
@@ -176,6 +174,7 @@ div.expanded-post {
           flex: 0 0 auto;
           margin-right: 0;
           margin-left: 6px;
+          display: none;
         }
 
         @include muted-activity();
@@ -244,7 +243,7 @@ div.expanded-post {
           top: 34px;
         }
 
-        & > button:not(.more-menu-bt), & > * > button:not(.more-menu-bt) {
+        button.menu-item-bt:not(.more-menu-bt), button.menu-item-bt:not(.more-menu-bt) {
           width: 32px;
           height: 32px;
           background-color: var(--opac-background-color-2);
@@ -260,29 +259,11 @@ div.expanded-post {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
 
-            & + button:not(.more-menu-bt),
-            & + div > button:not(.more-menu-bt) {
+            & + button.menu-item-bt:not(.more-menu-bt),
+            & + div > button.menu-item-bt:not(.more-menu-bt) {
               border-top-left-radius: 0;
               border-bottom-left-radius: 0;
             }
-          }
-        }
-
-        button.more-menu-bt {
-          width: 32px;
-          height: 32px;
-          background-color: transparent;
-          padding: 0;
-          margin: 0 9px 0 0;
-          opacity: 0.5;
-
-          &:not(.disabled):hover, &:not(.disabled):active {
-            opacity: 1;
-            background-color: transparent;
-          }
-
-          &:first-child {
-            border-left: none;
           }
         }
 
@@ -298,7 +279,7 @@ div.expanded-post {
     }
 
     div.expanded-post-container-inner {
-      padding: #{$expanded_post_header_height + 51}px 120px 32px;
+      padding: #{$expanded_post_header_height + 26}px 120px 32px;
 
       @include mobile() {
         padding: 0;
@@ -330,8 +311,8 @@ div.expanded-post {
           }
         }
 
-    $big-web-collapse-height: 134;
-    $mobile-collapse-height: 160;
+        $big-web-collapse-height: 134;
+        $mobile-collapse-height: 160;
         &.collapsed {
           height: #{$big-web-collapse-height}px;
           position: relative;
@@ -431,32 +412,24 @@ div.expanded-post {
 
       div.expanded-post-footer {
         margin-top: 24px;
-        min-height: 26px;
-        position: relative;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
 
         @include mobile() {
           margin-top: 16px;
-          min-height: 26px;
-        }
-
-        div.expanded-post-footer-mobile-group {
-          min-height: 26px;
-          float: left;
-          height: auto;
-          width: auto;
-        }
-
-        div.is-comments {
-          margin-left: 32px;
-          float: left;
-          cursor: pointer;
+          flex-flow: row wrap;
         }
 
         div.reactions {
-          float: left;
+          margin-left: 0;
+          margin-right: 8px;
+          flex: 0 0 auto;
+          order: 2;
 
           div.reactions-picker-container {
-            div.emoji-mart {
+            div.emoji-mart, section.emoji-mart {
               bottom: unset;
               top: 0;
               left: calc(100% + 8px);
@@ -471,9 +444,49 @@ div.expanded-post {
           }
         }
 
+        div.is-comments {
+          cursor: pointer;
+          margin-right: 8px;
+          margin-left: 8px;
+          flex: 0 0 auto;
+          order: 3;
+        }
+
         div.wrt-count-container {
-          float: left;
-          margin-left: 32px;
+          margin-right: 8px;
+          margin-left: 8px;
+          flex: 0 0 auto;
+          order: 4;
+        }
+
+        div.expanded-post-labels {
+          position: relative;
+          margin-left: 27px;
+          margin-right: 8px;
+          flex: 0 0 auto;
+          order: 5;
+
+          @include mobile() {
+            order: 1;
+            width: 100%;
+            margin: 8px 0 10px 0;
+          }
+
+          div.separator-dot {
+            position: absolute;
+            top: 50%;
+            left: -19px;
+            display: block;
+            width: 3px;
+            height: 3px;
+            background-color: var(--opac-background-color-2);
+            border-radius: 50%;
+            margin: -1px 1px 0 1px;
+
+            @include mobile() {
+              display: none;
+            }
+          }
         }
       }
 
@@ -496,6 +509,16 @@ div.expanded-post {
 
         div.stream-comments {
           z-index: 3;
+
+          @include mobile() {
+            &.show-picker {
+              z-index: 105;
+            }
+          }
+
+          &:empty {
+            padding: 12px 0;
+          }
         }
       }
     }

@@ -11,7 +11,6 @@ echo -n "Creating local-env.js file with ip $ip_address and port $port... "
 if [ ! -f $local_env_file ] ; then
   sed -e "s/\${LOCAL_DEV_HOST}/$ip_address/" \
       -e "s/\${LOCAL_DEV_PORT}/$port/" \
-      -e "s/\${OPEN_COMPANY_SENTRY_WEB}/$OPEN_COMPANY_SENTRY_WEB/" \
       $local_env_example > $local_env_file
   echo "Done"
 else

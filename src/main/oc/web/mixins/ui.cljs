@@ -1,11 +1,13 @@
 (ns oc.web.mixins.ui
   (:require [rum.core :as rum]
             [dommy.core :as dommy]
+            [clojure.set :as clj-set]
+            [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.utils.dom :as dom-utils]))
+            [oc.lib.cljs.useragent :as ua]
+            [oc.web.lib.utils :as utils]))
 
 (def refresh-tooltips-mixin
   {:did-mount (fn [s]
@@ -24,9 +26,10 @@
    s)
    :did-update (fn [s]
                  (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
-                        #(doto (js/$ %2)
-                           (.tooltip "fixTitle")
-                           (.tooltip "hide")))
+                        (fn [_ el]
+                          (doto (js/$ el)
+                            (.tooltip "fixTitle")
+                            (.tooltip "hide"))))
                  s)})
 
 (def no-scroll-mixin
@@ -40,6 +43,18 @@
    :will-unmount (fn [state]
      (dom-utils/unlock-page-scroll)
      state)})
+
+(def mobile-no-scroll-mixin
+  "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
+   If it doesn't it remember to remove it once the component is going to unmount."
+  {:did-mount (fn [state]
+                (when ua/mobile?
+                  (dom-utils/lock-page-scroll))
+                (assoc state ::mobile-lock? ua/mobile?))
+   :will-unmount (fn [state]
+                   (when (::mobile-lock? state)
+                     (dom-utils/unlock-page-scroll))
+                   (dissoc state ::mobile-lock?))})
 
 (def mounted-flag
   "Adds a flag to the component state with a boolean value.
@@ -317,7 +332,7 @@
   it uses the ref instead."
  ([callback] (on-click-out nil callback))
  ([optional-ref callback]
-  (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
+  (let [click-out-kw (keyword (str "on-click-out-listener-" (rand 100)))]
     {:will-mount (fn [s]
        (assoc s ::click-out-mounted? (atom true)))
      :did-mount (fn [s]
@@ -342,3 +357,20 @@
            (events/unlistenByKey (click-out-kw s))
            (dissoc s click-out-kw))
          s))})))
+
+(defn on-key-press
+  "Mixin used to listen for every key press that is triggered.
+  If only the callback is provided it uses the main node of the component,
+  it uses the ref instead."
+  [keys callback]
+  (let [keypress-key (keyword (str "on-keypress-listener-" (rand 100)))]
+    {:will-mount (fn [s]
+                   (assoc s keypress-key
+                          (events/listen js/window EventType/KEYUP
+                                         (fn [e]
+                                           (when (seq (clj-set/intersection (set keys) (set [(.-key e) (.-keyCode e)])))
+                                             (callback s e))))))
+     :will-unmount (fn [s]
+                     (when-let [listener (get s keypress-key)]
+                       (events/unlistenByKey listener))
+                     (dissoc s keypress-key))}))

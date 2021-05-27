@@ -10,7 +10,7 @@
             [oc.web.utils.theme :as theme-utils]
             [oc.web.lib.cookies :as cook]))
 
-(def ^:private theme-cookie-name-suffix :ui-theme)
+(def ^{:private true} theme-cookie-name-suffix :ui-theme)
 
 (defn theme-cookie-name []
   (str (name theme-cookie-name-suffix)))

@@ -52,23 +52,71 @@ $header_top_margin: 24;
   @content
 }
 
+@mixin label_text($font-size: 12, $line-height: 20){
+  @include OC_Body_Book();
+  font-size: #{$font-size}px;
+  line-height: #{$line-height}px;
+  letter-spacing: 0.5px;
+  color: var(--oc-label-color);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+
+@mixin label($font-size: 12, $line-height: 20) {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 4px;
+  position: relative;
+  height: #{$line-height}px;
+  border-radius: 2px;
+  background-color: var(--oc-label-background-color);
+  @include no-user-select();
+  @include label_text($font-size, $line-height);
+
+  a, button {
+    &, &:hover, &:active, &:focus {
+      text-decoration: none;
+      @include label_text($font-size, $line-height);
+    }
+  }
+
+  @content
+}
+
 @mixin bookmark-tag() {
   div.bookmark-tag {
-    @include image-2x("/img/ML/bookmark_tag");
-    background-size: 93px 14px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: rgba($sea_blue, 0.2);
+    background-color: var(--very-light-color);
     height: 18px;
-    width: 104px;
+    width: auto;
     margin-right: 8px;
     position: relative;
-    vertical-align: top;
     border-radius: 4px;
+    flex-flow: row nowrap;
+    padding: 3px 3px 3px 6px;
+    align-items: center;
+    justify-content: center;
+    // display: flex;
 
-    &.white-bg {
-      // @include image-2x("/img/ML/bookmark_tag_white");
-      background-color: white;
+    &:before {
+      content: "";
+      width: 6px;
+      height: 8px;
+      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 6px 8px, var(--bright-color));
+    }
+
+    &:after {
+      content: "BOOKMARKED";
+      @include OC_Body_Bold();
+      color: var(--bright-color);
+      font-size: 11px;
+      line-height: 12px;
+      margin-left: 6px;
+      word-spacing: 0;
     }
 
     @content
@@ -83,14 +131,29 @@ $header_top_margin: 24;
     vertical-align: top;
     border-radius: 4px;
     background-color: rgba($sea_blue, 0.2);
-    @include image-2x("/img/ML/bookmark_icon");
-    background-size: 8px 11px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-color: var(--very-light-color);
+    flex-flow: row nowrap;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
 
-    &.white-bg {
-      // @include image-2x("/img/ML/bookmarks_icon_white");
-      background-color: rgba(white, 0.2);
+    @include mobile() {
+      background-color: transparent;
+      width: 10px;
+      height: 12px;
+    }
+
+    &:before {
+      content: "";
+      width: 10px;
+      height: 12px;
+      display: block;
+
+      @include svgBgColor("/img/ML/bookmark_icon.svg", center, 10px 12px, var(--bright-color));
+
+      @include mobile() {
+        @include svgBgColor("/img/ML/bookmark_icon.svg", center, 10px 12px, var(--bright-color));
+      }
     }
 
     @content
@@ -100,7 +163,7 @@ $header_top_margin: 24;
 @mixin new-item-tag() {
   div.new-item-tag {
     width: 31px;
-    height: 14px;
+    height: 18px;
     position: relative;
     background-color: var(--primary-light-color);
     border-radius: 4px;
@@ -110,15 +173,12 @@ $header_top_margin: 24;
     &:before {
       display: block;
       width: 27px;
-      height: 12px;
+      height: 18px;
       @include OC_Body_Bold();
       font-size: 11px;
-      line-height: 12px;
+      line-height: 18px;
       content: "NEW";
       color: var(--primary-color);
-      // position: absolute;
-      // top: 0;
-      // left: 0;
       text-align: center;
     }
   }
@@ -138,6 +198,12 @@ $header_top_margin: 24;
     align-items: center;
     justify-content: center;
 
+    @include mobile() {
+      background-color: transparent;
+      width: 10px;
+      height: 10px;
+    }
+
     &:before {
       @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 10px 10px, var(--bright-color));
       width: 10px;
@@ -148,6 +214,7 @@ $header_top_margin: 24;
 
       @include mobile() {
         margin-right: 0;
+        flex: 0 0 auto;
       }
     }
 
@@ -296,6 +363,7 @@ $header_top_margin: 24;
             font-size: 14px;
             line-height: 18px;
             color: var(--color);
+            min-height: unset;
           }
 
           input.poll-reply-body {
@@ -320,7 +388,7 @@ $header_top_margin: 24;
 
           button.delete-reply {
             position: absolute;
-            top: 30px;
+            top: 40px;
             right: 9px;
             width: 16px;
             height: 24px;

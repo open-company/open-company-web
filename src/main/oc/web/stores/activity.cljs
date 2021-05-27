@@ -8,6 +8,7 @@
             [oc.web.stores.pin :as pins-store]
             [oc.web.utils.user :as uu]
             [oc.web.utils.activity :as au]
+            [oc.web.stores.user :as user-store]
             [clojure.set :as set]))
 
 (defn- item-from-entity [entry]
@@ -476,37 +477,34 @@
                                    parsed-board-data (au/parse-board updated-board-data change-data active-users follow-boards-list dispatcher/recently-posted-sort)]
                                 (assoc-in ndb board-data-key (dissoc parsed-board-data :fixed-items))))
                            with-fixed-contribs
-                           (keys (get-in db boards-key)))]
-    ;; Now if the post is the one being edited in cmail let's remove it from there too
-    (if (= (get-in db (conj dispatcher/cmail-data-key :uuid)) (:uuid activity-data))
-      (-> with-fixed-boards
-          (update-in contributions-count-key dec)
-          (assoc-in dispatcher/cmail-data-key {:delete true})
-          (assoc-in posts-key next-posts))
-      (assoc-in with-fixed-boards posts-key next-posts))))
+                           (keys (get-in db boards-key)))
+        label-entries-list-key (dispatcher/label-entries-list-key org-slug)
+        with-fixed-label-entries (reduce
+                                  (fn [ndb lkey]
+                                    (let [label-entries-data-key (dispatcher/label-entries-data-key org-slug lkey)
+                                          label-entries-data (get-in ndb label-entries-data-key)
+                                          updated-label-entries-data (update label-entries-data :posts-list (fn [posts-list]
+                                                                                                  (filterv #(not= (:uuid %) (:uuid activity-data)) posts-list)))
+                                          parsed-label-entries-data (au/parse-label-entries updated-label-entries-data change-data org-data active-users dispatcher/recently-posted-sort)]
+                                      (assoc-in ndb label-entries-data-key
+                                                (dissoc parsed-label-entries-data :fixed-items))))
+                                  with-fixed-boards
+                                  (keys (get-in db label-entries-list-key)))
+        cmail-editing? (= (get-in db (conj dispatcher/cmail-data-key :uuid)) (:uuid activity-data))]
+    (as-> with-fixed-label-entries ndb
+          (assoc-in ndb posts-key next-posts)
+          ;; If the post is being edited, remove it from cmail
+          (if cmail-editing?
+            (assoc-in ndb dispatcher/cmail-data-key {:delete true})
+            ndb)
+          ;; If post is from current publishers list, decrease posts count
+          (if (= (-> activity-data :publisher :user-id) (dispatcher/current-contributions-id))
+            (update-in ndb contributions-count-key dec)
+            ndb))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data _org-slug _board-data]]
   (update db :foc-menu-open #(if (= % (:uuid activity-data)) nil %)))
-
-(defmethod dispatcher/action :activity-share-show
-  [db [_ activity-data container-element-id share-medium]]
-  (-> db
-    (assoc :activity-share {:share-data activity-data})
-    (assoc :activity-share-container container-element-id)
-    (assoc :activity-share-medium share-medium)
-    (dissoc :activity-shared-data)))
-
-(defmethod dispatcher/action :activity-share-hide
-  [db [_]]
-  (-> db
-    (dissoc :activity-share)
-    (dissoc :activity-share-medium)
-    (dissoc :activity-share-container)))
-
-(defmethod dispatcher/action :activity-share-reset
-  [db [_]]
-  (dissoc db :activity-shared-data))
 
 (defmethod dispatcher/action :activity-share
   [db [_ share-data]]
@@ -884,6 +882,14 @@
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (assoc-in activity-key next-activity-data))))
 
+(defmethod dispatcher/action :item-seen
+  [db [_ org-slug container-id entry-uuid seen-at]]
+  (let [container-last-seen-at-key (concat (dispatcher/change-data-key org-slug) [container-id :last-seen-at])
+        entry-unseen-key (vec (conj (dispatcher/activity-key org-slug entry-uuid) :board-item-unseen))]
+    (-> db
+        (update-in container-last-seen-at-key #(max seen-at %))
+        (assoc entry-unseen-key false))))
+
 ;; Inbox
 
 (defmethod dispatcher/action :inbox-get/finish
@@ -1014,7 +1020,8 @@
       (assoc-in ndb container-key (dissoc fixed-following-data :fixed-items))
       (update-in ndb following-badge-key #(if (= (keyword current-container-slug) :following) false (boolean badge-following?)))
       (assoc-in ndb posts-key merged-items)
-      (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data)))))
+      (assoc-in ndb (conj org-data-key :following-count) (:total-count fixed-following-data))
+      (user-store/check-user-tags ndb))))
 
 (defmethod dispatcher/action :following-get/finish
   [db [_ org-slug sort-type current-container-slug keep-seen-at? following-data]]
@@ -1255,9 +1262,3 @@
         change-data (dispatcher/change-data db)
         active-users (dispatcher/active-users org-slug db)]
     (au/update-containers db org-data change-data active-users)))
-
-(defmethod dispatcher/action :foc-menu-open
-  [db [_ val]]
-  (if (not= (:foc-menu-open db) val)
-    (assoc db :foc-menu-open val)
-    db))

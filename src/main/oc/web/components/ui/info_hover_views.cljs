@@ -91,15 +91,15 @@
                                    :otf true})]
       (rum/portal (user-info-view (assoc next-props :above? above?)) portal-el))))
 
-(def ^:private default-positioning {:vertical-position nil :horizontal-position nil})
+(def ^{:private true} default-positioning {:vertical-position nil :horizontal-position nil})
 
-(def ^:private popup-size
+(def ^{:private true} popup-size
   {:width 200
    :height 211})
 
-(def ^:private padding 16)
+(def ^{:private true} padding 16)
 
-(def ^:private popup-offset
+(def ^{:private true} popup-offset
   {:x padding
    :y (+ padding responsive/navbar-height)})
 

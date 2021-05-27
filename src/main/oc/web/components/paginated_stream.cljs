@@ -1,6 +1,7 @@
 (ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
             [oops.core :refer (oget)]
+            [clojure.string :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.rum :as rutils]
@@ -16,6 +17,7 @@
             [oc.web.components.stream-item :refer (stream-item)]
             [oc.web.components.ui.activity-refresh-button :refer (activity-refresh-button)]
             [oc.web.actions.contributions :as contributions-actions]
+            [oc.web.actions.label :as label-actions]
             [oc.web.components.ui.all-caught-up :refer (caught-up-line)]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
@@ -50,11 +52,16 @@
            container-data
            editable-boards
            foc-layout
-           is-mobile
+           is-mobile?
            clear-cell-measure-cb
            current-user-data
            row-index
-           foc-menu-open] :as props}]
+           foc-show-menu
+           foc-menu-open
+           foc-labels-picker
+           foc-activity-move
+           foc-share-entry
+           foc-other-menu] :as props}]
   (let [member? (:member? org-data)
         replies? (= (:container-slug container-data) :replies)
         show-wrt? member?
@@ -64,7 +71,12 @@
      {:class (utils/class-set {:collapsed-item collapsed-item?
                                :open-item (:open-item item)
                                :close-item (:close-item item)
-                               :foc-menu-open foc-menu-open})}
+                               :foc-other-menu foc-other-menu
+                               :foc-show-menu (or foc-show-menu
+                                                  foc-menu-open
+                                                  foc-labels-picker
+                                                  foc-activity-move
+                                                  foc-share-entry)})}
      (cond
        collapsed-item?
        (stream-collapsed-item {:activity-data     item
@@ -76,12 +88,22 @@
                                :clear-cell-measure-cb clear-cell-measure-cb
                                :replies?           replies?
                                :foc-menu-open      foc-menu-open
+                               :foc-show-menu      foc-show-menu
+                               :foc-labels-picker  foc-labels-picker
+                               :foc-activity-move  foc-activity-move
+                               :foc-share-entry    foc-share-entry
+                               :foc-other-menu     foc-other-menu
                                :premium?          (:premium? org-data)})
        :else
        (stream-item {:activity-data item
                      :read-data          read-data
                      :show-wrt?          show-wrt?
                      :foc-menu-open      foc-menu-open
+                     :foc-show-menu      foc-show-menu
+                     :foc-labels-picker  foc-labels-picker
+                     :foc-share-entry    foc-share-entry
+                     :foc-activity-move  foc-activity-move
+                     :foc-other-menu     foc-other-menu
                      :show-new-comments? show-new-comments?
                      :replies?           replies?
                      :member?            member?
@@ -124,7 +146,11 @@
              current-user-data
              clear-cell-measure-cb
              row-index
-             foc-menu-open]
+             foc-menu-open
+             foc-show-menu
+             foc-labels-picker
+             foc-activity-move
+             foc-share-entry]
     :as derivatives}
    {:keys [rowIndex key style isScrolling] :as row-props}
    props]
@@ -133,13 +159,28 @@
         entry? (activity-utils/entry? item)
         read-data (when entry?
                     (get activities-read (:uuid item)))
-        replies? (= (:container-slug container-data) :replies)]
+        replies? (= (:container-slug container-data) :replies)
+        foc-item-menu-open (boolean (= foc-menu-open (:uuid item)))
+        foc-item-show-menu (boolean (= foc-show-menu (:uuid item)))
+        foc-item-labels-picker (boolean (= foc-labels-picker (:uuid item)))
+        foc-item-activity-move (boolean (= foc-activity-move (:uuid item)))
+        foc-item-share-entry (boolean (= foc-share-entry (:uuid item)))
+        foc-other-menu (and (not foc-item-menu-open)
+                            (not foc-item-show-menu)
+                            (not foc-item-labels-picker)
+                            (not foc-item-activity-move)
+                            (not foc-item-share-entry)
+                            (or (seq foc-menu-open)
+                                (seq foc-show-menu)
+                                (seq foc-labels-picker)
+                                (seq foc-activity-move)
+                                (seq foc-share-entry)))]
     [:div.virtualized-list-item
       {:key (str (name (:resource-type item)) "-" key "-" (if entry?
                                                             (cond replies?
                                                                   (str (:uuid item) "-" (:last-activity-at item) "-" (count (:replies-data item)))
                                                                   :else
-                                                                  (clojure.string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
+                                                                  (string/join "-" (select-keys item [:uuid :created-at :published-at :updated-at])))
                                                             (str (:uuid item)
                                                                  (:sort-value item)
                                                                  (:last-activity-at item))))
@@ -159,21 +200,26 @@
         :else
         (wrapped-stream-item (merge derivatives {:item item
                                                  :read-data read-data
-                                                 :is-mobile is-mobile?
+                                                 :is-mobile? is-mobile?
                                                  :foc-layout foc-layout
                                                  :container-data container-data
                                                  :clear-cell-measure-cb clear-cell-measure-cb
                                                  :row-index row-index
-                                                 :foc-menu-open (boolean (= foc-menu-open (:uuid item)))})))]))
+                                                 :foc-menu-open foc-item-menu-open
+                                                 :foc-show-menu foc-item-show-menu
+                                                 :foc-labels-picker foc-item-labels-picker
+                                                 :foc-activity-move foc-item-activity-move
+                                                 :foc-share-entry foc-item-share-entry
+                                                 :foc-other-menu foc-other-menu})))]))
 
  (defn- unique-row-string [item]
   (let [entry? (activity-utils/entry? item)
-        static-part (str (name (:resource-type item)) "-" (:uuid item))
+        static-part [(name (:resource-type item)) (:uuid item)]
         variable-part (cond entry?
-                            (or (:updated-at item) (:created-at item))
+                            [(:created-at item) (:updated-at item) (count (:labels item))]
                             :else
-                            (:last-activity-at item))]
-    (str static-part "-" variable-part)))
+                            [(:last-activity-at item)])]
+    (string/join "-" (concat static-part variable-part))))
 
 (defn- clear-cell-measure
 
@@ -195,37 +241,42 @@
       (clear-cell-measure s idx 0))
     (reset! resource-types next-row-keys)))
 
-(rum/defcs virtualized-stream < rum/static
-                                (seen-mixins/container-nav-mixin)
-                                (rum/local nil ::row-keys)
-                                (rum/local nil ::cache)
-                                (rum/local nil ::force-re-render)
-                                mixins/mounted-flag
-                                {:will-mount (fn [s]
-                                  (let [props (-> s :rum/args s first)
-                                        replies? (-> props :container-data :container-slug (= :replies))
-                                        next-row-keys (mapv unique-row-string (:items props))]
-                                    (reset! (::force-re-render s) (utils/activity-uuid))
-                                    (reset! (::cache s)
-                                     (RVCellMeasurerCache.
-                                      (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (or (:foc-layout props) replies?))
-                                                :minHeight 1
-                                                :fixedWidth true})))
-                                    (reset! (::row-keys s) next-row-keys))
-                                  s)
-                                 :did-remount (fn [_ s]
-                                  (let [props (-> s :rum/args first)
-                                        next-row-keys (mapv unique-row-string (:items props))]
-                                    (when-not (= @(::row-keys s) next-row-keys)
-                                      (clear-changed-cells-cache s next-row-keys)))
-                                  s)}
+(rum/defcs virtualized-stream <
+  rum/static
+  (seen-mixins/container-nav-mixin)
+  (rum/local nil ::row-keys)
+  (rum/local nil ::cache)
+  (rum/local nil ::force-re-render)
+  mixins/mounted-flag
+  {:will-mount (fn [s]
+    (let [props (-> s :rum/args s first)
+          replies? (-> props :container-data :container-slug (= :replies))
+          next-row-keys (mapv unique-row-string (:items props))]
+      (reset! (::force-re-render s) (utils/activity-uuid))
+      (reset! (::cache s)
+        (RVCellMeasurerCache.
+        (clj->js {:defaultHeight (calc-card-height (:is-mobile? props) (or (:foc-layout props) replies?))
+                  :minHeight 1
+                  :fixedWidth true})))
+      (reset! (::row-keys s) next-row-keys))
+    s)
+   :did-remount (fn [_ s]
+    (let [props (-> s :rum/args first)
+          next-row-keys (mapv unique-row-string (:items props))]
+      (when-not (= @(::row-keys s) next-row-keys)
+        (clear-changed-cells-cache s next-row-keys)))
+    s)}
   [s {:keys [items
              activities-read
              foc-layout
              is-mobile?
              container-data
              current-user-data
-             foc-menu-open]
+             foc-menu-open
+             foc-show-menu
+             foc-activity-move
+             foc-labels-picker
+             foc-share-entry]
       :as derivatives}
      virtualized-props]
   (let [{:keys [height
@@ -235,15 +286,15 @@
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         key-prefix (if is-mobile? "mobile" foc-layout)
         cell-measurer-renderer (fn [{:keys [cache]} props]
-                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)]
-                                   (let [derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
+                                 (let [{:keys [rowIndex key parent columnIndex] :as row-props} (js->clj props :keywordize-keys true)
+                                       derived-props (assoc derivatives :clear-cell-measure-cb #(clear-cell-measure s rowIndex columnIndex) :row-index rowIndex)]
                                      (cell-measurer (clj->js {:cache cache
                                                               :columnIndex columnIndex
                                                               :rowIndex rowIndex
                                                               :index rowIndex
                                                               :key key
                                                               :parent parent})
-                                      (partial list-item derived-props row-props)))))
+                                      (partial list-item derived-props row-props))))
         width (if is-mobile?
                 js/window.innerWidth
                 620)
@@ -277,9 +328,7 @@
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
-  ([s] (did-scroll s (responsive/is-mobile-size?) nil))
-  ([s mobile?] (did-scroll s mobile? nil))
-  ([s mobile? e]
+  [s]
   (let [scroll-top (or (oget js/document "scrollingElement.?scrollTop") (oget js/window "pageYOffset"))
         direction (if (> @last-scroll-top scroll-top)
                     :up
@@ -300,6 +349,7 @@
         pnr (- max-scroll win-height)
         current-board-slug @(drv/get-ref s :board-slug)
         current-contributions-id @(drv/get-ref s :contributions-id)
+        current-label-slug @(drv/get-ref s :label-slug)
         board-kw (keyword current-board-slug)]
     ;; scrolling down
     (when (and ;; not already loading more
@@ -321,6 +371,8 @@
         (activity-actions/following-more @(::has-next s) :down)
         (seq current-contributions-id)
         (contributions-actions/contributions-more @(::has-next s) :down)
+        (seq current-label-slug)
+        (label-actions/label-entries-more @(::has-next s) :down)
         (= board-kw :inbox)
         (activity-actions/inbox-more @(::has-next s) :down)
         (= board-kw :all-posts)
@@ -332,7 +384,7 @@
         (not (dis/is-container? current-board-slug))
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
-    (reset! last-scroll-top (max 0 scroll-top)))))
+    (reset! last-scroll-top (max 0 scroll-top))))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
@@ -341,58 +393,61 @@
     (did-scroll s)))
 
 (rum/defcs paginated-stream  <
-                        rum/static
-                        rum/reactive
-                        ;; Derivatives
-                        (drv/drv :org-data)
-                        (drv/drv :items-to-render)
-                        (drv/drv :container-data)
-                        (drv/drv :activities-read)
-                        (drv/drv :editable-boards)
-                        (drv/drv :current-user-data)
-                        (drv/drv :board-slug)
-                        (drv/drv :contributions-id)
-                        (drv/drv :foc-menu-open)
-                        ;; Locals
-                        (rum/local nil ::scroll-listener)
-                        (rum/local false ::has-next)
-                        (rum/local nil ::bottom-loading)
-                        ;; Mixins
-                        mixins/first-render-mixin
-                        section-mixins/container-nav-in
-                        ; section-mixins/window-focus-auto-loader
-                        ;; (section-mixins/load-entry-comments (fn [s]
-                        ;;   (let [container-data @(drv/get-ref s :container-data)]
-                        ;;     (when (= (:container-slug container-data) :replies)
-                        ;;       container-data))))
-                        {:will-mount (fn [s]
-                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-                          (reset! (::scroll-listener s)
-                           (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
-                          s)
-                         :did-mount (fn [s]
-                          (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
-                          (check-pagination s)
-                          s)
-                         :did-remount (fn [_ s]
-                          (check-pagination s)
-                         s)
-                         :did-update (fn [s]
-                          (let [container-data @(drv/get-ref s :container-data)]
-                            (when (and (not (:loading-more container-data))
-                                       @(::bottom-loading s))
-                              (reset! (::bottom-loading s) false)
-                              (check-pagination s)))
-                          s)
-                         :will-unmount (fn [s]
-                          (when @(::scroll-listener s)
-                            (events/unlistenByKey @(::scroll-listener s))
-                            (reset! (::scroll-listener s) nil))
-                          s)}
+  rum/static
+  rum/reactive
+  ;; Derivatives
+  (drv/drv :org-data)
+  (drv/drv :items-to-render)
+  (drv/drv :container-data)
+  (drv/drv :activities-read)
+  (drv/drv :editable-boards)
+  (drv/drv :current-user-data)
+  (drv/drv :board-slug)
+  (drv/drv :contributions-id)
+  (drv/drv :label-slug)
+  (drv/drv :activity-uuid)
+  (drv/drv :foc-menu)
+  ;; Locals
+  (rum/local nil ::scroll-listener)
+  (rum/local false ::has-next)
+  (rum/local nil ::bottom-loading)
+  ;; Mixins
+  section-mixins/container-nav-in
+  ; section-mixins/window-focus-auto-loader
+  ;; (section-mixins/load-entry-comments (fn [s]
+  ;;   (let [container-data @(drv/get-ref s :container-data)]
+  ;;     (when (= (:container-slug container-data) :replies)
+  ;;       container-data))))
+  {:will-mount (fn [s]
+                 (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+                 (reset! (::scroll-listener s)
+                         (events/listen js/window EventType/SCROLL (partial did-scroll s (responsive/is-mobile-size?))))
+                 s)
+   :did-mount (fn [s]
+                (reset! last-scroll-top (.. js/document -scrollingElement -scrollTop))
+                (check-pagination s)
+                s)
+   :did-remount (fn [_ s]
+                  (check-pagination s)
+                  s)
+   :did-update (fn [s]
+                 (let [container-data @(drv/get-ref s :container-data)]
+                   (when (and (not (:loading-more container-data))
+                              @(::bottom-loading s))
+                     (reset! (::bottom-loading s) false)
+                     (check-pagination s)))
+                 s)
+   :will-unmount (fn [s]
+                   (when @(::scroll-listener s)
+                     (events/unlistenByKey @(::scroll-listener s))
+                     (reset! (::scroll-listener s) nil))
+                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         _board-slug (drv/react s :board-slug)
         _contributions-id (drv/react s :contributions-id)
+        _label-slug (drv/react s :label-slug)
+        current-activity-id (drv/react s :activity-uuid)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :items-to-render)
@@ -400,21 +455,39 @@
         current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         replies? (= (:container-slug container-data) :replies)
-        foc-menu-open (drv/react s :foc-menu-open)]
+        {foc-menu-open* :foc-menu-open
+         foc-show-menu* :foc-show-menu
+         foc-activity-move* :foc-activity-move
+         foc-labels-picker* :foc-labels-picker
+         foc-share-entry* :foc-share-entry} (drv/react s :foc-menu)
+        foc-menu-open (when-not (seq current-activity-id)
+                        foc-menu-open*)
+        foc-show-menu (when-not (seq current-activity-id)
+                        foc-show-menu*)
+        foc-activity-move (when-not (seq current-activity-id)
+                            foc-activity-move*)
+        foc-labels-picker (when-not (seq current-activity-id)
+                            foc-labels-picker*)
+        foc-share-entry (when-not (seq current-activity-id)
+                          foc-share-entry*)]
     [:div.paginated-stream.group
-      [:div.paginated-stream-cards
-        [:div.paginated-stream-cards-inner.group
-          (when replies?
-            (rum/with-key
-             (activity-refresh-button {:items-to-render items})
-             (str "activity-refresh-button-" (:last-seen-at container-data))))
-          (window-scroller
-           {}
-           (partial virtualized-stream {:org-data org-data
-                                        :items items
-                                        :container-data container-data
-                                        :is-mobile? is-mobile?
-                                        :current-user-data current-user-data
-                                        :activities-read activities-read
-                                        :editable-boards editable-boards
-                                        :foc-menu-open foc-menu-open}))]]]));)]]]))
+     [:div.paginated-stream-cards
+      [:div.paginated-stream-cards-inner.group
+       (when replies?
+         (rum/with-key
+           (activity-refresh-button {:items-to-render items})
+           (str "activity-refresh-button-" (:last-seen-at container-data))))
+       (window-scroller
+        {}
+        (partial virtualized-stream {:org-data org-data
+                                     :items items
+                                     :container-data container-data
+                                     :is-mobile? is-mobile?
+                                     :current-user-data current-user-data
+                                     :activities-read activities-read
+                                     :editable-boards editable-boards
+                                     :foc-menu-open foc-menu-open
+                                     :foc-show-menu foc-show-menu
+                                     :foc-activity-move foc-activity-move
+                                     :foc-labels-picker foc-labels-picker
+                                     :foc-share-entry foc-share-entry}))]]]))

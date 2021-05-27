@@ -8,19 +8,18 @@
             [oc.web.lib.utils :as utils]
             [oc.lib.cljs.useragent :as ua]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.fullstory :as fullstory]))
 
 ;; Logout
 
 (defn logout
   ([]
-   (logout (if ua/pseudo-native?
-             oc-urls/native-login
-             oc-urls/home)))
+   (logout oc-urls/marketing-landing))
   ([location]
+   (timbre/info "Logout, removing jwt")
    (jwt/remove-jwt!)
-   (router/redirect! location)
+   (timbre/debugf "Will redirect to %s" (or location oc-urls/marketing-landing))
+   (router/redirect! (or location oc-urls/marketing-landing))
    (dis/dispatch! [:logout])))
 
 ;; ID Token

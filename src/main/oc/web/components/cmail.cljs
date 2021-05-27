@@ -29,6 +29,7 @@
             [oc.web.components.ui.boards-picker :refer (boards-picker)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.post-to-button :refer (post-to-button)]
+            [oc.web.components.ui.labels :refer (cmail-labels-list labels-picker)]
             [goog.object :as gobj]
             [oc.web.lib.emoji-autocomplete :as emoji-autocomplete])
   (:import [goog.async Debouncer]))
@@ -106,7 +107,7 @@
 
 (defn- clean-body [s]
   (when (body-element)
-    (dis/dispatch! [:input (conj dis/cmail-data-key :body) (cleaned-body)])))
+    (cmail-actions/cmail-data-update {:body (cleaned-body)})))
 
 ;; Local cache for outstanding edits
 
@@ -160,7 +161,7 @@
 ;; Data change handling
 
 (defn body-on-change [state]
-  (dis/dispatch! [:input (conj dis/cmail-data-key :has-changes) true])
+  (cmail-actions/cmail-data-changed)
   (debounced-autosave! state)
   (when-let [body-el (body-element)]
     (reset! (::last-body state) (oget body-el "innerHTML"))))
@@ -174,8 +175,7 @@
   (when-let [headline (headline-element state)]
     (let [clean-headline (fix-headline (oget headline "innerText"))
           post-button-title (when-not (seq clean-headline) :title)]
-      (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline clean-headline
-                                                            :has-changes true})])
+      (cmail-actions/cmail-data-update {:headline clean-headline})
       (reset! (::post-tt-kw state) post-button-title)
       (debounced-autosave! state))
     (setup-top-padding state)))
@@ -238,7 +238,7 @@
          fixed-headline (fix-headline (:headline cmail-data))
          published? (= (:status cmail-data) "published")]
      (if (is-publishable? cmail-data)
-       (let [_ (dis/dispatch! [:update dis/cmail-data-key #(merge % {:headline fixed-headline})])
+       (let [_ (cmail-actions/cmail-data-update {:headline fixed-headline} false) ;; Skip has-changes flag update to avoid problems during save
              updated-cmail-data @(drv/get-ref s :cmail-data)]
          (if published?
            (do
@@ -265,7 +265,7 @@
 
 ;; Delete handling
 
-(defn delete-clicked [s e activity-data]
+(defn delete-clicked [_ _ activity-data]
   (if (or (:uuid activity-data)
            (:links activity-data)
            (:auto-saving activity-data))
@@ -288,7 +288,7 @@
       ;; In case the data are queued up to be saved but the request didn't started yet
       (when (:has-changes activity-data)
         ;; Remove them
-        (dis/dispatch! [:update dis/cmail-data-key #(dissoc % :has-changes)]))
+        (cmail-actions/cmail-data-remove-has-changes))
       (cmail-actions/cmail-hide))))
 
 (defn win-width []
@@ -304,6 +304,7 @@
                     false)]
     (when-not (or (:fullscren cmail-state)
                   (:collapsed cmail-state)
+                  (:labels-floating-view cmail-state)
                   event-in?
                   (:has-changes cmail-data)
                   (:auto-saving cmail-data)
@@ -351,6 +352,10 @@
     (reset! (::post-tt-kw s) (when-not (seq (:headline cmail-data)) :title))
     (reset! (::latest-key s) (:key cmail-state))
     (reset! (::unlock-scroll s) scroll-lock?)
+    (when-let [delete-bt (rum/ref-node s :floating-delete-bt)]
+      (.tooltip (js/$ delete-bt) "destroy"))
+    (when-let [close-bt (rum/ref-node s :dismiss-inline-cmail-bt)]
+      (.tooltip (js/$ close-bt) "destroy"))
     (when scroll-lock?
       (dom-utils/lock-page-scroll))))
 
@@ -433,13 +438,22 @@
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-click-out :board-picker-container (fn [s _] (hide-board-picker! s)))
                    (mixins/on-click-out :cmail-container (fn [s e]
-                                                           (when (and (not (responsive/is-mobile-size?))
-                                                                      (:fullscreen @(drv/get-ref s :cmail-state))
-                                                                      (not (:distraction-free? @(drv/get-ref s :cmail-state)))
-                                                                      (not (dom-utils/event-container-has-class e "modal-wrapper"))
-                                                                      (not (dom-utils/event-container-has-class e "nux-tooltip-container"))
-                                                                      (not (dom-utils/event-container-has-class e "emoji-autocomplete-menu")))
-                                                             (close-cmail s e))))
+                                                           (let [cmail-state (-> s (drv/get-ref :cmail-state) deref)]
+                                                             (when (and (not (responsive/is-mobile-size?))
+                                                                        (:fullscreen cmail-state)
+                                                                        (not (:distraction-free? cmail-state))
+                                                                        (not (:labels-inline-view cmail-state))
+                                                                        (not (:labels-floating-view cmail-state))
+                                                                        (not (dom-utils/event-container-matches e
+                                                                              (str ".modal-wrapper, "
+                                                                                  ".nux-tooltip-container, "
+                                                                                  ".label-modal-view, "
+                                                                                  ".cmail-outer.fullscreen, "
+                                                                                  ".cmail-outer.distraction-free, "
+                                                                                  ".labels-picker, "
+                                                                                  ".oc-labels-modal-wrapper, "
+                                                                                   ".emoji-autocomplete-menu"))))
+                                                              (close-cmail s e)))))
                    {:will-mount (fn [s]
                     (reset! (::debounced-autosave s) (Debouncer. #(autosave s) 2000))
                     (init-cmail s)
@@ -466,6 +480,10 @@
                         (when (:fullscreen cmail-state)
                           (fullscreen-focus-headline s))
                         (reset! (::last-fullscreen-state s) (:fullscreen cmail-state))))
+                    (let [cmail-data @(drv/get-ref s :cmail-data)]
+                      (when (and (:has-changes cmail-data)
+                                 (not (:auto-saving cmail-data)))
+                        (debounced-autosave! s)))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -527,7 +545,6 @@
                     #(if (:publisher-board cmail-data*)
                        self-board-name
                        %))
-        published? (= (:status cmail-data) "published")
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         publishable? (is-publishable? cmail-data)
@@ -537,31 +554,22 @@
                       (not publishable?)
                       @(::publishing s)
                       @(::disable-post s))
-        working? (or (and published?
-                          @(::saving s))
-                     (and (not published?)
-                          @(::publishing s)))
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
                             "Share update")
         did-pick-board (fn [board-data note dismiss-action]
-                           (hide-board-picker! s)
-                           (when (and board-data
-                                      (seq (:name board-data)))
-                            (let [has-changes (or (:has-changes cmail-data)
-                                                  (seq (:uuid cmail-data))
-                                                  (:auto-saving cmail-data))]
-                              (dis/dispatch! [:input dis/cmail-data-key
-                               (merge cmail-data {:board-slug (:slug board-data)
-                                                  :board-name (:name board-data)
-                                                  :board-access (:access board-data)
-                                                  :publisher-board (:publisher-board board-data)
-                                                  :has-changes has-changes
-                                                  :invite-note note})])
-                              (when has-changes
-                                (debounced-autosave! s)))
-                            (when (fn? dismiss-action)
-                              (dismiss-action))))
+                         (hide-board-picker! s)
+                         (when (and board-data
+                                    (seq (:name board-data)))
+                           (let [updated-cmail-data (merge cmail-data {:board-slug (:slug board-data)
+                                                                       :board-name (:name board-data)
+                                                                       :board-access (:access board-data)
+                                                                       :publisher-board (:publisher-board board-data)
+                                                                       :has-changes (seq (:uuid cmail-data))
+                                                                       :invite-note note})]
+                             (cmail-actions/cmail-data-replace updated-cmail-data))
+                           (when (fn? dismiss-action)
+                             (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         editable-boards (drv/react s :editable-boards)
         show-board-picker? (or ;; Publisher board can still be created
@@ -582,7 +590,7 @@
                             (not expanded-state?)
                             (not (:fullscreen cmail-state)))
                    (fn [e]
-                      (cmail-actions/cmail-expand cmail-data cmail-state)
+                      (cmail-actions/cmail-expand cmail-data)
                       (utils/after 280
                        #(when-let [el (headline-element s)]
                           (utils/to-end-of-content-editable el)))))}
@@ -598,19 +606,41 @@
               "New update")]
          [:button.mlb-reset.mobile-close-bt
            {:on-click (partial close-cmail s)}]]
-        [:div.dismiss-inline-cmail-container
+        [:div.cmail-floating-right
+         [:div.dismiss-inline-cmail-container
           {:class (when-not (:published? cmail-data) "long-tooltip")}
           [:button.mlb-reset.dismiss-inline-cmail
-            {:on-click (partial close-cmail s)
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title (if-not (:published? cmail-data)
-                      "Save & Close"
-                      "Close")}]]
+           {:on-click (partial close-cmail s)
+            :data-toggle (when-not (:published? cmail-data) "tooltip")
+            :data-placement (if (:distraction-free? cmail-state) "right" "top")
+            :data-published (:published? cmail-data)
+            :data-container "body"
+            :ref :dismiss-inline-cmail-bt
+            :title (when-not (:published? cmail-data)
+                     "Save & Close")}
+           [:span.dismiss-inline-cmail-icon]
+           [:span.dismiss-inline-cmail-text
+            "Close"]]]
+         [:div.floating-delete-bt-container
+          [:button.mlb-reset.floating-delete-bt
+           {:ref :floating-delete-bt
+            :on-click #(if (:uuid cmail-data)
+                         (delete-clicked s % cmail-data)
+                         (close-cmail s %))
+            :data-toggle (when-not (:published? cmail-data) "tooltip")
+            :data-published (:published? cmail-data)
+            :data-container "body"
+            :data-placement "right"
+            :title (when-not (:published? cmail-data)
+                    "Delete draft")}
+           [:span.floating-delete-bt-icon]
+           [:span.floating-delete-bt-text
+            "Delete"]]]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})
            :style (when (and (not is-mobile?)
                              (:fullscreen cmail-state)
+                             (not (:collapsed cmail-state))
                              (not (:distraction-free? cmail-state)))
                     {:padding-top (str @(::top-padding s) "px")})}
           [:div.cmail-content
@@ -688,6 +718,10 @@
                               :dispatch-key (first dis/cmail-data-key)
                               :remove-poll-cb #(body-on-change s)
                               :activity-data cmail-data}))]]
+      (when (and (map? cmail-state)
+                 (not (:collapsed cmail-state)))
+        [:div.cmail-labels
+         (cmail-labels-list)])
       [:div.cmail-footer
         [:div.post-button-container.group
           (post-to-button {:on-submit #(post-clicked s)
@@ -728,13 +762,24 @@
            :data-container "body"
            :title "Add attachment"}]
         [:div.cmail-footer-media-picker-container.group]
-        (when (:uuid cmail-data)
+        [:div.cmail-footer-labels-bt-container
+         {:class (when fullscreen? "top-modal")}
+         [:button.mlb-reset.cmail-footer-labels-bt
+          {:data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :title "Add label"
+           :on-click #(cmail-actions/cmail-toggle-floating-labels-view)}]
+         (when (:labels-floating-view cmail-state)
+           (labels-picker))]
+        (when (:distraction-free? cmail-state)
           [:div.delete-bt-container
            [:button.mlb-reset.delete-bt
-            {:on-click #(delete-clicked s % cmail-data)
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Delete"}]])
+            {:on-click (when (:uuid cmail-data)
+                         #(delete-clicked s % cmail-data))}
+            (if (:published? cmail-data)
+              "Delete post"
+              "Delete draft")]])
         ; (when-not (:fullscreen cmail-state)
         ;   [:div.fullscreen-bt-container
         ;     [:button.mlb-reset.fullscreen-bt

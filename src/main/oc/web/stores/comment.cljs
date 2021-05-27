@@ -18,7 +18,7 @@
   [db [_ org-slug focus-value]]
   (update-in db (dispatcher/comment-reply-to-key org-slug) dissoc focus-value))
 
-(defmethod dispatcher/action :add-comment-change
+(defmethod dispatcher/action :add-comment/update
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid comment-body force-update?]]
   (let [comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)
         add-comment-activity-key (dispatcher/add-comment-activity-key org-slug comment-key)]

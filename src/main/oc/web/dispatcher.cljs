@@ -3,6 +3,7 @@
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
+            [clojure.set :as clj-set]
             [cljs-flux.dispatcher :as flux]
             [oc.web.utils.drafts :as du]
             [oc.lib.cljs.useragent :as ua]))
@@ -14,84 +15,115 @@
 (defonce ^{:export true} app-state (atom {:loading false
                                           :show-login-overlay false}))
 
-(def recent-activity-sort :recent-activity)
-(def recently-posted-sort :recently-posted)
+(def ^{:export true} recent-activity-sort :recent-activity)
+(def ^{:export true} recently-posted-sort :recently-posted)
 
-(def default-foc-layout :expanded)
-(def other-foc-layout :collapsed)
+(def ^{:export true} default-foc-layout :expanded)
+(def ^{:export true} other-foc-layout :collapsed)
 
-(def premium-picker-modal :show-premium-picker?)
+(def ^{:export true} premium-picker-modal :show-premium-picker?)
 
 ;; Pre-declare some routing functions
 
 (declare current-org-slug)
 (declare current-board-slug)
 (declare current-contributions-id)
+(declare current-label-slug)
 (declare current-sort-type)
 (declare current-activity-id)
 (declare current-secure-activity-id)
 (declare current-comment-id)
 (declare query-params)
 (declare query-param)
+(declare get-label)
 
 ;; Data key paths
 
-(def router-key :router-path)
-(def router-opts-key :opts)
-(def router-dark-allowed-key :dark-allowed)
+(def ^{:export true} router-key :router-path)
+(def ^{:export true} router-opts-key :opts)
+(def ^{:export true} router-dark-allowed-key :dark-allowed)
 
-(def checkout-result-key :checkout-success-result)
-(def checkout-update-price-key :checkout-update-price)
+(def ^{:export true} checkout-result-key :checkout-success-result)
+(def ^{:export true} checkout-update-price-key :checkout-update-price)
 
-(def expo-key [:expo])
+(def ^{:export true} expo-key [:expo])
 
-(def expo-deep-link-origin-key (vec (conj expo-key :deep-link-origin)))
-(def expo-app-version-key (vec (conj expo-key :app-version)))
-(def expo-push-token-key (vec (conj expo-key :push-token)))
+(def ^{:export true} expo-deep-link-origin-key (vec (conj expo-key :deep-link-origin)))
+(def ^{:export true} expo-app-version-key (vec (conj expo-key :app-version)))
+(def ^{:export true} expo-push-token-key (vec (conj expo-key :push-token)))
 
-(def show-invite-box-key :show-invite-box)
+(def ^{:export true} show-invite-box-key :show-invite-box)
 
-(def api-entry-point-key [:api-entry-point])
+(def ^{:export true} api-entry-point-key [:api-entry-point])
 
-(def auth-settings-key [:auth-settings])
+(def ^{:export true} auth-settings-key [:auth-settings])
 
-(def notifications-key [:notifications-data])
-(def show-login-overlay-key :show-login-overlay)
+(def ^{:export true} notifications-key [:notifications-data])
+(def ^{:export true} show-login-overlay-key :show-login-overlay)
 
-(def current-user-key [:current-user-data])
+(def ^{:export true} current-user-key [:current-user-data])
 
-(def orgs-key :orgs)
+(def ^{:export true} orgs-key :orgs)
 
-(defn org-key [org-slug]
+;; FoC Menu
+
+(def ^{:export true} foc-menu-key :foc-menu)
+
+(def ^{:export true} foc-show-menu-key :foc-show-menu)
+
+(def ^{:export true} foc-menu-open-key :foc-menu-open)
+
+(def ^{:export true} foc-share-entry-key :foc-share-entry)
+
+(def ^{:export true} foc-activity-move-key :foc-activity-move)
+
+(def ^{:export true} foc-labels-picker-key :foc-labels-picker)
+
+;; Org keys
+
+(defn ^:export org-key [org-slug]
   [(keyword org-slug)])
 
-(defn org-data-key [org-slug]
+(defn ^:export org-data-key [org-slug]
   (vec (conj (org-key org-slug) :org-data)))
 
-(defn boards-key [org-slug]
+(defn ^:export boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
+
+;; Labels
+
+(def ^{:export true} editing-label-key [:editing-label])
+
+(defn ^:export labels-key [org-slug]
+  (vec (conj (org-key org-slug) :labels)))
+
+(defn ^:export org-labels-key [org-slug]
+  (vec (conj (labels-key org-slug) :org-labels)))
+
+(defn ^:export user-labels-key [org-slug]
+  (vec (conj (labels-key org-slug) :user-labels)))
 
 ;; Editable boards keys
 
-(defn editable-boards-key [org-slug]
+(defn ^:export editable-boards-key [org-slug]
   (vec (conj (org-key org-slug) :editable-boards)))
 
-(defn private-boards-key [org-slug]
+(defn ^:export private-boards-key [org-slug]
   (vec (conj (org-key org-slug) :private-boards)))
 
-(defn public-boards-key [org-slug]
+(defn ^:export public-boards-key [org-slug]
   (vec (conj (org-key org-slug) :public-boards)))
 
-(defn payments-key [org-slug]
+(defn ^:export payments-key [org-slug]
   (vec (conj (org-key org-slug) :payments)))
 
-(defn payments-notify-cache-key [org-slug]
+(defn ^:export payments-notify-cache-key [org-slug]
   (vec (conj (org-key org-slug) :payments-notify-cache)))
 
-(defn posts-data-key [org-slug]
+(defn ^:export posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
-(defn board-key 
+(defn ^:export board-key 
   ([org-slug board-slug sort-type]
     (if sort-type
       (vec (concat (boards-key org-slug) [(keyword board-slug) (keyword sort-type)]))
@@ -99,16 +131,16 @@
   ([org-slug board-slug]
    (vec (concat (boards-key org-slug) [(keyword board-slug) recently-posted-sort]))))
 
-(defn board-data-key
+(defn ^:export board-data-key
   ([org-slug board-slug]
    (board-data-key org-slug board-slug recently-posted-sort))
   ([org-slug board-slug sort-type]
     (conj (board-key org-slug board-slug sort-type) :board-data)))
 
-(defn contributions-list-key [org-slug]
+(defn ^:export contributions-list-key [org-slug]
   (vec (conj (org-key org-slug) :contribs)))
 
-(defn contributions-key
+(defn ^:export contributions-key
   ([org-slug author-uuid]
    (contributions-key org-slug author-uuid recently-posted-sort))
   ([org-slug author-uuid sort-type]
@@ -116,16 +148,37 @@
      (vec (concat (contributions-list-key org-slug) [(keyword author-uuid) (keyword sort-type)]))
      (vec (conj (contributions-list-key org-slug) (keyword author-uuid))))))
 
-(defn contributions-data-key
+(defn ^:export contributions-data-key
   ([org-slug slug-or-uuid sort-type]
    (conj (contributions-key org-slug slug-or-uuid sort-type) :contrib-data))
   ([org-slug slug-or-uuid]
    (conj (contributions-key org-slug slug-or-uuid) :contrib-data)))
 
-(defn containers-key [org-slug]
+;; Label entries
+
+(defn ^:export label-entries-list-key [org-slug]
+  (vec (conj (org-key org-slug) :label-entries)))
+
+(defn ^:export label-entries-key
+  ([org-slug label-slug]
+   (label-entries-key org-slug label-slug recently-posted-sort))
+  ([org-slug label-slug sort-type]
+   (if sort-type
+     (vec (concat (label-entries-list-key org-slug) [(keyword label-slug) (keyword sort-type)]))
+     (vec (conj (label-entries-list-key org-slug) (keyword label-slug))))))
+
+(defn ^:export label-entries-data-key
+  ([org-slug slug-or-uuid sort-type]
+   (conj (label-entries-key org-slug slug-or-uuid sort-type) :label-data))
+  ([org-slug slug-or-uuid]
+   (conj (label-entries-key org-slug slug-or-uuid) :label-data)))
+
+;; Containers
+
+(defn ^:export containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
-(defn container-key
+(defn ^:export container-key
   ([org-slug items-filter]
    (container-key org-slug items-filter recently-posted-sort))
   ([org-slug items-filter sort-type]
@@ -135,36 +188,40 @@
      :else
      (vec (conj (containers-key org-slug) (keyword items-filter))))))
 
-(defn badges-key [org-slug]
+(defn ^:export badges-key [org-slug]
   (vec (conj (org-key org-slug) :badges)))
 
-(defn replies-badge-key [org-slug]
+(defn ^:export replies-badge-key [org-slug]
   (vec (conj (badges-key org-slug) :replies)))
 
-(defn following-badge-key [org-slug]
+(defn ^:export following-badge-key [org-slug]
   (vec (conj (badges-key org-slug) :following)))
 
-(defn secure-activity-key [org-slug secure-id]
+(defn ^:export secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
 
-(defn activity-key [org-slug activity-uuid]
+(defn ^:export activity-key [org-slug activity-uuid]
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
+    
+(defn ^:export entry-labels-key [org-slug activity-uuid]
+  (let [post-key (activity-key org-slug activity-uuid)]
+    (vec (concat post-key [:labels]))))
 
-(defn pins-key [org-slug entry-uuid]
+(defn ^:export pins-key [org-slug entry-uuid]
   (let [entry-key (activity-key org-slug entry-uuid)]
     (vec (concat entry-key [:pins]))))
 
-(defn pin-key [org-slug entry-uuid pin-container-uuid]
+(defn ^:export pin-key [org-slug entry-uuid pin-container-uuid]
   (vec (concat (pins-key org-slug entry-uuid) pin-container-uuid)))
 
-(defn activity-last-read-at-key [org-slug activity-uuid]
+(defn ^:export activity-last-read-at-key [org-slug activity-uuid]
   (vec (conj (activity-key org-slug activity-uuid) :last-read-at)))
 
-(defn add-comment-key [org-slug]
+(defn ^:export add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
-(defn add-comment-string-key
+(defn ^:export add-comment-string-key
   ([activity-uuid] (add-comment-string-key activity-uuid nil nil))
   ([activity-uuid parent-comment-uuid] (add-comment-string-key activity-uuid parent-comment-uuid nil))
   ([activity-uuid parent-comment-uuid comment-uuid]
@@ -174,85 +231,85 @@
      (when comment-uuid
        (str "-" comment-uuid)))))
 
-(def add-comment-force-update-root-key :add-comment-force-update)
+(def ^{:export true} add-comment-force-update-root-key :add-comment-force-update)
 
-(defn add-comment-force-update-key [add-comment-string-key]
+(defn ^:export add-comment-force-update-key [add-comment-string-key]
   (vec (concat [add-comment-force-update-root-key] [add-comment-string-key])))
 
-(defn add-comment-activity-key [org-slug activity-uuid]
+(defn ^:export add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
 
-(defn comment-reply-to-key [org-slug]
+(defn ^:export comment-reply-to-key [org-slug]
   (vec (conj (org-key org-slug) :comment-reply-to-key)))
 
-(defn comments-key [org-slug]
+(defn ^:export comments-key [org-slug]
   (vec (conj (org-key org-slug) :comments)))
 
-(defn activity-comments-key [org-slug activity-uuid]
+(defn ^:export activity-comments-key [org-slug activity-uuid]
   (vec (conj (comments-key org-slug) activity-uuid)))
 
-(def sorted-comments-key :sorted-comments)
+(def ^{:export true} sorted-comments-key :sorted-comments)
 
-(defn activity-sorted-comments-key [org-slug activity-uuid]
+(defn ^:export activity-sorted-comments-key [org-slug activity-uuid]
   (vec (concat (comments-key org-slug) [activity-uuid sorted-comments-key])))
 
-(def teams-data-key [:teams-data :teams])
+(def ^{:export true} teams-data-key [:teams-data :teams])
 
-(defn team-data-key [team-id]
+(defn ^:export team-data-key [team-id]
   [:teams-data team-id :data])
 
-(defn team-roster-key [team-id]
+(defn ^:export team-roster-key [team-id]
   [:teams-data team-id :roster])
 
-(defn team-channels-key [team-id]
+(defn ^:export team-channels-key [team-id]
   [:teams-data team-id :channels])
 
-(defn active-users-key [org-slug]
+(defn ^:export active-users-key [org-slug]
   (vec (conj (org-key org-slug) :active-users)))
 
-(defn follow-list-key [org-slug]
+(defn ^:export follow-list-key [org-slug]
   (vec (conj (org-key org-slug) :follow-list)))
 
-(defn follow-list-last-added-key [org-slug]
+(defn ^:export follow-list-last-added-key [org-slug]
   (vec (conj (org-key org-slug) :follow-list-last-added)))
 
-(defn follow-publishers-list-key [org-slug]
+(defn ^:export follow-publishers-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :publisher-uuids)))
 
-(defn follow-boards-list-key [org-slug]
+(defn ^:export follow-boards-list-key [org-slug]
   (vec (conj (follow-list-key org-slug) :follow-boards-list)))
 
-(defn unfollow-board-uuids-key [org-slug]
+(defn ^:export unfollow-board-uuids-key [org-slug]
   (vec (conj (follow-list-key org-slug) :unfollow-board-uuids)))
 
-(defn followers-count-key [org-slug]
+(defn ^:export followers-count-key [org-slug]
   (vec (conj (org-key org-slug) :followers-count)))
 
-(defn followers-publishers-count-key [org-slug]
+(defn ^:export followers-publishers-count-key [org-slug]
   (vec (conj (followers-count-key org-slug) :publishers)))
 
-(defn followers-boards-count-key [org-slug]
+(defn ^:export followers-boards-count-key [org-slug]
   (vec (conj (followers-count-key org-slug) :boards)))
 
-(defn mention-users-key [org-slug]
+(defn ^:export mention-users-key [org-slug]
   (vec (conj (org-key org-slug) :mention-users)))
 
-(defn users-info-hover-key [org-slug]
+(defn ^:export users-info-hover-key [org-slug]
   (vec (conj (org-key org-slug) :users-info-hover)))
 
-(defn uploading-video-key [org-slug video-id]
+(defn ^:export uploading-video-key [org-slug video-id]
   (vec (concat (org-key org-slug) [:uploading-videos video-id])))
 
-(defn current-board-key
+(defn ^:export current-board-key
   "Find the board key for db based on the current path."
   []
   (let [org-slug (current-org-slug)
         board-slug (current-board-slug)]
      (board-data-key org-slug board-slug)))
 
-(def can-compose-key :can-copmose?)
+(def ^{:export true} can-compose-key :can-copmose?)
 
-(defn org-can-compose-key
+(defn ^:export org-can-compose-key
   "Key for a boolean value: true if the user has at least one board
    he can publish updates in."
   [org-slug]
@@ -260,44 +317,44 @@
 
 ;; User notifications
 
-(defn user-notifications-key [org-slug]
+(defn ^:export user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
 ;; Reminders
 
-(defn reminders-key [org-slug]
+(defn ^:export reminders-key [org-slug]
   (vec (conj (org-key org-slug) :reminders)))
 
-(defn reminders-data-key [org-slug]
+(defn ^:export reminders-data-key [org-slug]
   (vec (conj (reminders-key org-slug) :reminders-list)))
 
-(defn reminders-roster-key [org-slug]
+(defn ^:export reminders-roster-key [org-slug]
   (vec (conj (reminders-key org-slug) :reminders-roster)))
 
-(defn reminder-edit-key [org-slug]
+(defn ^:export reminder-edit-key [org-slug]
   (vec (conj (reminders-key org-slug) :reminder-edit)))
 
 ;; Change related keys
 
-(defn change-data-key [org-slug]
+(defn ^:export change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
-(def activities-read-key
+(def ^{:export true} activities-read-key
   [:activities-read])
 
 ;; Seen
 
-(defn org-seens-key [org-slug]
+(defn ^:export org-seens-key [org-slug]
   (vec (conj (org-key org-slug) :container-seen)))
 
-; (defn container-seen-key [org-slug container-id]
+; (defn ^:export container-seen-key [org-slug container-id]
 ;   (vec (conj (org-seens-key org-slug) (keyword container-id))))
 
 ;; Cmail keys
 
-(def cmail-state-key [:cmail-state])
+(def ^{:export true} cmail-state-key [:cmail-state])
 
-(def cmail-data-key [:cmail-data])
+(def ^{:export true} cmail-data-key [:cmail-data])
 
 ;; Payments keys
 
@@ -305,7 +362,7 @@
 
 ;; Payments UI banner keys
 
-(def payments-ui-upgraded-banner-key :payments-ui-upgraded-banner)
+(def ^{:export true} payments-ui-upgraded-banner-key :payments-ui-upgraded-banner)
 
 ;; Boards helpers
 
@@ -330,10 +387,14 @@
   (when-let [container-slug-kw (keyword container-slug)]
     (#{:replies} container-slug-kw)))
 
+;; Internal getter helpers
+
 (defn- get-container-posts [base posts-data org-slug container-slug sort-type items-key]
   (let [cnt-key (cond
                   (is-container? container-slug)
                   (container-key org-slug container-slug sort-type)
+                  (seq (current-label-slug))
+                  (label-entries-data-key org-slug container-slug)
                   (seq (current-contributions-id))
                   (contributions-data-key org-slug container-slug)
                   :else
@@ -354,17 +415,50 @@
                 container-posts)]
     (vec items)))
 
-(def theme-key [:theme])
-(def theme-setting-key :setting-value)
-(def theme-mobile-key :mobile-value)
-(def theme-desktop-key :desktop-value)
-(def theme-web-key :web-value)
+;; Label lookup
+
+(def ^{:private true} label-lookup-keys [:uuid :slug])
+
+(defun find-label
+  ([labels-list label-uuid-or-slug]
+   (find-label label-lookup-keys labels-list label-uuid-or-slug))
+
+  ([lookup-keys labels-list label :guard string?]
+   (find-label lookup-keys  labels-list (set [label])))
+
+  ([lookup-keys labels-list labels :guard map?]
+   (find-label lookup-keys  labels-list (-> labels
+                                            (select-keys lookup-keys)
+                                            vals
+                                            set)))
+
+  ([lookup-keys labels-list label-vals]
+   (let [label-values-set (set label-vals)]
+     (some #(when (-> %
+                      (select-keys lookup-keys)
+                      vals
+                      set
+                      (clj-set/intersection label-values-set)
+                      seq)
+            %)
+           labels-list))))
+
+(def ^{:export true} theme-key [:theme])
+(def ^{:export true} theme-setting-key :setting-value)
+(def ^{:export true} theme-mobile-key :mobile-value)
+(def ^{:export true} theme-desktop-key :desktop-value)
+(def ^{:export true} theme-web-key :web-value)
 
 ;; Functions needed by derivatives
 
 (declare org-data)
+(declare labels-data)
+(declare org-labels-data)
+(declare user-labels-data)
+(declare editing-label)
 (declare board-data)
 (declare contributions-data)
+(declare label-entries-data)
 (declare editable-boards-data)
 (declare private-boards-data)
 (declare public-boards-data)
@@ -385,6 +479,7 @@
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :contributions-id    [[:route] (fn [route] (:contributions route))]
+   :label-slug          [[:route] (fn [route] (:label route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :entry-board-slug    [[:route] (fn [route] (:entry-board route))]
    :sort-type           [[:route] (fn [route] (:sort-type route))]
@@ -486,9 +581,9 @@
                                (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
-                           (let [container-slug (or (:contributions route) (:board route))]
+                           (let [container-slug (or (:contributions route) (:label route) (:board route))]
                              (when (and base org-data container-slug posts-data)
-                               (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render))))]
+                               (vec (get-container-posts base posts-data (:slug org-data) container-slug (:sort-type route) :items-to-render)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -506,14 +601,18 @@
    :public-boards       [[:base :org-slug]
                          (fn [base org-slug]
                            (public-boards-data base org-slug))]
-   :container-data      [[:base :org-slug :board-slug :contributions-id :sort-type]
-                         (fn [base org-slug board-slug contributions-id sort-type]
+   :container-data      [[:base :org-slug :board-slug :contributions-id :label-slug :sort-type]
+                         (fn [base org-slug board-slug contributions-id label-slug sort-type]
                            (when (and org-slug
                                       (or board-slug
-                                          contributions-id))
+                                          contributions-id
+                                          label-slug))
                              (let [is-contributions? (seq contributions-id)
+                                   is-label? (seq label-slug)
                                    cnt-key (cond is-contributions?
                                                  (contributions-data-key org-slug contributions-id)
+                                                 is-label?
+                                                 (label-entries-data-key org-slug label-slug)
                                                  (is-container? board-slug)
                                                  (container-key org-slug board-slug sort-type)
                                                  :else
@@ -523,13 +622,33 @@
                          (fn [org-slug contributions-id]
                            (when (and org-slug contributions-id)
                              (contributions-data org-slug contributions-id)))]
-   :board-data          [[:base :org-slug :board-slug]
-                          (fn [base org-slug board-slug]
-                            (board-data base org-slug board-slug))]
+   :label-entries-data    [[:base :org-slug :label-slug]
+                           (fn [base org-slug label-slug]
+                             (when (and org-slug label-slug)
+                               (label-entries-data base org-slug label-slug)))]
+   :board-data            [[:base :org-slug :board-slug]
+                           (fn [base org-slug board-slug]
+                             (board-data base org-slug board-slug))]
    :contributions-user-data [[:active-users :contributions-id]
                              (fn [active-users contributions-id]
                               (when (and active-users contributions-id)
                                 (get active-users contributions-id)))]
+   :label-data-fallback [[:posts-data :label-entries-data :label-slug]
+                         (fn [posts-data label-entries-data label-slug]
+                           (when (and label-entries-data label-slug)
+                             (let [first-uuid (-> label-entries-data :posts-list first :uuid)
+                                   first-entry-labels (get-in posts-data [first-uuid :labels])
+                                   label-data (find-label first-entry-labels {:slug label-slug})]
+                               label-data)))]
+   :label-data          [[:org-labels :label-slug :label-data-fallback]
+                         (fn [org-labels label-slug label-data-fallback]
+                           (when label-slug
+                             (let [label-data* (find-label org-labels label-slug)
+                                   label-data (if (and (not label-data*)
+                                                       (seq org-labels))
+                                                label-data-fallback
+                                                label-data*)]
+                               label-data)))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -561,11 +680,10 @@
                             (:alert-modal base))]
    :activity-share        [[:base] (fn [base] (:activity-share base))]
    :activity-share-medium [[:base] (fn [base] (:activity-share-medium base))]
-   :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data :contributions-user-data :org-slug :board-slug :contributions-id :activity-uuid :current-user-data]
-                          (fn [base org-data board-data contributions-user-data org-slug board-slug contributions-id activity-uuid current-user-data]
+   :navbar-data         [[:base :org-data :board-data :contributions-user-data :label-data :org-slug :board-slug :contributions-id :label-slug :activity-uuid :current-user-data]
+                          (fn [base org-data board-data contributions-user-data label-data org-slug board-slug contributions-id label-slug activity-uuid current-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
@@ -575,10 +693,12 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
+                                (assoc :label-data label-data)
                                 (assoc :contributions-user-data contributions-user-data)
                                 (assoc :current-org-slug org-slug)
                                 (assoc :current-board-slug board-slug)
                                 (assoc :current-contributions-id contributions-id)
+                                (assoc :current-label-slug label-slug)
                                 (assoc :current-activity-id activity-uuid)
                                 (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
@@ -646,12 +766,14 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :org-dashboard-data    [[:base :orgs :org-data :contributions-data :container-data :posts-data :nux
+   :org-dashboard-data    [[:base :orgs :org-data :label-entries-data :container-data :posts-data :nux
                             :entry-editing :jwt :loading :payments :search-active :current-user-data
-                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id :entry-board-slug :activity-uuid]
-                            (fn [base orgs org-data contributions-data container-data posts-data nux
+                            :active-users :follow-publishers-list :follow-boards-list :org-slug :board-slug :contributions-id
+                            :label-slug :entry-board-slug :activity-uuid :label-data :show-label-editor]
+                            (fn [base orgs org-data label-entries-data container-data posts-data nux
                                  entry-editing jwt loading payments search-active current-user-data
-                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id entry-board-slug activity-uuid]
+                                 active-users follow-publishers-list follow-boards-list org-slug board-slug contributions-id
+                                 label-slug entry-board-slug activity-uuid label-data show-label-editor]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -660,9 +782,10 @@
                                :current-org-slug org-slug
                                :current-board-slug board-slug
                                :current-contributions-id contributions-id
+                               :current-label-slug label-slug
                                :current-entry-board-slug entry-board-slug
                                :current-activity-id activity-uuid
-                               :contributions-data contributions-data
+                               :label-entries-data label-entries-data
                                :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
@@ -672,19 +795,21 @@
                                :media-input (:media-input base)
                                :show-section-add-cb (:show-section-add-cb base)
                                :entry-editing-board-slug (:board-slug entry-editing)
-                               :activity-share-container (:activity-share-container base)
                                :cmail-state (get-in base cmail-state-key)
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
                                :search-active search-active
                                :current-user-data current-user-data
                                :active-users active-users
+                               :label-data label-data
                                :follow-publishers-list follow-publishers-list
                                :follow-boards-list follow-boards-list
                                :show-premium-picker? (:show-premium-picker? base)
                                payments-ui-upgraded-banner-key (get base payments-ui-upgraded-banner-key)
                                :nux nux
-                               :ui-tooltip (:ui-tooltip base)})]
+                               :ui-tooltip (:ui-tooltip base)
+                               :show-labels-manager (:show-labels-manager base)
+                               :show-label-editor show-label-editor})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -714,17 +839,21 @@
    :comment-reply-to      [[:base :org-slug] (fn [base org-slug] (get-in base (comment-reply-to-key org-slug)))]
    :show-invite-box       [[:base] (fn [base] (get base show-invite-box-key))]
    :can-compose           [[:org-data] (fn [org-data] (get org-data can-compose-key))]
-   :foc-menu-open         [[:base] (fn [base] (get base :foc-menu-open))]
-   })
+   :foc-menu              [[:base] (fn [base] (get base foc-menu-key))]
+   :org-labels            [[:base :org-slug] (fn [base org-slug] (org-labels-data base org-slug))]
+   :user-labels           [[:base :org-slug] (fn [base org-slug] (user-labels-data base org-slug))]
+   :show-label-editor     [[:editing-label] (fn [editing-label] (boolean (seq editing-label)))]
+   :editing-label         [[:base] (fn [base] (get-in base editing-label-key))]
+   :ui-tooltip            [[:base] (fn [base] (:ui-tooltip base))]})
 
 ;; Action Loop =================================================================
 
+(def ^{:private true} skip-log-action-types
+  #{:input :update :entry-toggle-save-on-exit :label-editor/update :cmail-state/update :cmail-data/update :interaction-comment/update :add-comment/update})
+
 (defmulti action (fn [_db [action-type & _]]
-                   (when (and (not= action-type :input)
-                              (not= action-type :update)
-                              (not= action-type :entry-toggle-save-on-exit)
-                              (not= action-type :cmail-state/update)
-                              (not= action-type :cmail-data/update))
+                   ;; Avoid logging high-frequency actions for performance reasons
+                   (when-not (action-type skip-log-action-types)
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 
@@ -740,10 +869,13 @@
          (timbre/warn "Nil key in app-state! Content:" (get next-db nil)))
        next-db))))
 
-(defn dispatch! [payload]
+(defn ^:export dispatch! [payload]
   (flux/dispatch actions payload))
 
 ;; Path components retrieve
+
+(defn ^:export db []
+  (deref app-state))
 
 (defn ^:export route
   ([] (route @app-state))
@@ -760,6 +892,10 @@
 (defn ^:export current-contributions-id
   ([] (current-contributions-id @app-state))
   ([data] (get-in data [router-key :contributions])))
+
+(defn ^:export current-label-slug
+  ([] (current-label-slug @app-state))
+  ([data] (get-in data [router-key :label])))
 
 (defn ^:export current-sort-type
   ([] (current-sort-type @app-state))
@@ -802,7 +938,7 @@
   ([] (invite-token @app-state))
   ([data] (query-param data :invite-token)))
 
-(defn in-route?
+(defn ^:export in-route?
   ([route-name] (in-route? (route-set @app-state) route-name))
   ([routes route-name]
   (when route-name
@@ -816,7 +952,7 @@
 
 ;; Payments
 
-(defn payments-data
+(defn ^:export payments-data
   ([]
     (payments-data @app-state (current-org-slug)))
   ([org-slug]
@@ -826,7 +962,7 @@
 
 ;; Payments cached data
 
-(defn payments-notify-cache-data
+(defn ^:export payments-notify-cache-data
   ([]
     (payments-notify-cache-data @app-state (current-org-slug)))
   ([org-slug]
@@ -836,37 +972,53 @@
 
 ;; Data
 
-(defn bot-access
-  ""
+(defn ^:export bot-access
   ([] (bot-access @app-state))
   ([data]
     (:bot-access data)))
 
-(defn notifications-data
-  ""
+(defn ^:export notifications-data
   ([] (notifications-data @app-state))
   ([data]
     (get-in data notifications-key)))
 
-(defn teams-data-requested
-  ""
+(defn ^:export teams-data-requested
   ([] (teams-data-requested @app-state))
   ([data] (:teams-data-requested data)))
 
-(defn auth-settings
+(defn ^:export auth-settings
   "Get the Auth settings data"
   ([] (auth-settings @app-state))
   ([data] (get-in data auth-settings-key)))
 
-(defn api-entry-point
+(defn ^:export api-entry-point
   "Get the API entry point."
   ([] (api-entry-point @app-state))
   ([data] (get-in data api-entry-point-key)))
 
-(defn current-user-data
+(defn ^:export current-user-data
   "Get the current logged in user info."
   ([] (current-user-data @app-state))
   ([data] (get-in data current-user-key)))
+
+(defn ^:export current-user-tags
+  ([] (current-user-tags @app-state))
+  ([data]
+   (let [user-data (current-user-data data)]
+     (-> user-data
+         :tags))))
+
+(defun ^:export user-tagged?
+  ([tag] (user-tagged? @app-state tag))
+  ([data tag]
+   (when tag
+     (let [tag-kw (if-not (keyword? tag)
+                    (keyword tag)
+                    tag)]
+       (some-> data
+               current-user-tags
+               set
+               tag-kw)))))
 
 (defn ^:export orgs-data
   ([] (orgs-data @app-state))
@@ -887,6 +1039,41 @@
   ([data org-slug]
     (get-in data (org-data-key org-slug))))
 
+(defn ^:export labels-data
+  "Get the org labels"
+  ([] (labels-data @app-state (current-org-slug)))
+  ([data] (labels-data data (current-org-slug)))
+  ([data org-slug]
+   (get-in data (labels-key org-slug))))
+
+(defn ^:export org-labels-data
+  "Get the org labels"
+  ([] (org-labels-data @app-state (current-org-slug)))
+  ([data] (org-labels-data data (current-org-slug)))
+  ([data org-slug]
+   (get-in data (org-labels-key org-slug))))
+
+(defn ^:export user-labels-data
+  "Get the org labels but sorted by user usage."
+  ([] (user-labels-data @app-state (current-org-slug)))
+  ([data] (user-labels-data data (current-org-slug)))
+  ([data org-slug]
+   (get-in data (user-labels-key org-slug))))
+
+(defn ^:export label-data
+  "Get a label by uuid"
+  ([] (label-data @app-state (current-org-slug) (current-label-slug)))
+  ([label-uuid-or-slug] (label-data @app-state (current-org-slug) label-uuid-or-slug))
+  ([data label-uuid-or-slug] (label-data data (current-org-slug) label-uuid-or-slug))
+  ([data org-slug label-uuid-or-slug]
+   (let [labels (org-labels-data data org-slug)]
+     (find-label labels label-uuid-or-slug))))
+
+(defn ^:export editing-label
+  "Get the current editing label"
+  ([] (editing-label @app-state))
+  ([data] (get-in data editing-label-key)))
+
 (defn ^:export posts-data
   "Get org all posts data."
   ([]
@@ -896,7 +1083,7 @@
   ([data org-slug]
     (get-in data (posts-data-key org-slug))))
 
-(defun org-board-data
+(defun ^:export org-board-data
   "Get board data from org data map: mostly used to edit the board infos."
   ([nil] nil)
   ([nil _] nil)
@@ -917,7 +1104,7 @@
   ([data :guard map? org-slug board-slug]
    (org-board-data (org-data data org-slug) board-slug)))
 
-(defun board-data
+(defun ^:export board-data
   "Get board data."
   ([]
     (board-data @app-state))
@@ -948,6 +1135,22 @@
   ([data org-slug contributions-id]
     (when (and org-slug contributions-id)
       (get-in data (contributions-data-key org-slug contributions-id)))))
+
+(defun ^:export label-entries-data
+  "Get label entries data"
+  ([]
+   (label-entries-data @app-state))
+  ([data :guard map?]
+   (label-entries-data data (current-org-slug data) (current-label-slug data)))
+  ([label-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state (current-org-slug) label-slug))
+  ([org-slug :guard #(or (keyword? %) (string? %)) label-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state org-slug label-slug))
+  ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
+   (label-entries-data @app-state org-slug (current-label-slug data)))
+  ([data org-slug label-slug]
+   (when (and org-slug label-slug)
+     (get-in data (label-entries-data-key org-slug label-slug)))))
 
 (defn ^:export editable-boards-data
   ([] (editable-boards-data @app-state (current-org-slug)))
@@ -980,10 +1183,13 @@
   ([data org-slug board-slug sort-type]
     (get-in data (container-key org-slug board-slug sort-type))))
 
-(defn ^:explore current-container-data []
+(defn ^:export current-container-data []
   (let [board-slug (current-board-slug)
-        contributions-id (current-contributions-id)]
+        contributions-id (current-contributions-id)
+        label-slug (current-label-slug)]
     (cond
+      (seq label-slug)
+      (label-entries-data @app-state (current-org-slug) label-slug)
       (seq contributions-id)
       (contributions-data @app-state (current-org-slug) contributions-id)
       (is-container? board-slug)
@@ -1134,6 +1340,21 @@
    (let [entry-pin-key (pin-key org-slug entry-uuid pin-container-uuid)]
      (get-in data entry-pin-key))))
 
+(defn ^:export entry-labels-data
+  ([] (entry-labels-data @app-state (current-org-slug) (current-activity-id)))
+  ([activity-id] (entry-labels-data @app-state (current-org-slug) activity-id))
+  ([org-slug activity-id] (entry-labels-data @app-state org-slug activity-id))
+  ([data org-slug activity-id]
+   (get-in data (entry-labels-key org-slug activity-id))))
+
+(defn ^:export entry-label-data
+  ([label-uuid] (entry-label-data @app-state (current-org-slug) (current-activity-id) label-uuid))
+  ([activity-id label-uuid] (entry-label-data @app-state (current-org-slug) activity-id label-uuid))
+  ([org-slug activity-id label-uuid] (entry-label-data @app-state org-slug activity-id label-uuid))
+  ([data org-slug activity-id label-uuid]
+   (let [entry-labels (entry-labels-data data org-slug activity-id)]
+     (some #(when (= (:uuid %) label-uuid) %) entry-labels))))
+
 (defn ^:export secure-activity-data
   "Get secure activity data."
   ([]
@@ -1199,17 +1420,17 @@
   ([data] (get-in data teams-data-key))
   ([data team-id] (some #(when (= (:team-id %) team-id) %) (get-in data teams-data-key))))
 
-(defn team-data
+(defn ^:export team-data
   ([] (team-data (:team-id (org-data))))
   ([team-id] (team-data team-id @app-state))
   ([team-id data] (get-in data (team-data-key team-id))))
 
-(defn team-roster
+(defn ^:export team-roster
   ([] (team-roster (:team-id (org-data))))
   ([team-id] (team-roster team-id @app-state))
   ([team-id data] (get-in data (team-roster-key team-id))))
 
-(defn team-channels
+(defn ^:export team-channels
   ([] (team-channels (:team-id (org-data))))
   ([team-id] (team-channels team-id @app-state))
   ([team-id data] (get-in data (team-channels-key team-id))))
@@ -1254,7 +1475,7 @@
   ([org-slug] (unfollow-board-uuids org-slug @app-state))
   ([org-slug data] (get-in data (unfollow-board-uuids-key org-slug))))
 
-(defn uploading-video-data
+(defn ^:export uploading-video-data
   ([video-id] (uploading-video-data (current-org-slug) video-id @app-state))
   ([org-slug video-id] (uploading-video-data org-slug video-id @app-state))
   ([org-slug video-id data]
@@ -1263,7 +1484,7 @@
 
 ;; User notifications
 
-(defn user-notifications-data
+(defn ^:export user-notifications-data
   "Get user notifications data"
   ([]
     (user-notifications-data (current-org-slug) @app-state))
@@ -1274,7 +1495,7 @@
 
 ;; Change related
 
-(defn change-data
+(defn ^:export change-data
   "Get change data."
   ([]
     (change-data @app-state))
@@ -1283,7 +1504,7 @@
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
 
-(defun activity-read-data
+(defun ^:export activity-read-data
   "Get the read counts of all the items."
   ([]
     (activity-read-data @app-state))
@@ -1300,14 +1521,50 @@
     (let [all-activities-read (get-in data activities-read-key)]
       (get all-activities-read item-id))))
 
+;; FoC Menu
+
+(defn ^:export foc-menu-data
+  ([] (foc-menu-data @app-state))
+  ([db] (get db foc-menu-key)))
+
+(defn ^:export foc-show-menu
+  ([] (foc-show-menu @app-state))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-show-menu-key))))
+
+(defn ^:export foc-menu-open
+  ([] (foc-menu-open @app-state))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-menu-open-key))))
+
+(defn ^:export foc-share-entry
+  ([] (foc-share-entry @app-state))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-share-entry-key))))
+
+(defn ^:export foc-activity-move
+  ([] (foc-activity-move @app-state))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-activity-move))))
+
+(defn ^:export foc-labels-picker
+  ([] (foc-labels-picker @app-state))
+  ([db] (-> db
+            foc-menu-data
+            (get foc-labels-picker-key))))
+
 ;; Seen
 
-(defn org-seens-data
+(defn ^:export org-seens-data
   ([] (org-seens-data @app-state (current-org-slug)))
   ([org-slug] (org-seens-data @app-state org-slug))
   ([data org-slug] (get-in data (org-seens-key org-slug))))
 
-; (defn container-seen-data
+; (defn ^:export container-seen-data
 ;  ([container-id] (container-seen-data @app-state (current-org-slug) container-id))
 ;  ([org-slug container-id] (container-seen-data @app-state org-slug container-id))
 ;  ([data org-slug container-id] (get-in data (container-seen-key org-slug container-id))))
@@ -1322,21 +1579,26 @@
   ([] (cmail-state @app-state))
   ([data] (get-in data cmail-state-key)))
 
+(defn ^:export cmail-collapsed?
+  ([] (cmail-collapsed? @app-state))
+  ([data]
+   (get-in data (conj cmail-state-key :collapsed))))
+
 ;; Reminders
 
-(defn reminders-data
+(defn ^:export reminders-data
   ([] (reminders-data (current-org-slug) @app-state))
   ([org-slug] (reminders-data org-slug @app-state))
   ([org-slug data]
     (get-in data (reminders-data-key org-slug))))
 
-(defn reminders-roster-data
+(defn ^:export reminders-roster-data
   ([] (reminders-roster-data (current-org-slug) @app-state))
   ([org-slug] (reminders-roster-data org-slug @app-state))
   ([org-slug data]
     (get-in data (reminders-roster-key org-slug))))
 
-(defn reminder-edit-data
+(defn ^:export reminder-edit-data
   ([] (reminder-edit-data (current-org-slug) @app-state))
   ([org-slug] (reminder-edit-data org-slug @app-state))
   ([org-slug data]
@@ -1344,127 +1606,18 @@
 
 ;; Expo
 
-(defn expo-deep-link-origin
+(defn ^:export expo-deep-link-origin
   ([] (expo-deep-link-origin @app-state))
   ([data] (get-in data expo-deep-link-origin-key)))
 
-(defn expo-app-version
+(defn ^:export expo-app-version
   ([] (expo-app-version @app-state))
   ([data] (get-in data expo-app-version-key)))
 
-(defn expo-push-token
+(defn ^:export expo-push-token
   ([] (expo-push-token @app-state))
   ([data] (get-in data expo-push-token-key)))
 
-;; Debug functions
-
-(defn print-app-state []
-  @app-state)
-
-(defn print-org-data []
-  (get-in @app-state (org-data-key (current-org-slug))))
-
-(defn print-team-data []
-  (get-in @app-state (team-data-key (:team-id (org-data)))))
-
-(defn print-team-roster []
-  (get-in @app-state (team-roster-key (:team-id (org-data)))))
-
-(defn print-change-data []
-  (get-in @app-state (change-data-key (current-org-slug))))
-
-(defn print-activity-read-data []
-  (get-in @app-state activities-read-key))
-
-(defn print-board-data []
-  (get-in @app-state (board-data-key (current-org-slug) (current-board-slug))))
-
-(defn print-container-data []
-  (if (is-container? (current-board-slug))
-    (get-in @app-state (container-key (current-org-slug) (current-board-slug) (current-sort-type)))
-    (get-in @app-state (board-data-key (current-org-slug) (current-board-slug)))))
-
-(defn print-activity-data []
-  (get-in
-   @app-state
-   (activity-key (current-org-slug) (current-activity-id))))
-
-(defn print-secure-activity-data []
-  (get-in
-   @app-state
-   (secure-activity-key (current-org-slug) (current-secure-activity-id))))
-
-(defn print-reactions-data []
-  (get-in
-   @app-state
-   (conj
-    (activity-key (current-org-slug) (current-activity-id))
-    :reactions)))
-
-(defn print-comments-data []
-  (get-in
-   @app-state
-   (comments-key (current-org-slug))))
-
-(defn print-activity-comments-data []
-  (get-in
-   @app-state
-   (activity-comments-key (current-org-slug) (current-activity-id))))
-
-(defn print-entry-editing-data []
-  (get @app-state :entry-editing))
-
-(defn print-posts-data []
-  (get-in @app-state (posts-data-key (current-org-slug))))
-
-(defn print-filtered-posts []
-  (filtered-posts-data @app-state (current-org-slug) (current-board-slug)))
-
-(defn print-items-to-render []
-  (items-to-render-data @app-state (current-org-slug) (current-board-slug)))
-
-(defn print-user-notifications []
-  (user-notifications-data (current-org-slug) @app-state))
-
-(defn print-reminders-data []
-  (reminders-data (current-org-slug) @app-state))
-
-(defn print-reminder-edit-data []
-  (reminder-edit-data (current-org-slug) @app-state))
-
-(defn print-panel-stack []
-  (:panel-stack @app-state))
-
-(defn print-payments-data []
-  (payments-data @app-state (current-org-slug)))
-
-(defn print-router-path []
-  (route @app-state))
-
-(set! (.-OCWebPrintAppState js/window) print-app-state)
-(set! (.-OCWebPrintOrgData js/window) print-org-data)
-(set! (.-OCWebPrintTeamData js/window) print-team-data)
-(set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
-(set! (.-OCWebPrintActiveUsers js/window) active-users)
-(set! (.-OCWebPrintChangeData js/window) print-change-data)
-(set! (.-OCWebPrintActivityReadData js/window) print-activity-read-data)
-(set! (.-OCWebPrintBoardData js/window) print-board-data)
-(set! (.-OCWebPrintContainerData js/window) print-container-data)
-(set! (.-OCWebPrintActivityData js/window) print-activity-data)
-(set! (.-OCWebPrintSecureActivityData js/window) print-secure-activity-data)
-(set! (.-OCWebPrintReactionsData js/window) print-reactions-data)
-(set! (.-OCWebPrintCommentsData js/window) print-comments-data)
-(set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
-(set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
-(set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
-(set! (.-OCWebPrintItemsToRender js/window) print-items-to-render)
-(set! (.-OCWebPrintPostsData js/window) print-posts-data)
-(set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
-(set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
-(set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
-(set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
-(set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
-(set! (.-OCWebPrintRouterPath js/window) print-router-path)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:deref deref
                                     :keyword keyword

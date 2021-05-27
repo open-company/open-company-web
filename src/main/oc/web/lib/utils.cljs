@@ -2,12 +2,11 @@
   (:require [clojure.string]
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
-            [goog.string :refer (format)]
             [oops.core :refer (oget)]
             [oc.lib.cljs.useragent :as ua]
-            [oc.web.urls :as oc-urls]
             [oc.web.utils.drafts :as du]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [cuerdas.core :as s]
             [oc.lib.hateoas :as hateoas]
@@ -300,8 +299,7 @@
   (when (string? domain)
     (re-matches valid-domain-re domain)))
 
-(defn remove-tooltips []
-  (.remove (js/$ "div.tooltip")))
+(def remove-tooltips ui-utils/remove-tooltips)
 
 (defn parse-input-email [email-address]
   (let [parsed-email (email/parse email-address)]
@@ -460,27 +458,7 @@
         (str label-prefix created-str "\nEdited " updated-str)
         (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
-(defn ios-copy-to-clipboard [el]
-  (let [old-ce (.-contentEditable el)
-        old-ro (.-readOnly el)
-        rg (.createRange js/document)]
-    (set! (.-contentEditable el) true)
-    (set! (.-readOnly el) false)
-    (.selectNodeContents rg el)
-    (let [s (.getSelection js/window)]
-      (.removeAllRanges s)
-      (.addRange s rg)
-      (.setSelectionRange el 0 (.. el -value -length))
-      (set! (.-contentEditable el) old-ce)
-      (set! (.-readOnly el) old-ro))))
-
-(defn copy-to-clipboard [el]
-  (try
-    (when ua/ios?
-      (ios-copy-to-clipboard el))
-    (.execCommand js/document "copy")
-    (catch :default _
-      false)))
+(def copy-to-clipboard ui-utils/copy-to-clipboard)
 
 (defn body-without-preview [body]
   (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)

@@ -117,15 +117,8 @@ div.menu {
             width: 32px;
             height: 32px;
             padding: 0;
-            background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-            background-size: 12px 12px;
-            background-position: center;
-            background-repeat: no-repeat;
             border-radius: 4px;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-            }
+            @include svgBgColor("/img/ML/mobile_dark_x.svg", center, 12px 12px, var(--color))
           }
         }
 

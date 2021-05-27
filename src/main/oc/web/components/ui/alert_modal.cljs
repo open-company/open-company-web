@@ -1,6 +1,5 @@
 (ns oc.web.components.ui.alert-modal
   (:require [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]

@@ -110,10 +110,6 @@
       (when slack-icon
         [:span.slack-icon])
       title]
-    (when (seq description)
-      [:div.notification-description
-       {:dangerouslySetInnerHTML #js {"__html" description}
-        :class (when mention "oc-mentions")}])
     (when feedback-bt
       [:div.notification-footer
        "You can"

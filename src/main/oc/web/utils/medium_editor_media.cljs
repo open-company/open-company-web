@@ -288,12 +288,13 @@
                       :solid-button-title "OK"
                       :solid-button-cb #(alert-modal/hide-alert)}]
                   (alert-modal/show-alert alert-data))
-      (let [cmail-state (:cmail-state @dis/app-state)]
+      (let [cmail-state (dis/cmail-state)
+            editing-board (cmail-actions/get-board-for-edit)]
         ;; If Quick Post is still collapsed expand it
         (when (:collapsed cmail-state)
-          (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
-                                                                        :fullscreen false
-                                                                        :key (:key cmail-state)}))
+          (cmail-actions/cmail-show editing-board {:collapsed false
+                                                   :fullscreen false
+                                                   :key (:key cmail-state)}))
         (if (.match (.-type file) "image")
           (do
             (.hide  ^js @(::media-picker-ext s))

@@ -40,6 +40,7 @@ $dark_mode: "dark";
   --highlighter-bg-color: #FEDF95;
   --box-shadow-color: rgba(0, 0, 0, 0.07);
   --box-shadow: 0 2px 4px 0 var(--box-shadow-color);
+  --label-autocomplete-color: black;
 
   --opac-background-color-04: #{rgba($deep_navy, 0.04)};
   --opac-background-color-05: #{rgba($deep_navy, 0.05)};
@@ -48,6 +49,9 @@ $dark_mode: "dark";
   --opac-background-color-15: #{rgba($deep_navy, 0.15)};
   --opac-background-color-2: #{rgba($deep_navy, 0.2)};
   --opac-background-color-24: #{rgba($deep_navy, 0.24)};
+  --opac-background-color-32: #{rgba($deep_navy, 0.32)};
+  --opac-background-color-48: #{rgba($deep_navy, 0.48)};
+  --opac-background-color-64: #{rgba($deep_navy, 0.64)};
   --opac-background-color-72: #{rgba($deep_navy, 0.72)};
 
   --mobile-background-color: white;
@@ -159,6 +163,12 @@ $dark_mode: "dark";
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(0, 0, 0, 0.24);
 
+  // Labels
+  --oc-label-background-color: #{rgba($deep_navy, 0.08)};
+  --oc-label-color: #{rgba($deep_navy, 0.72)};
+  --labels-picker-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  --labels-picker-border: 1px solid #{rgba($deep_navy, 0.08)};
+
   html, body {
     scrollbar-color: light;
   }
@@ -195,6 +205,7 @@ $dark_mode: "dark";
   --highlighter-bg-color: #FEDF95;
   --box-shadow-color: rgba(255, 255, 255, 0.11);
   --box-shadow: 0 2px 4px 0 var(--box-shadow-color);
+  --label-autocomplete-color: white;
 
   --opac-background-color-04: #{rgba(white, 0.04)};
   --opac-background-color-05: #{rgba(white, 0.05)};
@@ -202,6 +213,10 @@ $dark_mode: "dark";
   --opac-background-color-1: #{rgba(white, 0.1)};
   --opac-background-color-15: #{rgba(white, 0.15)};
   --opac-background-color-2: #{rgba(white, 0.2)};
+  --opac-background-color-24: #{rgba(white, 0.24)};
+  --opac-background-color-32: #{rgba(white, 0.32)};
+  --opac-background-color-48: #{rgba(white, 0.48)};
+  --opac-background-color-64: #{rgba(white, 0.64)};
   --opac-background-color-72: #{rgba(white, 0.72)};
 
   --mobile-background-color: #1B202A;
@@ -312,6 +327,12 @@ $dark_mode: "dark";
 
   // Push notifications wall
   --push-notifications-wall-shadow: rgba(255, 255, 255, 0.12);
+
+  // Labels
+  --oc-label-background-color: #{rgba(white, 0.16)};
+  --oc-label-color: #{rgba(white, 0.72)};
+  --labels-picker-box-shadow: 0 2px 4px 0 rgba(255, 255, 255, 0.07);
+  --labels-picker-border: 1px solid #{rgba(white, 0.4)};
 
   &, body {
     scrollbar-color: dark;

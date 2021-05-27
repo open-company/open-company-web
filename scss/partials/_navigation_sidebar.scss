@@ -99,6 +99,14 @@
   outline: none;
   border-radius: 4px;
 
+  &.label-item {
+    background-color: transparent;
+
+    span.label-bg-color {
+      opacity: 0.3;
+    }
+  }
+
   div.nav-link-label {
     @include OC_Body_Book();
     font-size: 14px;
@@ -175,6 +183,14 @@
   -webkit-tap-highlight-color: var(--navigation-sidebar-hover-bg);
   background-color: var(--navigation-sidebar-hover-bg);
   border-radius: 4px;
+
+  &.label-item {
+    background-color: transparent;
+
+    span.label-bg-color {
+      opacity: 0.3;
+    }
+  }
 
   @include mobile() {
     border-radius: 0;
@@ -383,6 +399,20 @@ div.left-navigation-sidebar {
             opacity: 1;
           }
         }
+
+        &.label-item {
+          span.label-bg-color {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+          }
+        }
       }
 
       div.public {
@@ -436,6 +466,23 @@ div.left-navigation-sidebar {
             width: auto;
             margin-left: 0px;
             padding: 0px 0px 0px 28px;
+          }
+
+          &.label-item-internal {
+            position: relative;
+
+            span.label-dot {
+              width: 12px;
+              height: 12px;
+              position: absolute;
+              border-radius: 50%;
+              left: 4px;
+              top: 11px;
+
+              @include mobile() {
+                top: 6px;
+              }
+            }
           }
 
           .emojione {

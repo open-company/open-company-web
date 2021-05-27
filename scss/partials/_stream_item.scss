@@ -24,7 +24,14 @@ div.virtualized-list-row:not(.collapsed-item) {
   }
 
   @include big_web() {
-    &:hover, &.foc-menu-open {
+    &:hover.foc-other-menu {
+      z-index: 1;
+      div.stream-item, div.stream-item.open-item, div.stream-item.close-item {
+        z-index: 1;
+      }
+    }
+
+    &:hover, &.foc-show-menu {
       z-index: 2;
       box-shadow: 0 2px 4px 0 var(--foc-box-shadow);
       div.stream-item, div.stream-item.open-item, div.stream-item.close-item {
@@ -39,13 +46,13 @@ div.virtualized-list-row:not(.collapsed-item) {
           div.more-menu {
             display: block;
 
-            button {
+            button.menu-item-bt {
               display: initial;
             }
           }
         }
 
-        div.activity-share-container {
+        div.share-entry-container {
           display: block;
         }
 
@@ -54,7 +61,7 @@ div.virtualized-list-row:not(.collapsed-item) {
             div.more-menu {
               display: block;
 
-              button {
+              button.menu-item-bt {
                 display: initial;
               }
             }
@@ -73,13 +80,17 @@ div.virtualized-list-row:not(.collapsed-item) {
             div.more-menu {
               display: block;
 
-              button {
+              & > button {
                 display: initial;
               }
             }
           }
         }
       }
+    }
+
+    &.foc-show-menu {
+      z-index: 3;
     }
   }
 
@@ -115,6 +126,14 @@ div.stream-item {
     padding: 24px 16px 18px;
   }
 
+  div.separator-dot {
+    width: 3px;
+    height: 3px;
+    background-color: var(--opac-background-color-2);
+    border-radius: 50%;
+    margin: 1px 1px 0 1px;
+  }
+
   &.draft {
     cursor: pointer;
   }
@@ -141,8 +160,12 @@ div.stream-item {
 
   &.bookmark-item {
 
-    div.bookmark-tag, div.bookmark-tag-small {
-      display: inline-block;
+    div.bookmark-tag {
+      display: flex;
+    }
+
+    div.bookmark-tag-small {
+      display: flex;
     }
   }
 
@@ -154,12 +177,13 @@ div.stream-item {
     display: flex;
   }
 
-  div.activity-share-container {
-    display: none;
+  &.muted-item, &.pinned-item, &.new-item, &.bookmark-item {
+    div.stream-item-header div.stream-item-header-head-author div.separator-dot {
+      display: block;
 
-    div.activity-share-modal-container {
-      right: -9px;
-      margin-top: 24px;
+      @include mobile() {
+        display: none;
+      }
     }
   }
 
@@ -225,7 +249,7 @@ div.stream-item {
       display: block;
     }
 
-    div.stream-header-head-author {
+    div.stream-item-header-head-author {
       height: 24px;
       flex: 0 0 auto;
       margin-right: 8px;
@@ -253,19 +277,15 @@ div.stream-item {
         z-index: 2;
         max-width: 100%;
         display: contents;
+        *:last-child {
+          margin-right: 4px;
+        }
       }
 
       div.separator-dot {
-        width: 3px;
-        height: 3px;
-        background-color: var(--light-color);
-        border-radius: 50%;
-        margin: 1px 5px 0 5px;
+        margin: 1px 1px 0 1px;
         flex: 0 0 auto;
-
-        @include mobile() {
-          display: none;
-        }
+        display: none;
       }
 
       span.time-since {
@@ -275,15 +295,15 @@ div.stream-item {
         text-align: left;
         @include OC_Body_Book();
         font-size: 12px;
-        color: var(--color);
+        color: var(--light-color);
         position: relative;
         white-space: nowrap;
         flex: 0 0 auto;
         overflow: hidden;
+        margin-left: 4px;
+        margin-right: 4px;
 
         @include mobile() {
-          color: var(--light-color);
-          margin-left: 6px;
           height: 32px;
           line-height: 32px;
 
@@ -297,6 +317,9 @@ div.stream-item {
 
       div.new-item-tag {
         flex: 0 0 auto;
+        margin-left: 4px;
+        margin-right: 4px;
+        display: none;
       }
 
       div.pin-tag {
@@ -304,15 +327,8 @@ div.stream-item {
       }
 
       div.bookmark-tag-small {
-        margin-right: 0;
         flex: 0 0 auto;
         align-self: center;
-      }
-
-      @include mobile() {
-        div.bookmark-tag-small {
-          margin-left: auto;
-        }
       }
 
       div.bookmark-tag {
@@ -324,11 +340,6 @@ div.stream-item {
         align-self: center;
         opacity: 0.5;
         flex: 0 0 auto;
-
-
-        @include mobile() {
-          margin-right: 8px;
-        }
       }
     }
 
@@ -341,7 +352,7 @@ div.stream-item {
       @include big_web() {
         display: none;
 
-        &:not(.menu-expanded) button {
+        &:not(.menu-expanded) > button {
           display: none;
         }
       }
@@ -362,8 +373,8 @@ div.stream-item {
 
   div.bookmark-tag, div.bookmark-tag-small, div.muted-activity, div.pinned-tag, div.new-item-tag {
     display: none;
-    margin-right: 0;
-    margin-left: 8px;
+    margin-left: 4px;
+    margin-right: 4px;
   }
 
   & > div.bookmark-tag, & > div.bookmark-tag-small {
@@ -462,10 +473,14 @@ div.stream-item {
     }
   }
 
-  div.stream-item-footer {
+  div.stream-item-draft-footer {
     margin-top: 10px;
     min-height: 26px;
     position: relative;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
 
     @include mobile() {
       height: auto;
@@ -474,21 +489,8 @@ div.stream-item {
       width: 100%;
     }
 
-    div.reactions {
-      @include mobile() {
-        display: inline-block;
-      }
-    }
-
-    div.stream-item-footer-mobile-group {
-      @include mobile() {
-        float: left;
-        height: 26px;
-      }
-    }
-
     div.stream-body-draft-edit {
-      float: left;
+      order: 1;
 
       button.edit-draft-bt {
         text-align: left;
@@ -500,7 +502,9 @@ div.stream-item {
     }
 
     div.stream-body-draft-delete {
-      float: right;
+      order: 2;
+      margin-left: auto;
+
       button.delete-draft-bt {
         text-align: right;
         padding: 0px;
@@ -509,25 +513,34 @@ div.stream-item {
         color: var(--light-color);
       }
     }
+  }
 
-    div.stream-item-comments-summary {
-      float: left;
-      margin-right: 16px;
+  div.stream-item-footer {
+    margin-top: 10px;
+    min-height: 26px;
+    position: relative;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
 
-      @include mobile() {
-        position: relative;
-        top: initial;
-        left: initial;
-      }
+    @include mobile() {
+      height: auto;
+      overflow: hidden;
+      margin-top: 12px;
+      width: 100%;
     }
 
     div.reactions {
-      float: left;
-      margin-right: 16px;
+      order: 2;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
 
       div.reactions-picker-container {
 
-        div.emoji-mart {
+        div.emoji-mart, section.emoji-mart {
           bottom: unset;
           top: 0;
           left: calc(100% + 8px);
@@ -542,13 +555,30 @@ div.stream-item {
       }
     }
 
+    div.stream-item-comments-summary {
+      order: 3;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
+    }
+
+    div.stream-item-wrt {
+      order: 4;
+      position: relative;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
+    }
+
     div.stream-item-mobile-attachments {
       display: none;
 
       @include mobile() {
         display: block;
-        float: left;
-        height: 26px;
+        order: 5;
+        height: 22px;
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
@@ -572,10 +602,13 @@ div.stream-item {
     }
 
     div.stream-item-attachments {
-      float: left;
-      margin-right: 16px;
+      order: 5;
       height: 26px;
       position: relative;
+
+      &:not(:empty) {
+        margin-right: 16px;
+      }
 
       @include mobile() {
         display: none;
@@ -674,15 +707,45 @@ div.stream-item {
       }
     }
 
-    div.stream-item-wrt {
-      float: left;
+    div.stream-item-labels {
+      order: 6;
       position: relative;
-      margin-right: 16px;
+      height: 20px;
+      margin-top: 0;
+      margin-bottom: 0;
+
+      &:not(:empty) {
+        margin-right: 16px;
+        margin-left: 19px;
+
+        @include mobile() {
+          margin-right: 0;
+          margin-left: 0;
+        }
+      }
+
+      div.separator-dot {
+        position: absolute;
+        top: 50%;
+        margin: -1px 0 5px 0;
+        left: -19px;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+
+      @include mobile() {
+        order: 1;
+        width: 100%;
+        margin: 8px 0 10px 0;
+      }
     }
 
     div.stream-item-mobile-view-more {
+      order: 7;
       display: block;
-      float: right;
+      margin-left: auto;
       height: 26px;
       line-height: 26px;
       font-size: 14px;

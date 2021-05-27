@@ -6,6 +6,10 @@ div.more-menu {
   opacity: 1;
   position: relative;
 
+  div.activity-share-modal-container {
+    z-index: 1132;
+  }
+
   &.left-gradient {
     background-color: var(--foc-background-color);
 
@@ -33,26 +37,42 @@ div.more-menu {
     }
   }
 
+  div.foc-labels-picker-wrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+  }
+
+  button.menu-item-bt {
+    height: 32px;
+    width: 32px;
+    padding: 0;
+    display: inline-block;
+    opacity: 0.5;
+
+    span.menu-item-icon {
+      width: 32px;
+      height: 32px;
+      display: block;
+    }
+  }
+
   button.more-menu-bt {
     height: 32px;
     width: 32px;
-    display: inline;
-    background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
-    background-size: 18px 4px;
-    background-position: center;
+    display: inline-block;
     padding: 0;
-    background-repeat: no-repeat;
     opacity: 0.5;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/more_menu_horizontal_ellipsis.svg", center, 18px 4px, var(--color));
     }
 
     @include mobile() {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -62,19 +82,8 @@ div.more-menu {
   }
 
   button.more-menu-share-bt {
-    height: 32px;
-    width: 32px;
-    display: inline;
-    background-image: cdnUrl("/img/ML/more_menu_new_share.svg");
-    background-size: 14px 14px;
-    background-position: center;
-    padding: 0;
-    background-repeat: no-repeat;
-    display: inline-block;
-    opacity: 0.5;
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/more_menu_new_share.svg", center, 14px 14px, var(--color));
     }
 
     @include mobile() {
@@ -82,7 +91,7 @@ div.more-menu {
       border-right: none;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -91,39 +100,25 @@ div.more-menu {
     }
   }
 
-  button:not(.has-next-bt) {
+  button.menu-item-bt:not(.has-next-bt) {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
   }
 
-  button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
+  button.menu-item-bt.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: 0px solid var(--opac-background-color-15);
   }
 
   button.more-menu-remove-bookmark-bt {
-    height: 32px;
-    width: 32px;
-    background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
-    background-size: 10px 14px;
-    background-position: center;
-    padding: 0;
-    background-repeat: no-repeat;
-    opacity: 0.5;
-    display: inline-block;
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/menu_add_bookmark@dark.svg");
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/menu_add_bookmark.svg", center, 10px 14px, var(--color));
     }
 
     @include big_web() {
-      &:hover {
-        background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
-        }
+      &:hover span.menu-item-icon {
+        @include svgBgColor("/img/ML/menu_remove_bookmark.svg", center, 10px 14px, var(--color));
       }
     }
 
@@ -132,7 +127,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -158,17 +153,13 @@ div.more-menu {
       background-repeat: no-repeat;
       opacity: 0.5;
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
+      span.menu-item-icon {
+        @include svgBgColor("/img/ML/menu_remove_bookmark.svg", center, 10px 14px, var(--color));
       }
 
       @include big_web() {
-        &:hover {
-          background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/menu_add_bookmark@dark.svg");
-          }
+        &:hover span.menu-item-icon {
+          @include svgBgColor("/img/ML/menu_add_bookmark.svg", center, 10px 14px, var(--color));
         }
       }
 
@@ -177,7 +168,7 @@ div.more-menu {
         opacity: 1;
       }
 
-      &:hover, &:active, &:focus {
+      &:hover, &:active, &:focus, &.active {
         opacity: 1;
 
         @include mobile() {
@@ -198,16 +189,12 @@ div.more-menu {
   button.more-menu-inbox-dismiss-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/more_inbox_done.svg");
-    background-size: 14px 10px;
-    background-position: center;
     padding: 0;
-    background-repeat: no-repeat;
     opacity: 0.5;
     display: inline-block;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_inbox_done@dark.svg");
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/more_inbox_done.svg", center, 14px 10px, var(--color));
     }
 
     @include mobile() {
@@ -215,7 +202,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -227,25 +214,18 @@ div.more-menu {
   button.more-menu-entry-follow-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
-    background-size: 12px 14px;
-    background-position: center;
     padding: 0;
-    background-repeat: no-repeat;
     opacity: 0.5;
     display: inline-block;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/more_inbox_unfollow.svg", center, 12px 14px, var(--color));
     }
 
     @include big_web() {
-      &:hover {
-        background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/more_inbox_follow@dark.svg");
-        }
+      &:hover span.menu-item-icon {
+        @include svgBgColor("/img/ML/more_inbox_follow.svg", center, 12px 14px, var(--color));
       }
     }
 
@@ -254,7 +234,7 @@ div.more-menu {
       border-radius: 4px;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -266,26 +246,42 @@ div.more-menu {
   button.more-menu-entry-unfollow-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
-    background-size: 12px 14px;
-    background-position: center;
     padding: 0;
-    background-repeat: no-repeat;
     opacity: 0.5;
     display: inline-block;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_inbox_follow@dark.svg");
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/more_inbox_follow.svg", center, 12px 14px, var(--color));
     }
 
     @include big_web() {
-      &:hover {
-        background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
-        }
+      &:hover span.menu-item-icon {
+        @include svgBgColor("/img/ML/more_inbox_unfollow.svg", center, 12px 14px, var(--color));
       }
+    }
+    @include mobile() {
+      border-radius: 4px;
+      opacity: 1;
+    }
+
+    &:hover, &:active, &:focus, &.active {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-edit-labels-bt {
+    height: 32px;
+    width: 32px;
+    padding: 0;
+    opacity: 0.5;
+    display: inline-block;
+
+    span.menu-item-icon {
+      @include svgBgColor("/img/ML/label_icon.svg", center, 16px 12px, var(--color));
     }
 
     @include mobile() {
@@ -293,7 +289,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -305,23 +301,28 @@ div.more-menu {
   button.more-menu-toggle-pin-bt {
     height: 32px;
     width: 32px;
-    @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 14px 14px, var(--color));
     padding: 0;
     opacity: 0.5;
     display: inline-block;
-    transition: transform 180ms ease-in, margin-top 180ms ease-in;
+    
+    span.menu-item-icon {
+      transition: transform 180ms ease-in, margin-top 180ms ease-in;
+      @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 14px 14px, var(--color));
+    }
 
     @include big_web() {
-      &:hover {
+      &:hover span.menu-item-icon {
         transform: rotate(-45deg);
       }
     }
 
     &.pinned {
-      transform: rotate(-45deg);
+      span.menu-item-icon {
+        transform: rotate(-45deg);
+      }
 
       @include big_web() {
-        &:hover {
+        &:hover span.menu-item-icon{
           transform: rotate(0deg);
         }
       }
@@ -332,7 +333,7 @@ div.more-menu {
       opacity: 1;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover, &:active, &:focus, &.active {
       opacity: 1;
 
       @include mobile() {
@@ -350,7 +351,7 @@ div.more-menu {
     z-index: 110;
     background-color: var(--overlay-background-color);
     border: 1px solid var(--divider-line);
-    box-shadow: none;
+    box-shadow: var(--box-shadow);
     border-radius: 4px;
     margin: 0;
     padding: 8px 0;
@@ -457,12 +458,11 @@ div.more-menu {
       visibility: hidden;
       transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 
-      &.menu-expanded {
-        visibility: visible;
-        opacity: 1;
-        top: 0;
-        height: 100vh;
+      & > * {
+        display: none;
+      }
 
+      &.menu-expanded {
         & > * {
           display: none;
         }
@@ -472,9 +472,46 @@ div.more-menu {
         }
       }
 
-      & > * {
-        display: none;
+      &.menu-expanded, &.foc-labels-picker, &.showing-share, &.move-activity {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
       }
+
+      &.foc-labels-picker {
+        div.foc-labels-picker-wrapper {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
+        }
+
+        ul.more-menu-list {
+          display: none;
+        }
+      }
+
+      &.showing-share {
+        div.activity-share-modal-container {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
+        }
+
+        ul.more-menu-list {
+          display: none;
+        }
+      }
+
+      &.move-activity {
+        div.activity-move {
+          display: block;
+          z-index: #{$navbar_zindex + 101};
+        }
+
+        ul.more-menu-list {
+          display: none;
+        }
+      }
+
       // Add some extra padding at the bottom of mobile browsers
       //  to avoid having the bottom part of the menu hidden
       &.ios-browser ul.more-menu-list {
@@ -737,6 +774,32 @@ div.more-menu {
               @include svgBgColor("/img/ML/menu_toggle_pin.svg", center, 18px 18px, var(--color));
               position: absolute;
               top: 15px;
+              left: 15px;
+            }
+
+            &.pinned:before {
+              transform: rotate(-45deg);
+              margin-top: 2px;
+            }
+          }
+
+          &.edit-labels {
+            padding-left: 56px;
+
+            &.disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+
+            &:before {
+              transition: transform 180ms ease-in, margin-top 180ms ease-in;
+              content: "";
+              width: 18px;
+              height: 14px;
+              margin-top: 0px;
+              @include svgBgColor("/img/ML/label_icon.svg", center, 18px 14px, var(--color));
+              position: absolute;
+              top: 17px;
               left: 15px;
             }
 

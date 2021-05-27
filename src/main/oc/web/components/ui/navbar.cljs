@@ -50,6 +50,7 @@
   [s]
   (let [{:keys [org-data
                 board-data
+                label-data
                 contributions-user-data
                 show-login-overlay
                 orgs-dropdown-visible
@@ -59,6 +60,7 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
+                current-label-slug
                 mobile-user-notifications]} (drv/react s :navbar-data)
         is-mobile? (responsive/is-mobile-size?)
         current-panel (last panel-stack)
@@ -84,6 +86,8 @@
                        "You"
                        (and current-contributions-id (map? contributions-user-data))
                        (:name contributions-user-data)
+                       (and current-label-slug (map? label-data))
+                       (:name label-data)
                        (seq board-name)
                        board-name
                        :else

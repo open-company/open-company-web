@@ -4,13 +4,21 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.user :as user-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.lib.json :refer (json->cljs cljs->json)]))
+            [oc.web.actions.user-tags :as user-tags]
+            [oc.web.lib.json :refer (json->cljs)]))
 
-(def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data) (dis/cmail-state)))
+(def expand-cmail #(cmail-actions/cmail-expand (dis/cmail-data)))
 
-(def collapse-cmail #(cmail-actions/cmail-collapse (dis/cmail-state)))
+(def collapse-cmail cmail-actions/cmail-collapse)
+
+(defn- invite-box? []
+  (get @dis/app-state dis/show-invite-box-key))
+
+(defn- nux-done []
+  (user-tags/tag! :nux-done))
 
 (defn step-intro [steps _viewer?]
   {:title "Welcome!"
@@ -79,93 +87,120 @@
    :position :right
    :sel [:div.left-navigation-sidebar :div.invite-people-box]})
 
+(defn- dismiss-ready [viewer?]
+  (when-not viewer?
+    (cmail-actions/cmail-hide))
+  (nux-done))
+
 (defn step-ready [steps viewer?]
   {:title "You’re ready to go! 🎉"
    :description (if viewer?
                   "Check the latest update from your team."
                   "Give it a try. Add an update or start a discussion to get started.")
-   :steps (if viewer? (str "4 of " steps) (str "6 of " steps))
+   :steps (str steps " of " steps)
    :back-title "Back"
    :scroll :top
    :arrow-position :top
    :next-title "Done"
    :position :bottom
-   :post-next-cb (when-not viewer? cmail-actions/cmail-hide)
-   :post-dismiss-cb (when-not viewer? cmail-actions/cmail-hide)
+   :post-next-cb dismiss-ready
+   :post-dismiss-cb dismiss-ready
    :sel (if viewer?
           [:div.paginated-stream-cards :div.virtualized-list-item:first-child]
           [:div.cmail-outer])})
 
-(defn get-tooltip-data [step user-type]
-  (let [viewer? (= user-type :viewer)
-        steps (if viewer? 4 6)]
-    (case step
-      :intro    (if viewer?
-                  (step-news steps viewer?)
-                  (step-intro steps viewer?))
-      :news     (step-news steps viewer?)
-      :feed     (step-feed steps viewer?)
-      :settings (step-settings steps viewer?)
-      :invite   (step-invite steps viewer?)
-      :ready    (step-ready steps viewer?)
-      nil)))
+(defn get-tooltip-data [step nux-type]
+  (let [viewer? (= nux-type :viewer)
+        steps (cond viewer?       4
+                    (invite-box?) 6
+                    :else         5)
+        step (case step
+               :intro    (if viewer?
+                           (step-news steps viewer?)
+                           (step-intro steps viewer?))
+               :news     (step-news steps viewer?)
+               :feed     (step-feed steps viewer?)
+               :settings (step-settings steps viewer?)
+               :invite   (step-invite steps viewer?)
+               :ready    (step-ready steps viewer?)
+               nil)
+        next-map (assoc step :nux-type nux-type)]
+    next-map))
 
-(defn- get-user-role []
-  (some-> (dis/current-user-data) :role keyword))
-
-(defn get-nux-cookie
-  "Read the cookie from the document only if the nux-cookie-value atom is nil.
-  In all the other cases return the read value in the atom."
-  []
-  (some-> (jwt/user-id)
-          router/nux-cookie
-          cook/get-cookie
-          json->cljs
-          (update :key #(when % (keyword %)))
-          (assoc :user-type (get-user-role))))
-
-(defn set-nux-cookie
-  "Create a map for the new user cookie and save it. Also update the value of
-  the nux-cookie-value atom."
-  [value-map]
-  (let [old-nux-cookie (get-nux-cookie)
-        value-map (merge old-nux-cookie value-map)
-        json-map (cljs->json value-map)
-        json-string (.stringify js/JSON json-map)]
-    (cook/set-cookie! (router/nux-cookie (jwt/user-id))
-                      json-string
-                      (* 60 60 24 7))))
+(defn- get-nux-type []
+  (cond (or (user-tags/user-tagged? :nux-first-user)
+            (user-tags/user-tagged? :nux-admin))
+        :admin
+        (user-tags/user-tagged? :nux-author)
+        :contributor
+        :else
+        :viewer))
 
 (defn ^:export end-nux
-  "NUX completed for the current user, remove the cookie and update the nux-cookie-value."
-  []
+  "NUX completed for the current user, remove the cookie and add the nux-done tag."
+  [completed?]
   (dis/dispatch! [:input [:nux] nil])
-  (cook/remove-cookie! (router/nux-cookie (jwt/user-id))))
+  (when completed?
+    (nux-done)))
+
+(defn- old-nux-cookie-name []
+  (str "nux-" (jwt/user-id)))
+
+(defn- get-old-nux-state []
+  (some-> (old-nux-cookie-name)
+          cook/get-cookie
+          json->cljs
+          (update :key #(when % (keyword %)))))
+
+(defn- convert-nux-cookie-to-tag []
+  (let [old-nux-state (get-old-nux-state)
+        current-user-data (or (dis/current-user-data)
+                              (jwt/get-contents))
+        org-data (dis/org-data)
+        user-type (when (and org-data
+                            current-user-data)
+                    (user-utils/get-user-type current-user-data org-data))
+        nux-type (cond (= (-> org-data :author :user-id) (jwt/user-id))
+                       :nux-first-user
+                       (#{:admin :author} user-type)
+                       :nux-author
+                       :else
+                       :nux-viewer)]
+    (when (and old-nux-state
+               current-user-data
+               org-data
+               (not= (:key old-nux-state) :done))
+      (cook/remove-cookie! (old-nux-cookie-name))
+      (user-tags/tag! nux-type))))
 
 (defn check-nux
   [& [force?]]
+  (convert-nux-cookie-to-tag)
   (when (and (or force?
                  (not (contains? @dis/app-state :nux)))
              (not (responsive/is-mobile-size?))
              (dis/current-org-slug)
-             (router/is-home?))
-    (let [nux-state (get-nux-cookie)]
+             (router/is-home?)
+             (not (user-tags/user-tagged? :nux-done))
+             (user-tags/user-tagged? [:nux-first-user :nux-admin :nux-author :nux-viewer]))
+    (let [nux-type (get-nux-type)
+          nux-state {:key :intro :nux-type nux-type}]
       (if (= (:key nux-state) :done)
-        (end-nux)
-        (dis/dispatch! [:input [:nux] (get-nux-cookie)])))))
+        (end-nux true)
+        (dis/dispatch! [:input [:nux] nux-state])))))
 
 (defn- calc-next-step
-  ([] (calc-next-step (get-user-role) {}))
-  ([user-type] (calc-next-step user-type {}))
-  ([user-type {:keys [key]}]
+  ([] (calc-next-step (get-nux-type) {}))
+  ([nux-type] (calc-next-step nux-type {}))
+  ([nux-type {:keys [key]}]
    (case key
-     :intro    (if (= user-type :viewer)
+     :intro    (if (= nux-type :viewer)
                  :feed
                  :news)
      :news     :feed
      :feed     :settings
-     :settings (if (or (= user-type :viewer)
-                       (not (get @dis/app-state dis/show-invite-box-key)))
+     :settings (if (or (= nux-type :viewer)
+                       (not (invite-box?)))
                  :ready
                  :invite)
      :invite   :ready
@@ -174,42 +209,41 @@
      key)))
 
 (defn next-step []
-  (let [user-type (get-user-role)
+  (let [nux-type (get-nux-type)
         current-value (get @dis/app-state :nux)
-        next-step (calc-next-step user-type current-value)
+        next-step (calc-next-step nux-type current-value)
         same-step? (= (:key current-value) next-step)
         prepare-cb (when (and (= next-step :ready)
-                              (not= user-type :viewer)
+                              (not= nux-type :viewer)
                               (not same-step?))
                      expand-cmail)
         delay (if (fn? prepare-cb)
                 280
                 0)]
     ;; In case we are stalled on a value it means NUX is finished/dismissed
-    (when (:key current-value)
-      (if same-step?
-        (end-nux)
-        (set-nux-cookie {:key next-step})))
+    (when (and (:key current-value)
+               same-step?)
+      (end-nux true))
     (when (fn? prepare-cb)
       (prepare-cb))
     (utils/maybe-after delay #(dis/dispatch! [:input [:nux :key] next-step]))))
 
-(defn- calc-prev-step [user-type {:keys [key]}]
+(defn- calc-prev-step [nux-type {:keys [key]}]
   (case key
     :news     :intro
-    :feed     (if (= user-type :viewer) :intro :news)
+    :feed     (if (= nux-type :viewer) :intro :news)
     :settings :feed
     :invite   :settings
-    :ready    (if (or (= user-type :viewer)
+    :ready    (if (or (= nux-type :viewer)
                       (not (get @dis/app-state dis/show-invite-box-key)))
                 :settings
                 :invite)
     nil))
 
 (defn prev-step []
-  (let [user-type (get-user-role)
+  (let [nux-type (get-nux-type)
         current-value (get @dis/app-state :nux)
-        prev-step (calc-prev-step user-type current-value)
+        prev-step (calc-prev-step nux-type current-value)
         same-step? (= (:key current-value) prev-step)
         prepare-cb (when (and (= current-value :ready)
                               (not same-step?))
@@ -218,26 +252,25 @@
                 280
                 0)]
     ;; In case we are stalled on a value it means NUX is finished/dismissed
-    (when (:key current-value)
-      (when-not same-step?
-        (set-nux-cookie {:key prev-step})))
     (when (fn? prepare-cb)
       (prepare-cb))
     (utils/maybe-after delay #(dis/dispatch! [:input [:nux :key] prev-step]))))
 
-(defn dismiss-nux []
+(defn dismiss-nux [completed?]
   (dis/dispatch! [:input [:nux :key] :done])
-  (end-nux))
+  (end-nux completed?))
 
-(defn new-user-registered [medium-type & [cb]]
+(defn new-user-registered [_medium-type & [cb]]
   (cook/set-cookie! (router/first-ever-landing-cookie (jwt/user-id))
                     true (* 60 60 24 7))
-  (when (not= (get-user-role) :viewer)
+  (when (not= (get-nux-type) :viewer)
     (cook/set-cookie! (router/show-invite-box-cookie (jwt/user-id)) true))
-  (set-nux-cookie {:key (calc-next-step) :medium medium-type})
   (when (fn? cb)
     (utils/after 100 cb)))
 
-(defn ^:export restart-nux [& [key]]
-  (set-nux-cookie {:key (if key (keyword key) (calc-next-step))})
-  (utils/after 280 #(check-nux true)))
+(defn ^:export restart-nux
+  "Used for debug to test the nux a second time, triggered from console."
+  [nux-type]
+  (user-tags/tag! (if nux-type (keyword nux-type) :nux-first-user))
+  (user-tags/untag! :nux-done)
+  (utils/after 850 #(check-nux true)))

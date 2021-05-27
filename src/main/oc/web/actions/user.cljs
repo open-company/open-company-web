@@ -17,6 +17,7 @@
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.user-tags :as user-tags]
             [oc.web.utils.activity :as activity-utils]
             [oc.web.utils.notification :as notif-utils]
             [oc.web.actions.routing :as routing-actions]
@@ -527,7 +528,7 @@
 
 ;; Mobile push notifications
 
-(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
+(def ^{:private true} expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
 
 (defn dispatch-expo-push-token
   "Save the expo push token in a cookie (or re-save to extend the cookie expire time)
@@ -705,31 +706,11 @@
 
 ;; Tags
 
-(defun tag!
-  ([tag :guard string?] (when tag (tag! (keyword tag))))
-  ([tag :guard keyword?]
-   (when-let [cur-user (dis/current-user-data)]
-     (let [cleaned-tag (if (keyword? tag) (name tag) (str tag))
-           tag-link (utils/link-for (:links cur-user) "partial-tag" "POST" {} {:tag cleaned-tag})]
-       (dis/dispatch! [:user/tag! tag])
-       (api/user-tag tag-link (fn [{success :success}]
-                                (when-not success
-                                  (get-user))))))))
+(def tag! user-tags/tag!)
 
-(defun untag!
-  ([tag :guard string?] (when tag (untag! (keyword tag))))
-  ([tag :guard keyword?]
-   (when-let [cur-user (dis/current-user-data)]
-     (let [cleaned-tag (if (keyword? tag) (name tag) (str tag))
-           tag-link (utils/link-for (:links cur-user) "partial-untag" "DELETE" {} {:tag cleaned-tag})]
-       (dis/dispatch! [:user/untag! tag])
-       (api/user-tag tag-link (fn [{success :success}]
-                                (when-not success
-                                  (get-user))))))))
+(def untag! user-tags/untag!)
 
 ;; Debug
 
-(defn force-jwt-refresh []
+(defn ^:export force-jwt-refresh []
   (when (jwt/jwt) (jwt-actions/jwt-refresh)))
-
-(set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

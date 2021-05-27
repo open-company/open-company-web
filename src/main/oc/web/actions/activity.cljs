@@ -4,12 +4,14 @@
             [defun.core :refer (defun)]
             [clojure.set :as set]
             [oc.web.api :as api]
+            [oc.lib.time :as time]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
@@ -19,6 +21,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.contributions :as contrib-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -416,18 +419,22 @@
 
   ([edit-key entry-data entry-body callback]
   (let [entry-map (assoc entry-data :body entry-body)
-        cache-key (cmail-actions/get-entry-cache-key (:uuid entry-data))]
+        cache-key (cmail-actions/get-entry-cache-key (:uuid entry-data))
+        can-save? (and (not= "published" (:status entry-map))
+                       (:has-changes entry-map)
+                       (not (:auto-saving entry-map)))]
+    ;; dispatch that you are auto saving
+    (when can-save?
+      (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true
+                                                    :body (:body entry-map)
+                                                    :has-changes false})]))
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
      (fn [err]
        (when-not err
          ;; auto save on drafts that have changes
-         (when (and (not= "published" (:status entry-map))
-                    (:has-changes entry-map)
-                    (not (:auto-saving entry-map)))
-           ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :body (:body entry-map)})])
+         (when can-save?
            (entry-save edit-key entry-map
              (fn [_ _ {:keys [success body]}]
                (if-not success
@@ -480,7 +487,7 @@
     (when (and (dis/current-activity-id)
                (not= board-slug (dis/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid entry-data))))
-    (au/save-last-used-section board-slug)
+    (au/save-last-used-board board-slug)
     (when-not is-published?
       (sa/drafts-get))
     ;; Remove saved cached item
@@ -533,7 +540,7 @@
 (defn get-org [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link (fn [{:keys [ body success]}]
+    (api/get-org org-link (fn [{:keys [body success]}]
                             (let [org-data (when success (json->cljs body))]
                               (dis/dispatch! [:org-loaded org-data])
                               (cb success))))))
@@ -543,10 +550,11 @@
 
 (defn- reload-current-container []
   (when-not (dis/current-activity-id)
-    (let [board-slug (dis/current-board-slug)
-          org-data (dis/org-data)
+    (let [org-data (dis/org-data)
+          board-slug (dis/current-board-slug)
           board-data (dis/current-container-data)
-          contributions-id (dis/current-contributions-id)]
+          contributions-id (dis/current-contributions-id)
+          label-slug (dis/current-label-slug)]
       (cond
 
         (= board-slug "topics")
@@ -588,6 +596,9 @@
         (seq contributions-id)
         (contrib-actions/contributions-get contributions-id)
 
+        (seq label-slug)
+        (label-actions/label-entries-get label-slug)
+
         :else
         (let [fixed-board-data (or board-data
                                    (dis/org-board-data org-data board-slug))
@@ -601,6 +612,7 @@
    (when-not (dis/current-activity-id)
      (let [current-board-slug (dis/current-board-slug)
            current-contrib-id (dis/current-contributions-id)
+           current-label-slug (dis/current-label-slug)
            org-data (dis/org-data)
            board-kw (keyword current-board-slug)]
        (cond (= board-kw :topics)
@@ -617,6 +629,8 @@
              (unfollowing-refresh org-data (not refresh-seen-at?))
              (seq current-contrib-id)
              (contrib-actions/contributions-refresh org-data current-contrib-id)
+             (seq current-label-slug)
+             (label-actions/label-entries-refresh org-data current-label-slug)
              (not (dis/is-container? current-board-slug))
              (sa/section-refresh current-board-slug)
              :else
@@ -701,8 +715,8 @@
            (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
 (defn- entry-publish-finish [initial-uuid edit-key org-slug board-slug entry-data]
-  ;; Save last used section
-  (au/save-last-used-section board-slug)
+  ;; Save last used board
+  (au/save-last-used-board board-slug)
   ; (refresh-org-data)
   ;; Remove entry cached edits
   (cmail-actions/remove-cached-item initial-uuid)
@@ -725,7 +739,7 @@
 
 (defn- entry-publish-with-board-finish [entry-uuid edit-key new-board-data]
   (let [saved-entry-data (first (:entries new-board-data))]
-    (au/save-last-used-section (:slug new-board-data))
+    (au/save-last-used-board (:slug new-board-data))
     (cmail-actions/remove-cached-item entry-uuid)
     ;; reset initial revision after successful publish.
     ;; need a new revision number on the next edit.
@@ -802,15 +816,6 @@
                      (fn [entry-data edit-key resp]
                        (create-update-entry-cb entry-data edit-key resp)
                        (refresh-current-container)))))
-
-(defn activity-share-show [activity-data & [element-id share-medium]]
-  (dis/dispatch! [:activity-share-show activity-data element-id (or share-medium :url)]))
-
-(defn activity-share-hide []
-  (dis/dispatch! [:activity-share-hide]))
-
-(defn activity-share-reset []
-  (dis/dispatch! [:activity-share-reset]))
 
 (defn activity-share-cb [{:keys [success body]}]
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
@@ -1075,8 +1080,10 @@
   (when-let* [entry-data (dis/entry-data (dis/current-org-slug) entry-uuid)
               publisher-id (:user-id (:publisher entry-data))
               container-id (:board-uuid entry-data)
-              org-id (:org-uuid entry-data)]
-    (ws-cc/item-seen publisher-id org-id container-id entry-uuid)))
+              org-id (:org-uuid entry-data)
+              seen-at (time/current-timestamp)]
+    (dis/dispatch! [:item-seen (dis/current-org-slug) container-id entry-uuid seen-at])
+    (ws-cc/item-seen publisher-id org-id container-id entry-uuid seen-at)))
 
 (defn- send-container-seen
   "Send a seen message for the given container-id to Change service."
@@ -1093,7 +1100,7 @@
 (defonce last-seen-at (atom nil))
 
 (defn container-nav-in [container-slug sort-type]
-  (let [container-data (dis/container-data @dis/app-state (dis/current-org-slug) container-slug sort-type)
+  (let [container-data (dis/current-container-data)
         next-seen-at (str "last-seen-at-" (:container-slug container-data) "-" (:next-seen-at container-data))]
     (when (and (:container-id container-data)
                (not= @last-seen-at next-seen-at))
@@ -1116,7 +1123,7 @@
               user-name (:name token-data)
               avatar-url (:avatar-url token-data)
               org-id (:uuid (dis/org-data))]
-    (ws-cc/item-seen publisher-id org-id container-id activity-id)
+    (ws-cc/item-seen publisher-id org-id container-id activity-id (time/current-timestamp))
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn send-item-read
@@ -1377,5 +1384,6 @@
                                       (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))
 
-(defn foc-menu-open [v]
-  (dis/dispatch! [:foc-menu-open v]))
+(defn ui-compose []
+  (ui-utils/remove-tooltips)
+  (activity-edit))

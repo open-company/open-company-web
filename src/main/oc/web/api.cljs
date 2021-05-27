@@ -11,6 +11,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.poll :as poll-utils]
             [oc.web.utils.sentry :as sentry]
+            [oc.web.utils.label :as label-utils]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
@@ -19,21 +20,21 @@
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
-(def ^:private web-origin ls/web-server-domain)
+(def ^{:private true} web-origin ls/web-server-domain)
 
-(def ^:private storage-origin ls/storage-server-domain)
+(def ^{:private true} storage-origin ls/storage-server-domain)
 
-(def ^:private auth-origin ls/auth-server-domain)
+(def ^{:private true} auth-origin ls/auth-server-domain)
 
-(def ^:private payments-origin ls/payments-server-domain)
+(def ^{:private true} payments-origin ls/payments-server-domain)
 
-(def ^:private interaction-origin ls/interaction-server-domain)
+(def ^{:private true} interaction-origin ls/interaction-server-domain)
 
-(def ^:private change-origin ls/change-server-domain)
+(def ^{:private true} change-origin ls/change-server-domain)
 
-(def ^:private search-origin ls/search-server-domain)
+(def ^{:private true} search-origin ls/search-server-domain)
 
-(def ^:private reminders-origin ls/reminder-server-domain)
+(def ^{:private true} reminders-origin ls/reminder-server-domain)
 
 (defun- relative-href
   "Given a link map or a link string return the relative href."
@@ -221,21 +222,21 @@
 
             (on-complete response)))))))
 
-(def ^:private web-http (partial req web-origin))
+(def ^{:private true} web-http (partial req web-origin))
 
-(def ^:private storage-http (partial req storage-origin))
+(def ^{:private true} storage-http (partial req storage-origin))
 
-(def ^:private auth-http (partial req auth-origin))
+(def ^{:private true} auth-http (partial req auth-origin))
 
-(def ^:private payments-http (partial req payments-origin))
+(def ^{:private true} payments-http (partial req payments-origin))
 
-(def ^:private interaction-http (partial req interaction-origin))
+(def ^{:private true} interaction-http (partial req interaction-origin))
 
-(def ^:private change-http (partial req change-origin))
+(def ^{:private true} change-http (partial req change-origin))
 
-(def ^:private search-http (partial req search-origin))
+(def ^{:private true} search-http (partial req search-origin))
 
-(def ^:private reminders-http (partial req reminders-origin))
+(def ^{:private true} reminders-http (partial req reminders-origin))
 
 ;; Report failed api request
 
@@ -255,7 +256,7 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot :utm-data :brand-color :new-entry-cta :new-entry-placeholder])
 
-(def entry-allowed-keys [:headline :body :attachments :video-id :video-error :board-slug :status :must-see :polls :publisher-board])
+(def entry-allowed-keys [:headline :body :attachments :video-id :video-error :board-slug :status :must-see :polls :publisher-board :labels])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications :publisher-board :description])
 
@@ -431,8 +432,9 @@
   (if (and create-board-link board-data)
     (let [fixed-board-data (select-keys board-data board-allowed-keys)
           fixed-entries (mapv #(-> %
-                                (select-keys (conj entry-allowed-keys :uuid :secure-uuid))
-                                (poll-utils/clean-polls))
+                                   (select-keys (conj entry-allowed-keys :uuid :secure-uuid))
+                                   (poll-utils/clean-polls)
+                                   (label-utils/clean-entry-labels))
                          (:entries board-data))
           with-entries (if (pos? (count fixed-entries))
                          (assoc fixed-board-data :entries fixed-entries)
@@ -475,13 +477,15 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link callback]
+(defn get-entries [activity-link callback]
   (if activity-link
     (let [href (relative-href activity-link)]
       (storage-http (method-for-link activity-link) href
         {:headers (headers-for-link activity-link)}
         callback))
-    (handle-missing-link "get-all-posts" activity-link callback)))
+    (handle-missing-link "get-entries" activity-link callback)))
+
+(def get-all-posts get-entries)
 
 (defn load-more-items [more-link direction callback]
   (if (and more-link direction)
@@ -603,6 +607,7 @@
                        :org-name (:name org-data)
                        :org-uuid (:uuid org-data)
                        :org-slug (:slug org-data)
+                       :user-type user-type
                        :org-logo-url (:logo-url org-data)}
           with-invited-user (if (= invite-from "slack")
                               (merge
@@ -831,8 +836,9 @@
   [create-entry-link entry-data edit-key callback]
   (if (and create-entry-link entry-data)
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link create-entry-link) (relative-href create-entry-link)
        {:headers (headers-for-link create-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -845,8 +851,9 @@
   [publish-entry-link entry-data callback]
   (if (and entry-data publish-entry-link)
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link publish-entry-link) (relative-href publish-entry-link)
         {:headers (headers-for-link publish-entry-link)
          :json-params (cljs->json cleaned-entry-data)}
@@ -858,8 +865,9 @@
   [patch-entry-link entry-data edit-key callback]
   (if patch-entry-link
     (let [cleaned-entry-data (-> entry-data
-                              (select-keys entry-allowed-keys)
-                              (poll-utils/clean-polls))]
+                                 (select-keys entry-allowed-keys)
+                                 (poll-utils/clean-polls)
+                                 (label-utils/clean-entry-labels))]
       (storage-http (method-for-link patch-entry-link) (relative-href patch-entry-link)
        {:headers (headers-for-link patch-entry-link)
         :json-params (cljs->json cleaned-entry-data)}
@@ -1085,3 +1093,71 @@
       :body container-id}
      callback)
     (handle-missing-link "mark-unread" mark-unread-link callback)))
+
+;; Labels
+
+(defn get-labels [labels-link callback]
+  (if labels-link
+    (storage-http (method-for-link labels-link) (relative-href labels-link)
+     {:headers (headers-for-link labels-link)}
+     callback)
+    (handle-missing-link "labels" labels-link callback)))
+
+(defn create-label [create-label-link label-data callback]
+  (if create-label-link
+    (let [cleaned-label-data (-> label-data
+                                 (label-utils/clean-label)
+                                 (cljs->json))]
+      (storage-http (method-for-link create-label-link) (relative-href create-label-link)
+      {:headers (headers-for-link create-label-link)
+        :json-params cleaned-label-data}
+      callback))
+    (handle-missing-link "create-label" create-label-link callback {:label-data label-data})))
+
+(defn update-label [update-label-link label-data callback]
+  (if update-label-link
+    (let [cleaned-label-data (-> label-data
+                                 (label-utils/clean-label)
+                                 (cljs->json))]
+      (storage-http (method-for-link update-label-link) (relative-href update-label-link)
+                    {:headers (headers-for-link update-label-link)
+                     :json-params cleaned-label-data}
+                    callback))
+    (handle-missing-link "update-label" update-label-link callback {:label-data label-data})))
+
+(defn delete-label [delete-label-link callback]
+  (if delete-label-link
+    (storage-http (method-for-link delete-label-link) (relative-href delete-label-link)
+                  {:headers (headers-for-link delete-label-link)}
+                  callback)
+    (handle-missing-link "delete-label" delete-label-link callback)))
+
+(defn get-label-entries [label-entries-link callback]
+  (if label-entries-link
+    (storage-http (method-for-link label-entries-link) (relative-href label-entries-link)
+                  {:headers (headers-for-link label-entries-link)}
+                  callback)
+    (handle-missing-link "get-label-entries" label-entries-link callback)))
+
+(defn add-entry-label [add-entry-label-link callback]
+  (if add-entry-label-link
+    (storage-http (method-for-link add-entry-label-link) (relative-href add-entry-label-link)
+                  {:headers (headers-for-link add-entry-label-link)}
+                  callback)
+    (handle-missing-link "add-entry-label" add-entry-label-link callback)))
+
+(defn remove-entry-label [remove-entry-label-link callback]
+  (if remove-entry-label-link
+    (storage-http (method-for-link remove-entry-label-link) (relative-href remove-entry-label-link)
+                  {:headers (headers-for-link remove-entry-label-link)}
+                  callback)
+    (handle-missing-link "remove-entry-label" remove-entry-label-link callback)))
+
+(defn entry-label-changes [label-changes-link add-remove-labels-map callback]
+  (if label-changes-link
+    (let [payload (cljs->json add-remove-labels-map)]
+      (storage-http (method-for-link label-changes-link) (relative-href label-changes-link)
+                    {:headers (headers-for-link label-changes-link)
+                     :json-params payload}
+                    callback))
+    (handle-missing-link "entry-label-changes" label-changes-link callback add-remove-labels-map)))

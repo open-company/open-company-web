@@ -9,8 +9,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.cmail :refer (cmail)]
+            [oc.web.actions.label :as label-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.explore-view :refer (explore-view)]
             [oc.web.components.user-notifications :as user-notifications]
@@ -26,9 +26,11 @@
                               ;; Derivative
                               (drv/drv :org-data)
                               (drv/drv :contributions-user-data)
+                              (drv/drv :label-data)
                               (drv/drv :container-data)
                               (drv/drv :org-slug)
                               (drv/drv :board-slug)
+                              (drv/drv :label-slug)
                               (drv/drv :contributions-id)
                               (drv/drv :activity-uuid)
                               (drv/drv :filtered-posts)
@@ -39,6 +41,8 @@
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :user-notifications)
                               (drv/drv :show-invite-box)
+                              (drv/drv :foc-menu)
+                              (drv/drv :activities-read)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:did-mount (fn [s]
@@ -52,9 +56,12 @@
   (let [org-data (drv/react s :org-data)
         contributions-user-data (drv/react s :contributions-user-data)
         container-data* (drv/react s :container-data)
-        posts-data (drv/react s :filtered-posts)
+        label-data (drv/react s :label-data)
         _items-to-render (drv/react s :items-to-render)
+        _foc-menu (drv/react s :foc-menu)
+        _activities-read (drv/react s :activities-read)
         current-board-slug (drv/react s :board-slug)
+        current-label-slug (drv/react s :label-slug)
         current-contributions-id (drv/react s :contributions-id)
         current-activity-id (drv/react s :activity-uuid)
         current-org-slug (drv/react s :org-slug)
@@ -79,9 +86,11 @@
         is-unfollowing (= current-board-slug "unfollowing")
         is-topics (= current-board-slug "topics")
         is-contributions (seq current-contributions-id)
+        is-label (seq current-label-slug)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-container? (dis/is-container? current-board-slug)
         container-data (if (and (not is-contributions)
+                                (not is-label)
                                 (not is-container?)
                                 (not container-data*))
                          org-board-data
@@ -94,13 +103,15 @@
         should-show-settings-bt (and current-board-slug
                                      (not is-container?)
                                      (not is-topics)
+                                     (not is-contributions)
                                      (not (:read-only container-data)))
+        should-show-label-edit-bt (and current-label-slug
+                                       (:can-edit? label-data))
         cmail-state (drv/react s :cmail-state)
-        dismiss-all-link (when is-inbox
-                           (utils/link-for (:links container-data) "dismiss-all"))
         member? (:member? org-data)
         show-follow-banner? (and (not is-container?)
                                  (not (seq current-contributions-id))
+                                 (not (seq current-label-slug))
                                  (not is-drafts-board)
                                  (map? org-board-data)
                                  (false? (:following org-board-data)))
@@ -113,6 +124,8 @@
                                   current-org-slug "-"
                               (cond is-contributions
                                     current-contributions-id
+                                    is-label
+                                    current-label-slug
                                     current-board-slug
                                     (name current-board-slug))
                               (when (:last-seen-at container-data)
@@ -179,12 +192,15 @@
                                         :topics-view is-topics})}
               ;; Board name and settings button
               [:div.board-name
+                {:class (when is-topics "topics-header")}
                 [:div.board-name-with-icon
+                  {:class (when is-contributions "contributions")}
                   [:div.board-name-with-icon-internal
                   {:class (utils/class-set {:private (and (= (:access container-data) "private")
                                                           (not is-drafts-board))
                                             :public (= (:access container-data) "public")
                                             :contributions is-contributions
+                                            :label-icon is-label
                                             :home-icon is-following
                                             :unfollowing-icon is-unfollowing
                                             :all-icon is-all-posts
@@ -193,10 +209,11 @@
                                             :drafts-icon is-drafts-board
                                             :replies-icon is-replies
                                             :board-icon (and (not is-container?)
-                                                              (not is-contributions)
-                                                              (not is-topics)
-                                                              (not is-drafts-board)
-                                                              (not current-activity-id))})}
+                                                             (not is-contributions)
+                                                             (not is-topics)
+                                                             (not is-drafts-board)
+                                                             (not is-label)
+                                                             (not current-activity-id))})}
                   (cond is-contributions
                         contrib-headline
 
@@ -220,6 +237,9 @@
 
                         is-replies
                         "Activity"
+
+                        is-label
+                        (or (:name label-data) (:slug label-data) current-label-slug)
 
                         :else
                             ;; Fallback to the org board data
@@ -248,25 +268,34 @@
                   [:button.mlb-reset.explore-view-block.create-topic-bt
                     {:on-click #(nav-actions/show-section-add)}
                     [:span.plus]
-                    [:span.new-topic "Add new topic"]])]
-              [:div.board-name-right
-                (when should-show-settings-bt
-                  [:div.board-settings-container
-                    ;; Settings button
+                    [:span.new-topic "Add new topic"]])
+                (when (and is-topics
+                           (:can-create-label? org-data))
+                  [:button.mlb-reset.explore-view-block.manage-labels-bt
+                   {:on-click #(label-actions/show-labels-manager)}
+                   [:span.manage-labels-bt-icon]
+                   [:span.manage-labels-bt-text
+                    "Manage labels"]])]
+              (when-not is-topics
+                [:div.board-name-right
+                 (when should-show-settings-bt
+                   [:div.board-settings-container
+                        ;; Settings button
                     [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                        :data-placement "top"
-                        :data-container "body"
-                        :title (str (:name container-data) " settings")
-                        :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
-                (when (and dismiss-all-link
-                            (pos? (count posts-data)))
-                  [:button.mlb-reset.complete-all-bt
-                    {:on-click #(activity-actions/inbox-dismiss-all)
-                      :data-toggle (when-not is-mobile? "tooltip")
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                       :data-placement "top"
                       :data-container "body"
-                      :title "Dismiss all"}])]]
+                      :title (str (:name container-data) " settings")
+                      :on-click #(nav-actions/show-section-editor (:slug container-data))}]])
+                 (when should-show-label-edit-bt
+                   [:div.board-settings-container
+                        ;; Settings button
+                    [:button.mlb-reset.board-settings-bt
+                     {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                      :data-placement "top"
+                      :data-container "body"
+                      :title (str (:name label-data) " edit")
+                      :on-click #(label-actions/edit-label label-data)}]])])]
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; Explore view

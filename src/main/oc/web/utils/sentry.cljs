@@ -1,28 +1,29 @@
 (ns oc.web.utils.sentry
   (:require ["@sentry/browser" :as sentry-browser]
+            [oops.core :refer (ocall oset!)]
             [oc.web.actions.notifications :as notification-actions]
             [taoensso.timbre :as timbre]))
 
 (defn- custom-error [error-name error-message]
   (let [err (js/Error. error-message)]
-    (set! (.-name ^js err) error-name)
+    (oset! err "name" error-name)
     err))
 
 (defn capture-error!
   ([e]
    (timbre/info "Capture error:" e)
-   (let [event-id (.captureException ^js sentry-browser e)]
+   (let [event-id (ocall sentry-browser "captureException" e)]
      (notification-actions/sentry-event-id event-id)
      event-id))
   ([e error-info]
    (timbre/info "Capture error:" e "extra:" error-info)
-   (let [event-id (.captureException ^js sentry-browser e #js {:extra error-info})]
+   (let [event-id (ocall sentry-browser "captureException" e #js {:extra error-info})]
      (notification-actions/sentry-event-id event-id)
      event-id)))
 
 (defn capture-message! [msg & [log-level]]
   (timbre/info "Capture message:" msg)
-  (let [event-id (.captureMessage ^js sentry-browser msg (or log-level "info"))]
+  (let [event-id (ocall sentry-browser "captureMessage" msg (or log-level "info"))]
     (notification-actions/sentry-event-id event-id)
     event-id))
 
@@ -37,22 +38,22 @@
   (doseq [k (keys ctx)]
     (if (map? (get ctx k))
       (set-extra-context! scope (get ctx k) (str prefix (when (seq prefix) "|") (name k)))
-      (.setExtra ^js scope (str prefix (when (seq prefix) "|") (name k)) (get ctx k)))))
+      (ocall scope "setExtra" (str prefix (when (seq prefix) "|") (name k)) (get ctx k)))))
 
 (defn capture-message-with-extra-context! [ctx message]
   (timbre/info "Capture message:" message "with context:" ctx)
-  (.withScope ^js sentry-browser (fn [scope]
-                                   (set-extra-context! scope ctx)
-                                   (capture-message! message))))
+  (ocall sentry-browser "withScope" (fn [scope]
+                                      (set-extra-context! scope ctx)
+                                      (capture-message! message))))
 
 (defn capture-error-with-extra-context! [ctx error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message "with context:" ctx)
-  (.withScope ^js sentry-browser (fn [scope]
-                                   (set-extra-context! scope ctx)
-                                   (try
-                                     (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
-                                     (catch :default e
-                                       (capture-error! e))))))
+  (ocall sentry-browser "withScope" (fn [scope]
+                                      (set-extra-context! scope ctx)
+                                      (try
+                                        (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
+                                        (catch :default e
+                                          (capture-error! e))))))
 
 (defn ^:export capture-error-with-message! [error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message)
@@ -64,12 +65,12 @@
 (defn- sentry-event-id
   ([] (sentry-event-id "EMPTY MESSAEG" "info"))
   ([msg] (sentry-event-id msg "info"))
-  ([msg log-level] (.captureMessage ^js sentry-browser msg (or log-level "info"))))
+  ([msg log-level] (ocall sentry-browser "captureMessage" msg (or log-level "info"))))
 
 (defn ^:export show-report-dialog
   ([] (show-report-dialog (sentry-event-id)))
   ([event-id]
-   (.showReportDialog ^js sentry-browser #js {:eventId event-id})))
+   (ocall sentry-browser "showReportDialog" #js {:eventId event-id})))
 
 (defn ^:export test-error-dialog []
    (notification-actions/show-notification {:title "This is a generic error, click the feedback button below!"

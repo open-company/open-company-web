@@ -1,6 +1,6 @@
 (ns oc.web.components.org-dashboard
   (:require [rum.core :as rum]
-            [clojure.string :as s]
+            [clojure.string :as cstr]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.lib.cljs.useragent :as ua]
@@ -19,6 +19,7 @@
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
+            [oc.web.components.ui.labels :refer (org-labels-list label-editor)]
             ;; [oc.web.components.ui.follow-picker :refer (follow-picker)]
             [oc.web.components.ui.nux-tooltip :refer (nux-tooltips-manager nux-tooltip)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -69,6 +70,7 @@
                 current-org-slug
                 current-board-slug
                 current-contributions-id
+                current-label-slug
                 current-entry-board-slug
                 current-activity-id
                 initial-section-editing
@@ -76,56 +78,68 @@
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
-                activity-share-container
                 cmail-state
                 force-login-wall
                 panel-stack
                 app-loading
                 user-info-data
                 active-users
+                label-data
                 search-active
                 show-premium-picker?
                 payments-ui-upgraded-banner
                 nux
-                ui-tooltip]} (drv/react s :org-dashboard-data)
+                ui-tooltip
+                show-labels-manager
+                show-label-editor]} (drv/react s :org-dashboard-data)
         theme-data (drv/react s :theme)
         _route-dark-allowed (drv/react s :route/dark-allowed)
         is-mobile? (responsive/is-mobile-size?)
-        loading? (or ;; force loading screen
-                  app-loading
+        loading? (or app-loading ;; force loading screen
                      ;; the org data are not loaded yet
-                  (not org-data)
-                     ;; No board or contributions specified
-                  (and (not current-board-slug)
-                       (not current-contributions-id)
-                          ;; but there are some
-                       (pos? (count (:boards org-data))))
+                     (not org-data)
+                     ;; No board nor contributions nor label specified
+                     (and (not current-board-slug)
+                          (not current-contributions-id)
+                          (not current-label-slug)
+                       ;; but there are some
+                          (pos? (count (:boards org-data))))
                      ;; Active users have not been loaded yet:
                      ;; they are blocking since they are used to:
                      ;; - init entries body and comments body for mentions
                      ;; - show user's info on hover and in profile panels
                      ;; - on mobile it's not blocking since cmail is closed
-                  (not (map? active-users)))
+                     (not (map? active-users)))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) current-org-slug)))
-        section-not-found (and (not org-not-found)
+        board-exists? (set (mapcat #(vec [(:slug %) (:uuid %)]) (:boards org-data)))
+        board-not-found (and (not org-not-found)
                                org-data
                                (not current-contributions-id)
+                               (not current-label-slug)
                                (not (dis/is-container? current-board-slug))
-                               (not ((set (map :slug (:boards org-data))) current-board-slug)))
+                               current-board-slug
+                               (not (board-exists? current-board-slug)))
+        label-not-found (and (not org-not-found)
+                             org-data
+                             current-label-slug
+                             (not (map? label-data)))
         contributions-not-found (and (not org-not-found)
                                      org-data
                                      current-contributions-id
                                      (map? active-users)
-                                     (get active-users (keyword current-contributions-id)))
+                                     (not (get active-users (keyword current-contributions-id))))
+        entry-board-not-found (and (not org-not-found)
+                                   org-data
+                                   current-entry-board-slug
+                                   (not (board-exists? current-entry-board-slug)))
         current-activity-data (when current-activity-id
                                 (get posts-data current-activity-id))
                              ;; org is present
         entry-not-found (and (not org-not-found)
                              ;; Users for mentions has not been loaded
                              (map? active-users)
-                             ;; section is present
-                             (not section-not-found)
+                             (not entry-board-not-found)
                              ;; route is for a single post and it's been loaded
                              current-activity-data
                              ;; post wasn't found
@@ -139,11 +153,14 @@
                              (or force-login-wall
                                  (and current-activity-id
                                       (or org-not-found
-                                          section-not-found
+                                          board-not-found
+                                          label-not-found
                                           contributions-not-found
+                                          entry-board-not-found
                                           entry-not-found))))
         show-activity-removed (and jwt-data
-                                   entry-not-found)
+                                   (or entry-board-not-found
+                                       entry-not-found))
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
@@ -152,9 +169,9 @@
         show-section-add (= open-panel :section-add)
         show-reminders? (= open-panel :reminders)
         show-reminder-edit? (and open-panel
-                                 (s/starts-with? (name open-panel) "reminder-"))
+                                 (cstr/starts-with? (name open-panel) "reminder-"))
         show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))
+                            (cstr/starts-with? (name open-panel) "wrt-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
@@ -163,11 +180,12 @@
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
         show-user-info? (and open-panel
-                             (s/starts-with? (name open-panel) "user-info-"))
+                             (cstr/starts-with? (name open-panel) "user-info-"))
         ;; show-follow-picker (= open-panel :follow-picker)
         mobile-search? (and is-mobile?
                             search-active)
-        should-show-expanded-post? (and (not entry-not-found)
+        should-show-expanded-post? (and (not entry-board-not-found)
+                                        (not entry-not-found)
                                         (map? current-activity-data)
                                         (:published? current-activity-data))]
     (if is-loading
@@ -186,13 +204,6 @@
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
-        (if nux
-          (nux-tooltips-manager)
-          (when ui-tooltip
-            (nux-tooltip {:data ui-tooltip
-                          :next-cb (:next-cb ui-tooltip)
-                          :dismiss-cb (:next-cb ui-tooltip)})))
-        
         (cond
           ;; Activity removed
           show-activity-removed
@@ -255,20 +266,17 @@
           ;; (follow-picker)
           ;; Mobile fullscreen search
           mobile-search?
-          (search-box))
+          (search-box)
+          ;; NUX
+          nux
+          (nux-tooltips-manager)
+          ;; Specific tooltips
+          ui-tooltip
+          (nux-tooltip {:data ui-tooltip
+                        :next-cb (:next-cb ui-tooltip)
+                        :dismiss-cb (:next-cb ui-tooltip)}))
         (when payments-ui-upgraded-banner
           (upgraded-banner))
-        ;; Activity share modal for no mobile
-        (when (and (not is-mobile?)
-                   is-sharing-activity)
-          ;; If we have an element id find the share container inside that element
-          ;; and portal the component to that element
-          (let [portal-element (when activity-share-container
-                                  (.get (.find (js/$ (str "#" activity-share-container))
-                                         ".activity-share-container") 0))]
-            (if portal-element
-              (rum/portal (activity-share) portal-element)
-              (activity-share))))
         ;; Cmail mobile editor
         (when show-mobile-cmail?
           (cmail))
@@ -278,6 +286,10 @@
                   (and is-mobile?
                        (= open-panel :menu)))
           (menu))
+        (if show-label-editor
+          (label-editor)
+          (when show-labels-manager
+            (org-labels-list)))
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
           (push-notifications-permission-modal))

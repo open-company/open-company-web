@@ -3,6 +3,8 @@
             [goog.dom :as gdom]
             [oops.core :refer (oget)]
             [cuerdas.core :as string]
+            [oc.web.utils.color :as color-utils]
+            [oc.lib.color :as lib-color]
             [oc.web.utils.rum :as rutils]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
@@ -19,66 +21,11 @@
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.email-domains :refer (email-domains)]
+            [oc.web.components.ui.colors-presets :refer (colors-presets)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             ["react-color" :as react-color :refer (ChromePicker)]))
 
-(def default-css-color-names {:aliceblue "#f0f8ff",:antiquewhite "#faebd7",:aqua "#00ffff",:aquamarine "#7fffd4",:azure "#f0ffff",
-    :beige "#f5f5dc",:bisque "#ffe4c4",:black "#000000",:blanchedalmond "#ffebcd",:blue "#0000ff",:blueviolet "#8a2be2",:brown "#a52a2a",:burlywood "#deb887",
-    :cadetblue "#5f9ea0",:chartreuse "#7fff00",:chocolate "#d2691e",:coral "#ff7f50",:cornflowerblue "#6495ed",:cornsilk "#fff8dc",:crimson "#dc143c",:cyan "#00ffff",
-    :darkblue "#00008b",:darkcyan "#008b8b",:darkgoldenrod "#b8860b",:darkgray "#a9a9a9",:darkgreen "#006400",:darkkhaki "#bdb76b",:darkmagenta "#8b008b",:darkolivegreen "#556b2f",
-    :darkorange "#ff8c00",:darkorchid "#9932cc",:darkred "#8b0000",:darksalmon "#e9967a",:darkseagreen "#8fbc8f",:darkslateblue "#483d8b",:darkslategray "#2f4f4f",:darkturquoise "#00ced1",
-    :darkviolet "#9400d3",:deeppink "#ff1493",:deepskyblue "#00bfff",:dimgray "#696969",:dodgerblue "#1e90ff",
-    :firebrick "#b22222",:floralwhite "#fffaf0",:forestgreen "#228b22",:fuchsia "#ff00ff",
-    :gainsboro "#dcdcdc",:ghostwhite "#f8f8ff",:gold "#ffd700",:goldenrod "#daa520",:gray "#808080",:green "#008000",:greenyellow "#adff2f",
-    :honeydew "#f0fff0",:hotpink "#ff69b4",
-    :indianred "#cd5c5c",:indigo "#4b0082",:ivory "#fffff0",:khaki "#f0e68c",
-    :lavender "#e6e6fa",:lavenderblush "#fff0f5",:lawngreen "#7cfc00",:lemonchiffon "#fffacd",:lightblue "#add8e6",:lightcoral "#f08080",:lightcyan "#e0ffff",:lightgoldenrodyellow "#fafad2",
-    :lightgrey "#d3d3d3",:lightgreen "#90ee90",:lightpink "#ffb6c1",:lightsalmon "#ffa07a",:lightseagreen "#20b2aa",:lightskyblue "#87cefa",:lightslategray "#778899",:lightsteelblue "#b0c4de",
-    :lightyellow "#ffffe0",:lime "#00ff00",:limegreen "#32cd32",:linen "#faf0e6",
-    :magenta "#ff00ff",:maroon "#800000",:mediumaquamarine "#66cdaa",:mediumblue "#0000cd",:mediumorchid "#ba55d3",:mediumpurple "#9370d8",:mediumseagreen "#3cb371",:mediumslateblue "#7b68ee",
-    :mediumspringgreen "#00fa9a",:mediumturquoise "#48d1cc",:mediumvioletred "#c71585",:midnightblue "#191970",:mintcream "#f5fffa",:mistyrose "#ffe4e1",:moccasin "#ffe4b5",
-    :navajowhite "#ffdead",:navy "#000080",
-    :oldlace "#fdf5e6",:olive "#808000",:olivedrab "#6b8e23",:orange "#ffa500",:orangered "#ff4500",:orchid "#da70d6",
-    :palegoldenrod "#eee8aa",:palegreen "#98fb98",:paleturquoise "#afeeee",:palevioletred "#d87093",:papayawhip "#ffefd5",:peachpuff "#ffdab9",:peru "#cd853f",:pink "#ffc0cb",:plum "#dda0dd",:powderblue "#b0e0e6",:purple "#800080",
-    :rebeccapurple "#663399",:red "#ff0000",:rosybrown "#bc8f8f",:royalblue "#4169e1",
-    :saddlebrown "#8b4513",:salmon "#fa8072",:sandybrown "#f4a460",:seagreen "#2e8b57",:seashell "#fff5ee",:sienna "#a0522d",:silver "#c0c0c0",:skyblue "#87ceeb",:slateblue "#6a5acd",:slategray "#708090",:snow "#fffafa",:springgreen "#00ff7f",:steelblue "#4682b4",
-    :tan "#d2b48c",:teal "#008080",:thistle "#d8bfd8",:tomato "#ff6347",:turquoise "#40e0d0",
-    :violet "#ee82ee",
-    :wheat "#f5deb3",:white "#ffffff",:whitesmoke "#f5f5f5",
-    :yellow "#ffff00",:yellowgreen "#9acd32"})
-
-(def default-css-color-by-hex (zipmap (vals default-css-color-names) (keys default-css-color-names)))
-
-(def hex-reg-string "#[0-9a-fA-F]{3,6}")
-
-(def colors-reg-exp
-  (str "^("
-         ;; all color values
-         (string/join "|" (->> default-css-color-names keys (map name)))
-         ;; hex color
-         "|" hex-reg-string
-       ")$"))
-
 (def color-picker (partial rutils/build ChromePicker))
-
-(def color-presets [{:rgb {:r 251 :g 94 :b 72}
-                     :hex "#FB5E48"
-                     :name "Carrot orange"}
-                    {:rgb {:r 248 :g 155 :b 68}
-                     :hex "#F89A44"
-                     :name "Orange"}
-                    {:rgb {:r 33 :g 178 :b 104}
-                     :hex "#21B268"
-                     :name "Carrot green"}
-                    {:rgb {:r 105 :g 184 :b 171}
-                     :hex "#69B8AB"
-                     :name "Teal"}
-                    {:rgb {:r 97 :g 135 :b 248}
-                     :hex "#6187F8"
-                     :name "Blue"}
-                    {:rgb {:r 120 :g 83 :b 215}
-                     :hex "#7853D7"
-                     :name "Purple"}])
 
 (def brand-colors-list [{:label "White (default)" :value "#FFFFFF" :rgb {:r 244 :g 244 :b 244}}
                         {:label "Deep navy" :value "#34414F" :rgb {:r 52 :g 65 :b 79}}
@@ -180,19 +127,6 @@
       {:style {:background-color hex
                :color text-color}}
       "Button text"]]))
-
-(defn- rgb-from-hex [color]
-  (let [rm-blank #(remove string/empty-or-nil? %)
-        colors (-> color
-                   (string/split #"")
-                   rm-blank
-                   rest
-                   vec)
-        red (take 2 colors)
-        green (take 2 (drop 2 colors))
-        blue (take 2 (drop 4 colors))
-        mapped-colors (mapv #(-> % (conj "0x") (string/join) (js/Number)) [red green blue])]
-    {:r (get mapped-colors 0) :g (get mapped-colors 1) :b (get mapped-colors 2)}))
 
 (rum/defcs org-settings-modal <
   ;; Mixins
@@ -332,16 +266,16 @@
            [:input.field-value.oc-input
             {:type "text"
              :value @(::primary-color-value s)
-             :pattern colors-reg-exp
+             :pattern lib-color/valid-color?
              :placeholder "Ie: red, green or #0000ff"
              :on-focus #(reset! (::show-color-picker s) true)
              :on-change (fn [e]
                           (let [v (string/lower (.. e -target -value))]
                             (reset! (::primary-color-value s) v)
                             (when (.. e -target checkValidity)
-                              (let [is-hex-color? (.match v (js/RegExp. hex-reg-string))
-                                    hex-color (if is-hex-color? v (-> v keyword default-css-color-names))
-                                    rgb-color (rgb-from-hex hex-color)]
+                              (let [is-hex-color? (lib-color/valid-hex-color? v)
+                                    hex-color (if is-hex-color? v (-> v keyword lib-color/default-css-color-names))
+                                    rgb-color (lib-color/hex->rgb hex-color)]
                                 (change-brand-color {:hex hex-color :rgb rgb-color} (:secondary current-brand-color))))))}]
            (when @(::show-color-picker s)
              [:div.color-picker-container
@@ -356,20 +290,12 @@
            [:div.field-description.colors-preset.group
             [:span.color-preset-label "Presets:"]
             [:div.colors-list.group
-             (for [c color-presets
-                   :let [lower-hex (comp string/lower :hex)
-                         active? (-> current-brand-color :primary lower-hex (= (lower-hex c)))]]
-               [:button.mlb-reset.color-preset-bt
-                {:key (str "color-preset-" (:hex c))
-                 :on-click #(do
-                              (reset! (::primary-color-value s) (:hex c))
-                              (change-brand-color (select-keys c [:hex :rgb])
-                                                  (:secondary current-brand-color)))
-                 :class (when active? "active")}
-                [:span.dot
-                 {:data-color-hex (:hex c)
-                  :data-color-rgb (str (-> c :rgb :r) " " (-> c :rgb :g) " " (-> c :rgb :b))
-                  :style {:background-color (:hex c)}}]])]]
+             (colors-presets {:color-list color-utils/colors-presets-list
+                              :current-selected (-> current-brand-color :primary :hex)
+                              :on-change-cb (fn [c]
+                                              (reset! (::primary-color-value s) (:hex c))
+                                              (change-brand-color (select-keys c [:hex :rgb])
+                                                                  (:secondary current-brand-color)))})]]
            [:div.field-description
             "Button text color"]
            [:select.oc-input.field-value.button-text-color

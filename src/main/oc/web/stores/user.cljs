@@ -6,6 +6,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.user :as uu]
+            [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
@@ -64,36 +65,87 @@
                       (assoc :self? (= (:user-id u) (j/user-id)))))
           users-list)))
 
-(defn- pin-tooltip [db]
-  {:title "New! Increase visibility with Pins."
+(defn- feed-first-uuid
+  "Get the uuid of the first rendered post in the feed list."
+  []
+  (->> (dispatcher/items-to-render-data)
+       (some #(when (and (= (:resource-type %) :entry) (:uuid %)) %))
+       :uuid))
+
+(defn- dismiss-labels-tooltip [completed?]
+  (dispatcher/dispatch! [:labels-tooltip/dismiss])
+  (foc-menu-actions/toggle-foc-menu-open)
+  (when completed?
+    (user-actions/untag! :labels-tooltip)
+    (user-actions/tag! :labels-tooltip-done)))
+
+(defn- show-labels-tooltip []
+  (when-let [menu-uuid (feed-first-uuid)]
+    (foc-menu-actions/toggle-foc-show-menu menu-uuid)))
+
+(defn- labels-tooltip [_db]
+  {:title "🆕 Tag your posts with labels"
+   :description "Carrot’s new labels let you group similar posts within a topic, or across topics. Click on a label to see all posts with that same label."
+   :back-title nil
+   :scroll :top
+   :lock-scroll true
+   :arrow-position :bottom-right
+   :position :top-right
+   :key :labels-tooltip
+   :next-title "OK"
+   :show-el-cb show-labels-tooltip
+   :next-cb dismiss-labels-tooltip
+   :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :button.more-menu-edit-labels-bt]})
+
+(defn- dismiss-pin-tooltip [completed?]
+  (dispatcher/dispatch! [:pin-tooltip/dismiss])
+  (foc-menu-actions/toggle-foc-show-menu)
+  (when completed?
+    (user-actions/untag! :pin-tooltip)
+    (user-actions/tag! :pin-tooltip-done)))
+
+(defn- show-pin-tooltip []
+  (when-let [menu-uuid (feed-first-uuid)]
+    (foc-menu-actions/toggle-foc-menu-open menu-uuid)))
+
+(defn- pin-tooltip [_db]
+  {:title "🆕 Increase visibility with Pins!"
    :description "Keep important posts at the top of the feed for everyone to see."
    :back-title nil
    :scroll :top
+   :lock-scroll true
    :arrow-position :right-top
    :position :left
    :key :pin-tooltip
    :next-title "OK"
-   :show-el-cb #(let [following-data (dispatcher/following-data)
-                      menu-uuid (-> following-data :posts-list first :uuid)]
-                  (when menu-uuid
-                    (dispatcher/dispatch! [:input [:foc-menu-open] menu-uuid])))
-   :next-cb #(do
-               (dispatcher/dispatch! [:input [:ui-tooltip] nil])
-               (dispatcher/dispatch! [:input [:foc-menu-open] nil])
-               (user-actions/untag! :pin-tooltip)
-               (user-actions/tag! :pin-tooltip-done))
+   :show-el-cb show-pin-tooltip
+   :next-cb dismiss-pin-tooltip
    :sel [:div.paginated-stream-cards :div.virtualized-list-item :div.more-menu :li.toggle-pin]})
 
 (defn check-user-tags [db]
-  (let [cur-user-data (dispatcher/current-user-data db)
-        show-pin-tooltip? (and (not (responsive/is-mobile-size?))
-                               ((:tags cur-user-data) :pin-tooltip)
+  (let [cmail-collapsed? (dispatcher/cmail-collapsed? db)
+        rendering-items (dispatcher/items-to-render-data db)
+        mobile? (responsive/is-mobile-size?)
+        show-pin-tooltip? (and (seq rendering-items)
+                               (not mobile?)
+                               (dispatcher/user-tagged? db :pin-tooltip)
                                (not (:ui-tooltip db))
                                (not (:nux db))
-                               (router/is-home?))]
-    (if show-pin-tooltip?
-      (assoc db :ui-tooltip (pin-tooltip db))
-      db)))
+                               (router/is-home?)
+                               cmail-collapsed?)
+        show-labels-tooltip? (and (seq rendering-items)
+                                  (not mobile?)
+                                  (dispatcher/user-tagged? db :labels-tooltip)
+                                  (not (:ui-tooltip db))
+                                  (not (:nux db))
+                                  (router/is-home?)
+                                  cmail-collapsed?)]
+    (cond show-pin-tooltip?
+          (assoc db :ui-tooltip (pin-tooltip db))
+          show-labels-tooltip?
+          (assoc db :ui-tooltip (labels-tooltip db))
+          :else
+          db)))
 
 (defn parse-user-data [user-data org-data active-users]
   (let [active-user-data (get active-users (:user-id user-data))
@@ -111,7 +163,7 @@
       (assoc u :digest-delivery fixed-digest-delivery)
       (update u :tags #(set (map keyword %))))))
 
-(def ^:private empty-user*
+(def ^{:private true} empty-user*
  {:first-name ""
   :last-name ""
   :password ""
@@ -531,3 +583,11 @@
 (defmethod dispatcher/action :user/untag!
   [db [_ tag]]
   (update-in db (conj dispatcher/current-user-key :tags) #(disj (or % #{}) tag)))
+
+(defmethod dispatcher/action :labels-tooltip/dismiss
+  [db [_]]
+  (dissoc db :ui-tooltip))
+
+(defmethod dispatcher/action :pin-tooltip/dismiss
+  [db [_]]
+  (dissoc db :ui-tooltip))
