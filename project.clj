@@ -25,7 +25,7 @@
                  ;; ***************** (JWT schema changes, more info here: *****************
                  ;; ******* https://github.com/open-company/open-company-lib/pull/82) ******
                  ;; ************************************************************************
-                 [open-company/lib "0.18.0-alpha6" :exclusions [ring/ring-core org.clojure/tools.reader]]
+                 [open-company/lib "0.18.0-alpha7" :exclusions [ring/ring-core org.clojure/tools.reader]]
                  ;; ************************************************************************
                  ;; Utility functions https://github.com/weavejester/medley
                  [medley "1.3.0"]
