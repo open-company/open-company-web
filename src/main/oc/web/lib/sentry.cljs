@@ -16,19 +16,18 @@
 (defn ^:export init-parameters []
   (cond-> {:tags {:isMobile (responsive/is-mobile-size?)
                   :hasJWT (not (not (jwt/jwt)))}
+           :maxBreadcrumbs 20
            :sourceRoot ls/web-server
-           :integrations (clj->js [(BrowserTracing.)])
+           :integrations (clj->js [(BrowserTracing. (clj->js {:tracingOrigins [ls/web-server #"^\\/"]}))])
            :debug (= ls/log-level "debug")
            :dsn ls/local-dsn
            :tracesSampleRate 1.0
            :normalizeDepth 6}
     (p? ls/sentry-release) (assoc :release ls/sentry-release)
+    ;; (and (p? ls/sentry-release)
+    ;;      (p? ls/deploy-key)) (assoc-in [:tags :deploy-key] ls/deploy-key)
     (and (p? ls/sentry-release)
-         (p? ls/deploy-key)) (assoc-in [:tags :deploy-key] ls/deploy-key)
-    (and (p? ls/sentry-release)
-         (p? ls/deploy-key)) (merge {:deploy ls/deploy-key
-                                     :dist ls/deploy-key
-                                     :distribution ls/deploy-key})
+         (p? ls/sentry-deploy)) (merge {:dist ls/sentry-deploy})
     (p? ls/sentry-env) (assoc :environment ls/sentry-env)))
 
 (defn sentry-setup []

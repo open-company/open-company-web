@@ -366,6 +366,11 @@ div.follow-picker {
               line-height: 18px;
               flex: 0 0 92px;
 
+              @include mobile() {
+                margin-left: 0;
+                margin-right: auto;
+              }
+
               @include big_web(){
                 &:hover {
                   opacity: 1;
