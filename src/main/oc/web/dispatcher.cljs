@@ -468,12 +468,12 @@
 
 ;; Action Loop =================================================================
 
+(def ^{:private true} skip-log-action-types
+  #{:input :update :entry-toggle-save-on-exit :label-editor/update :cmail-state/update :cmail-data/update :interaction-comment/update :add-comment/update})
+
 (defmulti action (fn [_db [action-type & _]]
-                   (when (and (not= action-type :input)
-                              (not= action-type :update)
-                              (not= action-type :entry-toggle-save-on-exit)
-                              (not= action-type :cmail-state/update)
-                              (not= action-type :cmail-data/update))
+                   ;; Avoid logging high-frequency actions for performance reasons
+                   (when-not (action-type skip-log-action-types)
                      (timbre/info "Dispatching action:" action-type))
                    action-type))
 

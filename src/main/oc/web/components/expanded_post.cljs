@@ -57,6 +57,11 @@
 
 (def add-comment-prefix "main-comment")
 
+(defn- can-dismiss? [s]
+  (and (not (:foc-show-menu @(drv/get-ref s :foc-menu)))
+       (not (seq @(drv/get-ref s :panel-stack)))
+       (not (seq @(drv/get-ref s :expand-image-src)))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -88,18 +93,18 @@
   mixins/no-scroll-mixin
   (mixins/on-key-press ["Escape"]
                        (fn [s e]
-                         (when (and (not (seq @(drv/get-ref s :panel-stack)))
-                                    (not (seq (:foc-show-menu @(drv/get-ref s :foc-menu))))
-                                    (not (seq @(drv/get-ref s :expand-image-src))))
+                         (when (can-dismiss? s)
                            (close-expanded-post e))))
-  (mixins/on-window-click-mixin (fn [_s e]
-                                  (when-not (dom-utils/event-container-matches e (str ".expanded-post-container, "
-                                                                                      ".exp-click-stop, "
-                                                                                      ".modal-wrapper, "
-                                                                                      ".label-modal-view, "
-                                                                                      ".labels-picker, "
-                                                                                      ".oc-labels-modal-wrapper, "
-                                                                                      ".emoji-autocomplete-menu"))
+  (mixins/on-window-click-mixin (fn [s e]
+                                  (when (and (can-dismiss? s)
+                                             (not (dom-utils/event-container-matches e (str ".expanded-post-container, "
+                                                                                            ".exp-click-stop, "
+                                                                                            ".modal-wrapper, "
+                                                                                            ".label-modal-view, "
+                                                                                            ".labels-picker, "
+                                                                                            ".oc-labels-modal-wrapper, "
+                                                                                            ".emoji-autocomplete-menu, "
+                                                                                            ".more-menu"))))
                                     (close-expanded-post e))))
   {:will-mount (fn [s]
                  (reset! (::collapse-post s) (-> s (drv/get-ref :activity-data) deref :collapse-body?))

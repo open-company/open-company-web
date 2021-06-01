@@ -1,8 +1,22 @@
 (ns oc.web.utils.sentry
   (:require ["@sentry/browser" :as sentry-browser]
+            [oc.web.local-settings :as ls]
             [oops.core :refer (ocall oset!)]
             [oc.web.actions.notifications :as notification-actions]
             [taoensso.timbre :as timbre]))
+
+(defn- fix-event
+  ([] (fix-event {}))
+  ([event]
+   (cond (or (string? event)
+             (instance? js/Error event))
+         event
+         (map? event)
+         (clj->js (assoc event :dist ls/sentry-deploy))
+         (instance? js/Object event)
+         (oset! event "!dist" ls/sentry-deploy)
+         :else
+         event)))
 
 (defn- custom-error [error-name error-message]
   (let [err (js/Error. error-message)]
@@ -12,18 +26,18 @@
 (defn capture-error!
   ([e]
    (timbre/info "Capture error:" e)
-   (let [event-id (ocall sentry-browser "captureException" e)]
+   (let [event-id (ocall sentry-browser "captureException" e (fix-event))]
      (notification-actions/sentry-event-id event-id)
      event-id))
   ([e error-info]
    (timbre/info "Capture error:" e "extra:" error-info)
-   (let [event-id (ocall sentry-browser "captureException" e #js {:extra error-info})]
+   (let [event-id (ocall sentry-browser "captureException" e (fix-event {:extra error-info}))]
      (notification-actions/sentry-event-id event-id)
      event-id)))
 
 (defn capture-message! [msg & [log-level]]
   (timbre/info "Capture message:" msg)
-  (let [event-id (ocall sentry-browser "captureMessage" msg (or log-level "info"))]
+  (let [event-id (ocall sentry-browser "captureMessage" msg (or log-level "info") (fix-event))]
     (notification-actions/sentry-event-id event-id)
     event-id))
 
@@ -65,7 +79,7 @@
 (defn- sentry-event-id
   ([] (sentry-event-id "EMPTY MESSAEG" "info"))
   ([msg] (sentry-event-id msg "info"))
-  ([msg log-level] (ocall sentry-browser "captureMessage" msg (or log-level "info"))))
+  ([msg log-level] (ocall sentry-browser "captureMessage" msg (or log-level "info") (fix-event))))
 
 (defn ^:export show-report-dialog
   ([] (show-report-dialog (sentry-event-id)))

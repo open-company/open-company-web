@@ -1,6 +1,5 @@
 (ns oc.web.utils.mention
   (:require [oops.core :refer (ocall)]
-            ["react" :as react :refer (createElement)]
             [oc.web.utils.rum :refer (create-element)]
             ["react-dom" :as react-dom]
             ["medium-editor" :as medium-editor]

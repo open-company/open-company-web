@@ -1,5 +1,6 @@
 (ns oc.web.core
-  (:require [secretary.core :as secretary :refer-macros (defroute)]
+  (:require [oc.web.lib.cookies :as cook]
+            [secretary.core :as secretary :refer-macros (defroute)]
             [dommy.core :as dommy :refer (listen!) :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
             [rum.core :as rum]
@@ -60,7 +61,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.utils.dom :as dom-utils]
@@ -131,7 +131,7 @@
         (dommy/add-class! body "win-electron"))))
   ;; Setup timbre log level
   (when (-> params :query-params :log-level)
-    (logging/config-log-level! (-> params :query-params :log-level)))
+    (logging/config-log-level! (-> params :query-params :log-level) true))
   ; make sure the menu is closed
   (let [window-location (oget js/window "location")
         location-pathname (oget window-location "pathname")]
@@ -566,9 +566,7 @@
       (timbre/info "Routing logout-route" urls/logout)
       (jwt/remove-jwt!)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if ua/pseudo-native?
-                          urls/native-login
-                          urls/home)))
+      (router/redirect! urls/marketing-landing))
 
     (defroute apps-detect-route urls/apps-detect {:as params}
       (timbre/info "Routing apps-detect-route" urls/apps-detect)
@@ -758,9 +756,12 @@
     (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn ^:export init []
-  (jwt/init)
+  ;; Init cookies
+  (cook/setup!)
   ;; Setup timbre log level
-  (logging/config-log-level! (or (dis/query-param :log-level) ls/log-level))
+  (logging/config-log-level! (or (cook/get-cookie :log-level) ls/log-level))
+  ;; Read JWT
+  (jwt/init)
   ;; Setup API requests
   (api/config-request
    #(ja/update-jwt %) ;; success jwt refresh after expire

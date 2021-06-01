@@ -325,6 +325,11 @@
   ([published-at last-seen-at :guard #(or (nil? %) (string? %))]
    (pos? (compare published-at last-seen-at))))
 
+(defn need-item-seen?
+  "Check the unseen flag in the post data."
+  [entry-uuid]
+  (some->> entry-uuid (dis/entry-data (dis/current-org-slug)) :board-item-unseen))
+
 (defn entry-unread?
   "An entry is new if its uuid is contained in container's unread."
   [entry changes]
@@ -651,6 +656,7 @@
           fixed-board-access (if published?
                                (or (:board-access entry-data) (:access board-data))
                                "private")
+          board-last-seen-at (some-> changes (get fixed-board-uuid) :last-seen-at)
           fixed-publisher-board (or (:publisher-board entry-data) (:publisher-board board-data) false)
           fixed-video-id (:video-id entry-data)
           fixed-publisher (when published?
@@ -668,6 +674,7 @@
             (assoc e :publisher? (is-publisher? e))
             e)
           (assoc e :unseen (entry-unseen? e container-seen-at))
+          (assoc e :board-item-unseen (entry-unseen? e board-last-seen-at))
           (assoc e :unread (entry-unread? e changes))
           (assoc e :read-only (readonly-entry? (:links e)))
           (update e :comments (fn [comments] (mapv #(parse-comment org-data e % container-seen-at) comments)))

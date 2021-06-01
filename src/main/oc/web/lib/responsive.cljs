@@ -8,7 +8,7 @@
 (def big-web-min-width 768)
 (def tablet-max-width 980)
 (def navbar-height 56)
-(def mobile-navbar-height 54)
+(def mobile-navbar-height 56)
 
 (defn ww []
   (when (and js/document

@@ -1,6 +1,7 @@
 (ns oc.web.urls
   (:require [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
+            [oc.lib.cljs.useragent :as ua]
             [clojure.string :as clj-str]))
 
 (defn params->query-string [m]
@@ -170,6 +171,16 @@
    (if (fn? default-url-fn)
     (default-url-fn org-slug)
     (all-posts org-slug))))
+
+(def marketing-landing
+  (if ua/pseudo-native?
+    native-login
+    home))
+
+(def device-login
+  (if ua/pseudo-native?
+    native-login
+    login))
 
 ;; First ever landing
 

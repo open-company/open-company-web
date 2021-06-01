@@ -278,12 +278,14 @@ function OCStaticShowYTVideo() {
 (function(){
   // Get the jwt cookie to know if the user is logged in
   console.debug("Read jwt from cookie");
-  var jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
-  if (jwt) {
-    console.debug("JWT found, reading it and redirecting");
-    var decoded_jwt = OCStaticGetDecodedJWT(jwt),
-        your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
-    if (window.location.pathname === "/" && !(OCStaticGetParameterByName("no_redirect"))) {
+  const jwt = OCStaticGetCookie(OCStaticCookieName("jwt"));
+  let decoded_jwt, your_board_url;
+  if (jwt && window.location.pathname === "/") {
+    console.debug("JWT found, decoding it...");
+    decoded_jwt = OCStaticGetDecodedJWT(jwt);
+    your_board_url = OCStaticGetYourBoardsUrl(decoded_jwt);
+    if (!(OCStaticGetParameterByName("no_redirect"))) {
+      console.debug("Redirecting to:", your_board_url);
       window.location = your_board_url;
     }
   }

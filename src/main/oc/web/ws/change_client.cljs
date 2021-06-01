@@ -6,7 +6,6 @@
             [taoensso.timbre :as timbre]
             [taoensso.encore :as encore :refer-macros (have)]
             [oc.lib.time :as time]
-            [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.ws.utils :as ws-utils]
             [oc.web.utils.ws-client-ids :as ws-client-ids]
@@ -60,9 +59,9 @@
   (timbre/debug "Sending container/seen for org:" org-id "container:" container-id "seen at:" seen-at)
   (send! chsk-send! [:container/seen {:org-id org-id :container-id container-id :seen-at seen-at}]))
 
-(defn item-seen [publisher-id org-id container-id item-id]
+(defn item-seen [publisher-id org-id container-id item-id seen-at]
   (timbre/debug "Sending item/seen for org:" org-id "container:" container-id "item:" item-id)
-  (send! chsk-send! [:item/seen {:publisher-id publisher-id :org-id org-id :container-id container-id :item-id item-id :seen-at (time/current-timestamp)}]))
+  (send! chsk-send! [:item/seen {:publisher-id publisher-id :org-id org-id :container-id container-id :item-id item-id :seen-at seen-at}]))
  
 (defn item-read [org-id container-id item-id user-name avatar-url]
   (timbre/debug "Sending item/read for container:" container-id "item:" item-id)

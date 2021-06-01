@@ -37,11 +37,12 @@ div.foc-labels-picker {
       overflow-y: auto;
 
       @include mobile() {
-        padding: #{$mobile_navbar_height}px 0 0;
+        padding: #{$mobile_navbar_height}px 0 24px;
         border: none;
         border-radius: 0;
         box-shadow: none;
-        min-height: 100%;
+        height: 100vh;
+        max-height: 100vh;
       }
 
       div.foc-labels-title {

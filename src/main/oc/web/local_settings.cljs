@@ -8,11 +8,14 @@
           keywordize-keys
           key))
 
+;; Deploy key (cache buster)
+(def deploy-key "123456")
+
 ;; Sentry
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 (def sentry-env "local")
-(def sentry-release "")
-(def sentry-deploy "")
+(def sentry-release "ALOHA")
+(def sentry-deploy deploy-key)
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network
@@ -55,9 +58,6 @@
 ;; JWT
 (def jwt-cookie-domain web-hostname)
 (def jwt-cookie-secure false)
-
-;; Deploy key (cache buster)
-(def deploy-key "")
 
 ;; Filestack key
 (def filestack-key "Aoay0qXUSOyVIcDvls4Egz")

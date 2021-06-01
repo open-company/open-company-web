@@ -163,7 +163,7 @@
       :data-container "body"
       :data-original-title (if (and lock-add?
                                     (not selected?))
-                             "Max labels limit reached, remove another label before adding one."
+                             (str "Maximum " ls/max-entry-labels " labels per post")
                              "")
       :on-click click-cb}
      (carrot-checkbox {:selected selected?})
