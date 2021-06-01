@@ -223,8 +223,7 @@
           (activity-share-email {:activity-data entity-data})
           foc-activity-move
           (activity-move {:activity-data entity-data
-                          :current-user-data current-user-data
-                          :dismiss-cb #(reset! (::move-activity s) false)})
+                          :current-user-data current-user-data})
           foc-menu-open
           [:ul.more-menu-list
             {:class (utils/class-set {:has-remove-bookmark (and add-bookmark-link
