@@ -244,7 +244,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## License
 
-Copyright © 2015-2020 OpenCompany, LLC.
+Copyright © 2015-2021 OpenCompany, LLC.
 
 This code is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License](https://creativecommons.org/licenses/by-nc-sa/4.0/) (CC BY-NC-SA 4.0).
 
