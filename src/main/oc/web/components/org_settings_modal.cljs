@@ -288,7 +288,6 @@
                                                      (reset! (::primary-color-value s) hex-color)
                                                      (change-brand-color {:hex hex-color :rgb rgb-colors} (:secondary current-brand-color)))))})])
            [:div.field-description.colors-preset.group
-            [:span.color-preset-label "Presets:"]
             [:div.colors-list.group
              (colors-presets {:color-list color-utils/colors-presets-list
                               :current-selected (-> current-brand-color :primary :hex)
