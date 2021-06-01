@@ -17,6 +17,7 @@
     "cljs:clean": "rm -dfR node_modules/ public/js/* target/ .shadow-cljs/"
   },
   "devDependencies": {
+    "hosted-git-info": ">=2.8.9",
     "node-sass-chokidar": "^1.5.0",
     "nodemon": "^2.0.4",
     "normalize.scss": "^0.1.0",
@@ -42,6 +43,7 @@
     "ini": "^1.3.8",
     "jwt-decode": "2.2.0",
     "localforage": "1.5.3",
+    "lodash": ">=4.17.21",
     "medium-editor": "5.23.3",
     "moment-timezone": "0.5.31",
     "react": "16.11.0",
