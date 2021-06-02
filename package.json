@@ -27,7 +27,7 @@
     "@bago2k4/emoji-autocomplete": "github:bago2k4/emoji-autocomplete#56e86be129c1094bb9b343c28f3834c610fed1de",
     "@bago2k4/medium-editor-filedragging": "github:bago2k4/medium-editor-filedragging#mainline",
     "@bago2k4/medium-editor-media-picker": "github:bago2k4/medium-editor-media-picker",
-    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector#fix-ts",
+    "@bago2k4/react-giphy-selector": "github:bago2k4/react-giphy-selector#49b4c5bbdbefda2c5f528072220f27162a8af1c7",
     "@open-company/medium-editor-extentions": "github:open-company/medium-editor-extentions#mainline",
     "@rangy/core": "^2.1.0",
     "@rangy/selectionsaverestore": "^2.1.0",
