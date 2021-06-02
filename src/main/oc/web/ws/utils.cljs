@@ -111,7 +111,7 @@
         ctx {:timestamp (.getTime (new js/Date))
              :connection-status connection-status
              :sessionURL (fullstory/session-url)}]
-    (sentry/capture-message-with-extra-context! ctx (str service-name " WS: handshake timeout"))
+    ;; (sentry/capture-message-with-extra-context! ctx (str service-name " WS: handshake timeout"))
     (timbre/error service-name " WS: handshake timeout " ctx)))
 
 (defn auth-check [service-name ch-state chsk-send! channelsk jwt-refresh-cb reconnect-cb success-cb rep]
