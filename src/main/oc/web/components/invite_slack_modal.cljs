@@ -251,5 +251,5 @@
                 [:div.invites-list-title
                   "Invite someone with a specific permission level"]
                 [:button.mlb-reset.enable-carrot-bot-bt
-                  {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=invite-slack"))}
+                  {:on-click #(org-actions/bot-auth team-data cur-user-data (-> team-data :slack-orgs first :slack-org-id) (str (router/get-token) "?org-settings=invite-slack"))}
                   (str "Enable the " ls/product-name " bot for Slack")]]))]]]))

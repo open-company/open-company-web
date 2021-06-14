@@ -51,8 +51,6 @@
                                      rum/reactive
                                      (on-window-click-mixin (fn [s e]
                                       (when (and @(::show-users-dropdown s)
-                                                ; (not (utils/event-inside? e
-                                                ;       (sel1 [:div.board-edit-slack-channels-dropdown])))
                                                 (not (utils/event-inside? e
                                                       (.-parentElement (sel1 [:input.slack-users-dropdown])))))
                                        (reset! (::show-users-dropdown s) false)

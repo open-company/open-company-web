@@ -120,7 +120,7 @@ div.section-editor-container {
           line-height: 32px;
         }
       }
-      
+
       div.section-editor-header-right {
         order: 3;
         display: flex;
@@ -143,7 +143,7 @@ div.section-editor-container {
           @include mobile() {
             margin-left: auto;
           }
-  
+
           &.disabled {
             opacity: 0.4;
             cursor: not-allowed;
@@ -327,6 +327,47 @@ div.section-editor-container {
 
       div.section-editor-add-slack-channel-container {
         margin-top: 8px;
+
+        div.section-editor-active-mirror-channels-list {
+          display: flex;
+          flex-flow: column nowrap;
+          justify-content: flex-start;
+          width: 100%;
+          align-items: flex-start;
+          padding: 8px 0;
+
+          div.section-editor-active-mirror-channel {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-content: center;
+            width: 100%;
+
+            span.ch-prefix {
+              margin-right: 4px;
+              @include OC_Body_Book();
+              font-size: 16px;
+              line-height: 18px;
+              color: var(--color);
+            }
+
+            span.ch-name {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: var(--color);
+            }
+            button.remove-ch {
+              flex: 0 0 auto;
+              margin-left: auto !important;
+
+              i.mdi:before {
+                font-size: 18px;
+                color: var(--light-color);
+              }
+            }
+          }
+        }
 
         div.section-editor-add-slack-channel {
           &.disabled {
@@ -659,7 +700,7 @@ div.section-editor-container {
     div.section-editor-add-access {
       background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
-  
+
     div.section-editor-add {
       div.access-item {
         &.private-access:before {

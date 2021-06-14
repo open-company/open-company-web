@@ -63,7 +63,7 @@
               "Invite via Slack"]
             (when (-> team-data :team-id jwt/is-admin?)
               [:button.mlb-reset.invite-slack-bt
-                {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
+                {:on-click #(org-actions/bot-auth team-data current-user-data (-> team-data :slack-orgs first :slack-org-id) (str (router/get-token) "?org-settings=invite-picker"))}
                 [:span.disabled "Invite via Slack"]
                 [:span.enabled "(add Slack)"]]))
           (when (= (:role current-user-data) :admin)

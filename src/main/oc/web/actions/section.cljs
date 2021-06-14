@@ -139,7 +139,7 @@
 
 (defn section-save-error [status]
   ;; Board name exists or too short
-  (dis/dispatch! [:update [:section-editing]
+  (dis/dispatch! [:update [dis/section-editing-key]
    #(-> %
      (assoc :section-name-error (when (= status 409) "Topic name already exists or isn't allowed"))
      (assoc :section-error (when-not (= status 409) "An error occurred, please retry."))
@@ -273,11 +273,11 @@
     (dis/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
     (let [next-section-editing (merge section-editing {:loading true
                                                        :name section-name})]
-      (dis/dispatch! [:input [:section-editing] next-section-editing])
+      (dis/dispatch! [:input [dis/section-editing-key] next-section-editing])
       (success-cb next-section-editing))))
 
 (defn pre-flight-check [section-slug section-name]
-  (dis/dispatch! [:update [:section-editing] #(merge % {:has-changes true
+  (dis/dispatch! [:update [dis/section-editing-key] #(merge % {:has-changes true
                                                                :pre-flight-loading true})])
   (let [org-data (dis/org-data)
         pre-flight-link (utils/link-for (:links org-data) "create-preflight")]
@@ -285,7 +285,7 @@
      (fn [{:keys [success body status]}]
        (when-not success
          (section-save-error 409))
-       (dis/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
+       (dis/dispatch! [:input [dis/section-editing-key :pre-flight-loading] false])))))
 
 (defn section-more-finish [org-slug board-slug sort-type direction {:keys [success body]}]
   (when success

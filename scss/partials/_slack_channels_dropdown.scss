@@ -49,7 +49,7 @@ div.slack-channels-dropdown {
     overflow-y: auto;
     border-radius: 4px;
 
-    div.slack-team{
+    div.slack-team {
 
       &.show-slack-name {
         div.channel {
@@ -60,27 +60,75 @@ div.slack-channels-dropdown {
       div.slack-team-name {
         @include OC_Body_Book();
         font-size: 14px;
+        line-height: 18px;
         color: var(--light-color);
-        padding: 0.4rem 0.8rem;
+        padding: 6px 14px;
+        height: 30px;
+        &:not(:first-child) {
+          margin-top: 4px;
+        }
       }
 
       div.channel {
         width: 100%;
-        padding: 8px 16px;
-        color: var(--color);
-        @include OC_Body_Book();
-        font-size: 14px;
+        height: 30px;
+        padding: 6px 16px;
         cursor: pointer;
 
-        &:hover {
+        &:not(.block):hover {
           background-color: var(--opac-background-color-2);
         }
 
-        span.ch-prefix {
-          @include OC_Body_Book()
-          font-size: 16px;
-          color: var(--light-colro);
-          margin-right: 4px;
+        div.channel-inner {
+          display: flex;
+          width: 100%;
+          flex-flow: row nowrap;
+          justify-content: flex-start;
+          align-items: center;
+          height: 18px;
+
+          &.selected {
+            span.ch-prefix, span.ch {
+              color: var(--light-color);
+            }
+          }
+
+          span.ch-prefix {
+            @include OC_Body_Book();
+            font-size: 16px;
+            line-height: 18px;;
+            color: var(--color);
+            margin-right: 4px;
+            order: 1;
+          }
+
+          span.ch {
+            order: 2;
+            color: var(--color);
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+
+            i.mdi.mdi-information-outline:before {
+              font-size: 12px;
+              line-height: 18px;
+            }
+          }
+
+          i.mdi.mdi-check {
+            order: 3;
+            margin-left: auto;
+            height: 18px;
+
+            &:before {
+              font-size: 18px;
+              line-height: 18px;
+              color: var(--color);
+            }
+          }
         }
       }
     }

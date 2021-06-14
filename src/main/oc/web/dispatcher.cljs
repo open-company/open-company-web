@@ -5,7 +5,7 @@
             [clojure.string :as s]
             [clojure.set :as clj-set]
             [cljs-flux.dispatcher :as flux]
-            [oc.web.utils.drafts :as du]
+            [oc.web.utils.board :as bu]
             [oc.lib.cljs.useragent :as ua]))
 
 
@@ -53,6 +53,8 @@
 (def ^{:export true} expo-push-token-key (vec (conj expo-key :push-token)))
 
 (def ^{:export true} show-invite-box-key :show-invite-box)
+
+(def ^{:export true} section-editing-key :section-editing)
 
 (def ^{:export true} api-entry-point-key [:api-entry-point])
 
@@ -367,7 +369,7 @@
 ;; Boards helpers
 
 (defn get-posts-for-board [posts-data board-slug]
-  (let [filter-fn (if (= board-slug du/default-drafts-board-slug)
+  (let [filter-fn (if (= board-slug bu/default-drafts-board-slug)
                     #(not= (:status %) "published")
                     #(and (= (:board-slug %) board-slug)
                           (= (:status %) "published")))]
@@ -410,7 +412,7 @@
                                  (merge (get posts-data (:uuid entry)) entry)
                                  entry))
                          posts-list)
-        items (if (= container-slug du/default-drafts-board-slug)
+        items (if (= container-slug bu/default-drafts-board-slug)
                 (filter (comp not :published?) container-posts)
                 container-posts)]
     (vec items)))
@@ -669,7 +671,7 @@
                             (:entry-editing base))]
    :section-editing     [[:base]
                           (fn [base]
-                            (:section-editing base))]
+                            (get base section-editing-key))]
    :org-editing         [[:base]
                           (fn [base]
                             (:org-editing base))]
@@ -1300,7 +1302,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug du/default-drafts-board-slug)))
+    (filtered-posts-data data org-slug bu/default-drafts-board-slug)))
 
 (defn ^:export activity-data
   "Get activity data."

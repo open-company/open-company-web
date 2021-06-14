@@ -802,6 +802,12 @@
           (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
+	        (update :slack-mirror #(cond (map? %)
+                                       [%]
+                                       (sequential? %)
+                                       %
+                                       :else
+                                       []))
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions
