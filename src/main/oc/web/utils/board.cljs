@@ -41,7 +41,10 @@
   ([channel :guard map?]
    (prefix-for-channel (or (:channel-type channel) (:type channel))))
   ([channel-type :guard string?]
-   (if (= channel-type "user") "@" "#")))
+   (if (= channel-type "user") "@" "#"))
+  ;; Catch all, for old channel maps
+  ([channel-type]
+   "#"))
 
 
 (def ^{:private true} chid #(or (:id %) (:channel-id %)))

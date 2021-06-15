@@ -734,6 +734,16 @@
           (assoc :can-create-private-board? (map? create-private-board-link))
           (assoc :can-create-label? (map? create-label))))))
 
+(defn parse-slack-mirror [mirror-channel]
+  (let [channels-list (cond (map? mirror-channel)
+                            [mirror-channel]
+                            (sequential? mirror-channel)
+                            mirror-channel
+                            :else
+                            [])
+        fix-channel-type #(or % "channel")]
+    (mapv #(update % :channel-type fix-channel-type) channels-list)))
+
 (defn parse-board
   "Parse board data coming from the API."
   ([board-data]
@@ -802,12 +812,7 @@
           (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
-	        (update :slack-mirror #(cond (map? %)
-                                       [%]
-                                       (sequential? %)
-                                       %
-                                       :else
-                                       []))
+	        (update :slack-mirror parse-slack-mirror)
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions
