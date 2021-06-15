@@ -705,7 +705,7 @@
                             :else
                             [])
         fix-channel-type #(or % "channel")]
-    (mapv #(update % :channel-type fix-channel-type) channels-list)))
+    (mapv #(update % :type fix-channel-type) channels-list)))
 
 (defn parse-org
   "Fix org data coming from the API."
