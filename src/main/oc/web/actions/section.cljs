@@ -1,6 +1,7 @@
 (ns oc.web.actions.section
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [defun.core :refer (defun-)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -13,9 +14,11 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs)]))
 
-(defn is-currently-shown? [section]
-  (= (dis/current-board-slug)
-     (:slug section)))
+(defun- is-currently-shown?
+  ([board :guard map?]
+   (is-currently-shown? (:slug board)))
+  ([board-slug]
+   (= (dis/current-board-slug) board-slug)))
 
 (defn watch-single-section [section]
   ;; only watch the currently visible board.
@@ -40,13 +43,12 @@
   (let [is-currently-shown (is-currently-shown? section-slug)
         user-is-part-of-the-team (:member? (dis/org-data))]
     (when is-currently-shown
-      (when user-is-part-of-the-team
         ;; only watch the currently visible board.
-        ; only for logged in users and if the board is currently shown
-        (when (= (dis/current-board-slug) section-slug)
-          (watch-single-section section)
-          ;; Retrieve reads count if there are items in the loaded section
-          (request-reads-count section))))
+      (when user-is-part-of-the-team
+        ;; only for logged in users and if the board is currently shown
+        (watch-single-section section)
+        ;; Retrieve reads count if there are items in the loaded section
+        (request-reads-count section)))
     (dis/dispatch! [:section org-slug section-slug sort-type (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
