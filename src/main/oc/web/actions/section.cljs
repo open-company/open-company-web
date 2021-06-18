@@ -1,6 +1,7 @@
 (ns oc.web.actions.section
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [defun.core :refer (defun-)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -13,9 +14,11 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs)]))
 
-(defn is-currently-shown? [section]
-  (= (dis/current-board-slug)
-     (:slug section)))
+(defun- is-currently-shown?
+ ([board :guard map?]
+   (is-currently-shown? (:slug board)))
+  ([board-slug]
+   (= (dis/current-board-slug) board-slug)))
 
 (defn watch-single-section [section]
   ;; only watch the currently visible board.
