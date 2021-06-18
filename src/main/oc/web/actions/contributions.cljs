@@ -1,6 +1,7 @@
 (ns oc.web.actions.contributions
   (:require-macros [if-let.core :refer (if-let*)])
   (:require [taoensso.timbre :as timbre]
+            [defun.core :refer (defun-)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -22,8 +23,11 @@
           (timbre/debug "Watching on socket " board-slugs board-uuids)
           (ws-ic/boards-watch board-uuids)))))))
 
-(defn- is-currently-shown? [author-uuid]
-  (= (dis/current-contributions-id) author-uuid))
+(defun- is-currently-shown?
+  ([contribs :guard map?]
+   (is-currently-shown? (:author-id contribs)))
+  ([author-id]
+   (= (dis/current-contributions-id) author-id)))
 
 (defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
