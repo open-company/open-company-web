@@ -1,6 +1,7 @@
 (ns oc.web.actions.label
   (:require-macros [if-let.core :refer (if-let* when-let*)])
   (:require [oc.web.dispatcher :as dis]
+            [defun.core :refer (defun-)]
             [cuerdas.core :as cstr]
             [oc.lib.hateoas :as hateoas]
             [taoensso.timbre :as timbre]
@@ -178,8 +179,11 @@
                                (timbre/debug "Watching on socket " board-slugs board-uuids)
                                (ws-ic/boards-watch board-uuids)))))))
 
-(defn- is-currently-shown? [label-slug]
-  (= (dis/current-label-slug) label-slug))
+(defun- is-currently-shown?
+  ([label :guard map?]
+   (is-currently-shown? (:slug label)))
+  ([label-slug]
+   (= (dis/current-label-slug) label-slug)))
 
 (defn- request-reads-count
   "Request the reads count data only for the items we don't have already."
