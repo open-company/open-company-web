@@ -29,8 +29,8 @@
   (let [user-is-part-of-the-team (:member? (dis/org-data))]
     (when (and user-is-part-of-the-team
                (not= (:slug section) utils/default-drafts-board-slug)
-               (seq (:entries section)))
-      (let [item-ids (map :uuid (:entries section))
+               (seq (:posts-list section)))
+      (let [item-ids (map :uuid (:posts-list section))
             cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activity-read-data))]
         (when (seq cleaned-ids)
           (api/request-reads-count cleaned-ids))))))
