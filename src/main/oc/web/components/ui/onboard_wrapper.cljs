@@ -163,6 +163,7 @@
             {:type "password"
              :pattern ".{8,}"
              :value @(::pswd s)
+             :autocomplete "new-password"
              :placeholder "Minimum 8 characters"
              :on-key-press (partial submit-on-enter continue-fn)
              :on-change #(let [v (.. % -target -value)]
@@ -334,6 +335,7 @@
             {:class (utils/class-set {utils/hide-class true
                                       :error invalid-first-name})
              :type "text"
+             :autocomplete "given-name"
              :ref "first-name"
              :placeholder "First name..."
              :max-length user-utils/user-name-max-lenth
@@ -351,6 +353,7 @@
             {:class (utils/class-set {utils/hide-class true
                                       :error invalid-last-name})
              :type "text"
+             :autocomplete "family-name"
              :placeholder "Last name..."
              :value (or (:last-name user-data) "")
              :max-length user-utils/user-name-max-lenth
@@ -368,6 +371,7 @@
             [:input.field.oc-input
               {:type "text"
                :ref "org-name"
+               :autocomplete "organization"
                :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
@@ -484,6 +488,7 @@
           [:input.field.oc-input
             {:type "text"
              :ref "org-name"
+             :autocomplete "organization"
              :class (utils/class-set {:error (:error org-editing)
                                       utils/hide-class true})
              :value (:name org-editing)
@@ -593,6 +598,7 @@
                  :key (str "invite-row-" @(::invite-rand s) "-" idx)}
                 [:input.oc-input
                   {:type "text"
+                   :autocomplete "email"
                    :placeholder "name@example.com"
                    :on-key-press (partial submit-on-enter continue-fn)
                    :on-change (fn [e]
@@ -698,6 +704,7 @@
                   [:span.error "Email is not valid"])]
               [:input.field.oc-input
                 {:type "email"
+                 :autocomplete "email"
                  :class (utils/class-set {:error (= (:error signup-with-email) 409)
                                           utils/hide-class true})
                  :pattern utils/valid-email-pattern
@@ -715,6 +722,7 @@
               [:input.field.oc-input
                 {:type "password"
                  :pattern ".{8,}"
+                 :autocomplete "new-password"
                  :value @(::pswd s)
                  :placeholder "Minimum 8 characters"
                  :on-key-press (partial submit-on-enter continue-fn)
@@ -821,6 +829,7 @@
           [:div.email-field-tooltip-container]
           [:input.field.oc-input.email-field
             {:type "email"
+             :autocomplete "email"
              :class utils/hide-class
              :value (:email jwt)
              :read-only true}]
@@ -833,6 +842,7 @@
               [:span.error "Minimum 8 characters"])]
           [:input.field.oc-input
             {:type "password"
+             :autocomplete "new-password"
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
              :ref "password"
@@ -923,6 +933,7 @@
                                       :error invalid-first-name})
              :type "text"
              :ref "first-name"
+             :autocomplete "given-name"
              :placeholder "First name..."
              :value (:first-name user-data)
              :max-length user-utils/user-name-max-lenth
@@ -939,6 +950,7 @@
             {:class (utils/class-set {utils/hide-class true
                                       :error invalid-last-name})
              :type "text"
+             :autocomplete "family-name"
              :placeholder "Last name..."
              :value (:last-name user-data)
              :max-length user-utils/user-name-max-lenth
