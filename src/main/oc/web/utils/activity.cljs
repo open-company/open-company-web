@@ -697,6 +697,16 @@
         (pi/can-board-pin? (jwt/user-id) org-data board-data)
         (update :labels lu/parse-entry-labels))))))
 
+(defn parse-slack-mirror [mirror-channel]
+  (let [channels-list (cond (map? mirror-channel)
+                            [mirror-channel]
+                            (sequential? mirror-channel)
+                            mirror-channel
+                            :else
+                            [])
+        fix-channel-type #(or % "channel")]
+    (mapv #(update % :type fix-channel-type) channels-list)))
+
 (defn parse-org
   "Fix org data coming from the API."
   [db org-data]
@@ -707,7 +717,8 @@
                               (assoc b :read-only (-> % :links readonly-board?))
                               (if follow-lists-loaded?
                                 (assoc b :following (not (unfollow-boards-set (:uuid %))))
-                                b))
+                                b)
+                               (update b :slack-mirror parse-slack-mirror))
                         (:boards org-data))
           drafts-board (dis/org-board-data org-data utils/default-drafts-board-slug)
           drafts-link (when drafts-board
@@ -802,6 +813,7 @@
           (dissoc :old-links :entries)
           (assoc :posts-list full-items-list)
           (assoc :items-to-render with-ending-item)
+	        (update :slack-mirror parse-slack-mirror)
           (assoc :following (boolean (follow-board-uuids (:uuid board-data)))))))))
 
 (defn parse-contributions

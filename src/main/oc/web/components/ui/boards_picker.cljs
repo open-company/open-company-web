@@ -3,7 +3,7 @@
             [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.lib.utils :as utils]
+            [oc.web.utils.board :as bu]
             [oc.web.utils.dom :as du]
             [oc.web.lib.responsive :as responsive]
             [oc.web.local-settings :as ls]))
@@ -11,11 +11,9 @@
 (def self-board-name "All")
 
 (defn- self-board [user-data]
-  {:name ""
-   :slug utils/default-board-slug
-   :publisher-board true
-   :access "team"
-   :authors [(:user-id user-data)]})
+  (merge bu/default-board
+         {:publisher-board true
+          :authors [(:user-id user-data)]}))
 
 (def relative-max-allowed-height (/ 1 2))
 (def min-allowed-height 200)
@@ -88,10 +86,10 @@
                                                        %)))]]
             [:div.boards-picker-board
               {:key (str "boards-picker-" (:uuid b))
-               :class (utils/class-set {:active active
-                                        :premium-lock (:premium-lock b)
-                                        :has-access-icon (#{"public" "private"} (:access b))
-                                        :publisher-board (:publisher-board b)})
+               :class (du/class-set {:active active
+                                     :premium-lock (:premium-lock b)
+                                     :has-access-icon (#{"public" "private"} (:access b))
+                                     :publisher-board (:publisher-board b)})
                :data-toggle (when (and (not is-mobile?)
                                        (:premium-lock b))
                               "tooltip")

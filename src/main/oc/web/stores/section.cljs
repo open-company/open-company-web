@@ -3,10 +3,11 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.org :as ou]
+            [oc.web.utils.board :as bu]
             [oc.web.utils.activity :as au]))
 
 (defmethod dispatcher/action :section
-  [db [_ org-slug section-slug sort-type section-data]]
+  [db [_ org-slug _section-slug sort-type section-data]]
   (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
@@ -43,12 +44,12 @@
 ;       (vals posts-data))))
 
 (defmethod dispatcher/action :section-change
-  [db [_ section-uuid]]
+  [db [_ _section-uuid]]
   db)
 
 (defmethod dispatcher/action :section-edit-save
-  [db [_ org-slug section-data]]
-  (assoc-in db [:section-editing :loading] true))
+  [db [_ _org-slug _section-data]]
+  (assoc-in db [dispatcher/section-editing-key :loading] true))
 
 (defmethod dispatcher/action :section-edit-save/finish
   [db [_ org-slug section-data]]
@@ -70,15 +71,15 @@
                                                  fixed-section-data
                                                  board))
                                              %))
-        (update :section-editing #(dissoc % :loading :has-changes)))))
+         (update dispatcher/section-editing-key #(dissoc % :loading :has-changes)))))
 
 (defmethod dispatcher/action :section-edit/dismiss
   [db [_]]
-  (dissoc db :section-editing))
+  (dissoc db dispatcher/section-editing-key))
 
 (defmethod dispatcher/action :private-section-user-add
   [db [_ user user-type]]
-  (let [section-data (:section-editing db)
+  (let [section-data (get db dispatcher/section-editing-key)
         current-notifications (filterv #(not= (:user-id %) (:user-id user))
                                        (:private-notifications section-data))
         current-authors (filterv #(not= % (:user-id user)) (:authors section-data))
@@ -90,7 +91,7 @@
                        (vec (conj current-viewers (:user-id user)))
                        current-viewers)
         next-notifications (vec (conj current-notifications user))]
-    (assoc db :section-editing
+    (assoc db dispatcher/section-editing-key
            (merge section-data {:has-changes true
                                 :authors next-authors
                                 :viewers next-viewers
@@ -98,12 +99,12 @@
 
 (defmethod dispatcher/action :private-section-user-remove
   [db [_ user]]
-  (let [section-data (:section-editing db)
+  (let [section-data (get db dispatcher/section-editing-key)
         private-notifications (filterv #(not= (:user-id %) (:user-id user))
                                        (:private-notifications section-data))
         next-authors (filterv #(not= % (:user-id user)) (:authors section-data))
         next-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))]
-    (assoc db :section-editing
+    (assoc db dispatcher/section-editing-key
            (merge section-data {:has-changes true
                                 :authors next-authors
                                 :viewers next-viewers
@@ -113,7 +114,7 @@
   [db [_ success]]
   (if success
     ;; Force board editing dismiss
-    (dissoc db :section-editing)
+    (dissoc db dispatcher/section-editing-key)
     ;; An error occurred while kicking the user out, no-op to let the user retry
     db))
 
@@ -142,23 +143,21 @@
       (update-in (butlast section-key) dissoc (last section-key))
       (assoc posts-key (zipmap (map :uuid removed-posts) removed-posts))
       (assoc org-sections-key remaining-sections)
-      (dissoc :section-editing))))
+      (dissoc dispatcher/section-editing-key))))
 
 (defmethod dispatcher/action :container/status
-  [db [_ change-data replace-change-data?]]
+  [db [_ change-data _replace-change-data?]]
   (timbre/debug "Change status received:" change-data)
   (if change-data
     (let [org-data (dispatcher/org-data db)
           old-change-data (dispatcher/change-data db)
           new-change-data (merge old-change-data change-data)
-          ; active-users (dispatcher/active-users (:slug org-data) db)
-          ; follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)
-          ]
+          active-users (dispatcher/active-users (:slug org-data) db)
+          follow-publishers-list (dispatcher/follow-publishers-list (:slug org-data) db)]
       (timbre/debug "Change status data:" new-change-data)
       (-> db
-        ; (fix-posts-new-label new-change-data)
-        ; (au/update-all-containers org-data change-data active-users follow-publishers-list)
-        (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
+          (au/update-all-containers org-data change-data active-users follow-publishers-list)
+          (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 
 (defn update-unseen-unread-remove [old-change-data item-id container-id new-changes]
@@ -262,3 +261,15 @@
                           (assoc old-container-id next-old-container-change-data)
                           (assoc container-id next-new-container-change-data))]
     (assoc-in db change-key next-change-data)))
+
+(defmethod dispatcher/action :section-editor/toggle-mirror-channel
+  [db [_ slack-org-id channel]]
+  (update-in db [dispatcher/section-editing-key :slack-mirror]
+             (fn [old-slack-mirror]
+               (let [slack-mirror (or old-slack-mirror [])
+                     selected? (bu/contains-channel? slack-mirror slack-org-id channel)]
+                 (if selected?
+                   (filterv (comp not (bu/compare-channel slack-org-id channel)) slack-mirror)
+                   (-> slack-mirror
+                       (conj (bu/format-mirror-channel slack-org-id channel))
+                       vec))))))

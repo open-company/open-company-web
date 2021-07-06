@@ -12,13 +12,13 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.mixins.seen :as seen-mixins]
-            [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.foc-menu :as foc-menu-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.mixins.gestures :refer (swipe-gesture-manager)]
             [oc.web.components.ui.labels :refer (labels-list)]
@@ -32,6 +32,20 @@
      :class utils/hide-class
      :dangerouslySetInnerHTML {:__html (:body activity-data)}}])
 
+(defn delete-draft-clicked [draft e]
+  (dom-utils/event-stop! e)
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "delete-entry"
+                    :message "Delete this draft?"
+                    :link-button-title "No"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-title "Yes"
+                    :solid-button-style :red
+                    :solid-button-cb #(do
+                                        (activity-actions/activity-delete draft)
+                                        (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
+
 (rum/defc stream-item-draft-footer <
   rum/static
   [activity-data]
@@ -42,7 +56,7 @@
      "Continue editing"]]
    [:div.stream-body-draft-delete
     [:button.mlb-reset.delete-draft-bt
-     {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+     {:on-click #(delete-draft-clicked activity-data %)}
      "Delete draft"]]])
 
 (rum/defc stream-item-attachments <

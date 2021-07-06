@@ -98,6 +98,9 @@
 ;; Publisher boards feature-flag
 (def publisher-board-enabled? false)
 
+;; Max number of Slack mirrored channels
+(def max-slack-mirror-channels 3)
+
 ;; Fake container ids for seen table
 (def seen-home-container-id "1111-1111-1111")
 (def seen-replies-container-id "2222-2222-2222")

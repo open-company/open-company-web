@@ -22,13 +22,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]))
-
-(defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
-      (.-innerWidth js/window)))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn- maybe-load-comments [s]
   (let [activity-data (:activity-data @(drv/get-ref s :secure-activity-data))
@@ -38,6 +32,7 @@
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
+                             (drv/drv :org-data)
                              (drv/drv :id-token)
                              (drv/drv :theme)
                              (drv/drv :route/dark-allowed)
@@ -58,16 +53,11 @@
                                s)}
   [s]
   (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
-        activity-author (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         id-token (drv/react s :id-token)
-        theme-data (drv/react s :theme)
-        route-dark-allowed (drv/react s :route/dark-allowed)
-        org-data (-> activity-data
-                  (select-keys [:org-slug :org-name :org-logo-url])
-                  (clojure.set/rename-keys {:org-slug :slug
-                                            :org-name :name
-                                            :org-logo-url :logo-url}))
+        _theme-data (drv/react s :theme)
+        _route-dark-allowed (drv/react s :route/dark-allowed)
+        org-data (drv/react s :org-data)
         comments-drv (drv/react s :comments-data)
         comments-data (au/activity-comments activity-data comments-drv)
         activity-link (utils/link-for (:links org-data) "entries")]
@@ -131,6 +121,7 @@
             [:div.activity-content-footer.group
               (comments-summary {:activity-data activity-data :comments-data comments-drv :current-activity-id (:uuid activity-data)})
               (reactions {:entity-data activity-data
+                          :only-thumb? true
                           :hide-picker true})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
