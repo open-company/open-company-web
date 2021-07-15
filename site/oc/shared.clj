@@ -349,6 +349,16 @@
          :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
+(def contact-link-centred
+  [:div.pricing-header-footer
+    [:div.pricing-header-footer-logo]
+    [:div.pricing-header-footer-subheadline.slack-contact-link
+      "Need more info or support? "
+      [:a.chat-with-us
+        {:class "intercom-chat-link"
+         :href "mailto:hello@carrot.io"}
+        "Chat with us!"]]])
+
 (def pricing-headline "Open source and free")
 
 (def pricing-chat
