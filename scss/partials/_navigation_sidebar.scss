@@ -220,6 +220,10 @@ div.left-navigation-sidebar {
   top: #{$navbar_height}px;
   padding: 40px 0;
 
+  &.anonymous-sidebar {
+    padding: initial;
+  }
+
   @media (max-height: 654px), (max-width: 975px) {
     position: absolute !important;
     top: 0;

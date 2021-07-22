@@ -103,13 +103,14 @@
                           (not current-contributions-id)
                           (not current-label-slug)
                        ;; but there are some
-                          (pos? (count (:boards org-data))))
+                          (seq (:boards org-data)))
                      ;; Active users have not been loaded yet:
                      ;; they are blocking since they are used to:
                      ;; - init entries body and comments body for mentions
                      ;; - show user's info on hover and in profile panels
                      ;; - on mobile it's not blocking since cmail is closed
-                     (not (map? active-users)))
+                     (and (:member? org-data)
+                          (not (map? active-users))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) current-org-slug)))
         board-exists? (set (mapcat #(vec [(:slug %) (:uuid %)]) (:boards org-data)))

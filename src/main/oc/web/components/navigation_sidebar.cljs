@@ -205,7 +205,8 @@
         show-plus-button? (:can-compose? org-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
-                                :absolute-position @(::absolute-position s)})
+                                :absolute-position @(::absolute-position s)
+                                :anonymous-sidebar (not (:member? org-data))})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
