@@ -82,7 +82,6 @@
                 force-login-wall
                 panel-stack
                 app-loading
-                user-info-data
                 active-users
                 label-data
                 search-active

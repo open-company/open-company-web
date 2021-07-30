@@ -4,9 +4,9 @@
             [goog.fx.dom :refer (Scroll)]
             [oops.core :refer (oget)]
             [oc.lib.cljs.useragent :as ua]
-            [oc.web.utils.drafts :as du]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.utils.ui :as ui-utils]
+            [oc.web.utils.board :as bu]
             [oc.web.local-settings :as ls]
             [cuerdas.core :as s]
             [oc.lib.hateoas :as hateoas]
@@ -510,21 +510,18 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-drafts-board-name du/default-drafts-board-name)
+(def default-drafts-board-name bu/default-drafts-board-name)
 
-(def default-drafts-board-slug du/default-drafts-board-slug)
+(def default-drafts-board-slug bu/default-drafts-board-slug)
 
-(def default-draft-status du/default-draft-status)
+(def default-draft-status bu/default-draft-status)
 
-(def default-drafts-board du/default-drafts-board)
+(def default-drafts-board bu/default-drafts-board)
 
-(def default-board-slug "--default-section-slug")
-(def default-board-access "team")
+(def default-board-slug bu/default-board-slug)
+(def default-board-access bu/default-board-access)
 
-(def default-board
-  {:name ""
-   :access default-board-access
-   :slug default-board-slug})
+(def default-board bu/default-board)
 
 (defn retina-src [url]
   {:src (cdn (str url ".png"))
@@ -534,8 +531,6 @@
   (if (string? value)
     (s/trim value)
     value))
-
-(def section-name-exists-error "Team name already exists or isn't allowed")
 
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))

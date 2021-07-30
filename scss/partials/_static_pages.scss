@@ -832,6 +832,10 @@ div.pricing-header-footer {
     color: $deep_navy;
     text-align: left;
 
+    &.slack-contact-link {
+      margin-left: 0;
+    }
+
     @include mobile() {
       text-align: center;
       width: 100%;

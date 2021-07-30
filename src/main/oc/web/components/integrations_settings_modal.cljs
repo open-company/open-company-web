@@ -110,7 +110,7 @@
                       [:div.bot-line
                         (str ls/product-name " bot is currently ") [:strong "off"] ". "
                         [:button.mlb-reset.turn-on-bot-bt
-                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
+                          {:on-click #(org-actions/bot-auth team-data cur-user-data (:slack-org-id slack-team) (str (router/get-token) "?org-settings=integrations"))}
                           "Turn it on?"]
                         [:i.mdi.mdi-information-outline
                           {:title (str "The " ls/product-name " bot integrates " ls/product-name " with Slack to allow invites, shares, digests and notifications to use Slack rather than email.")

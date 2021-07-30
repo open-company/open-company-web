@@ -30,13 +30,14 @@
     (if success
       (dis/dispatch! [:channels-enumerate/success team-id channels]))))
 
-(defn enumerate-channels [team-data]
-  (let [org-data (dis/org-data)
-        team-id (:team-id team-data)]
-    (when team-id
-      (let [enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
-        (api/enumerate-channels enumerate-link (partial enumerate-channels-cb team-id))
-        (dis/dispatch! [:channels-enumerate team-id])))))
+(defn enumerate-channels
+  ([] (enumerate-channels (dis/team-data)))
+  ([team-data]
+   (let [team-id (:team-id team-data)]
+     (when team-id
+       (let [enumerate-link (utils/link-for (:links team-data) "channels" "GET")]
+         (api/enumerate-channels enumerate-link (partial enumerate-channels-cb team-id))
+         (dis/dispatch! [:channels-enumerate team-id]))))))
 
 (defn team-get [team-link]
   (api/get-team team-link

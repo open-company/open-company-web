@@ -41,6 +41,7 @@
                  (shared/cdn "/img/ML/homepage_mobile_screenshot@3x.png") " 3x")}]]
 
         ;shared/testimonials-logos-line
+        shared/contact-link-centred
      ]
 
     (shared/testimonials-section :slack)

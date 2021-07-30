@@ -39,14 +39,19 @@
         (cook/remove-cookie! first-ever-landing-name)
         (oc-urls/first-ever-landing org-slug)))))
 
-(defn bot-auth [team-data user-data & [redirect-to]]
+(defn bot-auth
+  ([team-data user-data redirect-to] (bot-auth team-data user-data nil redirect-to))
+  ([team-data user-data slack-org-id redirect-to]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (uu/auth-link-with-state (:href auth-link)
-                                                {:user-id (:user-id user-data)
-                                                 :team-id (:team-id team-data)
-                                                 :redirect redirect})]
-    (router/redirect! fixed-auth-url)))
+        state-map* {:user-id (:user-id user-data)
+                    :team-id (:team-id team-data)
+                    :redirect redirect}
+        state-map (if (seq slack-org-id)
+                    (assoc state-map* :state-slack-org-id slack-org-id)
+                    state-map*)
+        fixed-auth-url (uu/auth-link-with-state (:href auth-link) state-map)]
+    (router/redirect! fixed-auth-url))))
 
 (defn maybe-show-integration-added-notification? []
   ;; Do we need to show the add bot banner?

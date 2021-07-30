@@ -153,6 +153,7 @@
                 {:value (:email login-with-email)
                  :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
                  :type "email"
+                 :autocomplete "email"
                  :auto-focus true
                  :tabIndex 1
                  :autoCapitalize "none"
@@ -164,6 +165,7 @@
                 {:value (:pswd login-with-email)
                  :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
                  :type "password"
+                 :autocomplete "current-password"
                  :tabIndex 2
                  :name "pswd"}]
               [:div.forgot-password
@@ -224,6 +226,7 @@
                  :value (:email (:password-reset (rum/react dis/app-state)))
                  :tabIndex 1
                  :type "email"
+                 :autocomplete "email"
                  :placeholder "Please enter your email address"
                  :autoCapitalize "none"
                  :auto-focus true
@@ -291,6 +294,7 @@
                  :pattern ".{8,}"
                  :placeholder "Minimum 8 characters"
                  :type "password"
+                 :autocomplete "current-password"
                  :tabIndex 4
                  :name "pswd"}]]
             [:button.mlb-reset.mlb-default.continue

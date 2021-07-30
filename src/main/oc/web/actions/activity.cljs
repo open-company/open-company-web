@@ -14,6 +14,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.board :as bu]
             [oc.web.lib.user-cache :as uc]
             [oc.web.actions.section :as sa]
             [oc.web.utils.user :as user-utils]
@@ -513,7 +514,7 @@
 
 (defn- board-name-exists-error [edit-key]
   (dis/dispatch! [:update [edit-key] #(-> %
-                                        (assoc :section-name-error utils/section-name-exists-error)
+                                        (assoc :section-name-error bu/board-name-exists-error)
                                         (dissoc :loading))]))
 
 (defn add-attachment [dispatch-input-key attachment-data]

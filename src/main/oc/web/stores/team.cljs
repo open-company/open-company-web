@@ -105,12 +105,11 @@
 
 (defmethod dispatcher/action :channels-enumerate/success
   [db [_ team-id channels]]
-  (let [channels-key (dispatcher/team-channels-key team-id)]
+  (let [channels-key (dispatcher/team-channels-key team-id)
+        next-db (dissoc db :enumerate-channels-requested)]
     (if channels
-      (assoc-in db channels-key channels)
-      (-> db
-        (update-in (butlast channels-key) dissoc (last channels-key))
-        (dissoc :enumerate-channels-requested)))))
+      (assoc-in next-db channels-key channels)
+      (update-in next-db (butlast channels-key) dissoc (last channels-key)))))
 
 ;; Invite users
 
