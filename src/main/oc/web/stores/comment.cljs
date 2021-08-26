@@ -290,6 +290,8 @@
           replies-badge-key (dispatcher/replies-badge-key org-slug)
           replies-data (dispatcher/replies-data org-slug db)
           should-badge-replies? (and (not (:author? comment-data))
+                                     ;; The data for the specified entry have been loaded from server already, not form WS only
+                                     (seq (:links with-last-activity-at))
                                      ;; If unfollow link is present it means the user is following the entry
                                      (utils/link-for (:links with-last-activity-at) "unfollow")
                                      ;; And if there 
