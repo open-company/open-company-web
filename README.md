@@ -74,7 +74,9 @@ lein -v
 
 Prospective users of [Carrot](https://carrot.io/) should get started by going to [Carrot.io](https://carrot.io/). The following usage is **for developers** wanting to work on the Web application.
 
-Local usage of the web application requires you to run 3 services, the [Storage service](https://github.com/open-company/open-company-storage), the [Auth service](https://github.com/open-company/open-company-auth), and the [Interaction service](https://github.com/open-company/open-company-interaction). All can be started in their respective repositiories with:
+### Starting Services Manually
+
+Local usage of the web application requires you to run at least 3 services, the [Storage service](https://github.com/open-company/open-company-storage), the [Auth service](https://github.com/open-company/open-company-auth), and the [Interaction service](https://github.com/open-company/open-company-interaction). All can be started in their respective repositiories with:
 
 ```console
 lein start
@@ -90,7 +92,31 @@ lein start
 
 If you've done it right, you'll now have 4 terminal sessions running: Storage, Auth, Interaction and Web, optionally another 2 running Change and Notify services.
 
-Open your browser to [http://localhost:3559/](http://localhost:3559/).
+### Starting Services With Overmind
+
+A potentially easier alternative approach is to use [Overmind](https://github.com/DarthSim/overmind) to manage the starting and stopping of these various processes for you.
+
+First nstall Overmind. On a Mac, this can be done with:
+
+```
+brew install tmux overmind
+```
+
+For other platforms, follow Overmind's instructions.
+
+Overmind uses the [Procfile](./Procfile) to start up all the various services.
+
+After you've got it installed, run all your services that are enabled in the [Procfile](./Procfile) with:
+
+```
+overmind start
+```
+
+### Opening the Web App 
+
+Then open your browser to [http://localhost:3559/](http://localhost:3559/).
+
+### Using a Real IP Address
 
 If you want to use your local IP address instead of `localhost` to tests on a different device you can set them in your environment with the following variable names:
 
@@ -99,11 +125,13 @@ export LOCAL_DEV_HOST=192.168.1.2
 export LOCAL_DEV_PORT=3559
 ```
 
-the [startup script](/bin/local-env-js) creates a copy of `public/lib/local-env-example.js` and with those values.
+The [startup script](/bin/local-env-js) creates a copy of `public/lib/local-env-example.js` and with those values.
 
 Then you can connect to [http://192.168.1.2:3559](http://192.168.1.2:3559). This file, and any of its keys, is optional.
 
 NB: If you want to change the port you have to change it also in the [shadow.cljs](/shadow.cljs) and [oc.web.local-settings](/src/main/oc/web/local_settings.cljs) files.
+
+### Creating a Production Build
 
 To create a **production** build run:
 

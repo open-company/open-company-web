@@ -6,6 +6,7 @@ pom.xml
 /out/
 /target/
 .lein-*
+.overmind.sock
 .repl
 .nrepl-*
 .DS_Store
