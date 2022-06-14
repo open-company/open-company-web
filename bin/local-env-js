@@ -1,8 +1,8 @@
 #! /bin/bash
 
 local_env_folder="./public/lib/"
-local_env_example="${local_env_folder}local-env-example.js"
-local_env_file="${local_env_folder}local-env.js"
+local_env_example="${local_env_folder%/}/local-env-example.js"
+local_env_file="${local_env_folder%/}/local-env.js"
 ip_address="$LOCAL_DEV_HOST"
 port="$LOCAL_DEV_PORT"
 

@@ -184,7 +184,7 @@
         slack-teams (drv/react s :team-channels)
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         editing-existing-section? @(::editing-existing-section? s)
-        mirror-channels (when editing-existing-section?
+        mirror-channels (when show-slack-channels?
                           (:slack-mirror section-editing))
         roster (drv/react s :team-roster)
         all-users-data (if team-data (:users team-data) (:users roster))
