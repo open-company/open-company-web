@@ -328,8 +328,9 @@
                                        :loading true}))
 
 (defmethod dispatcher/action :signup-with-email/failed
-  [db [_ status]]
+  [db [_ {:keys [status error-message]}]]
   (update db :signup-with-email merge {:error status
+                                       :error-message error-message
                                        :loading false}))
 
 (defmethod dispatcher/action :signup-with-email/success

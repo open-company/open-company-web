@@ -132,17 +132,21 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label.email-field
-            "Work email"
-            (cond
-              (= (:error signup-with-email) 409)
-              [:span.error "Email already exists"]
-              (> 399 (:error signup-with-email) 500)
-              [:span.error "Error, try again or "
-               [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
-               "."]
-              @(::email-error s)
-              [:span.error "Email is not valid"])]
+          (let [error-tag (cond
+                            (= (:error signup-with-email) 409)
+                            [:span.error "Email already exists"]
+                            (< 399 (:error signup-with-email) 500)
+                            (if (seq (:error-message signup-with-email))
+                              [:span.error (:error-message signup-with-email)]
+                              [:span.error "Error, try again or "
+                                [:a.underline.red {:href oc-urls/contact-mail-to} "contact support"]
+                                "."])
+                            @(::email-error s)
+                            [:span.error "Email is not valid"])]
+            [:div.field-label.email-field
+             "Work email"
+             error-tag
+             ])
           [:input.field.oc-input
             {:type "email"
              :class (utils/class-set {:error (= (:error signup-with-email) 409)

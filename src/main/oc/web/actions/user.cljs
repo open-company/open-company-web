@@ -327,8 +327,10 @@
 
 ;; Signup
 
-(defn signup-with-email-failed [status]
-  (dis/dispatch! [:signup-with-email/failed status]))
+(defn signup-with-email-failed
+  ([status] (signup-with-email-failed status nil))
+  ([status error-message]
+   (dis/dispatch! [:signup-with-email/failed {:status status :error-message error-message}])))
 
 (defn signup-with-email-success
   [user-email team-token-signup? status jwt]
@@ -352,6 +354,8 @@
              (fn [orgs collection]
                (when (pos? (count orgs))
                  (router/nav! (oc-urls/default-landing (:slug (get-default-org orgs))))))))))
+      (= status 422)
+      (dis/dispatch! [:signup-with-email/failed "Error signing up!"])
       :else ;; Valid signup let's collect user data
       (do
         (jwt-actions/update-jwt jwt)
@@ -364,7 +368,7 @@
   [user-email team-token-signup? success body status]
   (if success
     (signup-with-email-success user-email team-token-signup? status body)
-    (signup-with-email-failed status)))
+    (signup-with-email-failed status body)))
 
 (defn signup-with-email [signup-data & [team-token-signup?]]
   (let [email-links (:links (dis/auth-settings))

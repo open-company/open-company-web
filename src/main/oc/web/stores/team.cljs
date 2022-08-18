@@ -1,8 +1,6 @@
 (ns oc.web.stores.team
-  (:require [taoensso.timbre :as timbre]
-            [oc.web.dispatcher :as dispatcher]
+  (:require [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
-            [oc.lib.user :as user-lib]
             [oc.web.utils.activity :as au]
             [oc.web.utils.mention :as mu]
             [oc.web.lib.utils :as utils]
