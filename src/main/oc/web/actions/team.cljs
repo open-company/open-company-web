@@ -39,15 +39,19 @@
          (api/enumerate-channels enumerate-link (partial enumerate-channels-cb team-id))
          (dis/dispatch! [:channels-enumerate team-id]))))))
 
-(defn team-get [team-link]
+(defn team-get
+  ([] (team-get (utils/link-for (:links (dis/team-data)) "item") nil))
+  ([team-link] (team-get team-link nil))
+  ([team-link cb]
   (api/get-team team-link
-    (fn [{:keys [success body status]}]
-      (let [team-data (when success (json->cljs body))
-            current-team? (= (:team-id team-data) (:team-id (dis/org-data)))]
+    (fn [{:keys [success body]}]
+      (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded (dis/current-org-slug) team-data])
           (utils/after 100 org-actions/maybe-show-integration-added-notification?)
-          (enumerate-channels team-data))))))
+          (enumerate-channels team-data))
+        (when (fn? cb)
+          (cb success team-data)))))))
 
 (defn force-team-refresh [team-id]
   (when-let [team-data (dis/team-data team-id)]
@@ -279,7 +283,7 @@
 
 ;; Invite users
 
-(defn invite-users [inviting-users & [note]]
+(defn invite-users* [inviting-users note]
   (let [note (or note "")
         org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
@@ -312,6 +316,16 @@
       (doseq [user cleaned-inviting-users]
         (invite-user org-data team-data user note)))
     (dis/dispatch! [:invite-users (vec checked-users)])))
+
+(defn invite-users
+  "Invite all the users passed, make sure the csrf token we got with the team data is not expired,
+   if it's expired, refresh the team data."
+  [inviting-users & [note]]
+  (let [invite-link (invite-user-link)
+        invite-link-expire-at (* (:ttl invite-link) 1000)]
+    (if (<= invite-link-expire-at (.getTime (utils/js-date)))
+      (team-get (utils/link-for (:links (dis/team-data)) "item") #(invite-users* inviting-users note))
+      (invite-users* inviting-users note))))
 
 ;; User actions
 

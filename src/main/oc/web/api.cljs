@@ -599,7 +599,8 @@
    Add the company's logo and its size if possible."
   [invitation-link invited-user invite-from user-type first-name last-name note org-data callback]
   (if (and invitation-link invited-user invite-from user-type)
-    (let [json-params {:first-name first-name
+    (let [json-params {:csrf (:csrf invitation-link)
+                       :first-name first-name
                        :last-name last-name
                        :note note
                        :admin (= user-type :admin)
