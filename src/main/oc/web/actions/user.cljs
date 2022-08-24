@@ -503,12 +503,27 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+(defn resend-verification-link []
+  (let [user-data (dis/current-user-data)]
+    (utils/link-for (:links user-data) "resend-verification" "POST")))
+
+(def -resend-verificaiton-cookie-suffix "-resent-verification")
+
+(defn mark-resend-verification-email []
+  (let [user-data (dis/current-user-data)]
+    (cook/set-cookie! (str (:user-id user-data) -resend-verificaiton-cookie-suffix) "resent" (* 60 60 3))))
+
+(defn can-resend-verification-email? []
+  (let [user-data (dis/current-user-data)]
+    (not (cook/get-cookie (str (:user-id user-data) -resend-verificaiton-cookie-suffix)))))
+
 (defn resend-verification-email []
-  (let [user-data (dis/current-user-data)
-        resend-link (utils/link-for (:links user-data) "resend-verification" "POST")]
-    (when resend-link
+  (let [resend-link (resend-verification-link)]
+    (when (and (can-resend-verification-email?)
+               resend-link)
       (api/resend-verification-email resend-link
        (fn [success]
+         (mark-resend-verification-email)
          (notification-actions/show-notification
           {:title (if success "Verification email re-sent!" "An error occurred")
            :description (when-not success "Please try again.")

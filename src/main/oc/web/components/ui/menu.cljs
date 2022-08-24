@@ -17,6 +17,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.utils.sentry :as sentry]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -54,6 +55,23 @@
 (defn invite-team-click [_s e]
   (dom-utils/prevent-default! e)
   (nav-actions/show-org-settings :invite-picker))
+
+(defn resend-verification-click [_s e]
+  (dom-utils/prevent-default! e)
+  (let [can-resend? (user-actions/can-resend-verification-email?)
+        alert-data {:emoji-icon "📧"
+                    :action "resend-verification-from-invite"
+                    :title "Please, verify your email"
+                    :message [:span ["To invite your teammates to Carrot, you have to verify your email first." [:br] [:br] "Check your email and follow the link you find inside."]]
+                    :link-button-title "Ok"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :black
+                    :solid-button-title (when can-resend? "Resend email")
+                    :solid-button-cb #(when can-resend?
+                                        (user-actions/resend-verification-email)
+                                        (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
+
 
 (defn integrations-click [_s e]
   (dom-utils/prevent-default! e)
@@ -126,7 +144,6 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :payments)
                   (drv/drv :navbar-data)
-                  (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
                   (rum/local nil ::hr)
                   (rum/local false ::complete-info)
@@ -143,15 +160,17 @@
      (whats-new/check-whats-new-badge))
     s)}
   [s]
-  (let [{:keys [panel-stack org-data current-org-slug]} (drv/react s :navbar-data)
+  (let [{:keys [panel-stack org-data current-org-slug current-user-data]} (drv/react s :navbar-data)
         payments-data (drv/react s :payments)
-        current-user-data (drv/react s :current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
         is-admin-or-author? (#{:admin :author} (:role current-user-data))
         expo-app-version (drv/react s :expo-app-version)
+        show-resend-verif? (and current-org-slug
+                                is-admin-or-author?
+                                (user-actions/resend-verification-link))
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?
                                  (team-actions/invite-user-link))
@@ -258,7 +277,8 @@
                 "Recurring updates"]])
           ;; Settings separator
           (when (or current-org-slug
-                    show-invite-people?
+                    (or show-invite-people?
+                        show-resend-verif?)
                     show-billing?)
             [:div.oc-menu-separator])
           ;; Admin settings
@@ -271,10 +291,13 @@
               [:div.oc-menu-item.digest-settings
                 "Admin settings"]])
           ;; Invite
-          (when show-invite-people?
+          (when (or show-invite-people?
+                    show-resend-verif?)
             [:a
               {:href "#"
-              :on-click #(invite-team-click s %)}
+              :on-click #(if show-invite-people?
+                           (invite-team-click s %)
+                           (resend-verification-click s %))}
               [:div.oc-menu-item.invite-team
                 "Invite people"]])
           ;; Manage team

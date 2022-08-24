@@ -94,7 +94,9 @@
             (if is-admin?
               "Manage team"
               "View team")]
-          (when is-admin-or-author?
+          (when (and org-data
+                     is-admin-or-author?
+                     (team-actions/invite-user-link))
             [:button.mlb-reset.save-bt
               {:on-click #(nav-actions/show-org-settings :invite-picker)}
               "Invite"])
