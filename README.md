@@ -96,7 +96,7 @@ If you've done it right, you'll now have 4 terminal sessions running: Storage, A
 
 A potentially easier alternative approach is to use [Overmind](https://github.com/DarthSim/overmind) to manage the starting and stopping of these various processes for you.
 
-First nstall Overmind. On a Mac, this can be done with:
+First install Overmind. On a Mac, this can be done with:
 
 ```
 brew install tmux overmind

@@ -327,8 +327,10 @@
 
 ;; Signup
 
-(defn signup-with-email-failed [status]
-  (dis/dispatch! [:signup-with-email/failed status]))
+(defn signup-with-email-failed
+  ([status] (signup-with-email-failed status nil))
+  ([status error-message]
+   (dis/dispatch! [:signup-with-email/failed {:status status :error-message error-message}])))
 
 (defn signup-with-email-success
   [user-email team-token-signup? status jwt]
@@ -352,6 +354,8 @@
              (fn [orgs collection]
                (when (pos? (count orgs))
                  (router/nav! (oc-urls/default-landing (:slug (get-default-org orgs))))))))))
+      (= status 422)
+      (dis/dispatch! [:signup-with-email/failed "Error signing up!"])
       :else ;; Valid signup let's collect user data
       (do
         (jwt-actions/update-jwt jwt)
@@ -364,7 +368,7 @@
   [user-email team-token-signup? success body status]
   (if success
     (signup-with-email-success user-email team-token-signup? status body)
-    (signup-with-email-failed status)))
+    (signup-with-email-failed status body)))
 
 (defn signup-with-email [signup-data & [team-token-signup?]]
   (let [email-links (:links (dis/auth-settings))
@@ -503,12 +507,27 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+(defn resend-verification-link []
+  (let [user-data (dis/current-user-data)]
+    (utils/link-for (:links user-data) "resend-verification" "POST")))
+
+(def -resend-verificaiton-cookie-suffix "-resent-verification")
+
+(defn mark-resend-verification-email []
+  (let [user-data (dis/current-user-data)]
+    (cook/set-cookie! (str (:user-id user-data) -resend-verificaiton-cookie-suffix) "resent" (* 60 60 3))))
+
+(defn can-resend-verification-email? []
+  (let [user-data (dis/current-user-data)]
+    (not (cook/get-cookie (str (:user-id user-data) -resend-verificaiton-cookie-suffix)))))
+
 (defn resend-verification-email []
-  (let [user-data (dis/current-user-data)
-        resend-link (utils/link-for (:links user-data) "resend-verification" "POST")]
-    (when resend-link
+  (let [resend-link (resend-verification-link)]
+    (when (and (can-resend-verification-email?)
+               resend-link)
       (api/resend-verification-email resend-link
        (fn [success]
+         (mark-resend-verification-email)
          (notification-actions/show-notification
           {:title (if success "Verification email re-sent!" "An error occurred")
            :description (when-not success "Please try again.")
