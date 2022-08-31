@@ -45,7 +45,7 @@
     "localforage": "1.5.3",
     "lodash": ">=4.17.21",
     "medium-editor": "5.23.3",
-    "moment-timezone": "0.5.31",
+    "moment-timezone": "0.5.35",
     "react": "16.11.0",
     "react-color": "^2.18.1",
     "react-dom": "16.11.0",
