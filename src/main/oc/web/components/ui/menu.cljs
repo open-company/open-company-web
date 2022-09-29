@@ -166,7 +166,7 @@
         show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
-        is-admin-or-author? (#{:admin :author} (:role current-user-data))
+        is-admin-or-author? (some-> current-user-data :role keyword #{:admin :author})
         expo-app-version (drv/react s :expo-app-version)
         show-resend-verif? (and current-org-slug
                                 is-admin-or-author?
