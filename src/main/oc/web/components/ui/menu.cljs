@@ -174,6 +174,10 @@
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?
                                  (team-actions/invite-user-link))
+        _ (js/console.log "DBG show-invite-people?" show-invite-people?)
+        _ (when-not show-invite-people? (js/console.log "DBG   current-org-slug" current-org-slug))
+        _ (when-not show-invite-people? (js/console.log "DBG   is-admin-or-author?" is-admin-or-author?))
+        _ (when-not show-invite-people? (js/console.log "DBG   invite-user-link" (team-actions/invite-user-link)))
         native-app-data (detect-native-app)
         web-app-version client-version
         build-version (when (seq ls/sentry-deploy) (str "build: " ls/sentry-deploy))
