@@ -166,7 +166,7 @@
         show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
-        is-admin-or-author? (#{:admin :author} (:role current-user-data))
+        is-admin-or-author? (some-> current-user-data :role keyword #{:admin :author})
         expo-app-version (drv/react s :expo-app-version)
         show-resend-verif? (and current-org-slug
                                 is-admin-or-author?
@@ -205,7 +205,10 @@
         download-csv-link (utils/link-for (:links org-data) "wrt-csv")
         show-download-csv? (and (not is-mobile?)
                                 download-csv-link
-                                (not (-> org-data :content-visibility :disallow-wrt-download)))]
+                                (not (-> org-data :content-visibility :disallow-wrt-download)))
+        show-invite-menu-item? (and show-invite-people?
+                                    (or show-invite-people?
+                                        show-resend-verif?))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :menu-container))
@@ -277,8 +280,7 @@
                 "Recurring updates"]])
           ;; Settings separator
           (when (or current-org-slug
-                    (or show-invite-people?
-                        show-resend-verif?)
+                    show-invite-menu-item?
                     show-billing?)
             [:div.oc-menu-separator])
           ;; Admin settings
@@ -291,8 +293,7 @@
               [:div.oc-menu-item.digest-settings
                 "Admin settings"]])
           ;; Invite
-          (when (or show-invite-people?
-                    show-resend-verif?)
+          (when show-invite-menu-item?
             [:a
               {:href "#"
               :on-click #(if show-invite-people?
