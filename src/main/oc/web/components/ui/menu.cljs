@@ -174,10 +174,6 @@
         show-invite-people? (and current-org-slug
                                  is-admin-or-author?
                                  (team-actions/invite-user-link))
-        _ (js/console.log "DBG show-invite-people?" show-invite-people?)
-        _ (when-not show-invite-people? (js/console.log "DBG   current-org-slug" current-org-slug))
-        _ (when-not show-invite-people? (js/console.log "DBG   is-admin-or-author?" is-admin-or-author?))
-        _ (when-not show-invite-people? (js/console.log "DBG   invite-user-link" (team-actions/invite-user-link)))
         native-app-data (detect-native-app)
         web-app-version client-version
         build-version (when (seq ls/sentry-deploy) (str "build: " ls/sentry-deploy))
@@ -209,7 +205,10 @@
         download-csv-link (utils/link-for (:links org-data) "wrt-csv")
         show-download-csv? (and (not is-mobile?)
                                 download-csv-link
-                                (not (-> org-data :content-visibility :disallow-wrt-download)))]
+                                (not (-> org-data :content-visibility :disallow-wrt-download)))
+        show-invite-menu-item? (and show-invite-people?
+                                    (or show-invite-people?
+                                        show-resend-verif?))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (dom-utils/event-inside? % (rum/ref-node s :menu-container))
@@ -281,8 +280,7 @@
                 "Recurring updates"]])
           ;; Settings separator
           (when (or current-org-slug
-                    (or show-invite-people?
-                        show-resend-verif?)
+                    show-invite-menu-item?
                     show-billing?)
             [:div.oc-menu-separator])
           ;; Admin settings
@@ -295,8 +293,7 @@
               [:div.oc-menu-item.digest-settings
                 "Admin settings"]])
           ;; Invite
-          (when (or show-invite-people?
-                    show-resend-verif?)
+          (when show-invite-menu-item?
             [:a
               {:href "#"
               :on-click #(if show-invite-people?
