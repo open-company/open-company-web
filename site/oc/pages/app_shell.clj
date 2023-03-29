@@ -119,6 +119,11 @@
           ;; Stripe
           shared/stripe-js]
    :body [:body {:class "covid-banner"}
+          [:div.covid-banner
+            [:div.covid-banner-content
+              [:div.covid-banner-carrot-logo]
+              [:div.covid-banner-copy
+                "Unfortunately Carrot is shutting down service on April 14th, 2023."]]]
           [:div#app
            [:div.oc-loading.active
             [:div.oc-loading-inner

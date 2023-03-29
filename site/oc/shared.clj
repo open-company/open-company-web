@@ -606,17 +606,7 @@
   [:div.covid-banner
     [:div.covid-banner-content
       [:div.covid-banner-carrot-logo]
-      [:div.covid-banner-copy.mobile-only
-        "Given COVID-19, Carrot is now free."
-        (when-not (= page :pricing)
-          [:br])
-        (when-not (= page :pricing)
-          [:a
-            {:href "/pricing"}
-            "Learn more"])
-        (when-not (= page :pricing)
-          ".")]
-      [:div.covid-banner-copy.big-web-tablet-only
+      [:div.covid-banner-copy
         "Unfortunately Carrot is shutting down service on April 14th, 2023."]]])
 
 (defn head [page options]
