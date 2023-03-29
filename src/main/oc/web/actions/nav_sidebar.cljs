@@ -131,7 +131,7 @@
 (defn nav-to-container!
   ([e board-slug url]
    (nav-to-container! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) true))
-  
+
   ([e board-slug url refresh?]
    (nav-to-container! e board-slug url (or (dis/route-param :back-y) (utils/page-scroll-top)) refresh?))
 
@@ -369,24 +369,6 @@
 
 ;; Show premium picker
 
-(defn prompt-open-pricing [msg]
-  (let [alert-data {:action "mobile-prompt-open-pricing"
-                    :title "Try Premium"
-                    :message (or msg "This feature is available only to Premium accounts.")
-                    :solid-button-style :green
-                    :solid-button-title "Tell me more"
-                    :solid-button-cb #(let [pricing-url (str ls/web-server-domain oc-urls/pricing)]
-                                        (alert-modal/hide-alert)
-                                        (if ua/mobile-app?
-                                          (expo/open-in-browser pricing-url)
-                                          (.open js/window pricing-url "_blank")))
-                    :link-button-title "OK, got it"
-                    :link-button-cb #(alert-modal/hide-alert)}]
-    (alert-modal/show-alert alert-data)))
+(defn prompt-open-pricing [msg])
 
-(defn ^:export toggle-premium-picker! [& [msg]]
-  (when ls/payments-enabled
-    (if (or (responsive/is-mobile-size?)
-            ua/mobile-app?)
-      (prompt-open-pricing msg)
-      (dis/dispatch! [:toggle-premium-picker]))))
+(defn ^:export toggle-premium-picker! [& [msg]])

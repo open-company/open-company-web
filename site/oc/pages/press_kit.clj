@@ -135,6 +135,4 @@
             :target "_blank"}
            "Github"]]]]]]]
 
-    (shared/dashed-string 2)
-
-    shared/pricing-footer]])
+    (shared/dashed-string 2)]])

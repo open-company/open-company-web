@@ -9,7 +9,6 @@
             [oc.pages.app-shell :as app-shell]
             [oc.pages.index :as index]
             [oc.pages.press-kit :as press-kit]
-            [oc.pages.pricing :as pricing]
             [oc.pages.privacy :as privacy]
             [oc.pages.slack :as slack]
             [oc.pages.terms :as terms]))
@@ -23,17 +22,16 @@
 (def options {:contact-email contact-email
               :contact-mail-to contact-mail-to
               :oc-github oc-github
-              :anonymous-title anonymous-title
               :your-digest-title your-digest-title})
 
 (defn- body-wrapper [body page opts]
   [:body
-   {:class (when (env :covid-banner) "covid-banner")}
+   {:class "covid-banner"}
    shared/tag-manager-body
    [:div
     {:class "outer header"}
     shared/ph-banner
-    (when (env :covid-banner)
+    (when true
       (shared/covid-banner page))
     (shared/nav (name page) opts)
     (shared/mobile-menu (name page) opts)]
@@ -82,12 +80,6 @@
              :head shared/head
              :body (partial body-wrapper press-kit/press-kit)
              :title "Carrot | Press kit"
-             :target #{:dev :prod}}
-            {:page-name "pricing"
-             :page :pricing
-             :head shared/head
-             :body (partial body-wrapper pricing/pricing)
-             :title "Carrot | Pricing"
              :target #{:dev :prod}}
             {:page-name "privacy"
              :page :privacy

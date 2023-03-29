@@ -259,9 +259,6 @@
         "per user"
         [:br]
         "per month"]]
-      [:a.pricing-column-right-link
-        {:href "/sign-up"}
-        "Try for free"]
       [:div.pricing-column-row
         "Unlimited users"]
       [:div.pricing-column-row
@@ -368,18 +365,6 @@
       {:class "intercom-chat-link"
        :href "mailto:hello@carrot.io"}
       "Let's chat"]])
-
-(def pricing-footer
-  [:section.pricing-footer
-
-    [:h1.pricing-headline
-      pricing-headline]
-
-    pricing-table
-    
-    ; pricing-table-footer
-
-    pricing-chat])
 
 (def testimonials-section-old
   [:section.testimonials-section-old.big-web-tablet-only
@@ -632,15 +617,7 @@
         (when-not (= page :pricing)
           ".")]
       [:div.covid-banner-copy.big-web-tablet-only
-        "Given the COVID-19 crisis, Carrot is free for unlimited users until further notice. "
-        (when-not (= page :pricing)
-          [:a
-            {:href "/pricing"}
-            "Learn more"])
-        (when-not (= page :pricing)
-          ".")]]
-    [:button.mlb-reset.covid-banner-close-button
-      {:onclick "OCStaticHideCovidBanner();"}]])
+        "Unfortunately Carrot is shutting down service on April 14th, 2023."]]])
 
 (defn head [page options]
   [:head
@@ -696,25 +673,11 @@
         [:a
           {:href "/?no_redirect=1"
            :class (when (= active-page "index") "active")}
-          "Home"]]
-      [:div.site-mobile-menu-item
-        [:a
-          {:href "/pricing"
-           :class (when (= active-page "pricing") "active")}
-          "Pricing"]]
-      [:div.site-mobile-menu-item
-        [:a
-          {:href "/apps/detect"}
-          "Get the mobile app"]]]
+          "Home"]]]
     [:div.site-mobile-menu-footer
       [:a.login.not-your-digest
         {:href "/login"}
-        "Login"]
-      [:a.signup.anonymous-after.your-digest-after
-        {:href "/sign-up"
-         :data-your-digest-title (:your-digest-title options)
-         :data-anonymous-title (:anonymous-title options)}
-       "Sign Up"]]])
+        "Login"]]])
 
 (def apps-menu
   [:div.apps-dropdown-menu
@@ -749,46 +712,14 @@
         [:div.site-navbar-left
           [:a.navbar-brand
             {:href "/?no_redirect=1"}]]
-        [:div.site-navbar-center
-          [:div.site-navbar-links
-            [:a
-              {:href "/?no_redirect=1"
-              :class (when (= active-page "index") "active")}
-              "Home"]
-            [:div.apps-container
-              [:button.mlb-reset.apps-bt
-                {:class (when (= active-page "about") "active")}
-                "Apps"]
-              apps-menu]
-            [:a
-              {:href "/pricing"
-              :class (when (= active-page "pricing") "active")}
-              "Pricing"]]]
         (cond
           is-slack-page?
-          [:div.site-navbar-right
-            [:a.signup.anonymous-after.your-digest-after
-              {:href (env :slack-signup-url)
-               :data-anonymous-title "Add to Slack"
-               :data-your-digest-title your-digest-title}
-              "Add to Slack"]]
-          is-slack-lander?
-          [:div.site-navbar-right
-            [:a.signup.anonymous-after.your-digest-after
-              {:href (env :slack-signup-url)
-               :data-your-digest-title your-digest-title
-               :data-anonymous-title "Continue with Slack"}
-              "Continue with Slack"]]
+          [:div.site-navbar-right]
           :else
           [:div.site-navbar-right
-            [:a.login.not-your-digest
+             [:a.login.not-your-digest
               {:href "/login"}
-              "Login"]
-            [:a.signup.anonymous-after.your-digest-after
-             {:href "/sign-up"
-              :data-your-digest-title your-digest-title
-              :data-anonymous-title anonymous-title}
-             "Sign Up"]])]
+              "Login"]])]
 
       ;; Mobile and tablet
       [:div.site-navbar-container.tablet-mobile-only.anonymous
@@ -816,21 +747,13 @@
   "Static hiccup for the site footer."
   [options]
   [:footer.navbar.navbar-default.navbar-bottom
-    [:section.try-carrot-footer
-      [:h2 "Ready to stay focused with less noise?"]
-      [:a.get-started-button.get-started-action
-       {:href "/sign-up"}
-       "Try Carrot for free"]]
     [:div.container-fluid.group
       [:div.right-column.group
 
         [:div.column.column-company
           [:div.column-title
             "Product"]
-          [:div.column-item [:a {:href "/pricing"} "Pricing"]]
-          [:div.column-item [:a {:href (env :whats-new-url) :target "_blank"} "What’s new"]]
-          [:div.column-item [:a {:href (:oc-github options) :target "_blank"} "GitHub"]]
-          [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
+          [:div.column-item [:a {:href (:oc-github options) :target "_blank"} "GitHub"]]]
 
         [:div.column.column-resources
           [:div.column-title
@@ -852,9 +775,7 @@
         [:img.logo
           {:src (cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-small-links.static
-          [:a {:href "/login"} "Login"]
-          "or"
-          [:a {:href "/sign-up"} "create your team"]]
+          [:a {:href "/login"} "Login"]]
         [:div.tos-and-pp
           [:a {:href "/privacy"}
            "Privacy"]

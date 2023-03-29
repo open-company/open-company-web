@@ -178,15 +178,7 @@
                :disabled (or (not (seq (:email login-with-email)))
                              (not (seq (:pswd login-with-email))))}
               "Sign In"]]]
-        ;; Link to signup
-        [:div.footer-link
-          "Don't have an account yet?"
-          [:a
-            {:href oc-urls/sign-up
-             :on-click (fn [e]
-                         (utils/event-stop e)
-                         (router/nav! oc-urls/sign-up))}
-            "Sign up here"]]]]))
+        ]]))
 
 (rum/defcs password-reset < rum/reactive
                             dont-scroll

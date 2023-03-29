@@ -44,9 +44,7 @@
         shared/contact-link-centred
      ]
 
-    (shared/testimonials-section :slack)
-
-    shared/pricing-footer]])
+    (shared/testimonials-section :slack)]])
 
 (defn slack-lander
   "Slack lander page. This is a copy of oc.web.components.slack-lander and

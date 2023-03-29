@@ -54,8 +54,6 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.js"}]
           ;; Intercom (Support)
           (shared/intercom-js)
-          ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Stripe
           shared/stripe-js]
    :body [:body
@@ -120,7 +118,7 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Stripe
           shared/stripe-js]
-   :body [:body
+   :body [:body {:class "covid-banner"}
           [:div#app
            [:div.oc-loading.active
             [:div.oc-loading-inner
@@ -140,8 +138,6 @@
           [:script {:type "text/javascript" :src (shared/cdn "/lib/autotrack/google-analytics.js")}]
           ;; Intercom (Support)
           (shared/intercom-js)
-          ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN
           (shared/oc-js)
           ;; Compiled assets

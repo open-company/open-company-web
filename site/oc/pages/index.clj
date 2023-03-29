@@ -12,13 +12,6 @@
         [:div.subheadline
          "Keep your team focused on what matters with more effective internal communication."]
 
-        [:div.get-started-button-container.group
-          [:a.get-started-button.get-started-action
-            {:href "/sign-up"}
-            "Try Carrot for free"]
-          [:span.get-started-subtitle
-            "Carrot is open source."]]
-
         [:div.main-animation-container
           [:img.main-animation.big-web-tablet-only
             {:src (shared/cdn "/img/ML/homepage_screenshot.png")
@@ -47,4 +40,4 @@
       ;;                 (shared/cdn "/img/ML/homepage_screenshot@2x.png") " 2x, "
       ;;                 (shared/cdn "/img/ML/homepage_screenshot@3x.png") " 3x")}]]]
 
-    shared/pricing-footer]])
+    ]])

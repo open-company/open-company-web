@@ -61,8 +61,6 @@
 
 (def logout "/logout")
 
-(def pricing "/pricing")
-
 (def terms "/terms")
 
 (def privacy "/privacy")

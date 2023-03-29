@@ -73,11 +73,7 @@
         "Web app"]
        [:img.pricing-apps-app-screenshot
         {:src (shared/cdn "/img/ML/pricing_apps_signup.png")
-         :srcSet (str (shared/cdn "/img/ML/pricing_apps_signup@2x.png") " 2x")}]
-       [:div.pricing-apps-app-links
-        [:a
-         {:href "/sign-up"}
-         "Try Carrot for free"]]]
+         :srcSet (str (shared/cdn "/img/ML/pricing_apps_signup@2x.png") " 2x")}]]
       [:div.pricing-apps-separator]
       [:div.pricing-apps-app-block
        [:div.pricing-apps-app-header
@@ -166,5 +162,5 @@
     (shared/dashed-string 4)
 
     shared/testimonials-section-old
-    
+
     (shared/dashed-string 5 "big-web-tablet-only")]])

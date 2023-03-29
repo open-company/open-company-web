@@ -184,10 +184,7 @@
         long-app-version (str short-app-version (when (seq build-version) (str " (" build-version ")")))
         env-endpoint (when (not= ls/sentry-env "production")
                        (str "Endpoint: " ls/web-server))
-        show-billing? (and (not is-mobile?)
-                           (or (:can-manage-subscription? payments-data)
-                               (:can-create-subscription? payments-data))
-                           current-org-slug)
+        show-billing? false
         manage-sub? (:can-manage-subscription? payments-data)
         billing-label (when show-billing?
                         (if manage-sub?
@@ -320,42 +317,6 @@
               :on-click #(integrations-click s %)}
               [:div.oc-menu-item.team-integrations
                 "Integrations"]])
-          (when show-download-csv?
-            (if (:premium? org-data)
-              [:a.download-wrt
-               {:href (:href download-csv-link)
-                :on-click (if (pos? (:wrt-posts-count org-data))
-                            #(menu-close s)
-                            (fn [e]
-                              (dom-utils/prevent-default! e)
-                              (wu/empty-analytics-alert)))
-                :target "_blank"
-                :data-toggle (when-not is-mobile?
-                               "tooltip")
-                :data-container "body"
-                :data-placement "top"
-                :title (str "Download analytics for the past " ls/default-csv-days " days in excel-compatible format")}
-               [:div.oc-menu-item
-                "Analytics"]]
-              [:a.download-wrt
-               {:href oc-urls/pricing
-                :on-click billing-click
-                :target "_blank"
-                :data-toggle (when-not is-mobile?
-                               "tooltip")
-                :data-container "body"
-                :data-placement "top"
-                :title (str wu/premium-download-csv-tooltip " Click for details")}
-               [:div.oc-menu-item
-                "Analytics"]]))
-          ;; Billing
-          (when show-billing?
-            [:a.payments
-              {:href "#"
-               :class (when-not manage-sub? "try-premium")
-               :on-click billing-click}
-              [:div.oc-menu-item
-                billing-label]])
           ;; What's new & Support separator
           (when-not is-mobile?
             [:div.oc-menu-separator])
@@ -365,14 +326,6 @@
             :target "_blank"}
            [:div.oc-menu-item.share-feedback
             "Share feedback"]]
-          ;; What's new
-          [:a.whats-new-link
-            {:href oc-urls/what-s-new
-             :target "_blank"
-             :on-click (when-not is-mobile?
-                         (partial whats-new-click s))}
-            [:div.oc-menu-item.whats-new
-              "What’s new"]]
           ;; Support
           [:a
             {:class "intercom-chat-link"
@@ -386,13 +339,6 @@
                          (sentry/show-report-dialog))}
             [:div.oc-menu-item.support
               "Report a problem"]]
-          ;; Desktop app
-          (when native-app-data
-            [:a
-              {:href (:href native-app-data)
-              :target "_blank"}
-              [:div.oc-menu-item.native-app
-                (:title native-app-data)]])
           ;; Logout separator
           [:div.oc-menu-separator]
           ;; Logout

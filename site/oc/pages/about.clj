@@ -104,7 +104,5 @@
            :target "_blank"}
           "Build with us on GitHub"]]]]]]
 
-    (shared/dashed-string 1)
-
-    shared/pricing-footer] ;<!-- main -->
+    (shared/dashed-string 1)] ;<!-- main -->
    ])

@@ -73,10 +73,10 @@
             "Log in"]]]
         [:div.login-wall-wrapper
           [:div.login-wall-internal
-            
+
             [:div.login-wall-content
               [:div.login-overlay-cta.group
-                
+
                 [:div.login-title "Log in"]]
               (when (seq (or desc default-desc))
                 [:div.login-description (or desc default-desc)])
@@ -161,11 +161,4 @@
                      :on-click login-action}
                     "Log in"]]]]]]
           [:div.footer-link
-            "Don't have an account yet?"
-            [:div.footer-link-inner
-              [:a
-                {:href oc-urls/sign-up
-                 :on-click (fn [e]
-                             (utils/event-stop e)
-                             (router/nav! oc-urls/sign-up))}
-                "Sign up here"]]]])))
+            [:div.footer-link-inner]]])))
