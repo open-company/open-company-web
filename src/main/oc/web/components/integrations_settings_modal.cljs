@@ -49,7 +49,7 @@
             {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
         [:div.integrations-settings-body
-          (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
+          (when false
             [:button.btn-reset.add-slack-team-bt
               {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
               [:div.slack-icon]
